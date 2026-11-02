@@ -1,0 +1,7 @@
+includes/config.local.php
+data/archivos/*
+!data/archivos/.htaccess
+data/logs/*
+!data/logs/.htaccess
+scratch/
+*.log

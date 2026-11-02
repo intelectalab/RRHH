@@ -1,0 +1,108 @@
+AyniHR — Sistema de Recursos Humanos
+=====================================
+Versión 1.0 | PHP 8.3+ | MySQL 8 / MariaDB 10.6+ | Bootstrap 5
+
+
+INSTALACIÓN PASO A PASO
+────────────────────────
+
+1. REQUISITOS
+   - PHP 8.2 o superior con extensiones: pdo_mysql, gd, openssl, mbstring, fileinfo
+   - MySQL 8.0+ o MariaDB 10.6+
+   - Apache con mod_rewrite habilitado (XAMPP lo incluye)
+
+2. BASE DE DATOS
+   a) Cree la base de datos (UTF-8 / utf8mb4):
+      CREATE DATABASE aynihr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+   b) Importe el esquema y los datos iniciales desde phpMyAdmin
+      o con el cliente MySQL:
+      mysql -u root -p aynihr < includes/sql/esquema.sql
+      mysql -u root -p aynihr < includes/sql/datos_iniciales.sql
+
+3. CONFIGURACIÓN LOCAL
+   a) Copie el archivo de ejemplo:
+      copy includes\config.local.example.php includes\config.local.php
+
+   b) Edite includes\config.local.php con las credenciales reales:
+      define('DB_HOST',    'localhost');
+      define('DB_NOMBRE',  'aynihr');
+      define('DB_USUARIO', 'su_usuario');
+      define('DB_CLAVE',   'su_contraseña');
+
+   c) Cambie APP_CLAVE por una cadena larga y aleatoria (mínimo 32 caracteres).
+      Esta clave cifra los datos bancarios (cuenta y CUSPP).
+      ¡Guárdela en lugar seguro! Si la pierde, los datos cifrados no se podrán recuperar.
+      NUNCA use la clave de ejemplo en producción.
+
+   d) Si desea envío de correos, configure las variables SMTP_*:
+      define('SMTP_HOST',     'smtp.ejemplo.com');
+      define('SMTP_PUERTO',   587);
+      define('SMTP_USUARIO',  'correo@ejemplo.com');
+      define('SMTP_CLAVE',    'clave_smtp');
+      define('SMTP_REMITE',   'correo@ejemplo.com');
+      define('SMTP_NOMBRE',   'AyniHR');
+      Si SMTP_HOST está vacío, el sistema no envía correos (solo notificaciones internas).
+
+4. CARPETAS CON PERMISOS DE ESCRITURA
+   El servidor web debe poder escribir en:
+   - data/archivos/   (documentos adjuntos)
+   - data/logs/       (registro de errores PHP)
+   - assets/img/personas/  (fotos de colaboradores)
+
+   En Linux:  chmod -R 775 data/ assets/img/personas/
+   En Windows (XAMPP): ya tiene acceso por defecto.
+
+5. PRIMER INGRESO
+   - Usuario: admin
+   - Contraseña inicial: Ayni2024* (debe cambiarla obligatoriamente al primer ingreso)
+   - El sistema pedirá una nueva contraseña de al menos 10 caracteres con letras y números.
+
+   IMPORTANTE: El usuario «admin» no tiene un colaborador vinculado.
+   No lo use para el trabajo diario; cree usuarios para cada persona del área de RR.HH.
+
+6. CONFIGURACIÓN INICIAL RECOMENDADA
+   En el siguiente orden:
+   a) Configuración › Parámetros: revise días de vacaciones, aviso de contratos y feriados.
+   b) Organización: registre la empresa, sus sedes, áreas, puestos y horarios.
+   c) Personal: registre o importe a los colaboradores.
+   d) Configuración › Usuarios: cree un usuario de RR.HH. y uno por cada jefe de área.
+
+
+TAREA PROGRAMADA DIARIA
+────────────────────────
+El archivo includes/tareas/diario.php detecta contratos por vencer y vacaciones acumuladas
+sin gozar, y envía notificaciones dentro del sistema (y por correo si SMTP está configurado).
+
+Windows (Task Scheduler):
+  Acción:    Iniciar un programa
+  Programa:  C:\xampp\php\php.exe
+  Argumentos: C:\xampp\htdocs\aynihr\includes\tareas\diario.php
+  Desencadenador: Diario a las 06:00
+
+Linux (cron):
+  0 6 * * * /usr/bin/php /var/www/aynihr/includes/tareas/diario.php >> /var/log/aynihr_diario.log 2>&1
+
+
+COPIAS DE SEGURIDAD
+────────────────────
+Haga respaldos diarios de:
+  1. La base de datos MySQL:
+     mysqldump -u usuario -p aynihr > aynihr_AAAA-MM-DD.sql
+  2. La carpeta data/archivos/ (documentos subidos por los usuarios)
+  3. La carpeta assets/img/personas/ (fotos de los colaboradores)
+  4. El archivo includes/config.local.php (credenciales y clave de cifrado)
+
+
+SEGURIDAD EN PRODUCCIÓN
+─────────────────────────
+- Nunca exponga data/ directamente; los archivos .htaccess lo protegen.
+- Use HTTPS. Con conexión segura, la cookie de sesión se marca automáticamente como Secure.
+- El archivo config.local.php contiene contraseñas: deje fuera del control de versiones.
+- El log de errores PHP se guarda en data/logs/php_error.log (protegido por .htaccess).
+- Después de cada actualización, revise la auditoría para detectar accesos no autorizados.
+
+
+SOPORTE
+────────
+soporte@aynihr.pe · lunes a viernes de 9:00 a 18:00 (hora Lima)

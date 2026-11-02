@@ -1,0 +1,4 @@
+# Denegar acceso directo a los archivos adjuntos
+# Las descargas se gestionan únicamente a través de index.php?descargar=<id>
+Require all denied
+
