@@ -1,0 +1,437 @@
+{
+  "nota": "Módulos comerciales: lo que una organización contrata (claves de docs/01-vision-y-fases.md §4). «requiere» son dependencias obligatorias; «recomienda» son módulos que enriquecen al módulo pero no lo bloquean. La consola SaaS (SAS) no es un módulo contratable. La épica PAI (paquetes de país) no figura en ese documento: sus tablas y permisos se tratan como parte de «base»; confirmar.",
+  "modulos": [
+    {
+      "codigo": "base",
+      "nombre": "Plataforma base",
+      "fase": 0,
+      "base": true,
+      "epicas": [
+        "PLT",
+        "TEN",
+        "SEG",
+        "AUD",
+        "UI",
+        "WFL",
+        "NOT",
+        "CFG"
+      ],
+      "requiere": [],
+      "recomienda": [],
+      "descripcion": "Cimientos: multiempresa, identidad, permisos, auditoría, aprobaciones, notificaciones y configuración."
+    },
+    {
+      "codigo": "core",
+      "nombre": "Core HR",
+      "fase": 1,
+      "base": true,
+      "epicas": [
+        "ORG",
+        "POS",
+        "COL",
+        "HIS",
+        "CON",
+        "DOC",
+        "ESS",
+        "MSS",
+        "IMP"
+      ],
+      "requiere": [
+        "base"
+      ],
+      "recomienda": [],
+      "descripcion": "Estructura, posiciones, colaboradores y ficha 360, historia con vigencia, contratos, documentos y firma, portales e importador."
+    },
+    {
+      "codigo": "attendance",
+      "nombre": "Asistencia y turnos",
+      "fase": 2,
+      "base": false,
+      "epicas": [
+        "ASI",
+        "TUR",
+        "BHO"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ASI, TUR, BHO."
+    },
+    {
+      "codigo": "time_off",
+      "nombre": "Vacaciones y ausencias",
+      "fase": 2,
+      "base": false,
+      "epicas": [
+        "VAC",
+        "AUS"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: VAC, AUS."
+    },
+    {
+      "codigo": "timesheets",
+      "nombre": "Hojas de tiempo",
+      "fase": 2,
+      "base": false,
+      "epicas": [
+        "TSH"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: TSH."
+    },
+    {
+      "codigo": "payroll",
+      "nombre": "Nómina Perú",
+      "fase": 3,
+      "base": false,
+      "epicas": [
+        "NOM",
+        "CPT",
+        "PAR",
+        "PER",
+        "BOL",
+        "BSO",
+        "DEC",
+        "PRV",
+        "LIQ"
+      ],
+      "requiere": [
+        "core",
+        "time_off"
+      ],
+      "recomienda": [
+        "attendance"
+      ],
+      "descripcion": "Épicas: NOM, CPT, PAR, PER, BOL, BSO, DEC, PRV, LIQ."
+    },
+    {
+      "codigo": "advances",
+      "nombre": "Préstamos y adelanto de sueldo",
+      "fase": 3,
+      "base": false,
+      "epicas": [
+        "PRE"
+      ],
+      "requiere": [
+        "payroll"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: PRE."
+    },
+    {
+      "codigo": "contractors",
+      "nombre": "Locadores",
+      "fase": 3,
+      "base": false,
+      "epicas": [
+        "LOC"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: LOC."
+    },
+    {
+      "codigo": "recruiting",
+      "nombre": "Reclutamiento",
+      "fase": 4,
+      "base": false,
+      "epicas": [
+        "ATS",
+        "ENT"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ATS, ENT."
+    },
+    {
+      "codigo": "onboarding",
+      "nombre": "Onboarding y offboarding",
+      "fase": 4,
+      "base": false,
+      "epicas": [
+        "ONB",
+        "OFF"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ONB, OFF."
+    },
+    {
+      "codigo": "performance",
+      "nombre": "Desempeño y objetivos",
+      "fase": 4,
+      "base": false,
+      "epicas": [
+        "DES",
+        "OKR",
+        "CMP",
+        "FBK"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: DES, OKR, CMP, FBK."
+    },
+    {
+      "codigo": "learning",
+      "nombre": "Aprendizaje",
+      "fase": 5,
+      "base": false,
+      "epicas": [
+        "LMS"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: LMS."
+    },
+    {
+      "codigo": "careers",
+      "nombre": "Carrera y sucesión",
+      "fase": 5,
+      "base": false,
+      "epicas": [
+        "CAR"
+      ],
+      "requiere": [
+        "performance"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: CAR."
+    },
+    {
+      "codigo": "compensation",
+      "nombre": "Compensaciones",
+      "fase": 5,
+      "base": false,
+      "epicas": [
+        "COM"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: COM."
+    },
+    {
+      "codigo": "benefits",
+      "nombre": "Beneficios",
+      "fase": 5,
+      "base": false,
+      "epicas": [
+        "BNF"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: BNF."
+    },
+    {
+      "codigo": "engagement",
+      "nombre": "Clima y encuestas",
+      "fase": 6,
+      "base": false,
+      "epicas": [
+        "ENC",
+        "REC",
+        "CIN"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ENC, REC, CIN."
+    },
+    {
+      "codigo": "helpdesk",
+      "nombre": "Mesa de ayuda",
+      "fase": 6,
+      "base": false,
+      "epicas": [
+        "HSD"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: HSD."
+    },
+    {
+      "codigo": "sst",
+      "nombre": "Seguridad y salud",
+      "fase": 7,
+      "base": false,
+      "epicas": [
+        "SST"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: SST."
+    },
+    {
+      "codigo": "grievances",
+      "nombre": "Denuncias",
+      "fase": 7,
+      "base": false,
+      "epicas": [
+        "DEN",
+        "DIS"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: DEN, DIS."
+    },
+    {
+      "codigo": "assets",
+      "nombre": "Activos y EPP",
+      "fase": 7,
+      "base": false,
+      "epicas": [
+        "ACT"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ACT."
+    },
+    {
+      "codigo": "expenses",
+      "nombre": "Gastos y viáticos",
+      "fase": 7,
+      "base": false,
+      "epicas": [
+        "GAS"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: GAS."
+    },
+    {
+      "codigo": "compliance",
+      "nombre": "Cumplimiento Perú",
+      "fase": 7,
+      "base": false,
+      "epicas": [
+        "CUM",
+        "PRI",
+        "SIN"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: CUM, PRI, SIN."
+    },
+    {
+      "codigo": "analytics",
+      "nombre": "Analítica y reportes",
+      "fase": 8,
+      "base": false,
+      "epicas": [
+        "ANA",
+        "RPT",
+        "ALE"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: ANA, RPT, ALE."
+    },
+    {
+      "codigo": "ai",
+      "nombre": "Asistente de IA",
+      "fase": 8,
+      "base": false,
+      "epicas": [
+        "IAR"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: IAR."
+    },
+    {
+      "codigo": "integrations",
+      "nombre": "API e integraciones",
+      "fase": 9,
+      "base": false,
+      "epicas": [
+        "API",
+        "INT"
+      ],
+      "requiere": [
+        "base"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: API, INT."
+    },
+    {
+      "codigo": "whatsapp",
+      "nombre": "WhatsApp",
+      "fase": 9,
+      "base": false,
+      "epicas": [
+        "WHA"
+      ],
+      "requiere": [
+        "core"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: WHA."
+    },
+    {
+      "codigo": "white_label",
+      "nombre": "Marca blanca",
+      "fase": 9,
+      "base": false,
+      "epicas": [
+        "WLB"
+      ],
+      "requiere": [
+        "base"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: WLB."
+    },
+    {
+      "codigo": "partner",
+      "nombre": "Estudio contable",
+      "fase": 9,
+      "base": false,
+      "epicas": [
+        "EST"
+      ],
+      "requiere": [
+        "payroll"
+      ],
+      "recomienda": [],
+      "descripcion": "Épicas: EST."
+    }
+  ]
+}

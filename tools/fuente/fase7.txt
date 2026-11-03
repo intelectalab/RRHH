@@ -1,0 +1,406 @@
+# SST | 7 | sst | Seguridad y salud en el trabajo | Backend + Frontend | Accidentes, riesgos, inspecciones, salud ocupacional, comité y registros obligatorios.
+
+@ 1 | H | BF | Accidentes, incidentes y enfermedades ocupacionales
+D Registrar accidentes de trabajo, incidentes peligrosos, incidentes y enfermedades ocupacionales con los datos del formato referencial, investigación, causas y días de descanso. Los plazos de notificación a la autoridad son parámetros y generan alerta.
+- El registro contiene los campos de los formatos de la RM 050-2013-TR
+- Un accidente abre su investigación con responsable
+- El reporte desde el móvil admite fotos
+R 06; 05; 04; 14; §57; ME-35; RN-SST-01 a RN-SST-12; P SST → Accidentes e incidentes
+X COL-3, PLT-7
+
+@ 2 | H | BF | Matriz de riesgos IPERC
+D Gestionar la identificación de peligros, evaluación de riesgos y controles por puesto, sede y actividad, con nivel de riesgo calculado y versiones. La matriz se relaciona con los puestos y con el EPP requerido.
+- El nivel de riesgo se calcula con la metodología configurada
+- La matriz se versiona y conserva las anteriores
+R 06; 14; §57; RN-SST-01 a RN-SST-12; P SST → Matriz IPERC
+X ORG-2, ORG-5
+
+@ 3 | H | BF | Inspecciones y observaciones
+D Programar y ejecutar inspecciones con listas de verificación desde el móvil, registrar observaciones con foto y generar hallazgos. Las listas de verificación son plantillas configurables por tipo de inspección.
+- Una inspección se completa sin conexión y se sincroniza después
+- Cada hallazgo queda vinculado a su inspección
+R 06; 14; §57; RN-SST-01 a RN-SST-12; P SST → Registros obligatorios
+X SST-2, UI-9
+
+@ 4 | H | BF | Medidas correctivas
+D Dar seguimiento a las medidas correctivas y preventivas originadas en accidentes, inspecciones y auditorías, con responsable, plazo, evidencia de cierre y verificación de eficacia. Las medidas usan el motor de tareas.
+- Una medida no se cierra sin evidencia
+- Las medidas vencidas se escalan
+R 06; 05; §57; §77; ME-36; RN-SST-01 a RN-SST-12
+X SST-1, SST-3, WFL-8
+
+@ 5 | H | BF | Exámenes médicos ocupacionales
+D Programar exámenes de ingreso, periódicos y de retiro según el protocolo por puesto, y registrar la aptitud y sus restricciones. El detalle clínico no se almacena salvo configuración expresa y con permiso propio.
+- RRHH ve solo la aptitud y las restricciones; el detalle es dato sensible del médico ocupacional
+- Los exámenes por vencer se listan por sede
+- Cada consulta del resultado queda registrada
+R 06; 14; 07; §57; §105; RN-SST-01 a RN-SST-12; P SST → Registros obligatorios
+X SST-2, SEG-11
+
+@ 6 | H | BF | Capacitaciones y simulacros de SST
+D Planificar las capacitaciones obligatorias y los simulacros, registrar asistencia y evaluar, apoyándose en el módulo de aprendizaje cuando está activo. El plan anual de SST se registra con su cumplimiento.
+- El registro muestra las capacitaciones del año por trabajador
+- Quien no completó una capacitación obligatoria aparece en una lista con su jefe
+R 06; 14; §57; §68; RN-SST-01 a RN-SST-12; P SST → Registros obligatorios
+X SST-1, LMS-5
+
+@ 7 | H | BF | Comité o supervisor de SST
+D Registrar el comité (con 20 o más trabajadores) o el supervisor (con menos), sus miembros con paridad entre empleador y trabajadores, el mandato y las vacancias. Los umbrales se leen de parámetros con vigencia; el proceso electoral y las sesiones tienen historias propias.
+- El sistema indica si corresponde comité o supervisor según la dotación y el parámetro vigente, con comparación mayor o igual
+- Los acuerdos del acta generan tareas con seguimiento
+R 06; 14; §57; RN-SST-01 a RN-SST-12
+X ORG-1, WFL-8
+
+@ 8 | T | B | Registros obligatorios y plazos de conservación
+D Generar los registros obligatorios de SST (accidentes, enfermedades, exámenes, monitoreo, inspecciones, estadísticas, equipos de seguridad, capacitaciones y simulacros, auditorías) en su formato, incluida la versión simplificada para MYPE, con el plazo de conservación de cada uno como política de retención. Los registros se arman con los datos operativos del módulo, sin doble digitación.
+- Cada registro se exporta en su formato por periodo
+- El plazo de conservación de cada registro es un parámetro y bloquea su eliminación
+R 06; 14; §57; §91; RN-SST-01 a RN-SST-12
+X SST-1, SST-3, SST-5, SST-6
+
+@ 9 | H | BF | Tablero y estadísticas de SST
+D Mostrar el tablero de SST con índices de frecuencia, gravedad y accidentabilidad, días sin accidentes, medidas pendientes y vencimientos de documentos del sistema de gestión. Los índices se calculan por sede y por periodo.
+- Los índices se calculan con las horas trabajadas reales
+- Los documentos y vencimientos de SST se ven en una sola lista
+R 06; §57; RN-SST-01 a RN-SST-12; P SST → Tablero SST
+X SST-4, SST-8
+
+@ 10 | H | BF | Proceso electoral del comité de SST
+D Conducir la elección de los representantes de los trabajadores: comunicación, convocatoria por el sindicato mayoritario o el empleador, junta electoral, inscripción y publicación de candidatos, votación secreta presencial o electrónica, escrutinio, proclamación e instalación. El plazo de cada etapa es un parámetro con vigencia.
+- El voto guarda quién votó y el contador por candidato, sin vínculo entre ambos
+- Un integrante de la junta no puede ser candidato
+- Cada etapa deja un asiento en el libro inalterable
+R 06; 05; 14; 18; ME-46; §57; RN-SST-01 a RN-SST-20
+X SST-7, CUM-8
+
+@ 11 | H | BF | Sesiones, quórum y libro de actas
+D Programar una sesión ordinaria por mes, registrar asistencia y quórum, reprogramar cuando no lo hay, redactar el acta con acuerdos y firmarla; el acta firmada se asienta en el libro inalterable con su huella. Controla vacancia por inasistencias y licencias de los representantes.
+- Sin quórum se crea la sesión reprogramada dentro del plazo del parámetro
+- Un acta firmada no se edita; su huella queda en el libro
+- El mes que cierra sin sesión ordinaria deja la obligación en incumplimiento con explicación
+R 06; 05; 14; 18; ME-47; §57; RN-SST-01 a RN-SST-20
+X SST-7, CUM-8, DOC-6
+
+# DEN | 7 | denuncias | Canal de denuncias y hostigamiento | Backend + Frontend | Canal confidencial independiente, anonimato real, investigación restringida y procedimiento de hostigamiento sexual.
+
+@ 1 | H | BF | Canal público de denuncias
+D Publicar el canal de denuncias en una dirección independiente, accesible sin iniciar sesión, con categorías, relato, personas involucradas y adjuntos. La denuncia puede ser identificada o anónima.
+- El canal se usa sin cuenta y desde cualquier dispositivo
+- Los adjuntos se limpian de metadatos antes de guardarse
+R 06; 04; §58; RN-DEN-01 a RN-DEN-13; P Cumplimiento → Canal de denuncias
+X PLT-7, TEN-1
+
+@ 2 | T | B | Anonimato sin rastro técnico
+D En denuncias anónimas no registrar usuario, IP, dispositivo ni identificadores en logs técnicos, auditoría o analítica. La trazabilidad del caso se lleva sobre el caso, no sobre el denunciante.
+- Una prueba verifica que una denuncia anónima no deja IP ni usuario en ningún almacén
+- La auditoría del caso registra las acciones de los investigadores
+R 06; 02; C-06; §58; RN-DEN-01 a RN-DEN-13
+X DEN-1, PLT-10
+
+@ 3 | H | BF | Código de seguimiento y comunicación con el denunciante
+D Entregar al denunciante un código seguro con el que consulta el estado, responde preguntas del investigador y agrega evidencia, sin identificarse. El código se muestra una sola vez al enviar la denuncia.
+- El código no se puede recuperar ni deducir
+- El denunciante y el investigador intercambian mensajes por el caso
+R 06; §58; RN-DEN-01 a RN-DEN-13
+X DEN-2
+
+@ 4 | H | BF | Gestión del caso
+D Gestionar cada denuncia con estados (recibida, en evaluación, en investigación, resuelta, archivada), clasificación, bitácora de actuaciones, evidencias y resolución. Las denuncias identificadas protegen la identidad del denunciante frente a los denunciados.
+- Cada cambio de estado tiene responsable y fecha
+- La resolución registra medidas y comunicación a las partes
+R 06; 05; §58; ME-37; RN-DEN-01 a RN-DEN-13; P Cumplimiento → Casos de denuncia
+X DEN-3, PLT-8
+
+@ 5 | H | BF | Investigadores y acceso restringido
+D Limitar el acceso a cada caso a los investigadores asignados, excluir a cualquier persona mencionada en la denuncia y dejar fuera a administradores, soporte y búsqueda global. La asignación la hace un responsable del canal con permiso propio.
+- Un administrador de la empresa no ve los casos si no es investigador asignado
+- Una persona involucrada en el caso no puede ser asignada ni verlo
+- Todo acceso al caso queda registrado
+R 06; 07; §58; §105; RN-DEN-01 a RN-DEN-13
+X DEN-4, SEG-11
+
+@ 6 | H | BF | Procedimiento de hostigamiento sexual
+D Implementar el procedimiento de la Ley 27942 y su reglamento (docs/18 §5.2): recepción, atención médica y psicológica (1 día hábil), traslado al comité de intervención o al delegado (1 día hábil), medidas de protección (3 días hábiles), informe del comité (15 días calendario) y decisión (10 días calendario), con cada plazo como parámetro y alertas de vencimiento. No existe un plazo total configurable. Los plazos se computan por día: una denuncia no guarda hora.
+- El caso muestra la etapa actual y el plazo restante de cada hito
+- Las medidas de protección se registran con su fecha de otorgamiento y de ejecución
+- Los plazos se leen de parámetros con vigencia y distinguen días hábiles de calendario
+- Un miembro mencionado en la queja es reemplazado antes del traslado
+R 06; 14; 18; 05; E-15; ME-48; RN-DEN-01 a RN-DEN-13
+X DEN-5, CFG-3
+
+@ 7 | H | BF | Comité de intervención y capacitación obligatoria
+D Registrar el comité de intervención o el delegado según la dotación, su conformación y vigencia, y controlar la capacitación de prevención al ingreso y anual. La capacitación se apoya en el módulo de aprendizaje cuando está activo.
+- El sistema indica si corresponde comité o delegado según el parámetro vigente
+- Se lista quién no tiene la capacitación de prevención al día
+R 06; 14; E-15; RN-DEN-01 a RN-DEN-13
+X DEN-6, ORG-1
+
+@ 8 | H | BF | Comunicaciones a la autoridad y expediente del procedimiento
+D Generar y registrar las dos comunicaciones a la autoridad de trabajo (queja recibida con medidas, y decisión) con su plazo y su cargo de presentación. Cada acto del procedimiento se asienta en el libro inalterable del caso sin identidad del denunciante ni hora.
+- Una comunicación solo se da por cumplida con el cargo adjunto
+- El libro del caso no contiene identidad, IP ni hora
+- Solo los asignados al caso leen sus asientos, y la lectura queda registrada
+R 06; 14; 18; 05; E-15; ME-48; RN-DEN-01 a RN-DEN-17
+X DEN-6, CUM-8
+
+# DIS | 7 | disciplina | Casos disciplinarios | Backend + Frontend | Procedimientos disciplinarios confidenciales con descargos, medidas y seguimiento.
+
+@ 1 | H | BF | Registro del caso disciplinario
+D Abrir casos con hechos, fecha, involucrados, tipo de falta según el reglamento interno y evidencias, con acceso por permiso especial. El caso puede originarse en una denuncia resuelta o en un reporte del jefe.
+- El caso solo lo ven los roles autorizados y nunca aparece en búsqueda global para otros
+- Los hechos se vinculan a la norma interna infringida
+R 06; 05; 04; 07; §59; §105; ME-38; RN-DIS-01 a RN-DIS-09; P Cumplimiento → Casos disciplinarios
+X COL-3, SEG-11
+
+@ 2 | H | BF | Imputación y descargos
+D Generar la carta de imputación desde plantilla, notificarla con constancia y recibir los descargos del trabajador dentro del plazo configurado. La notificación se hace por firma electrónica o por cargo físico digitalizado.
+- El plazo de descargos se controla y avisa antes de vencer
+- Los descargos quedan archivados con su fecha de presentación
+R 06; 05; §59; RN-DIS-01 a RN-DIS-09
+X DIS-1, DOC-6
+
+@ 3 | H | BF | Medidas disciplinarias
+D Registrar la decisión (amonestación, suspensión, despido u otra) tomada por una persona autorizada, generar el documento y, si corresponde, sus efectos en asistencia y planilla. La IA no interviene en la decisión.
+- La decisión siempre la registra una persona, con motivación
+- Una suspensión sin goce genera la ausencia correspondiente
+R 06; §59; C-08; RN-DIS-01 a RN-DIS-09
+X DIS-2, AUS-2
+
+@ 4 | H | BF | Seguimiento e historial disciplinario
+D Mostrar el historial disciplinario por colaborador a quien tiene permiso, con reincidencias y vigencia de las sanciones. La vigencia de cada tipo de sanción es un parámetro de política.
+- El historial no es visible para el jefe salvo permiso expreso
+- Las sanciones vencidas se distinguen de las vigentes
+R 06; §59; 07; RN-DIS-01 a RN-DIS-09
+X DIS-3
+
+# ACT | 7 | activos | Activos, EPP y uniformes | Backend + Frontend | Inventario y asignación de activos, y entrega de equipos de protección y uniformes con firma.
+
+@ 1 | H | BF | Inventario de activos
+D Registrar activos (laptop, celular, monitor, tarjeta, equipo, licencia de software y otros) con tipo, serie, valor, ubicación y estado: disponible, asignado, en mantenimiento, perdido y de baja. Las licencias de software se gestionan como activos con fecha de vencimiento.
+- Cada activo tiene un identificador único y código para etiqueta
+- El cambio de estado sigue su máquina de estados
+R 06; 04; 05; §37; ME-34; RN-ACT-01 a RN-ACT-08; P Operaciones → Activos
+X ORG-2
+
+@ 2 | H | BF | Asignación y devolución con acta firmada
+D Asignar activos a colaboradores con acta de entrega firmada, y registrar la devolución con estado del bien y acta. Las actas se generan desde plantilla y se firman con el flujo de firma.
+- La pestaña de activos de la ficha muestra lo que tiene asignado cada persona
+- Un activo asignado no puede asignarse a otra persona
+R 06; §37; §6; RN-ACT-01 a RN-ACT-08
+X ACT-1, DOC-6
+
+@ 3 | H | BF | Historial y activos en ingresos y salidas
+D Mostrar el historial completo de cada activo y conectar con onboarding (solicitud de equipos) y offboarding (devolución pendiente). La integración se hace mediante tareas de los procesos de ingreso y salida.
+- El proceso de salida lista los activos por devolver
+- El historial muestra todos los responsables anteriores
+R 06; §37; §17; RN-ACT-01 a RN-ACT-08
+X ACT-2, OFF-2
+
+@ 4 | H | BF | Matriz de EPP por puesto
+D Definir los equipos de protección requeridos por puesto y actividad según la matriz de riesgos, con vida útil. La matriz se revisa cuando cambia la matriz de riesgos.
+- Cada puesto con riesgo tiene su lista de EPP requerido
+- La vida útil se define por tipo de equipo
+R 06; 14; E-12; §57; RN-ACT-01 a RN-ACT-08
+X SST-2, ACT-1
+
+@ 5 | H | BF | Entrega de EPP con firma y vencimientos
+D Registrar la entrega de EPP con firma del trabajador, controlar existencias y alertar la reposición por vencimiento de vida útil. Alimenta el registro obligatorio de equipos de seguridad.
+- La entrega queda firmada desde el móvil o el kiosko
+- El EPP por vencer se lista por trabajador y sede
+R 06; 14; E-12; RN-ACT-01 a RN-ACT-08
+X ACT-4, DOC-7
+
+@ 6 | H | BF | Uniformes y tallas
+D Registrar las tallas de cada colaborador y las entregas de uniformes con periodicidad por política. Las tallas se actualizan desde el portal del colaborador.
+- El pedido de uniformes se arma con las tallas registradas
+- La siguiente entrega se programa según la política
+R 06; E-12; §37; RN-ACT-01 a RN-ACT-08
+X ACT-5
+
+# GAS | 7 | gastos | Gastos, viáticos y reembolsos | Backend + Frontend | Registro de gastos con comprobante, políticas por puesto, viáticos, rendiciones y reembolso.
+
+@ 1 | H | BF | Registro de gastos
+D Permitir que el colaborador registre un gasto desde el móvil con foto del comprobante, categoría, centro de costo, moneda y proyecto. El registro admite varios gastos agrupados en un informe.
+- El comprobante es obligatorio según la categoría
+- Un comprobante duplicado se detecta por emisor, serie y número
+R 06; 04; §36; §8; RN-GAS-01 a RN-GAS-10; P Operaciones → Gastos
+X ESS-1, ORG-4, CFG-7
+
+@ 2 | H | BF | Categorías y políticas por puesto
+D Configurar categorías de gasto y políticas con topes por categoría, puesto, nivel y destino, y validar cada gasto contra la política. Las políticas tienen vigencia y moneda.
+- Un gasto que excede el tope se marca y exige justificación
+- La política aplicable se determina con el puesto vigente
+R 06; E-23; RN-GAS-01 a RN-GAS-10
+X GAS-1, HIS-6
+
+@ 3 | H | BF | Aprobación de gastos
+D Enviar los gastos por el flujo empleado → manager → finanzas, con devolución para corrección. El flujo usa el motor de aprobaciones y admite montos límite por aprobador.
+- Finanzas ve los gastos aprobados por el manager con sus alertas de política
+- El colaborador sigue el estado de cada gasto
+R 06; 05; §36; §56; ME-32; RN-GAS-01 a RN-GAS-10
+X GAS-2, WFL-2
+
+@ 4 | H | BF | Solicitud de viáticos y anticipo
+D Solicitar viáticos para un viaje con destino, fechas, motivo y monto calculado según la política, y entregar el anticipo. La solicitud pasa por el flujo de aprobación antes de la entrega.
+- El monto sugerido sale de la política por destino y nivel
+- El anticipo queda como saldo por rendir del colaborador
+R 06; 05; E-23; ME-33; RN-GAS-01 a RN-GAS-10
+X GAS-3
+
+@ 5 | H | BF | Rendición de viáticos
+D Rendir el anticipo con los gastos del viaje, calcular el saldo a favor o por devolver y controlar el plazo de rendición. La rendición reutiliza el registro de gastos.
+- Una rendición fuera de plazo avisa al colaborador y a su jefe
+- El saldo por devolver puede descontarse por planilla con autorización
+R 05; 06; E-23; ME-33; RN-GAS-01 a RN-GAS-10
+X GAS-4, PRE-3
+
+@ 6 | H | BF | Reembolso y contabilización
+D Generar el lote de reembolso de gastos aprobados, marcar pagados y generar el asiento por centro de costo. El lote usa los archivos bancarios configurados.
+- El gasto pasa a pagado al confirmarse el lote
+- El asiento se exporta con el mismo mecanismo de la planilla
+R 06; §36; §75; RN-GAS-01 a RN-GAS-10
+X GAS-3, PRV-3
+
+# CUM | 7 | cumplimiento | Cumplimiento Perú y SUNAFIL | Backend + Frontend | Tablero de obligaciones laborales por empresa, pólizas, expediente de inspección y casilla electrónica.
+
+@ 1 | T | D | Catálogo de obligaciones laborales
+D Cargar el catálogo de obligaciones del Perú con su condición de aplicación (umbral de trabajadores, tipo de actividad), periodicidad, norma y evidencia esperada: comité o supervisor de SST, comité de hostigamiento, política salarial, Vida Ley, SCTR, cuota de discapacidad, lactario, T-Registro y registros de SST. El catálogo forma parte del paquete Perú y se actualiza con los cambios normativos.
+- Cada obligación indica la norma y la condición que la hace exigible
+- Los umbrales son parámetros con vigencia
+R 06; 14; E-01; RN-CUM-01 a RN-CUM-11
+X CFG-3, ORG-1
+
+@ 2 | H | BF | Tablero de cumplimiento con semáforo
+D Evaluar por empresa qué obligaciones aplican y su estado (al día, por vencer, incumplida, no aplica) con datos del propio sistema cuando existen, y mostrarlo en un tablero con semáforo, responsable y evidencia. Donde el sistema no tiene datos, la evaluación se basa en la evidencia cargada.
+- Cada semáforo explica por qué está en ese estado
+- El estado se recalcula cuando cambian la dotación o las evidencias
+R 06; E-01; RN-CUM-01 a RN-CUM-11; P Cumplimiento → Cumplimiento Perú → Tablero
+X CUM-1, SST-7, DEN-7, COM-7
+
+@ 3 | H | BF | Responsables, evidencias y calendario
+D Asignar responsable a cada obligación, adjuntar evidencias con vigencia y generar el calendario de vencimientos con recordatorios. Los recordatorios usan el motor de notificaciones.
+- Una evidencia vencida devuelve la obligación a estado pendiente
+- Los vencimientos aparecen en el calendario de RRHH
+R 06; E-01; §78; RN-CUM-01 a RN-CUM-11
+X CUM-2, CFG-8
+
+@ 4 | H | BF | Pólizas de Vida Ley y SCTR
+D Registrar pólizas de Vida Ley y de SCTR (salud y pensión) con aseguradora, vigencia y trabajadores cubiertos por periodo, y detectar trabajadores sin cobertura. Las pólizas se registran por empresa y sus vencimientos generan alerta.
+- Un ingreso sin Vida Ley registrada aparece como pendiente
+- Los trabajadores de puestos o sedes de riesgo sin SCTR se listan
+R 06; 14; E-19; E-01; RN-CUM-01 a RN-CUM-11
+X CUM-1, COL-7
+
+@ 5 | H | BF | Cuota de discapacidad y lactario
+D Calcular la cuota de empleo de personas con discapacidad sobre el promedio anual, registrar convocatorias y ajustes razonables, y contar por sede el indicador que hace exigible el lactario con registro de su implementación. Ambos indicadores usan parámetros con vigencia para sus umbrales.
+- El cálculo de la cuota usa solo datos registrados con consentimiento y los muestra agregados
+- El indicador de lactario se calcula por centro de trabajo
+R 06; 14; E-01; E-16; RN-CUM-01 a RN-CUM-11
+X CUM-2, COL-4
+
+@ 6 | H | BF | Expediente de inspección SUNAFIL
+D Armar por trabajador o grupo y por periodo el expediente con boletas y constancias de entrega, registro de asistencia, contratos, documentos de SST y constancias de pago, con índice, en un paquete descargable. La generación corre en segundo plano y respeta los permisos por campo de quien la solicita.
+- El expediente se genera para un trabajador y un rango de periodos en una sola acción
+- El índice lista cada documento con su fecha
+- La generación queda registrada con autor y contenido
+R 06; 14; E-02; RN-CUM-01 a RN-CUM-11; P Cumplimiento → Cumplimiento Perú → Expediente de inspección
+X BOL-3, ASI-10, CON-2, SST-8
+
+@ 7 | H | BF | Bandeja de casilla electrónica
+D Registrar las notificaciones recibidas en la casilla electrónica de SUNAFIL con el instante de su depósito, plazo de respuesta, responsable, documentos y estado, con alertas previas al vencimiento. Los efectos y el vencimiento se calculan desde el depósito, en días hábiles con el calendario de la empresa. La revisión diaria de la casilla por razón social se registra como evidencia de diligencia.
+- Cada requerimiento muestra su plazo restante, contado desde el día hábil siguiente a los efectos de la notificación
+- La respuesta enviada se archiva con su cargo
+- Cada día hábil sin revisión registrada alerta al responsable
+R 06; 05; 14; 18; E-02; ME-45; RN-CUM-01 a RN-CUM-14
+X CUM-3
+
+@ 8 | T | B | Libro inalterable de cumplimiento encadenado por huella
+D Implementar el libro de solo inserción en el que cada fila guarda la huella de la anterior de su cadena, con contenido canónico, verificación de la cadena y ancla periódica con sello de tiempo detrás de un adaptador. El rol de aplicación solo tiene lectura e inserción.
+- Actualizar, borrar o vaciar el libro falla
+- Una fila alterada por fuera de la aplicación se detecta al verificar, con la fila y el motivo
+- Un asiento anónimo no admite usuario ni firma
+- El expediente se exporta con un manifiesto de huellas verificable sin acceso al sistema, y la exportación queda asentada
+R 06; 14; 18; E-01; E-02; RN-CUM-01 a RN-CUM-14
+X AUD-1
+
+# PRI | 7 | privacidad | Privacidad y retención | Backend + Frontend | Consentimientos, derechos del titular, banco de datos, incidentes, evaluación de impacto y retención.
+
+@ 1 | H | BF | Consentimientos y finalidades
+D Registrar las finalidades de tratamiento y los consentimientos de colaboradores y candidatos, con versión del texto, fecha, medio y revocación. Los textos de consentimiento se gestionan como plantillas versionadas.
+- Cada consentimiento guarda el texto aceptado y su versión
+- La revocación detiene el tratamiento asociado y queda registrada
+R 06; 14; E-16; §92; RN-PRI-01 a RN-PRI-11
+X COL-1, DOC-7
+
+@ 2 | H | BF | Solicitudes de derechos del titular
+D Atender solicitudes de acceso, rectificación, cancelación, oposición y portabilidad con plazo de respuesta controlado, y generar la exportación de los datos de la persona. El titular presenta la solicitud desde su portal o por un formulario público con verificación de identidad.
+- Cada solicitud muestra su plazo legal y avisa antes de vencer
+- La exportación de datos de una persona se genera en formato estructurado
+R 06; 05; 14; E-16; §92; §91; ME-39; RN-PRI-01 a RN-PRI-11
+X PRI-1, WFL-8
+
+@ 3 | H | BF | Banco de datos y registro de tratamientos
+D Mantener el inventario de bancos de datos y tratamientos con finalidad, categorías de datos, encargados, transferencias y medidas de seguridad, y el dato del oficial de datos personales. El inventario se mantiene por organización y por empresa.
+- El inventario se exporta para la inscripción y actualización del banco de datos
+- Cada integración con datos personales figura como encargo o transferencia
+R 06; 14; E-16; RN-PRI-01 a RN-PRI-11
+X PRI-1
+
+@ 4 | H | BF | Registro de incidentes de seguridad
+D Registrar incidentes de seguridad de datos personales con su evaluación, afectados, medidas y la notificación a la autoridad dentro del plazo de 48 horas, con cuenta regresiva y alertas. El plazo es un parámetro por jurisdicción.
+- El incidente muestra el tiempo restante para notificar
+- La notificación realizada se archiva con su constancia
+R 06; 14; E-16; RN-PRI-01 a RN-PRI-11
+X PRI-3
+
+@ 5 | H | BF | Evaluación de impacto
+D Documentar la evaluación de impacto para tratamientos de riesgo (biometría, perfilado con IA) con plantilla, riesgos, medidas y aprobación, como requisito para activar esas funciones. La plantilla sigue el contenido que pide el reglamento.
+- La marcación facial no se activa sin una evaluación de impacto aprobada
+- La evaluación se versiona y tiene responsable
+R 06; 14; E-16; C-08; RN-PRI-01 a RN-PRI-11
+X PRI-3, ASI-3
+
+@ 6 | T | B | Políticas de retención, anonimización y eliminación
+D Aplicar políticas de retención por tipo de dato, organización y jurisdicción: al vencer, anonimizar o eliminar con un proceso programado que respeta los plazos legales de conservación y los bloqueos por litigio. Las políticas se definen sobre un catálogo de tipos de dato que cada módulo declara.
+- Los datos de candidatos no contratados se anonimizan al vencer el plazo consentido
+- Un bloqueo por litigio suspende la eliminación
+- Cada ejecución deja un informe de lo anonimizado y eliminado
+R 06; §91; §92; E-16; RN-PRI-01 a RN-PRI-11
+X PRI-1, CFG-9
+
+@ 7 | H | BF | Registro de accesos y descargas de datos personales
+D Dar al responsable de privacidad la consulta de quién accedió o descargó datos personales sensibles y cuándo, y las solicitudes de información atendidas. La consulta se apoya en el registro de accesos de la plataforma.
+- Se obtiene el historial de accesos a los datos de una persona
+- El registro no puede modificarse
+R 06; §92; §60; RN-PRI-01 a RN-PRI-11
+X SEG-11, AUD-3
+
+# SIN | 7 | relaciones-laborales | Sindicatos y convenios | Backend + Frontend | Afiliación sindical, cuota, licencias sindicales y cláusulas de convenio como conceptos.
+
+@ 1 | H | BF | Sindicatos y afiliación
+D Registrar sindicatos, su junta directiva y la afiliación de trabajadores con fechas de alta y baja. La afiliación es dato sensible con permiso por campo.
+- La afiliación solo la ven los roles con el permiso específico
+- La afiliación no aparece en reportes ni exportaciones generales
+R 06; 04; 07; E-17; RN-SIN-01 a RN-SIN-07
+X COL-3, SEG-9
+
+@ 2 | T | B | Cuota sindical en planilla
+D Descontar la cuota sindical autorizada por el trabajador como concepto de planilla y generar la relación de aportes para el sindicato. El concepto forma parte del paquete Perú.
+- El descuento solo se aplica con autorización registrada
+- La relación de aportes por periodo se exporta
+R 06; E-17; 14; RN-SIN-01 a RN-SIN-07
+X SIN-1, PER-2
+
+@ 3 | H | BF | Licencias sindicales
+D Registrar las licencias sindicales de los dirigentes con el tope de días por año que fija la norma o el convenio, como tipo de ausencia con saldo. El tope es un parámetro que el convenio puede mejorar.
+- El saldo de licencia sindical se controla por dirigente y año
+- La licencia aparece como ausencia justificada
+R 06; E-17; 14; RN-SIN-01 a RN-SIN-07
+X SIN-1, AUS-1
+
+@ 4 | H | BF | Convenios colectivos y cláusulas
+D Registrar convenios con vigencia, ámbito y cláusulas, y convertir las cláusulas económicas (bonos, asignaciones, incrementos) en conceptos de planilla aplicables a los trabajadores comprendidos. El ámbito se define por sindicato, empresa y grupo de trabajadores.
+- Una cláusula económica se calcula solo para los trabajadores del ámbito del convenio
+- El vencimiento del convenio avisa con anticipación configurable
+R 06; E-17; C-05; RN-SIN-01 a RN-SIN-07
+X SIN-1, CPT-1

@@ -1,0 +1,585 @@
+@@ Relación laboral | employments | COL HIS
+st: por_ingresar=Por ingresar; activa=Activa; suspendida=Suspendida; en_cese=En proceso de cese; cesada=Cesada; anulada=Anulada
+ini: por_ingresar
+fin: cesada,anulada
+t: por_ingresar | activar | activa | Sistema (fecha de ingreso) o RRHH (`people.employments.activate`) | Fecha de ingreso alcanzada; datos obligatorios completos; límite del plan | Habilita marcación, saldos y planilla; ocupa la posición | employment.activated
+t: por_ingresar | anular | anulada | RRHH (`people.employments.update`) | Sin marcaciones ni resultados de planilla | Libera la posición; cancela onboarding; datos de pre-ingreso pasan a régimen de candidato | employee.hire_cancelled
+t: activa | suspender | suspendida | RRHH (`people.employments.suspend`) o sistema por ausencia o medida | Motivo de suspensión (perfecta o imperfecta) y fechas | Ajusta cómputo de beneficios según el tipo; avisa a planilla | employment.status_changed
+t: suspendida | reanudar | activa | RRHH o sistema (fin de la causa) | Fecha de fin alcanzada o registrada | Reanuda cómputos | employment.status_changed
+t: activa,suspendida | registrar_cese | en_cese | RRHH (`col.colaborador.cesar`) | Fecha y motivo; fecha no anterior al último periodo cerrado | Inicia offboarding y liquidación en borrador; crea novedad de baja | offboarding.started
+t: en_cese | revertir_cese | activa | RRHH (`people.employments.cancel_termination`) | Antes de la fecha efectiva; liquidación no pagada | Cancela offboarding y liquidación | offboarding.cancelled
+t: en_cese | hacer_efectivo | cesada | Sistema (fecha efectiva) | Fecha de cese alcanzada | Libera posición; retira roles; modo ex-colaborador; cierra saldos hacia liquidación | employee.terminated
+nota: Un reingreso crea una relación nueva en «Por ingresar»; la relación cesada no se reabre. El estado se guarda con vigencia (M-HIS).
+
+@@ Cuenta de usuario | users | SEG
+st: invitado=Invitado; activo=Activo; bloqueado=Bloqueado; exmodo=Ex-colaborador (solo lectura); desactivado=Desactivado
+ini: invitado
+fin: desactivado
+t: invitado | activar_cuenta | activo | El propio usuario | Enlace u OTP válido; clave conforme a política; aviso de privacidad aceptado | Crea sesión; registra factor MFA si el rol lo exige | user.activated
+t: invitado | reenviar_invitacion | invitado | `seg.usuario.invitar` | Invitación vencida o no recibida | Nuevo enlace; invalida el anterior | user.invited
+t: activo | bloquear | bloqueado | Sistema (intentos fallidos) o `identity.users.suspend` | Umbral superado o motivo registrado | Cierra sesiones; reasigna aprobaciones según regla | user.locked
+t: bloqueado | desbloquear | activo | Sistema (tiempo cumplido) o `identity.users.reactivate` | Verificación de identidad | Restablece acceso | user.unlocked
+t: activo,bloqueado | pasar_a_ex_colaborador | exmodo | Sistema (cese efectivo) | Sin otra relación activa ni otro rol vigente | Retira roles; deja lectura de boletas, certificados y liquidación | user.deactivated
+t: exmodo | reactivar | activo | Sistema (reingreso) o `identity.users.reactivate` | Nueva relación activa | Asigna rol Empleado | user.activated
+t: activo,bloqueado,exmodo,invitado | desactivar | desactivado | `seg.usuario.administrar` o sistema (fin del periodo de ex-colaborador) | No deja a la organización sin administrador | Cierra sesiones y credenciales | user.deactivated
+
+@@ Posición | positions | POS
+st: propuesta=Propuesta; aprobada=Aprobada; vacante=Vacante; en_reclutamiento=En reclutamiento; ocupada=Ocupada; congelada=Congelada; cerrada=Cerrada
+ini: propuesta
+fin: cerrada
+t: propuesta | aprobar | aprobada | `pos.solicitud.aprobar` (vía motor de aprobaciones) | Presupuesto disponible o excepción aprobada | Reserva presupuesto | position.approved
+t: propuesta | rechazar | cerrada | `pos.solicitud.aprobar` | Motivo | Notifica al solicitante | position.closed
+t: aprobada,vacante | abrir_reclutamiento | en_reclutamiento | `ats.vacante.crear` | No congelada; sin vacante abierta para el mismo cupo | Crea o enlaza vacante | position.opened
+t: aprobada,vacante,en_reclutamiento | ocupar | ocupada | Sistema al activar una relación | Cupo disponible | Asigna ocupante; actualiza organigrama | position.filled
+t: ocupada | liberar | vacante | Sistema (cese o traslado efectivo) | Sin ocupante activo | Actualiza organigrama y headcount | position.vacated
+t: en_reclutamiento | cancelar_reclutamiento | vacante | `ats.vacante.publicar` | Vacante cerrada sin contratación | — | position.vacated
+t: aprobada,vacante | congelar | congelada | `org.positions.freeze` | Motivo y fecha | Bloquea vacantes y asignaciones | position.frozen
+t: congelada | descongelar | vacante | `org.positions.unfreeze` | — | Vuelve a estar disponible | position.unfrozen
+t: aprobada,vacante,congelada | cerrar | cerrada | `org.positions.close` | Sin ocupante ni vacante abierta | Libera presupuesto | position.closed
+
+@@ Solicitud de posición | position_requests | POS
+st: borrador=Borrador; en_aprobacion=En aprobación; aprobada=Aprobada; rechazada=Rechazada; cancelada=Cancelada
+ini: borrador
+fin: aprobada,rechazada,cancelada
+t: borrador | enviar | en_aprobacion | `pos.solicitud.crear` | Puesto, unidad, motivo y costo estimado | Crea solicitud en el motor de aprobaciones | position.requested
+t: en_aprobacion | aprobar | aprobada | Aprobadores del flujo | Todos los niveles cumplidos | Crea la posición en «Aprobada» | position.approved
+t: en_aprobacion | rechazar | rechazada | Aprobadores del flujo | Motivo | Notifica | approval.rejected
+t: borrador,en_aprobacion | cancelar | cancelada | Solicitante | — | Anula pasos pendientes | approval.cancelled
+
+@@ Vacante | job_openings | ATS
+st: borrador=Borrador; en_aprobacion=En aprobación; aprobada=Aprobada; publicada=Publicada; pausada=Pausada; cubierta=Cubierta; cancelada=Cancelada
+ini: borrador
+fin: cubierta,cancelada
+t: borrador | enviar_aprobacion | en_aprobacion | `recruiting.requisitions.submit` | Posición válida si la política lo exige; descripción y requisitos | Solicitud de aprobación | vacancy.created
+t: en_aprobacion | aprobar | aprobada | `ats.vacante.aprobar` | — | — | vacancy.approved
+t: en_aprobacion | devolver | borrador | `ats.vacante.aprobar` | Observaciones | Notifica al reclutador | approval.rejected
+t: aprobada,pausada | publicar | publicada | `ats.vacante.publicar` | Etapas y formulario definidos | Visible en el portal; posición «En reclutamiento» | vacancy.opened
+t: publicada | pausar | pausada | `recruiting.requisitions.hold` | — | Oculta del portal; conserva postulaciones | vacancy.paused
+t: publicada,pausada | cerrar_cubierta | cubierta | Sistema (plazas cubiertas) o `recruiting.requisitions.close` | Ofertas aceptadas = plazas | Descarta postulaciones restantes previa confirmación | vacancy.closed
+t: borrador,en_aprobacion,aprobada,publicada,pausada | cancelar | cancelada | `recruiting.requisitions.close` | Motivo | Libera la posición; avisa a postulantes | vacancy.closed
+
+@@ Postulación del candidato | applications | ATS
+st: nuevo=Nuevo; en_proceso=En proceso (etapas configurables); oferta=Oferta; contratado=Contratado; descartado=Descartado; retirado=Retirado
+ini: nuevo
+fin: contratado,descartado,retirado
+t: nuevo | iniciar_revision | en_proceso | `recruiting.applications.move_stage` | — | Entra a la primera etapa del tablero | candidate.stage_changed
+t: en_proceso | mover_etapa | en_proceso | `recruiting.applications.move_stage` | Etapa destino existe en la vacante | Registra la etapa y el tiempo en la anterior | candidate.stage_changed
+t: en_proceso | pasar_a_oferta | oferta | `ent.oferta.crear` | Evaluaciones requeridas completas | Crea oferta en borrador | candidate.stage_changed
+t: oferta | contratar | contratado | Sistema al aceptarse la oferta | Oferta aceptada | Inicia pre-onboarding; precarga el ingreso | candidate.hired
+t: oferta | volver_a_proceso | en_proceso | `recruiting.applications.move_stage` | Oferta rechazada, vencida o retirada | — | candidate.stage_changed
+t: nuevo,en_proceso,oferta | descartar | descartado | `recruiting.applications.reject` | Motivo de catálogo | Mensaje opcional; pasa a base de talento si consintió | candidate.rejected
+t: nuevo,en_proceso,oferta | retirar | retirado | Candidato (enlace de seguimiento) o reclutador | — | Cancela entrevistas pendientes | candidate.withdrawn
+nota: Las etapas dentro de «En proceso» (preselección, entrevista RRHH, entrevista técnica, evaluación, referencias) son datos configurables por vacante, no estados fijos.
+
+@@ Oferta laboral | offers | ENT
+st: borrador=Borrador; revision=En revisión; aprobacion=En aprobación; aprobada=Aprobada; enviada=Enviada; aceptada=Aceptada; rechazada=Rechazada; vencida=Vencida; retirada=Retirada
+ini: borrador
+fin: aceptada,rechazada,vencida,retirada
+t: borrador | enviar_revision | revision | `ent.oferta.crear` | Plantilla y variables completas | — | offer.created
+t: revision | enviar_aprobacion | aprobacion | `recruiting.offers.submit` | Monto comparado con banda y presupuesto | Solicitud de aprobación con nivel según exceso | approval.requested
+t: revision,aprobacion | devolver | borrador | Revisor o aprobador | Observaciones | — | approval.rejected
+t: aprobacion | aprobar | aprobada | `ent.oferta.aprobar` | — | — | offer.approved
+t: aprobada | enviar | enviada | `recruiting.offers.send` | Posición con cupo; fecha de vencimiento | Enlace seguro al candidato | offer.sent
+t: enviada | aceptar | aceptada | Candidato | Dentro de plazo; firma con evidencia | Postulación «Contratado»; inicia pre-onboarding | offer.accepted
+t: enviada | rechazar | rechazada | Candidato | Motivo opcional | Libera cupo | offer.declined
+t: enviada | vencer | vencida | Sistema | Fecha de vencimiento superada | Libera cupo | offer.expired
+t: aprobada,enviada | retirar | retirada | `recruiting.offers.withdraw` | Motivo | Invalida el enlace | offer.withdrawn
+
+@@ Proceso de onboarding | onboarding_processes | ONB
+st: preingreso=Pre-ingreso; en_curso=En curso; pausado=Pausado; completado=Completado; cancelado=Cancelado
+ini: preingreso
+fin: completado,cancelado
+t: preingreso | iniciar | en_curso | Sistema (`employee.hired`) | Relación creada; plantilla resuelta | Crea tareas con fechas y responsables | onboarding.started
+t: preingreso | cancelar | cancelado | `onboarding.processes.cancel` o sistema (ingreso anulado) | — | Anula tareas; datos pasan a régimen de candidato | onboarding.cancelled
+t: en_curso | completar_tarea | en_curso | Responsable de la tarea (`onb.tarea.resolver`) | Evidencia si la tarea la exige | Recalcula avance | onboarding.task_completed
+t: en_curso | pausar | pausado | `onb.proceso.administrar` | Motivo (licencia) | Suspende plazos | onboarding.paused
+t: pausado | reanudar | en_curso | `onb.proceso.administrar` | — | Recalcula fechas | onboarding.resumed
+t: en_curso | cerrar | completado | `onboarding.processes.complete` o sistema | Todas las tareas obligatorias completas | Lanza encuesta de onboarding | onboarding.completed
+t: en_curso,pausado | cancelar | cancelado | `onboarding.processes.cancel` o sistema (cese) | — | Anula tareas pendientes | onboarding.cancelled
+nota: Las tareas del proceso tienen su propio ciclo simple: pendiente → en curso → completada / omitida (con motivo) / vencida.
+
+@@ Proceso de offboarding | offboarding_processes | OFF
+st: iniciado=Iniciado; en_curso=En curso; pendiente_liquidacion=Pendiente de liquidación; completado=Completado; cancelado=Cancelado
+ini: iniciado
+fin: completado,cancelado
+t: iniciado | planificar | en_curso | `off.proceso.administrar` | Plantilla del tipo de salida; sucesor de aprobaciones designado | Crea tareas | offboarding.started
+t: en_curso | completar_tarea | en_curso | Responsable (`off.tarea.resolver`) | Evidencia cuando aplica | Recalcula avance | offboarding.task_completed
+t: en_curso | revocar_accesos | en_curso | Sistema (fecha efectiva) | Fecha de cese alcanzada | Desactiva accesos | offboarding.access_revoked
+t: en_curso | esperar_liquidacion | pendiente_liquidacion | Sistema | Tareas obligatorias completas; liquidación sin pagar | Alerta de plazo de pago | —
+t: en_curso,pendiente_liquidacion | cerrar | completado | `onboarding.offboardings.complete` | Liquidación pagada y documentos entregados | Registra motivo final | offboarding.completed
+t: iniciado,en_curso | cancelar | cancelado | `onboarding.offboardings.cancel` | Cese revertido antes de la fecha efectiva | Revierte tareas no ejecutadas | offboarding.cancelled
+
+@@ Flujo de firma | signature_requests | DOC
+st: borrador=Borrador; enviado=Enviado; visto=Visto; firmado_parcial=Firmado parcialmente; completado=Completado; rechazado=Rechazado; vencido=Vencido; cancelado=Cancelado
+ini: borrador
+fin: completado,rechazado,vencido,cancelado
+t: borrador | enviar | enviado | `doc.firma.enviar` | Documento final; firmantes y orden definidos; contacto de cada firmante | Calcula hash; notifica al primer firmante o a todos | signature.sent
+t: enviado | abrir | visto | Firmante | Identidad verificada | Registra fecha, hora e IP | signature.viewed
+t: visto,enviado | firmar | firmado_parcial | Firmante (`doc.firma.firmar`) | OTP válido; es su turno | Añade evidencia; notifica al siguiente | signature.signed
+t: firmado_parcial | firmar | firmado_parcial | Firmante siguiente | OTP válido; es su turno | Añade evidencia | signature.signed
+t: firmado_parcial,visto,enviado | completar | completado | Sistema | Último firmante firmó | Sella el PDF; genera constancia; archiva | signature.completed
+t: enviado,visto,firmado_parcial | rechazar | rechazado | Firmante | Motivo obligatorio | Notifica al emisor | signature.rejected
+t: enviado,visto,firmado_parcial | vencer | vencido | Sistema | Fecha de caducidad superada | Permite reenviar como nuevo envío | signature.expired
+t: borrador,enviado,visto,firmado_parcial | cancelar | cancelado | `documents.signature_requests.cancel` | — | Invalida enlaces | signature.cancelled
+
+@@ Contrato | contracts | CON
+st: borrador=Borrador; en_aprobacion=En aprobación; en_firma=En firma; firmado=Firmado; vigente=Vigente; por_vencer=Por vencer; vencido=Vencido sin regularizar; terminado=Terminado; anulado=Anulado
+ini: borrador
+fin: terminado,anulado
+t: borrador | enviar_aprobacion | en_aprobacion | `contracts.contracts.create` | Tipo, fechas, causa objetiva si es a plazo, topes de modalidad | — | contract.created
+t: en_aprobacion | aprobar | en_firma | `con.contrato.aprobar` | — | Genera documento y envío de firma | contract.sent_for_signature
+t: en_aprobacion | devolver | borrador | `con.contrato.aprobar` | Observaciones | — | approval.rejected
+t: en_firma | registrar_firma | firmado | Sistema (`signature.completed`) | Ambas partes firmaron | Archiva el documento | contract.signed
+t: en_firma | firma_rechazada | borrador | Sistema (`signature.rejected` o vencido) | — | Notifica a RRHH | signature.rejected
+t: firmado | iniciar_vigencia | vigente | Sistema (fecha de inicio) | Fecha de inicio alcanzada | Crea registro de vigencia en M-HIS | contract.started
+t: vigente | marcar_por_vencer | por_vencer | Sistema | Dentro de la ventana de aviso | Alertas a RRHH y jefe | contract.expiring
+t: por_vencer,vigente | renovar | terminado | `contracts.contracts.renew` | Prórroga firmada; topes respetados | Crea contrato sucesor enlazado | contract.renewed
+t: por_vencer | vencer | vencido | Sistema | Fecha fin superada sin renovación ni cese | Alerta de riesgo; aparece en cumplimiento | contract.expired
+t: vencido | regularizar | terminado | `contracts.contracts.renew` | Renovación, conversión a indeterminado o cese registrados | Crea sucesor o cierra la relación | contract.regularized
+t: vigente,por_vencer | terminar | terminado | Sistema (cese efectivo) o `contracts.contracts.terminate` | Motivo | — | contract.terminated
+t: borrador,en_aprobacion,en_firma,firmado | anular | anulado | `con.contrato.administrar` | Antes del inicio de vigencia | Cancela firma pendiente | contract.voided
+nota: Una adenda es un documento con su propio flujo de firma (ME-10) que, al completarse, emite `contract.amended` y crea el movimiento con vigencia.
+
+@@ Documento | documents | DOC
+st: solicitado=Solicitado; entregado=Entregado (en revisión); vigente=Vigente; rechazado=Rechazado; por_vencer=Por vencer; vencido=Vencido; archivado=Archivado
+ini: solicitado
+fin: archivado
+t: solicitado | subir | entregado | Titular o `doc.documento.subir` | Tipo y tamaño permitidos; antivirus | Nueva versión | document.uploaded
+t: entregado | aprobar | vigente | `doc.documento.aprobar` | Legible y corresponde al tipo | Agenda vencimiento si aplica | document.approved
+t: entregado | rechazar | rechazado | `doc.documento.aprobar` | Motivo | Notifica al titular | document.rejected
+t: rechazado | subir | entregado | Titular o `doc.documento.subir` | — | Nueva versión | document.uploaded
+t: vigente | marcar_por_vencer | por_vencer | Sistema | Ventana de aviso del tipo | Alerta | document.expiring
+t: por_vencer | vencer | vencido | Sistema | Fecha superada | Alerta; puede afectar cumplimiento | document.expired
+t: vigente,por_vencer,vencido | reemplazar | entregado | Titular o `doc.documento.subir` | — | Conserva la versión anterior | document.uploaded
+t: vigente,vencido,rechazado,por_vencer | archivar | archivado | `documents.documents.archive` | No está bajo retención legal activa que exija disponibilidad | Sale de las vistas activas; se conserva | document.archived
+nota: Un documento subido directamente por RRHH o generado desde plantilla nace en «Vigente» (si su tipo no exige revisión).
+
+@@ Marcación | attendance_punches | ASI
+st: registrada=Registrada; con_incidencia=Con incidencia; validada=Validada; reemplazada=Reemplazada por corrección; duplicada=Duplicada
+ini: registrada
+fin: validada,reemplazada,duplicada
+t: registrada | detectar_incidencia | con_incidencia | Sistema | Fuera de geocerca, sin horario, diferencia de reloj o marca incompleta | Aparece en revisión | attendance.punched
+t: registrada | marcar_duplicada | duplicada | Sistema | Misma persona y tipo dentro de la ventana de duplicado | No entra al cálculo | —
+t: registrada,con_incidencia | validar | validada | Sistema (cálculo diario) o `asi.correccion.aprobar` | Incidencia resuelta o inexistente | Entra al cálculo del día | attendance.day_calculated
+t: registrada,con_incidencia,validada | reemplazar | reemplazada | Sistema al aprobarse una corrección | Corrección aprobada enlazada | La marca original se conserva; la correctiva la sustituye en el cálculo | attendance.correction_approved
+nota: La marca es de solo inserción: sus datos nunca cambian; el estado es una clasificación derivada que se guarda en un registro aparte.
+
+@@ Corrección de marcación | attendance_corrections | ASI
+st: solicitada=Solicitada; aprobada=Aprobada; rechazada=Rechazada; cancelada=Cancelada
+ini: solicitada
+fin: aprobada,rechazada,cancelada
+t: solicitada | aprobar | aprobada | `asi.correccion.aprobar` (jefe o RRHH; no el solicitante) | Asistencia del periodo abierta; motivo y sustento | Inserta marca correctiva; recalcula el día | attendance.correction_approved
+t: solicitada | rechazar | rechazada | `asi.correccion.aprobar` | Motivo | Notifica | attendance.correction_rejected
+t: solicitada | cancelar | cancelada | Solicitante | — | — | —
+
+@@ Solicitud de vacaciones | leave_requests | VAC
+st: borrador=Borrador; pendiente=Pendiente de jefe; validacion=En validación de RRHH; aprobada=Aprobada (programada); en_goce=En goce; gozada=Gozada; rechazada=Rechazada; cancelada=Cancelada
+ini: borrador
+fin: gozada,rechazada,cancelada
+t: borrador | enviar | pendiente | Titular (`vac.solicitud.crear`) | Saldo, anticipación, fraccionamiento, sin traslape, periodo de planilla abierto | Crea solicitud de aprobación | leave.requested
+t: pendiente | aprobar | validacion | Jefe (`vac.solicitud.aprobar`) | Política exige validación de RRHH | Notifica a RRHH | approval.step_approved
+t: pendiente,validacion | aprobar_final | aprobada | Jefe o RRHH (`vac.solicitud.validar`) según política | Último nivel del flujo | Reserva saldo; marca calendario; bloquea turnos; crea incidencia de planilla | leave.approved
+t: pendiente,validacion | rechazar | rechazada | Jefe o RRHH (`time.vacation_requests.reject`) | Motivo | Notifica | leave.rejected
+t: borrador,pendiente,validacion,aprobada | cancelar | cancelada | Titular o RRHH | Antes del inicio; periodo de planilla abierto | Devuelve saldo; libera calendario; retira incidencia | leave.cancelled
+t: aprobada | iniciar_goce | en_goce | Sistema (fecha de inicio) | — | — | leave.started
+t: en_goce | interrumpir | gozada | RRHH (`vac.saldo.ajustar`) | Motivo; días no gozados calculados | Devuelve días no gozados al saldo | leave.balance_adjusted
+t: en_goce | finalizar | gozada | Sistema (fecha de fin) | — | Saldo pasa de programado a tomado | leave.completed
+
+@@ Ausencia | absences | AUS
+st: solicitada=Solicitada; pendiente_sustento=Pendiente de sustento; aprobada=Aprobada; en_curso=En curso; finalizada=Finalizada; rechazada=Rechazada; cancelada=Cancelada
+ini: solicitada
+fin: finalizada,rechazada,cancelada
+t: solicitada | aprobar | aprobada | `aus.ausencia.aprobar` según tipo | Reglas del tipo; sustento si es obligatorio; sin traslape | Calendario, asistencia e incidencia de planilla | absence.approved
+t: solicitada | pedir_sustento | pendiente_sustento | `aus.ausencia.aprobar` o sistema | Tipo exige sustento y falta | Plazo para adjuntar | absence.requested
+t: pendiente_sustento | adjuntar_sustento | solicitada | Titular o RRHH | Documento válido | — | document.uploaded
+t: pendiente_sustento | vencer_sustento | rechazada | Sistema | Plazo superado | Se trata como falta según política | absence.rejected
+t: solicitada | rechazar | rechazada | `time.absences.reject` | Motivo | — | absence.rejected
+t: aprobada | iniciar | en_curso | Sistema | Fecha de inicio | — | absence.started
+t: en_curso | extender | en_curso | `aus.ausencia.registrar` | Nuevo sustento contiguo | Recalcula acumulado y subsidio | absence.subsidy_started
+t: en_curso | finalizar | finalizada | Sistema o RRHH | Fecha de fin o alta anticipada | Cierra efecto en planilla | absence.ended
+t: solicitada,pendiente_sustento,aprobada | cancelar | cancelada | Titular o RRHH | Antes del inicio | Revierte efectos | absence.cancelled
+
+@@ Horas extra | overtime_requests | BHO
+st: solicitada=Solicitada; autorizada=Autorizada; por_calificar=Por calificar; calificada=Calificada; pagada=En planilla; compensada=En bolsa de horas; rechazada=Rechazada
+ini: solicitada
+fin: pagada,compensada,rechazada
+t: solicitada | autorizar | autorizada | `bho.solicitud.aprobar` | Tope del periodo; persona sujeta a control | — | overtime.approved
+t: solicitada | rechazar | rechazada | `time.overtime_requests.reject` | Motivo | — | overtime.rejected
+t: autorizada | confirmar_horas | por_calificar | Sistema (asistencia del día) | Marcas validadas | Toma horas reales hasta el máximo autorizado | attendance.day_calculated
+t: por_calificar | calificar | calificada | Sistema o RRHH | Tramos y sobretasas vigentes | Calcula horas por tramo | overtime.qualified
+t: por_calificar | rechazar | rechazada | `time.overtime_requests.reject` | Sobretiempo no reconocido, con motivo | Alerta de riesgo a RRHH | overtime.rejected
+t: calificada | enviar_a_planilla | pagada | Sistema | Destino pago; periodo abierto | Incidencia de planilla | overtime.qualified
+t: calificada | acreditar_bolsa | compensada | Sistema | Destino compensación; acuerdo aceptado | Movimiento en la bolsa | time_bank.credited
+nota: El sobretiempo detectado sin solicitud previa nace directamente en «Por calificar».
+
+@@ Hoja de tiempo | timesheets | TSH
+st: abierta=Abierta; enviada=Enviada; aprobada=Aprobada; devuelta=Devuelta; bloqueada=Bloqueada
+ini: abierta
+fin: bloqueada
+t: abierta,devuelta | enviar | enviada | Titular (`tsh.hoja.registrar`) | Diferencia con asistencia dentro de tolerancia o justificada | — | timesheet.submitted
+t: enviada | aprobar | aprobada | `tsh.hoja.aprobar` | — | Alimenta costeo | timesheet.approved
+t: enviada,aprobada | devolver | devuelta | `time.timesheets.reject` | Motivo; periodo no bloqueado | — | timesheet.returned
+t: aprobada | bloquear | bloqueada | Sistema (cierre de planilla) | — | Fija la distribución contable | —
+
+@@ Periodo de planilla | payroll_periods | PER NOM
+st: abierto=Abierto; calculado=Calculado; en_aprobacion=En aprobación; aprobado=Aprobado; cerrado=Cerrado; pagado=Pagado; contabilizado=Contabilizado
+ini: abierto
+fin: contabilizado
+t: abierto,calculado | calcular | calculado | `per.periodo.calcular` | Parámetros del periodo disponibles | Guarda resultados con traza; detecta anomalías | payroll.calculated
+t: calculado | enviar | en_aprobacion | `per.periodo.enviar` | Sin relaciones con error; anomalías revisadas o confirmadas | Solicitud de aprobación | payroll.submitted
+t: en_aprobacion | aprobar | aprobado | `per.periodo.aprobar` (distinto de quien calculó o cargó incidencias) | Segregación de funciones | — | payroll.approved
+t: en_aprobacion | devolver | calculado | `payroll.periods.reject` | Observaciones | Notifica a Payroll | payroll.returned
+t: aprobado | cerrar | cerrado | `per.periodo.cerrar` | Periodo anterior cerrado; parámetros «a confirmar» confirmados | Resultados inmutables; genera boletas, archivos, provisiones y asiento | payroll.closed
+t: aprobado | reabrir_calculo | calculado | `per.periodo.calcular` | Motivo | Invalida la aprobación | payroll.returned
+t: cerrado | reabrir | abierto | `per.periodo.reabrir` | No declarado ni pagado; motivo | Retira boletas; anula asiento no exportado | payroll.reopened
+t: cerrado | registrar_pago | pagado | `per.pago.registrar` | Lote de pago conciliado | Marca cuotas y adelantos como descontados | payroll.paid
+t: pagado | contabilizar | contabilizado | Sistema (asiento exportado) o `prv.asiento.exportar` | Asiento cuadrado | Guarda referencia del ERP | accounting.entry_exported
+
+@@ Boleta de pago | payslips | BOL
+st: generada=Generada; publicada=Publicada; vista=Vista; con_acuse=Con acuse; anulada=Anulada
+ini: generada
+fin: con_acuse,anulada
+t: generada | publicar | publicada | Sistema (cierre) o `bol.boleta.generar` | Firma del empleador aplicada | Visible en el portal; notifica | payslip.published
+t: publicada | abrir | vista | Titular | — | Constancia de acceso | payslip.viewed
+t: vista,publicada | dar_acuse | con_acuse | Titular | Política exige acuse | Constancia de recepción | payslip.acknowledged
+t: generada,publicada,vista,con_acuse | anular | anulada | `payroll.payslips.void` o sistema (reapertura) | Motivo | Conserva la versión; genera la nueva si hay recálculo | payslip.voided
+
+@@ Préstamo | loans | PRE
+st: solicitado=Solicitado; aprobado=Aprobado; desembolsado=Desembolsado; en_pago=En pago; pagado=Pagado; refinanciado=Refinanciado; rechazado=Rechazado; cancelado=Cancelado
+ini: solicitado
+fin: pagado,refinanciado,rechazado,cancelado
+t: solicitado | aprobar | aprobado | `pre.prestamo.aprobar` | Elegibilidad; capacidad de descuento | — | loan.approved
+t: solicitado | rechazar | rechazado | `payroll.loans.reject` | Motivo | — | loan.rejected
+t: aprobado | desembolsar | desembolsado | `pre.prestamo.administrar` | Pago confirmado por el adaptador | Genera cronograma | loan.disbursed
+t: desembolsado | iniciar_descuento | en_pago | Sistema (primera cuota) | — | Cuota como incidencia | loan.installment_due
+t: en_pago | pagar_cuota | en_pago | Sistema (cierre de planilla) o pago directo | Monto descontado | Actualiza saldo | loan.installment_paid
+t: en_pago | liquidar | pagado | Sistema | Saldo cero | — | loan.paid_off
+t: en_pago | refinanciar | refinanciado | `payroll.loans.update` | Nueva aprobación | Crea préstamo sucesor con el saldo | loan.refinanced
+t: solicitado,aprobado | cancelar | cancelado | Titular o Payroll | Antes del desembolso | — | loan.cancelled
+
+@@ Adelanto de sueldo | salary_advances | PRE
+st: solicitado=Solicitado; aprobado=Aprobado; pagado=Pagado; descontado=Descontado; rechazado=Rechazado
+ini: solicitado
+fin: descontado,rechazado
+t: solicitado | aprobar | aprobado | Sistema (cumple política) o `payroll.salary_advances.approve` | Monto ≤ disponible; elegibilidad | — | advance.requested
+t: solicitado | rechazar | rechazado | Sistema o `payroll.salary_advances.reject` | Motivo | — | advance.rejected
+t: aprobado | pagar | pagado | `payroll.salary_advances.pay` o adaptador de pago | Confirmación del medio de pago | Crea incidencia de descuento en el periodo que corresponde | advance.granted
+t: pagado | descontar | descontado | Sistema (cierre de planilla) | Periodo cerrado | — | advance.deducted
+
+@@ Liquidación de beneficios | settlements | LIQ
+st: borrador=Borrador; calculada=Calculada; en_aprobacion=En aprobación; aprobada=Aprobada; pagada=Pagada; entregada=Documentos entregados; anulada=Anulada
+ini: borrador
+fin: entregada,anulada
+t: borrador,calculada | calcular | calculada | `liq.liquidacion.calcular` | Fecha y motivo de cese; parámetros vigentes | Guarda detalle con traza | settlement.calculated
+t: calculada | enviar | en_aprobacion | `payroll.settlements.calculate` | Sin errores | — | approval.requested
+t: en_aprobacion | aprobar | aprobada | `liq.liquidacion.aprobar` (distinto de quien calculó) | — | Inmutable | settlement.approved
+t: en_aprobacion | devolver | calculada | `liq.liquidacion.aprobar` | Observaciones | — | approval.rejected
+t: aprobada | pagar | pagada | `liq.liquidacion.pagar` | Dentro del plazo legal (alerta si no) | Crea bajas en T-Registro y seguros | settlement.paid
+t: pagada | entregar_documentos | entregada | `liq.liquidacion.pagar` | Documentos de cese firmados | Publica en el portal del ex-colaborador | settlement.documents_issued
+t: borrador,calculada,en_aprobacion | anular | anulada | `payroll.settlements.void` | Cese revertido | — | settlement.voided
+
+@@ Archivo de declaración o pago | filing_files | DEC
+st: borrador=Borrador; validado=Validado; con_errores=Con errores; presentado=Presentado; aceptado=Aceptado; observado=Observado; rectificado=Rectificado
+ini: borrador
+fin: aceptado,rectificado
+t: borrador,con_errores | validar | validado | `payroll.declaration_files.validate` | Periodo cerrado; validación previa sin errores | Fija hash | filing.validated
+t: borrador,con_errores | validar_con_errores | con_errores | `payroll.declaration_files.validate` | Validación previa con errores | Lista errores con enlace al dato | filing.generated
+t: validado | presentar | presentado | `dec.archivo.presentar` | Constancia adjunta | Registra fecha | filing.submitted
+t: presentado | aceptar | aceptado | `dec.archivo.presentar` | Respuesta de la entidad | Actualiza cumplimiento | filing.accepted
+t: presentado | observar | observado | `dec.archivo.presentar` | Detalle de la observación | Tarea de corrección | filing.observed
+t: observado,aceptado | rectificar | rectificado | `dec.archivo.rectificar` | Motivo | Crea nueva versión en «Borrador» enlazada | filing.rectified
+
+@@ Campaña de evaluación | performance_cycles | DES
+st: borrador=Borrador; lanzada=En evaluación; calibracion=En calibración; publicada=Resultados publicados; cerrada=Cerrada; cancelada=Cancelada
+ini: borrador
+fin: cerrada,cancelada
+t: borrador | lanzar | lanzada | `performance.cycles.launch` | Población, formulario, evaluadores y fechas | Crea evaluaciones; notifica | performance_cycle.launched
+t: lanzada | pasar_a_calibracion | calibracion | `performance.cycles.start_calibration` | Fecha límite o avance mínimo | Bloquea respuestas; calcula resultados | performance_cycle.evaluation_closed
+t: calibracion | publicar | publicada | `performance.reviews.share` | Calibración registrada | Resultados visibles al jefe y luego al evaluado | review.published
+t: publicada | cerrar | cerrada | `performance.cycles.close` | — | Genera insumos para desarrollo, 9-box y compensación | performance_cycle.closed
+t: borrador,lanzada | cancelar | cancelada | `des.campana.administrar` | Motivo | Cancela evaluaciones pendientes | performance_cycle.cancelled
+
+@@ Evaluación individual | reviews | DES
+st: asignada=Asignada; en_progreso=En progreso; enviada=Enviada; calibrada=Calibrada; publicada=Publicada; con_acuse=Con acuse; cancelada=Cancelada
+ini: asignada
+fin: con_acuse,cancelada
+t: asignada | empezar | en_progreso | Evaluador (`des.evaluacion.responder`) | Campaña en evaluación | Guarda borrador | review.started
+t: asignada,en_progreso | enviar | enviada | Evaluador | Preguntas obligatorias completas | Bloquea edición | review.submitted
+t: enviada | reabrir | en_progreso | `performance.reviews.reopen` | Motivo; campaña aún en evaluación | — | review.reopened
+t: enviada | calibrar | calibrada | `des.calibracion.ejecutar` | Guarda original, ajuste y motivo | — | review.calibrated
+t: enviada,calibrada | publicar | publicada | Sistema (publicación de campaña) | — | Visible según anonimato | review.published
+t: publicada | dar_acuse | con_acuse | Evaluado | — | Comentario opcional | review.acknowledged
+t: asignada,en_progreso | cancelar | cancelada | `des.campana.administrar` o sistema (cese) | — | — | review.cancelled
+
+@@ Objetivo | goals | OKR
+st: borrador=Borrador; en_aprobacion=En aprobación; activo=Activo; en_riesgo=En riesgo; cerrado=Cerrado; cancelado=Cancelado
+ini: borrador
+fin: cerrado,cancelado
+t: borrador | enviar | en_aprobacion | Dueño (`okr.objetivo.crear`) | Resultados clave con métrica y meta; pesos válidos | — | goal.created
+t: en_aprobacion | aprobar | activo | Jefe (`okr.objetivo.aprobar`) | — | — | goal.approved
+t: en_aprobacion | devolver | borrador | Jefe | Comentario | — | approval.rejected
+t: activo,en_riesgo | actualizar_avance | activo | Dueño | Ciclo abierto | Recalcula avance | goal.progress_updated
+t: activo | marcar_en_riesgo | en_riesgo | Dueño o sistema (sin actualización o confianza baja) | — | Avisa al jefe | goal.at_risk
+t: activo,en_riesgo | modificar_meta | en_aprobacion | Dueño | Motivo | Conserva historial | goal.created
+t: activo,en_riesgo | cerrar | cerrado | Dueño, jefe o sistema (fin de ciclo) | Calificación final | Insumo para desempeño | goal.closed
+t: borrador,en_aprobacion,activo,en_riesgo | cancelar | cancelado | Dueño o jefe | Motivo | — | goal.cancelled
+
+@@ Inscripción a curso | enrollments | LMS
+st: no_iniciado=No iniciado; en_progreso=En progreso; completado=Completado; vencido=Vencido; cancelado=Cancelado
+ini: no_iniciado
+fin: completado,cancelado
+t: no_iniciado | iniciar | en_progreso | Inscrito (`lms.curso.cursar`) | Curso publicado | Registra inicio | enrollment.started
+t: en_progreso | completar | completado | Sistema | Lecciones vistas y evaluación aprobada (o asistencia a sesión) | Emite certificado; actualiza registros legales | course.completed
+t: no_iniciado,en_progreso | vencer | vencido | Sistema | Fecha límite superada | Alerta a inscrito, jefe y responsable | enrollment.overdue
+t: vencido | completar | completado | Sistema | Requisitos cumplidos fuera de plazo | Marca «completado con retraso» | course.completed
+t: no_iniciado,en_progreso,vencido | cancelar | cancelado | `lms.inscripcion.asignar` o sistema (cese) | — | — | enrollment.cancelled
+
+@@ Ciclo de revisión salarial | salary_review_cycles | COM
+st: borrador=Borrador; propuestas=Propuestas de managers; revision_rrhh=Revisión de RRHH; aprobacion_finanzas=Aprobación de finanzas; aprobacion_direccion=Aprobación de dirección; aprobado=Aprobado; aplicado=Aplicado; cancelado=Cancelado
+ini: borrador
+fin: aplicado,cancelado
+t: borrador | lanzar | propuestas | `compensation.cycles.open` | Población, presupuesto por unidad, lineamientos, fecha de vigencia | Notifica a managers | salary_review.launched
+t: propuestas | cerrar_propuestas | revision_rrhh | `compensation.cycles.submit` | Propuestas enviadas o plazo vencido | Bloquea edición de managers | salary_review.proposal_submitted
+t: revision_rrhh | enviar_a_finanzas | aprobacion_finanzas | `com.propuesta.aprobar` | Excepciones justificadas | — | approval.requested
+t: aprobacion_finanzas | aprobar | aprobacion_direccion | Aprobador de finanzas del flujo | Costo dentro del presupuesto o excepción | — | approval.step_approved
+t: aprobacion_direccion | aprobar | aprobado | Aprobador de dirección del flujo | — | — | salary_review.approved
+t: revision_rrhh,aprobacion_finanzas,aprobacion_direccion | devolver | propuestas | Aprobador de la etapa | Observaciones | Reabre propuestas indicadas | approval.rejected
+t: aprobado | aplicar | aplicado | `com.ciclo.aplicar` | Fecha de vigencia; periodo de planilla abierto | Crea compensaciones con vigencia; genera cartas y evidencia de comunicación | salary_review.applied
+t: borrador,propuestas,revision_rrhh,aprobacion_finanzas,aprobacion_direccion,aprobado | cancelar | cancelado | `compensation.cycles.close` | Motivo | Sin efectos en sueldos | salary_review.cancelled
+
+@@ Encuesta | surveys | ENC
+st: borrador=Borrador; programada=Programada; abierta=Abierta; cerrada=Cerrada; publicada=Resultados publicados; archivada=Archivada
+ini: borrador
+fin: archivada
+t: borrador | programar | programada | `engagement.surveys.update` | Preguntas, población y modo de anonimato fijados | — | survey.scheduled
+t: borrador,programada | lanzar | abierta | `engagement.surveys.launch` o sistema (fecha) | Población no vacía | Fija segmentos; envía invitaciones | survey.launched
+t: abierta | cerrar | cerrada | `engagement.surveys.close` o sistema (fecha) | — | Calcula resultados con umbral | survey.closed
+t: cerrada | publicar | publicada | `enc.encuesta.administrar` | Participación mínima o confirmación | Visible a managers en su alcance | survey.results_published
+t: cerrada,publicada | archivar | archivada | `enc.encuesta.administrar` | — | Conserva agregados | survey.archived
+
+@@ Solicitud a RRHH (ticket) | tickets | HSD
+st: nuevo=Nuevo; en_atencion=En atención; esperando=Esperando información; resuelto=Resuelto; cerrado=Cerrado
+ini: nuevo
+fin: cerrado
+t: nuevo | tomar | en_atencion | Agente (`helpdesk.tickets.assign`) o asignación automática | No es el solicitante | Registra primera respuesta para el SLA | ticket.assigned
+t: en_atencion | pedir_informacion | esperando | Agente (`helpdesk.tickets.request_info`) | Mensaje al solicitante | Detiene el reloj del SLA | ticket.waiting_info
+t: esperando | responder | en_atencion | Solicitante | — | Reanuda el reloj | ticket.updated
+t: esperando | cerrar_por_inactividad | cerrado | Sistema | Plazo sin respuesta | Aviso al solicitante | ticket.closed
+t: en_atencion,nuevo | resolver | resuelto | Agente | Respuesta registrada | Pide confirmación y valoración | ticket.resolved
+t: resuelto | reabrir | en_atencion | Solicitante | Dentro del plazo de reapertura | — | ticket.reopened
+t: resuelto | cerrar | cerrado | Solicitante o sistema (plazo) | — | — | ticket.closed
+
+@@ Informe de gastos | expense_reports | GAS
+st: borrador=Borrador; enviado=Enviado (manager); en_revision=En revisión de finanzas; observado=Observado; aprobado=Aprobado; pagado=Pagado; rechazado=Rechazado
+ini: borrador
+fin: pagado,rechazado
+t: borrador,observado | enviar | enviado | Titular (`gas.gasto.registrar`) | Comprobantes exigidos; excesos justificados | Solicitud de aprobación | expense.submitted
+t: enviado | aprobar | en_revision | Manager (`gas.gasto.aprobar`; no el titular) | — | — | approval.step_approved
+t: en_revision | aprobar | aprobado | Finanzas (`gas.gasto.revisar`) | Comprobantes válidos; sin duplicados | Define medio de pago | expense.approved
+t: enviado,en_revision | observar | observado | Manager o finanzas | Observación por gasto | Devuelve al titular | expense.observed
+t: enviado,en_revision | rechazar | rechazado | Manager o finanzas (`expenses.reports.reject`) | Motivo | — | expense.rejected
+t: aprobado | pagar | pagado | `gas.gasto.pagar` o sistema (cierre de planilla) | Pago confirmado | Contabiliza | expense.paid
+
+@@ Anticipo de viático y rendición | travel_advances | GAS
+st: solicitado=Solicitado; aprobado=Aprobado; entregado=Entregado; por_rendir=Por rendir; rendido=Rendido; vencido=Vencido sin rendir; cerrado=Cerrado; rechazado=Rechazado
+ini: solicitado
+fin: cerrado,rechazado
+t: solicitado | aprobar | aprobado | `expenses.advances.approve` | Política de viáticos; sin anticipos vencidos | — | approval.approved
+t: solicitado | rechazar | rechazado | `expenses.advances.reject` | Motivo | — | approval.rejected
+t: aprobado | entregar | entregado | `expenses.advances.mark_paid` | Pago confirmado | — | travel_advance.granted
+t: entregado | iniciar_plazo | por_rendir | Sistema (fin del viaje) | — | Empieza el plazo de rendición | —
+t: por_rendir,vencido | rendir | rendido | Titular | Informe de gastos aprobado enlazado | Calcula saldo a devolver o reembolsar | travel_advance.settled
+t: por_rendir | vencer | vencido | Sistema | Plazo superado | Alerta; bloquea nuevos anticipos según política | travel_advance.overdue
+t: rendido | cerrar | cerrado | `expenses.advances.mark_paid` | Devolución o reembolso registrado | — | travel_advance.closed
+
+@@ Activo | assets | ACT
+st: disponible=Disponible; asignado=Asignado; mantenimiento=Mantenimiento; perdido=Perdido; baja=Baja
+ini: disponible
+fin: baja
+t: disponible | asignar | asignado | `act.activo.asignar` | Acta firmada por quien recibe | Registra asignación | asset.assigned
+t: asignado | devolver | disponible | `assets.assets.return` | Estado verificado; acta de devolución | Cierra asignación | asset.returned
+t: asignado,disponible | enviar_mantenimiento | mantenimiento | `assets.assets.send_to_maintenance` | Motivo | Cierra asignación si la había | asset.sent_to_maintenance
+t: mantenimiento | retornar | disponible | `act.activo.administrar` | — | — | asset.available
+t: asignado,disponible,mantenimiento | marcar_perdido | perdido | `assets.assets.report_lost` | Motivo y fecha | Informa a liquidación si hay cese | asset.lost
+t: perdido | recuperar | disponible | `act.activo.administrar` | — | — | asset.available
+t: disponible,mantenimiento,perdido | dar_baja | baja | `assets.assets.retire` | Motivo | Conserva historial | asset.retired
+
+@@ Incidente o accidente SST | sst_incidents | SST
+st: reportado=Reportado; clasificado=Clasificado; en_investigacion=En investigación; con_medidas=Con medidas en curso; cerrado=Cerrado; descartado=Descartado
+ini: reportado
+fin: cerrado,descartado
+t: reportado | clasificar | clasificado | `sst.incidents.update` | Tipo y gravedad | Crea tarea de notificación a la autoridad si el tipo lo exige | sst.incident_classified
+t: reportado | descartar | descartado | `sst.incidents.close` | Motivo (no constituye incidente) | — | sst.incident_discarded
+t: clasificado | investigar | en_investigacion | `sst.incidente.investigar` | Responsable asignado | — | sst.investigation_started
+t: en_investigacion | definir_medidas | con_medidas | `sst.incidente.investigar` | Causas registradas | Crea medidas correctivas | sst.corrective_action_created
+t: con_medidas | cerrar | cerrado | `sst.incidents.close` | Todas las medidas verificadas o descartadas | Entra al registro obligatorio y estadísticas | sst.incident_closed
+t: en_investigacion | cerrar | cerrado | `sst.incidents.close` | Investigación concluye sin medidas, con fundamento | — | sst.incident_closed
+
+@@ Medida correctiva | sst_corrective_actions | SST
+st: pendiente=Pendiente; en_curso=En curso; ejecutada=Ejecutada; verificada=Verificada; vencida=Vencida; descartada=Descartada
+ini: pendiente
+fin: verificada,descartada
+t: pendiente | iniciar | en_curso | Responsable (`sst.medida.ejecutar`) | — | — | sst.corrective_action_started
+t: pendiente,en_curso,vencida | ejecutar | ejecutada | Responsable | Evidencia adjunta | Solicita verificación | sst.corrective_action_executed
+t: ejecutada | verificar | verificada | `sst.medida.administrar` (distinto del responsable) | Eficacia comprobada | Permite cerrar el incidente | sst.corrective_action_verified
+t: ejecutada | rechazar_verificacion | en_curso | `sst.medida.administrar` | Motivo | — | sst.corrective_action_reopened
+t: pendiente,en_curso | vencer | vencida | Sistema | Plazo superado | Alerta a responsable y SST | sst.corrective_action_overdue
+t: pendiente,en_curso,vencida | descartar | descartada | `sst.corrective_actions.update` | Motivo | — | sst.corrective_action_discarded
+
+@@ Denuncia | whistleblowing_cases | DEN
+st: recibida=Recibida; admitida=Admitida; en_investigacion=En investigación; con_informe=Con informe; resuelta=Resuelta; cerrada=Cerrada; no_admitida=No admitida
+ini: recibida
+fin: cerrada,no_admitida
+t: recibida | admitir | admitida | `den.denuncia.administrar` | Categoría; sin conflicto de interés del receptor | Dicta medidas de protección si es hostigamiento; inicia plazos | whistleblowing.case_received
+t: recibida | no_admitir | no_admitida | `grievances.cases.dismiss` | Fundamento; orientación al canal correcto | Visible al denunciante con su código | whistleblowing.case_closed
+t: admitida | asignar | en_investigacion | `grievances.cases.assign` | Investigador no mencionado en el caso | Acceso solo al asignado | —
+t: en_investigacion | registrar_actuacion | en_investigacion | `den.denuncia.investigar` | — | Bitácora del caso | —
+t: en_investigacion | emitir_informe | con_informe | `den.denuncia.investigar` | Hechos, descargos y conclusión | — | whistleblowing.deadline_approaching
+t: con_informe | resolver | resuelta | `grievances.cases.resolve` (órgano decisor) | Decisión y medidas | Deriva a caso disciplinario si corresponde, sin identidad del denunciante | —
+t: resuelta | cerrar | cerrada | `den.denuncia.cerrar` | Comunicación a las partes | Programa anonimización al vencer la retención | whistleblowing.case_closed
+nota: Ningún evento de este módulo lleva datos del caso ni identidades; solo los reciben los asignados.
+
+@@ Caso disciplinario | disciplinary_cases | DIS
+st: abierto=Abierto; imputado=Imputación notificada; en_descargos=En descargos; en_evaluacion=En evaluación; decidido=Decidido; notificado=Medida notificada; cerrado=Cerrado; archivado=Archivado sin medida
+ini: abierto
+fin: cerrado,archivado
+t: abierto | notificar_imputacion | imputado | `discipline.cases.notify` | Hechos y evidencias documentados | Genera carta con plazo de descargos | disciplinary.charge_notified
+t: abierto | archivar | archivado | `dis.caso.administrar` | Fundamento | — | disciplinary.closed
+t: imputado | abrir_descargos | en_descargos | Sistema (constancia de notificación) | Notificación recibida | Corre el plazo | —
+t: en_descargos | recibir_descargos | en_evaluacion | Trabajador (`dis.descargo.presentar`) o sistema (plazo vencido) | — | Registra descargos o su ausencia | disciplinary.defense_submitted
+t: en_evaluacion | decidir | decidido | `dis.caso.decidir` (distinto de quien condujo, para suspensión o despido) | Medida proporcional y fundamentada | — | disciplinary.decided
+t: en_evaluacion | archivar | archivado | `dis.caso.decidir` | Fundamento | — | disciplinary.closed
+t: decidido | notificar_medida | notificado | `discipline.cases.notify` | Documento firmado | Suspensión crea ausencia; despido inicia offboarding | disciplinary.measure_notified
+t: notificado | cerrar | cerrado | `discipline.cases.close` | Efectos aplicados | Registra antecedente con vigencia | disciplinary.closed
+
+@@ Solicitud de derechos sobre datos personales | data_subject_requests | PRI
+st: recibida=Recibida; en_verificacion=Verificando identidad; en_proceso=En proceso; atendida=Atendida; denegada=Denegada (con fundamento); cerrada=Cerrada
+ini: recibida
+fin: cerrada
+t: recibida | verificar_identidad | en_verificacion | `pri.solicitud.atender` | Titular externo o sin sesión | Pide sustento | privacy.request_received
+t: recibida,en_verificacion | admitir | en_proceso | `pri.solicitud.atender` | Identidad verificada; tipo de derecho | Calcula fecha límite | —
+t: en_proceso | atender | atendida | `pri.solicitud.atender` | Acción ejecutada (entrega, rectificación, cancelación, oposición, portabilidad) | Registra respuesta | privacy.request_resolved
+t: en_proceso | denegar | denegada | `privacy.subject_requests.reject` | Fundamento legal (obligación de conservar) | Responde al titular | privacy.request_resolved
+t: en_verificacion | denegar | denegada | `privacy.subject_requests.reject` | Identidad no acreditada en plazo | — | privacy.request_resolved
+t: atendida,denegada | cerrar | cerrada | Sistema | Respuesta entregada | Conserva expediente | —
+
+@@ Organización y suscripción | organizations | SAS
+st: prueba=En prueba; activa=Activa; gracia=En periodo de gracia; suspendida=Suspendida; cancelada=Cancelada; eliminada=Eliminada o anonimizada
+ini: prueba
+fin: eliminada
+t: prueba | convertir | activa | `platform.subscriptions.change_plan` o cliente | Plan elegido | Activa módulos y límites del plan | organization.activated
+t: prueba | vencer_prueba | gracia | Sistema | Fin de la prueba sin conversión | Avisos al administrador | organization.trial_ended
+t: activa | entrar_en_gracia | gracia | Sistema | Pago vencido | Avisos; operación normal | subscription.past_due
+t: gracia | regularizar | activa | Sistema o `sas.suscripcion.administrar` | Pago o conversión | — | organization.reactivated
+t: gracia,activa | suspender | suspendida | Sistema (fin de gracia) o `platform.tenants.suspend` | Motivo | Bloquea operación; colaboradores conservan lectura de boletas | organization.suspended
+t: suspendida | reactivar | activa | `platform.tenants.reactivate` | Causa resuelta | Continúa donde quedó | organization.reactivated
+t: activa,suspendida,gracia,prueba | cancelar | cancelada | Cliente (administrador) o `platform.tenants.cancel` | Confirmación | Ofrece exportación; inicia periodo de retención | organization.cancelled
+t: cancelada | reactivar | activa | `platform.tenants.reactivate` | Dentro del periodo de retención | — | organization.reactivated
+t: cancelada | eliminar | eliminada | Sistema | Periodo de retención cumplido; sin retención legal | Elimina o anonimiza; deja acta | organization.deleted
+nota: Cambios de plan o de módulos no cambian el estado: emiten `subscription.changed`, `module.enabled` y `module.disabled`.
+
+@@ Importación | import_batches | IMP
+st: cargado=Archivo cargado; mapeado=Mapeado; validado=Validado; con_errores=Con errores; importando=Importando; completado=Completado; fallido=Fallido; revertido=Revertido; descartado=Descartado
+ini: cargado
+fin: revertido,descartado,completado
+t: cargado | mapear | mapeado | `imports.imports.map` | Columnas obligatorias mapeadas | Guarda el mapeo | —
+t: mapeado,con_errores | validar | validado | `imports.imports.validate` | Sin filas con error (o política «solo válidas») | Genera vista previa | import.validated
+t: mapeado,con_errores | validar_con_errores | con_errores | `imports.imports.validate` | Filas con error | Lista descargable de errores | import.validated
+t: validado | confirmar | importando | `imp.importacion.ejecutar` | Vista previa revisada; permisos de campo | Proceso en segundo plano | import.started
+t: importando | finalizar | completado | Sistema | Todos los lotes confirmados | Informe del lote | import.completed
+t: importando | fallar | fallido | Sistema | Error no recuperable | Revierte el lote parcial | import.failed
+t: completado | deshacer | revertido | `imp.importacion.deshacer` | Ningún registro usado por otro proceso | Elimina o restaura a valores anteriores | import.reverted
+t: cargado,mapeado,validado,con_errores,fallido | descartar | descartado | `imports.imports.cancel` | — | Borra el archivo temporal | —
+
+@@ Definición de workflow | workflow_definitions | WFL
+st: borrador=Borrador; publicado=Publicado; pausado=Pausado; archivado=Archivado
+ini: borrador
+fin: archivado
+t: borrador | publicar | publicado | `workflow.workflows.activate` | Grafo válido (inicio, fin, sin nodos sueltos); sin acciones de alto impacto automáticas; prueba ejecutada | Nueva versión activa; la anterior queda para trámites en curso | workflow.published
+t: publicado | pausar | pausado | `workflow.workflows.pause` o sistema (bucle o fallos) | Motivo | Deja de dispararse | workflow.paused
+t: pausado | reanudar | publicado | `workflow.workflows.activate` | Causa corregida | — | workflow.resumed
+t: publicado,pausado | editar | borrador | `wfl.flujo.administrar` | — | Crea borrador de la siguiente versión; la publicada sigue activa | —
+t: borrador,publicado,pausado | archivar | archivado | `workflow.workflows.retire` | Sin trámites en curso o con plan de reasignación | — | workflow.archived
+
+@@ Solicitud de aprobación | approval_requests | WFL
+st: pendiente=Pendiente; en_curso=En curso; aprobada=Aprobada; rechazada=Rechazada; cancelada=Cancelada; escalada=Escalada
+ini: pendiente
+fin: aprobada,rechazada,cancelada
+t: pendiente | asignar_pasos | en_curso | Sistema | Flujo resuelto; aprobadores resueltos (no el solicitante) | Notifica al primer nivel | approval.requested
+t: en_curso | aprobar_paso | en_curso | Aprobador del paso (`wfl.aprobacion.resolver`) | Es su turno; no es el solicitante | Activa el siguiente paso | approval.step_approved
+t: en_curso,escalada | aprobar_ultimo_paso | aprobada | Aprobador del último paso | Mínimo requerido del paso cumplido | Devuelve el resultado al módulo de origen | approval.approved
+t: en_curso,escalada | rechazar | rechazada | Cualquier aprobador activo (`workflow.approval_requests.reject`) | Motivo obligatorio | Devuelve el resultado al módulo | approval.rejected
+t: en_curso | escalar | escalada | Sistema (plazo) o `wfl.aprobacion.reasignar` | Plazo superado o aprobador no disponible | Reasigna a suplente o nivel superior | approval.escalated
+t: escalada | aprobar_paso | en_curso | Nuevo aprobador | — | Activa el siguiente paso | approval.step_approved
+t: pendiente,en_curso,escalada | cancelar | cancelada | Solicitante o módulo de origen | Antes de la decisión final | Anula pasos pendientes | approval.cancelled
+
+@@ Ejecución de automatización | workflow_runs | WFL
+st: en_cola=En cola; en_ejecucion=En ejecución; en_espera=En espera; completada=Completada; fallida=Fallida; cancelada=Cancelada
+ini: en_cola
+fin: completada,cancelada
+t: en_cola | iniciar | en_ejecucion | Sistema | Condiciones del disparador cumplidas; sin bucle | — | workflow.run_started
+t: en_ejecucion | esperar | en_espera | Sistema (nodo espera o aprobación) | — | Programa la reanudación | —
+t: en_espera | reanudar | en_ejecucion | Sistema (tiempo o decisión) | — | — | —
+t: en_ejecucion | terminar | completada | Sistema | Todas las acciones ejecutadas | Registro completo | workflow.run_completed
+t: en_ejecucion | fallar | fallida | Sistema | Error tras reintentos | Detiene acciones dependientes; alerta | workflow.run_failed
+t: fallida | reintentar | en_cola | `wfl.ejecucion.reintentar` | Acciones idempotentes | Reanuda desde la acción fallida | workflow.run_retried
+t: en_cola,en_espera,fallida | cancelar | cancelada | `workflow.runs.cancel` | Motivo | — | workflow.run_cancelled
+
+@@ Requerimiento de la autoridad (casilla electrónica) | authority_requests | CUM
+st: registrado=Registrado; asignado=Asignado; en_preparacion=En preparación; respondido=Respondido; vencido=Vencido; cerrado=Cerrado
+ini: registrado
+fin: cerrado
+t: registrado | asignar | asignado | `compliance.notices.assign` | Fecha de notificación y plazo | Calcula vencimiento; alerta | authority_request.registered
+t: asignado | preparar | en_preparacion | Responsable | — | Puede generar expediente de inspección | inspection_file.generated
+t: en_preparacion,asignado,vencido | responder | respondido | `compliance.notices.answer` | Constancia de presentación | — | authority_request.answered
+t: asignado,en_preparacion | vencer | vencido | Sistema | Plazo superado sin respuesta | Alerta máxima a administradores | authority_request.due
+t: respondido | cerrar | cerrado | `compliance.notices.close` | Resultado registrado | — | authority_request.closed
+
+@@ Proceso electoral del comité de SST | sst_committee_elections | SST
+st: planificado=Planificado; comunicado=Comunicado; convocado=Convocado; junta=Junta electoral conformada; inscripcion=Inscripción de candidatos; publicados=Candidatos publicados; votacion=En votación; escrutado=Escrutado; proclamado=Proclamado; instalado=Instalado; anulado=Anulado
+ini: planificado
+fin: instalado,anulado
+t: planificado | comunicar | comunicado | `sst.elections.communicate` | Dotación y número de miembros calculados; paridad | Comunica al sindicato mayoritario si existe | sst.election.notified
+t: comunicado | convocar | convocado | Sindicato mayoritario (lo registra SST) o empleador (`sst.elections.call`) | Si convoca el empleador habiendo sindicato: venció el plazo del sindicato (parámetro) | Publica la convocatoria | sst.election.called
+t: convocado | conformar_junta | junta | `sst.elections.form_board` | Presidente, secretario y vocales; ninguno es candidato | — | sst.election.board_formed
+t: junta | abrir_inscripcion | inscripcion | `sst.elections.open_nominations` | Cronograma completo | — | sst.election.nominations_opened
+t: inscripcion | publicar_candidatos | publicados | `sst.elections.publish_candidates` | Requisitos de cada candidato; tachas resueltas en su plazo (parámetro) | Lista de candidatos aptos | sst.election.candidates_published
+t: publicados | abrir_votacion | votacion | `sst.elections.open_voting` | Padrón cargado con los trabajadores hábiles | Habilita el voto secreto | sst.election.voting_opened
+t: votacion | escrutar | escrutado | `sst.elections.count` | Votos emitidos ≤ padrón; suma de votos cuadra | Acta de escrutinio | sst.election.counted
+t: escrutado | proclamar | proclamado | `sst.elections.proclaim` | Titulares y suplentes por orden de votos | Acta del proceso firmada por la junta | sst.election.proclaimed
+t: proclamado | instalar | instalado | `sst.elections.install` | Representantes del empleador designados; acta de instalación; dentro del plazo (parámetro) | Crea el comité y sus miembros; cierra el saliente | sst.committee.installed
+t: comunicado,convocado,junta,inscripcion,publicados,votacion,escrutado | anular | anulado | `sst.elections.annul` | Motivo | Planifica un proceso nuevo | sst.election.annulled
+nota: El proceso nace «Planificado» cuando el mandato está por vencer, la dotación cruza el umbral o hay vacancia sin suplente. El voto se guarda en dos tablas sin vínculo (quién votó y cuántos votos por candidato). Cada transición deja un asiento en el libro inalterable (`compliance_ledger_entries`). Plazos y norma: `18-localizacion-peru-detalle-tecnico.md` §5.1.
+
+@@ Sesión del comité de SST | sst_committee_meetings | SST
+st: programada=Programada; convocada=Convocada; realizada=Realizada; sin_quorum=Sin quórum; acta_redactada=Acta redactada; acta_firmada=Acta firmada; cancelada=Cancelada
+ini: programada
+fin: sin_quorum,acta_firmada,cancelada
+t: programada | convocar | convocada | `sst.committee_meetings.call` | Agenda; fecha dentro del mes si es ordinaria | Avisa a los miembros | sst.meeting.called
+t: convocada | registrar_sesion | realizada | `sst.committee_meetings.record_session` | Asistencia por miembro; presentes ≥ quórum salvo sesión reprogramada | — | sst.meeting.held
+t: convocada | registrar_sin_quorum | sin_quorum | `sst.committee_meetings.record_no_quorum` | Presentes < quórum | Crea la sesión reprogramada dentro del plazo (parámetro) | sst.meeting.no_quorum
+t: realizada | redactar_acta | acta_redactada | `sst.committee_meetings.draft_minutes` | Acuerdos con responsable y fecha | — | sst.minutes.drafted
+t: acta_redactada | firmar_acta | acta_firmada | Miembros asistentes (`sst.committee_meetings.sign_minutes`) | Firman todos los asistentes | Asiento en el libro inalterable con la huella del acta; el acta ya no se edita | sst.minutes.signed
+t: programada,convocada | cancelar | cancelada | `sst.committee_meetings.cancel` | Motivo | Una ordinaria cancelada sin reemplazo deja la obligación del mes en incumplimiento | sst.meeting.cancelled
+nota: Una sesión ordinaria por mes mientras el comité esté vigente. Quórum, reprogramación, vacancia y licencias: parámetros `sst_*` (`18-localizacion-peru-detalle-tecnico.md` §5.1).
+
+@@ Procedimiento de hostigamiento sexual | complaints | DEN
+st: recibida=Recibida; trasladada=Trasladada al comité; investigacion=En investigación; informe=Informe emitido; decidida=Decidida; cerrada=Cerrada
+ini: recibida
+fin: cerrada
+t: recibida | trasladar_al_comite | trasladada | `grievances.cases.refer_to_committee` | Comité o delegado vigente; ningún miembro mencionado en la queja | Corre el plazo de traslado (1 día hábil, parámetro) | complaint.referred
+t: trasladada | iniciar_investigacion | investigacion | `grievances.cases.start_investigation` | Traslado de la queja al quejado con plazo de descargos | — | complaint.investigation_started
+t: investigacion | emitir_informe | informe | `grievances.cases.issue_report` | Descargos recibidos o plazo vencido; propuesta motivada; acuerdo por mayoría | Dentro de 15 días calendario desde la recepción (parámetro) | complaint.report_issued
+t: informe | decidir | decidida | `grievances.cases.decide` | Informe trasladado a las partes; alegatos o plazo vencido | Dentro de 10 días calendario desde el informe (parámetro); abre caso disciplinario sin la identidad del denunciante | complaint.decided
+t: decidida | cerrar | cerrada | `grievances.cases.close` | Comunicación de la decisión a la autoridad presentada o sustentada | — | complaint.closed
+nota: Aplica solo a denuncias de categoría hostigamiento sexual y se guarda en `complaints.procedure_stage`; convive con el estado general de la denuncia (ME-37). La atención médica y psicológica (1 día hábil), las medidas de protección (3 días hábiles) y las dos comunicaciones a la autoridad (6 días hábiles) son hitos paralelos en `compliance_deadlines` y `authority_communications`, no estados. Los plazos de una denuncia se computan por día: no se guarda la hora. Detalle: `18-localizacion-peru-detalle-tecnico.md` §5.2.
+
+@@ Devolución de retención de quinta en exceso | fifth_category_refunds | DEC
+st: pendiente=Pendiente; devuelto=Devuelto al trabajador; compensado=Compensado; solicitado=Solicitado a la autoridad; cerrado=Cerrado
+ini: pendiente
+fin: cerrado
+t: pendiente | devolver | devuelto | `payroll.fifth_category_refunds.refund` (persona distinta de quien calculó) | Exceso calculado por el ajuste final, la regularización de diciembre o la declaración del trabajador | Paga en la liquidación o en la planilla; asiento en el libro de retenciones | fifth_category.refund_paid
+t: devuelto | compensar | compensado | `payroll.fifth_category_refunds.compensate` | Retenciones de otros trabajadores del periodo suficientes | Reduce el total a pagar del periodo tributario | fifth_category.refund_compensated
+t: devuelto | solicitar_devolucion | solicitado | `payroll.fifth_category_refunds.request_authority_refund` | Saldo no compensado | Guarda la referencia del trámite | fifth_category.refund_requested
+t: compensado,solicitado | cerrar | cerrado | `payroll.fifth_category_refunds.close` | Saldo en cero o resolución de la autoridad | — | fifth_category.refund_closed
+nota: Reglas RN-PE-QTA-11 a RN-PE-QTA-18 en `18-localizacion-peru-detalle-tecnico.md` §2.7.

@@ -1,0 +1,554 @@
+@@ ATS | Reclutamiento, portal de empleos y base de talento | 4
+#obj
+Llevar cada vacante desde su aprobación hasta la contratación con un tablero configurable, un portal público propio y una base de talento reutilizable.
+#alc
+- Vacante ligada a una posición: descripción, requisitos, modalidad, ubicación, rango salarial opcional, responsable, equipo de selección.
+- Aprobación, publicación (portal propio, enlaces para bolsas externas), cierre.
+- Postulaciones con tablero por etapas configurable (nuevo, preselección, entrevista RRHH, entrevista técnica, evaluación, referencias, oferta, contratado) y arrastrar y soltar.
+- Candidato: datos, CV, experiencia, educación, pretensión salarial, fuente, notas, documentos, entrevistas, evaluaciones, actividad.
+- Portal de empleos público por empresa con formulario configurable y SEO (títulos, descripciones, datos estructurados, mapa del sitio).
+- Base de talento con etiquetas, búsqueda y filtros avanzados; referidos y movilidad interna (vacantes internas, postulación de colaboradores).
+- Consentimiento y retención de datos de candidatos; resumen de CV con IA como apoyo.
+#fue
+- Entrevistas y ofertas (M-ENT). Pruebas psicométricas y verificación de antecedentes (integración por socio, M-INT).
+#act
+- Recruiter gestiona. Manager solicitante participa y evalúa. RRHH aprueba. Candidato postula sin cuenta. Colaborador refiere o postula internamente.
+#flu
+**Vacante.** 1) Se crea desde una posición aprobada o vacante. 2) La IA puede proponer la descripción; el reclutador la edita. 3) Se aprueba. 4) Se publica en el portal. 5) Llegan postulaciones. 6) El equipo mueve candidatos por etapas, registra notas y evaluaciones. 7) Con oferta aceptada, el candidato pasa a «Contratado», la vacante se cierra y se precarga el ingreso.
+
+**Postulación pública.** 1) El candidato abre la vacante. 2) Completa el formulario, adjunta CV y acepta el aviso de privacidad. 3) Recibe confirmación y un enlace para ver su estado. 4) Si ya existe por documento o correo, se une a su perfil.
+
+**Descarte.** 1) Se elige motivo. 2) Se envía (opcional) un mensaje de cierre. 3) Si aceptó permanecer en la base, queda en talento con etiquetas.
+#pan
+Vacantes :: Tabla con posición, estado, postulantes por etapa, días abierta, responsable; crear :: Talento → Reclutamiento
+Tablero de la vacante :: Columnas por etapa con tarjetas arrastrables; filtros; acciones masivas :: Talento → Reclutamiento → Vacante
+Ficha del candidato :: Datos, CV, experiencia, educación, pretensión (con permiso), fuente, notas, documentos, entrevistas, evaluaciones, actividad :: Talento → Reclutamiento → Candidato
+Base de talento :: Búsqueda por etiquetas, habilidades, experiencia, fuente; invitar a vacante :: Talento → Reclutamiento → Base de talento
+Portal de empleos :: Página pública con vacantes, ubicación, modalidad, descripción, requisitos, beneficios y formulario :: Portal público → Trabaja con nosotros
+Configuración del portal :: Marca, textos, campos del formulario, etapas por defecto :: Configuración → Reclutamiento
+Vacantes internas :: Vacantes abiertas a colaboradores; postular, referir :: Portal → Mi desarrollo → Oportunidades
+#dat
+Vacantes (`job_openings`), etapas por vacante, candidatos (`candidates`), postulaciones (`applications`), notas, etiquetas, fuentes, referidos, consentimientos de candidato, configuración del portal.
+#rn
+[P] Si la empresa exige posición aprobada → no se crea una vacante sin posición en estado aprobada o vacante.
+[F] Si la vacante no está aprobada → no se puede publicar.
+[F] Si un candidato postula → debe aceptar el aviso de privacidad; sin aceptación no se guarda la postulación.
+[P] Si un candidato no contratado supera el plazo de conservación (parámetro por organización y jurisdicción) sin renovar su consentimiento → sus datos se anonimizan.
+[F] Si un candidato ya existe (mismo documento o correo) → la nueva postulación se añade a su perfil; no se duplica.
+[F] Si se descarta un candidato → se exige motivo de un catálogo; el motivo no se muestra al candidato salvo el mensaje elegido.
+[F] Si la IA resume un CV o sugiere orden de revisión → se muestra como apoyo con su explicación; ninguna postulación se descarta ni avanza de forma automática.
+[F] Si una postulación llega a «Contratado» → requiere una oferta aceptada (M-ENT).
+[F] Si la vacante cubre todas sus plazas → se cierra y las postulaciones activas restantes pasan a descarte con motivo «vacante cubierta», previa confirmación del reclutador.
+[F] Si un colaborador refiere a un candidato → queda como fuente «referido» con el referente, que solo ve el estado general.
+[F] Si el formulario pide datos sensibles (discapacidad para ajustes razonables) → son opcionales, con finalidad explícita, y no visibles para el equipo evaluador.
+[P] Si una vacante publica rango salarial (parámetro por empresa) → se toma de la banda del puesto.
+#eve
+- `vacancy.created`, `vacancy.approved`, `vacancy.opened`, `vacancy.paused`, `vacancy.closed`, `candidate.applied`, `candidate.stage_changed`, `candidate.rejected`, `candidate.hired`, `candidate.anonymized`.
+#evc
+- `position.approved`, `offer.accepted`, `offer.declined`, `interview.completed`.
+#int
+Bolsas de empleo, pruebas y verificación de antecedentes por socio, lectura de CV; por adaptador.
+#bor
+- Candidato que postula a varias vacantes a la vez.
+- Ex-colaborador que postula: se enlaza con su persona y se muestra su historia a quien tenga permiso.
+- Vacante confidencial (reemplazo): visible solo para su equipo.
+- Postulación interna: el jefe actual se entera según política.
+#acc
+- El flujo crear → aprobar → publicar → recibir → evaluar → entrevistar → calificar → contratar funciona y alimenta tiempo y costo de contratación.
+- El portal público es indexable y su formulario es configurable.
+
+@@ ENT | Entrevistas y ofertas | 4
+#obj
+Organizar entrevistas con evaluación estructurada y emitir ofertas aprobadas, de modo que la decisión de contratar quede sustentada.
+#alc
+- Agenda: fecha, hora, entrevistadores, tipo, lugar o enlace, guía y formulario de evaluación (scorecard).
+- Disponibilidad e invitaciones de calendario; recordatorios; reprogramación.
+- Scorecards por competencia con escala y comentario; consolidado por candidato.
+- Preguntas sugeridas por IA como apoyo.
+- Ofertas desde plantilla con variables (`{{nombre}}`, `{{cargo}}`, `{{salario}}`, `{{fecha_ingreso}}`); borrador → revisión → aprobación → enviada → aceptada o rechazada; vencimiento; firma.
+#fue
+- Tablero de candidatos (M-ATS). Pre-onboarding (M-ONB).
+#act
+- Recruiter agenda y redacta. Entrevistadores evalúan. RRHH y finanzas aprueban ofertas. Candidato acepta o rechaza.
+#flu
+**Entrevista.** 1) El reclutador propone horario según disponibilidad. 2) Se invita a entrevistadores y candidato. 3) Tras la entrevista, cada entrevistador completa su scorecard. 4) El consolidado se muestra cuando todos terminaron.
+
+**Oferta.** 1) Se genera desde plantilla con datos de la posición y el candidato. 2) Revisión. 3) Aprobación (monto frente a banda y presupuesto). 4) Se envía con enlace seguro y fecha de vencimiento. 5) El candidato acepta (firma) o rechaza con motivo. 6) Aceptada: `offer.accepted` inicia el pre-onboarding y reserva la posición.
+#pan
+Agenda de entrevistas :: Calendario y lista con estado; agendar, reprogramar :: Talento → Reclutamiento → Entrevistas
+Evaluación de entrevista :: Guía, competencias con escala, comentarios, recomendación :: Talento → Reclutamiento → Entrevistas → Evaluar
+Ofertas :: Lista con candidato, posición, estado, vencimiento; crear, enviar :: Talento → Reclutamiento → Ofertas
+Oferta (vista del candidato) :: Documento, aceptar con firma o rechazar :: Portal público → Oferta
+#dat
+Entrevistas (`interviews`), participantes, guías, plantillas de scorecard, evaluaciones, ofertas (`offers`) y versiones, respuestas.
+#rn
+[F] Si un entrevistador no ha enviado su evaluación → no ve las de los demás (evita sesgo de arrastre).
+[F] Si se agenda una entrevista → se valida que entrevistadores no tengan ausencia aprobada ni otra entrevista en ese horario.
+[P] Si el monto de la oferta supera el máximo de la banda del puesto o el presupuesto de la posición → la aprobación exige el nivel adicional configurado (parámetro).
+[F] Si la oferta no está aprobada → no se puede enviar.
+[P] Si la oferta no se responde antes de su vencimiento (parámetro) → pasa a «Vencida» y la posición queda libre.
+[F] Si el candidato acepta → la aceptación se registra con la evidencia de firma y se crea el proceso de pre-onboarding.
+[F] Si una oferta enviada necesita cambios → se retira y se emite una nueva versión; la anterior se conserva.
+[F] Si ya existe una oferta aceptada para la misma posición de cupo único → no se puede enviar otra.
+[F] Si la IA propone preguntas o un resumen → el entrevistador decide usarlos; la recomendación de contratar siempre la registra una persona.
+#eve
+- `interview.scheduled`, `interview.rescheduled`, `interview.cancelled`, `interview.completed`, `scorecard.submitted`, `offer.created`, `offer.approved`, `offer.sent`, `offer.accepted`, `offer.declined`, `offer.expired`, `offer.withdrawn`.
+#evc
+- `candidate.stage_changed`, `approval.approved`, `signature.completed`.
+#int
+Calendarios y videollamada (M-INT), firma (M-DOC).
+#bor
+- Candidato que acepta fuera de plazo.
+- Entrevistador que cesa antes de evaluar.
+- Contraoferta: nueva versión con nueva aprobación.
+#acc
+- Los entrevistadores evalúan con formularios estructurados y la oferta recorre borrador, revisión, aprobación, envío y respuesta.
+
+@@ ONB | Pre-onboarding y onboarding | 4
+#obj
+Convertir al candidato aceptado en colaborador productivo con procesos diseñados por plantilla, tareas con responsable y seguimiento de avance.
+#alc
+- Pre-onboarding: portal del futuro colaborador para datos, documentos, cuenta bancaria, contacto de emergencia, régimen pensionario y derechohabientes antes del ingreso.
+- Diseñador de plantillas por empresa, sede, puesto y unidad, con hitos relativos al ingreso (7 días antes, día 1, semana 1, 30, 60 y 90 días).
+- Tareas para RRHH, TI, jefe, colaborador y compañero guía; documentos, firmas, cursos, activos, accesos, reuniones, encuestas y evaluación de periodo de prueba.
+- Porcentaje de avance; recordatorios; cierre.
+- Obligaciones de ingreso en Perú: entrega de reglamentos, política salarial, capacitación en hostigamiento y SST, declaración de beneficiarios de Vida Ley, alta en T-Registro.
+#fue
+- El alta laboral en sí (M-COL). Cursos (M-LMS). Activos (M-ACT).
+#act
+- RRHH diseña y supervisa. Jefe, TI y otros ejecutan tareas. Futuro colaborador completa lo suyo.
+#flu
+**Pre-onboarding.** 1) Al aceptarse la oferta, el futuro colaborador recibe acceso limitado. 2) Completa datos y sube documentos. 3) RRHH revisa y aprueba o pide corrección. 4) Con todo aprobado, se confirma el ingreso y los datos pasan a la ficha.
+
+**Onboarding.** 1) `employee.hired` selecciona la plantilla más específica. 2) Se crean tareas con fecha calculada desde la fecha de ingreso y responsable resuelto. 3) Cada responsable las completa desde sus pendientes. 4) El avance se actualiza. 5) A los 30, 60 y 90 días se lanzan seguimiento, encuesta y evaluación de periodo de prueba. 6) Cierre con todas las tareas obligatorias completas.
+#pan
+Onboarding :: Procesos en curso con avance, hito actual, tareas vencidas; iniciar :: Talento → Onboarding
+Detalle del proceso :: Línea de hitos, tareas por responsable y estado, documentos, firmas :: Talento → Onboarding → Proceso
+Plantillas de onboarding :: Lista por criterio; editor de hitos y tareas :: Talento → Onboarding → Plantillas
+Pre-ingreso :: Formulario y carga de documentos del futuro colaborador; avance :: Portal público → Mi ingreso
+Mi onboarding :: Tareas y agenda del nuevo colaborador :: Portal → Pendientes
+#dat
+Plantillas y tareas de plantilla, procesos (`onboarding_processes`), tareas del proceso, expedientes de pre-ingreso.
+#rn
+[F] Si se registra un ingreso → se inicia el proceso con la plantilla que coincide con más criterios (puesto, unidad, sede, empresa); si ninguna aplica, la plantilla por defecto.
+[F] Si una tarea tiene fecha relativa → se calcula desde la fecha de ingreso y se recalcula si esa fecha cambia.
+[F] Si el responsable de una tarea es un rol o una relación (jefe, TI de la sede) → se resuelve a una persona al crear la tarea y se reasigna si esa persona cambia.
+[F] Si quedan tareas obligatorias sin completar → el proceso no puede cerrarse como «Completado».
+[F] Si se calcula el avance → es tareas completadas sobre tareas totales, ponderadas si la plantilla define pesos.
+[F] Si el futuro colaborador no ha ingresado → su acceso se limita al pre-ingreso; no ve directorio ni datos internos.
+[F] Si el ingreso se cancela antes de la fecha → el proceso se cancela, las tareas pendientes se anulan y los datos de pre-ingreso se tratan como de candidato no contratado.
+[P] Si una tarea supera su fecha → se recuerda al responsable y, tras el plazo de escalamiento (parámetro), a su jefe y a RRHH.
+[F] Si la empresa opera en Perú → la plantilla por defecto incluye las tareas de cumplimiento de ingreso (reglamentos, política salarial, capacitaciones obligatorias, Vida Ley, T-Registro) y no se pueden quitar sin dejar constancia.
+[P] Si se acerca el fin del periodo de prueba (parámetro de anticipación) → se crea la evaluación de periodo de prueba para el jefe.
+#eve
+- `preboarding.started`, `preboarding.completed`, `onboarding.started`, `onboarding.task_completed`, `onboarding.completed`, `onboarding.cancelled`.
+#evc
+- `offer.accepted`, `employee.hired`, `employee.terminated`, `signature.completed`, `course.completed`, `asset.assigned`.
+#int
+Creación de cuentas y accesos en sistemas de TI por adaptador (M-INT).
+#bor
+- Ingreso sin proceso de selección previo (alta directa).
+- Reingreso: plantilla abreviada.
+- Cambio de fecha de ingreso con tareas ya completadas.
+- Cese dentro del periodo de onboarding.
+#acc
+- Un proceso muestra hitos (7 días antes, día 1, semana 1, 30, 60, 90 días) con tareas, responsables y porcentaje de avance.
+
+@@ OFF | Offboarding | 4
+#obj
+Conducir la salida de forma ordenada y completa: nada se olvida, los accesos se cierran, los activos vuelven y la liquidación sale a tiempo.
+#alc
+- Tipos de salida: renuncia, despido, fin de contrato, mutuo acuerdo, jubilación, fallecimiento, otros; motivo y submotivo.
+- Lista de comprobación por plantilla: carta, liquidación, devolución de activos y EPP, desactivación de accesos, entrega de documentos, encuesta y entrevista de salida, traspaso de funciones.
+- Reasignación de aprobaciones, equipo y pendientes del saliente.
+- Documentos de cese y bajas legales (con M-LIQ y M-DEC).
+- Marca de recontratable y notas confidenciales.
+#fue
+- Cálculo de liquidación (M-LIQ). Procedimiento disciplinario previo a un despido (M-DIS).
+#act
+- RRHH conduce. Jefe, TI, Payroll y administración ejecutan tareas. Colaborador entrega y responde.
+#flu
+**Salida.** 1) RRHH registra el cese (o la renuncia recibida) con fecha y motivo. 2) Se inicia el proceso con la plantilla del tipo de salida. 3) Se crean tareas: carta, liquidación, activos, accesos, documentos, encuesta, entrevista. 4) Se reasignan aprobaciones y equipo. 5) El último día se desactivan accesos. 6) Con tareas y liquidación completas, se cierra el proceso.
+#pan
+Offboarding :: Procesos en curso con fecha de cese, avance y pendientes críticos :: Talento → Onboarding → Salidas
+Detalle de salida :: Lista de comprobación, activos por devolver, accesos, liquidación, documentos, entrevista :: Talento → Onboarding → Salidas → Proceso
+Entrevista de salida :: Formulario confidencial :: Talento → Onboarding → Salidas → Entrevista
+#dat
+Procesos de salida (`offboarding_processes`), tareas, motivos y submotivos, entrevistas de salida, marca de recontratable.
+#rn
+[F] Si se registra un cese → se inicia el proceso de salida con la plantilla del tipo de cese.
+[F] Si llega la fecha efectiva de cese → se desactivan accesos internos y se retiran roles; queda el modo ex-colaborador.
+[F] Si el saliente tiene aprobaciones pendientes o es jefe → se exige designar a quién pasan antes de cerrar el proceso.
+[F] Si hay activos o EPP sin devolver → la tarea queda abierta y se informa a liquidación para el descuento según política y norma.
+[F] Si el motivo detallado o la entrevista de salida se consultan → requieren el permiso sensible; el jefe solo ve el tipo de salida.
+[F] Si el proceso no tiene liquidación pagada ni documentos entregados → no puede cerrarse como «Completado».
+[F] Si la salida es por despido → debe existir un caso disciplinario cerrado con esa medida o una justificación registrada por RRHH.
+[F] Si el cese se anula antes de la fecha efectiva → el proceso se cancela y se revierten las tareas no ejecutadas.
+[P] Si se configura encuesta de salida → se envía de forma automática con la anticipación de la plantilla (parámetro).
+#eve
+- `offboarding.started`, `offboarding.task_completed`, `offboarding.access_revoked`, `offboarding.completed`, `offboarding.cancelled`.
+#evc
+- `employee.terminated`, `contract.expired`, `settlement.paid`, `asset.returned`, `disciplinary.closed`.
+#int
+Desactivación de cuentas en sistemas de TI (M-INT).
+#bor
+- Abandono de trabajo: fecha de cese retroactiva.
+- Fallecimiento: tareas hacia beneficiarios.
+- Renuncia con exoneración del plazo de preaviso.
+- Salida de una persona con dos relaciones (solo una cesa).
+#acc
+- Cada salida registra motivo y recorre carta, liquidación, activos, accesos, documentos, encuesta y entrevista.
+
+@@ DES | Evaluación de desempeño | 4
+#obj
+Medir el desempeño con campañas configurables de 90° a 360°, con resultados útiles para desarrollo, compensación y talento.
+#alc
+- Campañas con población, calendario, tipo (90°, 180°, 270°, 360°) y participantes (autoevaluación, jefe, pares, subordinados, otros).
+- Formularios con competencias, objetivos, preguntas abiertas y escalas configurables; pesos por sección y por evaluador.
+- Selección y aprobación de pares; anonimato de pares y subordinados.
+- Calibración por comités; retroalimentación; firma o acuse del evaluado; plan de desarrollo.
+- Evaluación de periodo de prueba; resultados para 9-box y revisión salarial.
+#fue
+- Objetivos (M-OKR). Catálogo de competencias (M-CMP).
+#act
+- RRHH diseña y administra. Evaluadores completan. Manager calibra y da retroalimentación. Evaluado se autoevalúa y recibe resultados.
+#flu
+**Campaña.** 1) RRHH configura población, formulario, evaluadores y fechas. 2) Lanza: se crean evaluaciones y se notifica. 3) Evaluados proponen pares; el jefe aprueba. 4) Cada evaluador completa. 5) Cierra la etapa de evaluación y se calculan resultados. 6) Calibración. 7) Publicación al jefe y luego al evaluado en la reunión de retroalimentación. 8) El evaluado da acuse y comenta. 9) Cierre y generación de planes de desarrollo.
+#pan
+Campañas de desempeño :: Lista con etapa, avance por evaluador y por unidad; crear, lanzar :: Talento → Desempeño
+Seguimiento de campaña :: Avance, pendientes, recordar, reasignar evaluador :: Talento → Desempeño → Campaña
+Formulario de evaluación :: Secciones, escala, comentarios, guardar y enviar :: Portal → Pendientes → Evaluar
+Calibración :: Distribución por unidad, comparar, ajustar con motivo :: Talento → Desempeño → Calibración
+Resultados :: Resultado por persona, por competencia y por evaluador (según anonimato) :: Personas → Colaboradores → Ficha → pestaña Desempeño
+Formularios y escalas :: Biblioteca de formularios :: Configuración → Desempeño
+#dat
+Campañas (`performance_cycles`), formularios, escalas, evaluaciones (`reviews`), respuestas, asignaciones de evaluador, calibraciones, resultados, acuses.
+#rn
+[F] Si una campaña se lanza → la población se congela con sus jefes vigentes a la fecha de corte; los cambios posteriores se gestionan caso a caso.
+[P] Si las respuestas de pares o de subordinados son menos que el mínimo de anonimato (parámetro) → no se muestran desglosadas; se agrupan con otra categoría o se omiten.
+[F] Si una evaluación fue enviada → no se edita salvo reapertura por RRHH con motivo.
+[F] Si se calcula el resultado → se aplican los pesos por sección y por tipo de evaluador definidos en la campaña.
+[F] Si se calibra una calificación → se guarda la original, la ajustada, quién y por qué.
+[F] Si los resultados no están publicados → el evaluado no los ve.
+[F] Si el evaluado cesa durante la campaña → sus evaluaciones pendientes se cancelan y las que debía responder se reasignan o se excluyen.
+[P] Si un evaluador no completa antes de la fecha límite → se recuerda y, vencido el plazo de gracia (parámetro), RRHH puede cerrar sin esa respuesta.
+[F] Si el resultado alimenta revisión salarial, 9-box o sucesión → es un insumo; ninguna de esas decisiones se toma de forma automática.
+[F] Si un evaluador es jefe desde hace menos que el tiempo mínimo (parámetro) → se ofrece incluir al jefe anterior como evaluador adicional.
+#eve
+- `performance_cycle.launched`, `performance_cycle.closed`, `review.assigned`, `review.submitted`, `review.calibrated`, `review.published`, `review.acknowledged`.
+#evc
+- `employment.manager_changed`, `employee.terminated`, `goal.closed`.
+#bor
+- Persona con dos jefes en el periodo.
+- Ingreso reciente por debajo de la antigüedad mínima de la campaña.
+- Evaluación 360° con un solo subordinado.
+#acc
+- Se configuran campañas 90°, 180°, 270° y 360° con competencias, preguntas y escalas, y sus resultados aparecen en la ficha.
+
+@@ OKR | Objetivos | 4
+#obj
+Alinear objetivos corporativos, de área e individuales con resultados clave medibles y seguimiento continuo.
+#alc
+- Ciclos (anual, trimestral); objetivos de empresa, unidad y persona; resultados clave con métrica, valor inicial, meta y avance.
+- Alineación jerárquica y árbol de objetivos; pesos; visibilidad pública o privada.
+- Registro de avance con comentario y nivel de confianza; cierre con calificación.
+- Aprobación de objetivos por el jefe; enlace con desempeño y con bonos por resultados.
+#fue
+- Cálculo del bono (M-COM, M-CPT). Evaluación (M-DES).
+#act
+- Dirección define corporativos. Managers definen y aprueban. Colaboradores proponen y actualizan.
+#flu
+**Ciclo.** 1) RRHH abre el ciclo. 2) Se publican objetivos corporativos. 3) Las unidades y personas definen los suyos alineados. 4) El jefe aprueba. 5) Se actualiza el avance con la frecuencia definida. 6) Al cierre se califica y se archiva.
+#pan
+Objetivos :: Árbol o lista por nivel con avance y estado; crear, alinear :: Talento → Objetivos
+Detalle del objetivo :: Resultados clave, avance, historial de actualizaciones, comentarios :: Talento → Objetivos → Objetivo
+Mis objetivos :: Objetivos propios con actualización rápida :: Portal → Mi desarrollo → Objetivos
+#dat
+Ciclos, objetivos (`goals`), resultados clave (`key_results`), actualizaciones, alineaciones.
+#rn
+[F] Si se calcula el avance de un objetivo → es el promedio ponderado del avance de sus resultados clave.
+[F] Si un resultado clave tiene valor inicial, meta y valor actual → su avance es (actual − inicial) / (meta − inicial), acotado entre 0 y el máximo permitido.
+[P] Si la suma de pesos de los objetivos de una persona en el ciclo no es 100 (cuando la política usa pesos) → no puede enviarlos a aprobación.
+[F] Si un objetivo está aprobado → cambiar su meta o peso exige nueva aprobación y queda historial.
+[F] Si el ciclo está cerrado → no se registran avances.
+[P] Si un objetivo no recibe actualización en el intervalo definido (parámetro) → se recuerda al dueño y se marca «sin actualizar».
+[F] Si el objetivo es privado → solo lo ven su dueño, su línea de jefes y RRHH.
+[F] Si la persona cambia de unidad a mitad de ciclo → conserva sus objetivos; el nuevo jefe decide cerrarlos, ajustarlos o mantenerlos.
+#eve
+- `goal.created`, `goal.approved`, `goal.progress_updated`, `goal.at_risk`, `goal.closed`.
+#evc
+- `employment.manager_changed`, `employee.terminated`, `performance_cycle.launched`.
+#bor
+- Resultado clave decreciente (reducir un valor).
+- Objetivo compartido por varias personas.
+- Meta modificada tras superarse.
+#acc
+- Los objetivos corporativos, de área e individuales se relacionan jerárquicamente y muestran avance por resultados clave.
+
+@@ CMP | Competencias y habilidades | 4
+#obj
+Mantener el lenguaje común de talento: qué competencias y habilidades existen, qué nivel exige cada puesto y cuál tiene cada persona.
+#alc
+- Catálogo de competencias (liderazgo, comunicación, trabajo en equipo, orientación a resultados, innovación, organización, otras) con niveles configurables y conductas observables.
+- Habilidades técnicas (skills) con nivel, evidencia y validación; matriz de habilidades por equipo.
+- Perfil de puesto: competencias y niveles requeridos.
+- Brechas por persona frente a su puesto y frente a un puesto objetivo.
+- Fuentes del nivel: evaluación, validación del jefe, certificación, curso completado.
+#fue
+- Evaluación (M-DES). Rutas y sucesión (M-CAR).
+#act
+- RRHH administra el catálogo. Manager valida niveles. Colaborador declara habilidades.
+#flu
+**Perfil.** 1) RRHH asigna competencias y nivel requerido a cada puesto. 2) Tras una evaluación o validación se registra el nivel actual de la persona. 3) El sistema calcula brechas y las ofrece al plan de desarrollo.
+
+**Habilidad.** 1) El colaborador declara una habilidad con nivel y evidencia. 2) El jefe valida. 3) Aparece en la matriz y en la búsqueda de movilidad interna.
+#pan
+Competencias :: Catálogo con niveles y conductas; crear, archivar :: Talento → Competencias
+Perfiles de puesto :: Competencias y nivel requerido por puesto :: Talento → Competencias → Perfiles
+Matriz de habilidades :: Personas × habilidades con nivel; filtros por unidad :: Talento → Competencias → Matriz
+Competencias del colaborador :: Nivel actual frente a requerido y brechas :: Personas → Colaboradores → Ficha → pestaña Competencias
+#dat
+Competencias (`competencies`), niveles, requisitos por puesto, niveles por persona con fuente y fecha, habilidades y validaciones.
+#rn
+[F] Si una competencia está en uso en perfiles o evaluaciones → no se elimina; se archiva.
+[F] Si se registra un nivel de persona → guarda fuente, fecha y autor; el nivel vigente es el más reciente de la fuente de mayor jerarquía definida.
+[F] Si se calcula la brecha → es nivel requerido menos nivel actual por competencia; sin nivel actual se muestra «sin evaluar», no cero.
+[F] Si el colaborador declara una habilidad → queda «declarada» hasta que su jefe la valide.
+[F] Si cambia la escala de niveles de una competencia → los niveles históricos conservan la escala con la que se registraron.
+[P] Si una validación de habilidad supera su vigencia (parámetro por habilidad) → se marca «por revalidar».
+#eve
+- `competency.level_recorded`, `skill.declared`, `skill.validated`, `job_profile.requirements_changed`.
+#evc
+- `review.published`, `course.completed`, `employment.assignment_changed`.
+#bor
+- Persona que cambia de puesto: las brechas se recalculan contra el nuevo perfil.
+- Competencia evaluada con escalas distintas en dos campañas.
+#acc
+- Las competencias con niveles se relacionan con los puestos y la ficha muestra las brechas.
+
+@@ FBK | Reuniones 1:1 y feedback continuo | 4
+#obj
+Sostener la conversación continua entre jefe y colaborador y entre compañeros, con registro y seguimiento.
+#alc
+- Reuniones 1:1 recurrentes: agenda compartida, temas, notas compartidas y notas privadas, compromisos con responsable y fecha.
+- Feedback continuo: solicitar, dar (público, privado, solo al jefe), plantillas, vínculo con competencias y objetivos.
+- Seguimiento de compromisos; resumen para la evaluación de desempeño.
+#fue
+- Reconocimientos públicos con insignias (M-REC). Evaluación formal (M-DES).
+#act
+- Manager y colaborador. Cualquier compañero para feedback.
+#flu
+**1:1.** 1) El jefe crea la serie. 2) Ambos agregan temas antes de la reunión. 3) Durante la reunión se toman notas y compromisos. 4) Los compromisos pendientes aparecen en la siguiente reunión.
+
+**Feedback.** 1) Una persona solicita feedback a otra sobre un tema. 2) La otra responde eligiendo visibilidad. 3) Queda en el historial del receptor y disponible como insumo en su evaluación.
+#pan
+Reuniones 1:1 :: Series, próxima reunión, agenda, notas, compromisos :: Talento → Desempeño → 1:1
+Feedback :: Recibido, dado y solicitudes; dar feedback :: Talento → Desempeño → Feedback
+#dat
+Series y reuniones 1:1, temas, notas (compartidas y privadas), compromisos, feedback y solicitudes.
+#rn
+[F] Si una nota es privada → solo la ve su autor; ni RRHH ni administradores acceden a su contenido desde la aplicación.
+[F] Si el feedback es «privado» → lo ven emisor y receptor; si es «con jefe» → además el jefe vigente del receptor.
+[F] Si un compromiso queda pendiente → se arrastra a la agenda de la siguiente reunión de la serie.
+[F] Si cambia el jefe → la serie 1:1 se cierra, el nuevo jefe no hereda las notas compartidas anteriores salvo que el colaborador las comparta.
+[F] Si RRHH consulta indicadores → ve frecuencia y cumplimiento, nunca el contenido.
+[P] Si no se realiza un 1:1 dentro de la frecuencia definida (parámetro) → se recuerda a ambos.
+#eve
+- `one_on_one.held`, `one_on_one.commitment_created`, `feedback.requested`, `feedback.given`.
+#evc
+- `employment.manager_changed`, `performance_cycle.launched`.
+#bor
+- Feedback hacia alguien que cesó.
+- Contenido que revela una posible denuncia: se ofrece el canal correspondiente; no se deriva de forma automática.
+#acc
+- Las reuniones 1:1 tienen agenda, temas, notas, compromisos y seguimiento, con información privada cuando corresponde, y el feedback se integra a desempeño.
+
+@@ LMS | Aprendizaje y plan anual de capacitación | 5
+#obj
+Capacitar al personal con cursos internos y externos, asignaciones obligatorias con vencimiento y un plan anual medible.
+#alc
+- Cursos con categorías, lecciones, videos, PDF, paquetes SCORM, evaluaciones y certificados.
+- Sesiones presenciales o en vivo con asistencia.
+- Asignación individual, por equipo, puesto, empresa o regla; obligatoriedad, fecha límite, vigencia y recertificación.
+- Seguimiento: no iniciado, en progreso, completado, vencido.
+- Plan anual: cursos, presupuesto, participantes, horas, proveedores, resultados; planificado frente a ejecutado.
+- Capacitaciones legales (SST, hostigamiento) con evidencia para registros obligatorios.
+- Rutas de aprendizaje; solicitudes de capacitación con aprobación.
+#fue
+- Creación de contenidos audiovisuales. Catálogos externos de pago (integración).
+#act
+- RRHH o responsable de formación administra. Instructor dicta y califica. Manager asigna y sigue. Colaborador cursa.
+#flu
+**Asignación.** 1) Se elige curso y destinatarios o regla. 2) Se crean inscripciones con fecha límite. 3) El colaborador cursa y rinde la evaluación. 4) Aprobado: «Completado» y certificado. 5) Pasada la fecha límite sin completar: «Vencido» y alerta.
+
+**Plan anual.** 1) Se registran necesidades (brechas, obligaciones legales, pedidos). 2) Se planifican cursos, participantes, horas y presupuesto. 3) Se ejecutan y registran. 4) El tablero compara planificado y ejecutado.
+#pan
+Cursos :: Catálogo con categoría, duración, tipo, inscritos; crear :: Aprendizaje → Cursos
+Editor de curso :: Lecciones, materiales, evaluación, certificado, vigencia :: Aprendizaje → Cursos → Curso
+Inscripciones :: Avance por persona y curso; asignar, recordar :: Aprendizaje → Inscripciones
+Plan anual :: Planificado frente a ejecutado en cursos, horas, participantes y presupuesto :: Aprendizaje → Planes
+Certificados :: Emitidos, vigencia, descarga, verificación :: Aprendizaje → Certificados
+Mis cursos :: Asignados y disponibles, continuar, certificados :: Portal → Mi desarrollo → Cursos
+Capacitaciones del colaborador :: Historial en la ficha :: Personas → Colaboradores → Ficha → pestaña Capacitaciones
+#dat
+Cursos (`courses`), lecciones, materiales, evaluaciones e intentos, sesiones y asistencia, inscripciones (`enrollments`), certificados, plan anual y partidas, proveedores, solicitudes.
+#rn
+[F] Si un curso tiene evaluación → se completa solo al alcanzar la nota mínima; los intentos se limitan al máximo configurado.
+[P] Si una inscripción obligatoria supera su fecha límite sin completarse → pasa a «Vencido» y se alerta al colaborador, a su jefe y al responsable.
+[P] Si el curso tiene vigencia (recertificación) → al acercarse el vencimiento del certificado se crea una nueva inscripción automática (anticipación: parámetro).
+[F] Si un curso se asigna por regla (puesto, unidad) → quien entra a la población después recibe la inscripción automáticamente.
+[F] Si el contenido de un curso cambia de versión → las inscripciones completadas conservan la versión cursada.
+[F] Si un curso es de tipo legal (SST, hostigamiento sexual) → su asistencia y evaluación alimentan el registro obligatorio correspondiente.
+[F] Si la persona cesa → sus inscripciones pendientes se cancelan y sus certificados se conservan.
+[P] Si una solicitud de capacitación supera el presupuesto disponible del plan → exige aprobación adicional (parámetro).
+[F] Si se emite un certificado → lleva código de verificación consultable.
+#eve
+- `course.published`, `enrollment.created`, `enrollment.started`, `course.completed`, `enrollment.overdue`, `certificate.issued`, `certificate.expiring`, `training_plan.updated`.
+#evc
+- `employee.hired`, `employment.assignment_changed`, `employee.terminated`, `development_plan.action_added`, `onboarding.started`.
+#int
+Paquetes SCORM y catálogos externos, videoconferencia (M-INT).
+#bor
+- Sesión presencial con asistencia parcial.
+- Curso obligatorio para alguien con licencia larga: el plazo se suspende.
+- Recertificación de un curso retirado del catálogo.
+#acc
+- Los cursos se asignan a persona, equipo, puesto o empresa, muestran los cuatro estados de seguimiento y el plan anual compara planificado y ejecutado.
+
+@@ CAR | Desarrollo, carrera, sucesión y 9-box | 5
+#obj
+Apoyar las decisiones de talento: planes de desarrollo, rutas de carrera, sucesión de puestos críticos y matriz 9-box, siempre como insumo para decisiones humanas.
+#alc
+- Planes de desarrollo individual con competencia, nivel actual y objetivo, acciones (curso, mentoría, proyecto, seguimiento), responsable y fecha.
+- Rutas de carrera entre puestos con competencias requeridas y brechas.
+- Sucesión: posiciones críticas, candidatos sucesores con preparación (preparado ahora, 1 año, 2 años, en desarrollo), riesgo de pérdida, matriz de sucesión.
+- 9-box: desempeño × potencial, por sesión de talento, con historial.
+- Riesgo de rotación explicable (factores visibles).
+#fue
+- Promoción efectiva (movimiento en M-HIS con aprobación). Cursos (M-LMS).
+#act
+- RRHH conduce. Managers proponen y dan seguimiento. Colaborador ve su plan y sus rutas. Dirección revisa sucesión.
+#flu
+**Plan de desarrollo.** 1) Tras la evaluación, jefe y colaborador eligen competencias. 2) Definen nivel objetivo y acciones. 3) Las acciones de curso crean inscripciones. 4) Se revisa el avance en los 1:1. 5) Se cierra con el nivel alcanzado.
+
+**Sucesión.** 1) Se marcan posiciones críticas. 2) Se proponen sucesores con su preparación. 3) Se revisa en sesión de talento. 4) Se definen acciones de desarrollo para cerrar brechas.
+
+**9-box.** 1) Se abre la sesión para una población. 2) El sistema propone el eje de desempeño desde la última evaluación; el potencial lo valora el comité. 3) Se ubica a cada persona con sustento. 4) Se guardan la matriz y las acciones acordadas.
+#pan
+Desarrollo :: Planes por persona con avance; crear :: Talento → Desarrollo
+Rutas de carrera :: Mapa de puestos y pasos con requisitos y brechas :: Talento → Desarrollo → Rutas
+Sucesión :: Posiciones críticas, sucesores y preparación; matriz de sucesión :: Talento → Sucesión
+Matriz 9-box :: Cuadrícula con personas; filtros; historial por sesión :: Talento → Sucesión → 9-box
+Mi plan :: Plan propio, acciones y rutas posibles :: Portal → Mi desarrollo → Plan
+#dat
+Planes de desarrollo y acciones, rutas y pasos, posiciones críticas, candidatos a sucesión, sesiones de talento, ubicaciones 9-box, indicadores de riesgo con factores.
+#rn
+[F] Si una persona se ubica en la matriz 9-box → no se produce ningún cambio automático en sueldo, puesto ni estado; toda acción posterior requiere decisión y aprobación humana.
+[F] Si se propone un sucesor → la persona propuesta no ve su condición de sucesor salvo que RRHH decida comunicarla.
+[F] Si se muestra una ruta de carrera → incluye las competencias requeridas del puesto destino y la brecha de la persona.
+[F] Si una acción del plan es un curso → crea la inscripción y su avance se refleja en el plan.
+[F] Si una posición crítica no tiene sucesor «preparado ahora» → aparece como riesgo en el tablero de sucesión.
+[F] Si se muestra un riesgo de rotación → se listan los factores que lo componen y su peso; nunca un puntaje sin explicación, y no dispara acciones automáticas.
+[P] Si el modelo de riesgo usa datos personales para perfilar → requiere evaluación de impacto registrada antes de activarse (M-PRI).
+[F] Si la ubicación 9-box se modifica → se conserva el historial por sesión con autor y sustento.
+[F] Si el sucesor o el titular cesan o cambian de posición → el plan de sucesión se marca «por revisar».
+#eve
+- `development_plan.created`, `development_plan.action_added`, `development_plan.completed`, `succession.updated`, `talent_review.closed`.
+#evc
+- `review.published`, `competency.level_recorded`, `course.completed`, `employee.terminated`, `position.vacated`.
+#bor
+- Persona nueva sin evaluación: «sin datos» en el eje de desempeño.
+- Un mismo sucesor para varias posiciones.
+- Ruta lateral (cambio de familia de puestos).
+#acc
+- Existen planes de desarrollo con acciones, rutas con brechas, matriz de sucesión con preparación y 9-box visual sin decisiones automáticas.
+
+@@ COM | Compensaciones, bandas, revisión salarial e igualdad salarial | 5
+#obj
+Administrar la compensación con criterio y evidencia: estructura, bandas, ciclos de revisión con presupuesto y cumplimiento de la igualdad salarial.
+#alc
+- Componentes: salario base, variable, bonos, comisiones, asignaciones, beneficios valorizados; compensación total.
+- Bandas por puesto, nivel y categoría (mínimo, medio, máximo, moneda, vigencia); posición en banda y compa-ratio.
+- Ciclos de revisión: manager propone → RRHH revisa → finanzas aprueba → dirección aprueba → actualización con vigencia; presupuesto por unidad; lineamientos por desempeño y posición en banda.
+- Igualdad salarial (Ley 30709): cuadro de categorías y funciones, política salarial, brecha por categoría y sexo con criterios objetivos, evidencia de comunicación.
+- Simulaciones de costo.
+#fue
+- Pago (M-PER). Historial de compensación (M-HIS guarda; aquí se decide).
+#act
+- RRHH o especialista de compensaciones administra. Manager propone. Finanzas y dirección aprueban. Payroll aplica.
+#flu
+**Ciclo de revisión.** 1) RRHH crea el ciclo con población, presupuesto, lineamientos y fecha de vigencia. 2) Cada manager propone dentro de su presupuesto, viendo desempeño y posición en banda. 3) RRHH revisa y ajusta. 4) Finanzas aprueba el costo. 5) Dirección aprueba. 6) Payroll aplica: se crean los registros de compensación con vigencia. 7) Se generan las cartas y la evidencia de comunicación.
+
+**Igualdad salarial.** 1) Se asigna cada puesto a una categoría con funciones, responsabilidad y requisitos. 2) Se publica la política salarial y se comunica con acuse. 3) El reporte calcula la brecha por categoría y sexo. 4) Cada diferencia relevante se justifica con criterios objetivos (experiencia, formación, antigüedad, desempeño) o genera un plan de corrección.
+#pan
+Salarios :: Compensación por persona con componentes y posición en banda :: Compensación → Salarios
+Bandas :: Bandas por puesto y nivel; personas fuera de banda :: Compensación → Bandas
+Ciclos de revisión :: Ciclos con etapa, presupuesto usado y pendiente :: Compensación → Revisiones
+Propuestas del manager :: Equipo con sueldo actual, banda, desempeño, propuesta y presupuesto restante :: Compensación → Revisiones → Mi equipo
+Igualdad salarial :: Cuadro de categorías, política, brecha por categoría y sexo, justificaciones, acuses :: Compensación → Igualdad salarial
+#dat
+Componentes de compensación, bandas (`salary_bands`), ciclos (`salary_review_cycles`), propuestas, presupuestos, cuadro de categorías, política salarial y versiones, acuses de comunicación, justificaciones de brecha.
+#rn
+[F] Si se aplica un ciclo → cada incremento aprobado crea un registro de compensación con vigencia en M-HIS; el módulo no guarda sueldos propios.
+[P] Si las propuestas de un manager superan su presupuesto asignado → no puede enviarlas sin solicitar excepción.
+[P] Si una propuesta deja el sueldo fuera de la banda del puesto → exige justificación y aprobación del nivel adicional (parámetro).
+[F] Si una etapa del ciclo no está aprobada → la siguiente no puede iniciarse.
+[F] Si el ciclo está aplicado → no se modifica; correcciones por movimiento individual.
+[F] Si quien propone el incremento es el beneficiario o su subordinado directo → se rechaza; nadie propone ni aprueba su propio sueldo.
+[F] Si un puesto no tiene categoría asignada → se reporta como incumplimiento del cuadro de categorías y funciones.
+[F] Si una persona ingresa, cambia de puesto o de remuneración → se genera la comunicación de la política salarial y se registra su acuse como evidencia.
+[P] Si la brecha salarial entre sexos dentro de una categoría supera el umbral de revisión (parámetro de la organización) → se exige registrar la justificación con criterios objetivos o un plan de corrección.
+[P] Si un grupo del reporte de brecha tiene menos personas que el mínimo de confidencialidad (parámetro) → se muestra agregado para no revelar sueldos individuales.
+[F] Si el sistema sugiere un incremento por lineamiento → es una referencia; la propuesta y la aprobación son humanas.
+[F] Si se compara la posición en banda → usa la banda vigente del puesto y la moneda de la relación, con conversión por tipo de cambio de la fecha.
+#eve
+- `salary_review.launched`, `salary_review.proposal_submitted`, `salary_review.approved`, `salary_review.applied`, `salary_band.changed`, `pay_equity.policy_published`, `pay_equity.communication_acknowledged`.
+#evc
+- `review.published`, `employment.compensation_changed`, `employment.assignment_changed`, `employee.hired`.
+#bor
+- Persona que cambia de jefe durante el ciclo.
+- Incremento mínimo obligatorio por alza de la RMV.
+- Tiempo parcial: comparación en equivalente a jornada completa.
+- Categoría con un solo sexo.
+#acc
+- Hay bandas con posición del trabajador, ciclos con presupuesto y cuatro niveles de aprobación, y el reporte de igualdad salarial con cuadro, política, brecha y evidencias.
+
+@@ BNF | Beneficios | 5
+#obj
+Publicar y administrar los beneficios que la empresa ofrece, con elegibilidad clara y consulta desde el portal.
+#alc
+- Catálogo: seguro, alimentación, movilidad, educación, descuentos, bienestar, otros; proveedor, costo empresa y trabajador, naturaleza remunerativa o no.
+- Elegibilidad por reglas (empresa, sede, puesto, nivel, antigüedad, tipo de contrato).
+- Inscripción, dependientes, ventanas de inscripción, bajas.
+- Vínculo con planilla (descuento o aporte) y con compensación total.
+- Planes EPS y seguros con beneficiarios.
+#fue
+- Seguros obligatorios (Vida Ley, SCTR: M-CUM y M-SST). Mercado de descuentos externo (integración).
+#act
+- RRHH administra. Colaborador consulta y se inscribe. Payroll ve efectos en planilla.
+#flu
+**Inscripción.** 1) El colaborador ve los beneficios para los que es elegible. 2) Solicita inscripción y registra dependientes si aplica. 3) Se aprueba según el beneficio. 4) Queda activo desde la fecha de efecto y genera el concepto de planilla si corresponde.
+#pan
+Beneficios :: Catálogo con elegibilidad, inscritos y costo (con permiso) :: Compensación → Beneficios
+Mis beneficios :: Activos y disponibles; inscribirme :: Portal → Mi desarrollo → Beneficios
+Beneficios del colaborador :: Beneficios activos en la ficha :: Personas → Colaboradores → Ficha → pestaña Beneficios
+#dat
+Beneficios (`benefits`), planes, reglas de elegibilidad, inscripciones, dependientes inscritos, ventanas.
+#rn
+[F] Si la persona no cumple las reglas de elegibilidad → el beneficio no se le muestra como disponible.
+[F] Si un beneficio tiene costo para el trabajador → la inscripción exige su aceptación expresa del descuento.
+[P] Si la inscripción se pide fuera de la ventana definida (parámetro) → requiere excepción de RRHH, salvo evento de vida (ingreso, nacimiento, matrimonio).
+[F] Si la persona deja de ser elegible (cambio de puesto, cese) → la inscripción termina en la fecha del cambio y cesa el concepto de planilla.
+[F] Si un beneficio es remunerativo → su concepto de planilla lleva las afectaciones correspondientes (M-CPT).
+[F] Si se inscribe a un dependiente → debe existir como derechohabiente registrado.
+#eve
+- `benefit.enrolled`, `benefit.ended`, `benefit.eligibility_changed`.
+#evc
+- `employee.hired`, `employment.assignment_changed`, `employee.terminated`, `dependent.added`.
+#int
+Aseguradoras, EPS y proveedores por archivo o API (M-INT).
+#bor
+- Beneficio con cupos limitados.
+- Cambio de plan de salud a mitad de vigencia.
+#acc
+- El catálogo define elegibilidad y el empleado consulta sus beneficios.

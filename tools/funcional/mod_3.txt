@@ -1,0 +1,556 @@
+@@ NOM | Motor de nómina | 3
+#obj
+Calcular cualquier planilla de forma reproducible y explicable: un motor genérico que ejecuta conceptos y fórmulas, alimentado por reglas del paquete de país y del régimen laboral, sin reglas legales en código ni en la interfaz.
+#alc
+- Arquitectura motor de nómina + motor de reglas + paquete de país + régimen laboral.
+- Tipos de proceso: mensual, quincenal, semanal, adelanto de quincena, gratificación, CTS, utilidades, liquidación, ajuste.
+- Entradas: historia con vigencia, asistencia cerrada, ausencias, horas extra, incidencias, préstamos, parámetros.
+- Cálculo por lotes, orden de conceptos por dependencias, acumuladores, redondeo, prorrateos por días.
+- Trazabilidad: por cada resultado, la fórmula, los valores de entrada y los parámetros con su vigencia.
+- Recalculo parcial, cálculo retroactivo por diferencias, cálculo neto a bruto (simulación).
+- Planillas separadas por empresa, régimen y tipo de trabajador.
+#fue
+- Definición de conceptos (M-CPT), parámetros (M-PAR), ciclo del periodo (M-PER). Pago bancario efectivo (M-DEC genera el archivo).
+#act
+- Payroll opera. El motor no tiene interfaz propia salvo el visor de traza.
+#flu
+**Cálculo.** 1) Se fija la fecha de corte y se toma una foto de las entradas. 2) Por cada relación se resuelven régimen, conceptos aplicables y parámetros vigentes. 3) Se ordenan los conceptos por dependencias. 4) Se evalúan fórmulas y se llenan acumuladores. 5) Se guardan resultados con su traza. 6) Se comparan contra el periodo anterior y se marcan anomalías.
+
+**Retroactivo.** 1) Un cambio con vigencia en un periodo cerrado genera una solicitud de diferencia. 2) El motor recalcula ese periodo en memoria con los datos corregidos. 3) La diferencia por concepto entra al periodo abierto como conceptos de reintegro o descuento.
+#pan
+Traza de cálculo :: Para una boleta o un concepto: fórmula, valores de entrada, parámetros con vigencia, acumuladores :: Nómina → Cálculo → Detalle → Ver cálculo
+Grupos y procesos :: Grupos de planilla, tipos de proceso, calendario de pagos :: Configuración → Planilla → Procesos
+Banco de pruebas :: Calcular una persona o un caso hipotético sin guardar :: Configuración → Planilla → Probar cálculo
+#dat
+Tipos de proceso, grupos de planilla, ejecuciones de cálculo (`payroll_runs`), resultados por concepto (`payroll_items`) con traza, acumuladores anuales, fotos de entrada, solicitudes de diferencia retroactiva.  Ventas y dotación anuales por razón social (`legal_entity_annual_figures`), acreditación del régimen (`legal_entity_regimes`), obras y categorías de construcción civil (`pe_construction_works`, `pe_construction_assignments`).
+#rn
+[F] Si se calcula un periodo → cada parámetro y fórmula se toma con la vigencia de la fecha del periodo, no con la del día del cálculo.
+[F] Si se repite el cálculo con las mismas entradas → el resultado es idéntico (el motor no depende de la hora ni del orden de proceso).
+[F] Si una regla legal cambia → se publica como nueva versión de parámetro o fórmula con fecha; ningún despliegue de código es necesario.
+[F] Si un resultado se guarda → conserva la fórmula, las entradas y la versión de parámetros que lo produjeron.
+[F] Si una relación ingresa, cesa o cambia de sueldo dentro del periodo → los conceptos proporcionales se prorratean por tramos de vigencia y días según la base del régimen (parámetro).
+[F] Si una fórmula referencia un concepto o parámetro inexistente o crea un ciclo → no se puede publicar.
+[F] Si un cambio afecta un periodo cerrado → el motor calcula la diferencia y la lleva al periodo abierto; el periodo cerrado nunca se reescribe.
+[P] Si se redondea → se aplica la regla de redondeo del paquete de país por concepto (parámetro).
+[F] Si la relación pertenece a un régimen → solo se le aplican los conceptos habilitados para ese régimen.
+[F] Si falta un dato obligatorio para calcular (régimen pensionario, fecha de ingreso, sueldo vigente) → la relación queda «con error» y no bloquea el cálculo de las demás.
+[F] Si la persona tiene dos relaciones en el grupo → cada una se calcula en su planilla; los conceptos que la norma consolida (renta de quinta) reciben la información de la otra como ingreso de otro empleador.
+[F] Si se calcula una relación → el motor obtiene del paquete de país la estrategia del régimen vigente en cada tramo (general, micro, pequeña, construcción civil, agrario, formativo); el núcleo no tiene condicionales por régimen (`18-localizacion-peru-detalle-tecnico.md` §4.7).
+[P] Si se proyecta la renta de quinta → remuneración ordinaria × meses que faltan + gratificaciones por percibir con su bonificación extraordinaria + lo ya percibido + rentas de otros empleadores declaradas, menos la deducción en UIT, con la escala y los divisores del parámetro; el ingreso extraordinario del mes se grava aparte por diferencia de impuestos y se retiene íntegro.
+[F] Si el trabajador tiene gastos deducibles adicionales (las 3 UIT de la declaración anual) → el motor no los considera: solo los aplica la administración tributaria en la determinación anual.
+[F] Si el trabajador tiene más de un empleador y declaró que otro retiene → la retención de quinta es cero y el libro registra el motivo; si esta razón social retiene, acumula las rentas declaradas de los demás.
+[P] Si el trabajador no es domiciliado → la retención es el porcentaje de `quinta_no_domiciliado_tasa_pct` sobre el total afecto del mes, sin proyección ni deducción.
+[P] Si la relación es de construcción civil → el jornal, la bonificación unificada, la movilidad y las demás bonificaciones se toman de la tabla salarial vigente en cada día trabajado, según la categoría del trabajador en la obra (reglas RN-PE-CC del documento 18).
+[P] Si la relación es agraria con prorrateo → la gratificación y la CTS se pagan dentro de la remuneración diaria como conceptos separados, y la bonificación especial por trabajo agrario se paga como concepto no remunerativo (reglas RN-PE-AGR del documento 18).
+[F] Si la razón social no tiene acreditación vigente del régimen especial, o la relación es anterior a la acreditación → no se propone el régimen de micro o pequeña empresa (reglas RN-PE-MYP del documento 18).
+#eve
+- `payroll.run_started`, `payroll.run_completed`, `payroll.run_failed`, `payroll.retro_difference_created`.
+#evc
+- `employment.compensation_changed`, `employment.assignment_changed`, `attendance.period_closed`, `absence.approved`, `leave.approved`, `parameter.changed`.
+#bor
+- 50 000 relaciones en un periodo: cálculo por lotes paralelos con reanudación.
+- Cambio de régimen pensionario a mitad de mes.
+- Neto negativo: se limita por las reglas de descuento máximo y el exceso se traslada.
+- Moneda distinta a la de la empresa en el contrato: conversión con tipo de cambio de la fecha de pago.
+#acc
+- Cualquier monto de una boleta se puede explicar con su traza.
+- No existe ninguna tasa, tope ni fórmula legal en el código del motor ni en la interfaz.
+
+@@ CPT | Conceptos y fórmulas | 3
+#obj
+Permitir que Payroll defina y mantenga los conceptos de la planilla (ingresos, descuentos, aportes) con su fórmula, condiciones, vigencia, afectaciones y cuenta contable.
+#alc
+- Catálogo por empresa sobre la plantilla del país: código, nombre, tipo (ingreso, descuento, aporte del trabajador, aporte del empleador, impuesto, beneficio, provisión, informativo), naturaleza remunerativa o no.
+- Fórmula con editor asistido, variables, funciones y condiciones; conceptos fijos, variables e ingresados por incidencia.
+- Afectaciones: a qué bases suma (pensión, salud, renta de quinta, CTS, gratificación, vacaciones, utilidades, indemnización).
+- Mapeo a código de la administración tributaria (PLAME) y a cuenta contable; centro de costo.
+- Versionado con vigencia; conceptos personalizados (comisión, bono de productividad, movilidad, descuento de préstamo); cláusulas de convenio como conceptos.
+#fue
+- Valores de tasas y topes (M-PAR). Carga mensual de montos (M-PER).
+#act
+- Payroll administra. Contador consulta el mapeo contable.
+#flu
+**Nuevo concepto.** 1) Se parte de cero o de un concepto de la plantilla. 2) Se define tipo, naturaleza, fórmula y condiciones. 3) Se marcan afectaciones y mapeos. 4) Se prueba con casos reales en el banco de pruebas. 5) Se publica con fecha de vigencia.
+
+**Cambio de fórmula.** 1) Se crea una nueva versión con fecha. 2) Se compara el resultado contra la versión vigente sobre el último periodo. 3) Se publica; los periodos anteriores siguen con la versión de su fecha.
+#pan
+Conceptos :: Tabla con código, nombre, tipo, afectaciones, vigencia, estado; crear, duplicar, archivar :: Nómina → Conceptos
+Editor de concepto :: Datos, fórmula con ayuda y validación, condiciones, afectaciones, mapeos, historial de versiones, prueba :: Nómina → Conceptos → Detalle
+Matriz de afectaciones :: Conceptos × bases de cálculo en una sola vista :: Nómina → Conceptos → Afectaciones
+#dat
+Conceptos (`payroll_concepts`) y versiones, fórmulas, condiciones, afectaciones por base, mapeos a declaración y a cuentas, plantilla de conceptos del país.
+#rn
+[F] Si se modifica un concepto usado en periodos cerrados → se crea una versión nueva con vigencia; la anterior no cambia.
+[F] Si un concepto tiene resultados históricos → no se elimina; se archiva.
+[F] Si un concepto proviene de la plantilla del país → la organización puede cambiar nombre y cuenta contable, pero no su afectación legal sin crear un concepto propio y dejar constancia.
+[F] Si la fórmula no supera la validación (sintaxis, referencias, ciclo) → no se guarda como publicable.
+[F] Si un concepto no tiene mapeo a código de declaración siendo declarable → la validación previa de PLAME lo reporta como error.
+[F] Si un concepto es no remunerativo → no suma a ninguna base salvo que la afectación se marque de forma expresa con sustento.
+[F] Si quien edita un concepto intenta publicarlo → se exige que la publicación la haga otra persona con `cpt.concepto.publicar` cuando la política de doble control está activa (parámetro; activa por defecto).
+[P] Si un descuento voluntario llevaría el neto por debajo del mínimo protegido (parámetro del paquete de país, a confirmar) → se descuenta hasta el límite y el resto se difiere.
+[F] Si un concepto afecta a la base de quinta → declara su naturaleza en la proyección (ordinario, gratificación o extraordinario); sin ella no se puede activar.
+[F] Si un concepto declara a qué regímenes aplica → el motor solo lo ofrece a las relaciones de esos regímenes.
+#eve
+- `payroll_concept.created`, `payroll_concept.version_published`, `payroll_concept.archived`.
+#evc
+- `parameter.changed`, `collective_agreement.clause_added`.
+#bor
+- Concepto con vigencia que empieza a mitad de periodo.
+- Concepto ingresado en otra moneda.
+- Dos conceptos con el mismo código de declaración (se suman al declarar).
+#acc
+- Un concepto personalizado se crea con código, nombre, tipo, fórmula, condiciones, vigencia, afectaciones y contabilización, y se usa en el siguiente cálculo sin programar.
+
+@@ PAR | Parámetros legales con vigencia | 3
+#obj
+Mantener tasas, topes, montos de referencia y plazos legales como datos con fecha de vigencia por país y régimen, actualizables el mismo día en que cambia la norma.
+#alc
+- Parámetros del paquete de país: UIT, RMV, tasas de pensiones y salud, escala y deducción de renta de quinta, sobretasas, porcentajes de utilidades, plazos y umbrales de cumplimiento.
+- Tablas por entidad (comisiones y primas por AFP y esquema, remuneración máxima asegurable).
+- Niveles: plataforma (publica el paquete), organización (aplica y puede mejorar donde la norma lo permite).
+- Fuente y sustento por valor (norma, fecha de publicación); estado «a confirmar».
+- Aviso a las organizaciones cuando cambia un parámetro; vista de impacto.
+#fue
+- Fórmulas (M-CPT). Políticas internas no legales (M-CFG).
+#act
+- Equipo de cumplimiento de la plataforma publica. Payroll de cada organización consulta y registra valores propios (tasas de SCTR, pólizas, EPS).
+#flu
+**Actualización legal.** 1) La plataforma registra el nuevo valor con fecha de vigencia, norma y sustento. 2) Lo publica. 3) Las organizaciones del país reciben el aviso con el impacto estimado. 4) Los cálculos de periodos desde esa fecha lo usan.
+
+**Carga periódica.** 1) Cada periodo se cargan las tablas que publica el supervisor (comisiones y primas de AFP, remuneración máxima asegurable). 2) Si falta la tabla del periodo, el cálculo lo advierte.
+#pan
+Parámetros legales :: Lista por país y régimen con valor vigente, vigencias anteriores y futuras, fuente, estado :: Nómina → Parámetros
+Tablas por entidad :: Valores por AFP, aseguradora o entidad y periodo :: Nómina → Parámetros → Entidades
+Novedades normativas :: Cambios publicados y su impacto en la organización :: Nómina → Parámetros → Novedades
+#dat
+Parámetros (`legal_parameters`: país, régimen, clave, valor, `valid_from`, `valid_to`, norma, estado de verificación), tablas por entidad y periodo, publicaciones del paquete.
+#rn
+[F] Si un cálculo necesita una tasa, tope o monto legal → lo obtiene del parámetro vigente en la fecha del hecho para el país y régimen de la relación; nunca de una constante.
+[F] Si se registra un nuevo valor → se inserta con su vigencia y fuente; el anterior queda cerrado, no modificado.
+[F] Si un parámetro está en estado «a confirmar» → se puede usar en simulación, pero el cierre de un periodo que lo use exige confirmación expresa del responsable de planilla.
+[F] Si falta el parámetro o la tabla del periodo (por ejemplo, comisiones de AFP del mes) → el cálculo de los afectados queda «con error» con mensaje claro.
+[P] Si la UIT de referencia es S/ 5 500 y la RMV S/ 1 130 (valores de referencia 2026, parámetros con vigencia) → se cargan como valores iniciales del paquete Perú y todo lo que depende de ellos se deriva, no se copia.
+[F] Si la plataforma publica una actualización → se notifica a Payroll y Administrador de cada organización afectada con la norma y la fecha.
+[F] Si la organización registra un valor propio más favorable donde la norma lo permite → se usa el propio; si es menos favorable que el legal → se rechaza.
+[F] Si se publica un parámetro con vigencia retroactiva → se listan los periodos cerrados afectados y se proponen diferencias.
+[F] Si un parámetro es un plazo → su unidad distingue días calendario (`days`) de días hábiles (`business_days`); el cálculo de vencimientos usa el calendario de la sede.
+[F] Si se publica una tabla salarial por convenio (construcción civil) → se carga como un lote de parámetros con la misma vigencia y fuente legal, sin verificar hasta que el responsable la confirme contra el acta.
+[P] Si el periodo de pago cae después del fin de vigencia de la tabla salarial y no hay tabla nueva → se calcula con la última y los afectados quedan marcados «tabla salarial vencida»; al cargarse la nueva se generan los reintegros.
+#eve
+- `parameter.changed`, `country_pack.published`.
+#bor
+- Cambio de UIT o RMV a mitad de año con efecto en asignación familiar y topes.
+- Norma publicada con efecto retroactivo.
+- Entidad nueva (AFP, aseguradora) que aparece en el mercado.
+#acc
+- Cambiar una tasa legal no requiere desplegar código y no altera boletas ya cerradas.
+
+@@ PER | Periodos, incidencias, cálculo, simulación y cierre | 3
+#obj
+Conducir cada planilla por su proceso completo, con control y segregación de funciones: periodo → incidencias → cálculo → revisión → aprobación → cierre → boletas → pago → contabilización.
+#alc
+- Periodos por empresa, grupo y tipo de proceso; calendario de pago.
+- Incidencias: novedades del periodo (bonos, comisiones, descuentos, días) por digitación, importación o automáticas desde tiempo, ausencias, préstamos y adelantos.
+- Cálculo y recálculo; simulación antes de cerrar; comparación mes anterior, mes actual y variación; detección de anomalías con explicación.
+- Revisión por excepción, aprobación por persona distinta, cierre, reapertura controlada.
+- Pago (lote bancario) y marca de pagado; ajustes y retroactivos.
+#fue
+- Fórmulas y parámetros. Archivos de declaración y banco (M-DEC). Asientos (M-PRV).
+#act
+- Payroll prepara y calcula. Aprobador de planilla (Administrador u otro rol) aprueba. Contador consulta. Auditor revisa.
+#flu
+**Ciclo mensual.** 1) Se abre el periodo. 2) Llegan incidencias automáticas (asistencia cerrada, ausencias, horas extra, cuotas de préstamos, adelantos) y Payroll carga las manuales. 3) Calcula. 4) Revisa por excepción: variaciones, anomalías, errores. 5) Corrige y recalcula. 6) Envía a aprobación. 7) Una persona distinta aprueba o devuelve con observaciones. 8) Cierre: los resultados quedan inmutables. 9) Se generan boletas, archivo de pago, declaraciones y asiento. 10) Se registra el pago.
+
+**Simulación.** 1) Sin cerrar, Payroll calcula y ve el comparativo. 2) Las anomalías llevan explicación («neto cayó 32 %: 6 días de licencia sin goce y fin de bono temporal»). 3) Puede descartar o marcar cada alerta como revisada.
+
+**Reapertura.** 1) Solo antes de declarar o pagar, con permiso y motivo. 2) Después, toda corrección va por ajuste en el periodo siguiente o por rectificatoria.
+#pan
+Periodos :: Lista con tipo, fechas, estado, totales (con permiso), responsable; abrir periodo :: Nómina → Periodos
+Incidencias :: Novedades del periodo por persona y concepto con origen; cargar, importar, aprobar :: Nómina → Incidencias
+Cálculo :: Resultado por persona con ingresos, descuentos, aportes y neto; errores; recalcular :: Nómina → Cálculo
+Simulación y comparativo :: Mes anterior | mes actual | variación por persona y concepto; anomalías explicadas :: Nómina → Cálculo → Simular
+Aprobación del periodo :: Resumen, variaciones, anomalías revisadas, observaciones; aprobar o devolver :: Nómina → Periodos → Aprobar
+Cierre y pagos :: Lista de comprobación de cierre, generar boletas y archivos, registrar pago :: Nómina → Periodos → Cierre
+Planilla del colaborador :: Resultados por periodo en la ficha :: Personas → Colaboradores → Ficha → pestaña Planilla
+#dat
+Periodos (`payroll_periods`), incidencias (`payroll_incidents`) con origen, ejecuciones, resultados, anomalías y su revisión, aprobaciones, lotes de pago, ajustes.
+#rn
+[F] Si un usuario calculó o modificó incidencias de un periodo → no puede aprobar ese mismo periodo, aunque tenga el permiso (segregación de funciones).
+[F] Si el periodo no está «Aprobado» → no se puede cerrar.
+[F] Si el periodo está «Cerrado» → sus resultados, incidencias y boletas no se modifican; las correcciones van como ajuste al periodo abierto.
+[F] Si existen relaciones «con error» de cálculo → el periodo no puede enviarse a aprobación.
+[P] Si el neto de una persona varía respecto al periodo anterior más que el umbral (parámetro, por defecto configurable por empresa) → se genera una anomalía con las causas calculadas (conceptos que explican la diferencia).
+[F] Si una anomalía no está marcada como revisada → el envío a aprobación lo advierte y exige confirmación.
+[F] Si la asistencia del periodo no está cerrada → el cálculo definitivo lo advierte; solo se permite simular.
+[F] Si se reabre un periodo → exige motivo, permiso específico y que no esté declarado ni pagado; las boletas publicadas se retiran y se notifica.
+[F] Si una incidencia viene de otro módulo (ausencia, horas extra, cuota) → no se edita en planilla; se corrige en su origen.
+[P] Si una incidencia manual supera el monto que requiere visto bueno (parámetro) → necesita aprobación antes de entrar al cálculo.
+[F] Si el periodo anterior del mismo grupo no está cerrado → no se puede cerrar el siguiente.
+[F] Si se registra el pago → se guarda fecha, medio y lote; el periodo pasa a «Pagado» y se emite `payroll.paid`.
+[F] Si se cierra el periodo → se disparan en orden boletas, archivo de pago, provisiones y asiento; un fallo en uno no revierte el cierre y queda como pendiente visible.
+[F] Si el grupo de planilla es semanal o quincenal → cada periodo de pago lleva el periodo tributario al que consolida; la retención de quinta y el aporte de salud se determinan por mes tributario.
+#eve
+- `payroll.period_opened`, `payroll.calculated`, `payroll.submitted`, `payroll.approved`, `payroll.returned`, `payroll.closed`, `payroll.reopened`, `payroll.paid`, `payroll.anomaly_detected`.
+#evc
+- `attendance.period_closed`, `overtime.qualified`, `absence.approved`, `leave.approved`, `loan.installment_due`, `advance.granted`, `expense.approved_for_payroll`, `payroll.retro_difference_created`.
+#int
+Bancos (archivo o API de pagos), contabilidad (M-PRV, M-INT).
+#bor
+- Ingreso registrado después del cálculo y antes del cierre.
+- Cese con liquidación dentro del periodo.
+- Planilla de una empresa con dos regímenes.
+- Segundo cálculo tras devolución del aprobador.
+- Pago parcial rechazado por el banco para algunas cuentas.
+#acc
+- El proceso recorre periodo, incidencias, cálculo, revisión, aprobación, cierre, boletas, pago y contabilización con un estado visible en cada paso.
+- Quien calcula no puede aprobar, comprobado por prueba automática.
+- El simulador muestra mes anterior, mes actual y variación, y explica cada anomalía.
+
+@@ BOL | Boletas de pago | 3
+#obj
+Generar y entregar la boleta de pago de forma digital, con constancia de entrega, y mantener su historial accesible para el trabajador y para una inspección.
+#alc
+- Plantilla de boleta por empresa con los datos exigidos; PDF.
+- Publicación automática en el portal al cerrar; aviso al colaborador; constancia de emisión y de acceso.
+- Firma del empleador (representante) y acuse o firma del trabajador según política.
+- Historial por trabajador, descarga individual y masiva, reemisión controlada.
+- Certificado de rentas y retenciones de quinta categoría: al cese, al cierre del ejercicio o a solicitud (su entrega ya no es obligatoria; el trabajador acredita ante otro empleador con declaración jurada).
+#fue
+- Cálculo. Otros documentos (M-DOC).
+#act
+- Payroll genera y publica. Empleado consulta y descarga. Auditor verifica entregas.
+#flu
+**Emisión.** 1) Al cerrar el periodo se generan los PDF. 2) Se firman con la firma del representante. 3) Se publican en el portal y se notifica. 4) Cada acceso del trabajador queda registrado. 5) Si la política exige acuse, el trabajador lo confirma.
+
+**Reemisión.** 1) Se anula la boleta con motivo. 2) Se genera la nueva versión ligada al ajuste. 3) Ambas quedan en el historial.
+#pan
+Boletas :: Por periodo: generadas, publicadas, vistas, con acuse; publicar, descargar en bloque :: Nómina → Boletas
+Mis boletas :: Historial propio, ver, descargar :: Portal → Mis boletas
+Constancias de entrega :: Emisión y accesos por trabajador y periodo; exportar :: Nómina → Boletas → Constancias
+Plantilla de boleta :: Logo, bloques, textos, firmas :: Configuración → Planilla → Boleta
+#dat
+Boletas (`payslips`) con versión, hash, estado, fecha de publicación; accesos; acuses; certificados anuales.
+#rn
+[F] Si el periodo se cierra → se genera una boleta por relación con resultado y se publica en el portal del titular.
+[F] Si el trabajador abre o descarga su boleta → se registra fecha y hora como constancia de entrega.
+[P] Si la política de la empresa exige acuse o firma del trabajador (parámetro) → la boleta queda «pendiente de acuse» y se recuerda hasta obtenerlo.
+[F] Si una boleta ya fue publicada → no se sobrescribe; una corrección genera una nueva versión y conserva la anterior anulada.
+[P] Si una boleta tiene menos años que el plazo de conservación de documentos de pago (cinco años como valor de referencia, parámetro a confirmar con la norma vigente) → no puede purgarse.
+[F] Si un usuario distinto del titular consulta una boleta → necesita `bol.boleta.ver` y `per.resultado.ver`, y el acceso queda en el registro de accesos sensibles.
+[F] Si el trabajador no tiene acceso digital → la boleta puede marcarse «entregada en físico» con cargo escaneado.
+[F] Si se descarga en bloque → el archivo se entrega por enlace temporal y queda registrado quién lo pidió.
+#eve
+- `payslip.generated`, `payslip.published`, `payslip.viewed`, `payslip.acknowledged`, `payslip.voided`.
+#evc
+- `payroll.closed`, `payroll.reopened`, `signature.completed`.
+#int
+Firma (M-DOC), WhatsApp para consulta (M-WHA).
+#bor
+- Ex-colaborador que necesita boletas antiguas.
+- Boleta de un periodo importado como histórico (solo lectura, marcada).
+- Persona con dos relaciones: una boleta por relación.
+#acc
+- Las boletas se generan en PDF, se publican solas, tienen historial por trabajador y descarga individual y masiva con constancia de entrega.
+
+@@ BSO | Beneficios sociales | 3
+#obj
+Calcular y pagar los beneficios sociales peruanos (gratificaciones, CTS, vacaciones, utilidades, asignación familiar) según el régimen de cada relación.
+#alc
+- Gratificaciones de julio y diciembre, proporcionales y truncas, con bonificación extraordinaria.
+- CTS: remuneración computable, depósitos semestrales, entidad depositaria por trabajador, constancia y liquidación de depósito.
+- Remuneración vacacional y registro de goce.
+- Utilidades: renta base, porcentaje por actividad, distribución por días y por remuneraciones, liquidación individual, tope.
+- Asignación familiar según derechohabientes.
+- Diferencias por régimen (general, micro, pequeña, otros).
+#fue
+- Liquidación al cese (M-LIQ). Provisión mensual (M-PRV). Detalle legal en `14-localizacion-peru.md`.
+#act
+- Payroll procesa. Aprobador aprueba como cualquier periodo. Empleado recibe boleta y constancias.
+#flu
+**Gratificación.** 1) Se abre el proceso del semestre. 2) El motor toma la remuneración computable y los meses completos de cada relación. 3) Calcula gratificación y bonificación extraordinaria según régimen. 4) Sigue revisión, aprobación, cierre, boleta y pago.
+
+**CTS.** 1) Se abre el depósito semestral. 2) Se calcula la remuneración computable (incluye un sexto de la última gratificación) y el tiempo computable. 3) Se genera el archivo por entidad depositaria. 4) Tras el depósito, se emite la liquidación de CTS a cada trabajador.
+
+**Utilidades.** 1) Finanzas registra la renta base y la actividad. 2) El motor reparte la mitad por días laborados y la mitad por remuneraciones, aplica el tope individual. 3) Emite la liquidación individual. 4) Pago y retención de quinta.
+#pan
+Beneficios sociales :: Procesos por tipo y semestre o año con estado :: Nómina → Beneficios sociales
+Gratificaciones :: Detalle por persona: computable, meses, monto, bonificación :: Nómina → Beneficios sociales → Gratificaciones
+CTS :: Computable, tiempo, depósito, entidad, constancia :: Nómina → Beneficios sociales → CTS
+Utilidades :: Datos de la empresa, reparto por criterio, liquidación individual :: Nómina → Beneficios sociales → Utilidades
+#dat
+Procesos de beneficio, bases computables por relación y semestre, depósitos de CTS, entidades depositarias, liquidaciones de utilidades, datos anuales de utilidades por empresa.
+#rn
+[P] Si la relación está en régimen general → la gratificación equivale a una remuneración computable por semestre completo, proporcional por meses completos laborados (valor de referencia 2026, parámetro con vigencia); pequeña empresa: media remuneración; microempresa: no corresponde.
+[P] Si se paga gratificación → se añade la bonificación extraordinaria del 9 % de la gratificación (valor de referencia 2026, parámetro con vigencia); el porcentaje para afiliados a EPS es un parámetro a confirmar con la norma vigente.
+[P] Si se calcula CTS → la remuneración computable incluye el sueldo más un sexto de la última gratificación y los depósitos se programan en la primera quincena de mayo y de noviembre (valores de referencia 2026, parámetros con vigencia).
+[P] Si la relación es de pequeña empresa → la CTS equivale a 15 remuneraciones diarias por año (valor de referencia 2026, parámetro con vigencia); microempresa: no corresponde.
+[F] Si el trabajador no tiene entidad depositaria registrada → el proceso de CTS lo reporta como error y no genera su línea.
+[F] Si se realiza el depósito de CTS → se emite a cada trabajador la liquidación con fecha, entidad, cuenta, periodo y cálculo.
+[P] Si el trabajador tiene uno o más hijos con derecho registrados y sustentados → percibe asignación familiar del 10 % de la RMV vigente (valor de referencia 2026, parámetro con vigencia); el monto se deriva de la RMV, no se digita.
+[P] Si la empresa supera el umbral de trabajadores que obliga a repartir utilidades (más de 20, valor de referencia 2026) y genera renta → se reparte el porcentaje de su actividad (industria 10 %, comercio y restaurantes 8 %, otras 5 % como valores de referencia; lista completa a confirmar con la norma vigente).
+[P] Si se distribuyen utilidades → la mitad se reparte en proporción a los días laborados y la mitad en proporción a las remuneraciones (criterio y tope individual: parámetros a confirmar con la norma vigente).
+[F] Si una persona cesó durante el ejercicio → participa en las utilidades por el tiempo laborado y se le liquida aunque ya no esté activa.
+[F] Si un concepto no está marcado como computable para un beneficio → no entra a su base (M-CPT define afectaciones).
+[P] Si una remuneración es variable (comisiones, horas extra) → entra a la base computable por promedio del periodo y bajo el requisito de regularidad del paquete de país (parámetros a confirmar).
+[P] Si se procesa la gratificación o la CTS → el factor y la forma salen del régimen de la relación: una remuneración (general), media (pequeña empresa), no corresponde (microempresa), 40 jornales (construcción civil); las relaciones agrarias con prorrateo se omiten y queda en la traza.
+#eve
+- `benefit.gratification_calculated`, `benefit.cts_deposited`, `benefit.profit_sharing_calculated`, `benefit.family_allowance_changed`.
+#evc
+- `dependent.added`, `parameter.changed`, `payroll.closed`, `employee.terminated`, `employment.regime_changed`.
+#int
+Entidades financieras depositarias (archivo), M-DEC.
+#bor
+- Ingreso o cese dentro del semestre.
+- Cambio de régimen MYPE a general dentro del semestre.
+- Hijo que cumple la edad límite o continúa estudios superiores (parámetros a confirmar).
+- Ambos padres en la misma empresa.
+- Días que no cuentan como laborados para utilidades.
+#acc
+- Gratificaciones, CTS, utilidades y asignación familiar se calculan por régimen con traza y sin valores fijos en código.
+
+@@ PRE | Préstamos, adelantos y adelanto de sueldo | 3
+#obj
+Administrar préstamos y adelantos al personal con cronograma y descuento automático, y ofrecer adelanto de sueldo sobre lo ya devengado dentro de una política.
+#alc
+- Préstamos: solicitud, aprobación, desembolso, cronograma de cuotas, saldo, refinanciación, pago anticipado, cancelación.
+- Adelantos: de quincena, de gratificación, extraordinarios.
+- Adelanto de sueldo a pedido: sobre días devengados, con tope por política, descuento automático en la siguiente planilla y pago por transferencia o billetera.
+- Descuento automático como incidencia; saldo al cese.
+#fue
+- Créditos de terceros con interés comercial (solo se registra el descuento por convenio). Evaluación crediticia.
+#act
+- Empleado solicita. Manager o RRHH aprueba según política. Payroll desembolsa y controla.
+#flu
+**Préstamo.** 1) El colaborador solicita monto y cuotas. 2) El sistema valida elegibilidad y capacidad de descuento. 3) Aprobación. 4) Desembolso y generación del cronograma. 5) Cada periodo la cuota entra como incidencia. 6) Al completarse pasa a «Pagado».
+
+**Adelanto de sueldo.** 1) El colaborador ve cuánto puede pedir (devengado × porcentaje − adelantos previos). 2) Solicita. 3) Si cumple la política, se aprueba automáticamente; si no, va a aprobación. 4) Se paga por el medio elegido. 5) Se descuenta íntegro en la planilla del periodo.
+#pan
+Préstamos :: Tabla con persona, monto, cuotas, saldo, estado; nuevo, refinanciar, registrar pago :: Nómina → Préstamos
+Cronograma :: Cuotas con fecha, monto, estado y periodo en que se descontó :: Nómina → Préstamos → Detalle
+Adelantos :: Solicitudes y pagos de adelanto con estado :: Nómina → Préstamos → Adelantos
+Pedir adelanto :: Monto disponible, simulación del neto resultante, solicitar :: Portal → Mis solicitudes → Adelanto
+#dat
+Préstamos (`loans`), cuotas (`loan_installments`), adelantos (`salary_advances`), políticas, pagos.
+#rn
+[P] Si el colaborador pide adelanto de sueldo → el máximo es el porcentaje de la política sobre la remuneración neta estimada devengada a la fecha, menos adelantos ya otorgados en el periodo (parámetros).
+[F] Si se otorga un adelanto → se descuenta de forma automática y completa en el cálculo del periodo al que corresponde.
+[P] Si la suma de cuotas y descuentos voluntarios supera el porcentaje máximo del neto de la política (parámetro) → no se aprueba el préstamo con ese cronograma.
+[F] Si una cuota no puede descontarse completa (neto insuficiente, licencia sin goce) → se descuenta lo posible y el saldo se reprograma según la política, quedando registrado.
+[F] Si la relación cesa con saldo → el saldo se descuenta en la liquidación hasta el límite permitido y el remanente queda como cuenta por cobrar documentada.
+[P] Si el colaborador no cumple la antigüedad mínima o está en periodo de prueba → no es elegible (parámetros).
+[F] Si el periodo de planilla ya está en aprobación o cerrado → los adelantos nuevos se imputan al periodo siguiente.
+[F] Si se refinancia → se cierra el cronograma anterior y se crea uno nuevo enlazado; el historial se conserva.
+[F] Si se paga por billetera o transferencia → el desembolso sale por adaptador con idempotencia y solo se marca «Pagado» con confirmación.
+#eve
+- `loan.requested`, `loan.approved`, `loan.disbursed`, `loan.installment_due`, `loan.installment_paid`, `loan.paid_off`, `advance.requested`, `advance.granted`, `advance.deducted`.
+#evc
+- `payroll.closed`, `employee.terminated`, `approval.approved`.
+#int
+Bancos y billeteras digitales por adaptador (M-INT).
+#bor
+- Varios adelantos en el mismo periodo.
+- Cese entre el adelanto y el cierre.
+- Préstamo en moneda distinta de la remuneración.
+#acc
+- Cada préstamo muestra cuotas, saldo y cronograma, y sus cuotas se descuentan solas en planilla.
+
+@@ DEC | Declaraciones y archivos | 3
+#obj
+Generar, validar y controlar los archivos que la empresa debe presentar o enviar: PLAME, T-Registro, AFPnet, pagos bancarios y otros, con seguimiento de su estado.
+#alc
+- T-Registro: altas, bajas y modificaciones de trabajadores, derechohabientes y personal en formación, con control de plazos.
+- PLAME: archivos de importación (jornada, ingresos, descuentos, aportes, días subsidiados y no laborados) con mapeo de conceptos y validación previa; rectificatorias.
+- AFPnet: planilla de aportes previsionales por AFP.
+- Bancos: archivos de pago de haberes, CTS y proveedores de servicios por banco y formato; billeteras.
+- Otros: retenciones judiciales, certificados de renta de quinta (a solicitud), declaraciones juradas de rentas de otros empleadores, libro de retenciones de quinta y devoluciones de exceso.
+- Ficha del registro laboral por relación (`peruvian_employee_profiles` y tablas hermanas) con validación previa al alta.
+- Estructuras de archivo y tablas paramétricas como datos con vigencia; archivo dorado por estructura.
+- Estado de cada archivo: generado, validado, presentado, aceptado, observado, rectificado; constancia adjunta.
+#fue
+- Presentación directa ante la autoridad (se hace en sus portales; integración futura por adaptador). Asiento contable (M-PRV).
+#act
+- Payroll genera y presenta. Contador consulta. Administrador supervisa plazos.
+#flu
+**PLAME.** 1) Con el periodo cerrado, Payroll genera los archivos. 2) La validación previa revisa mapeos, datos de T-Registro, totales y consistencia. 3) Corrige errores en su origen y regenera. 4) Descarga, importa en el aplicativo de la autoridad y adjunta la constancia. 5) El archivo queda «Presentado»/«Aceptado».
+
+**T-Registro.** 1) Un ingreso, cese o cambio declarable crea una novedad pendiente con su fecha límite. 2) Payroll genera el archivo o registra en el portal. 3) Marca presentado con constancia; se entrega la constancia de alta al trabajador.
+
+**Pago bancario.** 1) Se elige el banco y la cuenta de cargo. 2) Se genera el archivo en su formato. 3) Se valida (cuentas, montos, duplicados). 4) Tras procesar en el banco, se carga el resultado y se concilian rechazos.
+#pan
+Declaraciones :: Por periodo y tipo: estado, fecha límite, responsable, constancia; generar, validar, presentar :: Nómina → Declaraciones
+Validación previa :: Errores y advertencias con enlace al dato a corregir :: Nómina → Declaraciones → Validar
+T-Registro :: Novedades pendientes con plazo; generar archivo; constancias :: Nómina → Declaraciones → T-Registro
+Pagos bancarios :: Lotes por banco con total, estado y rechazos :: Nómina → Declaraciones → Bancos
+Formatos :: Bancos y estructuras de archivo configurables :: Configuración → Planilla → Formatos
+Ficha del registro laboral :: Datos del T-Registro de la relación con vigencia, códigos de las tablas paramétricas, faltantes y resultado de la validación previa al alta :: Nómina → Declaraciones → T-Registro
+Rentas de otros empleadores :: Declaraciones juradas por trabajador y ejercicio (empleador anterior o simultáneo), detalle mensual, quién retiene :: Nómina → Declaraciones
+Libro de retenciones de quinta :: Por trabajador y ejercicio: proyección, impuesto anual, retenciones deducidas, divisor, retención ordinaria y adicional, traza; devoluciones de exceso :: Nómina → Declaraciones
+Estructuras y tablas paramétricas :: Estructuras de archivo con vigencia y marca de verificada; tablas paramétricas de la planilla electrónica :: Configuración → Planilla → Formatos
+#dat
+Archivos generados (`filing_files`) con tipo, periodo, versión, hash, estado; novedades de T-Registro; lotes de pago y líneas; constancias; formatos de archivo.  Ficha del registro laboral (`peruvian_employee_profiles`, establecimientos, periodos declarados, direcciones y estudios codificados, derechohabientes), tablas paramétricas (`pe_parametric_tables`, `pe_parametric_items`), estructuras de archivo (`statutory_file_layouts`), declaraciones de rentas de otros empleadores, libro de retenciones de quinta (`fifth_category_ledger`, solo inserción) y devoluciones (`fifth_category_refunds`).
+#rn
+[F] Si el periodo no está cerrado → no se generan archivos definitivos de PLAME, AFPnet ni pago (solo borradores de validación).
+[F] Si la validación previa encuentra errores → el archivo no puede marcarse como presentable hasta corregirlos en su origen.
+[F] Si un archivo fue presentado → no se regenera encima; un cambio produce una rectificatoria enlazada con nueva versión.
+[P] Si ocurre un ingreso, un cese o una modificación declarable → se crea la novedad de T-Registro con su fecha límite (alta: dentro del día del ingreso; modificación: 5 días hábiles; baja: día siguiente, tipo de día a confirmar; parámetros `treg_*`) y se alerta antes de vencer.
+[F] Si un trabajador no tiene completos los datos exigidos (régimen pensionario, de salud, tipo de contrato, establecimiento) → la novedad de alta queda bloqueada con la lista de faltantes.
+[F] Si un concepto declarable no tiene código de la administración tributaria → PLAME no se puede validar.
+[F] Si se genera el archivo de AFPnet → lleva por trabajador la identificación, los indicadores de relación laboral, la remuneración asegurable y los aportes voluntarios; el aporte, la comisión y la prima los calcula AFPnet, y el sistema concilia su propio cálculo contra la liquidación devuelta.
+[F] Si el banco rechaza pagos → cada rechazo se concilia contra su línea y la persona queda «pago pendiente» hasta resolver.
+[F] Si se genera un archivo de pago → el total debe coincidir con el neto del periodo cerrado; cualquier diferencia impide exportarlo.
+[F] Si un archivo se descarga → se registra quién y cuándo, y se guarda su hash.
+[F] Si se genera un archivo oficial → se usa la estructura (`statutory_file_layouts`) vigente en la fecha del periodo; con una estructura no verificada el archivo solo sale como borrador.
+[F] Si se genera un archivo → se guardan su huella SHA-256, tamaño, totales de control, estructura y versión del generador; regenerar el mismo periodo cerrado produce los mismos bytes.
+[F] Si un concepto con monto no tiene mapeo vigente a un código de la tabla de conceptos de la autoridad en la fecha del periodo → la validación previa falla; el mapeo tiene vigencia y marca de verificado.
+[F] Si se intenta el alta de un trabajador en el registro laboral → debe pasar las comprobaciones TR-01 a TR-22 (`18-localizacion-peru-detalle-tecnico.md` §1.5); cada fallo indica campo, pantalla de origen y si bloquea.
+[F] Si cambia un dato declarable de la ficha del registro laboral → se cierra la fila vigente, se abre otra y se crea la novedad de modificación; lo declarado se compara con lo derivado del núcleo.
+[P] Si se presenta la planilla de aportes previsionales → debe declararse y pagarse dentro de `afpnet_plazo_dias_habiles` del mes siguiente; el calendario alerta con los días hábiles de la sede.
+[F] Si la planilla es semanal o quincenal → la declaración mensual consolida todas las corridas cerradas del mismo periodo tributario (`statutory_period_code`) y no se genera si falta cerrar alguna.
+[F] Si un trabajador presenta una declaración jurada de rentas de otros empleadores → se guarda con su documento, no se sobrescribe (una nueva reemplaza a la anterior) y alimenta la proyección de quinta desde el mes en que se valida.
+[F] Si se calcula la retención de quinta → se inserta una fila en el libro de retenciones con entradas, parámetros y traza; un recálculo es otra fila, nunca una modificación.
+[F] Si hay retención en exceso → se devuelve al cese (en la liquidación) o en la regularización de diciembre, se compensa contra las retenciones del periodo y el saldo se arrastra o se solicita a la autoridad (ME-49).
+#eve
+- `filing.generated`, `filing.validated`, `filing.submitted`, `filing.accepted`, `filing.observed`, `filing.rectified`, `tregistro.pending`, `bank_batch.generated`, `bank_batch.reconciled`.
+#evc
+- `payroll.closed`, `employee.hired`, `employee.terminated`, `dependent.added`, `employment.regime_changed`, `benefit.cts_deposited`.
+#int
+Portales de la autoridad tributaria y de AFPnet (carga manual de archivo; adaptador para integración directa cuando exista), bancos y billeteras.
+#bor
+- Trabajador que cambia de AFP dentro del periodo.
+- Rectificatoria por ajuste retroactivo.
+- Alta declarada fuera de plazo: se registra la contingencia.
+- Empresa con varios bancos pagadores.
+#acc
+- PLAME, T-Registro, AFPnet, archivos bancarios y contables se generan con validación previa y con su estado y constancia.
+
+@@ PRV | Provisiones y asientos contables | 3
+#obj
+Reflejar el costo laboral en contabilidad: provisiones mensuales de beneficios y asiento de planilla por centro de costo, exportable al ERP.
+#alc
+- Provisión mensual de CTS, gratificaciones, vacaciones y otros pasivos laborales, por relación.
+- Asiento de planilla, de provisiones, de pagos y de liquidaciones; plan de cuentas de nómina y reglas de contabilización por concepto, tipo de trabajador y centro de costo.
+- Distribución por centro de costo fijo, porcentual o según hojas de tiempo.
+- Exportación en formato configurable y por API; reversas y ajustes; conciliación provisión frente a pago.
+#fue
+- Contabilidad general. Plan contable completo de la empresa.
+#act
+- Payroll genera. Contador revisa, exporta y concilia.
+#flu
+**Asiento del periodo.** 1) Al cerrar el periodo, el sistema aplica las reglas de contabilización. 2) Genera el asiento por centro de costo con debe y haber cuadrados. 3) El contador lo revisa. 4) Se exporta o se envía por API. 5) Se marca «Contabilizado» con la referencia del ERP.
+
+**Provisión.** 1) Cada mes se calcula lo devengado de cada beneficio por relación. 2) Se registra la provisión y su asiento. 3) Al pagar el beneficio, se aplica contra la provisión y se muestra la diferencia.
+#pan
+Asientos :: Por periodo y tipo: estado, total, cuadre; ver detalle, exportar :: Nómina → Contabilidad
+Detalle del asiento :: Líneas por cuenta, centro de costo, debe, haber; origen por concepto :: Nómina → Contabilidad → Detalle
+Provisiones :: Saldos por beneficio y relación; movimiento del mes; conciliación :: Nómina → Contabilidad → Provisiones
+Cuentas y reglas :: Mapeo concepto → cuentas por tipo de trabajador y centro de costo :: Configuración → Planilla → Contabilización
+#dat
+Reglas de contabilización, cuentas, asientos (`accounting_entries`) y líneas, provisiones por relación y mes, exportaciones.
+#rn
+[F] Si se genera un asiento → el total del debe es igual al del haber; si no cuadra, no se puede exportar y se indica el concepto sin regla.
+[F] Si un concepto con importe no tiene regla de contabilización → el asiento queda «incompleto» y lo señala.
+[P] Si se calcula la provisión mensual → usa las mismas fórmulas de devengo del beneficio (gratificación, CTS, vacaciones) según régimen, sobre la remuneración computable del mes (parámetros del paquete de país).
+[F] Si el beneficio se paga → la provisión acumulada se revierte contra el pago y la diferencia se registra como ajuste.
+[F] Si una relación reparte su costo entre varios centros → las líneas se dividen con los porcentajes vigentes (o los de hojas de tiempo aprobadas).
+[F] Si un asiento ya fue exportado → no se modifica; una corrección genera un asiento de ajuste o reversa.
+[F] Si el periodo se reabre → el asiento no exportado se anula; si ya se exportó, se exige reversa.
+[F] Si la exportación se envía por API → usa idempotencia y registra la referencia devuelta por el ERP.
+#eve
+- `accounting.entry_generated`, `accounting.entry_exported`, `accounting.provision_posted`.
+#evc
+- `payroll.closed`, `payroll.reopened`, `benefit.cts_deposited`, `settlement.approved`, `timesheet.approved`.
+#int
+ERP y sistemas contables por archivo configurable o API (M-INT).
+#bor
+- Trabajador que cambia de centro de costo a mitad de mes.
+- Provisión de vacaciones con cambio de sueldo.
+- Empresa con moneda funcional distinta.
+#acc
+- El asiento por centro de costo se genera, cuadra y se exporta; las provisiones concilian contra los pagos.
+
+@@ LIQ | Liquidación de beneficios sociales | 3
+#obj
+Calcular y documentar lo que corresponde al trabajador al terminar su relación, con un simulador previo y los documentos de cese.
+#alc
+- Conceptos: remuneración pendiente, CTS trunca, gratificación trunca y su bonificación, vacaciones truncas y no gozadas, indemnización vacacional, indemnización por despido según régimen y causa, bolsa de horas, descuentos (préstamos, adelantos, activos no devueltos según política).
+- Simulador con fecha y motivo hipotéticos.
+- Aprobación, pago y firma.
+- Documentos de cese: liquidación, certificado de trabajo, carta de liberación de CTS, constancia de cese, certificado de rentas y retenciones (disponible; su entrega no es obligatoria).
+- Baja en T-Registro y seguros.
+#fue
+- El proceso de salida (M-OFF). La decisión de cesar.
+#act
+- Payroll calcula. Aprobador aprueba. RRHH entrega documentos. Empleado firma y recibe.
+#flu
+**Liquidación.** 1) El cese registrado crea la liquidación en borrador. 2) El motor calcula con datos a la fecha de cese. 3) Payroll revisa y ajusta incidencias. 4) Aprobación por persona distinta. 5) Pago dentro del plazo legal. 6) Se generan y firman los documentos; se entregan en el portal. 7) Se crean las novedades de baja.
+
+**Simulación.** 1) Se elige persona, fecha y motivo. 2) El sistema muestra el detalle por concepto. 3) No guarda efectos; queda registro de quién simuló.
+#pan
+Liquidaciones :: Lista con persona, fecha de cese, estado, total (con permiso), plazo de pago :: Nómina → Liquidaciones
+Detalle de liquidación :: Conceptos con base, tiempo y fórmula; documentos; pago :: Nómina → Liquidaciones → Detalle
+Simulador :: Persona, fecha, motivo; resultado por concepto :: Nómina → Liquidaciones → Simular
+#dat
+Liquidaciones (`settlements`) y líneas, simulaciones, documentos de cese, pagos.
+#rn
+[F] Si se registra un cese → se crea la liquidación en borrador con la fecha y el motivo del cese.
+[P] Si se paga la liquidación → debe hacerse dentro del plazo legal desde el cese (parámetro del paquete de país, a confirmar con la norma vigente); el sistema alerta antes de vencer.
+[P] Si corresponde indemnización por despido → se calcula con la fórmula y el tope del régimen de la relación (parámetros del paquete de país, a confirmar con la norma vigente) y solo cuando el motivo de cese la genera.
+[F] Si hay periodos vacacionales no gozados o truncos → se liquidan según la regla del régimen y el saldo de vacaciones queda en cero.
+[F] Si existen saldos de préstamos o adelantos → se descuentan hasta el límite permitido y el remanente se documenta.
+[F] Si quien calculó la liquidación intenta aprobarla → se rechaza (segregación de funciones).
+[F] Si la liquidación se aprueba → no se modifica; un error posterior se corrige con liquidación complementaria.
+[F] Si se paga la liquidación → se emiten certificado de trabajo, carta de liberación de CTS y constancia de cese, y se generan las bajas en T-Registro y seguros.
+[F] Si se simula → no se crea ningún registro de cese ni se notifica al trabajador; la simulación queda en auditoría como acceso sensible.
+[F] Si el motivo es fallecimiento → el pago se registra a favor de los beneficiarios declarados y se bloquea hasta contar con el sustento.
+[F] Si se liquida un cese → se calcula el ajuste final de quinta con lo realmente percibido; si resulta exceso, se devuelve en la liquidación y se registra para su compensación.
+#eve
+- `settlement.created`, `settlement.calculated`, `settlement.approved`, `settlement.paid`, `settlement.documents_issued`.
+#evc
+- `employee.terminated`, `offboarding.started`, `asset.returned`, `loan.paid_off`.
+#int
+M-DEC (bajas), M-DOC (firma), bancos.
+#bor
+- Cese el mismo día del ingreso o dentro del periodo de prueba.
+- Cese con periodo de planilla del mes aún abierto.
+- Reingreso posterior: nueva relación, antigüedad según regla.
+- Liquidación de modalidad formativa o de locador: reglas distintas.
+#acc
+- El simulador muestra truncos, vacaciones no gozadas e indemnización con su traza, y la liquidación aprobada emite los documentos de cese.
+
+@@ LOC | Locadores y cuarta categoría | 3
+#obj
+Gestionar a los prestadores de servicios independientes separados de la planilla: contratos de locación, recibos por honorarios, retenciones y pagos.
+#alc
+- Ficha del prestador (persona con relación de tipo «locador»), contrato de servicios, entregables y vigencia.
+- Recibos por honorarios: registro, validación, retención del impuesto, suspensión de retenciones, pago.
+- Reporte para declaración de cuarta categoría y archivo de pago.
+- Alertas de riesgo de laboralidad (indicadores configurables).
+#fue
+- Beneficios laborales, asistencia obligatoria, vacaciones (no aplican). Emisión del recibo electrónico (lo emite el prestador).
+#act
+- RRHH o compras registra al prestador. Responsable del servicio valida entregables. Payroll o tesorería paga.
+#flu
+**Ciclo mensual.** 1) El prestador o el responsable carga el recibo. 2) El responsable da conformidad al servicio. 3) Payroll valida datos y calcula la retención. 4) Se incluye en el lote de pago. 5) Queda en el reporte de cuarta categoría del periodo.
+#pan
+Locadores :: Prestadores con contrato, vigencia, responsable, monto pactado (con permiso) :: Nómina → Locadores
+Recibos por honorarios :: Recibos por periodo con estado, retención y pago; registrar, validar :: Nómina → Locadores → Recibos
+#dat
+Prestadores (relación de tipo locador), contratos de servicios, recibos (`fee_receipts`), retenciones, constancias de suspensión.
+#rn
+[F] Si la relación es de tipo locador → no entra a ninguna planilla ni genera beneficios sociales, asistencia obligatoria ni vacaciones.
+[P] Si el recibo supera el monto mínimo sujeto a retención y el prestador no tiene suspensión vigente → se retiene el porcentaje del impuesto (parámetros del paquete de país, a confirmar con la norma vigente).
+[F] Si el recibo no tiene conformidad del responsable del servicio → no entra al lote de pago.
+[F] Si un mismo número de recibo del mismo prestador se registra dos veces → se rechaza.
+[P] Si un prestador acumula indicadores de laboralidad (horario fijo, exclusividad, continuidad mayor al umbral; parámetros) → se alerta a RRHH con explicación; la decisión es humana.
+[F] Si el contrato de servicios venció → no se aceptan recibos por periodos posteriores sin renovación.
+#eve
+- `contractor.created`, `fee_receipt.registered`, `fee_receipt.approved`, `fee_receipt.paid`.
+#evc
+- `bank_batch.reconciled`.
+#int
+Bancos; validación del comprobante ante la administración tributaria por adaptador opcional.
+#bor
+- Locador que pasa a planilla: nueva relación laboral, misma persona.
+- Recibo en moneda extranjera.
+#acc
+- Los locadores se gestionan sin mezclarse con trabajadores en planilla, tableros de dotación ni declaraciones laborales.

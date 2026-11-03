@@ -1,0 +1,39 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Pesquisar",
+    "loading": "Carregando…",
+    "error": "Erro",
+    "success": "Sucesso",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "nav": {
+    "home": "Início",
+    "employees": "Colaboradores",
+    "attendance": "Frequência",
+    "payroll": "Folha de pagamento",
+    "vacations": "Férias",
+    "reports": "Relatórios",
+    "settings": "Configurações",
+    "help": "Ajuda",
+    "notifications": "Notificações",
+    "new": "Novo"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "forgot_password": "Esqueceu sua senha?"
+  }
+}
+

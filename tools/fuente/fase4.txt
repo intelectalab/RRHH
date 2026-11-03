@@ -1,0 +1,335 @@
+# ATS | 4 | reclutamiento | Reclutamiento, portal de empleos y base de talento | Backend + Frontend | Vacantes ligadas a posiciones, portal público, pipeline configurable, ficha del candidato y base de talento.
+
+@ 1 | H | BF | Vacantes ligadas a posiciones
+D Crear vacantes desde una posición aprobada con puesto, descripción, requisitos, modalidad, sede, rango salarial opcional y equipo de selección. La vacante pone la posición en reclutamiento.
+- Con la política de dotación activa no se crea una vacante sin posición libre
+- El rango salarial solo lo ven los roles con permiso
+R 06; 05; 04; §10; §5; C-02; ME-05; RN-ATS-01 a RN-ATS-12; P Talento → Reclutamiento
+X POS-6, POS-2
+
+@ 2 | H | BF | Aprobación y publicación de la vacante
+D Enviar la vacante a aprobación y, una vez aprobada, publicarla en el portal de empleos, internamente y en bolsas externas por adaptador, con fechas de apertura y cierre. Las bolsas externas se conectan por adaptador con implementación falsa.
+- Una vacante no se publica sin aprobación cuando el flujo lo exige
+- Despublicar retira la vacante del portal de inmediato
+R 06; 05; §10; §56; ME-05; RN-ATS-01 a RN-ATS-12
+X ATS-1, WFL-2
+
+@ 3 | H | BF | Portal público de empleos
+D Construir el portal de empleos por organización con su marca: listado de vacantes con ubicación, modalidad, descripción, requisitos y beneficios, filtros y páginas preparadas para buscadores. El portal se sirve sin sesión y solo expone lo publicado.
+- Cada vacante tiene dirección propia, metadatos y datos estructurados de oferta de empleo
+- El portal solo muestra vacantes publicadas de esa organización
+- El portal carga rápido y funciona en el móvil
+R 06; §11; RN-ATS-01 a RN-ATS-12; P Talento → Portal de empleos
+X ATS-2
+
+@ 4 | H | BF | Formulario de postulación configurable
+D Definir por vacante el formulario de postulación (datos, CV, preguntas filtro, pretensión salarial, fuente) con consentimiento de tratamiento de datos y protección contra envíos automáticos. Las respuestas se guardan en la ficha del candidato.
+- El postulante acepta la finalidad del tratamiento antes de enviar
+- Las preguntas filtro pueden marcar a un candidato para revisión, nunca descartarlo de forma automática
+- La postulación confirma la recepción al candidato
+R 06; §11; §10; C-08; E-16; RN-ATS-01 a RN-ATS-12
+X ATS-3
+
+@ 5 | H | BF | Pipeline configurable con arrastrar y soltar
+D Configurar etapas por vacante (nuevo, preselección, entrevista RRHH, entrevista técnica, evaluación, referencias, oferta, contratado) y mover candidatos en un tablero kanban, con motivo de descarte y comunicaciones por etapa. Cada etapa puede disparar acciones automáticas como correos o tareas.
+- Mover un candidato de etapa queda en su actividad
+- Descartar exige motivo de un catálogo
+- Las etapas se configuran por plantilla de proceso
+R 06; 05; §10; ME-06; RN-ATS-01 a RN-ATS-12; P Talento → Reclutamiento
+X ATS-4, UI-12
+
+@ 6 | H | BF | Ficha del candidato
+D Reunir en la ficha del candidato datos, CV, experiencia, educación, pretensión salarial, fuente, vacantes, notas, documentos, entrevistas, evaluaciones y actividad, con comentarios del equipo de selección. La ficha deduplica candidatos por documento y por correo.
+- Un candidato que postula a varias vacantes tiene una sola ficha
+- Las notas internas no son visibles para el candidato
+R 06; 04; §10; RN-ATS-01 a RN-ATS-12
+X ATS-5
+
+@ 7 | H | BF | Base de talento
+D Guardar candidatos no contratados en la base de talento con etiquetas, búsqueda y filtros avanzados (habilidades, experiencia, ubicación, fuente) y reutilizarlos en nuevas vacantes. La búsqueda usa texto completo sobre el CV y los campos estructurados.
+- Un candidato de la base se agrega a una vacante sin volver a postular
+- La base respeta el plazo de conservación consentido por el candidato
+R 06; §12; E-16; RN-ATS-01 a RN-ATS-12; P Talento → Base de talento
+X ATS-6
+
+@ 8 | H | BF | Referidos y movilidad interna
+D Publicar vacantes internas para que los colaboradores postulen desde su portal y permitir que refieran candidatos, con seguimiento del referido y regla de reconocimiento. Las postulaciones internas se tratan con confidencialidad frente al jefe actual.
+- El colaborador ve el estado de sus referidos
+- Una postulación interna avisa al jefe actual solo en la etapa que la política define
+R 06; E-14; §12; RN-ATS-01 a RN-ATS-12
+X ATS-5, ESS-1
+
+@ 9 | H | BF | Indicadores de reclutamiento
+D Medir tiempo de cobertura, embudo por etapa, fuentes y costo por contratación por vacante y por reclutador. Los datos se exponen también a la capa analítica.
+- Los indicadores se calculan desde los movimientos reales del pipeline
+- Cada indicador muestra su definición
+R 06; §64; §10; RN-ATS-01 a RN-ATS-12
+X ATS-5
+
+# ENT | 4 | reclutamiento | Entrevistas y ofertas | Backend + Frontend | Agenda de entrevistas, evaluación estructurada y ofertas con plantilla y aprobación.
+
+@ 1 | H | BF | Agenda de entrevistas
+D Programar entrevistas con fecha, hora, entrevistadores, tipo, lugar o enlace, e invitación al candidato y a los entrevistadores con archivo de calendario. La agenda se muestra en el calendario de RRHH y en la ficha del candidato.
+- Se detectan choques de horario de los entrevistadores
+- El candidato puede confirmar o pedir reprogramación desde el enlace recibido
+R 06; §13; §78; RN-ENT-01 a RN-ENT-09; P Talento → Reclutamiento
+X ATS-5, NOT-3
+
+@ 2 | H | BF | Guías y scorecards
+D Crear guías de entrevista y scorecards por puesto con criterios, escala y preguntas sugeridas, reutilizables por vacante. Las guías se versionan y se asignan por etapa del proceso.
+- Una vacante puede usar scorecards distintos por etapa
+- Los criterios pueden vincularse a competencias del puesto
+R 06; §13; RN-ENT-01 a RN-ENT-09
+X ENT-1
+
+@ 3 | H | BF | Evaluación del candidato por los entrevistadores
+D Permitir que cada entrevistador complete su scorecard de forma independiente y mostrar la consolidación cuando todos hayan evaluado. La evaluación se completa desde el móvil.
+- Un entrevistador no ve las evaluaciones de otros hasta enviar la suya
+- La consolidación muestra promedio y dispersión por criterio
+R 06; §13; RN-ENT-01 a RN-ENT-09
+X ENT-2
+
+@ 4 | H | BF | Plantillas y generación de la oferta
+D Generar la carta oferta desde plantillas con variables (`{{nombre}}`, `{{cargo}}`, `{{salario}}`, `{{fecha_ingreso}}`) y los datos de la posición. Las plantillas se gestionan con el generador de documentos.
+- La oferta valida que el sueldo esté dentro de la banda o pide justificación
+- La vista previa muestra el documento final
+R 06; §14; §20; RN-ENT-01 a RN-ENT-09
+X ENT-3, DOC-4
+
+@ 5 | H | BF | Flujo de la oferta
+D Llevar la oferta por sus estados: borrador, revisión, aprobación, enviada y aceptada o rechazada, con vencimiento y firma del candidato. El flujo usa el motor de aprobaciones y el flujo de firma.
+- La oferta no se envía sin las aprobaciones configuradas
+- El candidato acepta o rechaza desde un enlace seguro y queda la evidencia
+R 06; 05; §14; C-12; ME-07; RN-ENT-01 a RN-ENT-09
+X ENT-4, WFL-2, DOC-6
+
+@ 6 | H | BF | Contratación del candidato
+D Convertir al candidato con oferta aceptada en futuro colaborador: crear o reutilizar la persona, preparar el alta de la relación laboral con los datos de la oferta y emitir `candidate.hired`. La conversión es una acción explícita con permiso propio.
+- La persona no se duplica si ya existía
+- La posición pasa a ocupada en la fecha de ingreso
+- El resto de candidatos de la vacante recibe la comunicación de cierre que se configure
+R 06; §10; §15; §74; C-01; RN-ENT-01 a RN-ENT-09
+X ENT-5, COL-2
+
+# ONB | 4 | onboarding | Pre-onboarding y onboarding | Backend + Frontend | Recolección previa de datos y documentos, diseñador de procesos de ingreso y seguimiento.
+
+@ 1 | H | BF | Portal de pre-onboarding
+D Dar al futuro colaborador un acceso previo al ingreso para completar datos, documentos, cuenta bancaria, contactos de emergencia, derechohabientes y firmar su contrato. El acceso usa un enlace personal con verificación por documento y código.
+- El futuro colaborador accede sin correo corporativo
+- El avance de lo solicitado es visible para RRHH
+- Los datos entran a la ficha tras la validación de RRHH
+R 06; §15; C-09; RN-ONB-01 a RN-ONB-10
+X ENT-6, DOC-3
+
+@ 2 | H | BF | Validación y alta desde el pre-onboarding
+D Permitir que RRHH revise lo recibido, observe lo incorrecto y confirme el alta de la relación laboral con contrato firmado. La validación campo a campo deja registro de quién aprobó cada dato.
+- Un documento observado vuelve al futuro colaborador con el motivo
+- El alta confirmada emite `employee.hired`
+R 06; §15; §103; RN-ONB-01 a RN-ONB-10
+X ONB-1, CON-2
+
+@ 3 | H | BF | Diseñador de plantillas de onboarding
+D Diseñar plantillas por empresa, sede, puesto y área con tareas por hito relativo a la fecha de ingreso (antes del ingreso, primer día, primeros siete días, 30, 60 y 90 días), responsable por rol y tipo de tarea. Las plantillas se versionan y se prueban con un ingreso de ejemplo.
+- Una plantilla se asigna sola según las condiciones del nuevo ingreso
+- Las tareas pueden ser de TI, jefe, RRHH o del propio colaborador
+R 06; §16; §55; RN-ONB-01 a RN-ONB-10; P Talento → Onboarding
+X WFL-8, WFL-5
+
+@ 4 | H | BF | Ejecución del proceso de onboarding
+D Crear el proceso de cada ingreso desde su plantilla con tareas fechadas, recordatorios, cursos asignados, documentos por firmar y reuniones con el jefe. Las tareas se crean con el motor de tareas y sus fechas se recalculan si cambia la fecha de ingreso.
+- El alta de un colaborador crea su proceso sin intervención
+- Cada responsable ve sus tareas en la bandeja de pendientes
+R 06; 05; §16; §103; §77; ME-08; RN-ONB-01 a RN-ONB-10
+X ONB-3, ONB-2
+
+@ 5 | H | BF | Avance y seguimiento
+D Mostrar el porcentaje de avance por colaborador, el tablero de procesos en curso y los hitos de seguimiento (30, 60 y 90 días) con cierre formal. El nuevo colaborador ve su propio avance en el portal.
+- El avance se calcula sobre las tareas obligatorias
+- Los procesos atrasados se resaltan con su causa
+R 06; §16; RN-ONB-01 a RN-ONB-10; P Talento → Onboarding
+X ONB-4
+
+@ 6 | H | BF | Evaluación del periodo de prueba
+D Incluir en el onboarding la evaluación del periodo de prueba por el jefe antes de su vencimiento, con recomendación y registro de la decisión tomada por una persona. La evaluación usa un formulario breve configurable.
+- El jefe recibe el aviso con anticipación configurable
+- La decisión queda registrada con autor
+R 06; §16; §18; C-08; RN-ONB-01 a RN-ONB-10
+X ONB-5, CON-2
+
+# OFF | 4 | onboarding | Offboarding | Backend + Frontend | Proceso de salida con motivos, lista de verificación, entrevista de salida y cierre de accesos.
+
+@ 1 | H | BF | Inicio del proceso de salida
+D Iniciar la salida por renuncia, despido, fin de contrato, jubilación u otro motivo, con fecha de cese, carta adjunta y aprobaciones según el tipo. El inicio registra la fecha de comunicación y la del último día de labores.
+- El motivo de salida se registra con catálogo y detalle
+- El proceso de despido exige los documentos del procedimiento antes de avanzar
+R 06; 05; §17; ME-09; RN-OFF-01 a RN-OFF-09; P Talento → Offboarding
+X COL-11, WFL-2
+
+@ 2 | H | BF | Lista de verificación de salida
+D Generar desde plantilla las tareas de salida: carta, liquidación, devolución de activos, desactivación de accesos, entrega de documentos, encuesta y entrevista de salida. La plantilla varía según el motivo de salida y el puesto.
+- Cada tarea tiene responsable y estado
+- El proceso no se cierra con tareas obligatorias pendientes
+R 06; §17; §77; RN-OFF-01 a RN-OFF-09
+X OFF-1, WFL-8
+
+@ 3 | H | BF | Entrevista y encuesta de salida
+D Registrar la entrevista de salida con guía y notas confidenciales, y enviar la encuesta de salida. La encuesta se envía con el módulo de encuestas cuando está activo.
+- Las notas de la entrevista solo las ve RRHH con permiso
+- Los motivos de salida alimentan la analítica de rotación
+R 06; §17; RN-OFF-01 a RN-OFF-09
+X OFF-2
+
+@ 4 | T | B | Desactivación de accesos al cese
+D Desactivar en la fecha de cese los accesos del usuario, conservando el acceso de ex colaborador a sus boletas y documentos de cese. La desactivación se dispara con el evento de cese y alcanza a integraciones y tokens.
+- El usuario cesado no puede operar como colaborador activo
+- El ex colaborador descarga sus documentos de cese durante el plazo configurado
+R 06; 07; §17; RN-OFF-01 a RN-OFF-09
+X OFF-1, SEG-6
+
+@ 5 | H | BF | Liquidación y documentos de salida en el proceso
+D Enlazar el proceso de salida con la liquidación de beneficios y los documentos de cese, mostrando su estado dentro de la lista de verificación. El vínculo es de solo lectura: cada módulo conserva su propio proceso.
+- La tarea de liquidación se completa sola cuando la liquidación se paga
+- Los documentos de cese firmados se ven en el proceso
+R 06; §17; E-04; RN-OFF-01 a RN-OFF-09
+X OFF-2, LIQ-4
+
+# DES | 4 | desempeno | Evaluación de desempeño | Backend + Frontend | Campañas de 90° a 360° con formularios, escalas, calibración y resultados.
+
+@ 1 | H | BF | Configuración de campañas
+D Crear campañas de evaluación (90°, 180°, 270°, 360°) con población, periodo evaluado, etapas, fechas y pesos por tipo de evaluador. Una campaña puede clonarse de otra anterior.
+- La población se define por filtros y se puede ajustar persona a persona
+- La campaña sigue su máquina de estados hasta el cierre
+R 06; 05; §38; ME-25; RN-DES-01 a RN-DES-10; P Talento → Evaluaciones
+X HIS-6, WFL-1
+
+@ 2 | H | BF | Formularios, preguntas y escalas
+D Diseñar formularios con secciones de competencias, objetivos y preguntas abiertas, y escalas configurables con descriptores. Los formularios se versionan por campaña.
+- Un formulario puede variar por nivel de puesto
+- Las competencias evaluadas salen del perfil del puesto
+R 06; §38; §39; RN-DES-01 a RN-DES-10
+X DES-1, CMP-2
+
+@ 3 | H | BF | Red de evaluadores
+D Asignar autoevaluación, jefe, pares, subordinados y otros, con propuesta de pares por el evaluado y validación del jefe. RRHH puede ajustar la red y resolver casos sin jefe o con jefe nuevo.
+- La red respeta un mínimo de evaluadores por tipo para proteger el anonimato de pares y subordinados
+- El jefe se toma de la línea de reporte vigente al periodo evaluado
+R 06; §38; C-06; RN-DES-01 a RN-DES-10
+X DES-1
+
+@ 4 | H | BF | Ejecución de la evaluación
+D Permitir a cada participante completar sus evaluaciones con guardado parcial, recordatorios y avance visible para RRHH. Las respuestas se guardan por evaluador y no se muestran al evaluado hasta la publicación.
+- Las evaluaciones pendientes aparecen en la bandeja de cada persona
+- RRHH ve el avance por unidad y puede reabrir una evaluación
+R 06; 05; §38; §8; ME-26; RN-DES-01 a RN-DES-10
+X DES-2, DES-3, WFL-9
+
+@ 5 | H | BF | Calibración
+D Dar a RRHH y a los líderes una sesión de calibración por unidad con distribución de resultados y ajuste justificado. La calibración se hace antes de publicar los resultados.
+- Todo ajuste en calibración guarda el valor original, el nuevo y el motivo
+- La distribución se ve por unidad y por jefe
+R 06; §38; RN-DES-01 a RN-DES-10
+X DES-4
+
+@ 6 | H | BF | Resultados y devolución
+D Publicar el informe individual con resultados por competencia y por tipo de evaluador, registrar la reunión de devolución y la conformidad del evaluado. El informe se genera en PDF y se guarda en el legajo.
+- Las respuestas de pares y subordinados se muestran agregadas
+- El resultado queda en la pestaña de desempeño de la ficha
+R 06; §38; §6; RN-DES-01 a RN-DES-10
+X DES-5
+
+# OKR | 4 | desempeno | Objetivos | Backend + Frontend | Objetivos corporativos, de área e individuales con resultados clave y avance.
+
+@ 1 | H | BF | Ciclos y objetivos
+D Crear ciclos de objetivos y objetivos de nivel corporativo, de área e individual, con responsable, peso y visibilidad. Los ciclos tienen fechas de definición, seguimiento y cierre.
+- Un objetivo pertenece a un ciclo y a un nivel
+- Los objetivos individuales pueden requerir aprobación del jefe
+R 06; 05; 04; §40; ME-27; RN-OKR-01 a RN-OKR-08; P Talento → Objetivos
+X HIS-6, WFL-2
+
+@ 2 | H | BF | Resultados clave y avance
+D Definir resultados clave con métrica, valor inicial, meta y unidad, y registrar avances con comentario y evidencia. Los resultados clave admiten avance numérico, porcentual o por hitos.
+- El avance del objetivo se deriva de sus resultados clave
+- Cada actualización queda en el historial
+R 06; §40; RN-OKR-01 a RN-OKR-08
+X OKR-1
+
+@ 3 | H | BF | Alineación jerárquica
+D Enlazar objetivos con el objetivo superior al que contribuyen y mostrar el árbol de alineación. La alineación puede cruzar unidades.
+- El árbol muestra cómo los objetivos individuales aportan a los corporativos
+- Un objetivo sin alinear se identifica
+R 06; §40; RN-OKR-01 a RN-OKR-08
+X OKR-2, UI-12
+
+@ 4 | H | BF | Seguimiento periódico y tablero
+D Pedir actualizaciones periódicas de avance con nivel de confianza y mostrar el tablero por unidad, además de las tarjetas en los portales. La frecuencia de actualización se define por ciclo.
+- Los objetivos sin actualización reciente se resaltan
+- El colaborador ve sus objetivos en su inicio
+R 06; §40; §108; §107; RN-OKR-01 a RN-OKR-08
+X OKR-3, ESS-1
+
+@ 5 | T | B | Objetivos en la evaluación de desempeño
+D Exponer el cumplimiento de objetivos del periodo para que la evaluación de desempeño lo incorpore como sección con su peso. El dato se lee del módulo de objetivos al abrir la evaluación y se congela al cerrar la campaña.
+- La evaluación muestra los objetivos y su cumplimiento sin redigitar
+- El peso de la sección de objetivos se define en el formulario de la campaña
+R 06; §40; §38; C-11; RN-OKR-01 a RN-OKR-08
+X OKR-2, DES-2
+
+# CMP | 4 | desempeno | Competencias y habilidades | Backend + Frontend | Catálogo de competencias con niveles, perfiles por puesto, matriz de habilidades y brechas.
+
+@ 1 | H | BF | Catálogo de competencias y niveles
+D Mantener el catálogo de competencias (liderazgo, comunicación, trabajo en equipo, orientación a resultados, innovación, organización y las propias) con niveles configurables y conductas observables por nivel. Las competencias se agrupan por familia y tienen vigencia.
+- Cada nivel tiene su descripción de conductas
+- El catálogo distingue competencias transversales y específicas
+R 06; 04; §39; RN-CMP-01 a RN-CMP-06; P Talento → Competencias
+X ORG-5
+
+@ 2 | H | BF | Perfil de competencias por puesto
+D Asignar a cada puesto de catálogo las competencias requeridas y su nivel esperado. El perfil alimenta evaluaciones, brechas, scorecards y rutas de carrera.
+- El perfil del puesto se versiona
+- Un puesto sin perfil se identifica en un reporte
+R 06; §39; RN-CMP-01 a RN-CMP-06
+X CMP-1
+
+@ 3 | H | BF | Matriz de habilidades
+D Registrar habilidades técnicas y certificaciones por colaborador con nivel declarado y validado por el jefe, y mostrar la matriz por equipo. Las habilidades usan un catálogo propio, separado del de competencias conductuales.
+- Se busca en la organización quién tiene una habilidad y con qué nivel
+- Las certificaciones con vencimiento generan alerta
+R 06; E-14; §39; RN-CMP-01 a RN-CMP-06
+X CMP-1, COL-3
+
+@ 4 | H | BF | Brechas de competencias
+D Comparar el nivel evaluado o validado de cada persona con el requerido por su puesto y mostrar brechas individuales y por equipo. La brecha agregada por equipo orienta el plan de capacitación.
+- La brecha se actualiza con el resultado de la última evaluación
+- La pestaña de competencias de la ficha muestra nivel actual y requerido
+R 06; §39; §44; §6; RN-CMP-01 a RN-CMP-06
+X CMP-2, CMP-3
+
+# FBK | 4 | desempeno | Reuniones 1:1 y feedback | Backend + Frontend | Reuniones individuales con agenda y compromisos, y feedback continuo integrado al desempeño.
+
+@ 1 | H | BF | Reuniones 1:1
+D Crear reuniones individuales recurrentes entre manager y colaborador con agenda compartida, temas propuestos por ambos, notas y compromisos. La recurrencia se configura por pareja de manager y colaborador.
+- Ambos agregan temas antes de la reunión
+- Los compromisos pendientes pasan a la siguiente reunión
+R 06; §41; RN-FBK-01 a RN-FBK-06; P Talento → 1:1 y feedback → Reuniones 1:1
+X HIS-6, UI-12
+
+@ 2 | H | BF | Notas privadas y seguimiento de compromisos
+D Permitir notas privadas visibles solo para su autor y dar seguimiento a los compromisos con responsable y fecha. La privacidad de las notas se aplica en el backend, no solo en la pantalla.
+- Las notas privadas no las ve la otra parte ni RRHH
+- Los compromisos vencidos se notifican
+R 06; §41; 07; RN-FBK-01 a RN-FBK-06
+X FBK-1
+
+@ 3 | H | BF | Feedback continuo
+D Permitir solicitar feedback a otras personas, darlo de forma espontánea, reconocer y crear un seguimiento, con visibilidad configurable (privado, compartido con el jefe). El feedback puede vincularse a una competencia o a un objetivo.
+- Quien recibe feedback sabe quién lo dio salvo que la política permita anonimato
+- La solicitud de feedback aparece en pendientes
+R 06; §42; RN-FBK-01 a RN-FBK-06
+X FBK-1, WFL-9
+
+@ 4 | T | B | Feedback y 1:1 en la evaluación de desempeño
+D Mostrar al evaluador, durante la evaluación, el feedback recibido y los compromisos del periodo de su evaluado según la visibilidad definida. La vista es de solo lectura y respeta el periodo evaluado.
+- El evaluador consulta el feedback del periodo sin salir del formulario
+- El feedback privado no se expone
+R 06; §42; §38; RN-FBK-01 a RN-FBK-06
+X FBK-3, DES-4

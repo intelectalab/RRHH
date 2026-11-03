@@ -1,0 +1,304 @@
+@@ ASI | Asistencia y marcación | 2
+#obj
+Registrar la asistencia por cualquier medio, de forma inalterable, y convertirla en horas trabajadas, tardanzas, faltas y sobretiempo que la planilla puede usar.
+#alc
+- Marcación universal: web, aplicación con selfie y geocerca, kiosko, QR, PIN, cuadrilla (el supervisor marca al equipo), modo sin conexión, relojes biométricos por conector abierto, importación.
+- Marcas de entrada, salida y descansos; cálculo diario contra el horario asignado: horas trabajadas, tardanza, salida anticipada, falta, horas extra, horas nocturnas, incidencias.
+- Registro inalterable: las correcciones son registros nuevos con motivo y aprobación.
+- Reporte legal de asistencia (DS 004-2006-TR) y cierre de asistencia por periodo hacia planilla.
+- Personal no sujeto a control (dirección, confianza no fiscalizada) excluido por marca.
+#fue
+- Definición de horarios y turnos (M-TUR). Aprobación y pago de horas extra (M-BHO). Control de acceso físico y comedor (integración futura).
+#act
+- Empleado marca y pide correcciones. Supervisor de cuadrilla marca al equipo. Manager revisa y aprueba correcciones. RRHH administra, cierra y reporta.
+#flu
+**Marcación en aplicación.** 1) El colaborador pulsa «Marcar». 2) El dispositivo toma hora, ubicación y selfie si la política lo exige. 3) El servidor valida geocerca y registra la marca con su origen. 4) Si está fuera de geocerca o sin horario, la marca se guarda con incidencia para revisión.
+
+**Sin conexión.** 1) El dispositivo guarda la marca firmada con su hora local y la del último sincronizado. 2) Al recuperar conexión, sincroniza. 3) El servidor conserva la hora del dispositivo y la de recepción y marca la diferencia.
+
+**Cuadrilla.** 1) El supervisor elige su cuadrilla y marca entrada o salida de cada integrante (o de todos). 2) Cada marca guarda al supervisor como origen y su ubicación. 3) El integrante puede ver sus marcas y objetarlas.
+
+**Corrección.** 1) El colaborador o RRHH solicita corregir (marca omitida, hora errónea) con motivo y sustento. 2) El aprobador decide. 3) Aprobada, se inserta una marca correctiva enlazada a la original; la original no cambia. 4) Se recalcula el día.
+
+**Cierre.** 1) RRHH revisa incidencias del periodo. 2) Cierra la asistencia; se generan las incidencias para planilla. 3) Reabrir exige permiso y motivo, y solo si el periodo de planilla sigue abierto.
+#pan
+Marcar :: Botón de entrada o salida, estado del día, última marca, mapa de geocerca, avisos sin conexión :: Portal → Mi tiempo → Marcar
+Mi asistencia :: Calendario del mes con marcas, horas, tardanzas e incidencias; pedir corrección :: Portal → Mi tiempo → Asistencia
+Asistencia del día :: Presentes, ausentes, tardanzas, sin marca; filtros por sede y unidad :: Tiempo → Asistencia
+Detalle por colaborador :: Marcas, origen, cálculo diario, correcciones enlazadas :: Personas → Colaboradores → Ficha → pestaña Asistencia
+Correcciones :: Solicitudes pendientes con sustento; aprobar o rechazar :: Tiempo → Asistencia → Correcciones
+Cierre de asistencia :: Incidencias por resolver, totales por persona, cerrar o reabrir :: Tiempo → Asistencia → Cierre
+Cuadrilla :: Lista del equipo con marcación individual o grupal :: Tiempo → Asistencia → Cuadrilla
+Kiosko :: Pantalla compartida con QR, PIN o documento; cierre automático :: Kiosko
+Dispositivos y geocercas :: Relojes, kioskos, QR por sede, radios de geocerca, estado de sincronización :: Configuración → Asistencia
+#dat
+Marcaciones (`attendance_punches`, solo inserción, con origen, dispositivo, ubicación, foto opcional, hora de dispositivo y de servidor), correcciones, días calculados (`attendance_days`), dispositivos, geocercas, cuadrillas, cierres de asistencia, consentimientos biométricos.
+#rn
+[F] Si una marca se registra → no se puede editar ni borrar; cualquier ajuste es una marca correctiva nueva con motivo, autor y aprobación, enlazada a la original.
+[F] Si se genera el registro legal de asistencia → incluye razón social, RUC, nombre y documento del trabajador, fecha, hora y minutos de ingreso y salida y sobretiempo.
+[P] Si un registro de asistencia tiene menos de cinco años (valor de referencia 2026, parámetro con vigencia) → no puede purgarse por la política de retención.
+[P] Si la entrada ocurre después de la hora del horario más la tolerancia (parámetro por política) → se calcula tardanza en minutos desde la hora de inicio.
+[F] Si un día laborable del horario no tiene marcas ni ausencia aprobada → se registra falta injustificada al cerrar el día.
+[F] Si hay entrada sin salida al cerrar el día → se marca incidencia «marca incompleta»; no se asume hora de salida.
+[P] Si la marca se hace fuera de la geocerca de la sede asignada → se acepta con incidencia o se rechaza según la política (parámetro).
+[P] Si la política exige selfie o biometría → no se admite la marca sin ella y el colaborador debe tener consentimiento vigente; sin consentimiento se ofrece un método alternativo.
+[F] Si una marca llega de un dispositivo sin conexión → se conserva la hora del dispositivo y la de recepción; una diferencia de reloj mayor que la tolerancia genera incidencia.
+[F] Si el colaborador está marcado como no sujeto a control de asistencia → no se le calculan tardanzas, faltas ni horas extra.
+[F] Si el tiempo trabajado excede la jornada del horario → el exceso se registra como «sobretiempo por calificar» y solo se convierte en horas extra pagables o compensables cuando se aprueba (M-BHO).
+[P] Si las horas trabajadas caen en la franja nocturna (parámetro del paquete de país) → se contabilizan como horas nocturnas para la planilla.
+[F] Si la asistencia del periodo está cerrada → no se admiten correcciones salvo reapertura con permiso y motivo.
+[F] Si dos marcas del mismo tipo llegan dentro de la ventana de duplicado (parámetro) → la segunda se guarda marcada como duplicada y no entra al cálculo.
+#eve
+- `attendance.punched`, `attendance.correction_requested`, `attendance.correction_approved`, `attendance.day_calculated`, `attendance.absence_detected`, `attendance.period_closed`, `attendance.period_reopened`.
+#evc
+- `leave.approved`, `absence.approved`, `shift.assigned`, `employment.schedule_changed`, `holiday.changed`.
+#int
+Conectores a relojes biométricos (API abierta y archivos), geolocalización, detección de vida para selfie; todos por adaptador.
+#bor
+- Turno que cruza la medianoche: la jornada pertenece al día de inicio.
+- Cambio de sede en el día: dos geocercas válidas.
+- Feriado trabajado y día de descanso trabajado.
+- Reloj biométrico que envía marcas con días de retraso tras el cierre.
+- Trabajador con dos relaciones: marca por relación.
+#acc
+- Ninguna operación de la aplicación o de la API modifica una marca existente.
+- El reporte legal se genera por trabajador y periodo con los campos exigidos y la bitácora de correcciones.
+- Los seis métodos de marcación producen el mismo tipo de registro.
+
+@@ TUR | Horarios, jornadas y turnos | 2
+#obj
+Definir cuándo debe trabajar cada persona: jornadas, horarios, descansos, tolerancias, feriados y turnos, con un planificador visual.
+#alc
+- Jornada semanal y diaria, descansos, tolerancias, reglas de horas extra, horario nocturno.
+- Horarios fijos, flexibles y por turnos (mañana, tarde, noche, partido, rotativo); patrones de rotación.
+- Políticas por empresa, sede, unidad o grupo con herencia.
+- Planificador en calendario con arrastrar y soltar, asignación masiva, copia de semanas, publicación y aviso al equipo.
+- Intercambio de turnos entre compañeros con aprobación; cobertura mínima.
+#fue
+- Marcación (M-ASI). Cálculo de sobretiempo (M-BHO).
+#act
+- RRHH define políticas y horarios. Manager o supervisor planifica turnos. Empleado consulta y propone intercambios.
+#flu
+**Planificación.** 1) El planificador abre la semana o el mes de su unidad. 2) Arrastra turnos a personas o aplica un patrón. 3) El sistema valida descansos, jornada máxima, ausencias aprobadas y cobertura. 4) Publica; el equipo recibe su horario.
+
+**Intercambio.** 1) Un colaborador propone cambiar su turno con un compañero. 2) El compañero acepta. 3) El manager aprueba tras las mismas validaciones. 4) Se actualiza el plan.
+#pan
+Horarios :: Catálogo de jornadas y horarios con vigencia; asignación por persona o grupo :: Tiempo → Horarios
+Turnos :: Calendario por unidad con personas en filas y días en columnas; arrastrar, copiar, asignar en bloque, publicar :: Tiempo → Turnos
+Mi horario :: Horario y turnos publicados; proponer intercambio :: Portal → Mi tiempo → Horario
+Políticas de jornada :: Tolerancias, descansos, reglas de sobretiempo por nivel :: Configuración → Asistencia → Políticas
+#dat
+Jornadas, horarios (`work_schedules`), turnos (`shifts`), patrones de rotación, asignaciones de turno por día, políticas de tiempo, intercambios.
+#rn
+[P] Si un turno planificado hace superar la jornada máxima diaria o semanal (parámetro del paquete de país, a confirmar con la norma vigente) → se advierte o se bloquea según la política.
+[P] Si entre el fin de un turno y el inicio del siguiente hay menos que el descanso mínimo (parámetro) → se advierte o se bloquea.
+[F] Si la persona tiene una ausencia o vacaciones aprobadas en la fecha → no se le puede asignar turno.
+[F] Si un plan de turnos no está publicado → no rige para el cálculo de asistencia ni se notifica al equipo.
+[F] Si se modifica un turno ya publicado → se notifica al afectado y queda historial del cambio.
+[P] Si la cobertura de un turno queda por debajo del mínimo (parámetro por unidad) → se advierte al planificador.
+[F] Si una persona no tiene horario asignado en una fecha → hereda el de su grupo, sede o empresa, en ese orden.
+[F] Si un día es feriado según el calendario de su sede → no se espera asistencia salvo turno asignado, y el trabajo se califica como feriado trabajado.
+#eve
+- `shift.assigned`, `shift.published`, `shift.changed`, `shift.swap_requested`, `shift.swap_approved`, `schedule.changed`.
+#evc
+- `leave.approved`, `absence.approved`, `employee.hired`, `employee.terminated`.
+#bor
+- Turno partido con dos tramos el mismo día.
+- Rotación que incluye turnos nocturnos consecutivos.
+- Tiempo parcial con menos horas que el umbral del régimen.
+- Teletrabajo parcial: días presenciales y remotos en el mismo horario.
+#acc
+- El planificador permite arrastrar, asignar en bloque y publicar; el colaborador ve su turno en el portal.
+- Empresa, sede y grupo pueden tener políticas distintas con herencia.
+
+@@ VAC | Vacaciones | 2
+#obj
+Llevar el saldo de vacaciones de cada relación laboral con exactitud y resolver las solicitudes con un flujo simple que actualiza todo lo conectado.
+#alc
+- Política por régimen y empresa: días por año, devengo, requisitos, fraccionamiento, adelanto, acumulación, venta de días.
+- Saldo: generadas, tomadas, programadas, pendientes, disponibles, vencidas y truncas, por periodo vacacional.
+- Solicitud, aprobación por jefe y validación de RRHH si corresponde; programación anual; calendario del equipo.
+- Vacaciones colectivas; interrupción por descanso médico; reprogramación y cancelación.
+- Alertas de acumulación y de periodos por vencer; provisión (M-PRV) y remuneración vacacional (M-BSO).
+#fue
+- Otras ausencias (M-AUS). Cálculo del pago (M-BSO, M-PER).
+#act
+- Empleado solicita. Manager aprueba. RRHH valida, programa y ajusta saldos.
+#flu
+**Solicitud.** 1) El colaborador ve su saldo por periodo y elige fechas. 2) El sistema calcula días a descontar, valida saldo, anticipación, fraccionamiento, traslapes y cierre de planilla. 3) Se envía al jefe. 4) Si la política lo exige, RRHH valida. 5) Aprobada: se reserva el saldo («programadas»), se marca el calendario, se bloquean turnos y se genera la incidencia de planilla. 6) Al llegar las fechas pasa a «En goce» y luego «Gozada»; el saldo pasa de programado a tomado.
+
+**Cancelación o reprogramación.** 1) Antes del inicio, el colaborador o RRHH cancela; el saldo vuelve a disponible. 2) Iniciado el goce, solo RRHH puede interrumpir con motivo (p. ej. descanso médico) y los días no gozados vuelven al saldo.
+
+**Programación anual.** 1) RRHH abre la campaña. 2) Cada jefe propone fechas para su equipo. 3) Los colaboradores confirman. 4) Se crean solicitudes aprobadas.
+#pan
+Mis vacaciones :: Saldo por periodo (generadas, tomadas, programadas, disponibles, por vencer), historial, solicitar :: Portal → Mi tiempo → Vacaciones
+Solicitudes de vacaciones :: Bandeja con estado, días, saldo resultante y traslapes; aprobar o rechazar :: Tiempo → Vacaciones
+Calendario de ausencias :: Vista del equipo o de la unidad por mes :: Tiempo → Vacaciones → Calendario
+Saldos :: Tabla por colaborador y periodo; ajustar con motivo; exportar :: Tiempo → Vacaciones → Saldos
+Vacaciones del colaborador :: Saldos e historial en la ficha :: Personas → Colaboradores → Ficha → pestaña Vacaciones
+Políticas de vacaciones :: Reglas por régimen y empresa con vigencia :: Configuración → Vacaciones
+#dat
+Políticas de vacaciones, periodos vacacionales por relación, movimientos de saldo (libro mayor: devengo, goce, ajuste, venta, vencimiento), solicitudes (`leave_requests`), programación anual.
+#rn
+[P] Si la relación está en régimen general → devenga los días anuales del régimen (parámetro del paquete de país, a confirmar con la norma vigente); si es micro o pequeña empresa → 15 días por año (valor de referencia 2026, parámetro con vigencia).
+[F] Si se consulta el saldo → se calcula sumando los movimientos del libro de vacaciones; no existe un campo de saldo editable.
+[F] Si se aprueba una solicitud → los días pasan de «disponibles» a «programadas» en el mismo acto, y calendario, tablero e incidencias de planilla se actualizan.
+[P] Si los días solicitados superan el saldo disponible más el adelanto permitido por la política (parámetro) → se rechaza el envío.
+[P] Si la solicitud no respeta la anticipación mínima o el fraccionamiento mínimo de la política (parámetros; el fraccionamiento legal a confirmar con la norma vigente) → se rechaza o se pide excepción a RRHH.
+[F] Si las fechas se solapan con otra ausencia aprobada de la misma persona → se rechaza.
+[P] Si el rango incluye días no laborables → se cuentan o no según la regla de cómputo de la política (días calendario o hábiles; parámetro).
+[F] Si las fechas caen en un periodo de planilla cerrado → no se puede aprobar ni cancelar sin el flujo de ajuste de RRHH.
+[P] Si un periodo vacacional no se goza dentro del año siguiente a su generación (regla y efecto a confirmar con la norma vigente) → se marca «vencido», se alerta y se calcula la indemnización vacacional según el paquete de país.
+[P] Si una persona acumula más periodos que el máximo de la política → se alerta a su jefe y a RRHH con explicación.
+[F] Si durante el goce se registra un descanso médico → las vacaciones no se interrumpen de forma automática; RRHH decide según política y los días devueltos se registran como movimiento.
+[F] Si la relación cesa → los días pendientes y truncos pasan a la liquidación (M-LIQ) y el saldo queda en cero.
+[F] Si RRHH ajusta un saldo → exige motivo y sustento y queda como movimiento auditable.
+#eve
+- `leave.requested`, `leave.approved`, `leave.rejected`, `leave.cancelled`, `leave.started`, `leave.completed`, `leave.balance_adjusted`, `leave.period_expiring`.
+#evc
+- `employee.hired` (abre el primer periodo), `employee.terminated`, `approval.approved`, `approval.rejected`, `payroll.closed`, `employment.regime_changed`.
+#int
+Calendario externo (M-INT). WhatsApp (M-WHA).
+#bor
+- Ingreso a mitad de mes: devengo proporcional.
+- Cambio de régimen MYPE a general: días por año cambian desde la vigencia.
+- Tiempo parcial por debajo del umbral del régimen: derecho según paquete de país.
+- Venta de días (reducción de descanso) con tope del paquete de país.
+- Solicitud que cruza dos periodos vacacionales: consume primero el más antiguo.
+- Días que no computan para el récord vacacional (faltas, licencias sin goce) según el paquete de país.
+#acc
+- Aprobar vacaciones actualiza solicitud, saldo, calendario, tablero y actividad, y deja la incidencia lista para planilla.
+- El saldo muestra generadas, tomadas, programadas, pendientes y disponibles y coincide con el libro de movimientos.
+
+@@ AUS | Ausencias y permisos | 2
+#obj
+Gestionar todo tipo de ausencia distinta de las vacaciones con reglas propias por tipo y con su efecto correcto en asistencia y planilla.
+#alc
+- Tipos configurables: descanso médico, licencias (maternidad, paternidad, fallecimiento, otras de ley), permiso personal, compensación, trabajo remoto, licencia sindical, suspensión, otros.
+- Reglas por tipo: con o sin goce, quién aprueba, sustento obligatorio, máximo de días, anticipación, cómputo, efecto en planilla, subsidio, confidencialidad.
+- Descansos médicos: certificado, días acumulados en el año, paso a subsidio, seguimiento de reembolso.
+- Permisos por horas.
+#fue
+- Vacaciones (M-VAC). Compensación de horas (M-BHO define el saldo; aquí se registra el día libre).
+#act
+- Empleado solicita. Manager aprueba. RRHH valida sustento y registra las de ley. Payroll ve el efecto.
+#flu
+**Solicitud.** 1) El colaborador elige tipo y fechas u horas. 2) Adjunta sustento si el tipo lo exige. 3) El sistema valida reglas del tipo y traslapes. 4) Aprobación según el tipo. 5) Aprobada, actualiza calendario, asistencia e incidencias de planilla.
+
+**Descanso médico.** 1) Se registra con certificado. 2) El sistema suma los días del año. 3) Al superar el umbral a cargo del empleador, marca los días siguientes como subsidio. 4) Payroll gestiona el reembolso y registra su estado.
+#pan
+Ausencias :: Lista con tipo, fechas, estado y efecto en planilla; registrar, aprobar :: Tiempo → Ausencias
+Solicitar permiso :: Tipo, fechas u horas, sustento, saldo si aplica :: Portal → Mi tiempo → Permisos
+Tipos de ausencia :: Catálogo con reglas por tipo :: Configuración → Ausencias
+Subsidios :: Descansos en subsidio con días, entidad, monto y estado de reembolso :: Tiempo → Ausencias → Subsidios
+#dat
+Tipos de ausencia y reglas, ausencias (`absences`), sustentos, acumulados anuales de descanso médico, expedientes de subsidio.
+#rn
+[F] Si el tipo exige sustento → no se aprueba sin el documento adjunto (se puede registrar en estado «pendiente de sustento» por el plazo configurado).
+[P] Si el tipo es sin goce de haber → genera descuento proporcional en planilla y, según el paquete de país, no computa para ciertos beneficios (parámetro por tipo).
+[P] Si los días de descanso médico del año superan los que asume el empleador (parámetro del paquete de país, a confirmar con la norma vigente) → los días siguientes se tratan como subsidio y se separan en planilla.
+[P] Si el tipo tiene duración fijada por ley (maternidad, paternidad, fallecimiento; parámetros del paquete de país, a confirmar) → el sistema propone la duración y no permite menos.
+[F] Si el tipo es confidencial (salud) → el jefe ve «ausencia justificada» y fechas, nunca el diagnóstico ni el certificado.
+[F] Si una ausencia aprobada se solapa con marcas de asistencia → se genera incidencia para que RRHH resuelva.
+[P] Si la ausencia supera el máximo de días u horas del tipo en el periodo (parámetro) → requiere excepción de RRHH.
+[F] Si la ausencia cae en un periodo de planilla cerrado → solo RRHH la registra y su efecto va como ajuste al periodo abierto.
+[F] Si se registra «trabajo remoto» ocasional → no descuenta ni afecta asistencia; exige marcación remota si la política lo pide.
+#eve
+- `absence.requested`, `absence.approved`, `absence.rejected`, `absence.cancelled`, `absence.subsidy_started`, `absence.ended`.
+#evc
+- `approval.approved`, `sst.incident_reported` (descanso por accidente de trabajo), `payroll.closed`.
+#bor
+- Descanso médico que se extiende con un nuevo certificado contiguo.
+- Licencia de maternidad que empieza antes de la fecha prevista.
+- Permiso por horas que convierte un día en jornada parcial.
+- Accidente de trabajo cubierto por SCTR.
+#acc
+- Cada tipo puede tener reglas propias y su efecto llega a asistencia y planilla sin doble digitación.
+
+@@ BHO | Horas extra y bolsa de horas | 2
+#obj
+Controlar el sobretiempo: que se autorice, se califique con la sobretasa correcta y se pague o se compense con descanso, llevando un saldo claro.
+#alc
+- Autorización previa o regularización posterior de horas extra.
+- Calificación por tramos (primeras horas, siguientes, nocturnas, feriado, día de descanso) con sobretasas del paquete de país.
+- Destino: pago en planilla o compensación; acuerdo de compensación por escrito.
+- Bolsa de horas: saldo, vencimiento, solicitud de día u horas compensatorias.
+- Topes y alertas por persona y por unidad.
+#fue
+- Detección del exceso (M-ASI). Cálculo en boleta (M-PER).
+#act
+- Empleado registra o solicita. Manager autoriza. RRHH califica y controla. Payroll paga.
+#flu
+**Autorización previa.** 1) El jefe o el colaborador registra la necesidad (fecha, horas, motivo). 2) Se aprueba. 3) Tras la jornada, asistencia confirma las horas reales. 4) Se califican por tramo. 5) Según el destino, van a planilla o a la bolsa.
+
+**Regularización.** 1) Asistencia detecta sobretiempo no autorizado. 2) El jefe lo reconoce o lo rechaza con motivo. 3) Reconocido, sigue el flujo anterior.
+
+**Compensación.** 1) El colaborador pide usar horas de su bolsa. 2) El jefe aprueba. 3) Se registra la ausencia compensatoria y se descuenta el saldo.
+#pan
+Horas extra :: Solicitudes y sobretiempo detectado con estado, horas, tramo y destino; aprobar :: Tiempo → Horas extras
+Bolsa de horas :: Saldo por persona, movimientos, vencimientos; ajustar :: Tiempo → Horas extras → Bolsa
+Mi bolsa :: Saldo propio, movimientos, solicitar compensación :: Portal → Mi tiempo → Horas extra
+#dat
+Solicitudes de horas extra (`overtime_requests`), calificación por tramo, movimientos de bolsa de horas (libro), acuerdos de compensación.
+#rn
+[F] Si el sobretiempo no está aprobado → no se paga ni se acredita; permanece «por calificar» y visible para RRHH (el trabajo efectivo no reconocido es un riesgo que se alerta).
+[P] Si se califican horas extra → las dos primeras del día llevan la sobretasa del primer tramo y las siguientes la del segundo (parámetros del paquete de país, a confirmar con la norma vigente).
+[P] Si el destino es compensación → requiere acuerdo aceptado por el colaborador y las horas se acreditan a la bolsa con la equivalencia de la política (parámetro).
+[P] Si las horas de la bolsa no se usan dentro del plazo de la política (parámetro) → se pagan en la planilla siguiente con su sobretasa; no se pierden.
+[P] Si la persona supera el tope de horas extra del periodo (parámetro por política) → se bloquea una nueva autorización o se exige nivel superior.
+[F] Si el colaborador no está sujeto a control de asistencia → no se le registran horas extra.
+[F] Si el trabajo ocurre en feriado o día de descanso sin descanso sustitutorio → se califica con la regla propia de esos días del paquete de país.
+[F] Si las horas aprobadas difieren de las realmente marcadas → se pagan o acreditan las efectivamente trabajadas hasta el máximo aprobado; el exceso vuelve a «por calificar».
+[F] Si la relación cesa con saldo en la bolsa → el saldo se paga en la liquidación.
+#eve
+- `overtime.requested`, `overtime.approved`, `overtime.rejected`, `overtime.qualified`, `time_bank.credited`, `time_bank.used`, `time_bank.expiring`.
+#evc
+- `attendance.day_calculated`, `approval.approved`, `payroll.closed`, `employee.terminated`.
+#bor
+- Sobretiempo que cruza la medianoche hacia un feriado.
+- Tiempo parcial que supera su jornada pactada sin llegar a la jornada completa.
+- Compensación pedida con saldo aún no confirmado por asistencia.
+#acc
+- El saldo de la bolsa cuadra con sus movimientos y las horas pagadas aparecen en la boleta con su tramo.
+
+@@ TSH | Hojas de tiempo por proyecto | 2
+#obj
+Saber a qué proyectos, clientes o actividades se dedica el tiempo y cuánto cuesta, sin duplicar la asistencia.
+#alc
+- Proyectos, clientes, tareas o actividades y centros de costo; asignación de personas con vigencia y dedicación.
+- Registro diario o semanal de horas; temporizador; propuesta automática desde la asistencia.
+- Envío y aprobación semanal; bloqueo de periodos.
+- Costeo por proyecto con costo hora derivado de la planilla (solo quien tenga permiso); distribución de costo a centros de costo para el asiento.
+#fue
+- Facturación a clientes. Gestión de proyectos (tareas, cronogramas).
+#act
+- Empleado registra. Responsable de proyecto o manager aprueba. Finanzas y RRHH analizan costos.
+#flu
+**Semana.** 1) El colaborador abre su semana; el sistema propone horas según asistencia y asignaciones. 2) Distribuye por proyecto y actividad. 3) Envía. 4) El aprobador revisa y aprueba o devuelve. 5) Aprobada, alimenta costeo y distribución contable.
+#pan
+Mi hoja de tiempo :: Semana con proyectos en filas y días en columnas, total frente a asistencia, enviar :: Portal → Mi tiempo → Hoja de tiempo
+Hojas por aprobar :: Semanas enviadas con desviaciones; aprobar o devolver :: Tiempo → Hojas de tiempo
+Proyectos :: Catálogo con responsable, centro de costo, asignados, horas y costo (con permiso) :: Tiempo → Hojas de tiempo → Proyectos
+Costeo :: Horas y costo por proyecto, persona y periodo :: Tiempo → Hojas de tiempo → Costeo
+#dat
+Proyectos, actividades, asignaciones a proyecto, hojas de tiempo (`timesheets`) y líneas, costo hora por periodo.
+#rn
+[P] Si las horas registradas del día difieren de las de asistencia más allá de la tolerancia (parámetro) → se advierte y la hoja no puede enviarse sin justificación.
+[F] Si la persona no está asignada al proyecto en esa fecha → no puede imputarle horas.
+[F] Si una hoja está aprobada → no se edita; una corrección exige devolución por el aprobador.
+[F] Si se calcula el costo hora → se deriva del costo laboral del periodo cerrado de planilla y solo lo ven quienes tienen el permiso de costo.
+[F] Si el periodo de hojas está bloqueado → no admite registros nuevos.
+[P] Si una hoja no se envía antes del límite semanal (parámetro) → se recuerda al colaborador y a su jefe.
+[F] Si existen hojas aprobadas en el periodo → la distribución contable del costo de la persona usa esos porcentajes en lugar de su centro de costo fijo.
+#eve
+- `timesheet.submitted`, `timesheet.approved`, `timesheet.returned`, `project.created`.
+#evc
+- `attendance.day_calculated`, `payroll.closed`.
+#int
+Herramientas externas de proyectos por API (M-INT).
+#bor
+- Vacaciones y ausencias aparecen como líneas no imputables.
+- Persona asignada a varios proyectos con dedicación parcial.
+- Reapertura de una semana aprobada tras cerrar planilla.
+#acc
+- El costo por proyecto se obtiene sin que los aprobadores vean sueldos individuales.

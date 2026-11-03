@@ -1,0 +1,1880 @@
+{
+  "pais": "PE",
+  "nota": "Plantilla de conceptos de planilla del paquete Perú. Las fórmulas son seudocódigo del motor y solo referencian parámetros legales por código (nunca valores). Las afectaciones NO están verificadas: son una propuesta inicial que un especialista en planillas debe validar concepto por concepto. Los códigos con «codigo_plame_verificado»: true se cotejaron con la Tabla 22 publicada por SUNAT (versión del 01-10-2025, docs/18 §3.2); los demás siguen por confirmar. «regimenes» indica a qué regímenes aplica el concepto, «proyeccion_quinta» su naturaleza en la proyección de quinta categoría (ordinary, gratification, extraordinary) y «rol_monto» qué monto se declara.",
+  "afectaciones_verificadas": false,
+  "bases": {
+    "essalud": "Aporte de salud del empleador",
+    "pension": "Aportes previsionales del trabajador",
+    "quinta": "Renta de quinta categoría",
+    "cts": "Remuneración computable de CTS",
+    "gratificacion": "Remuneración computable de gratificación",
+    "vacaciones": "Remuneración vacacional",
+    "utilidades": "Remuneraciones para utilidades"
+  },
+  "conceptos": [
+    {
+      "codigo": "rem_basica",
+      "nombre": "Remuneración básica",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "sueldo_base * dias_trabajados / dias_periodo",
+      "parametros_legales": [],
+      "codigo_plame": "0121",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "asig_familiar",
+      "nombre": "Asignación familiar",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "param(rmv) * param(asignacion_familiar_pct_rmv) / 100",
+      "parametros_legales": [
+        "rmv",
+        "asignacion_familiar_pct_rmv"
+      ],
+      "codigo_plame": "0201",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "he_tramo1",
+      "nombre": "Horas extra, primer tramo",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "valor_hora * (1 + param(sobretiempo_tasa_tramo1_pct)/100) * horas",
+      "parametros_legales": [
+        "sobretiempo_tasa_tramo1_pct"
+      ],
+      "codigo_plame": "0105",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "he_tramo2",
+      "nombre": "Horas extra, segundo tramo",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "valor_hora * (1 + param(sobretiempo_tasa_tramo2_pct)/100) * horas",
+      "parametros_legales": [
+        "sobretiempo_tasa_tramo2_pct"
+      ],
+      "codigo_plame": "0106",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "trabajo_nocturno",
+      "nombre": "Sobretasa por trabajo nocturno",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "incidencia",
+      "parametros_legales": [
+        "nocturnidad_sobretasa_pct"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "feriado_trabajado",
+      "nombre": "Trabajo en feriado o día de descanso",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0107",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "comisiones",
+      "nombre": "Comisiones",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0103",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "bono_productividad",
+      "nombre": "Bonificación regular",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0902",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "bono_extraordinario",
+      "nombre": "Bonificación extraordinaria ocasional",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "extraordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": "A título de liberalidad, no regular."
+    },
+    {
+      "codigo": "movilidad",
+      "nombre": "Movilidad supeditada a la asistencia",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0909",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Condición de trabajo; validar tratamiento tributario según el caso."
+    },
+    {
+      "codigo": "teletrabajo_gastos",
+      "nombre": "Compensación de gastos de teletrabajo",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Concepto no remunerativo (Ley 31572)."
+    },
+    {
+      "codigo": "rem_vacacional",
+      "nombre": "Remuneración vacacional",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": false,
+        "utilidades": true
+      },
+      "formula": "remuneracion_computable * dias_vacaciones / 30",
+      "parametros_legales": [],
+      "codigo_plame": "0118",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "vacaciones_compra",
+      "nombre": "Compensación por venta de vacaciones",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable * dias_vendidos / 30",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "subsidio_incapacidad",
+      "nombre": "Subsidio por incapacidad temporal",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": true,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0916",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": "A cargo de la seguridad social; el empleador adelanta y recupera."
+    },
+    {
+      "codigo": "subsidio_maternidad",
+      "nombre": "Subsidio por maternidad",
+      "tipo": "earning",
+      "metodo": "input",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": true,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0915",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "gratificacion",
+      "nombre": "Gratificación legal",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable * meses_completos / 6 * factor_regimen",
+      "parametros_legales": [
+        "gratificacion_factor",
+        "gratificacion_meses"
+      ],
+      "codigo_plame": "0406",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "gratification",
+      "rol_monto": "accrued_and_paid",
+      "nota": "Inafecta a aportes por Ley 30334."
+    },
+    {
+      "codigo": "bonif_extraordinaria",
+      "nombre": "Bonificación extraordinaria de la gratificación",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "gratificacion * param(gratificacion_bonificacion_extraordinaria_pct) / 100",
+      "parametros_legales": [
+        "gratificacion_bonificacion_extraordinaria_pct"
+      ],
+      "codigo_plame": "0312",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "gratification",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "gratificacion_trunca",
+      "nombre": "Gratificación trunca",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable * meses_completos / 6",
+      "parametros_legales": [],
+      "codigo_plame": "0407",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "gratification",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cts",
+      "nombre": "Compensación por tiempo de servicios",
+      "tipo": "benefit",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "(remuneracion_computable + gratificacion * param(cts_fraccion_gratificacion)) * meses / 12",
+      "parametros_legales": [
+        "cts_fraccion_gratificacion",
+        "cts_meses_deposito"
+      ],
+      "codigo_plame": "0904",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "utilidades",
+      "nombre": "Participación en utilidades",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "monto_por_dias + monto_por_remuneraciones",
+      "parametros_legales": [
+        "utilidades_minimo_trabajadores"
+      ],
+      "codigo_plame": "0911",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "extraordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "vacaciones_truncas",
+      "nombre": "Vacaciones truncas",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable * meses / 12",
+      "parametros_legales": [],
+      "codigo_plame": "0114",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "extraordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "indemnizacion_vacacional",
+      "nombre": "Indemnización por vacaciones no gozadas",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable",
+      "parametros_legales": [],
+      "codigo_plame": "0504",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "indemnizacion_despido",
+      "nombre": "Indemnización por despido",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "segun_regimen",
+      "parametros_legales": [],
+      "codigo_plame": "0501",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "afp_aporte",
+      "nombre": "Aporte obligatorio AFP",
+      "tipo": "employee_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base_pension * param(afp_aporte_obligatorio_pct) / 100",
+      "parametros_legales": [
+        "afp_aporte_obligatorio_pct"
+      ],
+      "codigo_plame": "0608",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "afp_comision",
+      "nombre": "Comisión AFP",
+      "tipo": "employee_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base_pension * tasa_afp(comision)",
+      "parametros_legales": [
+        "afp_comision_flujo_pct",
+        "afp_comision_mixta_pct"
+      ],
+      "codigo_plame": "0601",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "afp_prima",
+      "nombre": "Prima de seguro AFP",
+      "tipo": "employee_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "min(base_pension, param(afp_remuneracion_maxima_asegurable)) * tasa_afp(prima)",
+      "parametros_legales": [
+        "afp_prima_seguro_pct",
+        "afp_remuneracion_maxima_asegurable"
+      ],
+      "codigo_plame": "0606",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "onp_aporte",
+      "nombre": "Aporte ONP",
+      "tipo": "employee_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base_pension * param(onp_aporte_pct) / 100",
+      "parametros_legales": [
+        "onp_aporte_pct"
+      ],
+      "codigo_plame": "0607",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "renta_quinta",
+      "nombre": "Retención de renta de quinta categoría",
+      "tipo": "tax",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "retencion_quinta(proyeccion_anual, param(uit), param(quinta_deduccion_uit), param(quinta_escala))",
+      "parametros_legales": [
+        "uit",
+        "quinta_deduccion_uit",
+        "quinta_escala"
+      ],
+      "codigo_plame": "0605",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "essalud",
+      "nombre": "Aporte EsSalud",
+      "tipo": "employer_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "max(base_essalud, param(rmv)) * param(essalud_aporte_pct) / 100",
+      "parametros_legales": [
+        "essalud_aporte_pct",
+        "rmv"
+      ],
+      "codigo_plame": "0804",
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "sctr",
+      "nombre": "Seguro complementario de trabajo de riesgo",
+      "tipo": "employer_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base * tasa_poliza",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "vida_ley",
+      "nombre": "Seguro de vida de ley",
+      "tipo": "employer_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base * tasa_poliza",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "dscto_prestamo",
+      "nombre": "Descuento de préstamo",
+      "tipo": "deduction",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "dscto_adelanto",
+      "nombre": "Descuento de adelanto",
+      "tipo": "deduction",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": "0701",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "dscto_judicial",
+      "nombre": "Retención judicial",
+      "tipo": "deduction",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "segun_mandato",
+      "parametros_legales": [],
+      "codigo_plame": "0703",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cuota_sindical",
+      "nombre": "Cuota sindical",
+      "tipo": "deduction",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "segun_sindicato",
+      "parametros_legales": [],
+      "codigo_plame": "0702",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "tardanzas",
+      "nombre": "Descuento por tardanzas",
+      "tipo": "deduction",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "valor_minuto * minutos_tardanza",
+      "parametros_legales": [],
+      "codigo_plame": "0704",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "faltas",
+      "nombre": "Descuento por faltas injustificadas",
+      "tipo": "deduction",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "valor_dia * dias_falta",
+      "parametros_legales": [],
+      "codigo_plame": "0705",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "eps_copago",
+      "nombre": "Aporte del trabajador al plan de salud",
+      "tipo": "deduction",
+      "metodo": "input",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": null,
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "prov_cts",
+      "nombre": "Provisión de CTS",
+      "tipo": "provision",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "provision_mensual(cts)",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "prov_gratificacion",
+      "nombre": "Provisión de gratificaciones",
+      "tipo": "provision",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "provision_mensual(gratificacion)",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "prov_vacaciones",
+      "nombre": "Provisión de vacaciones",
+      "tipo": "provision",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "provision_mensual(vacaciones)",
+      "parametros_legales": [],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "renta_quinta_devolucion",
+      "nombre": "Devolución de retención en exceso de quinta categoría",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "exceso_quinta(libro_de_retenciones)",
+      "parametros_legales": [],
+      "codigo_plame": "0928",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "No es ingreso: devuelve una retención. Ver docs/18 §2.7."
+    },
+    {
+      "codigo": "bonif_extraordinaria_trunca",
+      "nombre": "Bonificación extraordinaria proporcional",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "gratificacion_trunca * param(gratificacion_bonificacion_extraordinaria_pct) / 100",
+      "parametros_legales": [
+        "gratificacion_bonificacion_extraordinaria_pct"
+      ],
+      "codigo_plame": "0313",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "gratification",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_jornal",
+      "nombre": "Jornal básico (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "suma_dias(param(cc_jornal_basico)[categoria])",
+      "parametros_legales": [
+        "cc_jornal_basico"
+      ],
+      "codigo_plame": "0121",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_dominical",
+      "nombre": "Dominical (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "suma_dias(param(cc_jornal_basico)[categoria]) / 6",
+      "parametros_legales": [
+        "cc_jornal_basico"
+      ],
+      "codigo_plame": "0115",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_buc",
+      "nombre": "Bonificación unificada de construcción",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "cc_jornal * param(cc_buc_pct)[categoria] / 100",
+      "parametros_legales": [
+        "cc_buc_pct"
+      ],
+      "codigo_plame": "0311",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Afectaciones por confirmar."
+    },
+    {
+      "codigo": "cc_movilidad",
+      "nombre": "Movilidad por día laborado (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "dias * param(cc_movilidad_dia)",
+      "parametros_legales": [
+        "cc_movilidad_dia"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_escolar",
+      "nombre": "Asignación escolar (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "hijos_con_sustento * cc_jornal * param(cc_asignacion_escolar_jornales_anio) / 360",
+      "parametros_legales": [
+        "cc_asignacion_escolar_jornales_anio",
+        "cc_asignacion_escolar_edad_max"
+      ],
+      "codigo_plame": "0211",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Afectaciones por confirmar."
+    },
+    {
+      "codigo": "cc_altura",
+      "nombre": "Bonificación por altura",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "jornal_dias_en_altura * param(cc_altura_pct) / 100",
+      "parametros_legales": [
+        "cc_altura_pct"
+      ],
+      "codigo_plame": "0303",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Afectaciones por confirmar."
+    },
+    {
+      "codigo": "cc_agua",
+      "nombre": "Bonificación por contacto directo con agua",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "jornal_dias_con_agua * param(cc_contacto_agua_pct) / 100",
+      "parametros_legales": [
+        "cc_contacto_agua_pct"
+      ],
+      "codigo_plame": "0310",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Afectaciones por confirmar."
+    },
+    {
+      "codigo": "cc_nocturno",
+      "nombre": "Bonificación por trabajo nocturno (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "jornal_dias_nocturnos * param(cc_nocturno_pct) / 100",
+      "parametros_legales": [
+        "cc_nocturno_pct"
+      ],
+      "codigo_plame": "0309",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Porcentaje por confirmar."
+    },
+    {
+      "codigo": "cc_altas_temperaturas",
+      "nombre": "Bonificación por altas temperaturas",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "dias_asfalto * param(cc_altas_temperaturas_dia)",
+      "parametros_legales": [
+        "cc_altas_temperaturas_dia"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_bae",
+      "nombre": "Bonificación por alta especialización",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "cc_jornal * param(cc_bae_pct)[especialidad] / 100",
+      "parametros_legales": [
+        "cc_bae_pct"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_gratificacion",
+      "nombre": "Gratificación de construcción civil",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "param(cc_gratificacion_jornales) * param(cc_jornal_basico)[categoria] * meses / fracciones",
+      "parametros_legales": [
+        "cc_gratificacion_jornales",
+        "cc_gratificacion_fracciones",
+        "cc_jornal_basico"
+      ],
+      "codigo_plame": "0406",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": "gratification",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_comp_vacacional",
+      "nombre": "Compensación vacacional (construcción civil)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "cc_jornal * param(cc_vacaciones_pct) / 100",
+      "parametros_legales": [
+        "cc_vacaciones_pct",
+        "cc_liquidacion_modo"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_comp_tiempo_servicios",
+      "nombre": "Compensación por tiempo de servicios (construcción civil)",
+      "tipo": "benefit",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "cc_jornal * param(cc_compensacion_pct) / 100",
+      "parametros_legales": [
+        "cc_compensacion_pct",
+        "cc_liquidacion_modo"
+      ],
+      "codigo_plame": "0904",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "cc_conafovicer",
+      "nombre": "CONAFOVICER",
+      "tipo": "employee_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base_conafovicer * param(cc_conafovicer_pct) / 100",
+      "parametros_legales": [
+        "cc_conafovicer_pct"
+      ],
+      "codigo_plame": "0602",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_construccion"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "agr_rb",
+      "nombre": "Remuneración básica agraria",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": true,
+        "gratificacion": true,
+        "vacaciones": true,
+        "utilidades": true
+      },
+      "formula": "rb_mensual * dias / 30",
+      "parametros_legales": [],
+      "codigo_plame": "0121",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    },
+    {
+      "codigo": "agr_gratif_pror",
+      "nombre": "Gratificación prorrateada (agrario)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "agr_rb * param(agr_gratificacion_pct) / 100",
+      "parametros_legales": [
+        "agr_gratificacion_pct"
+      ],
+      "codigo_plame": "0406",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "ordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": "Solo con opción de prorrateo."
+    },
+    {
+      "codigo": "agr_cts_pror",
+      "nombre": "CTS prorrateada (agrario)",
+      "tipo": "benefit",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "agr_rb * param(agr_cts_pct) / 100",
+      "parametros_legales": [
+        "agr_cts_pct"
+      ],
+      "codigo_plame": "0904",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "Solo con opción de prorrateo."
+    },
+    {
+      "codigo": "agr_beta",
+      "nombre": "Bonificación especial por trabajo agrario (BETA)",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "param(rmv) * param(agr_beta_pct_rmv) / 100 * dias / 30",
+      "parametros_legales": [
+        "rmv",
+        "agr_beta_pct_rmv"
+      ],
+      "codigo_plame": "0314",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "No remunerativa. Tratamiento en quinta por confirmar."
+    },
+    {
+      "codigo": "agr_essalud",
+      "nombre": "Aporte a EsSalud (agrario)",
+      "tipo": "employer_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "base_essalud * param(agr_essalud_pct)[tramo]",
+      "parametros_legales": [
+        "agr_essalud_pct"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": ""
+    }
+  ]
+}

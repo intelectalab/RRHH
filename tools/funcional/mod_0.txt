@@ -1,0 +1,491 @@
+@@ PLT | Plataforma técnica | 0
+#obj
+Dar a todos los módulos una base común: API primero, eventos de dominio, colas, archivos, búsqueda, papelera, exportación y tareas programadas, para que ninguna épica funcional reinvente estos servicios.
+#alc
+- API REST versionada (`/api/v1`), contrato OpenAPI y tipos compartidos; toda la lógica vive en servicios, no en la interfaz.
+- Acciones explícitas de estado (`POST /recurso/{id}/accion`) validadas contra `05-maquinas-de-estado.md`.
+- Eventos de dominio con bandeja de salida (outbox), consumidores idempotentes y reintentos.
+- Colas y trabajos en segundo plano con progreso visible (cálculos, importaciones, exportaciones, generación masiva de PDF).
+- Almacenamiento de archivos con enlaces firmados de corta duración, antivirus y control de descargas.
+- Búsqueda global que respeta permisos; papelera con restauración; exportación CSV/Excel/PDF con permisos; paginación en servidor, índices y caché.
+- Organización demo coherente (semilla) que recorre el ciclo completo.
+#fue
+- Reglas de negocio de cada módulo (viven en su épica).
+- Infraestructura concreta del proveedor de nube y decisiones de despliegue (documento de arquitectura).
+#act
+- Todos los usuarios usan estos servicios de forma indirecta. El Superadmin SaaS observa su salud (ver M-SAS).
+#flu
+**Acción de estado.** 1) El cliente llama `POST /recurso/{id}/accion` con clave de idempotencia. 2) El servicio comprueba permiso, alcance, módulo contratado y transición válida. 3) Aplica el cambio y escribe auditoría y evento en la misma transacción. 4) Un despachador publica el evento a consumidores internos, webhooks y automatizaciones.
+
+**Exportación.** 1) El usuario pide exportar una vista con sus filtros. 2) El sistema recalcula en servidor qué filas y columnas puede ver (campos sensibles sin permiso se omiten). 3) Si supera el umbral de filas, se encola y se notifica al terminar. 4) Queda registro en actividad (quién, qué vista, cuántas filas, si incluyó campos sensibles).
+
+**Búsqueda global.** 1) El usuario escribe en la paleta de comandos. 2) Se consulta el índice por tipo (personas, documentos, vacantes, candidatos, cursos, solicitudes, reportes). 3) Cada resultado se filtra con el mismo permiso y alcance que su listado de origen.
+
+**Papelera.** 1) Eliminar marca el registro como eliminado y lo oculta. 2) Aparece en Papelera con quién y cuándo. 3) Restaurar lo devuelve con sus relaciones; la purga definitiva solo la hace la política de retención (M-PRI).
+#pan
+Búsqueda global / paleta de comandos :: Resultados agrupados por tipo, atajos de creación rápida según permiso, navegación por teclado :: Barra superior → Buscar
+Procesos en segundo plano :: Lista de trabajos propios con avance, resultado, errores y enlace de descarga temporal :: Barra superior → Procesos
+Papelera :: Registros eliminados por módulo, quién y cuándo; restaurar :: Configuración → Papelera
+Modal de exportación :: Formato, columnas permitidas, aviso de datos sensibles incluidos; copia o descarga :: Personas → Colaboradores → Exportar
+#dat
+Bandeja de salida de eventos (evento, carga, estado de entrega, intentos), trabajos en segundo plano, archivos (ubicación, hash, tamaño, tipo, propietario, clasificación de sensibilidad), claves de idempotencia, índice de búsqueda, registro de exportaciones.
+#rn
+[F] Si una petición de cambio de estado no corresponde a una transición de la máquina de la entidad → se rechaza con error de validación y no se modifica nada.
+[F] Si una acción llega dos veces con la misma clave de idempotencia → se devuelve el resultado original y no se repite el efecto.
+[F] Si un cambio de negocio se confirma → su evento y su auditoría se escriben en la misma transacción; si falla cualquiera, no se confirma ninguno.
+[P] Si la entrega de un evento a un consumidor falla → se reintenta con espera creciente hasta el número máximo de intentos (parámetro) y luego pasa a «fallido» visible en monitoreo.
+[F] Si un usuario exporta o busca → solo obtiene filas dentro de su alcance y columnas para las que tiene permiso de campo; nunca se confía en lo que la interfaz ocultó.
+[P] Si una exportación supera el umbral de filas (parámetro) → se ejecuta en segundo plano y se entrega por enlace temporal.
+[P] Si se descarga un archivo → el enlace firmado caduca tras el tiempo configurado (parámetro) y la descarga queda en el registro de accesos cuando el archivo es sensible.
+[F] Si se elimina un registro con historia laboral (relación laboral, boleta, marcación, contrato firmado) → la eliminación se rechaza; solo procede archivar o anular según su máquina de estados.
+[F] Si se restaura un registro cuya referencia padre sigue eliminada → se exige restaurar primero el padre.
+[P] Si un archivo subido supera el tamaño máximo o no es de un tipo permitido (parámetros) o no pasa el antivirus → se rechaza con mensaje claro.
+#eve
+- Publica todos los eventos de dominio de los módulos (no define eventos de negocio propios).
+- `export.completed`, `job.failed` (técnicos, para notificación y monitoreo).
+#evc
+- Todos: los enruta a notificaciones (M-NOT), automatizaciones (M-WFL), webhooks (M-API) y analítica (M-ANA).
+#int
+Almacenamiento compatible con S3, antivirus, motor de búsqueda y colas, todos detrás de adaptadores con implementación falsa para pruebas.
+#bor
+- Evento duplicado por reintento: el consumidor lo descarta por identificador de evento.
+- Exportación pedida y, antes de terminar, se le retira el permiso al usuario: se cancela la entrega.
+- Trabajo largo interrumpido por despliegue: se reanuda desde el último lote confirmado.
+- Organización suspendida: la API responde solo lectura o bloqueo según el estado (ver M-SAS).
+#acc
+- Todo recurso tiene listado paginado en servidor, filtros, orden y acciones de estado documentadas en OpenAPI.
+- Ninguna transición es posible por edición directa del campo estado.
+- La semilla demo permite recorrer vacante → candidato → contratación → onboarding → asistencia → planilla → evaluación → capacitación → vacaciones → offboarding sin cargar datos a mano.
+- Pruebas de carga con organizaciones de 50, 500, 5 000 y 50 000 trabajadores sin degradación de listados ni de cálculo por lotes.
+
+@@ TEN | Multiempresa y aislamiento | 0
+#obj
+Garantizar que cada organización (tenant) vea solo sus datos y que, dentro de ella, varias empresas (razones sociales) de distintos países convivan con su propia configuración.
+#alc
+- Jerarquía Plataforma → Organización → Empresas (razón social, país, régimen) → Sedes → Unidades → Posiciones → Relaciones laborales.
+- Aislamiento por `tenant_id` en todas las tablas, seguridad a nivel de fila y claves foráneas compuestas.
+- Selector de empresa en la interfaz y consolidación de grupo.
+- Usuarios que pertenecen a más de una organización (estudios contables, consultores) con cambio explícito de contexto.
+#fue
+- Planes y facturación del SaaS (M-SAS). Estructura interna de la empresa (M-ORG).
+#act
+- Administrador empresa: administra empresas del grupo. Superadmin SaaS: crea organizaciones. El resto opera dentro del contexto activo.
+#flu
+**Resolución de contexto.** 1) El usuario se autentica. 2) Si tiene acceso a varias organizaciones, elige una. 3) Toda petición lleva la organización activa; la base aplica la política de fila con ese valor. 4) El filtro de empresa de la barra superior acota listados y tableros.
+
+**Alta de empresa en el grupo.** 1) El administrador registra razón social, identificador fiscal, país, moneda, zona horaria y régimen laboral por defecto. 2) El sistema activa el paquete de país y siembra catálogos (feriados, conceptos, tipos de contrato). 3) Queda disponible para asignar sedes y posiciones.
+#pan
+Selector de organización :: Tras el ingreso, lista de organizaciones a las que el usuario pertenece :: Ingreso → Elegir organización
+Selector de empresa :: Filtro global por razón social o «Todas» :: Barra superior → Empresa
+Empresas del grupo :: Tabla de razones sociales con país, régimen, moneda, estado; crear, editar, archivar :: Organización → Estructura → pestaña Empresas
+#dat
+Organizaciones, empresas (razón social, identificador fiscal, país, moneda, zona horaria, régimen por defecto, tamaño declarado, actividad económica), pertenencia usuario–organización.
+#rn
+[F] Si una consulta o escritura no lleva organización activa → la base no devuelve ni modifica filas.
+[F] Si un registro referencia a otro de distinta organización → la clave foránea compuesta lo impide.
+[F] Si un endpoint nuevo se publica sin la prueba automática de aislamiento → la integración continua falla.
+[F] Si un usuario pertenece a varias organizaciones → cada sesión opera sobre una sola; cambiar exige elegir de nuevo y queda en actividad.
+[F] Si una empresa tiene relaciones laborales, periodos de planilla o documentos → no se elimina; solo se archiva y deja de aceptar altas.
+[F] Si una persona tiene relaciones laborales en dos empresas del mismo grupo → se ve una sola persona con dos relaciones, cada una con su régimen y planilla.
+[P] Si la organización alcanza el máximo de empresas de su plan (límite del plan) → no se puede crear otra hasta ampliar el plan.
+#eve
+- `company.created`, `company.archived`.
+#evc
+- `organization.suspended` / `organization.reactivated` (M-SAS): ajusta el modo de acceso.
+#bor
+- Trabajos en segundo plano y reportes programados deben fijar la organización antes de consultar.
+- Archivos: la ruta de almacenamiento incluye la organización y se valida al firmar el enlace.
+- Un soporte de la plataforma que entra a una organización lo hace por suplantación controlada (M-SAS), nunca por consulta directa.
+#acc
+- Una batería automática recorre todos los endpoints con credenciales de la organización A pidiendo recursos de B y siempre obtiene «no encontrado».
+- Crear una empresa de otro país no altera cálculos ni catálogos de las existentes.
+
+@@ SEG | Identidad, roles, permisos por campo y alcance | 0
+#obj
+Controlar quién entra y qué puede ver o hacer, con el detalle que piden los datos de recursos humanos: permiso por acción, por campo sensible y por alcance.
+#alc
+- Persona, usuario y relación laboral separados; un usuario puede existir sin relación (consultor, contador externo) y una persona sin usuario.
+- Ingreso con correo o con documento de identidad + clave u OTP; MFA; SSO (vía M-INT); políticas de contraseña, bloqueo, sesiones y límite de intentos.
+- Roles de sistema y personalizados; permisos `modulo.recurso.accion`; permisos por campo sensible; alcance (organización, empresa, sede, unidad, equipo, propio).
+- Registro de accesos a datos sensibles y control de descargas.
+- Delegación temporal de aprobaciones y de funciones.
+#fue
+- Catálogo detallado y matriz (documento `07-permisos-y-roles.md`). Auditoría de negocio (M-AUD).
+#act
+- Administrador empresa: usuarios y roles. RRHH: invita colaboradores. Cada usuario: su perfil de acceso, MFA y sesiones.
+#flu
+**Ingreso sin correo.** 1) El colaborador escribe tipo y número de documento. 2) Recibe un OTP por SMS o WhatsApp al teléfono registrado, o usa su clave. 3) En el primer ingreso define clave y acepta el aviso de privacidad. 4) Si el rol exige MFA, se pide el segundo factor.
+
+**Invitación.** 1) RRHH invita desde la ficha o en lote. 2) Se crea el usuario «Invitado» ligado a la persona. 3) El invitado activa su cuenta con enlace u OTP. 4) Pasa a «Activo» con rol Empleado y alcance propio.
+
+**Rol personalizado.** 1) El administrador crea el rol (vacío o duplicando uno). 2) Marca permisos por módulo y permisos por campo. 3) Define alcance por defecto y, si hace falta, alcance distinto por módulo. 4) Asigna usuarios. Todo cambio queda auditado con antes y después.
+
+**Comprobación de autorización (en cada petición).** módulo contratado → permiso de acción → alcance sobre el registro → permisos de campo para filtrar la respuesta.
+#pan
+Ingreso :: Correo o documento, clave u OTP, MFA, mensaje claro si la organización está suspendida :: Ingreso
+Usuarios :: Tabla con rol, estado, último acceso, MFA; invitar, bloquear, reactivar, cambiar rol, cerrar sesiones :: Seguridad → Usuarios
+Roles y permisos :: Matriz permiso × rol con casillas, alcance por rol, nuevo rol, duplicar; roles de sistema marcados :: Seguridad → Roles y permisos
+Políticas de seguridad :: Contraseña, MFA por rol, bloqueo, duración de sesión, redes permitidas :: Configuración → Seguridad
+Accesos a datos sensibles :: Quién vio o descargó qué dato sensible y cuándo :: Seguridad → Auditoría → pestaña Accesos
+Mi cuenta :: Cambiar clave, activar MFA, ver y cerrar mis sesiones, delegar aprobaciones :: Menú de usuario → Mi cuenta
+#dat
+`people`, `users`, pertenencias usuario–organización, roles, permisos, permisos por rol, asignaciones de rol con alcance, sesiones, factores MFA, intentos de ingreso, delegaciones, registro de accesos sensibles.
+#rn
+[F] Si se intenta borrar o renombrar un rol de sistema → se rechaza; solo se pueden duplicar.
+[F] Si un cambio dejara a la organización sin ningún usuario activo con el rol Administrador empresa → se rechaza.
+[F] Si un usuario intenta concederse permisos a sí mismo o asignar un rol con permisos que él no tiene → se rechaza, salvo que sea Administrador empresa.
+[F] Si el usuario tiene el permiso de acción pero el registro está fuera de su alcance → la respuesta es «no encontrado».
+[F] Si el usuario no tiene el permiso de un campo sensible → el campo no viaja en la respuesta de la API (no se enmascara en el cliente) y no puede filtrar, ordenar ni exportar por él.
+[F] Si un usuario consulta o descarga un dato marcado sensible → se inserta una fila en el registro de accesos con usuario, dato, registro y momento.
+[P] Si se superan los intentos fallidos permitidos (parámetro) → la cuenta se bloquea por el tiempo configurado y se notifica al titular.
+[P] Si un rol tiene MFA obligatorio (parámetro por rol) → no se completa el ingreso sin segundo factor; Administrador, Payroll e Investigador lo traen activado por defecto.
+[F] Si el colaborador no tiene correo → puede ingresar con documento + clave u OTP; el correo nunca es campo obligatorio de persona ni de usuario.
+[F] Si la relación laboral de un usuario con rol Empleado termina → su acceso pasa a modo ex-colaborador (solo sus boletas, certificados y liquidación) por el periodo configurado; los demás roles se retiran.
+[P] Si una delegación vence (fecha fin obligatoria) → las aprobaciones vuelven al titular automáticamente.
+[F] Si un usuario pertenece al rol Manager → su alcance «equipo» se calcula con la línea de reporte vigente (directos e indirectos) a la fecha de consulta.
+[F] Si una persona es a la vez aprobadora y solicitante de un mismo trámite → no puede aprobarse a sí misma; el paso sube al siguiente nivel.
+[P] Si la sesión supera el tiempo de inactividad configurado (parámetro) → se cierra y se pide ingresar de nuevo.
+#eve
+- `user.invited`, `user.activated`, `user.locked`, `user.deactivated`, `role.changed`, `sensitive_data.accessed`.
+#evc
+- `employee.hired` (ofrece invitación), `employee.terminated` (pasa a modo ex-colaborador), `employment.manager_changed` (recalcula alcance).
+#int
+SSO (SAML/OIDC), proveedor de SMS/WhatsApp para OTP, todos tras adaptadores (M-INT, M-NOT).
+#bor
+- Persona con dos relaciones activas en empresas distintas: un solo usuario, alcance «propio» cubre ambas.
+- Manager que también es RRHH de una sola sede: dos asignaciones de rol con alcances distintos; los permisos se unen por alcance.
+- Cambio de jefe con fecha futura: el alcance cambia el día de vigencia, no antes.
+- Usuario bloqueado con aprobaciones pendientes: se reasignan según la regla de ausencia del aprobador (M-WFL).
+#acc
+- Se puede crear un rol «Administrador sin sueldos» que administre usuarios y estructura y no reciba ningún campo de compensación en ninguna pantalla, exportación, reporte ni respuesta de API.
+- Toda ruta de API declara su permiso; una prueba automática falla si alguna queda sin declarar.
+- El menú, los botones y la creación rápida se construyen con los mismos permisos que valida el servidor.
+
+@@ SAS | Consola SaaS | 0
+#obj
+Dar al propietario de la plataforma un panel separado para administrar organizaciones, planes, módulos contratados, límites, feature flags, soporte, copias de seguridad y salud del servicio.
+#alc
+- Organizaciones: alta, prueba gratuita, activación, suspensión, bloqueo, cancelación, datos de contacto y facturación del SaaS.
+- Planes configurables (nombre libre, precio y moneda como campos que define el superadministrador, ciclo mensual o anual, límites, módulos y funcionalidades incluidas), duplicar, activar o desactivar, complementos (add-ons).
+- Suscripciones, consumo (colaboradores activos, administradores, almacenamiento, llamadas de API, mensajes), licencias.
+- Feature flags por organización, plan, grupo beta y país.
+- Soporte: suplantación controlada con consentimiento y registro; avisos de mantenimiento.
+- Monitoreo: errores, trabajos fallidos, colas, uso de API, webhooks fallidos, almacenamiento, estado de integraciones.
+- Copias de seguridad: automáticas y manuales, historial, retención, restauración segura.
+- Tablero SaaS: organizaciones activas y nuevas, usuarios, colaboradores administrados, ingresos recurrentes mensual y anual, cancelación, pruebas, conversiones, almacenamiento, suspendidas, módulos más usados, incidencias.
+#fue
+- Cobro con pasarela y emisión de comprobantes: se integra por adaptador (M-INT); la consola registra el estado de cuenta.
+- Administración de RRHH del cliente: la consola no muestra datos laborales de las organizaciones.
+#act
+- Superadmin SaaS y roles internos de plataforma (soporte, finanzas, operaciones) con permisos propios de la consola. Ningún usuario de cliente accede.
+#flu
+**Alta de organización.** 1) El superadmin registra nombre, país, contacto y plan (o prueba gratuita con fecha de fin). 2) Se crea la organización con su primera empresa y un usuario Administrador invitado. 3) Se activan los módulos del plan y se siembran plantillas del país. 4) El administrador entra al asistente de primeros pasos (M-IMP).
+
+**Cambio de plan o de módulos.** 1) El superadmin (o el administrador del cliente, si el plan permite autogestión) elige el nuevo plan o complemento. 2) El sistema compara límites con el consumo actual. 3) Al subir, los módulos se activan de inmediato. 4) Al bajar, los módulos retirados pasan a solo lectura y luego se ocultan; los datos se conservan.
+
+**Suspensión por falta de pago.** 1) Vence el periodo de gracia. 2) La organización pasa a «Suspendida»: sus usuarios ven el aviso y no pueden operar; los datos se conservan. 3) Al regularizar, se reactiva sin pérdida.
+
+**Restauración.** 1) Se elige copia y alcance. 2) Se restaura primero en un entorno aislado y se verifica. 3) Con doble aprobación interna se promueve. 4) Queda registro y aviso a la organización afectada.
+
+**Suplantación de soporte.** 1) El agente indica organización, usuario y motivo (ticket). 2) La organización debe tener habilitado el acceso de soporte. 3) La sesión es temporal, con marca visible; no puede ver campos sensibles salvo autorización expresa. 4) Todo queda en la auditoría de la organización y de la consola.
+#pan
+Tablero SaaS :: Indicadores de la plataforma y tendencias; accesos a organizaciones con problemas :: Consola SaaS → Tablero
+Organizaciones :: Tabla con plan, estado, colaboradores, almacenamiento, fin de prueba; crear, suspender, reactivar, entrar como soporte :: Consola SaaS → Organizaciones
+Detalle de organización :: Empresas, usuarios, suscripción, módulos, límites y consumo, flags, historial de estado, notas de soporte :: Consola SaaS → Organizaciones → Detalle
+Planes y complementos :: Catálogo de planes con límites y módulos; crear, duplicar, activar o desactivar :: Consola SaaS → Planes
+Feature flags :: Lista de funciones con reglas de activación por organización, plan, beta y país :: Consola SaaS → Funciones
+Monitoreo :: Errores, colas, trabajos fallidos, webhooks fallidos, uso de API, integraciones :: Consola SaaS → Salud
+Copias de seguridad :: Historial, estado, retención, copia manual, restauración :: Consola SaaS → Copias
+Suscripción (vista del cliente) :: Plan vigente, módulos activos, consumo frente a límites, solicitar cambio :: Configuración → Suscripción
+#dat
+Organizaciones, planes, módulos comerciales, funcionalidades por plan, complementos, suscripciones, límites y consumo por periodo, feature flags y reglas, sesiones de soporte, copias y restauraciones, avisos de plataforma, estado de cuenta.
+#rn
+[F] Si una organización no tiene contratado un módulo → sus rutas de API responden «módulo no contratado», su menú no lo muestra y sus permisos no surten efecto aunque el rol los tenga.
+[P] Si el número de colaboradores activos alcanza el límite del plan → se avisa al administrador al llegar al porcentaje de alerta (parámetro) y, al tope, no se permiten nuevas altas (los datos existentes siguen operativos).
+[P] Si el almacenamiento alcanza el límite del plan → se bloquean nuevas subidas y se mantiene la lectura.
+[P] Si vence la prueba gratuita sin conversión → la organización pasa a «Suspendida» tras el periodo de gracia (parámetro).
+[F] Si una organización está suspendida → sus usuarios no pueden ingresar a operar; los colaboradores conservan acceso de solo lectura a sus boletas y certificados.
+[F] Si se retira un módulo → sus datos no se borran; quedan en solo lectura durante el periodo de transición (parámetro) y luego se ocultan hasta reactivarlo.
+[F] Si una función está tras un feature flag → se evalúa en el orden organización, plan, grupo beta, país; el primero que la define decide.
+[F] Si soporte suplanta a un usuario → necesita motivo, la sesión caduca sola y cada acción lleva la marca «soporte» en la auditoría de la organización.
+[F] Si se pide restaurar una copia → nunca se sobrescribe producción directamente; se restaura en aislado, se verifica y se promueve con doble aprobación.
+[P] Si se cancela una organización → sus datos se conservan durante el periodo de retención (parámetro por jurisdicción), se ofrece exportación completa y después se eliminan o anonimizan.
+[F] Si un plan tiene organizaciones suscritas → no se elimina; se desactiva para nuevas ventas y las existentes conservan sus condiciones.
+[F] Si la consola muestra datos de una organización → solo metadatos y consumo; nunca sueldos, fichas ni documentos.
+#eve
+- `organization.created`, `organization.trial_started`, `organization.activated`, `organization.suspended`, `organization.reactivated`, `organization.cancelled`, `subscription.changed`, `module.enabled`, `module.disabled`, `limit.reached`.
+#evc
+- `employee.hired`, `employee.terminated` (recalcula consumo), métricas técnicas de M-PLT.
+#int
+Pasarela de cobro y facturación electrónica del SaaS (adaptador), monitoreo y alertas de infraestructura.
+#bor
+- Bajada de plan con consumo por encima del nuevo límite: se permite, pero quedan bloqueadas las altas hasta regularizar.
+- Organización con periodo de planilla abierto al momento de suspenderse: al reactivar continúa donde quedó.
+- Módulo retirado del que dependen otros (planilla depende de tiempo): se advierte la dependencia antes de confirmar.
+- Dos organizaciones del mismo grupo económico creadas por separado: se pueden fusionar solo por proceso de soporte, nunca automático.
+#acc
+- La consola vive en una aplicación y un dominio de autenticación separados; un usuario de cliente no puede obtener un token válido para ella.
+- Activar o desactivar un módulo para una organización cambia menú, permisos efectivos y API sin desplegar código.
+- Una empresa puede empezar con Core HR + Vacaciones y activar después cualquier otro módulo sin migración.
+
+@@ AUD | Auditoría, actividad y logs | 0
+#obj
+Dejar evidencia confiable de quién hizo qué, cuándo, desde dónde y con qué valores antes y después, separando auditoría de negocio, actividad de usuario y logs técnicos.
+#alc
+- Auditoría de negocio de solo inserción: entidad, registro, acción, valores anterior y nuevo, autor, origen (web, API, WhatsApp, automatización, soporte, IA), IP cuando corresponda.
+- Actividad de usuario: ingresos, vistas de fichas, descargas, exportaciones, búsquedas sensibles.
+- Logs técnicos: errores, trazas, trabajos; solo plataforma.
+- Línea de «Actividad» por registro (ficha, candidato, ticket, caso).
+- Verificación de integridad (encadenado de huellas) y exportación para auditorías externas.
+#fue
+- Historia laboral con vigencia (M-HIS): es dato de negocio, no auditoría.
+- Retención y purga (M-PRI define plazos; aquí se aplican).
+#act
+- Auditor y Administrador consultan. Cada módulo escribe. Nadie edita.
+#flu
+**Registro.** 1) Un servicio confirma un cambio. 2) En la misma transacción inserta la fila de auditoría con el diff por campo. 3) Los campos sensibles se guardan cifrados y se muestran solo con permiso.
+
+**Consulta.** 1) El auditor filtra por fecha, usuario, entidad, acción u origen. 2) Abre un registro y ve antes y después. 3) Puede saltar a la ficha del registro afectado si tiene permiso.
+
+**Verificación de integridad.** 1) Un proceso periódico recalcula la cadena de huellas. 2) Si detecta una rotura, alerta a la plataforma y a los administradores.
+#pan
+Auditoría :: Tabla con fecha, usuario, acción, entidad, registro, antes → después, origen; filtros, búsqueda, exportación :: Seguridad → Auditoría
+Actividad del registro :: Línea de tiempo de cambios y eventos de un colaborador u otro registro :: Personas → Colaboradores → Ficha → pestaña Actividad
+Actividad de usuarios :: Ingresos, vistas y descargas por usuario :: Seguridad → Auditoría → pestaña Actividad
+#dat
+Auditoría (solo inserción, particionada por fecha), actividad de usuario, registro de accesos sensibles (M-SEG), huellas de integridad.
+#rn
+[F] Si se crea, modifica, archiva, restaura o cambia de estado un registro de negocio → se inserta una fila de auditoría con valores anterior y nuevo por campo.
+[F] Si alguien intenta modificar o borrar una fila de auditoría por la aplicación o la API → no existe operación para hacerlo; la base lo impide por permisos del rol de conexión.
+[F] Si el campo auditado es sensible → su valor se muestra solo a quien tenga `aud.sensible.ver` y además el permiso del campo en su módulo; los demás ven «valor protegido».
+[F] Si el cambio lo origina una automatización, una importación, soporte o la IA → la fila registra el origen y el usuario responsable de haberla lanzado.
+[F] Si se registra una denuncia anónima → la auditoría del caso no guarda IP, dispositivo ni usuario del denunciante.
+[P] Si una fila de auditoría supera el plazo de retención de su jurisdicción (parámetro) → se archiva en frío; no se borra antes del plazo legal del dato que respalda.
+[F] Si actividad, auditoría y logs técnicos se consultan → cada uno vive en almacenamiento y pantalla distintos; los logs técnicos nunca contienen datos personales en claro.
+#eve
+- `audit.integrity_failed`.
+#evc
+- Todos los eventos de dominio (para la línea de actividad por registro).
+#bor
+- Cambio masivo (importación de 5 000 filas): una fila de auditoría por registro, agrupadas por identificador de lote.
+- Cambio con fecha de vigencia futura: se audita el día en que se registró, con la vigencia como dato.
+- Restauración desde papelera: se audita como acción propia, no como creación.
+#acc
+- Cambiar un sueldo muestra en auditoría «Sueldo: valor anterior → valor nuevo», autor, fecha, hora y origen.
+- No existe endpoint ni pantalla de edición o borrado de auditoría.
+- La exportación de auditoría respeta alcance y permisos de campo.
+
+@@ UI | Sistema de diseño y armazón | 0
+#obj
+Lograr que una plataforma muy amplia se sienta sencilla y propia: una sola forma de navegar, listar, filtrar, editar y aprobar en todos los módulos, en escritorio y en móvil, en tema claro y oscuro.
+#alc
+- Armazón: barra lateral por grupos, barra superior (empresa, búsqueda, crear, pendientes, notificaciones, usuario), migas, paleta de comandos.
+- Componentes: tarjetas, tablas avanzadas (buscar, filtrar, ordenar, elegir y ocultar columnas, redimensionar, paginar, acciones masivas, exportar, guardar vista), paneles laterales, modales, pestañas, líneas de tiempo, calendarios, kanban, tableros, gráficos, filtros, estados vacíos útiles, esqueletos de carga, ayudas.
+- Inicios por rol (RRHH, Manager, Empleado, Payroll), tableros con widgets reordenables.
+- Botón «+ Crear» y menú según permisos y módulos contratados.
+- Divulgación progresiva: lo esencial primero, lo avanzado en un segundo nivel.
+- Tema claro y oscuro diseñados por separado; responsive real; accesibilidad; validaciones con mensajes claros (el servidor repite toda validación).
+- Identidad visual propia (sin copiar interfaces, textos ni iconografía de terceros).
+#fue
+- Marca blanca por organización (M-WLB). Contenido de cada pantalla (su épica).
+#act
+- Todos los usuarios. Cada usuario personaliza sus vistas guardadas y su tablero.
+#flu
+**Inicio por rol.** 1) Al entrar, el sistema elige el inicio según el rol principal. 2) Muestra saludo, pendientes y widgets permitidos. 3) El usuario reordena o cambia widgets; se guarda por usuario.
+
+**Tabla con vista guardada.** 1) El usuario filtra, ordena y elige columnas. 2) Guarda la vista con nombre. 3) La vista vuelve a aplicar permisos al abrirse: si perdió acceso a una columna, desaparece.
+
+**Creación rápida.** 1) «+ Crear» lista solo lo que el usuario puede crear en los módulos contratados. 2) Abre el formulario en panel lateral. 3) Al guardar, ofrece ir al registro.
+#pan
+Armazón :: Barra lateral, barra superior, migas, selector de empresa, tema claro u oscuro :: (todas las pantallas)
+Inicio RRHH :: Dotación, ingresos, salidas, ausentes hoy, vacaciones, contratos por vencer, cumpleaños, onboarding, vacantes, pendientes, alertas, rotación, costo laboral (con permiso) :: Inicio
+Inicio Manager :: Mi equipo, quién está ausente, solicitudes, objetivos, evaluaciones, cumpleaños, pendientes :: Inicio
+Inicio Empleado :: Saludo, vacaciones disponibles, próximo pago, pendientes; accesos a perfil, horario, documentos, boletas, objetivos, cursos, solicitudes :: Inicio
+Paleta de comandos :: Buscar e ir a pantallas o registros, crear :: Barra superior → Buscar
+#dat
+Vistas guardadas, preferencias de usuario (tema, idioma, densidad), disposición de tableros por usuario y por rol.
+#rn
+[F] Si un control visible (crear, editar, eliminar, aprobar, rechazar, descargar, exportar, filtrar, buscar, firmar, duplicar, restaurar) no tiene una operación real detrás → no se publica la pantalla.
+[F] Si el usuario no tiene el permiso o el módulo no está contratado → el control no se muestra y el servidor rechaza la llamada igualmente.
+[F] Si una lista está vacía → se muestra un estado vacío con explicación y la acción para crear el primer registro (si el usuario puede).
+[F] Si una acción cambia datos → al terminar, todas las vistas afectadas (saldo, calendario, tablero, pendientes) reflejan el cambio sin recargar la sesión.
+[F] Si un formulario falla en servidor → cada error se muestra junto a su campo con un mensaje en lenguaje claro.
+[F] Si la pantalla mide menos que el ancho móvil de referencia → las tablas se vuelven tarjetas o se desplazan dentro de su contenedor; nunca se desborda la página.
+[F] Si un texto visible no proviene de los archivos de traducción → la revisión de calidad lo marca como defecto.
+[P] Si una acción masiva afecta a más registros que el umbral seguro (parámetro) o a datos sensibles → pide confirmación con resumen y se ejecuta en segundo plano.
+#bor
+- Usuario con dos roles (Manager y Empleado): el inicio combina widgets y permite cambiar de vista.
+- Vista guardada compartida que incluye una columna sensible: quien no tenga el permiso la ve sin esa columna.
+- Tema oscuro: gráficos y estados usan variables, no colores fijos.
+#acc
+- Todas las tablas del producto ofrecen el mismo conjunto de capacidades.
+- Recorrido completo en móvil: marcar asistencia, pedir vacaciones, ver boletas, firmar, responder encuestas, ver horario y crear solicitudes.
+- Sin textos críticos fijos en componentes; es, en y pt conmutables.
+
+@@ WFL | Motor de aprobaciones y workflows | 0
+#obj
+Ofrecer un único motor para aprobar trámites y automatizar reacciones a eventos, reutilizado por todos los módulos, con diseñador sin código, bandeja única y centro de automatizaciones.
+#alc
+- Aprobaciones de 1 a N niveles, secuenciales o paralelas, con aprobadores por rol, jefe directo, jefe de unidad, responsable de centro de costo, persona fija o regla.
+- Condiciones por datos del trámite (monto, días, empresa, sede, unidad, tipo).
+- Bandeja «Pendientes» y centro de aprobaciones con acciones masivas seguras.
+- Diseñador CUANDO → SI → ENTONCES y constructor visual con nodos Inicio, Condición, Aprobación, Acción, Notificación, Espera, Fin.
+- Acciones: crear tarea, asignar proceso de onboarding, asignar curso, pedir documento, notificar, cambiar campo permitido, llamar webhook.
+- Tareas internas de RRHH (responsable, fecha, estado, prioridad, vínculo con proceso).
+- Centro de automatizaciones: reglas activas, ejecuciones, errores, última y próxima ejecución, registro detallado.
+- Escalamiento, recordatorios, delegación y reemplazo por ausencia.
+#fue
+- Las reglas de negocio de cada trámite (qué valida una solicitud de vacaciones) viven en su módulo; el motor solo decide quién aprueba y en qué orden.
+- Decisiones de alto impacto automáticas: prohibidas.
+#act
+- Administrador y RRHH diseñan. Aprobadores (Manager, RRHH, Payroll, finanzas) resuelven. Solicitantes consultan el avance.
+#flu
+**Aprobación de un trámite.** 1) Un módulo envía una solicitud al motor con tipo y datos. 2) El motor elige el flujo publicado que aplica (por empresa, tipo y condiciones). 3) Crea los pasos y asigna aprobadores resolviendo reglas a personas concretas. 4) Cada aprobador decide desde su bandeja (aprobar, rechazar con motivo, pedir corrección). 5) Al completarse, el motor devuelve el resultado al módulo, que ejecuta su transición.
+
+**Automatización.** 1) Se publica una regla: CUANDO `employee.hired` SI unidad = Tecnología ENTONCES asignar onboarding TI, crear tareas, solicitar laptop, notificar al jefe. 2) Al llegar el evento, el motor evalúa condiciones. 3) Ejecuta acciones en orden, cada una idempotente. 4) Registra la ejecución con entradas, salidas y errores.
+
+**Escalamiento.** 1) Un paso supera su plazo. 2) Se envía recordatorio. 3) Si persiste, se escala al siguiente nivel o al suplente configurado.
+
+**Versionado.** 1) Se edita un borrador. 2) Se prueba con datos de ejemplo. 3) Se publica como nueva versión; los trámites en curso terminan con la versión con la que empezaron.
+#pan
+Pendientes :: Lista única de lo que espera al usuario (aprobar, firmar, evaluar, completar), agrupada por tipo, con contador :: Barra superior → Pendientes
+Centro de aprobaciones :: Aprobaciones por tipo con detalle, aprobar o rechazar, masivo cuando es seguro, historial :: Automatización → Aprobaciones
+Flujos de aprobación :: Lista de flujos por tipo de trámite, versión, estado; editor de niveles y condiciones :: Automatización → Workflows
+Constructor visual :: Lienzo con nodos y conexiones, panel de propiedades, prueba con datos de ejemplo :: Automatización → Workflows → Editor
+Reglas (CUANDO–SI–ENTONCES) :: Reglas simples por evento con condiciones y acciones :: Automatización → Reglas
+Centro de automatizaciones :: Reglas activas, ejecuciones, errores, última y próxima ejecución, registro por ejecución, reintentar :: Automatización → Centro de automatizaciones
+Tareas :: Tablero y lista de tareas internas por responsable, fecha, prioridad y proceso de origen :: Automatización → Tareas
+#dat
+Definiciones de flujo y versiones, nodos y conexiones, solicitudes de aprobación, pasos y decisiones, ejecuciones y su registro, tareas, reglas de escalamiento, suplencias.
+#rn
+[F] Si un trámite requiere aprobación → el motor selecciona el flujo publicado más específico (empresa + tipo + condición) y, si no hay ninguno, usa el flujo por defecto del tipo.
+[F] Si el paso es secuencial → el siguiente nivel no recibe la solicitud hasta que el anterior aprueba.
+[P] Si el paso es paralelo → se cumple cuando aprueba el mínimo requerido (todos, uno o N; parámetro del paso).
+[F] Si cualquier aprobador rechaza → el trámite termina rechazado y el motivo es obligatorio.
+[F] Si el aprobador resuelto es el propio solicitante → el paso se salta al siguiente nivel; si no hay siguiente, va a RRHH.
+[P] Si un paso supera su plazo (parámetro por flujo) → se envía recordatorio y, al segundo vencimiento, se escala según la regla configurada.
+[F] Si el aprobador está ausente (vacaciones aprobadas) o sin usuario activo → la solicitud va a su suplente o delegado; si no hay, a su jefe.
+[F] Si se publica una nueva versión de un flujo → los trámites en curso continúan con la versión anterior.
+[F] Si una automatización intenta contratar, cesar, sancionar, promover o cambiar un sueldo sin paso de aprobación humana → no se permite publicarla.
+[F] Si una acción de automatización falla → se registra el error, se reintenta según política y no se ejecutan las acciones siguientes que dependan de ella.
+[P] Si una regla se dispara en bucle (más ejecuciones que el máximo por registro y ventana; parámetro) → se pausa y se alerta al administrador.
+[F] Si se aprueba en masa → solo se permite para tipos marcados como seguros y cada aprobación se audita individualmente.
+[F] Si un trámite se cancela por el solicitante antes de la decisión final → todos los pasos pendientes se anulan y se notifica a los aprobadores.
+#eve
+- `approval.requested`, `approval.step_approved`, `approval.approved`, `approval.rejected`, `approval.escalated`, `approval.cancelled`, `workflow.published`, `workflow.run_failed`, `task.created`, `task.completed`.
+#evc
+- Cualquier evento de dominio como disparador; `employment.manager_changed` (reasigna aprobaciones pendientes al nuevo jefe).
+#int
+Webhooks salientes como acción (M-API); calendario para tareas (M-INT).
+#bor
+- Cambio de jefe con aprobaciones pendientes: pasan al nuevo jefe y se notifica.
+- Flujo sin aprobador resoluble (posición de jefe vacante): cae al jefe del nivel superior y, en último caso, a RRHH.
+- Aprobación paralela donde un aprobador deja la empresa: se recalcula el mínimo.
+- Automatización que reacciona a su propio efecto: protección de bucle.
+#acc
+- Vacaciones, gastos, horas extra, documentos, contrataciones, incrementos, headcount, cursos y solicitudes usan el mismo motor y la misma bandeja.
+- Un flujo de N niveles con un paso paralelo se configura sin código y se prueba antes de publicar.
+- El centro de automatizaciones muestra por regla: estado, ejecuciones, errores, última y próxima ejecución.
+
+@@ NOT | Notificaciones y mensajería | 0
+#obj
+Avisar a cada persona por el canal adecuado, sin saturarla, y dar a los módulos una única capa de mensajería independiente del proveedor.
+#alc
+- Centro de notificaciones en la aplicación; canales correo, push, SMS y WhatsApp tras adaptadores.
+- Plantillas por evento, idioma y canal, con variables; marca de la organización.
+- Preferencias por usuario y por tipo; resúmenes agrupados; horarios de silencio.
+- Registro de entregas (enviado, entregado, leído, fallido) y reintentos.
+- Calendario central de RRHH (vacaciones, ausencias, cumpleaños, aniversarios, contratos, capacitaciones, evaluaciones, entrevistas, eventos) con filtros.
+#fue
+- Comunicados y noticias (M-CIN). Autoservicio conversacional por WhatsApp (M-WHA).
+#act
+- Todos reciben. Administrador y RRHH configuran plantillas y reglas.
+#flu
+**Envío.** 1) Un evento llega al servicio. 2) Se resuelven destinatarios con permisos vigentes. 3) Se aplican preferencias, agrupación y silencio. 4) Se renderiza la plantilla en el idioma del destinatario. 5) Se entrega por adaptador y se registra el resultado.
+
+**Preferencias.** 1) El usuario elige por tipo de aviso qué canales acepta. 2) Los avisos obligatorios (firma requerida, seguridad de cuenta, obligaciones legales) no se pueden desactivar en la aplicación.
+
+**Calendario.** 1) Cada módulo publica sus fechas. 2) El calendario las muestra filtradas por alcance y tipo. 3) El usuario puede suscribirse desde su calendario externo (M-INT).
+#pan
+Centro de notificaciones :: Lista con no leídas, marcar leídas, ir al registro :: Barra superior → Notificaciones
+Preferencias :: Matriz tipo de aviso × canal, silencio, resumen diario :: Menú de usuario → Mi cuenta → Notificaciones
+Plantillas :: Lista por evento; editor con variables y vista previa por idioma y canal :: Configuración → Notificaciones
+Registro de entregas :: Mensajes enviados con estado y error; reenviar :: Configuración → Notificaciones → Entregas
+Calendario RRHH :: Mes, semana y lista con filtros por tipo, empresa, sede y unidad :: Inicio → Calendario
+#dat
+Notificaciones, plantillas, preferencias, entregas por canal, suscripciones de calendario, dispositivos para push.
+#rn
+[F] Si un evento genera un aviso → el destinatario se calcula en el momento del envío con los permisos y el alcance vigentes; nadie recibe datos que no puede ver.
+[F] Si el mensaje va por un canal externo (correo, SMS, WhatsApp) → no incluye montos de sueldo, datos de salud ni contenido de denuncias; solo el aviso y un enlace que exige ingresar.
+[P] Si el aviso cae en el horario de silencio del usuario (parámetro) y no es urgente → se entrega al terminar el silencio.
+[P] Si se generan varios avisos del mismo tipo en la ventana de agrupación (parámetro) → se envía uno solo con el resumen.
+[F] Si un aviso es de tipo obligatorio → el usuario no puede desactivar el canal en la aplicación.
+[P] Si la entrega falla → se reintenta según la política del canal y, agotados los intentos, se usa el canal alternativo configurado.
+[F] Si el colaborador no tiene correo → los avisos van por aplicación, push o WhatsApp/SMS; ningún flujo queda bloqueado por falta de correo.
+[F] Si una persona está con vacaciones o descanso aprobado → los avisos no urgentes de trabajo respetan la desconexión digital y se entregan al regreso.
+#eve
+- `notification.sent`, `notification.failed`.
+#evc
+- Todos los eventos con plantilla configurada.
+#int
+Proveedor de correo, push, SMS y WhatsApp Business por adaptador con implementación falsa («mensajes enviados (simulado)»).
+#bor
+- Destinatario que perdió el permiso entre el evento y el envío: no se envía.
+- Plantilla sin traducción al idioma del usuario: cae al idioma de la empresa.
+- Rebote permanente de correo: se marca el contacto como inválido y se avisa a RRHH.
+#acc
+- Cambiar de proveedor de un canal no requiere tocar ningún módulo.
+- Cada notificación abre el registro exacto y desaparece de pendientes al resolverse.
+
+@@ CFG | Configuración, parámetros, campos personalizados, i18n y multimoneda | 0
+#obj
+Reunir en un solo centro todo lo que una organización ajusta sin programar, con herencia organización → empresa → sede → grupo y con vigencia por fecha.
+#alc
+- Centro de configuración por secciones (organización, empresas, sedes, estructura, usuarios, roles, permisos, campos, workflows, asistencia, vacaciones, planilla, desempeño, reclutamiento, LMS, SST, documentos, integraciones, notificaciones, seguridad, API, auditoría).
+- Configuración por empresa: datos fiscales, logo, moneda, zona horaria, idioma, calendario, feriados, políticas.
+- Parámetros con vigencia y nivel de herencia; catálogos editables (tipos, motivos, categorías).
+- Campos personalizados (texto, número, fecha, selector, selección múltiple, casilla, usuario, archivo, URL, moneda, porcentaje) por entidad, con visibilidad y sensibilidad.
+- Idiomas es, en, pt; formatos regionales.
+- Multimoneda: moneda por empresa, por compensación y por gasto; tipos de cambio con fecha.
+- Calendarios y feriados por país, región y empresa.
+#fue
+- Parámetros legales del paquete de país (M-PAR los publica; aquí solo se consultan). Marca blanca (M-WLB).
+#act
+- Administrador empresa configura. RRHH ajusta catálogos y políticas de sus módulos.
+#flu
+**Cambiar un parámetro.** 1) Se elige nivel (organización, empresa, sede, grupo) y fecha de vigencia. 2) Se guarda como nuevo registro; el anterior se cierra el día previo. 3) Los cálculos usan el valor vigente en la fecha del hecho.
+
+**Campo personalizado.** 1) Se define entidad, tipo, etiqueta por idioma, obligatoriedad, opciones. 2) Se elige en qué sección aparece, quién lo ve y edita, y si es sensible. 3) Queda disponible en formularios, tablas, importador, reportes y API.
+
+**Feriados.** 1) El paquete de país carga feriados nacionales. 2) La empresa añade regionales o propios por sede. 3) Asistencia, vacaciones y planilla los consumen.
+#pan
+Centro de configuración :: Índice por secciones con buscador; cada sección abre su pantalla :: Configuración
+Empresa :: Datos fiscales, logo, moneda, zona horaria, idioma, calendario :: Configuración → Empresas
+Catálogos :: Tipos, motivos y categorías por módulo; crear, ordenar, archivar :: Configuración → Catálogos
+Campos personalizados :: Lista por entidad; editor con visibilidad y sensibilidad :: Configuración → Campos
+Parámetros :: Parámetros de política con nivel, valor y vigencia; historial :: Configuración → Parámetros
+Calendarios y feriados :: Calendarios por país, región, empresa y sede :: Configuración → Calendarios
+Monedas y tipos de cambio :: Monedas habilitadas, tipo de cambio por fecha :: Configuración → Monedas
+#dat
+Parámetros (clave, nivel, valor, vigencia), catálogos, definiciones y valores de campos personalizados, traducciones, monedas, tipos de cambio, calendarios, feriados.
+#rn
+[F] Si un parámetro existe en varios niveles → gana el más específico vigente: grupo, sede, empresa, organización, valor por defecto del paquete de país.
+[F] Si se cambia un parámetro → se crea un registro con vigencia; el valor anterior no se sobrescribe y los cálculos de fechas pasadas siguen usando el valor de su fecha.
+[F] Si un parámetro es legal (lo publica el paquete de país) → la organización no puede bajarlo por debajo del mínimo legal; solo mejorarlo cuando la norma lo permite.
+[F] Si un campo personalizado se marca sensible → hereda las reglas de permiso por campo, cifrado y registro de accesos.
+[F] Si un campo personalizado tiene valores cargados → no se elimina ni cambia de tipo; se archiva.
+[F] Si un monto se guarda → lleva siempre su moneda; nunca se suman montos de monedas distintas sin tipo de cambio de la fecha.
+[P] Si falta el tipo de cambio de la fecha → se usa el último anterior disponible y se marca el resultado como «tipo de cambio referencial» (comportamiento parámetro: bloquear o usar anterior).
+[F] Si una fecha u hora se muestra → usa la zona horaria de la empresa del registro; se guarda en UTC.
+[F] Si un valor de catálogo está en uso → no se elimina; se archiva y deja de ofrecerse para nuevos registros.
+#eve
+- `parameter.changed`, `custom_field.created`, `holiday.changed`.
+#evc
+- `company.created` (siembra configuración por defecto del país).
+#bor
+- Cambio retroactivo de un parámetro que afecta un periodo de planilla cerrado: no recalcula; genera aviso para evaluar un ajuste en el periodo abierto.
+- Empresa con sedes en regiones con feriados distintos.
+- Campo personalizado obligatorio añadido cuando ya hay registros: solo obliga en nuevas ediciones.
+#acc
+- Ninguna política vive en código: todas se cambian desde el centro de configuración con vigencia.
+- Un campo personalizado nuevo aparece en ficha, tabla, importador, constructor de reportes y API sin despliegue.

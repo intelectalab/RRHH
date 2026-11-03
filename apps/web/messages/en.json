@@ -1,0 +1,39 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading…",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "employees": "Employees",
+    "attendance": "Attendance",
+    "payroll": "Payroll",
+    "vacations": "Vacations",
+    "reports": "Reports",
+    "settings": "Settings",
+    "help": "Help",
+    "notifications": "Notifications",
+    "new": "New"
+  },
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot your password?"
+  }
+}
+

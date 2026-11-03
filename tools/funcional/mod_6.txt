@@ -1,0 +1,603 @@
+@@ ENC | Encuestas, clima y eNPS | 6
+#obj
+Escuchar a las personas con encuestas confiables, con anonimato real cuando se promete, y convertir los resultados en planes de acción con seguimiento.
+#alc
+- Constructor de encuestas: tipos de pregunta, secciones, lógica, plantillas (clima, compromiso, onboarding, salida, pulso, eNPS, personalizada).
+- Población, calendario, recordatorios, canales (portal, enlace, WhatsApp).
+- Anonimato configurable con umbral mínimo por segmento y sin vínculo respuesta–persona.
+- Resultados: participación, promedios, distribución, eNPS (promotores, pasivos, detractores), tendencias, mapa de calor por área, comentarios con resumen por IA.
+- Planes de acción con responsable, fecha y avance.
+#fue
+- Evaluaciones de desempeño. Encuestas a clientes.
+#act
+- RRHH diseña y analiza. Managers ven resultados de su área y gestionan acciones. Colaboradores responden.
+#flu
+**Encuesta.** 1) RRHH elige plantilla, población y si es anónima (no se puede cambiar tras lanzar). 2) Lanza. 3) Cada persona responde una vez. 4) Al cerrar se calculan resultados por segmento aplicando el umbral. 5) Se publican a los managers. 6) Se crean planes de acción por área.
+
+**eNPS.** 1) Pregunta de recomendación de 0 a 10. 2) Promotores 9–10, pasivos 7–8, detractores 0–6. 3) eNPS = % promotores − % detractores. 4) Se muestra la tendencia entre mediciones.
+#pan
+Encuestas :: Lista con tipo, estado, participación; crear desde plantilla :: Experiencia → Encuestas
+Constructor :: Preguntas, secciones, lógica, vista previa :: Experiencia → Encuestas → Editar
+Resultados :: Participación, puntajes, mapa de calor por área, comentarios, comparación con medición anterior :: Experiencia → Encuestas → Resultados
+eNPS :: Puntaje, distribución, tendencia, por segmento :: Experiencia → eNPS
+Planes de acción :: Acciones por área con responsable, fecha, avance :: Experiencia → Encuestas → Planes de acción
+Responder encuesta :: Formulario móvil con aviso de anonimato :: Portal → Pendientes → Encuesta
+#dat
+Encuestas (`surveys`), preguntas, población invitada, registro de participación (quién respondió, sin enlace a la respuesta), respuestas (sin identificador de persona si es anónima), atributos de segmento copiados a la respuesta, planes de acción.
+#rn
+[F] Si la encuesta es anónima → la respuesta se guarda sin identificador de persona, usuario, IP ni dispositivo; la participación se registra aparte y sin clave que permita unirlas.
+[P] Si un segmento tiene menos respuestas que el umbral mínimo (parámetro; no puede fijarse por debajo del mínimo de plataforma) → sus resultados no se muestran y se agrupan en el nivel superior.
+[F] Si la combinación de filtros permite aislar a una persona por diferencia entre segmentos → el sistema oculta también el segmento complementario.
+[F] Si una encuesta ya se lanzó → no se puede cambiar su condición de anónima ni añadir segmentaciones nuevas.
+[F] Si una persona ya respondió → no puede responder de nuevo; en modo anónimo se controla con un token de un solo uso sin relación con la respuesta.
+[F] Si se calcula eNPS → es porcentaje de promotores (9–10) menos porcentaje de detractores (0–6) sobre respuestas válidas.
+[F] Si la IA resume comentarios → trabaja sobre el conjunto que el usuario puede ver y no cita textos que identifiquen al autor en segmentos pequeños.
+[F] Si la encuesta es anónima → los comentarios abiertos solo se muestran a quien tenga el permiso y agrupados al nivel que cumple el umbral.
+[P] Si la participación no alcanza el mínimo definido para dar por válida la medición (parámetro) → se advierte antes de publicar resultados.
+[F] Si un plan de acción vence sin avance → se alerta a su responsable y a RRHH.
+#eve
+- `survey.launched`, `survey.response_submitted` (sin persona si es anónima), `survey.closed`, `survey.results_published`, `action_plan.created`, `action_plan.overdue`.
+#evc
+- `onboarding.completed`, `offboarding.started` (encuestas automáticas), `employee.hired`.
+#bor
+- Área de tres personas: nunca ve resultado propio.
+- Persona que cambia de área durante la encuesta: cuenta en el segmento de la fecha de lanzamiento.
+- Encuesta de salida con una sola respuesta en el mes: no se muestra individual si es anónima.
+#acc
+- El anonimato es verificable en el modelo de datos: no existe consulta que una una respuesta anónima con una persona.
+- Hay mapa de calor por área, eNPS con tendencia y planes de acción con seguimiento.
+
+@@ REC | Reconocimientos | 6
+#obj
+Hacer visible el buen trabajo entre compañeros, ligado a los valores de la empresa.
+#alc
+- Reconocer a un compañero o equipo con valor empresarial, mensaje e insignia.
+- Muro opcional con reacciones y comentarios; reconocimientos privados.
+- Catálogo de valores e insignias; programas (colaborador del mes), puntos opcionales y canje.
+- Indicadores por valor, área y persona.
+#fue
+- Bonos monetarios (M-COM). Feedback privado (M-FBK).
+#act
+- Todos los colaboradores. RRHH modera y configura.
+#flu
+**Reconocer.** 1) Se elige a la persona o equipo. 2) Se elige valor e insignia y se escribe el mensaje. 3) Se publica en el muro o se envía en privado. 4) El reconocido y su jefe reciben aviso; queda en su ficha.
+#pan
+Reconocimientos :: Muro con filtros por valor y área; reconocer :: Experiencia → Reconocimientos
+Programas e insignias :: Valores, insignias, reglas de puntos :: Configuración → Reconocimientos
+Reconocimientos del colaborador :: Recibidos y dados :: Personas → Colaboradores → Ficha → pestaña Reconocimientos
+#dat
+Reconocimientos (`recognitions`), destinatarios, valores, insignias, reacciones, comentarios, puntos y canjes.
+#rn
+[F] Si una persona intenta reconocerse a sí misma → se rechaza.
+[P] Si el programa usa puntos → cada persona tiene un cupo por periodo para dar (parámetro) y no puede excederlo.
+[F] Si un reconocimiento se oculta por moderación → deja de verse en el muro, se conserva con el motivo y se notifica al autor.
+[F] Si el muro está desactivado para la organización → los reconocimientos son visibles solo para emisor, receptor y jefe.
+[F] Si el receptor cesa → sus reconocimientos se conservan en el historial y dejan de mostrarse en el muro activo.
+[P] Si los puntos tienen valor canjeable → su tratamiento en planilla (remunerativo o no) se define por parámetro y concepto antes de activar el canje.
+#eve
+- `recognition.given`, `recognition.hidden`, `points.redeemed`.
+#evc
+- `employee.terminated`, `review.published` (sugerencia de reconocer).
+#bor
+- Reconocimiento a un equipo completo.
+- Mensaje con contenido inapropiado: denuncia desde el muro hacia moderación.
+#acc
+- Un colaborador reconoce a otro con valor, mensaje e insignia y aparece en el muro opcional.
+
+@@ CIN | Comunicación interna | 6
+#obj
+Informar a las personas correctas por el canal correcto y saber quién leyó lo que debía leer.
+#alc
+- Noticias, comunicados, eventos, cumpleaños y aniversarios.
+- Segmentación por empresa, sede, área, equipo, puesto o lista.
+- Programación, fijado, vigencia, adjuntos, comentarios y reacciones opcionales.
+- Confirmación de lectura obligatoria para comunicados formales (políticas, reglamentos).
+- Borrador con IA; envío por notificaciones y WhatsApp.
+#fue
+- Chat entre colaboradores. Transmisiones en vivo.
+#act
+- RRHH o comunicaciones publica. Managers publican a su equipo si se permite. Todos leen.
+#flu
+**Comunicado con lectura obligatoria.** 1) Se redacta y se elige el segmento. 2) Se marca «requiere confirmación». 3) Se publica o programa. 4) Cada destinatario lo ve en pendientes y confirma. 5) RRHH sigue el avance y envía recordatorios. 6) La lista de confirmaciones sirve como evidencia.
+#pan
+Comunicaciones :: Muro de noticias, comunicados y eventos del segmento del usuario :: Experiencia → Comunicaciones
+Editor de publicación :: Contenido, segmento, programación, lectura obligatoria, vista previa :: Experiencia → Comunicaciones → Nueva
+Seguimiento de lectura :: Leído, confirmado y pendiente por persona; recordar; exportar :: Experiencia → Comunicaciones → Lectura
+Celebraciones :: Cumpleaños y aniversarios según preferencias de privacidad :: Inicio → Celebraciones
+#dat
+Publicaciones (`announcements`), segmentos, lecturas y confirmaciones, eventos y asistencia, comentarios.
+#rn
+[F] Si una publicación tiene segmento → solo la ven quienes pertenecen a él al momento de consultar, más sus autores.
+[F] Si la publicación requiere confirmación → queda en pendientes del destinatario hasta que confirme; la confirmación guarda fecha y hora.
+[F] Si alguien entra al segmento después de publicar (ingreso, traslado) y la publicación sigue vigente → la recibe.
+[F] Si un colaborador desactiva mostrar su cumpleaños → no aparece en celebraciones; la preferencia por defecto la define la organización.
+[P] Si la publicación la crea un rol que requiere aprobación (parámetro) → no sale hasta ser aprobada.
+[F] Si un comunicado con lectura obligatoria se edita tras publicarse → se crea una versión nueva y se pide confirmar de nuevo.
+[P] Si la confirmación no llega dentro del plazo (parámetro) → se recuerda al destinatario y luego a su jefe.
+#eve
+- `announcement.published`, `announcement.read`, `announcement.acknowledged`, `event.created`, `policy.published`.
+#evc
+- `employee.hired`, `employment.assignment_changed`.
+#int
+Canales de M-NOT y M-WHA.
+#bor
+- Colaborador sin acceso digital: confirmación en kiosko o en físico con cargo.
+- Publicación para todo el grupo con empresas en distintos idiomas.
+#acc
+- Se publican noticias, comunicados y eventos segmentados y se registra lectura cuando se exige.
+
+@@ HSD | Mesa de ayuda y base de conocimiento | 6
+#obj
+Atender las consultas y pedidos a RRHH con orden, plazos y respuestas reutilizables.
+#alc
+- Solicitudes (tickets) por categoría: certificado, planilla, vacaciones, beneficios, documentos, consulta, otro; formularios por categoría.
+- Estados nuevo, en atención, esperando información, resuelto, cerrado; asignación por reglas, colas y prioridad.
+- SLA configurable por categoría y prioridad con calendario laboral; alertas y escalamiento.
+- Conversación con el solicitante, notas internas, adjuntos, plantillas de respuesta, encuesta de satisfacción.
+- Base de conocimiento: artículos, categorías, buscador, sugerencia de artículos al crear una solicitud, artículos relacionados con solicitudes.
+- Categorías confidenciales; asistente de IA que responde con la base de conocimiento.
+#fue
+- Denuncias (M-DEN). Soporte técnico del SaaS (M-SAS).
+#act
+- Empleado crea. Agentes de RRHH y Payroll atienden. Administrador configura.
+#flu
+**Solicitud.** 1) El colaborador elige categoría; el sistema sugiere artículos. 2) Si no resuelve, envía el formulario. 3) Se asigna a una cola y a un agente. 4) El agente responde, pide información («Esperando información» pausa el plazo) o resuelve. 5) El solicitante confirma o reabre. 6) Se cierra y se pide valoración.
+#pan
+Solicitudes :: Bandeja por cola con estado, prioridad, plazo y vencimiento; filtros :: Operaciones → Solicitudes
+Detalle de solicitud :: Conversación, notas internas, datos del solicitante permitidos, artículos relacionados, acciones :: Operaciones → Solicitudes → Solicitud
+Mis solicitudes :: Solicitudes propias y nueva solicitud con sugerencias :: Portal → Mis solicitudes
+Base de conocimiento :: Artículos por categoría, buscador, utilidad :: Operaciones → Solicitudes → Base de conocimiento
+Configuración de mesa de ayuda :: Categorías, colas, reglas de asignación, SLA, plantillas :: Configuración → Solicitudes
+#dat
+Solicitudes (`tickets`), mensajes, notas internas, categorías, colas, políticas de SLA, artículos (`kb_articles`) y versiones, valoraciones.
+#rn
+[P] Si se crea una solicitud → su plazo de primera respuesta y de resolución se calcula con el SLA de su categoría y prioridad sobre el calendario laboral de la empresa (parámetros).
+[F] Si la solicitud está «Esperando información» → el reloj del SLA se detiene y se reanuda al responder el solicitante.
+[P] Si el solicitante no responde en el plazo configurado → la solicitud se cierra automáticamente con aviso (parámetro).
+[P] Si un plazo está por vencer o vence → se alerta al agente y se escala según la regla de la cola.
+[F] Si la categoría es confidencial → solo la ven el solicitante y los agentes con el permiso; no aparece en búsquedas ni reportes generales.
+[P] Si una solicitud resuelta no se reabre dentro del plazo (parámetro) → pasa a «Cerrado» y ya no admite reapertura; se crea una nueva enlazada.
+[F] Si un agente es el propio solicitante → no puede atender su solicitud.
+[F] Si un artículo se publica → tiene versión, autor y fecha de revisión; los artículos vencidos se marcan «por revisar».
+[F] Si la IA responde una consulta → cita el artículo fuente y ofrece crear una solicitud; no inventa políticas ni datos personales.
+[F] Si la solicitud pide un certificado de emisión automática → se genera el documento (M-DOC) y la solicitud se resuelve sola.
+#eve
+- `ticket.created`, `ticket.assigned`, `ticket.waiting_info`, `ticket.resolved`, `ticket.reopened`, `ticket.closed`, `ticket.sla_breached`, `kb_article.published`.
+#evc
+- `document.generated`, `approval.approved`.
+#int
+WhatsApp y correo como canales de entrada (M-WHA, M-NOT).
+#bor
+- Solicitud creada por un ex-colaborador.
+- Cambio de categoría que cambia el SLA.
+- Solicitud que en realidad es una denuncia: el agente la deriva al canal con consentimiento del solicitante y la retira de la mesa.
+#acc
+- Las solicitudes recorren los cinco estados con SLA configurable y la base de conocimiento se relaciona con ellas.
+
+@@ SST | Seguridad y salud en el trabajo | 7
+#obj
+Gestionar la seguridad y salud en el trabajo con los registros obligatorios, sus plazos de conservación y un tablero de indicadores, configurable por país.
+#alc
+- Accidentes, incidentes peligrosos e incidentes; enfermedades ocupacionales; investigación y causas.
+- Matriz de peligros y riesgos (IPERC) por puesto y sede; controles.
+- Inspecciones internas, observaciones, medidas correctivas con responsable y plazo.
+- Exámenes médicos ocupacionales (ingreso, periódico, retiro) con aptitud y vencimientos; datos médicos restringidos.
+- Capacitaciones, inducciones y simulacros (con M-LMS).
+- Equipos de protección personal (con M-ACT), equipos de emergencia.
+- Comité o supervisor: elecciones, miembros, reuniones, actas, acuerdos.
+- Monitoreo de agentes (físicos, químicos, biológicos, psicosociales, disergonómicos), auditorías, estadísticas.
+- Documentos del sistema de gestión, plan anual, vencimientos; SCTR por puesto y sede.
+- Los ocho registros obligatorios con sus formatos y conservación.
+#fue
+- Historia clínica (la custodia el servicio médico; aquí solo aptitud y restricciones). Gestión ambiental.
+#act
+- Responsable SST administra. Comité revisa. Managers reportan y ejecutan medidas. Colaboradores reportan incidentes y actos inseguros.
+#flu
+**Accidente o incidente.** 1) Cualquiera lo reporta (fecha, lugar, personas, descripción, fotos). 2) SST lo clasifica y abre la investigación. 3) Registra causas y medidas correctivas. 4) Si hay descanso, se enlaza la ausencia. 5) Se notifica a la autoridad cuando el tipo lo exige. 6) Se verifica la eficacia de las medidas y se cierra. 7) Entra al registro obligatorio y a las estadísticas.
+
+**Examen ocupacional.** 1) Se programa por ingreso, periodicidad o retiro. 2) Se registra resultado de aptitud y restricciones. 3) El jefe solo ve «apto», «apto con restricciones» o «no apto» y las restricciones aplicables. 4) Se agenda el siguiente.
+
+**Inspección.** 1) Se planifica con lista de verificación. 2) Se registra en campo (móvil, fotos). 3) Cada hallazgo genera una medida. 4) Seguimiento hasta el cierre.
+#pan
+Tablero SST :: Accidentabilidad, días perdidos, medidas vencidas, exámenes y capacitaciones por vencer, cumplimiento del plan :: SST → Tablero
+Incidentes :: Lista con tipo, gravedad, estado, días perdidos; reportar :: SST → Incidentes
+Investigación :: Hechos, causas, involucrados, medidas, documentos :: SST → Incidentes → Detalle
+Riesgos :: Matriz por puesto y sede con nivel de riesgo y controles :: SST → Riesgos
+Inspecciones :: Programa, registros, hallazgos :: SST → Inspecciones
+Medidas correctivas :: Medidas por origen, responsable, plazo, estado :: SST → Inspecciones → Medidas
+Salud ocupacional :: Exámenes por persona, aptitud, vencimientos :: SST → Salud ocupacional
+Capacitaciones SST :: Programa, asistencia, simulacros :: SST → Capacitaciones
+Comité :: Miembros, vigencia, reuniones, actas, acuerdos :: SST → Comité
+Registros obligatorios :: Generación de cada registro por periodo en su formato :: SST → Registros
+Proceso electoral :: Línea de tiempo de la elección con el plazo de cada etapa, junta electoral, candidatos, padrón; acciones de cada etapa :: SST → Comité
+Votación :: Candidatos aptos; emitir un voto secreto; constancia de participación :: Portal → Pendientes
+Sesiones y actas :: Calendario de sesiones ordinarias, asistencia y quórum, acuerdos, firma del acta; libro de actas con huella y verificación de la cadena :: SST → Comité
+#dat
+Incidentes (`sst_incidents`), investigaciones, peligros y riesgos, inspecciones y hallazgos, medidas correctivas, exámenes ocupacionales, monitoreos, auditorías, comité y actas, pólizas SCTR, plan anual.  Elecciones (`sst_committee_elections`, participantes y padrón sin preferencia), sesiones con estado y asistencia (`sst_committee_meetings`, `sst_committee_meeting_attendees`).
+#rn
+[P] Si se registra un accidente de trabajo o incidente peligroso → su registro se conserva 10 años; enfermedades ocupacionales 20 años; los demás registros 5 años (valores de referencia 2026, parámetros con vigencia).
+[F] Si un incidente se cierra → debe tener investigación, causas y todas sus medidas en estado verificada o descartada con motivo.
+[P] Si el evento es accidente mortal o incidente peligroso → se crea la tarea de notificación a la autoridad con su plazo (parámetro del paquete de país, a confirmar con la norma vigente).
+[F] Si un usuario sin `sst.salud.ver` consulta a una persona → solo ve la aptitud y las restricciones laborales, nunca diagnósticos ni resultados.
+[P] Si un examen ocupacional está por vencer (anticipación y periodicidad por tipo de puesto: parámetros) → se alerta a SST y al colaborador.
+[F] Si una medida correctiva supera su plazo → pasa a «Vencida», se alerta al responsable y a SST y cuenta en el tablero.
+[P] Si la empresa tiene 20 o más trabajadores (`sst_comite_minimo_trabajadores`, comparación mayor o igual) → cumplimiento exige comité vigente; con menos de 20, supervisor elegido por los trabajadores.
+[F] Si un puesto o sede está marcado de riesgo → sus ocupantes deben figurar en la póliza SCTR vigente; si no, se alerta.
+[F] Si se entrega un EPP → queda con firma del trabajador y alimenta el registro de equipos de seguridad.
+[F] Si la empresa es micro o pequeña → se usan los registros simplificados del paquete de país (norma a confirmar).
+[F] Si un colaborador ingresa o cambia a un puesto con riesgos distintos → se le asigna la inducción y capacitación específica y se registra la entrega de recomendaciones de SST.
+[F] Si se reporta un acto o condición insegura de forma anónima → se registra sin identificar al reportante.
+[P] Si faltan los días de aviso para el fin del mandato (`sst_eleccion_aviso_dias`), la dotación cruza el umbral o hay vacancia sin suplente → se planifica un proceso electoral (ME-46) con el plazo de cada etapa tomado de los parámetros `sst_eleccion_*`.
+[F] Si se emite un voto en una elección → se registra quién votó en el padrón y se incrementa el contador del candidato, sin guardar vínculo entre votante y preferencia.
+[F] Si un integrante de la junta electoral se inscribe como candidato (o un candidato se designa en la junta) → se rechaza.
+[P] Si la sesión no alcanza el quórum (mitad más uno de los miembros) → queda «Sin quórum» y se crea una sesión nueva dentro de `sst_sin_quorum_reprogramacion_dias`, que sesiona con los presentes.
+[F] Si un mes calendario termina sin sesión ordinaria realizada y el comité está vigente → la obligación del mes pasa a «incumple» con explicación.
+[F] Si el acta se firma → se asienta en el libro inalterable de cumplimiento con la huella del documento y ya no se edita; una corrección es un acta aclaratoria nueva.
+[P] Si un miembro acumula las inasistencias de `sst_vacancia_inasistencias_consecutivas` o `sst_vacancia_inasistencias_alternas` → se propone la vacancia y se llama al suplente.
+[P] Si se elige a los representantes → el comité debe instalarse dentro de `sst_instalacion_dias_habiles`; vencido el plazo se alerta y la obligación pasa a «en riesgo».
+#eve
+- `sst.incident_reported`, `sst.incident_classified`, `sst.incident_closed`, `sst.corrective_action_created`, `sst.corrective_action_overdue`, `sst.medical_exam_expiring`, `sst.inspection_completed`, `sst.committee_expiring`.
+#evc
+- `employee.hired`, `employment.assignment_changed`, `course.completed`, `asset.assigned`, `absence.approved`.
+#int
+Clínicas ocupacionales y aseguradoras por archivo o API (M-INT).
+#bor
+- Accidente de un tercero (contratista, visitante).
+- Accidente en teletrabajo o en trayecto.
+- Trabajador «no apto» para su puesto: reubicación con movimiento.
+- Cierre de sede con medidas abiertas.
+#acc
+- Se administran accidentes, incidentes, inspecciones, riesgos, observaciones, medidas, exámenes, capacitaciones, EPP, comités, documentos y vencimientos, con tablero y los ocho registros exportables.
+
+@@ DEN | Canal de denuncias y hostigamiento | 7
+#obj
+Ofrecer un canal independiente y confidencial para denunciar, con anonimato real, acceso muy restringido y el procedimiento de hostigamiento sexual con sus plazos.
+#alc
+- Denuncia identificada o anónima desde un portal sin inicio de sesión; categorías (hostigamiento sexual, acoso laboral, discriminación, fraude, seguridad, otros).
+- Código seguro de seguimiento y clave; comunicación bidireccional con el denunciante; evidencias.
+- Asignación a investigadores autorizados; conflicto de interés; bitácora del caso.
+- Procedimiento de hostigamiento sexual: comité de intervención o delegado, medidas de protección, etapas y plazos, informe, decisión, comunicación.
+- Medidas de protección y no represalia; cierre con resultado.
+- Estadísticas sin datos identificables; capacitación obligatoria de prevención (con M-LMS).
+#fue
+- La sanción (M-DIS la ejecuta). Asesoría legal externa.
+#act
+- Denunciante (cualquier persona, incluso externa). Investigador de denuncias. Comité de intervención. Oficial de cumplimiento. Nadie más.
+#flu
+**Denuncia.** 1) El denunciante abre el portal, elige categoría y modo. 2) Describe los hechos y adjunta evidencia (se limpian metadatos). 3) Recibe código y define una clave. 4) El caso llega a los receptores autorizados. 5) Se clasifica y se asigna, excluyendo a personas mencionadas. 6) Se investiga con actuaciones registradas. 7) Se concluye y se cierra con resultado. 8) El denunciante consulta avances y responde preguntas con su código.
+
+**Hostigamiento sexual.** 1) Recibida la queja (o iniciada de oficio), se ofrece atención médica y psicológica (1 día hábil) y se traslada al comité o delegado (1 día hábil). 2) Se dictan y ejecutan las medidas de protección (3 días hábiles). 3) Se comunica la queja y las medidas a la autoridad de trabajo (6 días hábiles). 4) El comité investiga, recibe descargos y emite su informe (15 días calendario desde la recepción). 5) Recursos Humanos traslada el informe, recibe alegatos y decide (10 días calendario). 6) Comunica la decisión a la autoridad (6 días hábiles) y cierra. Máquina ME-48; plazos y norma en `18-localizacion-peru-detalle-tecnico.md` §5.2.
+#pan
+Portal de denuncias :: Formulario público, modo anónimo o identificado, adjuntos, entrega de código :: Portal público → Canal de denuncias
+Seguimiento con código :: Estado, mensajes con el investigador, aportar evidencia :: Portal público → Canal de denuncias → Seguimiento
+Bandeja de casos :: Casos asignados con categoría, estado, plazos :: Denuncias → Casos
+Expediente :: Hechos, personas mencionadas, evidencias, actuaciones, medidas de protección, plazos, conclusión :: Denuncias → Casos → Expediente
+Estadísticas :: Casos por categoría, estado, tiempos, sin datos identificables :: Denuncias → Estadísticas
+Comité y configuración :: Miembros, vigencia, investigadores, categorías :: Configuración → Denuncias
+Procedimiento de hostigamiento :: Línea de tiempo con los siete plazos, su vencimiento y cumplimiento; etapa; medidas; comunicaciones a la autoridad con su cargo; libro del caso :: Denuncias → Casos → Expediente
+Comité de intervención :: Miembros, paridad, vigencia, capacitación y evaluación anual :: Denuncias → Casos
+#dat
+Denuncias (`whistleblowing_cases`), mensajes, evidencias, actuaciones, medidas de protección, asignaciones, comité de intervención, códigos de seguimiento (solo huella). Almacenamiento y cifrado separados del resto.  Etapa del procedimiento de hostigamiento (`complaints.procedure_stage`), plazos en curso (`compliance_deadlines`), comunicaciones a la autoridad (`authority_communications`) y asientos del libro inalterable del caso.
+#rn
+[F] Si la denuncia es anónima → no se guarda IP, usuario, dispositivo ni sesión; la bitácora técnica del portal de denuncias excluye esos datos.
+[F] Si se entrega el código de seguimiento → el sistema guarda solo su huella; no se puede recuperar, y sin código y clave nadie accede al seguimiento.
+[F] Si un usuario no es receptor o investigador asignado → no ve la existencia del caso, ni en búsquedas, reportes, auditoría general ni notificaciones.
+[F] Si una persona es mencionada en la denuncia (denunciado o testigo) → no puede ser asignada como investigadora ni ver el caso, aunque tenga el rol.
+[F] Si el Administrador empresa revisa la auditoría → ve que hubo actividad en el canal, sin contenido ni identidades.
+[P] Si la queja es por hostigamiento sexual → las medidas de protección deben dictarse y ejecutarse dentro de 3 días hábiles desde la recepción (`host_medidas_proteccion_dias_habiles`), y la atención médica y psicológica debe ofrecerse dentro de 1 día hábil (`host_atencion_dias_habiles`); el caso crea ambos plazos con alerta.
+[P] Si la queja es por hostigamiento sexual → cada etapa lleva su plazo como parámetro: traslado al comité 1 día hábil, informe del comité 15 días calendario desde la recepción, decisión 10 días calendario desde el informe, y comunicación a la autoridad de trabajo 6 días hábiles tras la recepción y 6 tras la decisión; no existe un parámetro de duración total, y el expediente alerta antes de cada vencimiento.
+[P] Si el centro de trabajo tiene 20 o más trabajadores → cumplimiento exige comité de intervención vigente (dos representantes del empleador, uno de ellos de Recursos Humanos, y dos de los trabajadores, con paridad de género); con menos de 20, un delegado.
+[F] Si se adjunta evidencia → se eliminan metadatos del archivo antes de guardarlo.
+[F] Si un caso se cierra → requiere resultado, fundamento y medidas; el denunciante lo ve con su código.
+[F] Si se generan estadísticas → categorías con menos casos que el mínimo se agrupan para no identificar.
+[F] Si la denuncia llega por otro canal (mesa de ayuda, jefe) → se registra en el canal a nombre del receptor como «recibida por tercero», con consentimiento.
+[P] Si pasa el plazo de retención del caso cerrado (parámetro por jurisdicción) → se anonimiza conservando estadística.
+[F] Si se registra un acto del procedimiento de hostigamiento (recepción, atención, medida, traslado, informe, decisión, comunicación) → se asienta en el libro inalterable del caso, encadenado por huella, sin identidad del denunciante ni hora (solo fecha).
+[F] Si un miembro del comité o el receptor es mencionado en la queja → no puede intervenir: se llama al suplente antes de trasladar el caso.
+[P] Si vence un plazo del procedimiento sin el acto correspondiente → el plazo queda «cumplido tarde» o «vencido» con los días de atraso, se alerta al titular de Recursos Humanos y se asienta en el libro.
+[P] Si la empresa no es microempresa acreditada → se exige una capacitación anual especializada para Recursos Humanos y el comité, además de la capacitación al inicio de la relación laboral y la evaluación anual.
+#eve
+- `whistleblowing.case_received` (sin datos), `whistleblowing.deadline_approaching` (solo a asignados), `whistleblowing.case_closed` (sin datos).
+#evc
+- Ninguno de otros módulos (aislamiento deliberado).
+#int
+Ninguna integración saliente con contenido del caso.
+#bor
+- Denuncia contra un investigador o contra el administrador.
+- Denunciante que pierde su código.
+- Denuncia de un tercero externo (proveedor, postulante).
+- Denuncia manifiestamente ajena al canal: se cierra orientando al canal correcto.
+#acc
+- Una prueba automática confirma que ningún rol distinto de los asignados obtiene datos de un caso por ninguna ruta.
+- La denuncia anónima no deja rastro identificable en base de datos, logs ni auditoría.
+- El expediente de hostigamiento controla medidas de protección y plazos.
+
+@@ DIS | Casos disciplinarios | 7
+#obj
+Llevar los procesos disciplinarios con orden, derecho de defensa y confidencialidad, dejando un expediente completo.
+#alc
+- Caso: hechos, fecha, involucrados, tipo de falta, evidencias.
+- Etapas: registro, imputación (carta de preaviso), descargos del trabajador, evaluación, decisión, medida (amonestación verbal o escrita, suspensión, despido), notificación, seguimiento.
+- Plazos de descargo; documentos generados y firmados; historial de medidas por persona con vigencia de antecedentes.
+- Efectos: suspensión como ausencia sin goce; despido hacia offboarding.
+#fue
+- Investigación de denuncias (M-DEN). Asesoría legal.
+#act
+- RRHH y asesor legal conducen. Jefe informa los hechos. Trabajador presenta descargos. Administrador decide medidas graves.
+#flu
+**Caso.** 1) El jefe reporta o RRHH abre el caso. 2) Se documentan hechos y evidencias. 3) Se emite la imputación con plazo para descargos. 4) El trabajador presenta descargos desde el portal o por escrito. 5) RRHH evalúa y propone. 6) Quien tiene `dis.caso.decidir` decide. 7) Se notifica con documento firmado. 8) Se aplican efectos y se da seguimiento.
+#pan
+Casos disciplinarios :: Lista con persona, tipo, etapa, plazos (solo con permiso) :: Operaciones → Casos disciplinarios
+Expediente disciplinario :: Hechos, evidencias, imputación, descargos, decisión, documentos, seguimiento :: Operaciones → Casos disciplinarios → Expediente
+Presentar descargos :: Vista del trabajador con la imputación, plazo y formulario :: Portal → Pendientes → Descargos
+#dat
+Casos (`disciplinary_cases`), hechos, evidencias, imputaciones, descargos, decisiones, medidas, tipos de falta.
+#rn
+[F] Si se pretende aplicar una medida → debe existir imputación notificada y haberse cumplido el plazo de descargos o recibido los descargos.
+[P] Si se notifica la imputación → el plazo de descargos se calcula según el tipo de falta (parámetro del paquete de país, a confirmar con la norma vigente).
+[F] Si la medida es despido o suspensión → la decide una persona con `dis.caso.decidir` distinta de quien condujo el caso.
+[F] Si un usuario no tiene permiso disciplinario → no ve la existencia de casos ni medidas en la ficha, reportes ni búsquedas; el jefe solo ve lo que él reportó y la medida comunicada.
+[F] Si la medida es suspensión → crea una ausencia sin goce por los días decididos.
+[F] Si la medida es despido → inicia el offboarding con ese motivo.
+[P] Si una medida supera su vigencia como antecedente (parámetro de política) → deja de contarse para reincidencia y se marca histórica.
+[F] Si la IA resume el expediente → no propone la medida; solo ordena hechos y documentos.
+[F] Si el caso proviene de una denuncia → enlaza solo la conclusión necesaria, sin exponer la identidad del denunciante.
+#eve
+- `disciplinary.opened`, `disciplinary.charge_notified`, `disciplinary.defense_submitted`, `disciplinary.decided`, `disciplinary.closed`.
+#evc
+- `whistleblowing.case_closed` (solo si el investigador lo deriva), `attendance.absence_detected`.
+#bor
+- Trabajador que no recibe la notificación (medios alternativos con constancia).
+- Falta cometida por un dirigente sindical (protecciones del paquete de país).
+- Caso que termina sin medida (archivo).
+#acc
+- El expediente reúne incidentes, descargos, documentos, medidas y seguimiento con acceso restringido.
+
+@@ ACT | Activos, EPP y uniformes | 7
+#obj
+Saber qué tiene cada persona, en qué estado y cuándo debe devolverse o reponerse, incluidos los equipos de protección y uniformes.
+#alc
+- Inventario: laptop, celular, monitor, uniforme, tarjeta, equipo, licencia de software, otros; categorías, serie, valor, proveedor, garantía.
+- Estados disponible, asignado, mantenimiento, perdido, baja; historial completo.
+- Asignación con acta firmada, devolución con verificación de estado.
+- EPP y uniformes: tallas por persona, entregas firmadas, vida útil, vencimientos y reposición; kit por puesto.
+- Solicitudes de activo; mantenimiento; licencias con cupos.
+#fue
+- Compras. Gestión remota de dispositivos (integración).
+#act
+- Administración, TI o SST administran. Colaborador recibe, firma y devuelve. Manager solicita para su equipo.
+#flu
+**Asignación.** 1) Se elige un activo disponible y la persona. 2) Se genera el acta de entrega. 3) La persona firma. 4) El activo pasa a «Asignado». **Devolución.** 1) Se registra el estado al recibir. 2) Se firma el acta de devolución. 3) Vuelve a «Disponible» o va a «Mantenimiento» o «Baja».
+
+**Entrega de EPP.** 1) Según el kit del puesto y las tallas. 2) Se entrega con firma. 3) Se agenda la reposición por vida útil. 4) Alimenta el registro SST.
+#pan
+Activos :: Inventario con categoría, estado, asignado a, ubicación; crear, asignar :: Operaciones → Activos
+Detalle del activo :: Datos, historial de asignaciones, mantenimientos, documentos :: Operaciones → Activos → Activo
+EPP y uniformes :: Kits por puesto, tallas, entregas, vencimientos :: Operaciones → Activos → EPP
+Activos del colaborador :: Lo asignado y su historial :: Personas → Colaboradores → Ficha → pestaña Activos
+#dat
+Activos (`assets`), categorías, asignaciones, actas, mantenimientos, licencias, kits de EPP, tallas por persona, entregas de EPP.
+#rn
+[F] Si un activo no está «Disponible» → no puede asignarse.
+[F] Si un activo unitario está asignado → no admite una segunda asignación simultánea.
+[F] Si se asigna un activo → requiere acta firmada por quien recibe para quedar «Asignado».
+[F] Si la relación cesa con activos asignados → se crean las tareas de devolución en offboarding y la liquidación recibe la lista de pendientes.
+[F] Si un activo se da de baja o se marca perdido → exige motivo y conserva su historial.
+[P] Si un EPP alcanza su vida útil o fecha de vencimiento (parámetro por tipo) → se genera la tarea de reposición antes de vencer.
+[F] Si el puesto tiene kit de EPP → el ingreso o cambio a ese puesto crea la tarea de entrega.
+[P] Si las licencias asignadas igualan los cupos del software → no se asigna otra sin ampliar.
+#eve
+- `asset.created`, `asset.assigned`, `asset.returned`, `asset.sent_to_maintenance`, `asset.lost`, `asset.retired`, `ppe.delivered`, `ppe.expiring`.
+#evc
+- `employee.hired`, `employee.terminated`, `employment.assignment_changed`, `onboarding.started`.
+#int
+Gestión de dispositivos y de licencias por adaptador (M-INT).
+#bor
+- Activo compartido por un equipo.
+- Devolución con daño: registro y decisión de cobro según política.
+- Cambio de talla.
+#acc
+- Los activos recorren los cinco estados con historial completo y las entregas de EPP quedan firmadas.
+
+@@ GAS | Gastos, viáticos y reembolsos | 7
+#obj
+Controlar los gastos del personal de principio a fin, con políticas por puesto, anticipos de viáticos y rendición.
+#alc
+- Registro de gasto con comprobante (foto), categoría, monto, moneda, centro de costo, proyecto.
+- Informes de gastos; flujo empleado → manager → finanzas → aprobado → pagado.
+- Políticas por puesto, nivel y destino: topes por categoría, por día y por viaje; documentos exigidos.
+- Viáticos: solicitud de anticipo, entrega, rendición, devolución o reembolso del saldo.
+- Pago por planilla o por tesorería; contabilización.
+- Lectura de comprobantes por OCR como ayuda; detección de duplicados.
+#fue
+- Reserva de viajes. Tarjetas corporativas (integración futura).
+#act
+- Empleado registra y rinde. Manager aprueba. Finanzas revisa y paga. Auditor consulta.
+#flu
+**Reembolso.** 1) El colaborador registra gastos con comprobante. 2) Los agrupa en un informe y lo envía. 3) El sistema marca lo que excede la política. 4) El manager aprueba. 5) Finanzas revisa comprobantes y aprueba u observa. 6) Se paga por planilla (concepto no remunerativo) o por tesorería. 7) Se contabiliza.
+
+**Viático.** 1) Se solicita anticipo por viaje (destino, días, motivo). 2) Aprobación y entrega. 3) Al volver, se rinde con comprobantes. 4) Si gastó menos, devuelve; si gastó más y está aprobado, se reembolsa. 5) Rendición cerrada.
+#pan
+Gastos :: Informes por estado, persona, monto; filtros :: Operaciones → Gastos
+Mis gastos :: Gastos sueltos, informes, anticipos y rendiciones; registrar con foto :: Portal → Mis solicitudes → Gastos
+Revisión de finanzas :: Informe con comprobantes, excesos de política, observar o aprobar :: Operaciones → Gastos → Revisión
+Viáticos :: Anticipos entregados, pendientes de rendir, vencidos :: Operaciones → Gastos → Viáticos
+Políticas de gasto :: Categorías, topes por puesto y destino :: Configuración → Gastos
+#dat
+Gastos (`expense_items`), informes (`expense_reports`), comprobantes, categorías, políticas y topes, anticipos, rendiciones, pagos.
+#rn
+[F] Si un gasto no tiene comprobante y su categoría lo exige → no puede incluirse en un informe.
+[P] Si un gasto supera el tope de su categoría para el puesto o destino (parámetro de política) → se marca como exceso y requiere justificación y aprobación adicional, o se reembolsa solo hasta el tope según la política.
+[F] Si el mismo comprobante (emisor, número, monto) ya fue registrado → se advierte como posible duplicado y finanzas debe resolver.
+[P] Si un gasto se registra pasado el plazo máximo desde su fecha (parámetro) → requiere excepción.
+[P] Si un anticipo no se rinde dentro del plazo (parámetro) → se alerta y, según política, se bloquean nuevos anticipos.
+[F] Si la rendición es menor que el anticipo → se registra la devolución o el descuento autorizado por el trabajador.
+[F] Si el aprobador es quien registró el gasto → sube al siguiente nivel.
+[F] Si el gasto está en otra moneda → se convierte con el tipo de cambio de la fecha del gasto.
+[F] Si el pago va por planilla → entra como concepto no remunerativo del periodo abierto; si va por tesorería → en lote de pago propio.
+[F] Si el informe está «Pagado» → no se modifica.
+#eve
+- `expense.submitted`, `expense.approved`, `expense.rejected`, `expense.approved_for_payroll`, `expense.paid`, `travel_advance.granted`, `travel_advance.overdue`, `travel_advance.settled`.
+#evc
+- `approval.approved`, `payroll.closed`, `employee.terminated`.
+#int
+OCR, validación de comprobantes electrónicos, ERP (M-INT).
+#bor
+- Gasto compartido entre varias personas.
+- Cese con anticipo sin rendir: pasa a liquidación.
+- Comprobante a nombre de la persona y no de la empresa.
+#acc
+- El flujo empleado → manager → finanzas → aprobado → pagado funciona, con políticas por puesto y rendición de viáticos.
+
+@@ CUM | Cumplimiento Perú y SUNAFIL | 7
+#obj
+Mostrar en un solo tablero si cada empresa cumple sus obligaciones laborales, con responsable y evidencia, y preparar el expediente para una inspección.
+#alc
+- Catálogo de obligaciones del paquete de país con condición de aplicación (por número de trabajadores, actividad, régimen, sede).
+- Evaluación automática con datos del sistema y semáforo (cumple, por vencer, incumple, no aplica, sin datos); responsable, evidencia y plan.
+- Obligaciones iniciales: comité o supervisor SST, comité o delegado de hostigamiento, política salarial y cuadro de categorías, Vida Ley, SCTR, cuota de discapacidad, lactario, T-Registro al día, registros SST, registro de asistencia, contratos vigentes y sin desnaturalización, capacitaciones obligatorias, exámenes ocupacionales, boletas entregadas, depósitos de CTS, reglamentos.
+- Expediente de inspección exportable por trabajador y periodo: boletas, asistencia, contratos, SST, constancias.
+- Bandeja de casilla electrónica: requerimientos y notificaciones con responsable, plazo y respuesta.
+- Calendario de obligaciones.
+#fue
+- Asesoría legal y defensa en el procedimiento. Lectura automática de la casilla de la autoridad (integración futura).
+#act
+- Administrador y RRHH son responsables. Payroll, SST y legal aportan evidencia. Auditor consulta.
+#flu
+**Evaluación.** 1) Cada día el sistema evalúa las obligaciones aplicables a cada empresa. 2) Calcula el estado y la explicación («faltan 3 trabajadores en la póliza Vida Ley»). 3) Notifica cambios al responsable. 4) El responsable regulariza o adjunta evidencia.
+
+**Expediente de inspección.** 1) Se eligen empresa, trabajadores y periodo. 2) El sistema reúne boletas con constancia de entrega, registro de asistencia, contratos, documentos SST y constancias. 3) Lista los faltantes. 4) Genera el paquete con índice.
+
+**Requerimiento.** 1) Se registra la notificación recibida en la casilla con su fecha. 2) Se calcula el vencimiento. 3) Se asigna responsable. 4) Se prepara y adjunta la respuesta. 5) Se marca atendido con constancia.
+#pan
+Cumplimiento :: Semáforo por obligación y empresa, explicación, responsable, evidencia, vencimiento :: Cumplimiento → Tablero
+Detalle de obligación :: Regla aplicada, datos usados, historial de estado, evidencias, plan :: Cumplimiento → Tablero → Obligación
+Expediente de inspección :: Selección, contenido, faltantes, generar :: Cumplimiento → Expediente SUNAFIL
+Casilla electrónica :: Requerimientos con plazo, responsable y estado :: Cumplimiento → Casilla electrónica
+Calendario de obligaciones :: Vencimientos legales del mes y del año :: Cumplimiento → Calendario
+#dat
+Obligaciones (catálogo del paquete), evaluaciones por empresa y fecha, evidencias, planes, expedientes generados, requerimientos de la autoridad.  Libro inalterable de cumplimiento encadenado por huella (`compliance_ledger_entries`, `compliance_ledger_anchors`), plazos legales en curso (`compliance_deadlines`), comunicaciones a la autoridad (`authority_communications`) y exportaciones de expedientes con manifiesto (`evidence_exports`).
+#rn
+[F] Si una obligación depende de un umbral (número de trabajadores, mujeres en edad fértil por sede, promedio anual) → el sistema calcula el indicador con datos vigentes y aplica el umbral del parámetro.
+[F] Si el semáforo muestra un estado → incluye siempre la explicación con los datos y la regla que lo producen.
+[F] Si faltan datos para evaluar → el estado es «sin datos» con la lista de lo que falta; nunca «cumple» por omisión.
+[P] Si la empresa supera el umbral que obliga a la cuota de empleo de personas con discapacidad (umbral y porcentaje: parámetros a confirmar con la norma vigente) → se calcula la cuota sobre el promedio anual de trabajadores y se compara con las personas registradas con consentimiento.
+[P] Si una sede alcanza el número de mujeres en edad fértil que obliga a lactario (parámetro a confirmar con la norma vigente) → la obligación pasa a «aplica» y pide evidencia de implementación.
+[F] Si un trabajador activo no figura en la póliza Vida Ley → la obligación pasa a «incumple» desde el primer día de la relación.
+[P] Si se contrata o renueva la póliza Vida Ley → se registra y se alerta su registro ante la autoridad dentro de 30 días (valor de referencia 2026, parámetro con vigencia).
+[P] Si se registra un requerimiento de la casilla → el plazo corre desde la notificación aunque nadie la haya abierto; el sistema alerta según anticipación (parámetro).
+[F] Si se genera el expediente → cada documento incluido conserva su hash y el índice lista lo que falta por trabajador.
+[F] Si una evidencia manual tiene vigencia → al vencer, la obligación vuelve a «por vencer» o «incumple».
+[F] Si la obligación no aplica a la empresa (régimen, tamaño) → se muestra «no aplica» con la razón.
+[F] Si un proceso de cumplimiento asienta un acto → la fila del libro (`compliance_ledger_entries`) guarda la huella de la fila anterior de su cadena; la tabla es de solo inserción y no tiene columnas de IP ni de sesión.
+[F] Si la verificación de una cadena encuentra una fila que no cuadra → se abre un incidente de seguridad y el expediente solo se exporta con la advertencia de integridad.
+[F] Si se exporta un expediente → el paquete lleva un manifiesto con la huella de cada pieza y de cada asiento, y la exportación queda asentada en la misma cadena.
+[P] Si se registra una notificación de la casilla electrónica → se exige el instante del depósito; surte efectos ese día (o el primer día hábil siguiente si es inhábil) y el plazo que fija el documento corre desde el día hábil siguiente.
+[F] Si no se registra la revisión diaria de la casilla de una razón social → se alerta al responsable y, al segundo día hábil, al administrador.
+[P] Si una obligación debe comunicarse a la autoridad → se crea la comunicación con su plazo (parámetro) y solo se da por cumplida con el cargo de presentación adjunto.
+#eve
+- `compliance.status_changed`, `compliance.obligation_due`, `inspection_file.generated`, `authority_request.registered`, `authority_request.due`.
+#evc
+- `employee.hired`, `employee.terminated`, `contract.expired`, `sst.committee_expiring`, `payslip.published`, `benefit.cts_deposited`, `tregistro.pending`, `course.completed`, `parameter.changed`.
+#bor
+- Empresa que cruza un umbral a mitad de año.
+- Grupo con empresas de distinto tamaño y régimen.
+- Obligación nueva publicada en el paquete de país.
+#acc
+- Cada empresa ve sus obligaciones con semáforo, responsable y evidencia, y obtiene un expediente de inspección por trabajador y periodo.
+
+@@ PRI | Privacidad y retención | 7
+#obj
+Cumplir la normativa de datos personales: saber qué datos se tratan y para qué, atender los derechos de los titulares, conservar lo necesario y eliminar o anonimizar lo demás.
+#alc
+- Registro de tratamientos y bancos de datos; finalidades y bases legales por tipo de dato.
+- Consentimientos por finalidad (biometría, imagen, discapacidad, comunicaciones, candidatos) con versión, fecha y revocación.
+- Solicitudes de derechos del titular (acceso, rectificación, cancelación, oposición, portabilidad) con plazos y respuesta.
+- Políticas de retención, anonimización, eliminación y exportación por organización y jurisdicción; ejecución programada.
+- Registro de incidentes de seguridad con notificación.
+- Evaluaciones de impacto para biometría y perfilado con IA.
+- Transferencias internacionales y encargados de tratamiento; oficial de datos personales.
+- Registro de accesos y descargas de datos personales.
+#fue
+- Controles técnicos de seguridad (M-SEG, M-PLT). Asesoría legal.
+#act
+- Oficial de datos personales o Administrador. RRHH atiende solicitudes. Titulares (colaboradores, ex-colaboradores, candidatos) ejercen derechos.
+#flu
+**Solicitud de derechos.** 1) El titular la presenta desde el portal o un formulario público con verificación de identidad. 2) Se registra con su plazo. 3) RRHH reúne la información o ejecuta la acción. 4) Si hay obligación legal de conservar, se responde con el fundamento. 5) Se entrega la respuesta y se cierra.
+
+**Retención.** 1) Se definen plazos por categoría de dato y evento de inicio (cese, cierre de proceso). 2) Un proceso periódico lista lo que cumplió plazo. 3) El responsable revisa y aprueba. 4) Se anonimiza o elimina y queda acta.
+
+**Incidente.** 1) Se registra el incidente (qué, cuándo, datos y personas afectadas). 2) Se evalúa si corresponde notificar. 3) Se notifica dentro del plazo. 4) Se registran medidas y cierre.
+#pan
+Privacidad :: Tratamientos, bancos de datos, finalidades, encargados :: Configuración → Privacidad
+Consentimientos :: Textos y versiones; estado por persona :: Configuración → Privacidad → Consentimientos
+Solicitudes de derechos :: Bandeja con tipo, plazo, estado; responder :: Configuración → Privacidad → Solicitudes
+Retención :: Políticas por categoría; lotes pendientes de aprobar; actas :: Configuración → Privacidad → Retención
+Incidentes :: Registro con plazo de notificación :: Configuración → Privacidad → Incidentes
+Mis datos :: Consentimientos otorgados, descargar mis datos, presentar solicitud :: Portal → Mi perfil → Privacidad
+#dat
+Tratamientos, bancos de datos, finalidades, consentimientos (`consents`), solicitudes (`data_subject_requests`), políticas de retención, lotes y actas de anonimización, incidentes, evaluaciones de impacto, transferencias.
+#rn
+[F] Si un tratamiento requiere consentimiento (biometría, imagen, discapacidad, conservación de datos de candidato) → no se ejecuta sin consentimiento vigente y registrado con versión y fecha.
+[F] Si el titular revoca un consentimiento → el tratamiento se detiene desde ese momento y se ofrece la alternativa (otro método de marcación).
+[P] Si se registra una solicitud de derechos → se calcula su fecha límite según el tipo (plazos del paquete de país, a confirmar con la norma vigente) y se alerta antes de vencer.
+[F] Si se pide cancelar datos que la empresa debe conservar por obligación legal (planilla, asistencia, SST) → se rechaza esa parte con el fundamento y se atiende el resto.
+[P] Si se detecta un incidente de seguridad con datos personales → se crea la tarea de notificación con plazo de 48 horas (valor de referencia 2026, parámetro con vigencia).
+[P] Si un dato cumple su plazo de retención y no hay obligación ni litigio que lo impida → entra al lote de anonimización o eliminación, que exige aprobación antes de ejecutarse.
+[F] Si se anonimiza un registro → se conservan los agregados estadísticos y se elimina toda posibilidad de reidentificación; la acción es irreversible y deja acta.
+[F] Si se activa una función de biometría o de perfilado con IA → exige una evaluación de impacto registrada y aprobada.
+[F] Si los datos se alojan o transfieren fuera del país → debe existir el registro de la transferencia y sus garantías.
+[F] Si existe una retención legal por litigio o inspección sobre una persona → sus datos quedan excluidos de cualquier purga hasta levantarla.
+[F] Si el titular pide portabilidad o acceso → recibe sus datos en formato estructurado, sin datos de terceros.
+#eve
+- `privacy.consent_granted`, `privacy.consent_revoked`, `privacy.request_received`, `privacy.request_resolved`, `privacy.incident_registered`, `privacy.retention_batch_executed`.
+#evc
+- `employee.terminated`, `candidate.rejected`, `whistleblowing.case_closed`, `organization.cancelled`.
+#bor
+- Ex-colaborador que pide eliminar todo: se conserva lo exigido por ley.
+- Candidato que revoca durante un proceso activo.
+- Menor de edad en modalidad formativa: consentimiento del representante.
+#acc
+- Se gestionan consentimientos, accesos, descargas, solicitudes y anonimización con registro, y las políticas de retención se aplican por organización y jurisdicción.
+
+@@ SIN | Sindicatos y convenios | 7
+#obj
+Administrar la relación colectiva: afiliaciones, cuotas, licencias sindicales y cláusulas de convenio que afectan la planilla.
+#alc
+- Organizaciones sindicales, dirigentes y periodos; afiliación y desafiliación con autorización de descuento.
+- Cuota sindical como descuento de planilla y su pago al sindicato.
+- Licencias sindicales con cupo.
+- Convenios colectivos: vigencia, ámbito, cláusulas económicas como conceptos (bonos, asignaciones, incrementos) con población beneficiaria.
+- Pliegos y actas de negociación como expediente.
+#fue
+- Estrategia de negociación. Asesoría legal.
+#act
+- RRHH o relaciones laborales administra. Payroll aplica. Auditor consulta.
+#flu
+**Afiliación.** 1) Se registra la afiliación con la autorización de descuento. 2) Desde su vigencia, planilla descuenta la cuota. 3) Cada periodo se genera el pago al sindicato con el detalle.
+
+**Cláusula de convenio.** 1) Se registra el convenio con vigencia y ámbito. 2) Cada cláusula económica se crea como concepto con su población. 3) Planilla la aplica mientras el convenio esté vigente.
+#pan
+Sindicatos :: Organizaciones, dirigentes, afiliados (con permiso) :: Operaciones → Sindicatos
+Convenios :: Convenios con vigencia, ámbito y cláusulas; conceptos vinculados :: Operaciones → Sindicatos → Convenios
+Licencias sindicales :: Cupos, uso por dirigente :: Operaciones → Sindicatos → Licencias
+#dat
+Sindicatos, afiliaciones (dato sensible), dirigentes, convenios (`collective_agreements`), cláusulas, licencias sindicales.
+#rn
+[F] Si se descuenta cuota sindical → debe existir afiliación vigente con autorización del trabajador.
+[F] Si el trabajador se desafilia → el descuento cesa desde la fecha de vigencia de la desafiliación.
+[F] Si un usuario no tiene el permiso de afiliación → no ve quién está afiliado en ficha, reportes ni exportaciones; la boleta del titular sí muestra su descuento.
+[F] Si una cláusula de convenio define un beneficio económico → se aplica solo a la población de su ámbito y dentro de su vigencia.
+[P] Si un dirigente usa licencia sindical → se descuenta de su cupo (parámetro del convenio o de la norma, a confirmar); agotado, requiere autorización.
+[F] Si el convenio vence sin uno nuevo → la continuidad de sus cláusulas es una decisión registrada por RRHH, no automática.
+[F] Si la afiliación se usa en analítica → solo en agregados que cumplan el umbral de confidencialidad.
+#eve
+- `union.membership_started`, `union.membership_ended`, `collective_agreement.registered`, `collective_agreement.clause_added`, `collective_agreement.expiring`.
+#evc
+- `employee.terminated`, `payroll.closed`.
+#bor
+- Trabajador afiliado a dos sindicatos.
+- Convenio con efecto retroactivo: diferencias en planilla.
+- Dirigente con protección especial ante medidas disciplinarias.
+#acc
+- Afiliación, cuota, licencias y cláusulas de convenio operan conectadas con planilla y con acceso restringido.

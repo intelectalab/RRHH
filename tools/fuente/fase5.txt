@@ -1,0 +1,205 @@
+# LMS | 5 | aprendizaje | Aprendizaje y plan anual | Backend + Frontend | Cursos, lecciones, evaluaciones, certificados, asignaciones, seguimiento y plan anual de capacitación.
+
+@ 1 | H | BF | Cursos, categorías y lecciones
+D Crear cursos con categoría, descripción, duración declarada, lecciones ordenadas y estado de publicación. Los cursos pueden ser internos o de proveedor externo.
+- Un curso no publicado no es visible para los colaboradores
+- Las lecciones se reordenan arrastrando
+R 06; 04; §47; RN-LMS-01 a RN-LMS-09; P Aprendizaje → Cursos
+X PLT-7, UI-12
+
+@ 2 | H | BF | Contenidos de las lecciones
+D Soportar lecciones de video, PDF, texto enriquecido, enlace y paquete SCORM, con registro de avance por lección. Los contenidos se almacenan con el servicio de archivos.
+- El avance se guarda y el colaborador retoma donde quedó
+- Los videos se reproducen por transmisión protegida, sin enlace público
+R 06; §47; RN-LMS-01 a RN-LMS-09
+X LMS-1
+
+@ 3 | H | BF | Evaluaciones del curso
+D Crear evaluaciones con banco de preguntas, nota mínima, intentos permitidos y retroalimentación. El resultado de la evaluación determina si el curso se da por completado.
+- La nota mínima y los intentos son configurables por curso
+- Las preguntas se presentan en orden aleatorio
+R 06; §47; RN-LMS-01 a RN-LMS-09
+X LMS-2
+
+@ 4 | H | BF | Certificados
+D Emitir el certificado al completar el curso con plantilla, código de verificación y vigencia, y archivarlo en el legajo. El certificado se genera con el generador de documentos.
+- El certificado se verifica con su código
+- Un certificado con vigencia genera alerta antes de vencer
+R 06; §47; §20; RN-LMS-01 a RN-LMS-09
+X LMS-3, DOC-5
+
+@ 5 | H | BF | Asignación de cursos
+D Asignar cursos a una persona, equipo, puesto o empresa, con fecha límite y obligatoriedad, y mediante reglas automáticas al ingreso o al cambio de puesto. Las reglas usan el motor de automatizaciones.
+- Un nuevo ingreso recibe los cursos obligatorios de su puesto sin intervención
+- La asignación indica si el curso es obligatorio y su vencimiento
+R 06; §47; §103; §56; RN-LMS-01 a RN-LMS-09; P Aprendizaje → Cursos
+X LMS-1, WFL-5
+
+@ 6 | H | BF | Seguimiento del aprendizaje
+D Seguir cada inscripción por estado (no iniciado, en progreso, completado, vencido) con tableros por unidad y por curso, recordatorios y la tarjeta de cursos en el portal. El estado vencido se calcula con la fecha límite de la asignación.
+- Los cursos vencidos se listan por jefe y por unidad
+- El colaborador ve sus cursos y su avance en el inicio
+R 06; 05; §47; §108; §68; ME-28; RN-LMS-01 a RN-LMS-09; P Aprendizaje → Cursos
+X LMS-5, ESS-1
+
+@ 7 | H | BF | Plan anual de capacitación
+D Planificar por año los cursos, presupuesto, participantes, horas, proveedores y resultados esperados, con aprobación del plan. El plan parte de las brechas de competencias y de las capacitaciones obligatorias.
+- El plan asigna presupuesto por unidad y por curso
+- El plan aprobado genera las actividades de capacitación a ejecutar
+R 06; §48; RN-LMS-01 a RN-LMS-09; P Aprendizaje → Plan anual
+X LMS-5, WFL-2
+
+@ 8 | H | BF | Planificado frente a ejecutado
+D Comparar lo planificado con lo ejecutado en cursos, participantes, horas y presupuesto, y registrar la capacitación presencial o externa con lista de asistencia. El comparativo se actualiza con las inscripciones y los registros de ejecución.
+- El comparativo muestra la desviación por curso y por unidad
+- Una capacitación externa se registra con sus participantes y sustento
+R 06; §48; RN-LMS-01 a RN-LMS-09
+X LMS-7, LMS-6
+
+# CAR | 5 | desarrollo | Desarrollo, carrera, sucesión y 9-box | Backend + Frontend | Planes de desarrollo, rutas de carrera, sucesión de posiciones críticas y matriz 9-box.
+
+@ 1 | H | BF | Planes de desarrollo individual
+D Crear planes de desarrollo tras una evaluación: competencia, nivel actual, nivel objetivo y acciones (curso, mentoría, proyecto, seguimiento) con responsable y fechas. El plan se acuerda entre colaborador y jefe y queda con vigencia.
+- El plan parte de las brechas detectadas y permite agregar otras
+- El avance de las acciones se actualiza y se ve en la ficha
+R 06; §43; RN-CAR-01 a RN-CAR-09; P Talento → Desarrollo y sucesión → Planes de desarrollo
+X DES-6, CMP-4, LMS-5
+
+@ 2 | H | BF | Rutas de carrera
+D Definir rutas entre puestos (junior, semi sénior, sénior, líder, manager y rutas laterales) con los requisitos de cada paso. Las rutas se apoyan en los perfiles de competencias de cada puesto.
+- Una ruta enlaza puestos de catálogo y admite bifurcaciones
+- El colaborador ve las rutas posibles desde su puesto
+R 06; §44; RN-CAR-01 a RN-CAR-09; P Talento → Desarrollo y sucesión → Plan de carrera
+X CMP-2
+
+@ 3 | H | BF | Brechas frente al siguiente paso
+D Mostrar al colaborador y a su jefe las competencias requeridas por el puesto destino y la brecha frente a su nivel actual, con sugerencia de acciones. La vista no promete promociones: informa requisitos y brechas.
+- La brecha se calcula contra el perfil del puesto destino
+- Las acciones sugeridas pueden agregarse al plan de desarrollo
+R 06; §44; RN-CAR-01 a RN-CAR-09
+X CAR-2, CAR-1
+
+@ 4 | H | BF | Posiciones críticas y sucesores
+D Marcar posiciones críticas y proponer sucesores con nivel de preparación (preparado ahora, en un año, en dos años, en desarrollo) y riesgo de salida del titular. Cada sucesor se evalúa de forma individual y con comentario.
+- La sucesión se define sobre posiciones, no sobre puestos de catálogo
+- La lista de sucesores es confidencial y exige permiso propio
+R 06; §45; C-02; RN-CAR-01 a RN-CAR-09; P Talento → Desarrollo y sucesión
+X POS-1, CAR-1
+
+@ 5 | H | BF | Matriz de sucesión
+D Mostrar la matriz de sucesión por unidad con cobertura de cada posición crítica y las posiciones sin sucesor. La matriz se arma con las posiciones críticas y sus sucesores vigentes.
+- Las posiciones críticas sin sucesor preparado se resaltan
+- La matriz se exporta para el comité de talento
+R 06; §45; RN-CAR-01 a RN-CAR-09
+X CAR-4
+
+@ 6 | H | BF | Matriz 9-box
+D Ubicar a las personas en la matriz de desempeño por potencial, con el desempeño tomado de la última evaluación y el potencial valorado por el jefe con criterios definidos, y permitir análisis por unidad. La valoración de potencial usa un cuestionario configurable.
+- La matriz no dispara ninguna acción automática sobre las personas
+- Cada ubicación guarda quién la valoró y con qué criterios
+- La pantalla recuerda que la matriz es insumo de análisis, no una decisión
+R 06; §46; C-08; RN-CAR-01 a RN-CAR-09; P Talento → Desarrollo y sucesión → Matriz 9-box
+X DES-6
+
+@ 7 | H | BF | Sesión de revisión de talento
+D Preparar la sesión de revisión de talento por unidad con 9-box, sucesión y planes de desarrollo, y registrar los acuerdos como acciones con responsable. La sesión conserva una foto de los datos tal como estaban al realizarse.
+- Los acuerdos de la sesión generan tareas con seguimiento
+- La información de la sesión solo la ven los participantes autorizados
+R 06; §45; §46; RN-CAR-01 a RN-CAR-09
+X CAR-5, CAR-6, WFL-8
+
+# COM | 5 | compensaciones | Compensaciones, bandas, revisión salarial e igualdad salarial | Backend + Frontend | Estructura de compensación, bandas, campañas de revisión con presupuesto e igualdad salarial.
+
+@ 1 | H | BF | Estructura de compensación
+D Presentar la compensación total de cada colaborador (sueldo base, variable, bonos, comisiones y beneficios) a partir de la fuente única, con historial y comparación en el tiempo. Es una vista de consulta para RRHH y, si la política lo permite, para el propio colaborador.
+- La pantalla no guarda otra copia del sueldo: lee la compensación con vigencia
+- El total anual se calcula con los conceptos de planilla
+R 06; §33; C-11; RN-COM-01 a RN-COM-12; P Personas → Ficha del colaborador → Compensación
+X HIS-3, PER-8
+
+@ 2 | H | BF | Bandas salariales
+D Definir bandas por nivel o familia de puestos con mínimo, medio y máximo, moneda y vigencia. Las bandas admiten variantes por sede o por país.
+- Una banda se asocia a puestos o niveles
+- Las bandas se actualizan con fecha efectiva
+R 06; 04; §33; RN-COM-01 a RN-COM-12; P Compensación → Bandas salariales
+X ORG-5, CFG-7
+
+@ 3 | H | BF | Posición del trabajador en la banda
+D Calcular la posición de cada trabajador dentro de su banda y listar quiénes están por debajo del mínimo o por encima del máximo. El cálculo usa la compensación vigente convertida a la moneda de la banda.
+- La posición en banda se ve en la ficha con el permiso de sueldos
+- El listado de casos fuera de banda se filtra por unidad
+R 06; §33; RN-COM-01 a RN-COM-12
+X COM-2, COM-1
+
+@ 4 | H | BF | Campañas de revisión salarial
+D Crear campañas de revisión con población, criterios y flujo: el manager propone, RRHH revisa, Finanzas aprueba y Dirección aprueba. La campaña usa el motor de aprobaciones con etapas propias.
+- El manager propone aumentos para su equipo viendo desempeño y posición en banda
+- Cada propuesta recorre las etapas con comentarios
+R 06; 05; §34; §56; ME-29; RN-COM-01 a RN-COM-12; P Compensación → Revisión salarial
+X COM-3, WFL-2, DES-6
+
+@ 5 | H | BF | Control de presupuesto de la campaña
+D Asignar presupuesto por unidad y controlar en tiempo real lo propuesto frente a lo disponible, con guías de aumento por desempeño y posición en banda. Las guías son matrices configurables por campaña.
+- Una propuesta que excede el presupuesto de la unidad se señala y requiere justificación
+- El consumo del presupuesto se ve por unidad y total
+R 06; §34; RN-COM-01 a RN-COM-12
+X COM-4
+
+@ 6 | T | B | Aplicación de los aumentos aprobados
+D Al cerrar la campaña, registrar los aumentos aprobados como nuevos registros de compensación con fecha efectiva, generar las adendas y las cartas de comunicación. La aplicación se ejecuta como una acción explícita de RRHH tras la última aprobación.
+- Ningún sueldo cambia sin la aprobación final de una persona
+- Cada aumento queda en la historia con la campaña como motivo
+R 06; §34; C-03; C-08; RN-COM-01 a RN-COM-12
+X COM-5, HIS-3, CON-3
+
+@ 7 | H | BF | Cuadro de categorías y política salarial
+D Elaborar el cuadro de categorías y funciones (categoría, puestos, funciones, responsabilidad, requisitos), registrar la política salarial y dejar evidencia de su comunicación al ingreso, al cambio de puesto y al cambio de remuneración. El cuadro se construye a partir del catálogo de puestos.
+- Todo puesto pertenece a una categoría del cuadro
+- La comunicación de la política queda firmada por el trabajador
+- El cuadro se exporta en el formato para inspección
+R 06; 14; E-05; RN-COM-01 a RN-COM-12; P Compensación → Igualdad salarial
+X COM-2, DOC-6
+
+@ 8 | H | BF | Reporte de brecha salarial
+D Reportar la brecha por categoría y sexo, con los criterios objetivos que explican diferencias (experiencia, formación, antigüedad, desempeño) y registro de justificaciones y planes de corrección. El reporte se guarda por fecha de corte para comparar su evolución.
+- La brecha se calcula por categoría del cuadro
+- Los grupos pequeños se agregan para no exponer sueldos individuales
+R 06; 14; E-05; RN-COM-01 a RN-COM-12
+X COM-7, COM-3
+
+# BNF | 5 | compensaciones | Beneficios | Backend + Frontend | Catálogo de beneficios con elegibilidad, inscripción y consulta por el colaborador.
+
+@ 1 | H | BF | Catálogo de beneficios
+D Administrar beneficios (seguro, alimentación, movilidad, educación, descuentos, bienestar y otros) con proveedor, costo para la empresa y para el trabajador, y vigencia. El catálogo se define por empresa.
+- Un beneficio puede tener planes o niveles
+- El costo para la empresa exige permiso para verse
+R 06; 04; §35; RN-BNF-01 a RN-BNF-06; P Compensación → Beneficios
+X CFG-7
+
+@ 2 | H | BF | Reglas de elegibilidad
+D Definir quién accede a cada beneficio por empresa, sede, puesto, nivel, antigüedad o tipo de trabajador. Las reglas se evalúan de forma automática al cambiar los datos del colaborador.
+- La elegibilidad se evalúa con los datos vigentes de la ficha
+- Un cambio de puesto actualiza los beneficios disponibles
+R 06; §35; RN-BNF-01 a RN-BNF-06
+X BNF-1, HIS-6
+
+@ 3 | H | BF | Inscripción y dependientes
+D Permitir la inscripción del colaborador a los beneficios elegibles, con dependientes tomados de sus derechohabientes y aprobación cuando corresponda. La inscripción puede tener ventanas de apertura y cierre.
+- El colaborador solo puede inscribirse en lo que le corresponde
+- Los dependientes se eligen de los derechohabientes registrados
+R 06; §35; RN-BNF-01 a RN-BNF-06
+X BNF-2, COL-6
+
+@ 4 | H | BF | Mis beneficios
+D Mostrar al colaborador sus beneficios vigentes, los disponibles y cómo usarlos, en el portal y en la pestaña de beneficios de la ficha. La vista distingue beneficios legales de beneficios otorgados por la empresa.
+- El colaborador consulta sus beneficios desde el móvil
+- Se muestra el valor del beneficio cuando la política lo permite
+R 06; §35; §8; §6; RN-BNF-01 a RN-BNF-06
+X BNF-3, ESS-1
+
+@ 5 | T | B | Beneficios con efecto en planilla
+D Generar las incidencias de planilla de los beneficios con descuento o aporte, y reportar el costo total de beneficios. Las incidencias llegan al periodo abierto con su origen identificado.
+- Un beneficio con copago genera su descuento en el periodo
+- El costo de beneficios se reporta por unidad
+R 06; §35; C-11; RN-BNF-01 a RN-BNF-06
+X BNF-3, PER-2

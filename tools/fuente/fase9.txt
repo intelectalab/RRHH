@@ -1,0 +1,347 @@
+# API | 9 | ecosistema | API pública, webhooks y MCP | Backend | API pública versionada con tokens y scopes, webhooks firmados y servidor MCP para asistentes externos.
+
+@ 1 | H | BF | API pública con tokens y scopes
+D Publicar la API `/api/v1` para terceros (colaboradores, asistencia, ausencias, reclutamiento y demás recursos) con tokens por organización, scopes por recurso y acción, vencimiento y revocación. Los tokens se administran desde la configuración de la organización.
+- Un token solo accede a los recursos de sus scopes y de su organización
+- Los tokens se muestran una sola vez y se pueden revocar
+- La API pública usa los mismos servicios y validaciones que la aplicación
+R 06; 08; §73; §117; E-22; RN-API-01 a RN-API-09; P Configuración → Integraciones y API → Tokens de API
+X PLT-5, SEG-8, SAS-5
+
+@ 2 | H | BF | Portal de desarrolladores
+D Publicar la documentación de la API con referencia navegable, guías, ejemplos, registro de cambios y entorno de pruebas con datos demo. El portal es público y no requiere cuenta para leer la documentación.
+- La referencia se genera desde el contrato OpenAPI
+- El entorno de pruebas no toca datos reales
+R 06; 08; §73; E-22; RN-API-01 a RN-API-09
+X API-1
+
+@ 3 | T | B | Límites de uso y versionado
+D Aplicar límites de uso por token y por plan, medir el consumo y definir la política de versionado y retiro de versiones. Las versiones retiradas se anuncian con anticipación en el registro de cambios.
+- Superar el límite responde 429 con el tiempo de espera
+- El consumo de API por organización se ve en la consola SaaS
+R 06; 08; §73; §111; RN-API-01 a RN-API-09
+X API-1, SAS-6
+
+@ 4 | H | BF | Webhooks
+D Permitir suscribir direcciones a eventos (`employee.created`, `employee.updated`, `employee.terminated`, `leave.approved`, `payroll.closed`, `candidate.hired`) con firma del mensaje, reintentos y registro de entregas. Los eventos salen del outbox y llevan identificador para deduplicar.
+- Cada entrega va firmada y el receptor puede verificarla
+- Una entrega fallida se reintenta con espera creciente y queda en el registro
+- El administrador reenvía una entrega desde el registro
+R 06; 08; §74; §103; RN-API-01 a RN-API-09; P Configuración → Integraciones y API → Tokens de API
+X API-1, PLT-6
+
+@ 5 | T | B | Servidor MCP
+D Publicar un servidor MCP que expone a asistentes de IA externos herramientas de consulta y acciones de bajo impacto, autenticado con el usuario y limitado por sus permisos. La conexión se autoriza con un flujo de consentimiento del usuario.
+- Un asistente externo consulta datos con los permisos del usuario que lo conecta
+- Las herramientas no incluyen acciones de alto impacto
+- Cada llamada queda en el registro de uso de IA
+R 06; 08; E-22; C-08; RN-API-01 a RN-API-09
+X API-1, IAR-2, IAR-8
+
+# INT | 9 | ecosistema | Integraciones | Backend + Frontend | Marco de conectores desacoplados para ERP, bancos, biométricos, SSO, calendario y otros.
+
+@ 1 | H | BF | Marco y catálogo de integraciones
+D Construir el catálogo de integraciones por organización con activación, credenciales cifradas, estado, registro de sincronizaciones y errores, sobre el patrón de adaptadores. Cada conector declara qué datos lee y escribe.
+- Activar una integración no requiere desplegar
+- Cada sincronización muestra resultado y errores
+- El núcleo no depende de ningún proveedor concreto
+R 06; 02; §75; RN-INT-01 a RN-INT-08; P Configuración → Integraciones y API → Conectores
+X PLT-13, SEG-11
+
+@ 2 | H | BF | Conector contable y de ERP
+D Enviar asientos de planilla y gastos, y sincronizar centros de costo y plan de cuentas con sistemas contables por archivo y por API. El mapeo de cuentas se configura por empresa.
+- El asiento exportado se marca con el identificador del sistema destino
+- Un rechazo del ERP se muestra con su motivo
+R 06; §75; E-03; RN-INT-01 a RN-INT-08
+X INT-1, PRV-3
+
+@ 3 | H | BF | Conectores bancarios
+D Integrar el envío de lotes de pago y la lectura de resultados con bancos que ofrecen conexión directa, manteniendo el archivo como alternativa. Las credenciales bancarias se guardan cifradas y su uso exige doble aprobación.
+- El resultado del banco concilia el lote pago por pago
+- Sin conexión directa, el flujo por archivo sigue funcionando
+R 06; §75; §28; RN-INT-01 a RN-INT-08
+X INT-1, DEC-5
+
+@ 4 | H | BF | Conectores de relojes biométricos
+D Entregar conectores para los fabricantes de relojes más usados sobre la interfaz abierta de marcaciones, con sincronización de trabajadores hacia el reloj. Los conectores se construyen como adaptadores del marco de integraciones.
+- Un reloj compatible se conecta desde la configuración sin programar
+- El estado de cada reloj es visible
+R 06; §75; E-07; RN-INT-01 a RN-INT-08
+X INT-1, ASI-7
+
+@ 5 | H | BF | Inicio de sesión único (SSO)
+D Soportar SSO por SAML y OpenID Connect por organización, con aprovisionamiento de usuarios y convivencia con el ingreso por documento. La asignación de roles puede mapearse desde los grupos del proveedor de identidad.
+- La organización obliga SSO a ciertos dominios y mantiene el ingreso con documento para el personal operativo
+- La baja en el proveedor de identidad desactiva al usuario
+R 06; 07; §75; §60; RN-INT-01 a RN-INT-08
+X INT-1, SEG-6
+
+@ 6 | H | BF | Calendario y correo
+D Sincronizar entrevistas, reuniones 1:1, capacitaciones y ausencias con los calendarios corporativos, y permitir el envío de correo desde el dominio del cliente. La sincronización es opcional por usuario y por organización.
+- Una entrevista programada aparece en el calendario de los entrevistadores
+- Una ausencia aprobada puede bloquear el calendario del colaborador
+R 06; §75; §78; RN-INT-01 a RN-INT-08
+X INT-1, ENT-1, FBK-1
+
+@ 7 | H | BF | Conectores de selección y aprendizaje externos
+D Integrar bolsas de empleo, evaluaciones psicométricas y verificación de antecedentes en el reclutamiento, y catálogos de cursos externos en el aprendizaje. Cada conector sigue el patrón de adaptador con implementación falsa.
+- El resultado de una evaluación externa llega a la ficha del candidato
+- Un curso externo completado actualiza la inscripción
+R 06; §75; RN-INT-01 a RN-INT-08
+X INT-1, ATS-6, LMS-6
+
+# WHA | 9 | ecosistema | Autoservicio por WhatsApp | Backend | Canal de WhatsApp para boletas, vacaciones, constancias y marcación, sobre la capa de mensajería.
+
+@ 1 | T | B | Vinculación de identidad y sesión en WhatsApp
+D Vincular el número de celular con el usuario mediante verificación con documento y OTP, y mantener sesiones cortas con reverificación para operaciones sensibles. El canal se apoya en la capa de mensajería de la plataforma.
+- Un número no vinculado no obtiene ningún dato
+- Las operaciones sensibles piden un código adicional
+- El colaborador desvincula su número desde el portal
+R 06; 02; E-11; C-09; §86; RN-WHA-01 a RN-WHA-07
+X NOT-5, SEG-2
+
+@ 2 | H | B | Menú conversacional y consultas
+D Construir el menú conversacional con opciones guiadas para consultar saldo de vacaciones, horario, pendientes y estado de solicitudes. Las plantillas de mensaje se gestionan y aprueban por organización.
+- Las respuestas usan los mismos servicios y permisos que el portal
+- El menú funciona sin IA, con opciones numeradas
+R 06; E-11; §85; RN-WHA-01 a RN-WHA-07
+X WHA-1, VAC-2
+
+@ 3 | H | B | Boletas y constancias por WhatsApp
+D Entregar boletas y constancias por enlace seguro de un solo uso tras reverificación, sin enviar el archivo en el chat. El enlace abre el documento en el portal con una sesión limitada.
+- El documento se abre con un enlace que caduca
+- La entrega queda registrada como acceso del trabajador
+R 06; E-11; §31; RN-WHA-01 a RN-WHA-07
+X WHA-2, BOL-2, ESS-4
+
+@ 4 | H | B | Solicitud de vacaciones por WhatsApp
+D Permitir solicitar vacaciones en la conversación y que el jefe apruebe o rechace desde WhatsApp. Los mensajes muestran saldo y fechas antes de confirmar.
+- La solicitud sigue el mismo flujo de aprobación que en el portal
+- El jefe aprueba respondiendo a la notificación
+R 06; E-11; §25; RN-WHA-01 a RN-WHA-07
+X WHA-2, VAC-3
+
+@ 5 | H | B | Marcación por WhatsApp
+D Permitir marcar asistencia enviando la ubicación en la conversación, con las mismas validaciones de geocerca y política. La organización decide si habilita este medio de marcación.
+- La marca queda con medio «WhatsApp» y su ubicación
+- Una ubicación fuera de la geocerca se registra como observada
+R 06; E-11; E-07; RN-WHA-01 a RN-WHA-07
+X WHA-2, ASI-3
+
+# PAI | 9 | ecosistema | Paquetes de país | Backend | Estructura de paquetes de país para extender el producto a Latinoamérica sin tocar el núcleo.
+
+@ 1 | T | B | Contrato del paquete de país
+D Formalizar lo que aporta un paquete de país: parámetros, conceptos, regímenes, tipos de contrato y de ausencia, feriados, documentos, declaraciones, validaciones de identidad y obligaciones de cumplimiento, con su mecanismo de instalación y versionado. El contrato se documenta para que un equipo pueda construir un paquete nuevo.
+- Un paquete se instala y actualiza sin modificar el núcleo
+- El paquete declara su versión y la norma de cada regla
+R 06; 02; §82; C-05; RN-PAI-01 a RN-PAI-06
+X NOM-1, CUM-1
+
+@ 2 | T | B | Conformidad del paquete Perú
+D Verificar que toda la lógica peruana construida en las fases anteriores vive dentro del paquete Perú y mover lo que haya quedado en el núcleo. El resultado es un paquete Perú instalable y versionado.
+- Una prueba de arquitectura confirma que el núcleo no referencia normas ni conceptos peruanos
+- El paquete Perú pasa las pruebas doradas de planilla
+R 06; 14; §82; §28; RN-PAI-01 a RN-PAI-06
+X PAI-1
+
+@ 3 | T | B | Paquete de un segundo país como prueba
+D Construir el esqueleto de un segundo paquete de país (documentos de identidad, feriados, moneda, tipos de contrato, un régimen y conceptos básicos) para probar que la arquitectura lo soporta. El país de la prueba lo define el negocio.
+- Una empresa del segundo país opera Core HR y tiempo con su paquete
+- Las brechas del núcleo detectadas quedan documentadas y resueltas
+R 06; §82; §81; RN-PAI-01 a RN-PAI-06
+X PAI-2
+
+@ 4 | H | BF | Grupos con empresas en varios países
+D Permitir que una organización tenga empresas en distintos países, cada una con su paquete, y consolidar dotación y costo en una moneda de reporte. Los reportes de grupo se arman sobre la capa analítica.
+- Cada empresa calcula con el paquete de su país
+- El consolidado indica moneda y tipo de cambio
+R 06; §82; §81; §1; RN-PAI-01 a RN-PAI-06
+X PAI-3, CFG-7
+
+# WLB | 9 | ecosistema | Marca blanca | Backend + Frontend | Personalización de marca por organización según plan.
+
+@ 1 | H | BF | Marca de la organización
+D Permitir configurar logo, nombre visible, color principal y favicon, aplicados al armazón, al ingreso, a los documentos y al portal de empleos, en tema claro y oscuro. La marca se configura por organización y puede variar por empresa.
+- El color elegido se valida para mantener el contraste
+- La marca se aplica sin desplegar
+R 06; §83; RN-WLB-01 a RN-WLB-05; P Configuración → Centro de configuración → Marca de la organización
+X UI-1, SAS-5
+
+@ 2 | H | BF | Dominio personalizado
+D Permitir usar un dominio propio para la aplicación y el portal de empleos, con verificación de propiedad y certificado automático. La configuración guía al cliente con los registros de DNS requeridos.
+- El dominio se activa tras verificar su propiedad
+- El dominio anterior sigue funcionando y redirige
+R 06; §83; RN-WLB-01 a RN-WLB-05
+X WLB-1
+
+@ 3 | H | BF | Correos con la marca del cliente
+D Personalizar remitente, dominio de envío verificado y plantillas de correo con la marca. La verificación del dominio de envío se guía paso a paso.
+- Los correos salen del dominio del cliente cuando está verificado
+- Las plantillas muestran logo y colores de la organización
+R 06; §83; §86; RN-WLB-01 a RN-WLB-05
+X WLB-1, NOT-3
+
+@ 4 | T | B | Marca blanca según plan
+D Controlar cada nivel de personalización (marca, dominio, correos, retiro de la marca del producto) como funcionalidad del plan. El control usa el mecanismo de módulos y funcionalidades de la suscripción.
+- Una organización sin el nivel contratado no ve las opciones
+- Al bajar de plan, la personalización no incluida se desactiva sin perder su configuración
+R 06; §83; §3; RN-WLB-01 a RN-WLB-05
+X WLB-1, SAS-3
+
+# EST | 9 | ecosistema | Modo estudio contable | Backend + Frontend | Consola de socio para que un estudio contable administre las planillas de muchas empresas pequeñas.
+
+@ 1 | H | BF | Consola de socio
+D Crear la cuenta de tipo estudio con su consola: lista de empresas cliente, estado de cada una y cambio rápido entre ellas, sin mezclar datos. El estudio tiene sus propios usuarios y roles internos.
+- El estudio ve solo las organizaciones que lo autorizaron
+- Cada organización cliente sigue aislada de las demás
+R 06; 02; E-24; RN-EST-01 a RN-EST-07; P Consola de la plataforma → Socios
+X TEN-1, SEG-10
+
+@ 2 | H | BF | Alta de empresas cliente y delegación
+D Permitir que el estudio cree organizaciones cliente con las plantillas peruanas, o que una empresa existente le delegue acceso con un rol y alcance definidos, revocable. La relación entre estudio y empresa queda registrada con su vigencia.
+- La delegación la otorga y la revoca el administrador de la empresa
+- Las acciones del estudio quedan en la auditoría de la empresa identificadas como tales
+R 06; E-24; E-27; RN-EST-01 a RN-EST-07
+X EST-1, IMP-4
+
+@ 3 | H | BF | Procesos de planilla en lote
+D Permitir al estudio ver y avanzar en una sola pantalla el proceso de planilla de todas sus empresas: periodo, cálculo, cierre y archivos de declaración. Cada planilla se procesa dentro del contexto de su propia organización.
+- La pantalla muestra en qué estado está la planilla de cada empresa
+- Los archivos de declaración de varias empresas se generan en lote
+R 06; E-24; RN-EST-01 a RN-EST-07
+X EST-2, PER-8, DEC-2
+
+@ 4 | H | BF | Tablero de obligaciones por cliente
+D Mostrar al estudio el calendario de vencimientos y el semáforo de cumplimiento de todas sus empresas. El tablero se nutre del cumplimiento y de la bitácora de declaraciones de cada empresa.
+- El tablero ordena por vencimiento más próximo
+- Cada elemento lleva a la empresa y la obligación
+R 06; E-24; E-01; RN-EST-01 a RN-EST-07
+X EST-2, CUM-3
+
+@ 5 | H | BF | Portal de la empresa cliente
+D Dar a la empresa cliente del estudio un acceso simple para enviar novedades del periodo, aprobar la planilla y descargar boletas y reportes. El portal usa un rol predefinido de cliente de estudio.
+- La empresa cliente envía sus incidencias sin operar la planilla
+- La aprobación de la empresa queda registrada antes del cierre
+R 06; E-24; RN-EST-01 a RN-EST-07
+X EST-3
+
+# QA | T | calidad | Calidad, seguridad y salida a producción | Calidad | Pruebas de extremo a extremo por fase, pruebas doradas de planilla, rendimiento, seguridad, protección de datos, migración, ayuda y salida a producción.
+
+@ 1 | T | Q | Estrategia de pruebas y definición de hecho
+D Definir la pirámide de pruebas (unitarias, de API, de contrato, de extremo a extremo), los datos de prueba, los entornos y la definición de «hecho» que aplica a cada actividad del backlog, incluida la revisión de que ningún botón queda sin función y de que los cambios persisten. La estrategia se publica en el repositorio.
+- La definición de hecho está publicada y la aplican todas las solicitudes de cambio
+- Existe un conjunto de datos de prueba reproducible por fase
+R 02; §121; §114; §115
+X PLT-3, PLT-14
+
+@ 2 | T | Q | Recorrido de extremo a extremo de cimientos y Core HR
+D Automatizar el recorrido: crear organización desde la consola, ingresar con correo y con documento, configurar estructura, dar de alta un colaborador, registrar un movimiento, generar y firmar un documento y verificar auditoría, permisos por campo y alcance. El recorrido usa la organización demo como datos de base.
+- El recorrido corre en la integración continua contra un entorno limpio
+- Verifica que un rol sin permiso de sueldos no los ve en pantalla, API ni exportación
+R §120; §114
+X QA-1, IMP-5, DOC-7, SAS-5, MSS-3
+
+@ 3 | T | Q | Recorrido de extremo a extremo de tiempo
+D Automatizar el recorrido: asignar horario, marcar por web y móvil, corregir una marca, solicitar y aprobar vacaciones y una ausencia, autorizar horas extra y verificar saldos, calendario y cálculo diario. El recorrido cubre también la marcación de kiosko y la bolsa de horas.
+- Aprobar vacaciones actualiza solicitud, saldo, calendario, tablero y actividad
+- La corrección de una marca conserva el registro original
+R §115
+X QA-2, VAC-3, ASI-9, BHO-4, TSH-3
+
+@ 4 | T | Q | Recorrido de extremo a extremo de nómina
+D Automatizar el recorrido de un periodo completo: incidencias, cálculo, simulación, aprobación, cierre, boletas, pago, archivos de declaración, provisiones y asiento, más una liquidación por cese. El recorrido verifica las constancias de entrega de boletas.
+- Los totales de boletas, archivos y asiento coinciden entre sí
+- Un periodo cerrado no admite cambios
+R §27; §115
+X QA-3, DEC-7, PRV-2, LIQ-4, BOL-2
+
+@ 5 | T | Q | Pruebas doradas de planilla validadas por especialista laboral
+D Construir un conjunto de casos de planilla con resultado esperado, calculado y firmado por un especialista laboral peruano: regímenes, AFP y ONP, quinta, gratificación, CTS, utilidades, horas extra, subsidios, ingresos y ceses a mitad de periodo, retroactivos y liquidaciones. El conjunto se ejecuta en cada cambio del motor o de los parámetros.
+- Cada caso tiene entradas, resultado esperado y la validación del especialista registrada
+- La integración continua falla si un caso difiere en un céntimo
+- Cada cambio normativo agrega o actualiza casos
+R 14; 06; §28; C-05
+X QA-4, BSO-3, PER-9, LOC-3, NOM-7
+
+@ 6 | T | Q | Recorrido de extremo a extremo de talento, desarrollo y compensación
+D Automatizar el recorrido: vacante, postulación en el portal, entrevistas, oferta, contratación, pre-onboarding y onboarding, evaluación de desempeño, plan de desarrollo, curso con certificado, revisión salarial y salida. El recorrido se ejecuta en la integración continua.
+- El recorrido cubre de la vacante al offboarding con los datos demo
+- La contratación no duplica personas y ocupa la posición
+R §113; §124
+X QA-2, OFF-5, CAR-7, COM-6, LMS-8
+
+@ 7 | T | Q | Recorrido de extremo a extremo de experiencia, operación y cumplimiento
+D Automatizar los recorridos de encuesta anónima con umbral, ticket con SLA, comunicado con lectura, denuncia anónima con código, caso disciplinario, entrega de EPP, gasto con rendición y tablero de cumplimiento con expediente de inspección. Cada recorrido verifica también permisos y alcance.
+- La prueba confirma que una denuncia anónima no deja rastro técnico del denunciante
+- La prueba confirma que un segmento bajo el umbral no muestra resultados
+R C-06; §114
+X QA-2, ENC-7, HSD-7, DEN-7, CUM-7
+
+@ 8 | T | Q | Recorrido de extremo a extremo de inteligencia y ecosistema
+D Automatizar los recorridos de tablero, constructor de reportes, alerta con explicación, consulta de IA con permisos, token de API, webhook, MCP, WhatsApp y modo estudio. Los recorridos usan las implementaciones falsas de los proveedores externos.
+- Un rol sin permiso no obtiene sueldos por reportes, IA, API ni MCP
+- Los webhooks de los eventos del catálogo se entregan firmados
+R C-08; E-22; §114
+X QA-2, IAR-8, API-5, WHA-5, EST-5
+
+@ 9 | T | Q | Pruebas de concurrencia
+D Probar las operaciones con riesgo de carrera: aprobaciones simultáneas, doble envío, cierre de periodo durante el cálculo, marcaciones duplicadas, consumo de saldos y ocupación de una misma posición. Las pruebas se ejecutan con peticiones en paralelo contra un entorno real.
+- Dos aprobaciones simultáneas de la misma solicitud producen un solo efecto
+- Dos altas simultáneas sobre la misma posición vacante dejan una sola ocupación
+- Los saldos nunca quedan negativos por concurrencia
+R 02; 05
+X QA-3, PER-8, WFL-2
+
+@ 10 | T | Q | Accesibilidad
+D Auditar la aplicación contra WCAG 2.2 nivel AA con pruebas automáticas en la integración continua y revisión manual con lector de pantalla y teclado en los recorridos principales. La auditoría cubre el tema claro y el oscuro.
+- Las pruebas automáticas de accesibilidad corren en cada cambio de interfaz
+- Los recorridos del colaborador se completan solo con teclado y con lector de pantalla
+- Los hallazgos graves se corrigen antes de la salida
+R §96; §84
+X QA-2, UI-9
+
+@ 11 | T | Q | Pruebas de carga con 50 000 colaboradores
+D Generar una organización de 50 000 colaboradores con historia y probar listados, búsqueda, cálculo de planilla, generación de boletas, cálculo de asistencia, tableros y exportaciones, además de la carga simultánea de muchas organizaciones. Las pruebas se ejecutan en un entorno equivalente a producción.
+- Los objetivos de respuesta por tipo de operación están definidos y se cumplen
+- El cálculo de planilla y la emisión de boletas terminan dentro del objetivo definido
+- Los cuellos de botella hallados quedan corregidos o documentados con plan
+R 02; §101
+X QA-4, ANA-3
+
+@ 12 | T | Q | Revisión de seguridad
+D Ejecutar análisis estático y de dependencias, prueba de penetración por un tercero, revisión del aislamiento entre organizaciones, de permisos por campo, de carga de archivos y de gestión de secretos, y corregir los hallazgos. La revisión se repite ante cambios mayores de arquitectura.
+- No queda ningún hallazgo crítico ni alto abierto
+- La prueba de aislamiento cubre todos los endpoints publicados
+- El informe y las correcciones quedan archivados
+R 02; 07; §60; §1
+X QA-8, TEN-4
+
+@ 13 | T | Q | Verificación de protección de datos
+D Verificar el cumplimiento de la Ley 29733 y su reglamento: consentimientos, derechos del titular, banco de datos, flujo de incidentes, evaluaciones de impacto de biometría e IA, retención, cifrado y transferencias, con un especialista en protección de datos. El resultado se documenta como informe de cumplimiento.
+- Cada requisito del reglamento tiene su evidencia en el producto o en un procedimiento
+- La evaluación de impacto de marcación facial y de IA está aprobada
+R 14; E-16; C-08; §92
+X QA-7, PRI-7, IAR-2
+
+@ 14 | T | Q | Migración de los datos de una empresa
+D Ejecutar de punta a punta la migración de una empresa real o representativa desde su sistema anterior: estructura, colaboradores, históricos, contratos, saldos de vacaciones, acumulados de planilla del ejercicio y documentos, con conciliación y planilla en paralelo. La migración usa los importadores del producto, sin cargas directas a la base.
+- Los saldos y acumulados migrados cuadran con el sistema de origen
+- Una planilla calculada en paralelo coincide con la del sistema anterior o la diferencia está explicada
+- El procedimiento de migración queda documentado y es repetible
+R §71; E-27; §122
+X QA-5, IMP-6, VAC-7, ASI-11
+
+@ 15 | T | Q | Material de ayuda
+D Producir la ayuda del producto: guías por rol, ayuda contextual en pantalla, guía de puesta en marcha, guía de planilla peruana y notas de versión, en español y preparadas para traducción. La ayuda se versiona junto con el producto.
+- Cada módulo tiene su guía y su ayuda contextual
+- La guía de puesta en marcha acompaña al asistente de primeros pasos
+R §80; E-27; §124
+X QA-6, QA-7, QA-8
+
+@ 16 | T | Q | Salida a producción
+D Preparar y ejecutar la salida: lista de verificación de infraestructura, copias y restauración probadas, monitoreo y alertas, guardias y procedimiento de incidentes, plan de reversión, página de estado y verificación posterior con una organización piloto. La salida se hace primero con la organización piloto y después se abre al resto.
+- La restauración de una copia se probó con éxito antes de salir
+- El procedimiento de incidentes y el de reversión están ensayados
+- La organización piloto completa un ciclo de planilla en producción
+R 02; §89; §111; §124
+X QA-9, QA-10, QA-11, QA-12, QA-13

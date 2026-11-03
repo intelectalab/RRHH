@@ -1,0 +1,170 @@
+# ENC | 6 | experiencia | Encuestas, clima y eNPS | Backend + Frontend | Constructor de encuestas, anonimato real, eNPS, mapa de calor y planes de acción.
+
+@ 1 | H | BF | Constructor de encuestas
+D Crear encuestas con tipos de pregunta (escala, opción única y múltiple, texto, eNPS, matriz), secciones, lógica de salto y vista previa. El constructor guarda borradores y admite traducciones de cada pregunta.
+- La vista previa muestra la encuesta como la verá el colaborador en el móvil
+- Una encuesta publicada no cambia sus preguntas: se versiona
+R 06; 05; 04; §49; ME-30; RN-ENC-01 a RN-ENC-10; P Experiencia → Encuestas
+X UI-5
+
+@ 2 | H | BF | Tipos y plantillas de encuesta
+D Ofrecer plantillas de clima, compromiso, onboarding, salida, pulso, eNPS y personalizada, con dimensiones para agrupar resultados. Las dimensiones permiten comparar mediciones sucesivas.
+- Cada plantilla trae sus dimensiones y preguntas sugeridas
+- La organización guarda sus propias plantillas
+R 06; §49; RN-ENC-01 a RN-ENC-10
+X ENC-1
+
+@ 3 | H | BF | Distribución, segmentos y recordatorios
+D Enviar la encuesta a una población definida por filtros, con fechas, recordatorios, enlace para personal sin correo y seguimiento de participación. La población queda fijada al momento del envío.
+- La participación se ve por segmento sin identificar quién respondió en encuestas anónimas
+- El colaborador responde desde el móvil o desde un kiosko
+R 06; §49; §8; §85; C-09; RN-ENC-01 a RN-ENC-10
+X ENC-2, NOT-1
+
+@ 4 | T | B | Anonimato real con umbral mínimo
+D En encuestas anónimas, guardar las respuestas sin vínculo con la persona (solo los atributos de segmento necesarios) y registrar por separado quién ya respondió. Ningún resultado se muestra para un segmento con menos respuestas que el umbral configurado, ni por combinación de filtros.
+- No existe consulta que relacione una respuesta anónima con una persona
+- Un segmento bajo el umbral se muestra como «insuficiente» y se agrupa con el nivel superior
+- Los comentarios abiertos se muestran solo cuando el segmento supera el umbral
+R 04; 06; C-06; §49; §50; RN-ENC-01 a RN-ENC-10
+X ENC-3
+
+@ 5 | H | BF | eNPS y tendencias
+D Calcular el eNPS con promotores, pasivos y detractores, su evolución entre mediciones y su comparación por segmento. La pregunta de eNPS puede incluirse en cualquier encuesta.
+- El eNPS se calcula con la fórmula estándar y muestra el número de respuestas
+- La tendencia compara mediciones sucesivas
+R 06; §50; RN-ENC-01 a RN-ENC-10; P Experiencia → eNPS
+X ENC-4
+
+@ 6 | H | BF | Resultados de clima con mapa de calor
+D Presentar resultados por dimensión y pregunta, con mapa de calor por área frente al promedio de la organización, y resumen de comentarios. Los resultados se comparan con la medición anterior.
+- El mapa de calor respeta el umbral de anonimato en cada celda
+- Los resultados se filtran por empresa, sede y unidad
+R 06; E-25; §49; RN-ENC-01 a RN-ENC-10; P Experiencia → Encuestas → Mapa de calor
+X ENC-4, UI-12
+
+@ 7 | H | BF | Planes de acción con seguimiento
+D Crear planes de acción por área a partir de los resultados, con responsable, acciones, fechas y avance, y compararlos con la medición siguiente. Los planes usan el motor de tareas para sus acciones.
+- Cada plan se vincula a la dimensión que busca mejorar
+- El avance de los planes se ve en un tablero por unidad
+R 06; E-25; RN-ENC-01 a RN-ENC-10
+X ENC-6, WFL-8
+
+@ 8 | T | B | Encuestas automáticas por evento
+D Disparar encuestas por eventos del ciclo de vida (hitos de onboarding, salida) y pulsos recurrentes programados. Las reglas se configuran con el motor de automatizaciones.
+- Un nuevo ingreso recibe la encuesta de onboarding en el hito configurado
+- La encuesta de salida se envía al iniciarse el proceso de salida
+R 06; §49; §103; RN-ENC-01 a RN-ENC-10
+X ENC-3, WFL-5
+
+# REC | 6 | experiencia | Reconocimientos | Backend + Frontend | Reconocimientos entre compañeros ligados a valores, insignias y muro opcional.
+
+@ 1 | H | BF | Valores e insignias
+D Configurar los valores de la empresa y las insignias asociadas, con imagen y descripción. Cada organización define su propio conjunto.
+- Los valores e insignias se activan y desactivan sin perder el historial
+- Cada insignia se asocia a un valor de la empresa
+R 06; §51; RN-REC-01 a RN-REC-06; P Experiencia → Reconocimientos
+X CFG-1
+
+@ 2 | H | BF | Reconocer a un compañero
+D Permitir reconocer a una o varias personas con valor, mensaje e insignia, con aviso al reconocido y a su jefe. El reconocimiento puede ser público o privado.
+- El reconocimiento aparece en la ficha del reconocido
+- Nadie puede reconocerse a sí mismo
+R 06; §51; §6; RN-REC-01 a RN-REC-06; P Experiencia → Reconocimientos
+X REC-1, NOT-1
+
+@ 3 | H | BF | Muro de reconocimientos
+D Mostrar el muro opcional con los reconocimientos públicos, reacciones y comentarios, y moderación por RRHH. El muro respeta la segmentación por empresa cuando se configura.
+- La organización puede desactivar el muro y mantener los reconocimientos privados
+- RRHH puede ocultar una publicación con registro del motivo
+R 06; §51; RN-REC-01 a RN-REC-06
+X REC-2
+
+@ 4 | H | BF | Reportes de reconocimiento
+D Reportar reconocimientos por valor, unidad y periodo, y quiénes reconocen y son reconocidos. Los datos se exponen también a la capa analítica.
+- El reporte muestra las unidades sin reconocimientos en el periodo
+- El reporte se filtra por empresa y sede y se exporta
+R 06; §51; §64; RN-REC-01 a RN-REC-06
+X REC-2
+
+# CIN | 6 | experiencia | Comunicación interna | Backend + Frontend | Noticias, comunicados y eventos segmentados con confirmación de lectura.
+
+@ 1 | H | BF | Publicaciones
+D Publicar noticias, comunicados y eventos con texto enriquecido, imágenes, adjuntos, programación y vigencia. El editor permite guardar borradores y pedir revisión antes de publicar.
+- Una publicación programada aparece sola en su fecha
+- Las publicaciones vencidas pasan al archivo
+R 06; 04; §52; RN-CIN-01 a RN-CIN-07; P Experiencia → Comunicaciones
+X PLT-7, UI-5
+
+@ 2 | H | BF | Segmentación de la audiencia
+D Dirigir cada publicación por empresa, sede, área, equipo o grupo, y enviarla por los canales elegidos. La audiencia se calcula con los datos vigentes de cada colaborador.
+- Un colaborador solo ve lo dirigido a su segmento
+- El autor ve el tamaño de la audiencia antes de publicar
+R 06; §52; RN-CIN-01 a RN-CIN-07
+X CIN-1, NOT-1
+
+@ 3 | H | BF | Confirmación de lectura
+D Exigir confirmación de lectura en los comunicados que lo requieren y dar seguimiento de quién confirmó y quién falta, con recordatorios. La confirmación queda registrada con fecha y medio.
+- El comunicado obligatorio aparece en pendientes hasta confirmarse
+- El reporte de lectura se exporta como evidencia
+R 06; §52; §87; RN-CIN-01 a RN-CIN-07
+X CIN-2, WFL-9
+
+@ 4 | H | BF | Cumpleaños, aniversarios y eventos
+D Publicar de forma automática cumpleaños y aniversarios laborales según la política de privacidad, y gestionar eventos con inscripción. Las publicaciones automáticas usan plantillas editables.
+- Un colaborador puede optar por no mostrar su cumpleaños
+- Los eventos aparecen en el calendario de RRHH
+R 06; §52; §78; RN-CIN-01 a RN-CIN-07
+X CIN-1, CFG-8
+
+# HSD | 6 | mesa-de-ayuda | Mesa de ayuda y base de conocimiento | Backend + Frontend | Solicitudes a RRHH con colas, SLA y base de conocimiento vinculada.
+
+@ 1 | H | BF | Catálogo de solicitudes y formularios
+D Configurar los tipos de solicitud (certificado, planilla, vacaciones, beneficios, documentos, consulta, otro) con su formulario, cola responsable, prioridad y confidencialidad. Los formularios admiten campos personalizados.
+- Cada tipo define a qué cola llega y qué datos pide
+- Las solicitudes del portal del colaborador pasan a gestionarse aquí
+R 06; 04; §53; RN-HSD-01 a RN-HSD-10; P Experiencia → Mesa de ayuda
+X ESS-5, CFG-4
+
+@ 2 | H | BF | Tickets y estados
+D Gestionar cada solicitud como ticket con estados nuevo, en atención, esperando información, resuelto y cerrado, conversación con el colaborador, notas internas y adjuntos. Cada ticket conserva su historial completo de cambios.
+- El colaborador ve el estado y responde desde su portal
+- Las notas internas no son visibles para el solicitante
+- Un ticket resuelto se cierra solo tras el plazo configurado sin respuesta
+R 06; 05; §53; §8; ME-31; RN-HSD-01 a RN-HSD-10; P Experiencia → Mesa de ayuda
+X HSD-1
+
+@ 3 | H | BF | SLA configurable
+D Definir tiempos objetivo de primera respuesta y de resolución por tipo y prioridad, en horario hábil de la empresa, con pausas cuando se espera al solicitante y escalamiento al acercarse el vencimiento. El horario hábil y los feriados se toman del calendario de la empresa.
+- El reloj del SLA se detiene en «esperando información»
+- Un ticket por vencer avisa al responsable y a su supervisor
+R 06; §53; RN-HSD-01 a RN-HSD-10
+X HSD-2, CFG-8
+
+@ 4 | H | BF | Colas, asignación y respuestas tipo
+D Organizar la atención en colas con asignación manual o por turno rotativo, respuestas predefinidas y vista de carga por agente. La asignación puede reasignarse y queda registrada.
+- Un agente solo ve las colas a las que pertenece
+- Los tickets confidenciales solo los ve la cola autorizada
+R 06; §53; 07; RN-HSD-01 a RN-HSD-10
+X HSD-2
+
+@ 5 | H | BF | Base de conocimiento
+D Publicar artículos y preguntas frecuentes por categoría, con audiencia por segmento, versiones y valoración de utilidad. El editor es el mismo de las comunicaciones internas.
+- Un artículo solo lo ve la audiencia a la que va dirigido
+- Los artículos se versionan y tienen responsable de revisión
+R 06; §54; RN-HSD-01 a RN-HSD-10; P Experiencia → Mesa de ayuda
+X CIN-2
+
+@ 6 | H | BF | Buscador y artículos sugeridos
+D Ofrecer el buscador de la base de conocimiento, sugerir artículos al crear una solicitud y permitir enlazar artículos a tickets. Las sugerencias consideran solo los artículos visibles para el solicitante.
+- Al escribir el asunto se sugieren artículos relacionados
+- Un agente responde insertando un artículo
+R 06; §54; RN-HSD-01 a RN-HSD-10
+X HSD-5, HSD-2
+
+@ 7 | H | BF | Satisfacción y reportes de la mesa
+D Medir satisfacción al cierre y reportar volumen, tiempos, cumplimiento de SLA y motivos frecuentes. Los artículos más consultados y los motivos sin artículo orientan qué documentar.
+- La encuesta de satisfacción se envía al cerrar el ticket
+- El reporte muestra cumplimiento de SLA por tipo y cola
+R 06; §53; §64; RN-HSD-01 a RN-HSD-10
+X HSD-3

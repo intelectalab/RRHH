@@ -1,0 +1,205 @@
+act.activo.administrar assets.assets.update
+act.activo.asignar assets.assets.assign
+ana.costo.ver analytics.metrics.labor_cost.view
+asi.biometria.administrar time.punches.biometric.edit
+asi.correccion.aprobar time.attendance_corrections.approve
+asi.marcacion.cuadrilla time.punches.create_for_crew
+ats.candidato.administrar recruiting.applications.update
+ats.vacante.aprobar recruiting.requisitions.approve
+ats.vacante.crear recruiting.requisitions.create
+ats.vacante.publicar recruiting.requisitions.publish
+aud.auditoria.ver audit.logs.view
+aud.sensible.ver audit.logs.sensitive_values.view
+aus.ausencia.aprobar time.absences.approve
+aus.ausencia.registrar time.absences.create_for_others
+aus.sustento.ver time.absences.medical_certificate.view
+bho.solicitud.aprobar time.overtime_requests.approve
+bnf.costo.ver benefits.benefits.cost.view
+bol.boleta.anular payroll.payslips.void
+bol.boleta.generar payroll.payslips.publish
+bol.boleta.ver payroll.payslips.view
+car.ninebox.ver careers.talent_reviews.view
+car.riesgo.ver analytics.turnover_risk.view
+car.sucesion.ver careers.succession_plans.view
+col.colaborador.cesar people.employments.terminate
+col.colaborador.crear people.employments.create
+col.colaborador.ver people.employments.view
+col.pago.editar people.people.bank_account.edit
+col.pago.ver people.people.bank_account.view
+col.personal.editar people.people.personal_data.edit
+col.personal.ver people.people.personal_data.view
+col.salario.editar people.employments.salary.edit
+col.salario.ver people.employments.salary.view
+col.salud.ver people.people.health_data.view
+com.banda.ver compensation.bands.view
+com.ciclo.administrar compensation.cycles.update
+com.ciclo.aplicar compensation.cycles.apply
+com.compensacion.ver people.compensations.view
+com.propuesta.aprobar compensation.proposals.approve
+com.propuesta.crear compensation.proposals.create
+con.contrato.administrar contracts.contracts.update
+con.contrato.aprobar contracts.contracts.approve
+cpt.concepto.publicar payroll.concepts.publish
+cum.casilla.administrar compliance.notices.update
+dec.archivo.generar payroll.declaration_files.create
+dec.archivo.presentar payroll.declaration_files.mark_submitted
+dec.archivo.rectificar payroll.declaration_files.rectify
+den.denuncia.administrar grievances.cases.admit
+den.denuncia.cerrar grievances.cases.close
+den.denuncia.investigar grievances.cases.investigate
+den.denuncia.ver grievances.cases.view
+des.calibracion.ejecutar performance.reviews.calibrate
+des.campana.administrar performance.cycles.update
+des.evaluacion.responder performance.reviews.submit
+des.resultado.ver performance.reviews.results.view
+dis.caso.administrar discipline.cases.update
+dis.caso.decidir discipline.cases.resolve
+dis.caso.ver discipline.cases.view
+dis.descargo.presentar discipline.cases.submit_defense
+doc.confidencial.ver documents.documents.confidential.view
+doc.documento.aprobar documents.documents.approve
+doc.documento.archivar documents.documents.archive
+doc.documento.subir documents.documents.create
+doc.documento.ver documents.documents.view
+doc.firma.enviar documents.signature_requests.send
+doc.firma.firmar documents.signature_requests.sign
+enc.comentario.ver engagement.surveys.comments.view
+enc.encuesta.administrar engagement.surveys.update
+ent.oferta.aprobar recruiting.offers.approve
+ent.oferta.crear recruiting.offers.create
+gas.gasto.aprobar expenses.reports.approve
+gas.gasto.pagar expenses.reports.mark_paid
+gas.gasto.registrar expenses.reports.create
+gas.gasto.revisar expenses.reports.review
+his.movimiento.registrar people.assignments.create
+hsd.ticket.atender helpdesk.tickets.resolve
+hsd.ticket.confidencial helpdesk.tickets.confidential.view
+imp.importacion.deshacer imports.imports.revert
+imp.importacion.ejecutar imports.imports.execute
+liq.liquidacion.aprobar payroll.settlements.approve
+liq.liquidacion.calcular payroll.settlements.calculate
+liq.liquidacion.pagar payroll.settlements.mark_paid
+liq.liquidacion.ver payroll.settlements.view
+lms.curso.cursar learning.enrollments.complete
+lms.inscripcion.asignar learning.enrollments.create
+mss.equipo.indirectos people.team.view_indirect
+nom.traza.ver payroll.results.trace.view
+off.motivo.ver onboarding.offboardings.exit_reason.view
+off.proceso.administrar onboarding.offboardings.update
+off.tarea.resolver onboarding.offboardings.complete_task
+okr.objetivo.aprobar performance.objectives.activate
+okr.objetivo.crear performance.objectives.create
+onb.proceso.administrar onboarding.processes.create
+onb.tarea.resolver onboarding.processes.complete_task
+org.estructura.administrar org.units.update
+pai.paquete.administrar platform.country_packs.publish
+par.paquete.publicar platform.country_packs.publish
+per.pago.registrar payroll.periods.mark_paid
+per.periodo.aprobar payroll.periods.approve
+per.periodo.calcular payroll.periods.calculate
+per.periodo.cerrar payroll.periods.close
+per.periodo.enviar payroll.periods.submit
+per.periodo.reabrir payroll.periods.reopen
+per.periodo.ver payroll.periods.view
+per.resultado.ver payroll.results.view
+plt.exportacion.ejecutar reports.exports.create
+pos.posicion.administrar org.positions.update
+pos.presupuesto.ver org.positions.budget.view
+pos.solicitud.aprobar org.positions.approve
+pos.solicitud.crear org.position_requests.create
+pre.prestamo.administrar payroll.loans.disburse
+pre.prestamo.aprobar payroll.loans.approve
+pri.solicitud.atender privacy.subject_requests.resolve
+prv.asiento.exportar payroll.accounting_entries.export
+sas.organizacion.administrar platform.tenants.update
+sas.suscripcion.administrar platform.subscriptions.update
+seg.acceso_sensible.ver audit.sensitive_access.view
+seg.rol.administrar identity.roles.update
+seg.usuario.administrar identity.users.update
+seg.usuario.invitar identity.users.invite
+sin.afiliacion.administrar unions.memberships.update
+sin.afiliacion.ver unions.memberships.view
+sst.incidente.investigar sst.incidents.investigate
+sst.medida.administrar sst.corrective_actions.verify
+sst.medida.ejecutar sst.corrective_actions.complete
+sst.salud.administrar sst.medical_exams.update
+sst.salud.ver sst.medical_exams.view
+tsh.costo.ver time.timesheets.cost.view
+tsh.hoja.aprobar time.timesheets.approve
+tsh.hoja.registrar time.timesheets.submit
+tur.turno.planificar time.shift_assignments.publish
+vac.saldo.ajustar time.vacation_balances.adjust
+vac.solicitud.aprobar time.vacation_requests.approve
+vac.solicitud.crear time.vacation_requests.create
+vac.solicitud.validar time.vacation_requests.validate
+wfl.aprobacion.reasignar workflow.approval_requests.reassign
+wfl.aprobacion.resolver workflow.approval_requests.approve
+wfl.ejecucion.reintentar workflow.runs.retry
+wfl.flujo.administrar workflow.workflows.update
+TABLE compensations employment_compensations
+TABLE leave_requests vacation_requests
+TABLE absences absence_requests
+TABLE payroll_items payroll_run_lines
+TABLE filing_files statutory_filings
+TABLE accounting_entries journal_entries
+TABLE fee_receipts contractor_invoices
+TABLE job_openings job_requisitions
+TABLE offers job_offers
+TABLE offboarding_processes terminations
+TABLE salary_review_cycles compensation_review_cycles
+TABLE announcements posts
+TABLE whistleblowing_cases complaints
+TABLE attendance_corrections attendance_correction_requests
+TABLE travel_advances expense_advances
+TABLE sst_corrective_actions corrective_actions
+TABLE organizations tenants
+TABLE import_batches import_jobs
+TABLE approval_requests workflow_instances
+TABLE workflow_runs automation_runs
+TABLE authority_requests mailbox_notices
+EVENT organization.created tenant.created
+EVENT organization.suspended tenant.suspended
+EVENT organization.reactivated tenant.reactivated
+EVENT organization.activated tenant.activated
+EVENT organization.cancelled tenant.cancelled
+EVENT organization.trial_started tenant.trial_started
+EVENT organization.trial_ended tenant.trial_ended
+EVENT organization.deleted tenant.deleted
+EVENT module.enabled tenant.module_enabled
+EVENT module.disabled tenant.module_disabled
+EVENT vacancy.created requisition.created
+EVENT vacancy.approved requisition.approved
+EVENT vacancy.opened requisition.published
+EVENT vacancy.paused requisition.on_hold
+EVENT vacancy.closed requisition.closed
+EVENT candidate.stage_changed application.stage_changed
+EVENT candidate.rejected application.rejected
+EVENT candidate.withdrawn application.withdrawn
+EVENT performance_cycle.launched review_cycle.launched
+EVENT performance_cycle.closed review_cycle.closed
+EVENT performance_cycle.evaluation_closed review_cycle.evaluation_closed
+EVENT performance_cycle.cancelled review_cycle.cancelled
+EVENT goal.progress_updated objective.updated
+EVENT goal.created objective.created
+EVENT goal.approved objective.approved
+EVENT goal.at_risk objective.at_risk
+EVENT goal.closed objective.closed
+EVENT goal.cancelled objective.cancelled
+EVENT salary_review.applied compensation_cycle.applied
+EVENT salary_review.launched compensation_cycle.launched
+EVENT salary_review.proposal_submitted compensation_cycle.proposals_submitted
+EVENT salary_review.approved compensation_cycle.approved
+EVENT salary_review.cancelled compensation_cycle.cancelled
+EVENT whistleblowing.case_received grievance.received
+EVENT whistleblowing.case_closed grievance.closed
+EVENT whistleblowing.deadline_approaching grievance.deadline_approaching
+EVENT advance.granted advance.paid
+EVENT signature.rejected signature.declined
+EVENT enrollment.overdue course.expired
+EVENT enrollment.created course.assigned
+EVENT sst.medical_exam_expiring sst.exam_expiring
+EVENT compliance.obligation_due compliance.obligation_overdue
+EVENT privacy.incident_registered privacy.incident_opened
+EVENT contract.sent_for_signature contract.issued
+EVENT integration.sync_failed integration.health_changed
+EVENT user.locked user.suspended

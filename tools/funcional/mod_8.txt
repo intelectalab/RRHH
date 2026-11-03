@@ -1,0 +1,450 @@
+@@ ANA | People analytics y tableros | 8
+#obj
+Dar a dirección, RRHH y jefes indicadores confiables de su gente, con filtros, tendencias y tableros por rol, respetando permisos y confidencialidad.
+#alc
+- Tablero ejecutivo e indicadores: dotación, altas, bajas, rotación, ausentismo, tardanzas, horas extra, costo laboral, vacaciones, desempeño, capacitación, compromiso, eNPS, tiempo y costo de contratación, vacantes, diversidad cuando legalmente corresponde, antigüedad, distribución salarial, promociones, movilidad, SST.
+- Filtros por empresa, sede, área, puesto, fecha y manager; comparación entre periodos; desglose hasta el listado (si hay permiso).
+- Tableros personalizables por rol con widgets reordenables (RRHH, dirección, manager, payroll).
+- Definiciones de cada indicador visibles (fórmula y fuente); explicación de métricas con IA.
+- Modelo analítico con historia (fotos periódicas y cálculo a la fecha).
+#fue
+- Constructor de reportes (M-RPT). Alertas (M-ALE).
+#act
+- Dirección, RRHH, Payroll, managers, auditor.
+#flu
+**Consulta.** 1) El usuario abre su tablero. 2) Aplica filtros. 3) Cada widget se calcula sobre su alcance. 4) Puede abrir la definición o pedir una explicación. 5) Con permiso, desglosa hasta el listado.
+#pan
+Tablero ejecutivo :: Indicadores clave con tendencia y comparación :: Analytics → Dashboard
+People Analytics :: Exploración por tema (dotación, rotación, tiempo, costo, talento, clima, SST) con filtros :: Analytics → People Analytics
+Editor de tablero :: Biblioteca de widgets, arrastrar y soltar, publicar a un rol :: Analytics → Dashboard → Editar
+Definiciones :: Fórmula, fuente y última actualización de cada indicador :: Analytics → People Analytics → Definiciones
+#dat
+Hechos y dimensiones analíticas derivados (dotación diaria, movimientos, asistencia, planilla agregada), definiciones de indicadores, tableros y widgets.
+#rn
+[F] Si un indicador se muestra → se calcula solo con las personas dentro del alcance del usuario.
+[F] Si el indicador usa datos de un campo sensible (costo, sueldo, diversidad) → exige el permiso correspondiente; sin él, el widget no aparece.
+[P] Si un segmento tiene menos personas que el mínimo de confidencialidad (parámetro) y el indicador es sensible → se oculta o se agrega.
+[F] Si se calcula la rotación → es bajas del periodo sobre dotación promedio del periodo, con la definición visible; cada indicador tiene una única fórmula publicada.
+[F] Si se consulta un periodo pasado → se usa la estructura y la dotación vigentes en ese periodo (historia con vigencia), no las actuales.
+[F] Si un indicador de diversidad usa sexo, edad, discapacidad o nacionalidad → solo se muestra agregado y cuando la norma permite tratar ese dato para esa finalidad.
+[F] Si un módulo no está contratado → sus indicadores no aparecen en la biblioteca.
+[F] Si el locador no es trabajador → no cuenta en dotación ni rotación; se reporta aparte.
+#eve
+- `dashboard.published`.
+#evc
+- Todos los eventos de dominio (actualizan el modelo analítico).
+#int
+Herramientas externas de inteligencia de negocio por API o exportación (M-API).
+#bor
+- Persona con dos relaciones: cuenta una vez como persona y dos como relación; el indicador declara cuál usa.
+- Reorganización: comparaciones «con estructura actual» o «con estructura de la fecha».
+- Datos importados como histórico con menor detalle.
+#acc
+- El tablero ofrece todos los indicadores del pedido con los seis filtros y cada rol tiene su propio tablero.
+
+@@ RPT | Reportes y constructor | 8
+#obj
+Entregar reportes listos para usar y permitir crear los propios sin programar, con exportación y programación, sin abrir brechas de datos sensibles.
+#alc
+- Centro de reportes con predefinidos por módulo.
+- Constructor: fuente de datos → campos → filtros → agrupaciones → métricas → visualización; guardar, compartir.
+- Exportar a Excel, CSV y PDF; programar entrega automática.
+- Generación con lenguaje natural (IA) que produce una definición editable.
+- Reportes legales del paquete de país.
+#fue
+- Tableros (M-ANA).
+#act
+- RRHH, Payroll, managers, auditor, contador.
+#flu
+**Construir.** 1) Se elige la fuente. 2) Se seleccionan campos (solo los permitidos). 3) Filtros, agrupaciones y métricas. 4) Visualización (tabla, barras, líneas). 5) Guardar y, si se desea, compartir o programar.
+
+**Entrega programada.** 1) Llega la hora. 2) El reporte se ejecuta con los permisos del destinatario. 3) Se entrega como enlace que exige ingresar.
+#pan
+Centro de reportes :: Predefinidos y propios por categoría; buscar, ejecutar :: Analytics → Reportes
+Constructor :: Pasos fuente, campos, filtros, agrupaciones, métricas, visualización; vista previa :: Analytics → Reportes → Nuevo
+Programaciones :: Reportes programados con frecuencia, destinatarios y última entrega :: Analytics → Reportes → Programados
+#dat
+Definiciones de reporte, fuentes publicadas y su diccionario, comparticiones, programaciones, ejecuciones.
+#rn
+[F] Si el usuario construye un reporte → solo ve fuentes y campos de módulos contratados para los que tiene permiso, incluidos permisos de campo.
+[F] Si un reporte guardado se comparte → cada persona lo ejecuta con sus propios permisos y alcance; las columnas no permitidas se omiten.
+[F] Si un reporte programado se entrega → se ejecuta con los permisos vigentes del destinatario en ese momento y no adjunta datos sensibles en correo; entrega un enlace.
+[F] Si el destinatario perdió el acceso o cesó → la entrega se cancela y se avisa al dueño.
+[F] Si la IA genera un reporte → produce una definición visible que el usuario puede revisar y editar; se ejecuta con los permisos del usuario.
+[F] Si las fuentes de denuncias, casos disciplinarios o datos médicos existen → no están disponibles en el constructor general.
+[P] Si la ejecución supera el límite de filas o tiempo (parámetros) → pasa a segundo plano.
+[F] Si se exporta → queda registrado en actividad con la definición usada.
+#eve
+- `report.created`, `report.scheduled`, `report.delivered`, `report.delivery_cancelled`.
+#evc
+- Ninguno.
+#bor
+- Campo personalizado sensible añadido a un reporte compartido.
+- Reporte sobre una fuente de un módulo que la organización dio de baja.
+#acc
+- El constructor guarda reportes con fuente, campos, filtros, agrupaciones, métricas y visualización, exporta en tres formatos y controla datos sensibles.
+
+@@ ALE | Alertas explicadas | 8
+#obj
+Avisar a tiempo de lo que requiere atención, siempre con la explicación de por qué y qué hacer.
+#alc
+- Reglas de alerta por umbral, fecha o tendencia: contratos por vencer, vacaciones acumuladas, cursos obligatorios incompletos, aumento de rotación, documentos por firmar, evaluaciones vencidas, exámenes médicos, pólizas, topes de contrato, anomalías de planilla y de asistencia.
+- Destinatarios por rol y alcance; severidad; agrupación; posponer, descartar con motivo, convertir en tarea.
+- Explicación obligatoria: regla, datos, registros afectados, acción sugerida.
+- Detección de anomalías operativas (estadística simple o IA) con factores visibles.
+#fue
+- Notificación en sí (M-NOT). Obligaciones legales (M-CUM las evalúa y usa este motor para avisar).
+#act
+- RRHH configura. Cada rol recibe las de su alcance.
+#flu
+**Ciclo de una alerta.** 1) Una regla se evalúa (programada o por evento). 2) Si se cumple, se crea o actualiza la alerta con explicación y registros. 3) Se entrega a destinatarios. 4) El destinatario actúa, pospone o descarta. 5) Cuando la condición deja de cumplirse, la alerta se resuelve sola.
+#pan
+Alertas :: Lista por severidad y tema con explicación y enlace a los registros; gestionar :: Inicio → Alertas
+Reglas de alerta :: Reglas con condición, umbral, destinatarios, frecuencia; activar :: Automatización → Reglas → Alertas
+#dat
+Reglas de alerta, alertas (`alerts`) con explicación y registros afectados, acciones del usuario.
+#rn
+[F] Si una alerta no tiene explicación (regla aplicada, datos y registros afectados) → no se muestra.
+[F] Si el destinatario no puede ver alguno de los registros afectados → la alerta se le muestra solo con los que sí puede ver, o no se le envía.
+[F] Si la condición deja de cumplirse → la alerta pasa a «Resuelta» automáticamente.
+[P] Si una alerta se pospone → reaparece en la fecha elegida, con un máximo de posposiciones (parámetro).
+[F] Si una regla repetiría la misma alerta para el mismo registro → se actualiza la existente en lugar de crear otra.
+[F] Si la alerta proviene de un modelo (anomalía, riesgo) → muestra los factores y su contribución, y se rotula como estimación.
+[P] Si se evalúa «contratos por vencer», «vacaciones acumuladas» u otras reglas de plazo → usan las anticipaciones configuradas (parámetros por regla).
+[F] Si una alerta sugiere una acción sobre una persona (cesar, sancionar, cambiar sueldo) → nunca la ejecuta; solo enlaza al flujo humano.
+#eve
+- `alert.raised`, `alert.resolved`, `alert.dismissed`.
+#evc
+- Eventos de todos los módulos y evaluaciones programadas.
+#bor
+- Regla con cientos de registros afectados: una alerta agrupada con listado.
+- Alerta sobre datos sensibles a un manager.
+#acc
+- Cada alerta responde qué pasa, por qué, a quién afecta y qué hacer.
+
+@@ IAR | Asistente de IA y gobierno | 8
+#obj
+Ofrecer una capa de IA opcional que ahorra trabajo (redactar, resumir, consultar, detectar) bajo gobierno estricto: respeta permisos, deja registro y nunca decide sobre personas.
+#alc
+- Casos de uso: redactar descripción de puesto, resumir CV, preparar preguntas de entrevista, resumir encuestas, borradores de comunicados, explicar métricas, consultar información en lenguaje natural, generar reportes, detectar anomalías operativas, responder consultas con la base de conocimiento.
+- Asistente conversacional que ejecuta herramientas con los permisos del usuario.
+- Registro de cada uso: quién, cuándo, caso de uso, datos enviados, respuesta, herramienta usada.
+- Configuración por organización: activar por caso de uso, proveedor, retención del registro, datos excluidos.
+- Evaluación de impacto para perfilado; revisión de sesgo en usos de selección.
+#fue
+- Decisiones automáticas de alto impacto (prohibidas). Entrenamiento de modelos con datos de clientes (no se hace sin acuerdo expreso).
+#act
+- Usuarios con permiso por caso de uso. Administrador gobierna. Auditor revisa el registro.
+#flu
+**Consulta en lenguaje natural.** 1) El usuario pregunta «¿Cuántas personas ingresaron este trimestre?». 2) El asistente traduce a una consulta sobre fuentes permitidas. 3) La consulta se ejecuta con los permisos y el alcance del usuario. 4) Responde con el dato, la definición usada y el enlace al detalle. 5) Queda registrado.
+
+**Borrador.** 1) El usuario pide un texto (descripción de puesto, comunicado). 2) La IA lo genera con el contexto permitido. 3) El usuario edita y decide publicar. 4) El contenido publicado lleva al usuario como autor.
+#pan
+Asistente :: Conversación con respuestas citadas, acciones sugeridas que el usuario confirma :: Barra superior → Asistente
+Gobierno de IA :: Casos de uso activos, proveedor, exclusiones, retención :: Configuración → IA
+Registro de IA :: Usos con usuario, caso, datos consultados y respuesta :: Seguridad → Auditoría → pestaña IA
+#dat
+Configuración de IA por organización, registro de usos (`ai_interactions`), evaluaciones de impacto enlazadas, plantillas de instrucciones por caso de uso.
+#rn
+[F] Si la IA accede a datos → lo hace con las mismas comprobaciones de permiso, alcance y campo que el usuario que la invoca; no existe un acceso privilegiado de la IA.
+[F] Si se usa la IA → se registra usuario, momento, caso de uso, fuentes consultadas y respuesta.
+[F] Si una acción implica contratar, cesar, sancionar, promover o cambiar un sueldo → la IA no puede ejecutarla ni dejarla aprobada; solo prepara información para que una persona decida en el flujo normal.
+[F] Si la IA sugiere, ordena o puntúa → muestra los criterios usados; sin explicación no se muestra el resultado.
+[F] Si la organización no activó un caso de uso → la función no aparece.
+[F] Si el caso de uso implica perfilar personas (riesgo de rotación, orden de candidatos) → requiere evaluación de impacto aprobada y se rotula como estimación revisable.
+[F] Si los datos pertenecen a denuncias, salud o casos disciplinarios → nunca se envían al proveedor de IA.
+[P] Si el registro de usos supera su plazo de retención (parámetro) → se purga conservando metadatos.
+[F] Si la IA ejecuta una acción con efecto (crear solicitud, borrador) → pide confirmación explícita al usuario y la acción queda auditada con origen «IA» y el usuario responsable.
+[F] Si la respuesta proviene de documentos → cita la fuente; si no hay fuente, lo dice.
+#eve
+- `ai.interaction_logged`, `ai.action_confirmed`.
+#evc
+- Ninguno (opera a demanda).
+#int
+Proveedor de modelos por adaptador con implementación falsa; servidor MCP (M-API).
+#bor
+- Usuario que pide datos fuera de su alcance: respuesta «no tienes acceso» sin revelar existencia.
+- Texto generado con datos personales de terceros.
+- Proveedor no disponible: las funciones degradan sin bloquear el flujo manual.
+#acc
+- Los nueve casos de uso del pedido funcionan con registro, y una prueba automática confirma que la IA no devuelve datos fuera de los permisos del usuario.
+
+@@ API | API pública, webhooks y MCP | 9
+#obj
+Abrir la plataforma a integraciones y asistentes externos con una API versionada, eventos por webhook y un servidor MCP, con el mismo control de permisos.
+#alc
+- API REST `/api/v1` documentada (OpenAPI): colaboradores, asistencia, ausencias, reclutamiento, planilla (lectura), estructura, documentos y demás recursos.
+- Credenciales por aplicación con alcances (scopes), caducidad, rotación; OAuth para aplicaciones de terceros; límites de uso.
+- Webhooks: suscripción a eventos (`employee.created`, `employee.updated`, `employee.terminated`, `leave.approved`, `payroll.closed`, `candidate.hired` y el resto del catálogo), firma, reintentos, registro de entregas.
+- Servidor MCP que expone herramientas de consulta y acción con los permisos del usuario que autoriza.
+- Portal de desarrolladores, entorno de pruebas y registro de llamadas.
+#fue
+- Conectores concretos (M-INT).
+#act
+- Administrador gestiona credenciales. Desarrolladores e integradores consumen.
+#flu
+**Credencial.** 1) El administrador crea una aplicación con alcances mínimos y caducidad. 2) Se muestra el secreto una sola vez. 3) Cada llamada se valida contra alcances, módulo contratado y límites.
+
+**Webhook.** 1) Se registra la URL y los eventos. 2) Cada evento se envía firmado con identificador único. 3) Si falla, se reintenta con espera creciente. 4) Tras agotar intentos, queda «fallido» y se puede reenviar.
+
+**MCP.** 1) El usuario autoriza al asistente externo. 2) El asistente llama herramientas. 3) Cada herramienta aplica permisos y alcance del usuario y queda en el registro de IA.
+#pan
+API :: Aplicaciones, alcances, caducidad, último uso; crear, rotar, revocar :: Configuración → API
+Webhooks :: Suscripciones, estado, entregas, reenviar :: Configuración → API → Webhooks
+Registro de llamadas :: Llamadas por aplicación, estado, latencia, errores :: Configuración → API → Registro
+#dat
+Aplicaciones y credenciales (solo huella del secreto), alcances, suscripciones de webhook, entregas, autorizaciones MCP, registro de llamadas.
+#rn
+[F] Si una llamada usa una credencial → solo accede a los recursos de sus alcances y nunca a más de lo que permite el módulo contratado.
+[F] Si un alcance no incluye campos sensibles → la respuesta los omite igual que para un usuario sin permiso de campo.
+[P] Si la aplicación supera su límite de llamadas (parámetro del plan) → recibe respuesta de límite excedido con el tiempo de espera.
+[F] Si se envía un webhook → va firmado, con identificador de evento y sin datos sensibles en el cuerpo; el receptor consulta el detalle por API.
+[P] Si la entrega de un webhook falla → se reintenta según la política y, agotados los intentos (parámetros), la suscripción se marca con error y se avisa.
+[F] Si se introduce un cambio incompatible → se publica en una nueva versión de la API; la anterior se mantiene durante el periodo de convivencia anunciado.
+[F] Si un asistente actúa por MCP → lo hace con los permisos del usuario que autorizó, y las acciones de alto impacto no están expuestas como herramientas.
+[F] Si una credencial no se usa durante el periodo configurado o su creador pierde el rol → se marca para revisión.
+[F] Si se crea una credencial → el secreto se muestra una única vez y se almacena solo su huella.
+#eve
+- `api.credential_created`, `api.credential_revoked`, `webhook.delivery_failed`.
+#evc
+- Todos los eventos de dominio publicables.
+#bor
+- Receptor de webhook lento o caído durante días.
+- Dos integraciones que escriben el mismo dato: gana la última con auditoría de origen.
+- Token MCP de un usuario que cesa: se revoca.
+#acc
+- La API está versionada con tokens y alcances, los seis eventos del pedido se entregan por webhook y un asistente externo consulta por MCP sin superar los permisos del usuario.
+
+@@ INT | Integraciones | 9
+#obj
+Conectar con los sistemas que rodean a RRHH sin acoplar el núcleo a ningún proveedor.
+#alc
+- Capa de adaptadores por tipo: ERP y contabilidad, bancos y billeteras, relojes biométricos, correo, calendarios, SSO, firma, ATS externos y bolsas de empleo, LMS externos, pruebas y antecedentes, aseguradoras y EPS, proveedores de IA, mensajería.
+- Catálogo de conectores con instalación por organización, credenciales cifradas, mapeos y prueba de conexión.
+- Sincronizaciones programadas y por evento; cola de reintentos; registro y panel de estado.
+- Implementación falsa de cada adaptador para desarrollo y pruebas.
+#fue
+- Desarrollo a medida por cliente. Integración directa de la autoridad tributaria (se usa archivo hasta que exista interfaz).
+#act
+- Administrador instala y configura. Payroll, RRHH y TI operan cada conector.
+#flu
+**Instalación.** 1) Se elige el conector. 2) Se ingresan credenciales y mapeos. 3) Se prueba la conexión. 4) Se activa con su programación. 5) El panel muestra el estado y los errores.
+#pan
+Integraciones :: Catálogo por categoría, instalados, estado :: Configuración → Integraciones
+Detalle del conector :: Credenciales, mapeos, programación, últimas ejecuciones, errores, reintentar :: Configuración → Integraciones → Conector
+#dat
+Conectores instalados, credenciales cifradas, mapeos, ejecuciones de sincronización, errores.
+#rn
+[F] Si un módulo necesita un servicio externo → lo llama a través de la interfaz del adaptador; ningún módulo referencia a un proveedor concreto.
+[F] Si un efecto externo se envía (pago, mensaje, asiento, firma) → sale por la bandeja de salida con clave de idempotencia; un reintento no lo duplica.
+[F] Si un conector falla → el proceso de negocio continúa en estado «pendiente de integración» visible, sin perder datos.
+[F] Si se guardan credenciales → se cifran y nunca se devuelven completas por la API ni se escriben en logs.
+[F] Si un adaptador no tiene implementación falsa → no pasa la revisión de calidad.
+[P] Si una sincronización supera el número de fallos consecutivos (parámetro) → se pausa y se alerta al administrador.
+[F] Si un conector de reloj biométrico entrega marcas → entran como marcaciones con su origen y siguen las mismas reglas de inalterabilidad.
+[F] Si se usa SSO → el alta y la baja de usuarios pueden sincronizarse, pero los roles y el alcance se administran en Ayni HR.
+#eve
+- `integration.installed`, `integration.sync_completed`, `integration.sync_failed`.
+#evc
+- Eventos de dominio que cada conector necesite.
+#bor
+- Proveedor que cambia su formato de archivo.
+- Reloj que reenvía marcas ya recibidas.
+- Banco con horario de corte.
+#acc
+- Cambiar de proveedor en cualquier categoría solo requiere otro adaptador y configuración.
+
+@@ WHA | Autoservicio por WhatsApp | 9
+#obj
+Llevar el autoservicio al canal que el personal operativo ya usa, con la misma seguridad que el portal.
+#alc
+- Vinculación del número con la persona mediante verificación.
+- Consultas y trámites: boleta, saldo y solicitud de vacaciones, constancias, marcación con ubicación, horario, estado de solicitudes, preguntas a la base de conocimiento, confirmación de lectura.
+- Menú guiado y lenguaje natural; derivación a un agente de la mesa de ayuda.
+- Avisos salientes con plantillas aprobadas.
+#fue
+- Trámites que exigen firma con evidencia completa (se deriva al portal con enlace). Datos de salud, sanciones o denuncias.
+#act
+- Colaboradores. Agentes de RRHH para derivaciones. Administrador configura.
+#flu
+**Vinculación.** 1) El colaborador escribe al número de la empresa. 2) Se identifica con su documento. 3) Recibe un OTP por otro medio o confirma un dato. 4) El número queda vinculado.
+
+**Boleta.** 1) Pide «mi boleta». 2) El sistema confirma identidad reciente. 3) Envía un enlace de un solo uso al portal o el documento protegido, según política. 4) Registra la entrega.
+
+**Vacaciones.** 1) Pide saldo. 2) Indica fechas. 3) El sistema valida con las mismas reglas del portal. 4) Crea la solicitud y avisa del resultado.
+#pan
+Configuración de WhatsApp :: Número, menús, plantillas, política de entrega de documentos :: Configuración → Integraciones → WhatsApp
+Conversaciones :: Derivadas a agentes, con contexto :: Operaciones → Solicitudes → WhatsApp
+#dat
+Vinculaciones número–persona, sesiones de conversación, mensajes (metadatos y contenido no sensible), plantillas.
+#rn
+[F] Si un número no está vinculado y verificado → no recibe ningún dato personal.
+[P] Si la última verificación de identidad supera el tiempo configurado (parámetro) → se pide de nuevo antes de entregar documentos o crear trámites.
+[P] Si se entrega una boleta o constancia → se hace por enlace de un solo uso con caducidad o por documento protegido, según la política (parámetro); nunca montos en texto del chat.
+[F] Si el trámite se crea por WhatsApp → pasa por las mismas validaciones, aprobaciones y auditoría que por el portal, con origen «WhatsApp».
+[F] Si la marcación llega por WhatsApp → exige ubicación compartida y sigue las reglas de geocerca.
+[F] Si el colaborador cesa o cambia de número → la vinculación se revoca.
+[F] Si la consulta no se entiende o es sensible → se deriva a un agente o al portal.
+#eve
+- `whatsapp.linked`, `whatsapp.unlinked`, `whatsapp.handoff_requested`.
+#evc
+- Avisos de M-NOT; `employee.terminated`.
+#int
+Proveedor de WhatsApp Business tras el adaptador de mensajería.
+#bor
+- Número compartido por dos colaboradores.
+- Mensajes fuera de la ventana de conversación del proveedor.
+- Pérdida o robo del teléfono: desvinculación desde el portal o por RRHH.
+#acc
+- Un colaborador consulta boletas, pide vacaciones, obtiene constancias y marca asistencia por WhatsApp con identidad verificada.
+
+@@ PAI | Paquetes de país | 9
+#obj
+Separar todo lo específico de un país en un paquete instalable, de modo que sumar Colombia, Chile o México no toque el núcleo.
+#alc
+- Contrato del paquete: regímenes laborales, conceptos de planilla y fórmulas, parámetros legales, feriados, tipos de documento de identidad, tipos de contrato y topes, políticas de vacaciones y ausencias por defecto, plantillas de documentos, declaraciones y formatos de archivo, obligaciones de cumplimiento, registros SST, validaciones de datos, textos y traducciones.
+- Paquete Perú (detalle en `14-localizacion-peru.md`).
+- Versionado y publicación; activación por empresa según su país; pruebas de regresión con casos de referencia por paquete.
+#fue
+- Asesoría legal del país. Contenido de paquetes distintos de Perú (se construyen cuando se aborde cada país).
+#act
+- Equipo de cumplimiento de la plataforma construye y publica. Administrador de la organización activa.
+#flu
+**Activación.** 1) Se crea una empresa con su país. 2) Se activa el paquete. 3) Se siembran catálogos, conceptos, políticas y obligaciones. 4) La empresa ajusta lo permitido.
+
+**Actualización.** 1) La plataforma publica una versión con sus cambios y vigencias. 2) Las organizaciones reciben el aviso. 3) Lo legal se aplica solo; lo opcional (plantillas nuevas) se ofrece.
+#pan
+Paquete de país :: Versión activa, contenido, novedades, elementos ajustados por la organización :: Configuración → Paquete de país
+Consola de paquetes :: Construcción, casos de regresión, publicación :: Consola SaaS → Paquetes de país
+#dat
+Paquetes, versiones, elementos del paquete por tipo, activaciones por empresa, ajustes locales, casos de regresión.
+#rn
+[F] Si una regla depende del país → vive en el paquete como dato (parámetro, fórmula, plantilla, obligación) o como extensión declarada del paquete; el núcleo no contiene condiciones por país.
+[F] Si una empresa tiene un país → usa el paquete de ese país; empresas de países distintos conviven en la misma organización.
+[F] Si se publica una versión del paquete → los periodos cerrados no cambian; los cambios rigen desde su vigencia.
+[F] Si la organización ajustó un elemento del paquete → una actualización no lo pisa; se muestra la diferencia y la organización decide.
+[F] Si un paquete se publica → debe pasar sus casos de regresión de cálculo.
+[F] Si no existe paquete para un país → la empresa puede usar Core HR y los módulos no legales, y la nómina queda no disponible con mensaje claro.
+#eve
+- `country_pack.published`, `country_pack.activated`.
+#evc
+- `company.created`.
+#bor
+- Trabajador transferido entre empresas de países distintos: cese y alta, misma persona.
+- Norma con vigencia retroactiva.
+#acc
+- Agregar un país consiste en construir y publicar su paquete, sin cambios en el núcleo.
+
+@@ WLB | Marca blanca | 9
+#obj
+Permitir que cada organización presente la plataforma con su identidad, según su plan.
+#alc
+- Logo, nombre visible, color principal, favicon, pantalla de ingreso, correos y documentos con marca.
+- Dominio personalizado y remitente de correo propio.
+- Portal de empleos y canal de denuncias con la marca de la empresa.
+- Marca por empresa dentro de un grupo.
+#fue
+- Cambios de estructura de la interfaz. Aplicaciones móviles con nombre propio en tiendas.
+#act
+- Administrador empresa. Superadmin habilita según plan.
+#flu
+**Configuración.** 1) Se suben logo y favicon y se elige el color. 2) El sistema valida contraste y genera las variantes clara y oscura. 3) Vista previa. 4) Se publica. 5) Para dominio propio se muestran los registros a crear y se verifica.
+#pan
+Marca :: Logo, nombre, color, favicon, vista previa en claro y oscuro, correos :: Configuración → Marca
+Dominio :: Dominio y remitente con estado de verificación :: Configuración → Marca → Dominio
+#dat
+Configuración de marca por organización y empresa, dominios y su verificación, plantillas de correo con marca.
+#rn
+[F] Si el plan no incluye marca blanca → solo se permite logo y nombre.
+[P] Si el color elegido no cumple el contraste mínimo de accesibilidad (parámetro) → el sistema lo ajusta o lo rechaza con explicación.
+[F] Si el dominio propio no está verificado → no se activa y se sigue usando el dominio de la plataforma.
+[F] Si se cambia la marca → los documentos ya emitidos conservan la marca con la que se generaron.
+[F] Si hay varias empresas con marca propia → cada documento y correo usa la marca de la empresa de la relación.
+#eve
+- `branding.updated`, `domain.verified`.
+#bor
+- Logo solo apto para fondo claro.
+- Caducidad del certificado del dominio.
+#acc
+- Logo, nombre, color, favicon, dominio y correos se personalizan según el plan, en tema claro y oscuro.
+
+@@ EST | Modo estudio contable | 9
+#obj
+Permitir que un estudio contable o socio administre las planillas y obligaciones de muchas empresas pequeñas desde una sola consola.
+#alc
+- Organización de tipo «estudio» con cartera de organizaciones cliente.
+- Acceso delegado a cada cliente con rol y alcance definidos por el cliente; cambio rápido de cliente.
+- Tablero de cartera: estado de planilla, declaraciones, vencimientos y cumplimiento por cliente.
+- Acciones en lote entre clientes (abrir periodos, generar archivos) con resultados separados.
+- Plantillas del estudio aplicables a clientes nuevos; portal del cliente para cargar novedades y aprobar la planilla.
+#fue
+- Facturación del estudio a sus clientes. Contabilidad general.
+#act
+- Personal del estudio (operador, supervisor). Contacto del cliente (aprueba). Trabajadores del cliente (portal).
+#flu
+**Alta de cliente.** 1) El estudio crea o invita a la organización cliente. 2) El cliente otorga el acceso delegado con un rol. 3) El estudio aplica su plantilla. 4) El cliente aparece en la cartera.
+
+**Ciclo mensual.** 1) El cliente carga novedades en su portal. 2) El operador calcula. 3) El supervisor del estudio o el contacto del cliente aprueba (nunca quien calculó). 4) Se generan archivos y boletas. 5) El tablero de cartera marca el avance.
+#pan
+Cartera :: Clientes con estado de planilla, declaraciones, vencimientos y semáforo de cumplimiento; entrar :: Estudio → Cartera
+Acciones en lote :: Selección de clientes y acción; resultado por cliente :: Estudio → Cartera → Lote
+Acceso del estudio (vista del cliente) :: Estudio vinculado, rol otorgado, actividad, revocar :: Configuración → Usuarios → Acceso de terceros
+#dat
+Relación estudio–cliente, delegaciones con rol y vigencia, operadores asignados, plantillas del estudio, ejecuciones en lote.
+#rn
+[F] Si el personal del estudio entra a un cliente → opera con el rol y el alcance que ese cliente delegó, dentro del aislamiento de esa organización; ninguna consulta mezcla clientes.
+[F] Si el cliente revoca la delegación → el acceso del estudio termina de inmediato y los datos permanecen en el cliente.
+[F] Si se ejecuta una acción en lote → corre por separado en cada cliente y un fallo en uno no afecta a los demás.
+[F] Si el estudio calcula una planilla → la aprobación la hace una persona distinta (del estudio o del cliente), igual que en cualquier organización.
+[F] Si el tablero de cartera muestra datos → solo estados y fechas; los montos requieren entrar al cliente con permiso.
+[F] Si una acción del estudio se audita → queda en la auditoría del cliente con el usuario real del estudio.
+[P] Si el estudio supera el número de clientes de su plan → no puede vincular otro.
+#eve
+- `partner.client_linked`, `partner.delegation_revoked`, `partner.batch_executed`.
+#evc
+- `payroll.closed`, `filing.submitted`, `compliance.status_changed` (de cada cliente, solo estado).
+#bor
+- Cliente que cambia de estudio: revoca uno y delega a otro.
+- Operador del estudio que también es contador del cliente.
+- Cliente que deja el estudio y continúa solo, sin migración.
+#acc
+- Un estudio administra varias empresas con cambio rápido de cliente, tablero de cartera y aislamiento comprobado.
+
+@@ QA | Calidad, seguridad y salida a producción | Transversal
+#obj
+Asegurar que cada fase entregue software correcto, seguro y utilizable, con criterios verificables antes de pasar a la siguiente.
+#alc
+- Definición de terminado por épica: entidades, relaciones, permisos, servicios, backend, frontend, datos reales, CRUD, permisos, integridad, responsive, corrección de errores.
+- Pruebas automáticas: unidad, integración, contrato de API, aislamiento entre organizaciones, permisos por ruta, máquinas de estado, regresión de cálculo de planilla con casos de referencia, accesibilidad, rendimiento.
+- Revisión de «ningún botón falso» y de persistencia de extremo a extremo.
+- Seguridad: revisión de dependencias, pruebas de intrusión, gestión de secretos, cifrado, copias y restauración probadas.
+- Organización demo coherente como banco de pruebas del ciclo completo.
+- Si existe código previo: inventario (funciona, mejorable, parcial, no existe, duplicado, obsoleto) antes de reemplazar.
+- Lista de salida a producción y validación legal del paquete de país.
+#fue
+- Estimaciones y calendario (los define el área de desarrollo).
+#act
+- Equipo de desarrollo, responsable de calidad, responsable de seguridad, especialista laboral (valida el paquete de país).
+#flu
+**Cierre de una épica.** 1) Se cumplen los criterios de aceptación del módulo. 2) Pasan las pruebas automáticas transversales. 3) Se recorre el flujo en la organización demo en escritorio y móvil. 4) Se revisan permisos y auditoría. 5) Se documentan decisiones.
+
+**Continuidad.** El equipo (y los agentes de desarrollo) avanzan al siguiente paso lógico sin pedir confirmación en cada cambio menor; se detienen solo ante decisiones críticas no determinables técnicamente, que se registran como decisión pendiente.
+#pan
+Lista de salida a producción :: Comprobaciones por área con evidencia :: (documento del kit, sin pantalla)
+Organización demo :: Empresa con gerencia general, RRHH, ventas, tecnología y operaciones, y datos enlazados :: Ingreso → Organización demo
+#dat
+Casos de referencia de cálculo, semilla demo, resultados de pruebas, registro de decisiones.
+#rn
+[F] Si un endpoint no tiene prueba de aislamiento y de permiso → la integración continua falla.
+[F] Si una pantalla contiene un control sin operación real → la épica no se da por terminada.
+[F] Si una acción no persiste o no actualiza las vistas relacionadas (saldo, calendario, tablero, actividad) → es un defecto bloqueante.
+[F] Si el paquete de país cambia → se ejecutan los casos de referencia de cálculo y cualquier diferencia no esperada bloquea la publicación.
+[F] Si existe código previo que funciona y aporta valor → se conserva o se refactoriza; solo se elimina con justificación técnica registrada.
+[F] Si una decisión es crítica y no determinable técnicamente → se detiene ese punto y se consulta; en lo demás se continúa sin pedir confirmación.
+[F] Si los datos demo no permiten recorrer el ciclo completo de vacante a offboarding → la semilla se considera incompleta.
+[F] Si un parámetro legal del paquete sigue «a confirmar» → la salida a producción de nómina para ese cálculo queda bloqueada hasta la validación del especialista.
+#bor
+- Fase entregada con errores críticos pendientes: no se avanza.
+- Diferencia de céntimos por redondeo frente al caso de referencia.
+#acc
+- Cada fase termina con sus épicas aceptadas, sin errores críticos pendientes y con la organización demo recorriendo el flujo completo.
