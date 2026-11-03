@@ -9,9 +9,9 @@ Generado el **2026-11-02**. Actualizar manualmente al cerrar cada historia.
 |--------|--------|-------|------|------|--------|-------|------|
 | PLT-1 | Monorepo y estructura de aplicaciones | PLT | Fase 0 · Cimientos | Task | hecha | 2026-11-02 | Monorepo con apps/api, apps/web y packages/contracts; boundaries test y linters en verde. |
 | PLT-2 | Entorno local con Docker | PLT | Fase 0 · Cimientos | Task | hecha | 2026-11-02 | Entorno Docker completo con API, Web, Postgres, Redis, MinIO, Mailpit y Horizon; db-reset verificado. |
-| PLT-3 | Integración continua | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |
-| PLT-4 | Formato único de errores y validación en servidor | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |
-| PLT-5 | Contratos OpenAPI y tipos compartidos | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |
+| PLT-3 | Integración continua | PLT | Fase 0 · Cimientos | Task | hecha | 2026-11-03 | CI pipeline en .github/workflows/ci.yml con 3 jobs (lint, contratos, pruebas); CiContractsTest en verde. |
+| PLT-4 | Formato único de errores y validación en servidor | PLT | Fase 0 · Cimientos | Task | hecha | 2026-11-03 | ProblemDetailsResponse, AyniException y jerarquía de excepciones; middleware EnsureRequestId; catálogo de errores en es/en/pt; handler global en bootstrap/app.php; ErrorFormatTest en verde. |
+| PLT-5 | Contratos OpenAPI y tipos compartidos | PLT | Fase 0 · Cimientos | Task | hecha | 2026-11-03 | Contratos OpenAPI sincronizados con packages/contracts; web con cliente tipado sin tipos duplicados a mano; documentación navegable en /docs y /docs/openapi.yaml; ContractConformanceTest en verde. |
 | PLT-6 | Colas, trabajos programados y outbox de eventos de dominio | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |
 | PLT-7 | Servicio de archivos | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |
 | PLT-8 | Idempotencia y acciones de estado | PLT | Fase 0 · Cimientos | Task | pendiente | — |  |

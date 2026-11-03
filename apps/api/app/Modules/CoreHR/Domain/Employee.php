@@ -14,4 +14,3 @@ final class Employee
         public readonly string $fullName,
     ) {}
 }
-

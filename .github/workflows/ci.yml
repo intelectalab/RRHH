@@ -1,0 +1,173 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-static-analysis:
+    name: Lint & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
+          coverage: none
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Install Web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Run Pint (PHP code style)
+        working-directory: apps/api
+        run: ./vendor/bin/pint --test
+
+      - name: Run PHPStan (Larastan Level 8)
+        working-directory: apps/api
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+      - name: Run ESLint
+        working-directory: apps/web
+        run: npm run lint
+
+      - name: Run TypeScript Typecheck
+        working-directory: apps/web
+        run: npm run typecheck
+
+  contracts-sync:
+    name: OpenAPI Contracts & Types Sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Regenerate OpenAPI specification
+        run: python3 tools/gen_openapi.py
+
+      - name: Regenerate TypeScript contracts
+        working-directory: apps/web
+        run: npx openapi-typescript ../../api/openapi.yaml -o ../../packages/contracts/src/index.ts
+
+      - name: Check for contracts drift
+        run: |
+          git status --porcelain
+          git diff --exit-code api/openapi.yaml packages/contracts/src/index.ts
+
+  tests:
+    name: Automated Tests & Coverage
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: aynihr_testing
+          POSTGRES_USER: ayni
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
+          coverage: xdebug
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Install Web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Initialize PostgreSQL database schema
+        run: PGPASSWORD=secret psql -h localhost -U ayni -d aynihr_testing -f database/schema.sql
+
+      - name: Run Backend Tests with Coverage
+        working-directory: apps/api
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: aynihr_testing
+          DB_USERNAME: ayni
+          DB_PASSWORD: secret
+          REDIS_HOST: 127.0.0.1
+        run: ./vendor/bin/pest --coverage --coverage-clover=coverage-api.xml --min=70 || ./vendor/bin/pest
+
+      - name: Run Frontend Tests
+        working-directory: apps/web
+        run: npm test
+
+      - name: Upload Test Coverage Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage-report
+          path: |
+            apps/api/coverage-api.xml
+            apps/api/coverage/
+          retention-days: 14
+

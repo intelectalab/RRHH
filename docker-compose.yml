@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:17.11-alpine
     container_name: aynihr-postgres
     restart: unless-stopped
     command: postgres -c max_locks_per_transaction=1024
@@ -22,7 +22,7 @@ services:
       - ayni-network
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4.12-alpine
     container_name: aynihr-redis
     restart: unless-stopped
     ports:
@@ -38,7 +38,7 @@ services:
       - ayni-network
 
   minio:
-    image: coollabsio/minio:latest
+    image: minio/minio:RELEASE.2025-10-15T17-29-55Z
     container_name: aynihr-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -59,7 +59,7 @@ services:
       - ayni-network
 
   minio-init:
-    image: coollabsio/minio:latest
+    image: minio/minio:RELEASE.2025-10-15T17-29-55Z
     container_name: aynihr-minio-init
     depends_on:
       minio:
@@ -79,7 +79,7 @@ services:
       - ayni-network
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.33.0
     container_name: aynihr-mailpit
     restart: unless-stopped
     ports:
@@ -123,6 +123,9 @@ services:
       - ./apps/api:/var/www/html
       - ./database:/var/www/database
       - ./tools:/var/www/tools
+      - ./api:/var/www/api
+      - ./packages:/var/www/packages
+      - ./.github:/var/www/.github
     ports:
       - "${FORWARD_API_PORT:-8000}:8000"
     depends_on:
@@ -146,6 +149,7 @@ services:
     volumes:
       - ./apps/web:/app
       - ./packages:/packages
+      - ./api:/api
     ports:
       - "${FORWARD_WEB_PORT:-3000}:3000"
     depends_on:
