@@ -5,8 +5,8 @@ namespace App\Shared\Http\Responses;
 use Illuminate\Http\JsonResponse;
 
 /**
- * ProblemDetailsResponse — Genera respuestas de error conformes a RFC 7807
- * (application/problem+json) con estructura unificada para toda la API de Ayni HR.
+ * ProblemDetailsResponse — Genera respuestas de error con estructura unificada
+ * { "error": { ... } } para toda la API de Ayni HR (ver docs/08-api.md §4).
  */
 final class ProblemDetailsResponse
 {
@@ -42,7 +42,7 @@ final class ProblemDetailsResponse
         ];
 
         return response()->json($payload, $status, array_merge([
-            'Content-Type' => 'application/problem+json',
+            'Content-Type' => 'application/json',
             'X-Request-Id' => $requestId,
         ], $headers));
     }

@@ -116,6 +116,7 @@ Cada regla indica cómo se comprueba. Un cambio que rompe una regla no se entreg
 - No dejes botones sin función ni datos de ejemplo incoherentes en el seeder demo.
 - No incluyas precios, costos ni estimaciones de esfuerzo en código, comentarios ni documentos.
 - Ante una duda normativa peruana: no asumas la tasa. Créala como parámetro, márcala «por validar» y anótala en la historia.
+- **Toda prueba Feature de un endpoint DEBE llamar a `$this->assertMatchesOpenApi($response, $method, $path, $status)` para verificar el código de estado y los campos requeridos del body contra la operación exacta declarada en `api/openapi.yaml`.** El ayudante está en `Tests\Support\OpenApiAssert` (incluido por defecto en `Tests\TestCase`).
 
 ## Comandos de Claude Code disponibles
 

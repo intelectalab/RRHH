@@ -13,7 +13,7 @@ use Tests\TestCase;
  * PLT-4 · Formato único de errores y validación en servidor.
  *
  * Verifica que todas las respuestas de error de la API:
- *  - Usan Content-Type: application/problem+json
+ *  - Usan Content-Type: application/json
  *  - Incluyen el header X-Request-Id
  *  - Devuelven la estructura { error: { code, message, request_id, details, meta } }
  */
@@ -28,7 +28,7 @@ class ErrorFormatTest extends TestCase
         $response = $this->getJson('/api/v1/ruta-que-no-existe');
 
         $response->assertStatus(404)
-            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertHeader('Content-Type', 'application/json')
             ->assertJsonPath('error.code', 'not_found')
             ->assertJsonStructure([
                 'error' => ['code', 'message', 'request_id', 'details', 'meta'],
@@ -56,7 +56,7 @@ class ErrorFormatTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertHeader('Content-Type', 'application/json')
             ->assertJsonPath('error.code', 'validation_failed')
             ->assertJsonStructure([
                 'error' => ['code', 'message', 'request_id', 'details', 'meta'],
@@ -87,7 +87,7 @@ class ErrorFormatTest extends TestCase
         $response = $this->getJson('/test-business-rule');
 
         $response->assertStatus(422)
-            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertHeader('Content-Type', 'application/json')
             ->assertJsonPath('error.code', 'business_rule_violated')
             ->assertJsonStructure([
                 'error' => ['code', 'message', 'request_id', 'details', 'meta'],
@@ -111,7 +111,7 @@ class ErrorFormatTest extends TestCase
         $response = $this->getJson('/test-module-not-enabled');
 
         $response->assertStatus(403)
-            ->assertHeader('Content-Type', 'application/problem+json')
+            ->assertHeader('Content-Type', 'application/json')
             ->assertJsonPath('error.code', 'module_not_enabled')
             ->assertJsonStructure([
                 'error' => ['code', 'message', 'request_id', 'details', 'meta'],

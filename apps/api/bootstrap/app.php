@@ -3,6 +3,7 @@
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
+use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([
+        DispatchOutboxCommand::class,
+    ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             EnsureRequestId::class,

@@ -3,4 +3,4 @@
 use Illuminate\Support\Facades\Schedule;
 
 // Ejemplo de tarea programada; ampliar en cada módulo.
-Schedule::command('inspire')->hourly();
+Schedule::command('outbox:dispatch')->everyMinute()->withoutOverlapping();
