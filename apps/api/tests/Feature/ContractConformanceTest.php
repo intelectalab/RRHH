@@ -189,7 +189,7 @@ class ContractConformanceTest extends TestCase
             $this->assertStringContainsString(
                 "Value expected to be 'array', but 'string' given",
                 $e->getMessage(),
-                'El validador OpenAPI debe indicar que se esperaba un array y se recibió string',
+                'El validador OpenAPI debe indicar que se esperaba un array',
             );
         }
 

@@ -1,5 +1,8 @@
 <?php
 
+use App\Shared\Logging\RequestContextProcessor;
+use App\Shared\Logging\SensitiveDataScrubber;
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
@@ -37,6 +40,33 @@ return [
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
+        ],
+
+        /*
+         * Structured JSON channel — use in production via LOG_CHANNEL=structured.
+         *
+         * Every entry contains:
+         *   - request_id  (from EnsureRequestId middleware)
+         *   - tenant_id   (from TenancyScope, when active)
+         * Sensitive fields (password, salary, token, …) are automatically
+         * replaced with [REDACTED] by SensitiveDataScrubber.
+         */
+        'structured' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'with' => ['stream' => env('LOG_STRUCTURED_STREAM', 'php://stderr')],
+            'formatter' => JsonFormatter::class,
+            'formatter_with' => [
+                'batchMode' => JsonFormatter::BATCH_MODE_NEWLINES,
+                'appendNewline' => true,
+                'ignoreEmptyContextAndExtra' => false,
+            ],
+            'processors' => [
+                PsrLogMessageProcessor::class,
+                RequestContextProcessor::class,
+                SensitiveDataScrubber::class,
+            ],
         ],
     ],
 ];

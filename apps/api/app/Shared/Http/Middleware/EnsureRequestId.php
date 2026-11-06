@@ -16,6 +16,10 @@ final class EnsureRequestId
             $request->headers->set('X-Request-Id', $requestId);
         }
 
+        // Make the request ID available to log processors without coupling
+        // them to the HTTP layer (console commands also run processors).
+        app()->instance('request.id', $requestId);
+
         $response = $next($request);
         $response->headers->set('X-Request-Id', $requestId);
 
