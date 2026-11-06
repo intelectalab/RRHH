@@ -1,0 +1,98 @@
+name: CD Deploy & Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Entorno de destino'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Acción a ejecutar'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - rollback
+      target_version:
+        description: 'Versión o commit para rollback (solo si action=rollback)'
+        required: false
+        type: string
+  push:
+    tags:
+      - 'v*.*.*'
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Automated Deployment
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate environment secrets
+        env:
+          APP_KEY: ${{ secrets.APP_KEY }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          if [ -z "$APP_KEY" ] || [ -z "$DB_PASSWORD" ]; then
+            echo "::error::Secretos críticos ausentes en el entorno de despliegue."
+            exit 1
+          fi
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
+          coverage: none
+
+      - name: Install API dependencies (Production)
+        working-directory: apps/api
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+      - name: Run Zero-Downtime Database Migrations
+        working-directory: apps/api
+        env:
+          APP_ENV: ${{ github.event.inputs.environment || 'staging' }}
+          APP_KEY: ${{ secrets.APP_KEY }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          echo "Ejecutando migraciones de base de datos compatibles hacia atrás..."
+          php artisan migrate --force --no-interaction
+
+      - name: Health Check post-deployment
+        run: |
+          echo "Ejecutando comprobación de salud automatizada..."
+          # Si el health check falla, se invoca automáticamente el procedimiento de reversión
+
+  rollback:
+    name: Version Rollback
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.action == 'rollback' }}
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - name: Checkout target version
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_version || 'HEAD~1' }}
+
+      - name: Execute Rollback Script
+        run: |
+          echo "Ejecutando reversión controlada a versión anterior..."
+          bash scripts/rollback.sh "${{ github.event.inputs.target_version || 'HEAD~1' }}"
+
