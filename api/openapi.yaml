@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Ayni HR API
   version: 1.0.0
-  description: 'Contrato de la API REST de Ayni HR. Generado por kit/tools/gen_openapi.py; no editar a mano.
+  description: 'Contrato de la API REST de Ayni HR. Generado por tools/gen_openapi.py; no editar a mano.
 
 
     Extensiones: `x-permission` (permiso exigido; `authenticated` = basta la sesión, `public` = sin autenticación) y `x-phase`
