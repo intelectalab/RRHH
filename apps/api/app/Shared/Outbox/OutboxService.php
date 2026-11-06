@@ -6,8 +6,10 @@ use App\Shared\Outbox\Contracts\DomainEventSubscriber;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\Models\OutboxEvent;
 use App\Shared\Tenancy\TenancyScope;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use RuntimeException;
 
 class OutboxService implements OutboxWriter
 {
@@ -33,6 +35,10 @@ class OutboxService implements OutboxWriter
         ?string $tenantId = null,
         ?string $correlationId = null
     ): OutboxEvent {
+        if (DB::transactionLevel() === 0) {
+            throw new RuntimeException('OutboxService::record() debe llamarse dentro de una transacción de base de datos activa.');
+        }
+
         // Valida el payload contra el catálogo versionado
         DomainEventTypes::validatePayload($eventType, $payload);
 

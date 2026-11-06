@@ -1,8 +1,15 @@
 <?php
 
 it('returns health ok', function () {
-    $this->getJson('/api/v1/health')
+    $response = $this->getJson('/api/v1/health')
         ->assertOk()
-        ->assertJsonPath('status', 'ok')
-        ->assertJsonStructure(['status', 'timestamp']);
+        ->assertJsonPath('data.status', 'ok')
+        ->assertJsonStructure([
+            'data' => [
+                'status',
+                'timestamp',
+            ],
+        ]);
+
+    $this->assertMatchesOpenApi($response, 'get', '/platform/health', 200);
 });

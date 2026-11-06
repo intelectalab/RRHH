@@ -68,8 +68,8 @@ services:
       /bin/sh -c "
         mc alias set local http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD:-minioadmin} &&
         mc mb --ignore-existing local/${AWS_BUCKET:-aynihr} &&
-        mc anonymous set download local/${AWS_BUCKET:-aynihr}/public &&
-        echo 'Bucket inicializado.'
+        mc anonymous set none local/${AWS_BUCKET:-aynihr} &&
+        echo 'Bucket privado inicializado.'
       "
     environment:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:-minioadmin}

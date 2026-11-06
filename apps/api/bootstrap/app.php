@@ -1,6 +1,7 @@
 <?php
 
 use App\Shared\Exceptions\AyniException;
+use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             EnsureRequestId::class,
+            EnsureIdempotency::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

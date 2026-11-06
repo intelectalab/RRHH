@@ -14,13 +14,16 @@
     "fakerphp/faker": "^1.23",
     "larastan/larastan": "^3.0 || ^2.9",
     "laravel/pint": "^1.18",
+    "league/openapi-psr7-validator": "^0.24.0",
     "mockery/mockery": "^1.6",
     "nunomaduro/collision": "^8.1",
+    "nyholm/psr7": "^1.8",
     "pestphp/pest": "^3.5 || ^3.0",
     "pestphp/pest-plugin-arch": "^3.0",
     "pestphp/pest-plugin-laravel": "^3.0",
     "phpstan/phpstan": "^2.0 || ^1.12",
     "phpunit/phpunit": "^11.5",
+    "symfony/psr-http-message-bridge": "^8.1",
     "symfony/yaml": "^8.1"
   },
   "autoload": {

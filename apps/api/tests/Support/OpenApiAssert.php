@@ -5,73 +5,101 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use Illuminate\Testing\TestResponse;
+use League\OpenAPIValidation\PSR7\Exception\ValidationFailed;
+use League\OpenAPIValidation\PSR7\OperationAddress;
+use League\OpenAPIValidation\PSR7\ResponseValidator;
+use League\OpenAPIValidation\PSR7\ValidatorBuilder;
+use Nyholm\Psr7\Response as Psr7Response;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Yaml\Parser;
 
 /**
  * OpenApiAssert — Ayudante de pruebas reutilizable para validar respuestas HTTP
- * contra el contrato publicado en api/openapi.yaml.
+ * contra el contrato publicado en api/openapi.yaml usando league/openapi-psr7-validator.
  *
- * Uso:
- *   use Tests\Support\OpenApiAssert;
- *   ...
- *   $this->assertMatchesOpenApi($response, 'get', '/platform/health', 200);
- *
- * CLAUDE.md §"Forma de trabajar": toda prueba Feature de un endpoint DEBE
- * llamar a assertMatchesOpenApi() para verificar código de estado y estructura
- * del cuerpo contra la operación exacta del contrato OpenAPI.
+ * Valida de forma estricta:
+ *  - Código de estado declarado en la operación
+ *  - Content-Type de respuesta
+ *  - Tipos primitivos y estructuras
+ *  - Enums y formatos
+ *  - Campos obligatorios
  */
 trait OpenApiAssert
 {
     /**
-     * Especificación OpenAPI ya parseada (caché entre tests del mismo proceso).
+     * Especificación OpenAPI parseada en array (caché en memoria).
      *
      * @var array<string, mixed>|null
      */
     private static ?array $openApiSpec = null;
 
     /**
-     * Valida que la respuesta HTTP cumpla la operación declarada en openapi.yaml:
-     *  - El código de estado está declarado para ese método+ruta.
-     *  - Los campos requeridos por el esquema del cuerpo están presentes.
+     * Validador PSR-7 de OpenAPI cacheado.
+     */
+    private static ?ResponseValidator $responseValidator = null;
+
+    /**
+     * Valida que la respuesta HTTP cumpla la operación declarada en openapi.yaml
+     * usando el validador oficial league/openapi-psr7-validator.
      *
      * @param  string  $method  Método HTTP en minúsculas: 'get', 'post', 'patch', 'delete'…
-     * @param  string  $path  Ruta de la API sin el prefijo /api/v1 ni el tenant, p. ej. '/platform/health'
-     * @param  int  $status  Código HTTP esperado (200, 201, 204, 400, 401, 403, 404, 409, 422, 429…)
+     * @param  string  $path  Ruta de la API según openapi.yaml, p. ej. '/platform/health'
+     * @param  int  $status  Código HTTP esperado
      */
     protected function assertMatchesOpenApi(TestResponse $response, string $method, string $path, int $status): void
     {
-        $spec = $this->loadOpenApiSpec();
-
-        // 1. Verificar que el código de estado está en el contrato
-        $operationResponses = $this->findOperationResponses($spec, $method, $path);
-
-        $this->assertNotNull(
-            $operationResponses,
-            "La operación {$method} {$path} no existe en api/openapi.yaml. ".
-            'Ejecuta make openapi si añadiste una ruta nueva.',
-        );
-
-        $statusKey = (string) $status;
-        $this->assertArrayHasKey(
-            $statusKey,
-            $operationResponses,
-            "El código {$status} no está declarado en openapi.yaml para {$method} {$path}. ".
-            'Códigos declarados: '.implode(', ', array_keys($operationResponses)),
-        );
-
-        // 2. Verificar que el código de estado real coincide
         $response->assertStatus($status);
 
-        // 3. Si hay esquema definido para ese código, validar campos requeridos
-        $responseSpec = $operationResponses[$statusKey];
-        $schema = $this->resolveSchema($spec, $responseSpec);
+        $validator = $this->getOpenApiResponseValidator();
 
-        if ($schema !== null && isset($schema['required']) && $status !== 204) {
-            $json = $response->json();
-            if (is_array($json)) {
-                $this->assertRequiredFields($schema['required'], $json, "{$method} {$path} {$status}");
-            }
+        // Normalizar ruta a la forma declarada en openapi.yaml
+        $normalizedPath = $this->normalizeOpenApiPath($path);
+
+        $operation = new OperationAddress($normalizedPath, strtolower($method));
+
+        // Convertir respuesta de Laravel a PSR-7
+        $headers = [];
+        foreach ($response->headers->all() as $name => $values) {
+            $headers[$name] = $values;
         }
+
+        $psr7Response = new Psr7Response(
+            $response->status(),
+            $headers,
+            (string) $response->getContent(),
+        );
+
+        try {
+            $validator->validate($operation, $psr7Response);
+        } catch (ValidationFailed $e) {
+            $previous = $e->getPrevious() ? ' (Causa: '.$e->getPrevious()->getMessage().')' : '';
+            throw new AssertionFailedError(
+                "La respuesta no coincide con el contrato OpenAPI para {$method} {$normalizedPath} [{$status}]: ".
+                $e->getMessage().$previous
+            );
+        } catch (\Throwable $e) {
+            throw new AssertionFailedError(
+                "Error validando contrato OpenAPI para {$method} {$normalizedPath} [{$status}]: ".$e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Obtiene o construye la instancia singleton de ResponseValidator.
+     */
+    protected function getOpenApiResponseValidator(): ResponseValidator
+    {
+        if (self::$responseValidator !== null) {
+            return self::$responseValidator;
+        }
+
+        $spec = $this->loadOpenApiSpec();
+        $json = (string) json_encode($spec);
+
+        $builder = (new ValidatorBuilder)->fromJson($json);
+        self::$responseValidator = $builder->getResponseValidator();
+
+        return self::$responseValidator;
     }
 
     /**
@@ -114,107 +142,26 @@ trait OpenApiAssert
     }
 
     /**
-     * Busca el mapa de respuestas de una operación dada.
-     *
-     * Busca en paths del spec tanto la ruta exacta como variantes de prefijo
-     * (/api/v1/health → /health, etc.).
-     *
-     * @param  array<string, mixed>  $spec
-     * @return array<string, mixed>|null
+     * Normaliza la ruta eliminando prefijos de versión o buscando la ruta coincidente en el spec.
      */
-    private function findOperationResponses(array $spec, string $method, string $path): ?array
+    private function normalizeOpenApiPath(string $path): string
     {
+        $spec = $this->loadOpenApiSpec();
         $paths = $spec['paths'] ?? [];
 
-        // Intentar primero la ruta exacta, luego sin prefijo /api/v1
-        $candidates = [$path];
+        if (isset($paths[$path])) {
+            return $path;
+        }
+
         foreach (['/api/v1', '/api'] as $prefix) {
             if (str_starts_with($path, $prefix)) {
-                $candidates[] = substr($path, strlen($prefix));
+                $stripped = substr($path, strlen($prefix));
+                if (isset($paths[$stripped])) {
+                    return $stripped;
+                }
             }
         }
 
-        foreach ($candidates as $candidate) {
-            if (isset($paths[$candidate][$method]['responses'])) {
-                /** @var array<string, mixed> $responses */
-                $responses = $paths[$candidate][$method]['responses'];
-
-                return $this->resolveYamlAnchors($responses);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Resuelve $ref y aliases YAML superficiales en un mapa de respuestas.
-     * Para el spec de Ayni HR (con aliases *id001, *id002…) extrae el schema real.
-     *
-     * @param  array<string, mixed>  $responses
-     * @return array<string, mixed>
-     */
-    private function resolveYamlAnchors(array $responses): array
-    {
-        $resolved = [];
-        foreach ($responses as $code => $entry) {
-            if (is_array($entry)) {
-                $resolved[(string) $code] = $entry;
-            } else {
-                // Alias YAML ya resuelto por el parser como referencia al anchor
-                $resolved[(string) $code] = [];
-            }
-        }
-
-        return $resolved;
-    }
-
-    /**
-     * Extrae el schema de respuesta resolviendo $ref básicos.
-     *
-     * @param  array<string, mixed>  $spec
-     * @param  array<string, mixed>  $responseSpec
-     * @return array<string, mixed>|null
-     */
-    private function resolveSchema(array $spec, array $responseSpec): ?array
-    {
-        $schema = $responseSpec['content']['application/json']['schema']
-            ?? $responseSpec['content']['application/problem+json']['schema']
-            ?? null;
-
-        if ($schema === null) {
-            return null;
-        }
-
-        // Resolver $ref
-        if (isset($schema['$ref'])) {
-            $ref = (string) $schema['$ref'];
-            if (str_starts_with($ref, '#/components/schemas/')) {
-                $name = substr($ref, strlen('#/components/schemas/'));
-                /** @var array<string, mixed>|null $resolved */
-                $resolved = $spec['components']['schemas'][$name] ?? null;
-
-                return $resolved;
-            }
-        }
-
-        return $schema;
-    }
-
-    /**
-     * Verifica que todos los campos requeridos estén presentes en el body.
-     *
-     * @param  string[]  $required
-     * @param  array<string, mixed>  $body
-     */
-    private function assertRequiredFields(array $required, array $body, string $context): void
-    {
-        foreach ($required as $field) {
-            $this->assertArrayHasKey(
-                $field,
-                $body,
-                "Campo requerido '{$field}' ausente en la respuesta ({$context}). ".
-                'La respuesta no cumple el esquema publicado en openapi.yaml.',
-            );
-        }
+        return $path;
     }
 }

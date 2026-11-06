@@ -280,4 +280,36 @@ class OutboxTest extends TestCase
             'last_name' => 'Torres',
         ]);
     }
+
+    public function test_record_throws_exception_if_no_active_database_transaction(): void
+    {
+        // Guardamos y liberamos transacciones activas de la prueba para simular ejecución fuera de transacción
+        $level = DB::transactionLevel();
+        while (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('OutboxService::record() debe llamarse dentro de una transacción de base de datos activa.');
+
+            $this->outboxService->record(
+                eventType: DomainEventTypes::DOCUMENT_UPLOADED,
+                aggregateType: 'stored_file',
+                aggregateId: (string) Str::uuid(),
+                payload: [
+                    'file_id' => (string) Str::uuid(),
+                    'mime_type' => 'application/pdf',
+                    'size_bytes' => 1024,
+                    'storage_key' => 'tenants/test/file.pdf',
+                ],
+                tenantId: $this->tenantId,
+            );
+        } finally {
+            // Restaurar nivel de transacción para la infraestructura de DatabaseTransactions de PHPUnit
+            while (DB::transactionLevel() < $level) {
+                DB::beginTransaction();
+            }
+        }
+    }
 }

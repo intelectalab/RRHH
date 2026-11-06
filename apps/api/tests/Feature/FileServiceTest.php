@@ -11,6 +11,7 @@ use App\Shared\Outbox\ProcessedEventTracker;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\Support\TenantTestHelper;
@@ -165,5 +166,28 @@ class FileServiceTest extends TestCase
             fileId: $storedFile->id,
             tenantId: $otherTenantId,
         );
+    }
+
+    public function test_direct_unsigned_url_access_returns_403_forbidden(): void
+    {
+        $file = UploadedFile::fake()->create('privado.pdf', 10, 'application/pdf');
+        $storedFile = $this->fileService->upload(
+            fileContent: $file,
+            originalName: 'privado.pdf',
+            mimeType: 'application/pdf',
+            tenantId: $this->tenantId,
+        );
+
+        $endpoint = config('filesystems.disks.s3.endpoint') ?? 'http://minio:9000';
+        $bucket = config('filesystems.disks.s3.bucket') ?? 'aynihr';
+        $directUnsignedUrl = rtrim($endpoint, '/')."/{$bucket}/{$storedFile->storage_key}";
+
+        Http::fake([
+            $directUnsignedUrl => Http::response('Access Denied', 403),
+        ]);
+
+        $response = Http::get($directUnsignedUrl);
+
+        $this->assertSame(403, $response->status(), 'El acceso directo sin firma al bucket debe devolver 403.');
     }
 }

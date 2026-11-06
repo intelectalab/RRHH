@@ -138,23 +138,64 @@ class ContractConformanceTest extends TestCase
 
         $response = $this->getJson('/test-invalid-schema-response');
 
-        // Capturamos el AssertionFailedError que DEBE lanzar assertMatchesOpenApi
-        // porque el body {"wrong_field":"..."} no tiene el campo "data" requerido
+        // Capturamos el AssertionFailedError que lanza el validador oficial de OpenAPI
         $thrown = false;
         try {
             $this->assertMatchesOpenApi($response, 'get', '/platform/health', 200);
         } catch (AssertionFailedError $e) {
             $thrown = true;
             $this->assertStringContainsString(
-                "Campo requerido 'data' ausente",
+                "Required property 'data' must be present",
                 $e->getMessage(),
-                'assertMatchesOpenApi debe indicar exactamente qué campo requerido falta',
+                'assertMatchesOpenApi debe indicar la propiedad requerida faltante',
             );
         }
 
         $this->assertTrue(
             $thrown,
             'assertMatchesOpenApi debió lanzar AssertionFailedError porque el body no tiene "data" (requerido por GenericEnvelope)',
+        );
+    }
+
+    public function test_assert_matches_openapi_fails_when_field_type_is_incorrect(): void
+    {
+        // Registramos una ruta que responde con un tipo de dato incorrecto:
+        // /platform/tenants requiere data: array y meta: object.
+        // Aquí enviamos data como un string escalar "not-an-array".
+        Route::get('/test-invalid-type-response', function () {
+            return response()->json([
+                'data' => 'not-an-array',
+                'meta' => [
+                    'page' => 1,
+                    'per_page' => 15,
+                    'total' => 0,
+                    'total_pages' => 0,
+                ],
+            ]);
+        });
+
+        $response = $this->getJson('/test-invalid-type-response');
+
+        $thrown = false;
+        try {
+            $this->assertMatchesOpenApi($response, 'get', '/platform/tenants', 200);
+        } catch (AssertionFailedError $e) {
+            $thrown = true;
+            $this->assertStringContainsString(
+                'Body does not match schema',
+                $e->getMessage(),
+                'El validador OpenAPI debe rechazar la respuesta por tipo incorrecto',
+            );
+            $this->assertStringContainsString(
+                "Value expected to be 'array', but 'string' given",
+                $e->getMessage(),
+                'El validador OpenAPI debe indicar que se esperaba un array y se recibió string',
+            );
+        }
+
+        $this->assertTrue(
+            $thrown,
+            'assertMatchesOpenApi debió fallar por tipo de dato incorrecto (string en vez de array)',
         );
     }
 

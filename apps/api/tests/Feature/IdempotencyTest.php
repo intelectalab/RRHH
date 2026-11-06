@@ -58,7 +58,7 @@ class IdempotencyTest extends TestCase
         ])->postJson('/test-idempotency', $payload);
 
         $response2->assertStatus(201);
-        $response2->assertHeader('Idempotency-Replayed', 'true');
+        $response2->assertHeader('Idempotent-Replay', 'true');
         $response2->assertJsonPath('counter', 1); // El contador sigue en 1
         $this->assertSame(1, $this->executionCount); // El controlador NO se volvió a ejecutar
     }
@@ -103,5 +103,28 @@ class IdempotencyTest extends TestCase
 
         $response->assertStatus(409);
         $response->assertJsonPath('error.code', 'request_in_progress');
+    }
+
+    public function test_idempotency_applies_to_api_routes_automatically(): void
+    {
+        Route::middleware('api')->post('/api/v1/test-auto-idempotent', function (Request $request) {
+            return response()->json(['processed' => true, 'data' => $request->all()], 200);
+        });
+
+        $idempotencyKey = 'idemp-auto-'.Str::random(16);
+        $payload = ['action' => 'process_payment'];
+
+        $res1 = $this->withHeaders([
+            'Idempotency-Key' => $idempotencyKey,
+        ])->postJson('/api/v1/test-auto-idempotent', $payload);
+
+        $res1->assertStatus(200);
+
+        $res2 = $this->withHeaders([
+            'Idempotency-Key' => $idempotencyKey,
+        ])->postJson('/api/v1/test-auto-idempotent', $payload);
+
+        $res2->assertStatus(200);
+        $res2->assertHeader('Idempotent-Replay', 'true');
     }
 }

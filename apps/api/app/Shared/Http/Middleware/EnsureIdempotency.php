@@ -57,7 +57,7 @@ class EnsureIdempotency
                 // Devolver la respuesta cacheada sin duplicar el efecto
                 return response()
                     ->json($existing->response_body, $existing->response_status)
-                    ->header('Idempotency-Replayed', 'true');
+                    ->header('Idempotent-Replay', 'true');
             }
 
             // Caso 2: Petición en curso con bloqueo activo
