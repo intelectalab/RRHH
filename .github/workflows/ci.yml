@@ -67,7 +67,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install Python dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml openapi-spec-validator
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
@@ -103,7 +103,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U ayni -d aynihr_testing"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -143,11 +143,15 @@ jobs:
         run: npm ci
 
       - name: Initialize PostgreSQL database schema
-        run: PGPASSWORD=secret psql -h localhost -U ayni -d aynihr_testing -f database/schema.sql
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -f database/schema.sql
 
       - name: Run Backend Tests with Coverage
         working-directory: apps/api
         env:
+          APP_ENV: testing
+          APP_KEY: base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: 5432

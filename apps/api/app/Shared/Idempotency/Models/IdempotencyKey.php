@@ -60,4 +60,3 @@ class IdempotencyKey extends Model
         'expires_at' => 'datetime',
     ];
 }
-

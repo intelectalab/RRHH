@@ -105,4 +105,3 @@ class IdempotencyTest extends TestCase
         $response->assertJsonPath('error.code', 'request_in_progress');
     }
 }
-

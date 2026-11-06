@@ -34,4 +34,3 @@ interface FileStorageService
      */
     public function delete(string $fileId, ?string $tenantId = null): void;
 }
-

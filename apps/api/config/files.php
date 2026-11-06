@@ -33,4 +33,3 @@ return [
     // Estado de antivirus por defecto al subir
     'scan_status_default' => env('FILES_VIRUS_SCAN_STATUS', 'clean'),
 ];
-

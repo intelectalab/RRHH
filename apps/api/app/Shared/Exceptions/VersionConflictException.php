@@ -17,4 +17,3 @@ final class VersionConflictException extends AyniException
         );
     }
 }
-

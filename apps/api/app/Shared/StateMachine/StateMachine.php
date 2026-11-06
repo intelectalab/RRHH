@@ -56,4 +56,3 @@ abstract class StateMachine
         return array_keys($transitions[$currentState] ?? []);
     }
 }
-

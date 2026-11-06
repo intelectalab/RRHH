@@ -12,14 +12,28 @@ class CiContractsTest extends TestCase
 {
     private function resolvePath(string $relativePath): string
     {
+        $relativePath = ltrim($relativePath, '/');
+
         // En entorno dockerizado bajo /var/www
-        $containerPath = '/var/www/'.ltrim($relativePath, '/');
+        $containerPath = '/var/www/'.$relativePath;
         if (file_exists($containerPath)) {
             return $containerPath;
         }
 
-        // En ejecución local fuera de docker
-        return base_path('../../'.ltrim($relativePath, '/'));
+        $candidates = [
+            base_path('../../'.$relativePath),
+            base_path('../'.$relativePath),
+            dirname(base_path()).'/'.$relativePath,
+            dirname(dirname(base_path())).'/'.$relativePath,
+        ];
+
+        foreach ($candidates as $cand) {
+            if (file_exists($cand)) {
+                return $cand;
+            }
+        }
+
+        return base_path('../../'.$relativePath);
     }
 
     public function test_openapi_contract_file_exists_and_is_valid_yaml(): void

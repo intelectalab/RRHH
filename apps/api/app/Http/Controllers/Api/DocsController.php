@@ -72,7 +72,10 @@ HTML;
         $possiblePaths = [
             '/var/www/api/openapi.yaml',
             base_path('../../api/openapi.yaml'),
+            base_path('../api/openapi.yaml'),
             base_path('api/openapi.yaml'),
+            dirname(base_path()).'/api/openapi.yaml',
+            dirname(dirname(base_path())).'/api/openapi.yaml',
         ];
 
         $specPath = null;
