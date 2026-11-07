@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Shared\Cache\TenantCache;
 use App\Shared\Files\Contracts\FileStorageService;
 use App\Shared\Files\FileService;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Outbox\ProcessedEventTracker;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(FileService::class);
         $this->app->bind(FileStorageService::class, FileService::class);
+
+        $this->app->singleton(TenantCache::class);
     }
 
     /**
@@ -29,6 +33,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Model::preventLazyLoading(! $this->app->isProduction());
     }
 }
