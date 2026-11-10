@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/ui/tokens.css'
 import '@/ui/base.css'
+import '@/ui/shell.css'
 
 export const metadata: Metadata = {
   title: 'Ayni HR',

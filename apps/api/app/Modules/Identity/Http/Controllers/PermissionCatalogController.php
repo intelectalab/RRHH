@@ -13,12 +13,14 @@ final class PermissionCatalogController
     public function __invoke(): JsonResponse
     {
         $rows = DB::table('permissions')
-            ->orderBy('module_code')->orderBy('code')
-            ->get(['code', 'module_code', 'resource', 'action', 'kind', 'is_sensitive', 'description']);
+            ->join('modules', 'modules.code', '=', 'permissions.module_code')
+            ->orderBy('modules.phase')->orderBy('modules.name')->orderBy('permissions.code')
+            ->get(['permissions.code', 'permissions.module_code', 'modules.name as module_name', 'permissions.resource', 'permissions.action', 'permissions.kind', 'permissions.is_sensitive', 'permissions.description']);
 
         return response()->json(['data' => $rows->map(fn ($r) => [
             'code' => $r->code,
             'module' => $r->module_code,
+            'module_name' => $r->module_name,
             'resource' => $r->resource,
             'action' => $r->action,
             'kind' => $r->kind,

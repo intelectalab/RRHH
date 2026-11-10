@@ -41,18 +41,23 @@ export class ApiClient {
   ) {}
 
   async get<T>(endpoint: string, init?: RequestInit): Promise<T> {
-    return this.request<T>(endpoint, { ...init, method: 'GET' })
+    return this.send<T>(endpoint, { ...init, method: 'GET' })
   }
 
   async post<T>(endpoint: string, body?: unknown, init?: RequestInit): Promise<T> {
-    return this.request<T>(endpoint, {
+    return this.send<T>(endpoint, {
       ...init,
       method: 'POST',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
   }
 
-  private async request<T>(endpoint: string, init: RequestInit): Promise<T> {
+  /** PATCH, PUT o DELETE con cabeceras opcionales (If-Match). */
+  async request<T = unknown>(endpoint: string, method: 'PATCH' | 'PUT' | 'DELETE', body?: unknown, headers?: Record<string, string>): Promise<T> {
+    return this.send<T>(endpoint, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined })
+  }
+
+  private async send<T>(endpoint: string, init: RequestInit): Promise<T> {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`
     const method = (init.method ?? 'GET').toUpperCase()
     const headers: Record<string, string> = {
@@ -83,6 +88,7 @@ export class ApiClient {
       )
     }
 
+    if (response.status === 204) return undefined as T
     return (await response.json()) as T
   }
 }
