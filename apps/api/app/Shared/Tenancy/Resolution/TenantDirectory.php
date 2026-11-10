@@ -54,6 +54,24 @@ final class TenantDirectory
         );
     }
 
+    /**
+     * Organizaciones operables, para procesos programados que recorren cada una
+     * (cada recorrido corre luego con TenancyScope::runAs).
+     *
+     * @return array<int, string>
+     */
+    public function operableTenantIds(): array
+    {
+        /** @var array<int, string> $ids */
+        $ids = TenancyScope::runWithoutTenant(fn () => DB::table('tenants')
+            ->whereIn('status', (array) config('tenancy.operable_statuses', []))
+            ->whereNull('deleted_at')
+            ->orderBy('id')
+            ->pluck('id')->map(fn ($id) => (string) $id)->all());
+
+        return $ids;
+    }
+
     private function first(Builder $query, string $source): ?ResolvedTenant
     {
         /** @var object{id: string, status: string}|null $row */

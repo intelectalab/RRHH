@@ -52,6 +52,21 @@ final class DomainEventTypes
 
     public const USER_INVITED = 'user.invited.v1';
 
+    // Aprobaciones (WFL)
+    public const APPROVAL_REQUESTED = 'approval.requested.v1';
+
+    public const APPROVAL_STEP_APPROVED = 'approval.step_approved.v1';
+
+    public const APPROVAL_APPROVED = 'approval.approved.v1';
+
+    public const APPROVAL_REJECTED = 'approval.rejected.v1';
+
+    public const APPROVAL_ESCALATED = 'approval.escalated.v1';
+
+    public const APPROVAL_CANCELLED = 'approval.cancelled.v1';
+
+    public const APPROVAL_REMINDER = 'approval.reminder.v1';
+
     // Organización
     public const COMPANY_CREATED = 'company.created.v1';
 
@@ -151,6 +166,41 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['user_id', 'user_token_id', 'token_enc', 'expires_at'],
             'description' => 'Se solicitó el enlace de recuperación de clave (token cifrado, nunca en claro)',
+        ],
+        self::APPROVAL_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Solicitud de aprobación iniciada y asignada al primer nivel',
+        ],
+        self::APPROVAL_STEP_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Un nivel de la aprobación quedó aprobado',
+        ],
+        self::APPROVAL_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Aprobación final: el módulo de origen ejecuta su transición',
+        ],
+        self::APPROVAL_REJECTED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Aprobación rechazada con motivo',
+        ],
+        self::APPROVAL_ESCALATED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Tarea vencida reasignada por escalamiento',
+        ],
+        self::APPROVAL_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Solicitud cancelada antes de la decisión final',
+        ],
+        self::APPROVAL_REMINDER => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
+            'description' => 'Recordatorio de tarea de aprobación por vencer',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

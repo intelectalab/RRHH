@@ -13316,6 +13316,8 @@ export interface components {
             /** @enum {string} */
             status: "draft" | "published" | "retired";
             version: number;
+            has_draft?: boolean | null;
+            allowed_actions?: string[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -13330,6 +13332,8 @@ export interface components {
             conditions?: {
                 [key: string]: unknown;
             };
+            has_draft?: boolean | null;
+            allowed_actions?: string[] | null;
         };
         ApprovalRequest: {
             /** @description Identificador opaco */
@@ -13339,11 +13343,24 @@ export interface components {
             subject_id: string;
             /** @description Identificador opaco */
             flow_id: string;
+            flow_name?: string | null;
             current_step: number;
+            current_step_name?: string | null;
+            levels?: number | null;
             /** @enum {string} */
             status: "pending" | "approved" | "rejected" | "cancelled" | "expired";
+            escalated?: boolean | null;
             /** Format: date-time */
             due_at?: string | null;
+            /** @description Identificador opaco */
+            started_by_user_id?: string | null;
+            requester_name?: string | null;
+            tasks?: {
+                [key: string]: unknown;
+            }[] | null;
+            can_decide?: boolean | null;
+            /** Format: date-time */
+            finished_at?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
