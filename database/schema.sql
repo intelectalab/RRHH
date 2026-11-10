@@ -17047,9 +17047,9 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
 
 -- NOT-1 · NOT-6: horario de silencio, avisos obligatorios y retención del centro de notificaciones.
 INSERT INTO parameter_definitions (code, module_code, name, description, data_type, default_value, allowed_scopes, options) VALUES
-  ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por canal externo se difieren (RN-NOT-03). Vacío: sin silencio.', 'time', NULL, ARRAY['organization'], NULL),
-  ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos diferidos por el silencio (RN-NOT-03).', 'time', NULL, ARRAY['organization'], NULL),
-  ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto (RN-NOT-05).', 'list', '[]'::jsonb, ARRAY['organization'], NULL),
+  ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', 'time', NULL, ARRAY['organization'], NULL),
+  ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', NULL, ARRAY['organization'], NULL),
+  ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),
   ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', 'integer', '180'::jsonb, ARRAY['organization'], NULL);
 
 -- ====================================================================================================

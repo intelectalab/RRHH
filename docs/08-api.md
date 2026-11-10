@@ -324,8 +324,9 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/exchange-rates` | `settings.exchange_rates.{view,create}` | 0 |
 | GET, POST | `/saved-views` | `settings.saved_views.{view,create}` | 0 |
 | GET, PATCH, DELETE | `/saved-views/{id}` | `settings.saved_views.{view,update,delete}` | 0 |
-| GET | `/settings/{group}` | `settings.{group}.view` | 0 |
-| PUT | `/settings/{group}` | `settings.{group}.update` | 0 |
+| GET | `/settings` | `settings.parameters.view` | 0 |
+| GET | `/settings/{group}` | `settings.parameters.view` | 0 |
+| PUT | `/settings/{group}` | `settings.parameters.update` | 0 |
 
 **PLT · Plataforma técnica**
 

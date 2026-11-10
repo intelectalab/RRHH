@@ -244,3 +244,27 @@
 .vista-previa p { margin: 6px 0 0; }
 .nota { border: 1px solid var(--in); background: var(--in-50); color: var(--tx); border-radius: var(--r); padding: 10px 12px; font-size: var(--fs-s); margin-bottom: 16px; }
 @media (max-width: 600px) { .notif-lista { position: fixed; left: 12px; right: 12px; top: 60px; width: auto; } }
+
+/* Centro de configuración (CFG-1) y parámetros (CFG-3) */
+.cfg-buscar { position: relative; max-width: 520px; margin-bottom: 24px; }
+.cfg-buscar svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--tx3); }
+.cfg-buscar .form-control { padding-left: 38px; }
+.cfg-seccion { margin-bottom: 28px; }
+.cfg-seccion h2 { font-size: var(--fs-h2); font-weight: 800; margin: 0 0 12px; }
+.cfg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.cfg-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--sup); border: 1px solid var(--bd); border-radius: var(--r-l); color: var(--tx); text-decoration: none; transition: border-color var(--t-rapido) var(--ease-out), box-shadow var(--t-rapido) var(--ease-out); }
+.cfg-card:hover { border-color: var(--pe-500); box-shadow: var(--sombra-1); text-decoration: none; }
+.cfg-hit { display: flex; flex-direction: column; padding: 10px 16px; color: var(--tx); text-decoration: none; border-bottom: 1px solid var(--bd2); }
+.cfg-hit:hover { background: var(--bg); text-decoration: none; }
+.param { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 16px; border-bottom: 1px solid var(--bd); scroll-margin-top: 120px; }
+.param:last-child { border-bottom: 0; }
+.param:target { background: var(--oc-50); }
+.param .sub2 { display: block; }
+.param-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; min-width: 140px; }
+.param-form { margin-top: 12px; padding: 12px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--bg); }
+.grid-param { display: grid; grid-template-columns: 1fr 180px; gap: 12px; margin-bottom: 8px; }
+.param-acciones { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+.historial { margin-top: 8px; font-size: var(--fs-s); }
+.historial summary { cursor: pointer; color: var(--primario); font-weight: 700; }
+.historial ul { margin: 6px 0 0; padding-left: 18px; color: var(--tx2); }
+@media (max-width: 700px) { .param { grid-template-columns: minmax(0, 1fr); } .param-valor { align-items: flex-start; text-align: left; } .grid-param { grid-template-columns: 1fr; } }

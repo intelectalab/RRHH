@@ -2,8 +2,8 @@
 
 namespace App\Modules\Notifications\Application;
 
+use App\Shared\Settings\ParameterResolver;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Catálogo de tipos de aviso (config/notifications.php) más las decisiones de la organización:
@@ -97,13 +97,6 @@ final class NotificationCatalog
      */
     public function setting(string $code): mixed
     {
-        $today = now()->toDateString();
-        $value = DB::table('tenant_settings')->where('parameter_code', $code)->where('scope_kind', 'organization')
-            ->where(fn ($q) => $q->whereNull('valid_from')->orWhere('valid_from', '<=', $today))
-            ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $today))
-            ->orderByDesc('valid_from')->value('value');
-        $value ??= DB::table('parameter_definitions')->where('code', $code)->value('default_value');
-
-        return is_string($value) ? json_decode($value, true) : $value;
+        return app(ParameterResolver::class)->value($code);
     }
 }

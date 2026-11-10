@@ -22,7 +22,7 @@ const MODULES: ModuleLink[] = [
   { href: '/organizacion/empresas', key: 'shell.modules_org', module: 'base', visible: (can) => can('org.legal_entities.view') },
   { href: '/aprobaciones', key: 'shell.modules_approvals', module: 'base', visible: (can) => can('workflow.approval_requests.view') },
   { href: '/tareas', key: 'shell.modules_tasks', module: 'base', visible: (can) => can('workflow.tasks.view') },
-  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('notifications.templates.view') || can('audit.logs.view') },
+  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('notifications.templates.view') || can('settings.parameters.view') || can('audit.logs.view') },
 ]
 
 function initials(name: string): string {

@@ -25305,9 +25305,27 @@ paths:
       x-phase: 0
       x-permission: audit.sensitive_access.view
       operationId: getSensitiveAccessLogs
+  /settings:
+    get:
+      summary: Secciones de parámetros de los módulos contratados (para el centro de configuración y su buscador)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.parameters.view
+      operationId: getSettings
   /settings/{group}:
     get:
-      summary: Leer un grupo de configuración
+      summary: Parámetros de una sección con valor vigente, origen (empresa, organización o por defecto) e historial; ?legal_entity_id=
+        y ?as_of=
       responses:
         '200':
           description: Correcto
@@ -25321,7 +25339,7 @@ paths:
       tags:
       - CFG
       x-phase: 0
-      x-permission: settings.{group}.view
+      x-permission: settings.parameters.view
       operationId: getSettingsGroup
       parameters:
       - name: group
@@ -25330,7 +25348,8 @@ paths:
         schema:
           type: string
     put:
-      summary: Guardar un grupo de configuración
+      summary: Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa
+        empresa y value null vuelve a heredar
       requestBody:
         required: true
         content:
@@ -25353,7 +25372,7 @@ paths:
       tags:
       - CFG
       x-phase: 0
-      x-permission: settings.{group}.update
+      x-permission: settings.parameters.update
       operationId: putSettingsGroup
       parameters:
       - name: group

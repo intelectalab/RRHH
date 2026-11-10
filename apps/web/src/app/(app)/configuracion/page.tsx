@@ -1,5 +1,5 @@
-import { SettingsRedirect } from '@/modules/identity/SettingsRedirect'
+import { SettingsHome } from '@/modules/settings/SettingsHome'
 
 export default function ConfiguracionPage() {
-  return <SettingsRedirect />
+  return <SettingsHome />
 }

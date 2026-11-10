@@ -9897,6 +9897,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Secciones de parámetros de los módulos contratados (para el centro de configuración y su buscador) */
+        get: operations["getSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settings/{group}": {
         parameters: {
             query?: never;
@@ -9904,9 +9921,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Leer un grupo de configuración */
+        /** Parámetros de una sección con valor vigente, origen (empresa, organización o por defecto) e historial; ?legal_entity_id= y ?as_of= */
         get: operations["getSettingsGroup"];
-        /** Guardar un grupo de configuración */
+        /** Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa empresa y value null vuelve a heredar */
         put: operations["putSettingsGroup"];
         post?: never;
         delete?: never;
@@ -43165,6 +43182,28 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getSettingsGroup: {
