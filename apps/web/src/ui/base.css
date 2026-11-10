@@ -78,3 +78,4 @@ h1, h2, h3 { margin: 0; }
 .login-form .caja { width: 100%; max-width: 380px; }
 .login-form h1 { font-size: var(--fs-h1); font-weight: 800; margin-bottom: 4px; }
 @media (max-width: 860px) { .login { grid-template-columns: 1fr; } .login-foto { min-height: 160px; } .login-foto-pie { left: 20px; bottom: 16px; } }
+.mt-2 { margin-top: 8px; }

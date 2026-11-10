@@ -128,7 +128,14 @@
     "done_invited": "Convite enviado.",
     "done_suspended": "Usuário bloqueado.",
     "done_reactivated": "Usuário reativado.",
-    "done_reset": "O link para redefinir a senha foi enviado."
+    "done_reset": "O link para redefinir a senha foi enviado.",
+    "edit": "Editar",
+    "form_edit": "Editar usuário",
+    "scope": "Alcance",
+    "scope_default": "O do papel",
+    "scope_companies": "Empresas incluídas",
+    "done_saved": "Usuário salvo.",
+    "scope_note": "O alcance limita quais colaboradores e registros vê com esse papel. Unidades físicas e áreas poderão ser escolhidas quando estiverem cadastradas."
   },
   "roles": {
     "sub": "{count} papéis",

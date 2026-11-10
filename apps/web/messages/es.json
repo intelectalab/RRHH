@@ -128,7 +128,14 @@
     "done_invited": "Invitación enviada.",
     "done_suspended": "Usuario bloqueado.",
     "done_reactivated": "Usuario reactivado.",
-    "done_reset": "Se envió el enlace para restablecer la contraseña."
+    "done_reset": "Se envió el enlace para restablecer la contraseña.",
+    "edit": "Editar",
+    "form_edit": "Editar usuario",
+    "scope": "Alcance",
+    "scope_default": "El del rol",
+    "scope_companies": "Empresas incluidas",
+    "done_saved": "Usuario guardado.",
+    "scope_note": "El alcance limita qué colaboradores y registros ve con ese rol. Sedes y unidades se podrán elegir cuando estén registradas."
   },
   "roles": {
     "sub": "{count} roles",

@@ -128,7 +128,14 @@
     "done_invited": "Invitation sent.",
     "done_suspended": "User locked.",
     "done_reactivated": "User reactivated.",
-    "done_reset": "The password reset link was sent."
+    "done_reset": "The password reset link was sent.",
+    "edit": "Edit",
+    "form_edit": "Edit user",
+    "scope": "Scope",
+    "scope_default": "Role default",
+    "scope_companies": "Included companies",
+    "done_saved": "User saved.",
+    "scope_note": "Scope limits which employees and records they see with that role. Sites and units can be chosen once they are registered."
   },
   "roles": {
     "sub": "{count} roles",
