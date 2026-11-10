@@ -74,7 +74,12 @@
     "modules": "Módulos",
     "modules_home": "Início",
     "modules_settings": "Configurações",
-    "modules_org": "Organização"
+    "modules_org": "Organização",
+    "theme": "Tema",
+    "theme_light": "Claro",
+    "theme_dark": "Escuro",
+    "theme_system": "Do sistema",
+    "menu": "Menu de módulos"
   },
   "home": {
     "title": "Olá, {name}",

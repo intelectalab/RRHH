@@ -4,18 +4,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useT } from '@/lib/useT'
+import { applyTheme, storedTheme, type ThemeChoice } from '@/lib/theme'
 import { Icon } from '@/ui/components/Icon'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { SessionProvider, useSession } from './SessionProvider'
 
-type ModuleLink = { href: string; key: string; visible: (can: (p: string) => boolean) => boolean }
+/** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
+type ModuleLink = { href: string; key: string; module: string; visible: (can: (p: string) => boolean) => boolean }
 
 /** Módulos de la barra. Se agregan aquí a medida que existen pantallas (sin botones sin función). */
 const MODULES: ModuleLink[] = [
-  { href: '/', key: 'shell.modules_home', visible: () => true },
-  { href: '/organizacion/empresas', key: 'shell.modules_org', visible: (can) => can('org.legal_entities.view') },
-  { href: '/configuracion', key: 'shell.modules_settings', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('audit.logs.view') },
+  { href: '/', key: 'shell.modules_home', module: 'base', visible: () => true },
+  { href: '/organizacion/empresas', key: 'shell.modules_org', module: 'base', visible: (can) => can('org.legal_entities.view') },
+  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('audit.logs.view') },
 ]
 
 function initials(name: string): string {
@@ -27,7 +29,12 @@ function Shell({ children }: { children: ReactNode }) {
   const { session, can, logout } = useSession()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
+  const [theme, setTheme] = useState<ThemeChoice>('system')
   const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => setTheme(storedTheme()), [])
+  useEffect(() => setNavOpen(false), [pathname])
 
   useEffect(() => {
     if (!open) return
@@ -63,6 +70,16 @@ function Shell({ children }: { children: ReactNode }) {
             </button>
             {open && (
               <div className="menu-lista" role="menu">
+                <div className="menu-grupo" role="group" aria-label={t('shell.theme')}>
+                  <span className="small text-secondary">{t('shell.theme')}</span>
+                  <div className="seg">
+                    {(['light', 'dark', 'system'] as const).map((c) => (
+                      <button key={c} type="button" role="menuitemradio" aria-checked={theme === c} className={theme === c ? 'on' : undefined} onClick={() => { applyTheme(c); setTheme(c) }}>
+                        {t(`shell.theme_${c}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <button type="button" className="menu-item" role="menuitem" onClick={() => void logout()}>
                   <Icon name="signOut" /> {t('shell.logout')}
                 </button>
@@ -71,13 +88,18 @@ function Shell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <nav className="modbar" aria-label={t('shell.modules')}>
+      <nav className={`modbar${navOpen ? ' abierto' : ''}`} aria-label={t('shell.modules')}>
         <div className="in">
-          {MODULES.filter((m) => m.visible(can)).map((m) => (
+          <button type="button" className="modbar-toggle" aria-expanded={navOpen} aria-controls="modbar-lista" onClick={() => setNavOpen((v) => !v)}>
+            <Icon name="menu" /> {t('shell.menu')}
+          </button>
+          <div className="modbar-lista" id="modbar-lista">
+          {MODULES.filter((m) => session.modules.includes(m.module) && m.visible(can)).map((m) => (
             <Link key={m.href} href={m.href} className={active(m.href) ? 'on' : undefined} aria-current={active(m.href) ? 'page' : undefined}>
               {t(m.key)}
             </Link>
           ))}
+          </div>
         </div>
       </nav>
       {children}

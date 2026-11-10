@@ -57,15 +57,15 @@ Generado el **2026-11-02**. Actualizar manualmente al cerrar cada historia.
 | AUD-3 | Actividad de usuario y logs técnicos separados | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
 | AUD-4 | Visor de auditoría | AUD | Fase 0 · Cimientos | Story | hecha | 2026-11-10 | GET /audit-logs (filtros por usuario, entidad, registro, acción, fechas y búsqueda; cursor), GET /audit-logs/{id}, GET /sensitive-access-logs; pantallas Configuración → Auditoría (detalle antes/después, historia completa del registro, exportación CSV con campos ya enmascarados) y → Accesos sensibles; prueba de que el rol Auditor no tiene ningún permiso de escritura. |
 | AUD-5 | Integridad y retención de la auditoría | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
-| UI-1 | Fundamentos visuales y temas claro y oscuro | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
-| UI-2 | Armazón de navegación | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
+| UI-1 | Fundamentos visuales y temas claro y oscuro | UI | Fase 0 · Cimientos | Task | hecha | 2026-11-10 | Tokens semánticos de componentes (primario, controles, barra, velo, avisos, avatar) definidos para claro y oscuro; ningún estilo ni componente usa colores literales (prueba que recorre src/ui y src/modules); contraste AA verificado por prueba en 18 pares de uso real en ambos temas; tema claro/oscuro/del sistema en el menú de la cuenta, aplicado antes de pintar; identidad propia (petróleo/ocre, Nunito Sans). |
+| UI-2 | Armazón de navegación | UI | Fase 0 · Cimientos | Story | en_curso | 2026-11-10 | Barra de módulos horizontal del diseño aprobado (no barra lateral, por decisión del cliente) filtrada por módulo contratado y permiso; en pantallas angostas se pliega en «Menú de módulos» desplegable; rutas con dirección propia (/configuracion/usuarios, /organizacion/empresas…). Falta la vista móvil del resto de módulos a medida que existan. |
 | UI-3 | Biblioteca de componentes | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-4 | Tablas profesionales | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-5 | Formularios y validación en interfaz | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-6 | Estados vacíos, carga y error | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-7 | Paleta de comandos y búsqueda global | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
 | UI-8 | Botón de creación rápida | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
-| UI-9 | Experiencia móvil y aplicación instalable | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
+| UI-9 | Experiencia móvil y aplicación instalable | UI | Fase 0 · Cimientos | Task | en_curso | 2026-11-10 | Manifiesto de aplicación instalable con íconos 192/512 y maskable, color de tema por modo, viewport móvil; el armazón funciona a 360 px sin desplazamiento horizontal (verificado con Playwright). Falta el service worker para uso sin conexión del portal (va con el portal del colaborador). |
 | UI-10 | Divulgación progresiva | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-11 | Servicio de exportación | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-12 | Componentes de calendario, kanban y gráficos | UI | Fase 0 · Cimientos | Task | pendiente | — |  |

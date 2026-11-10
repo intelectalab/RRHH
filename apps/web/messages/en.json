@@ -74,7 +74,12 @@
     "modules": "Modules",
     "modules_home": "Home",
     "modules_settings": "Settings",
-    "modules_org": "Organization"
+    "modules_org": "Organization",
+    "theme": "Theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System",
+    "menu": "Modules menu"
   },
   "home": {
     "title": "Hello, {name}",

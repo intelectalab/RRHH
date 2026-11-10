@@ -71,6 +71,31 @@
   --t-rapido: 120ms;
   --t-medio: 180ms;
   --t-panel: 240ms;
+
+  /* Semánticos de componentes (UI-1): los componentes solo usan variables */
+  --sobre-marca: #FFFFFF;          /* texto sobre botones y fondos de marca */
+  --primario: var(--pe-600);
+  --primario-hover: var(--pe-700);
+  --primario-activo: var(--pe-800);
+  --control-bd: #C3CCD5;
+  --control-bd-hover: #A9B5C1;
+  --foco-anillo: rgba(23, 120, 138, 0.18);
+  --error-anillo: rgba(168, 50, 31, 0.15);
+  --neutro-50: #EEF1F4;
+  --av-bg: #E4E9EE;
+  --av-tx: #3D4A57;
+  --demo-bd: #E5C99B;
+  --barra: #0E4F5C;                /* barra de módulos */
+  --barra-tx: #D3E4E8;
+  --barra-tx-on: #FFFFFF;
+  --barra-hover: rgba(255, 255, 255, 0.05);
+  --marca-velo: rgba(11, 67, 80, 0.86);
+  --velo: rgba(28, 38, 48, 0.3);
+  --aviso-bg: #1C2630;
+  --aviso-tx: #FFFFFF;
+  --sombra-panel: -8px 0 24px rgba(28, 38, 48, 0.12);
+  --sombra-boton: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
@@ -80,7 +105,7 @@
   --pe-600: #4AAABF;
   --pe-500: #2A93A7;
   --pe-200: #125F6E;
-  --pe-100: #0E4F5C;
+  --pe-100: #0B4450;
   --pe-50: #0A2B33;
 
   --oc: #E5A83B;
@@ -118,6 +143,31 @@
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.35);
   --sombra-2: 0 6px 18px rgba(0, 0, 0, 0.45);
   --sombra-3: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  /* Semánticos de componentes en oscuro */
+  --sobre-marca: #FFFFFF;
+  --primario: #17788A;
+  --primario-hover: #1B8CA1;
+  --primario-activo: #125F6E;
+  --control-bd: #3A4B59;
+  --control-bd-hover: #4D6172;
+  --foco-anillo: rgba(74, 170, 191, 0.30);
+  --error-anillo: rgba(240, 101, 80, 0.25);
+  --neutro-50: #25323D;
+  --av-bg: #2E3C48;
+  --av-tx: #D7E0E8;
+  --demo-bd: #6B4A12;
+  --barra: #0B3A44;
+  --barra-tx: #B9D3D9;
+  --barra-tx-on: #FFFFFF;
+  --barra-hover: rgba(255, 255, 255, 0.06);
+  --marca-velo: rgba(5, 33, 40, 0.88);
+  --velo: rgba(0, 0, 0, 0.55);
+  --aviso-bg: #E6ECF1;
+  --aviso-tx: #10171D;
+  --sombra-panel: -8px 0 24px rgba(0, 0, 0, 0.5);
+  --sombra-boton: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
 }
 
 body {
