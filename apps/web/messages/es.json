@@ -29,11 +29,36 @@
     "new": "Nuevo"
   },
   "auth": {
-    "login": "Iniciar sesión",
+    "login": "Ingresar",
     "logout": "Cerrar sesión",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "forgot_password": "¿Olvidaste tu contraseña?"
+    "forgot_password": "¿Olvidó su contraseña?",
+    "login_title": "Ingresar",
+    "login_intro": "Ingrese el correo y la contraseña que le asignó su empresa.",
+    "show_password": "Mostrar u ocultar la contraseña",
+    "submitting": "Ingresando…",
+    "help": "¿Problemas para ingresar? Comuníquese con el área de RR. HH. de su empresa.",
+    "tagline": "AyniHR · Gestión de personal",
+    "forgot_title": "Recuperar contraseña",
+    "forgot_intro": "Escriba su correo. Si pertenece a una cuenta activa, le enviaremos un enlace para crear una nueva contraseña.",
+    "forgot_submit": "Enviar enlace",
+    "forgot_sent": "Si el correo pertenece a una cuenta activa, enviaremos un enlace para restablecer la contraseña. Revise su bandeja de entrada.",
+    "back_to_login": "Volver a ingresar",
+    "reset_title": "Crear nueva contraseña",
+    "reset_intro": "La contraseña debe tener al menos 12 caracteres, con letras y números.",
+    "new_password": "Nueva contraseña",
+    "confirm_password": "Repita la contraseña",
+    "reset_submit": "Guardar contraseña",
+    "reset_done": "Su contraseña se cambió. Ya puede ingresar.",
+    "reset_missing_token": "El enlace está incompleto. Solicite uno nuevo.",
+    "passwords_mismatch": "Las contraseñas no coinciden.",
+    "generic_error": "No se pudo completar la operación. Inténtelo de nuevo.",
+    "rate_limited": "Demasiados intentos. Espere un minuto e inténtelo de nuevo.",
+    "tenant_suspended": "La organización se encuentra suspendida. Comuníquese con el administrador.",
+    "missing_tenant": "Ingrese desde la dirección de su organización (por ejemplo, suempresa.aynihr.pe)."
+  },
+  "app": {
+    "name": "Ayni HR"
   }
 }
-

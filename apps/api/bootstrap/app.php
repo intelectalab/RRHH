@@ -37,6 +37,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // La API no redirige a una pantalla de ingreso: responde 401 unauthenticated.
         $middleware->redirectGuestsTo(fn () => null);
 
+        // Detrás del proxy del web (Next.js) o de nginx: X-Forwarded-Host define la organización.
+        // Solo se confía en los proxies listados en TRUSTED_PROXIES.
+        $proxies = env('TRUSTED_PROXIES');
+        if (is_string($proxies) && $proxies !== '') {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
+
         $middleware->api(prepend: [
             EnsureRequestId::class,
             ResolveTenantContext::class,

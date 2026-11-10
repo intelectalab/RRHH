@@ -33,7 +33,32 @@
     "logout": "Sair",
     "email": "E-mail",
     "password": "Senha",
-    "forgot_password": "Esqueceu sua senha?"
+    "forgot_password": "Esqueceu sua senha?",
+    "login_title": "Entrar",
+    "login_intro": "Informe o e-mail e a senha fornecidos pela sua empresa.",
+    "show_password": "Mostrar ou ocultar a senha",
+    "submitting": "Entrando…",
+    "help": "Problemas para entrar? Fale com o RH da sua empresa.",
+    "tagline": "AyniHR · Gestão de pessoas",
+    "forgot_title": "Recuperar senha",
+    "forgot_intro": "Informe seu e-mail. Se pertencer a uma conta ativa, enviaremos um link para criar uma nova senha.",
+    "forgot_submit": "Enviar link",
+    "forgot_sent": "Se o e-mail pertencer a uma conta ativa, enviaremos um link para redefinir a senha. Verifique sua caixa de entrada.",
+    "back_to_login": "Voltar para entrar",
+    "reset_title": "Criar nova senha",
+    "reset_intro": "A senha deve ter pelo menos 12 caracteres, com letras e números.",
+    "new_password": "Nova senha",
+    "confirm_password": "Repita a senha",
+    "reset_submit": "Salvar senha",
+    "reset_done": "Sua senha foi alterada. Você já pode entrar.",
+    "reset_missing_token": "O link está incompleto. Solicite um novo.",
+    "passwords_mismatch": "As senhas não coincidem.",
+    "generic_error": "Não foi possível concluir a operação. Tente novamente.",
+    "rate_limited": "Muitas tentativas. Aguarde um minuto e tente novamente.",
+    "tenant_suspended": "A organização está suspensa. Fale com o administrador.",
+    "missing_tenant": "Acesse pelo endereço da sua organização (por exemplo, suaempresa.aynihr.pe)."
+  },
+  "app": {
+    "name": "Ayni HR"
   }
 }
-

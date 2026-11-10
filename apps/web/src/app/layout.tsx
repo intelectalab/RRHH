@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import '@/ui/tokens.css'
+import '@/ui/base.css'
 
 export const metadata: Metadata = {
   title: 'Ayni HR',
-  description: 'Sistema de Gestión de Recursos Humanos',
+  icons: { icon: '/favicon.svg' },
 }
 
 export default function RootLayout({

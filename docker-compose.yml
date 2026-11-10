@@ -99,6 +99,9 @@ services:
     environment:
       APP_NAME: "Ayni HR"
       APP_ENV: local
+      TENANCY_BASE_DOMAIN: localhost
+      # El web (Next.js) reenvía /api con X-Forwarded-Host: la organización sale de ese host.
+      TRUSTED_PROXIES: "*"
       APP_KEY: ${APP_KEY:-base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=}
       APP_DEBUG: "true"
       APP_URL: http://localhost:8000
@@ -148,7 +151,7 @@ services:
     working_dir: /app
     environment:
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+      NEXT_PUBLIC_API_URL: http://api:8000/api
     volumes:
       - ./apps/web:/app
       - ./packages:/packages

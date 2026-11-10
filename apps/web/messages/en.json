@@ -33,7 +33,32 @@
     "logout": "Sign out",
     "email": "Email",
     "password": "Password",
-    "forgot_password": "Forgot your password?"
+    "forgot_password": "Forgot your password?",
+    "login_title": "Sign in",
+    "login_intro": "Enter the email and password your company gave you.",
+    "show_password": "Show or hide the password",
+    "submitting": "Signing in…",
+    "help": "Trouble signing in? Contact your company's HR department.",
+    "tagline": "AyniHR · People management",
+    "forgot_title": "Recover password",
+    "forgot_intro": "Enter your email. If it belongs to an active account, we will send you a link to create a new password.",
+    "forgot_submit": "Send link",
+    "forgot_sent": "If the email belongs to an active account, we will send a link to reset the password. Check your inbox.",
+    "back_to_login": "Back to sign in",
+    "reset_title": "Create a new password",
+    "reset_intro": "The password must have at least 12 characters, with letters and numbers.",
+    "new_password": "New password",
+    "confirm_password": "Repeat the password",
+    "reset_submit": "Save password",
+    "reset_done": "Your password was changed. You can sign in now.",
+    "reset_missing_token": "The link is incomplete. Request a new one.",
+    "passwords_mismatch": "The passwords do not match.",
+    "generic_error": "The operation could not be completed. Try again.",
+    "rate_limited": "Too many attempts. Wait a minute and try again.",
+    "tenant_suspended": "The organization is suspended. Contact the administrator.",
+    "missing_tenant": "Sign in from your organization's address (for example, yourcompany.aynihr.pe)."
+  },
+  "app": {
+    "name": "Ayni HR"
   }
 }
-
