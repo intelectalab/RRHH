@@ -47,11 +47,19 @@ class DemoOrganizationSeeder extends Seeder
         $password = $generated ? Str::password(16) : $password;
 
         $created = TenancyScope::runAs((string) $tenantId, function () use ($email, $password): bool {
-            $exists = UserIdentity::query()
+            $adminRole = Role::query()->where('system_role_code', 'admin_empresa')->firstOrFail();
+
+            /** @var UserIdentity|null $existing */
+            $existing = UserIdentity::query()
                 ->where('kind', 'email')
                 ->where('identifier_hash', BlindIndex::for('email', $email))
-                ->exists();
-            if ($exists) {
+                ->first();
+            if ($existing !== null) {
+                // Idempotente: un administrador sembrado antes de existir los roles recibe el suyo.
+                if (! $existing->user->roleAssignments()->where('role_id', $adminRole->id)->exists()) {
+                    $existing->user->roleAssignments()->create(['role_id' => $adminRole->id]);
+                }
+
                 return false;
             }
 
@@ -64,7 +72,6 @@ class DemoOrganizationSeeder extends Seeder
             ]);
             $user->identities()->create(UserIdentity::attributesFor('email', $email) + ['is_primary' => true]);
 
-            $adminRole = Role::query()->where('system_role_code', 'admin_empresa')->firstOrFail();
             $user->roleAssignments()->create(['role_id' => $adminRole->id]);
 
             return true;
