@@ -2,13 +2,14 @@
 
 namespace Tests\Support\Isolation;
 
+use App\Modules\Identity\Infrastructure\Models\User;
 use App\Shared\Tenancy\TenancyScope;
-use Illuminate\Auth\GenericUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
+use Tests\Support\IdentityFixtures;
 use Tests\TestCase;
 
 /**
@@ -38,6 +39,9 @@ final class CrossTenantHarness
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
+
+    /** @var array<string, User> */
+    private array $actors = [];
 
     /** @var array<int, string> */
     private const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
@@ -188,8 +192,9 @@ final class CrossTenantHarness
     {
         TenancyScope::clear();
 
-        $user = new GenericUser(['id' => (string) Str::uuid(), 'tenant_id' => $tenantId]);
-        $test->actingAs($user);
+        // Usuario de B con todos los permisos y módulos: el único obstáculo debe ser el aislamiento.
+        $this->actors[$tenantId] ??= IdentityFixtures::userWithPermissions($tenantId);
+        $test->actingAs($this->actors[$tenantId], 'ayni');
 
         $response = $test->withHeaders([
             'X-Tenant-Id' => $tenantId,

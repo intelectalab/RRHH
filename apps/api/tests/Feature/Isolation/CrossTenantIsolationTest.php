@@ -11,12 +11,15 @@
  */
 
 use App\Shared\Tenancy\TenancyScope;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Tests\Support\Isolation\CrossTenantHarness;
 
 const ISO_TENANT_A = 'aaaaaaaa-4444-4000-8000-00000000000a';
 const ISO_TENANT_B = 'bbbbbbbb-4444-4000-8000-00000000000b';
+
+uses(DatabaseTransactions::class);
 
 beforeEach(function (): void {
     if (DB::getDriverName() !== 'pgsql') {
@@ -32,10 +35,6 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     TenancyScope::clear();
-    foreach ([ISO_TENANT_A, ISO_TENANT_B] as $tenant) {
-        TenancyScope::runAs($tenant, fn () => DB::table('people')->where('tenant_id', $tenant)->delete());
-    }
-    DB::table('tenants')->whereIn('id', [ISO_TENANT_A, ISO_TENANT_B])->delete();
 });
 
 function isolationHarness(): CrossTenantHarness

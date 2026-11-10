@@ -33,8 +33,8 @@ Generado el **2026-11-02**. Actualizar manualmente al cerrar cada historia.
 | SEG-4 | Sesiones y dispositivos | SEG | Fase 0 · Cimientos | Story | pendiente | — |  |
 | SEG-5 | Políticas de contraseña, bloqueo y límite de peticiones | SEG | Fase 0 · Cimientos | Task | pendiente | — |  |
 | SEG-6 | Usuarios e invitaciones | SEG | Fase 0 · Cimientos | Story | pendiente | — |  |
-| SEG-7 | Roles del sistema y roles personalizados | SEG | Fase 0 · Cimientos | Story | pendiente | — |  |
-| SEG-8 | Catálogo de permisos `modulo.recurso.accion` | SEG | Fase 0 · Cimientos | Task | pendiente | — |  |
+| SEG-7 | Roles del sistema y roles personalizados | SEG | Fase 0 · Cimientos | Story | en_curso | 2026-11-10 | Backend: roles de sistema sembrados con seed_tenant_defaults; CRUD de roles personalizados con matriz de permisos y permisos por campo, alcance por rol, duplicar (copia permisos y alcances), If-Match/ETag; RN-SEG-01 (sistema inmutable, solo se duplica), RN-SEG-03 (no conceder lo que no se tiene), 409 in_use si está asignado; auditoría con antes y después; el cambio aplica de inmediato. Falta la pantalla Seguridad → Roles y permisos. |
+| SEG-8 | Catálogo de permisos `modulo.recurso.accion` | SEG | Fase 0 · Cimientos | Task | hecha | 2026-11-10 | Autorización única: middleware permission:<código> (sesión → módulo contratado 403 module_not_enabled → permiso 403 forbidden con meta.permission) y alcance concedido en la petición; permisos efectivos = unión de roles vigentes con el alcance más amplio, recalculados en cada petición; GET /me con usuario, organización, roles, permisos, permisos por campo, alcances y módulos; GET /permissions con el catálogo; PermissionDeclarationTest falla si una ruta no declara exactamente el x-permission del contrato. |
 | SEG-9 | Permisos por campo sensible | SEG | Fase 0 · Cimientos | Story | pendiente | — |  |
 | SEG-10 | Alcance de datos | SEG | Fase 0 · Cimientos | Story | pendiente | — |  |
 | SEG-11 | Cifrado de datos sensibles y registro de acceso | SEG | Fase 0 · Cimientos | Task | pendiente | — |  |

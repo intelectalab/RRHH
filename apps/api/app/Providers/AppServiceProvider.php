@@ -10,8 +10,12 @@ use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Outbox\ProcessedEventTracker;
+use App\Shared\Permissions\ModuleGate;
+use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\Events\RequestHandled;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FileStorageService::class, FileService::class);
 
         $this->app->singleton(TenantCache::class);
+        $this->app->singleton(PermissionResolver::class);
+        $this->app->singleton(ModuleGate::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);
         $this->app->singleton(IntegrationManager::class);
@@ -42,5 +48,11 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         TenantQueueContext::register();
+
+        // Permisos y módulos se memoizan solo dentro de una petición: un cambio de rol aplica de inmediato.
+        Event::listen(RequestHandled::class, function (): void {
+            $this->app->make(PermissionResolver::class)->forget();
+            $this->app->make(ModuleGate::class)->forget();
+        });
     }
 }

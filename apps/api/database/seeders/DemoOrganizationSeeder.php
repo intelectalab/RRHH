@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserIdentity;
 use App\Shared\Security\BlindIndex;
@@ -37,6 +38,9 @@ class DemoOrganizationSeeder extends Seeder
             ]);
         }
 
+        // Roles de sistema, sus permisos por defecto, política de seguridad y módulos base.
+        DB::select('SELECT seed_tenant_defaults(?)', [$tenantId]);
+
         $email = (string) env('DEMO_ADMIN_EMAIL', 'admin@demo.aynihr.test');
         $password = env('DEMO_ADMIN_PASSWORD');
         $generated = ! is_string($password) || $password === '';
@@ -59,6 +63,9 @@ class DemoOrganizationSeeder extends Seeder
                 'password_changed_at' => now(),
             ]);
             $user->identities()->create(UserIdentity::attributesFor('email', $email) + ['is_primary' => true]);
+
+            $adminRole = Role::query()->where('system_role_code', 'admin_empresa')->firstOrFail();
+            $user->roleAssignments()->create(['role_id' => $adminRole->id]);
 
             return true;
         });

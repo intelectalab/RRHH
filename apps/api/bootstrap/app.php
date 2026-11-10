@@ -10,6 +10,7 @@ use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Middleware\ResolveTenantContext;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
+use App\Shared\Permissions\RequirePermission;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -48,6 +49,9 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsureRequestId::class,
             ResolveTenantContext::class,
             EnsureIdempotency::class,
+        ]);
+        $middleware->alias([
+            RequirePermission::ALIAS => RequirePermission::class,
         ]);
         $middleware->api(append: [
             VerifyXsrfToken::class,

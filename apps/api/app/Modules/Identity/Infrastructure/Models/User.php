@@ -85,6 +85,14 @@ class User extends Model implements AuthenticatableContract
         return $this->hasMany(UserIdentity::class, 'user_id');
     }
 
+    /**
+     * @return HasMany<UserRole, $this>
+     */
+    public function roleAssignments(): HasMany
+    {
+        return $this->hasMany(UserRole::class, 'user_id');
+    }
+
     public function canSignIn(): bool
     {
         if ($this->status !== self::STATUS_ACTIVE) {
