@@ -68,4 +68,28 @@ class CiContractsTest extends TestCase
         $this->assertStringContainsString('Automated Tests & Coverage', $content);
         $this->assertStringContainsString('upload-artifact', $content);
     }
+
+    public function test_repository_work_guide_exists_and_contains_rules(): void
+    {
+        $guidePath = $this->resolvePath('docs/guia-trabajo.md');
+        $this->assertFileExists($guidePath, 'El archivo docs/guia-trabajo.md debe existir.');
+
+        $content = (string) file_get_contents($guidePath);
+        $this->assertStringContainsString('Guía de trabajo del repositorio', $content);
+        $this->assertStringContainsString('Regla fundamental de no regresión', $content);
+        $this->assertStringContainsString('justificación técnica', $content);
+        $this->assertStringContainsString('Definición de «Hecho»', $content);
+        $this->assertStringContainsString('Orden de construcción por fases', $content);
+    }
+
+    public function test_pull_request_template_exists_and_links_to_work_guide(): void
+    {
+        $templatePath = $this->resolvePath('.github/pull_request_template.md');
+        $this->assertFileExists($templatePath, 'El archivo .github/pull_request_template.md debe existir.');
+
+        $content = (string) file_get_contents($templatePath);
+        $this->assertStringContainsString('docs/guia-trabajo.md', $content);
+        $this->assertStringContainsString('Justificación técnica', $content);
+        $this->assertStringContainsString('Lista de verificación de «Hecho»', $content);
+    }
 }
