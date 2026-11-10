@@ -10,6 +10,7 @@ use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Outbox\ProcessedEventTracker;
+use App\Shared\Tenancy\Queue\TenantQueueContext;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,5 +40,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(! $this->app->isProduction());
+
+        TenantQueueContext::register();
     }
 }

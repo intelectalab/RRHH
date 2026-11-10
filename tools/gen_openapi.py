@@ -228,6 +228,7 @@ RES = [
 
 # Operaciones que no son CRUD: (épica, fase, método, ruta, permiso|None, resumen, público)
 EXTRA = [
+    ("PLT", 0, "get", "/health", None, "Salud de la API: disponible sin sesión ni organización", True),
     ("SEG", 0, "post", "/auth/login", None, "Iniciar sesión (correo o documento de identidad + clave)", True),
     ("SEG", 0, "post", "/auth/otp", None, "Solicitar o verificar un código de un solo uso", True),
     ("SEG", 0, "post", "/auth/mfa/verify", None, "Verificar segundo factor", True),

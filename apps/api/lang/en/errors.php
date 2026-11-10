@@ -9,6 +9,7 @@ return [
     'scope_insufficient' => 'The token scope is insufficient to access this resource.',
     'module_not_enabled' => 'The requested module is not enabled for this organization.',
     'feature_not_enabled' => 'This feature is not enabled for your organization.',
+    'missing_tenant_context' => 'The organization for this request could not be determined. Sign in from your organization\'s address.',
     'tenant_suspended' => 'The organization is currently suspended.',
     'plan_limit_reached' => 'The plan limit for this resource has been reached.',
     'not_found' => 'The requested resource was not found or belongs to another organization.',

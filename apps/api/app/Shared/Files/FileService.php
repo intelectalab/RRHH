@@ -125,19 +125,7 @@ class FileService implements FileStorageService
         ?string $userId = null,
         ?int $ttlSeconds = null
     ): string {
-        $resolvedTenantId = $tenantId ?? TenancyScope::current();
-
-        $query = StoredFile::where('id', $fileId);
-        if (! empty($resolvedTenantId)) {
-            $query->where('tenant_id', $resolvedTenantId);
-        }
-
-        /** @var StoredFile|null $file */
-        $file = $query->first();
-
-        if ($file === null) {
-            throw (new ModelNotFoundException)->setModel(StoredFile::class, [$fileId]);
-        }
+        $file = $this->findOwnedFile($fileId, $tenantId);
 
         $ttl = $ttlSeconds ?? (int) config('files.signed_url_ttl_seconds', 300);
         $expiresAt = now()->addSeconds($ttl);
@@ -166,25 +154,32 @@ class FileService implements FileStorageService
      */
     public function delete(string $fileId, ?string $tenantId = null): void
     {
-        $resolvedTenantId = $tenantId ?? TenancyScope::current();
-
-        $query = StoredFile::where('id', $fileId);
-        if (! empty($resolvedTenantId)) {
-            $query->where('tenant_id', $resolvedTenantId);
-        }
-
-        /** @var StoredFile|null $file */
-        $file = $query->first();
-
-        if ($file === null) {
-            throw (new ModelNotFoundException)->setModel(StoredFile::class, [$fileId]);
-        }
+        $file = $this->findOwnedFile($fileId, $tenantId);
 
         /** @var string $diskName */
         $diskName = config('files.disk', 's3');
         Storage::disk($diskName)->delete($file->storage_key);
 
         $file->delete();
+    }
+
+    /**
+     * Busca el archivo dentro de la organización activa (TEN-6). Sin organización no
+     * hay búsqueda; un archivo de otra organización o con una ruta fuera de
+     * tenants/{tenant_id}/ se trata como inexistente.
+     */
+    private function findOwnedFile(string $fileId, ?string $tenantId): StoredFile
+    {
+        $resolvedTenantId = $tenantId ?? TenancyScope::requireTenant();
+
+        /** @var StoredFile|null $file */
+        $file = StoredFile::where('id', $fileId)->where('tenant_id', $resolvedTenantId)->first();
+
+        if ($file === null || ! str_starts_with((string) $file->storage_key, "tenants/{$resolvedTenantId}/")) {
+            throw (new ModelNotFoundException)->setModel(StoredFile::class, [$fileId]);
+        }
+
+        return $file;
     }
 
     /**

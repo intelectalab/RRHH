@@ -321,6 +321,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET | `/health` | público | 0 |
 | GET | `/search` | sesión | 0 |
 | POST | `/files` | sesión | 0 |
 | GET | `/files/{id}/download-url` | sesión | 0 |

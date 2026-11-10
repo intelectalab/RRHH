@@ -9,6 +9,7 @@ return [
     'scope_insufficient' => 'El alcance del token es insuficiente para acceder a este recurso.',
     'module_not_enabled' => 'El módulo solicitado no está contratado ni activo para esta organización.',
     'feature_not_enabled' => 'Esta funcionalidad no está habilitada para su organización.',
+    'missing_tenant_context' => 'No se pudo determinar la organización de la solicitud. Ingrese desde la dirección de su organización.',
     'tenant_suspended' => 'La organización se encuentra suspendida.',
     'plan_limit_reached' => 'Se ha alcanzado el límite máximo permitido por su plan comercial.',
     'not_found' => 'El recurso solicitado no fue encontrado o no pertenece a su organización.',

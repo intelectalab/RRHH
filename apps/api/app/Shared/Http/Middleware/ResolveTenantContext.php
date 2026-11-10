@@ -2,15 +2,27 @@
 
 namespace App\Shared\Http\Middleware;
 
+use App\Shared\Http\Responses\ProblemDetailsResponse;
+use App\Shared\Tenancy\Resolution\TenantResolverChain;
 use App\Shared\Tenancy\TenancyScope;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Fija la organización activa de la petición (docs/02-arquitectura.md §5.1).
+ *
+ * - La organización sale del host (subdominio o dominio propio verificado).
+ *   Ningún dato que envía el cliente (cabecera, query, cuerpo) la elige, salvo
+ *   la cabecera X-Tenant-Id en el entorno de pruebas.
+ * - Si hay una credencial autenticada, debe pertenecer a esa organización; si no,
+ *   se responde 404 sin revelar que la organización existe.
+ * - Organización suspendida o bloqueada → 403 tenant_suspended.
+ */
 final class ResolveTenantContext
 {
     /**
-     * Rutas exentas de requerir contexto de organización obligatorio.
+     * Rutas exentas de requerir contexto de organización.
      *
      * @var array<int, string>
      */
@@ -21,23 +33,39 @@ final class ResolveTenantContext
         'up',
     ];
 
+    public function __construct(private readonly TenantResolverChain $resolvers) {}
+
     public function handle(Request $request, Closure $next): Response
     {
-        $tenantId = $this->resolveTenantId($request);
+        $resolved = $this->resolvers->resolve($request);
 
-        if ($tenantId !== null) {
-            TenancyScope::set($tenantId);
-        } elseif (TenancyScope::current() !== null) {
-            // Ya hay un contexto de organización activo (ej. sesión, token previo o prueba)
-            $tenantId = TenancyScope::current();
-        } elseif ($this->requiresTenant($request)) {
-            return response()->json([
-                'error' => [
-                    'code' => 'missing_tenant_context',
-                    'message' => 'Se requiere la cabecera X-Tenant-Id o un contexto de organización activo.',
-                ],
-            ], 400);
+        if ($resolved === null) {
+            // En pruebas se admite un contexto fijado antes de la petición (TenancyScope::set).
+            if (app()->environment('testing') && TenancyScope::current() !== null) {
+                return $next($request);
+            }
+
+            if ($this->requiresTenant($request)) {
+                return ProblemDetailsResponse::make(400, 'missing_tenant_context');
+            }
+
+            return $next($request);
         }
+
+        if (in_array($resolved->status, (array) config('tenancy.suspended_statuses', []), true)) {
+            return ProblemDetailsResponse::make(403, 'tenant_suspended');
+        }
+
+        if (! in_array($resolved->status, (array) config('tenancy.operable_statuses', []), true)) {
+            return ProblemDetailsResponse::make(404, 'not_found');
+        }
+
+        if (! $this->credentialBelongsTo($request, $resolved->tenantId)) {
+            return ProblemDetailsResponse::make(404, 'not_found');
+        }
+
+        TenancyScope::set($resolved->tenantId);
+        $request->attributes->set('tenant_resolution_source', $resolved->source);
 
         return $next($request);
     }
@@ -49,21 +77,19 @@ final class ResolveTenantContext
         }
     }
 
-    private function resolveTenantId(Request $request): ?string
+    /**
+     * Una sesión o token emitido para otra organización no sirve en este host.
+     */
+    private function credentialBelongsTo(Request $request, string $tenantId): bool
     {
-        $header = $request->header('X-Tenant-Id');
-        if (is_string($header) && TenancyScope::isValidUuid($header)) {
-            return $header;
+        $user = $request->user();
+        if ($user === null) {
+            return true;
         }
 
-        if ($request->has('tenant_id')) {
-            $queryTenant = (string) $request->input('tenant_id');
-            if (TenancyScope::isValidUuid($queryTenant)) {
-                return $queryTenant;
-            }
-        }
+        $credentialTenant = data_get($user, 'tenant_id');
 
-        return null;
+        return $credentialTenant === null || (string) $credentialTenant === $tenantId;
     }
 
     private function requiresTenant(Request $request): bool
@@ -76,7 +102,6 @@ final class ResolveTenantContext
             }
         }
 
-        // Cualquier ruta bajo api/v1 que no esté exenta exige contexto de organización
         return str_starts_with($path, 'api/v1');
     }
 }

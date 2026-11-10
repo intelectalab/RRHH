@@ -13647,6 +13647,22 @@ paths:
       x-phase: 1
       x-permission: org.headcount_plans.submit
       operationId: postHeadcountPlansIdSubmit
+  /health:
+    get:
+      summary: 'Salud de la API: disponible sin sesión ni organización'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+      tags:
+      - PLT
+      x-phase: 0
+      x-permission: public
+      operationId: getHealth
+      security: []
   /holiday-calendars:
     get:
       summary: Listar HolidayCalendar

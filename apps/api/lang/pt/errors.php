@@ -9,6 +9,7 @@ return [
     'scope_insufficient' => 'O escopo do token é insuficiente para acessar este recurso.',
     'module_not_enabled' => 'O módulo solicitado não está ativo para esta organização.',
     'feature_not_enabled' => 'Esta funcionalidade não está ativada para sua organização.',
+    'missing_tenant_context' => 'Não foi possível determinar a organização da solicitação. Acesse pelo endereço da sua organização.',
     'tenant_suspended' => 'A organização encontra-se suspensa.',
     'plan_limit_reached' => 'O limite permitido pelo seu plano foi atingido.',
     'not_found' => 'O recurso solicitado não foi encontrado ou não pertence à sua organização.',
