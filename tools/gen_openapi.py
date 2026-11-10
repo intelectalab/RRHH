@@ -62,7 +62,7 @@ RES = [
     ("SAS", 0, "platform.subscriptions", "/platform/subscriptions", "Subscription", "tenant_id:id plan_id:id status:e(trial|active|past_due|suspended|cancelled) addons:a starts_on:d ends_on?:d", "LCRU", "change-plan suspend reactivate"),
     ("SAS", 0, "platform.feature_flags", "/platform/feature-flags", "FeatureFlag", "key:s description:s default_on:b rules:j", "LCRU", ""),
     ("SAS", 0, "platform.support_sessions", "/platform/support-sessions", "SupportSession", "tenant_id:id reason:s status:e(requested|granted|ended|denied) expires_at:dt", "LCR", "end"),
-    ("SEG", 0, "identity.users", "/users", "User", "person_id?:id login:s display_name:s email?:s status:e(invited|active|locked|alumni|disabled) mfa_enabled:b role_ids:a last_login_at?:dt", "LCRU", "invite suspend reactivate reset-mfa reset-password"),
+    ("SEG", 0, "identity.users", "/users", "User", "person_id?:id login:s display_name:s email?:s status:e(invited|active|locked|alumni|disabled) mfa_enabled:b role_ids:a role_assignments?:ao last_login_at?:dt", "LCRU", "invite suspend reactivate reset-mfa reset-password"),
     ("SEG", 0, "identity.roles", "/roles", "Role", "name:s system:b permissions:a field_permissions:a scope:e(organization|legal_entity|site|unit|team|self)", "LCRUD", "duplicate"),
     ("SEG", 0, "identity.api_tokens", "/api-tokens", "ApiToken", "name:s scopes:a expires_at?:dt last_used_at?:dt status:e(active|revoked)", "LCR", "revoke"),
     ("AUD", 0, "audit.logs", "/audit-logs", "AuditLog", "actor_id?:id action:s entity:s entity_id:s before?:j after?:j ip?:s occurred_at:dt sensitive:b", "LR", ""),
@@ -311,6 +311,7 @@ TYPES = {
     "dt": {"type": "string", "format": "date-time"}, "id": {"type": "string", "description": "Identificador opaco"},
     "j": {"type": "object", "additionalProperties": True},
     "a": {"type": "array", "items": {"type": "string"}},
+    "ao": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
 }
 READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at"}
 

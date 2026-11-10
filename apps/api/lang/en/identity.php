@@ -13,6 +13,8 @@ return [
         'cannot_grant' => 'You cannot grant permissions you do not have: :codes.',
     ],
     'users' => [
+        'scope_units_required' => 'Specify at least one company, site or unit for that scope.',
+        'unknown_scope_unit' => 'One of the companies, sites or units does not exist in this organization.',
         'invite_without_email' => 'The user has no email: give them an activation code from HR.',
         'reset_without_email' => 'The user has no email to receive the link.',
         'unknown_role' => 'One or more roles do not exist in this organization.',

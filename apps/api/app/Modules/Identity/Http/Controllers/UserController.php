@@ -63,7 +63,7 @@ final class UserController
         $user = $this->find($id);
         $ifMatch = trim((string) $request->header('If-Match', ''), ' "W/');
 
-        /** @var array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>} $input */
+        /** @var array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>} $input */
         $input = $request->validated();
 
         return $this->respond($this->users->update($user, $input, $this->actor($request), $ifMatch === '' ? null : (int) $ifMatch));

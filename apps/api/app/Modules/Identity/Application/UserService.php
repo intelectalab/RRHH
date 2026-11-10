@@ -56,6 +56,7 @@ final class UserService
             'status' => $user->status,
             'mfa_enabled' => DB::table('user_mfa_factors')->where('user_id', $user->id)->whereNotNull('confirmed_at')->whereNull('disabled_at')->exists(),
             'role_ids' => $user->roleAssignments()->orderBy('created_at')->pluck('role_id')->map(fn ($id) => (string) $id)->all(),
+            'role_assignments' => $this->assignmentsOf($user),
             'last_login_at' => $user->last_login_at?->toIso8601String(),
             'allowed_actions' => $this->machine->allowedActions($user->status),
             'version' => (int) $user->lock_version,
@@ -101,16 +102,20 @@ final class UserService
     }
 
     /**
-     * @param  array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>}  $input
+     * @param  array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>}  $input
      */
     public function update(User $user, array $input, EffectivePermissions $actor, ?int $expectedVersion): User
     {
         if ($expectedVersion !== null && $expectedVersion !== (int) $user->lock_version) {
             throw new VersionConflictException($expectedVersion, (int) $user->lock_version);
         }
+        $assignments = array_key_exists('role_assignments', $input) ? $this->validatedAssignments((array) $input['role_assignments']) : null;
+        if ($assignments !== null) {
+            $input['role_ids'] = array_column($assignments, 'role_id');
+        }
         $roleIds = array_key_exists('role_ids', $input) ? $this->validatedRoles($input['role_ids'], $actor) : null;
 
-        return DB::transaction(function () use ($user, $input, $roleIds): User {
+        return DB::transaction(function () use ($user, $input, $roleIds, $assignments): User {
             $before = $this->present($user);
 
             $user->fill(array_intersect_key($input, array_flip(['display_name', 'person_id'])));
@@ -140,6 +145,9 @@ final class UserService
                 $existing = $user->roleAssignments()->pluck('role_id')->map(fn ($id) => (string) $id)->all();
                 foreach (array_diff($roleIds, $existing) as $roleId) {
                     $user->roleAssignments()->create(['role_id' => $roleId, 'granted_by_user_id' => $this->actorId()]);
+                }
+                if ($assignments !== null) {
+                    $this->syncScopes($user, $assignments);
                 }
                 DB::table('users')->where('id', $user->id)->update(['updated_at' => now()]);
             }
@@ -264,6 +272,76 @@ final class UserService
 
             return $user;
         });
+    }
+
+    /**
+     * @return array<int, array{role_id: string, scope: string|null, legal_entity_ids: array<int, string>, site_ids: array<int, string>, org_unit_ids: array<int, string>}>
+     */
+    private function assignmentsOf(User $user): array
+    {
+        $rows = $user->roleAssignments()->orderBy('created_at')->get(['id', 'role_id', 'scope_override']);
+        $scopes = DB::table('user_role_scopes')->whereIn('user_role_id', $rows->pluck('id'))->get();
+
+        return $rows->map(fn ($r) => [
+            'role_id' => (string) $r->role_id,
+            'scope' => $r->scope_override === null ? null : RoleScopes::toApi((string) $r->scope_override),
+            'legal_entity_ids' => $scopes->where('user_role_id', $r->id)->whereNotNull('legal_entity_id')->pluck('legal_entity_id')->map(fn ($v) => (string) $v)->values()->all(),
+            'site_ids' => $scopes->where('user_role_id', $r->id)->whereNotNull('site_id')->pluck('site_id')->map(fn ($v) => (string) $v)->values()->all(),
+            'org_unit_ids' => $scopes->where('user_role_id', $r->id)->whereNotNull('org_unit_id')->pluck('org_unit_id')->map(fn ($v) => (string) $v)->values()->all(),
+        ])->all();
+    }
+
+    /**
+     * @param  array<int, mixed>  $raw
+     * @return array<int, array{role_id: string, scope: string|null, legal_entity_ids: array<int, string>, site_ids: array<int, string>, org_unit_ids: array<int, string>}>
+     */
+    private function validatedAssignments(array $raw): array
+    {
+        $out = [];
+        $errors = [];
+        foreach ($raw as $i => $a) {
+            $a = (array) $a;
+            $item = [
+                'role_id' => (string) ($a['role_id'] ?? ''),
+                'scope' => isset($a['scope']) ? (string) $a['scope'] : null,
+                'legal_entity_ids' => array_values(array_map('strval', (array) ($a['legal_entity_ids'] ?? []))),
+                'site_ids' => array_values(array_map('strval', (array) ($a['site_ids'] ?? []))),
+                'org_unit_ids' => array_values(array_map('strval', (array) ($a['org_unit_ids'] ?? []))),
+            ];
+            $needs = ['legal_entity' => 'legal_entity_ids', 'site' => 'site_ids', 'unit' => 'org_unit_ids'];
+            if (isset($needs[$item['scope'] ?? '']) && $item[$needs[$item['scope']]] === []) {
+                $errors["role_assignments.{$i}.{$needs[$item['scope']]}"][] = (string) trans('identity.users.scope_units_required');
+            }
+            foreach (['legal_entity_ids' => 'legal_entities', 'site_ids' => 'sites', 'org_unit_ids' => 'org_units'] as $key => $table) {
+                if ($item[$key] !== [] && DB::table($table)->whereIn('id', $item[$key])->count() !== count(array_unique($item[$key]))) {
+                    $errors["role_assignments.{$i}.{$key}"][] = (string) trans('identity.users.unknown_scope_unit');
+                }
+            }
+            $out[] = $item;
+        }
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param  array<int, array{role_id: string, scope: string|null, legal_entity_ids: array<int, string>, site_ids: array<int, string>, org_unit_ids: array<int, string>}>  $assignments
+     */
+    private function syncScopes(User $user, array $assignments): void
+    {
+        foreach ($assignments as $a) {
+            $ur = $user->roleAssignments()->where('role_id', $a['role_id'])->firstOrFail();
+            $ur->forceFill(['scope_override' => $a['scope'] === null ? null : RoleScopes::toDb($a['scope'])])->save();
+            DB::table('user_role_scopes')->where('user_role_id', $ur->id)->delete();
+            $tenant = $user->tenant_id;
+            foreach (['legal_entity_ids' => 'legal_entity_id', 'site_ids' => 'site_id', 'org_unit_ids' => 'org_unit_id'] as $key => $column) {
+                foreach (array_unique($a[$key]) as $id) {
+                    DB::table('user_role_scopes')->insert(['tenant_id' => $tenant, 'user_role_id' => $ur->id, $column => $id]);
+                }
+            }
+        }
     }
 
     private function issueInvitation(User $user, string $origin): void

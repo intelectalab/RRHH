@@ -13,6 +13,8 @@ return [
         'cannot_grant' => 'No puede conceder permisos que usted no tiene: :codes.',
     ],
     'users' => [
+        'scope_units_required' => 'Indique al menos una empresa, sede o unidad para ese alcance.',
+        'unknown_scope_unit' => 'Una de las empresas, sedes o unidades no existe en esta organización.',
         'invite_without_email' => 'El usuario no tiene correo: entréguele un código de activación desde RR. HH.',
         'reset_without_email' => 'El usuario no tiene correo para recibir el enlace.',
         'unknown_role' => 'Uno o más roles no existen en esta organización.',

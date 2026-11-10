@@ -17406,6 +17406,9 @@ export interface components {
             status: "invited" | "active" | "locked" | "alumni" | "disabled";
             mfa_enabled: boolean;
             role_ids: string[];
+            role_assignments?: {
+                [key: string]: unknown;
+            }[] | null;
             /** Format: date-time */
             last_login_at?: string | null;
             /** Format: date-time */
@@ -17421,6 +17424,9 @@ export interface components {
             email?: string | null;
             mfa_enabled?: boolean;
             role_ids?: string[];
+            role_assignments?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         VacationBalance: {
             /** @description Identificador opaco */

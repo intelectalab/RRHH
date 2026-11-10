@@ -41206,6 +41206,12 @@ components:
         role_ids: &id767
           type: array
           items: *id034
+        role_assignments: &id768
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          nullable: true
         last_login_at:
           type: string
           format: date-time
@@ -41225,6 +41231,7 @@ components:
         email: *id765
         mfa_enabled: *id766
         role_ids: *id767
+        role_assignments: *id768
     VacationBalance:
       type: object
       required:
@@ -41281,18 +41288,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id768
+        employment_id: &id769
           type: string
           description: Identificador opaco
-        starts_on: &id769
+        starts_on: &id770
           type: string
           format: date
-        ends_on: &id770
+        ends_on: &id771
           type: string
           format: date
-        days: &id771
+        days: &id772
           type: number
-        advance: &id772
+        advance: &id773
           type: boolean
         status:
           type: string
@@ -41303,7 +41310,7 @@ components:
           - rejected
           - cancelled
           - taken
-        approval_request_id: &id773
+        approval_request_id: &id774
           type: string
           description: Identificador opaco
           nullable: true
@@ -41316,12 +41323,12 @@ components:
     VacationRequestInput:
       type: object
       properties:
-        employment_id: *id768
-        starts_on: *id769
-        ends_on: *id770
-        days: *id771
-        advance: *id772
-        approval_request_id: *id773
+        employment_id: *id769
+        starts_on: *id770
+        ends_on: *id771
+        days: *id772
+        advance: *id773
+        approval_request_id: *id774
     WageTable:
       type: object
       required:
@@ -41337,25 +41344,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        country: &id774
+        country: &id775
           type: string
-        regime: &id775
+        regime: &id776
           type: string
-        name: &id776
+        name: &id777
           type: string
-        legal_source: &id777
+        legal_source: &id778
           type: string
-        valid_from: &id778
+        valid_from: &id779
           type: string
           format: date
-        valid_to: &id779
+        valid_to: &id780
           type: string
           format: date
           nullable: true
-        values: &id780
+        values: &id781
           type: object
           additionalProperties: true
-        verified: &id781
+        verified: &id782
           type: boolean
         created_at:
           type: string
@@ -41366,14 +41373,14 @@ components:
     WageTableInput:
       type: object
       properties:
-        country: *id774
-        regime: *id775
-        name: *id776
-        legal_source: *id777
-        valid_from: *id778
-        valid_to: *id779
-        values: *id780
-        verified: *id781
+        country: *id775
+        regime: *id776
+        name: *id777
+        legal_source: *id778
+        valid_from: *id779
+        valid_to: *id780
+        values: *id781
+        verified: *id782
     WebhookDelivery:
       type: object
       required:
@@ -41429,12 +41436,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        url: &id782
+        url: &id783
           type: string
-        events: &id783
+        events: &id784
           type: array
           items: *id034
-        secret_hint: &id784
+        secret_hint: &id785
           type: string
         status:
           type: string
@@ -41451,9 +41458,9 @@ components:
     WebhookEndpointInput:
       type: object
       properties:
-        url: *id782
-        events: *id783
-        secret_hint: *id784
+        url: *id783
+        events: *id784
+        secret_hint: *id785
     WorkSchedule:
       type: object
       required:
@@ -41468,16 +41475,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id785
+        name: &id786
           type: string
-        weekly_hours: &id786
+        weekly_hours: &id787
           type: number
-        days: &id787
+        days: &id788
           type: object
           additionalProperties: true
-        tolerance_minutes: &id788
+        tolerance_minutes: &id789
           type: integer
-        break_minutes: &id789
+        break_minutes: &id790
           type: integer
         status:
           type: string
@@ -41493,11 +41500,11 @@ components:
     WorkScheduleInput:
       type: object
       properties:
-        name: *id785
-        weekly_hours: *id786
-        days: *id787
-        tolerance_minutes: *id788
-        break_minutes: *id789
+        name: *id786
+        weekly_hours: *id787
+        days: *id788
+        tolerance_minutes: *id789
+        break_minutes: *id790
     Workflow:
       type: object
       required:
@@ -41511,11 +41518,11 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id790
+        name: &id791
           type: string
-        trigger_event: &id791
+        trigger_event: &id792
           type: string
-        graph: &id792
+        graph: &id793
           type: object
           additionalProperties: true
         status:
@@ -41536,9 +41543,9 @@ components:
     WorkflowInput:
       type: object
       properties:
-        name: *id790
-        trigger_event: *id791
-        graph: *id792
+        name: *id791
+        trigger_event: *id792
+        graph: *id793
     WorkflowRun:
       type: object
       required:
