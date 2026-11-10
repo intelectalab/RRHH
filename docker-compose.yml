@@ -127,6 +127,7 @@ services:
       - ./packages:/var/www/packages
       - ./.github:/var/www/.github
       - ./scripts:/var/www/scripts
+      - ./docs:/var/www/docs
     ports:
       - "${FORWARD_API_PORT:-8000}:8000"
     depends_on:

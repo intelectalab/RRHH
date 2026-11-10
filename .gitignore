@@ -32,6 +32,7 @@ apps/api/storage/framework/sessions/*
 apps/api/storage/framework/testing/*
 apps/api/storage/framework/views/*
 apps/api/storage/logs/*.log
+apps/api/storage/*.md
 apps/api/bootstrap/cache/*.php
 !apps/api/storage/**/.gitkeep
 !apps/api/bootstrap/cache/.gitkeep

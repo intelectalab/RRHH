@@ -1,6 +1,8 @@
 <?php
 
 use App\Shared\Commands\EnvironmentCheckCommand;
+use App\Shared\Commands\GenerateDataDictionaryCommand;
+use App\Shared\Commands\VerifyDatabaseConventionsCommand;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
@@ -26,6 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         DispatchOutboxCommand::class,
         EnvironmentCheckCommand::class,
+        VerifyDatabaseConventionsCommand::class,
+        GenerateDataDictionaryCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
