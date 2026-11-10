@@ -146,6 +146,7 @@ final class ApprovalEngine
 
             WorkflowDecision::create(['workflow_task_id' => $task->id, 'decided_by_user_id' => $userId, 'decision' => 'delegate', 'comment' => $comment, 'decided_at' => now(), 'ip' => request()->ip()]);
             $task->forceFill(['assignee_user_id' => $toUserId, 'assignee_role_id' => null, 'delegated_from_user_id' => $userId])->save();
+            $this->event(DomainEventTypes::APPROVAL_TASK_ASSIGNED, $request, ['task_id' => $task->id]);
             $this->audit->record('approval_request.delegated', 'approval_request', $request->id, ['assignee' => $userId], ['assignee' => $toUserId], $comment);
 
             return $request->refresh();
@@ -280,7 +281,7 @@ final class ApprovalEngine
      */
     private function createTask(ApprovalRequest $request, WorkflowStep $step, array $r, int $sequence): void
     {
-        WorkflowTask::create([
+        $task = WorkflowTask::create([
             'workflow_instance_id' => $request->id,
             'workflow_step_id' => $step->id,
             'assignee_user_id' => $r['user_id'],
@@ -290,6 +291,7 @@ final class ApprovalEngine
             'due_at' => $step->sla_hours !== null ? now()->addHours((int) $step->sla_hours) : null,
             'sequence' => $sequence,
         ]);
+        $this->event(DomainEventTypes::APPROVAL_TASK_ASSIGNED, $request, ['task_id' => $task->id]);
     }
 
     private function stepAt(ApprovalRequest $request, int $level): ?WorkflowStep

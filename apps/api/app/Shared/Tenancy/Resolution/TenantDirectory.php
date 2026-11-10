@@ -39,6 +39,21 @@ final class TenantDirectory
         );
     }
 
+    /**
+     * Nombre y subdominio de una organización (para textos y enlaces de avisos).
+     *
+     * @return array{name: string, slug: string}|null
+     */
+    public function profile(string $tenantId): ?array
+    {
+        if (! TenancyScope::isValidUuid($tenantId)) {
+            return null;
+        }
+        $row = TenancyScope::runWithoutTenant(fn () => DB::table('tenants')->where('id', $tenantId)->first(['name', 'slug']));
+
+        return $row === null ? null : ['name' => (string) $row->name, 'slug' => (string) $row->slug];
+    }
+
     public function findById(string $tenantId, string $source): ?ResolvedTenant
     {
         if (! TenancyScope::isValidUuid($tenantId)) {

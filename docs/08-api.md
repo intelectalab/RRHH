@@ -311,6 +311,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/notification-templates/{id}` | `notifications.templates.{view,update}` | 0 |
 | GET | `/notifications` | sesión | 0 |
 | POST | `/notifications/read` | sesión | 0 |
+| GET | `/notification-deliveries` | `notifications.deliveries.view` | 0 |
 | GET | `/notification-preferences` | sesión | 0 |
 | PUT | `/notification-preferences` | sesión | 0 |
 

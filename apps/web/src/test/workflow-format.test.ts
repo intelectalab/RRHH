@@ -25,3 +25,12 @@ describe('formato de pendientes y aprobaciones', () => {
     expect(initials(null)).toBe('')
   })
 })
+
+describe('etiquetas de avisos', () => {
+  it('el tipo de aviso con punto se traduce y uno desconocido se muestra tal cual', async () => {
+    const { categoryLabel } = await import('@/modules/notifications/shared')
+    const t = (k: string) => translate('es', k)
+    expect(categoryLabel(t, 'approval.pending')).toBe('Solicitud por aprobar')
+    expect(categoryLabel(t, 'otro.tipo')).toBe('otro.tipo')
+  })
+})

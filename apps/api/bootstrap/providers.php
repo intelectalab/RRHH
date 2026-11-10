@@ -2,6 +2,7 @@
 
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
+use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
 use App\Modules\Workflow\WorkflowServiceProvider;
 use App\Providers\AppServiceProvider;
@@ -12,4 +13,5 @@ return [
     OrganizationServiceProvider::class,
     AuditServiceProvider::class,
     WorkflowServiceProvider::class,
+    NotificationsServiceProvider::class,
 ];

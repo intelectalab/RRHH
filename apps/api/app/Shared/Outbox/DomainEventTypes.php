@@ -67,7 +67,12 @@ final class DomainEventTypes
 
     public const APPROVAL_REMINDER = 'approval.reminder.v1';
 
+    public const APPROVAL_TASK_ASSIGNED = 'approval.task_assigned.v1';
+
     public const TASK_ASSIGNED = 'task.assigned.v1';
+
+    // Notificaciones (NOT)
+    public const NOTIFICATION_DELIVERY_REQUESTED = 'notification.delivery_requested.v1';
 
     public const TASK_OVERDUE = 'task.overdue.v1';
 
@@ -205,6 +210,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
             'description' => 'Recordatorio de tarea de aprobación por vencer',
+        ],
+        self::APPROVAL_TASK_ASSIGNED => [
+            'version' => 1,
+            'required_fields' => ['approval_request_id', 'subject_type', 'subject_id', 'task_id'],
+            'description' => 'Una tarea de aprobación quedó a cargo de una persona o un rol (nuevo nivel, siguiente turno o delegación)',
+        ],
+        self::NOTIFICATION_DELIVERY_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['delivery_id', 'category', 'locale'],
+            'description' => 'Entrega de un aviso por canal externo (correo); la dirección va cifrada en la entrega, no en el evento',
         ],
         self::TASK_ASSIGNED => [
             'version' => 1,

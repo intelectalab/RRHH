@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Textos por defecto de los avisos (NOT-1). Cada organización puede reemplazarlos en
+ * Configuración → Mensajes. Las variables van entre llaves: {name}.
+ */
+return [
+    'templates' => [
+        'approval.pending' => [
+            'in_app' => ['subject' => 'Solicitud por aprobar', 'body' => '{requester} envió una solicitud de {type} (nivel {level}).'],
+            'email' => ['subject' => 'Tienes una solicitud por aprobar', 'body' => "Hola {name}:\n\nTienes una solicitud de {type} esperando tu decisión en {organization}.\n\nRevísala aquí: {link}\n\nPor seguridad, el detalle solo se ve al ingresar."],
+        ],
+        'approval.reminder' => [
+            'in_app' => ['subject' => 'Recordatorio: solicitud por aprobar', 'body' => 'La solicitud de {type} de {requester} sigue esperando tu decisión.'],
+            'email' => ['subject' => 'Recordatorio: tienes una solicitud por aprobar', 'body' => "Hola {name}:\n\nUna solicitud de {type} sigue esperando tu decisión en {organization}.\n\nRevísala aquí: {link}"],
+        ],
+        'approval.escalated' => [
+            'in_app' => ['subject' => 'Solicitud escalada a ti', 'body' => 'La solicitud de {type} de {requester} venció su plazo y ahora te toca decidir.'],
+            'email' => ['subject' => 'Una solicitud vencida pasó a tu cargo', 'body' => "Hola {name}:\n\nUna solicitud de {type} venció su plazo y ahora espera tu decisión en {organization}.\n\nRevísala aquí: {link}"],
+        ],
+        'approval.approved' => [
+            'in_app' => ['subject' => 'Tu solicitud fue aprobada', 'body' => 'Tu solicitud de {type} fue aprobada.'],
+            'email' => ['subject' => 'Tu solicitud fue aprobada', 'body' => "Hola {name}:\n\nTu solicitud de {type} fue aprobada.\n\nMira el detalle aquí: {link}"],
+        ],
+        'approval.rejected' => [
+            'in_app' => ['subject' => 'Tu solicitud fue rechazada', 'body' => 'Tu solicitud de {type} fue rechazada: «{reason}».'],
+            'email' => ['subject' => 'Tu solicitud fue rechazada', 'body' => "Hola {name}:\n\nTu solicitud de {type} fue rechazada. El motivo está en la aplicación.\n\nMíralo aquí: {link}"],
+        ],
+        'task.assigned' => [
+            'in_app' => ['subject' => 'Nueva tarea asignada', 'body' => '{title} · vence {due_on}'],
+            'email' => ['subject' => 'Tienes una nueva tarea', 'body' => "Hola {name}:\n\nTe asignaron una tarea en {organization}: {title}.\n\nÁbrela aquí: {link}"],
+        ],
+        'task.overdue' => [
+            'in_app' => ['subject' => 'Tarea vencida', 'body' => '{title} venció el {due_on}.'],
+            'email' => ['subject' => 'Tienes una tarea vencida', 'body' => "Hola {name}:\n\nLa tarea «{title}» venció el {due_on}.\n\nÁbrela aquí: {link}"],
+        ],
+        'account.security' => [
+            'in_app' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => '{event}'],
+            'email' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => "Hola {name}:\n\n{event}\n\nSi no fuiste tú, avisa a RRHH de inmediato."],
+        ],
+    ],
+    'subject_types' => [
+        'vacation_request' => 'vacaciones',
+        'permission_request' => 'permiso',
+        'overtime_request' => 'horas extra',
+        'expense_report' => 'gastos',
+        'job_requisition' => 'requerimiento de personal',
+        'position_request' => 'nueva posición',
+        'compensation_change' => 'cambio de compensación',
+        'other' => 'trámite',
+    ],
+    'invalid_variables' => 'Variables no permitidas: :vars. Usa solo: :allowed.',
+    'unknown_category' => 'Tipo de aviso desconocido.',
+    'mandatory_in_app' => 'Este aviso es obligatorio y no se puede desactivar en la aplicación.',
+    'template_exists' => 'Ya existe una plantilla para ese aviso, canal e idioma.',
+    'unsupported_channel' => 'Ese canal aún no está disponible.',
+];

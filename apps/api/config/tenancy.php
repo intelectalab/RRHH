@@ -9,6 +9,12 @@ return [
     'base_domain' => env('TENANCY_BASE_DOMAIN', 'localhost'),
 
     /*
+     * Dirección de la aplicación web de cada organización, para los enlaces de correos y avisos.
+     * {slug} se reemplaza por el subdominio de la organización.
+     */
+    'app_url' => env('TENANCY_APP_URL', 'http://{slug}.localhost:3000'),
+
+    /*
      * Subdominios reservados que nunca resuelven a una organización
      * (consola de plataforma, sitio público, etc.).
      */

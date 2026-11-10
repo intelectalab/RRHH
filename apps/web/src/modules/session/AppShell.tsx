@@ -10,6 +10,7 @@ import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { InboxButton, useInboxCount } from './InboxButton'
+import { NotificationBell } from '@/modules/notifications/NotificationBell'
 import { SessionProvider, useSession } from './SessionProvider'
 
 /** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
@@ -21,7 +22,7 @@ const MODULES: ModuleLink[] = [
   { href: '/organizacion/empresas', key: 'shell.modules_org', module: 'base', visible: (can) => can('org.legal_entities.view') },
   { href: '/aprobaciones', key: 'shell.modules_approvals', module: 'base', visible: (can) => can('workflow.approval_requests.view') },
   { href: '/tareas', key: 'shell.modules_tasks', module: 'base', visible: (can) => can('workflow.tasks.view') },
-  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('audit.logs.view') },
+  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('notifications.templates.view') || can('audit.logs.view') },
 ]
 
 function initials(name: string): string {
@@ -67,6 +68,7 @@ function Shell({ children }: { children: ReactNode }) {
           <div className="espacio" />
           <CommandPalette />
           <InboxButton counts={inbox} />
+          <NotificationBell />
           <div className="menu" ref={menuRef}>
             <button type="button" className="userbtn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
               <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>
@@ -87,6 +89,9 @@ function Shell({ children }: { children: ReactNode }) {
                     ))}
                   </div>
                 </div>
+                <Link href="/cuenta/notificaciones" className="menu-item" role="menuitem" onClick={() => setOpen(false)}>
+                  <Icon name="bell" /> {t('shell.my_notifications')}
+                </Link>
                 <button type="button" className="menu-item" role="menuitem" onClick={() => void logout()}>
                   <Icon name="signOut" /> {t('shell.logout')}
                 </button>

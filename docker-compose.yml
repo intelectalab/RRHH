@@ -175,6 +175,43 @@ services:
     command: php artisan queue:work --tries=3
     environment:
       APP_ENV: local
+      # Misma clave que la API: los trabajos descifran lo que la API cifró.
+      APP_KEY: ${APP_KEY:-base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=}
+      TENANCY_BASE_DOMAIN: localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-aynihr}
+      DB_USERNAME: ${DB_USERNAME:-ayni}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - ./apps/api:/var/www/html
+      - ./database:/var/www/database
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ayni-network
+
+  # Programador: despacha el outbox cada minuto (avisos, correos de invitación y recuperación),
+  # escala aprobaciones vencidas y archiva avisos antiguos (routes/console.php y proveedores de módulos).
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    container_name: aynihr-scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan schedule:work
+    environment:
+      APP_ENV: local
+      APP_KEY: ${APP_KEY:-base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=}
+      TENANCY_BASE_DOMAIN: localhost
+      TENANCY_APP_URL: http://{slug}.localhost:3000
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: 5432

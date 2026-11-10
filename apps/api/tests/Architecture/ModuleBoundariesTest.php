@@ -104,3 +104,23 @@ arch('módulos no importan implementaciones falsas de integración directamente'
     ->not->toUse([
         'App\Shared\Integrations\Fake',
     ]);
+
+/*
+ * Regla general (se aplica sola a cada módulo nuevo): ningún módulo de app/Modules importa
+ * Domain, Application ni Infrastructure de otro. Se comunican por eventos (outbox) y por los
+ * contratos de app/Shared (p. ej. Shared\Notifications\Notifier, Shared\Inbox\InboxSource).
+ */
+$modulos = array_map('basename', glob(__DIR__.'/../../app/Modules/*', GLOB_ONLYDIR) ?: []);
+foreach ($modulos as $modulo) {
+    $ajenos = [];
+    foreach ($modulos as $otro) {
+        if ($otro !== $modulo) {
+            foreach (['Domain', 'Application', 'Infrastructure'] as $capa) {
+                $ajenos[] = "App\\Modules\\{$otro}\\{$capa}";
+            }
+        }
+    }
+    arch("{$modulo} no usa capas internas de ningún otro módulo")
+        ->expect("App\\Modules\\{$modulo}")
+        ->not->toUse($ajenos);
+}

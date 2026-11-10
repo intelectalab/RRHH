@@ -3,6 +3,8 @@
 namespace Tests\Support\Isolation;
 
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Notifications\Infrastructure\Models\Notification;
+use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +32,9 @@ final class CrossTenantHarness
     public const MODEL_OVERRIDES = [
         // La búsqueda global se prueba sembrando usuarios de A: B no debe encontrarlos.
         '/search' => User::class,
+        // Listados propios o de registro (sin esquema de recurso): se siembran avisos y entregas de A.
+        '/notifications' => Notification::class,
+        '/notification-deliveries' => NotificationDelivery::class,
     ];
 
     /**
@@ -38,7 +43,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
