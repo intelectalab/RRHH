@@ -71,7 +71,13 @@ export class ApiClient {
       if (xsrf) headers['X-XSRF-TOKEN'] = xsrf
     }
 
-    const response = await this.fetcher(url, { ...init, method, headers, credentials: 'same-origin' })
+    let response: Response
+    try {
+      response = await this.fetcher(url, { ...init, method, headers, credentials: 'same-origin' })
+    } catch {
+      // Sin red o servidor caído: el formulario conserva lo escrito y muestra este código (UI-5).
+      throw new ApiRequestError(0, 'network_error', 'network_error')
+    }
 
     if (!response.ok) {
       let body: ApiError | undefined

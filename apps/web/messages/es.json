@@ -15,7 +15,10 @@
     "previous": "Anterior",
     "yes": "Sí",
     "no": "No",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "network_error": "No hay conexión con el servidor. Lo que escribió se conserva; inténtelo de nuevo.",
+    "load_error": "No se pudo cargar la información.",
+    "retry": "Reintentar"
   },
   "nav": {
     "home": "Inicio",

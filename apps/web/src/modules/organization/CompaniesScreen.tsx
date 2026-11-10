@@ -8,7 +8,9 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
+import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
+import { formErrors } from '@/lib/errors'
 
 type Company = Schema<'LegalEntity'> & { trade_name?: string | null; allowed_actions?: string[]; version?: number }
 type Catalog = {
@@ -27,10 +29,16 @@ export function CompaniesScreen() {
   const [rows, setRows] = useState<Company[] | null>(null)
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [editing, setEditing] = useState<Company | 'new' | null>(null)
+  const [loadError, setLoadError] = useState(false)
 
   const load = useCallback(async () => {
-    const res = await api.get<{ data: Company[] }>('/legal-entities?per_page=100')
-    setRows(res.data)
+    try {
+      const res = await api.get<{ data: Company[] }>('/legal-entities?per_page=100')
+      setRows(res.data)
+      setLoadError(false)
+    } catch {
+      setLoadError(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -70,8 +78,15 @@ export function CompaniesScreen() {
                 <tr><th>{t('org.col_name')}</th><th>{t('org.col_tax')}</th><th>{t('org.col_country')}</th><th>{t('org.col_currency')}</th><th>{t('org.col_regime')}</th><th>{t('org.col_status')}</th><th /></tr>
               </thead>
               <tbody>
-                {rows === null && [1, 2].map((i) => <tr key={i}><td colSpan={7}><span className="esq" style={{ width: `${30 + i * 20}%` }} /></td></tr>)}
-                {rows?.length === 0 && <tr><td colSpan={7}><div className="vacio"><b>{t('org.empty_title')}</b>{t('org.empty_text')}</div></td></tr>}
+                {loadError && <tr><td colSpan={7}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
+                {!loadError && rows === null && [1, 2].map((i) => <tr key={i}><td colSpan={7}><span className="esq" style={{ width: `${30 + i * 20}%` }} /></td></tr>)}
+                {rows?.length === 0 && (
+                  <tr><td colSpan={7}>
+                    <EmptyState title={t('org.empty_title')} text={t('org.empty_text')} action={can('org.legal_entities.create') && (
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('org.new')}</button>
+                    )} />
+                  </td></tr>
+                )}
                 {rows?.map((r) => (
                   <tr key={r.id}>
                     <td><b>{r.name}</b>{r.trade_name && <span className="sub2">{r.trade_name}</span>}</td>
@@ -143,11 +158,9 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
       }
       await onSaved(company === null)
     } catch (err) {
-      if (err instanceof ApiRequestError && err.details.length > 0) {
-        setErrors(Object.fromEntries(err.details.map((d) => [d.field, d.message])))
-      } else {
-        setError(err instanceof ApiRequestError ? err.message : t('auth.generic_error'))
-      }
+      const { fields, general } = formErrors(err, t)
+      setErrors(fields)
+      setError(general)
     } finally {
       setBusy(false)
     }

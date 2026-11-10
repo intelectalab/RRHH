@@ -7,7 +7,9 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
+import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
+import { formErrors } from '@/lib/errors'
 import { useCompany } from '@/modules/session/CompanyProvider'
 import { settingsTabs } from './settingsTabs'
 
@@ -34,11 +36,18 @@ export function UsersScreen() {
     if (initial) setQ(initial)
   }, [])
 
+  const [loadError, setLoadError] = useState(false)
+
   const load = useCallback(async () => {
     const params = new URLSearchParams({ per_page: '100' })
     if (q.trim() !== '') params.set('q', q.trim())
-    const res = await api.get<{ data: User[] }>(`/users?${params.toString()}`)
-    setUsers(res.data)
+    try {
+      const res = await api.get<{ data: User[] }>(`/users?${params.toString()}`)
+      setUsers(res.data)
+      setLoadError(false)
+    } catch {
+      setLoadError(true)
+    }
   }, [q])
 
   useEffect(() => {
@@ -59,7 +68,7 @@ export function UsersScreen() {
       toast(t(doneKey))
       await load()
     } catch (e) {
-      toast(e instanceof ApiRequestError ? e.message : t('auth.generic_error'), 'error')
+      toast(formErrors(e, t).general ?? t('auth.generic_error'), 'error')
     }
   }
 
@@ -89,11 +98,16 @@ export function UsersScreen() {
                 <tr><th>{t('users.col_user')}</th><th>{t('users.col_roles')}</th><th>{t('users.col_last')}</th><th>{t('users.col_status')}</th><th /></tr>
               </thead>
               <tbody>
-                {users === null && [1, 2, 3].map((i) => (
+                {loadError && <tr><td colSpan={5}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
+                {!loadError && users === null && [1, 2, 3].map((i) => (
                   <tr key={i}><td colSpan={5}><span className="esq" style={{ width: `${40 + i * 12}%` }} /></td></tr>
                 ))}
                 {users?.length === 0 && (
-                  <tr><td colSpan={5}><div className="vacio"><b>{t('users.empty_title')}</b>{t('users.empty_text')}</div></td></tr>
+                  <tr><td colSpan={5}>
+                    <EmptyState title={t('users.empty_title')} text={t('users.empty_text')} action={can('identity.users.create') && (
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setCreating(true)}><Icon name="plus" /> {t('users.new')}</button>
+                    )} />
+                  </td></tr>
                 )}
                 {users?.map((u) => {
                   const actions = u.allowed_actions ?? []
@@ -192,7 +206,7 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
       await api.post('/users', { login, display_name: displayName || undefined, email: email || null, role_ids: roleIds })
       await onCreated()
     } catch (err) {
-      setError(err instanceof ApiRequestError ? (err.details[0]?.message ?? err.message) : t('auth.generic_error'))
+      setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
     } finally {
       setBusy(false)
     }
@@ -246,7 +260,7 @@ function SuspendPanel({ user, onClose, onDone }: { user: User; onClose: () => vo
       await api.post(`/users/${user.id}/suspend`, { reason })
       await onDone()
     } catch (err) {
-      setError(err instanceof ApiRequestError ? (err.details[0]?.message ?? err.message) : t('auth.generic_error'))
+      setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
     } finally {
       setBusy(false)
     }
@@ -299,7 +313,7 @@ function EditUserPanel({ user, roles, onClose, onSaved }: { user: User; roles: R
         user.version !== undefined ? { 'If-Match': `"${user.version}"` } : undefined)
       await onSaved()
     } catch (err) {
-      setError(err instanceof ApiRequestError ? (err.details[0]?.message ?? err.message) : t('auth.generic_error'))
+      setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
     } finally {
       setBusy(false)
     }

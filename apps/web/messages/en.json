@@ -15,7 +15,10 @@
     "previous": "Previous",
     "yes": "Yes",
     "no": "No",
-    "close": "Close"
+    "close": "Close",
+    "network_error": "There is no connection to the server. What you typed is kept; try again.",
+    "load_error": "The information could not be loaded.",
+    "retry": "Retry"
   },
   "nav": {
     "home": "Home",
