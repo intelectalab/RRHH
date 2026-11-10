@@ -271,3 +271,42 @@ test('sin permiso responde 403', function (): void {
     $r->assertStatus(403);
     $this->assertMatchesOpenApi($r, 'post', '/approval-flows', 403);
 });
+
+test('RN-WFL-12: la aprobación masiva solo aplica a tipos seguros y audita cada una', function (): void {
+    wflFlow($this->admin, [['mode' => 'sequential', 'approvers' => [['kind' => 'user', 'user_id' => $this->boss->id]]]]);
+    wflFlow($this->admin, [['mode' => 'sequential', 'approvers' => [['kind' => 'user', 'user_id' => $this->boss->id]]]], [], 'expense_report');
+    $a = wflStart($this->requester);
+    $b = wflStart($this->requester);
+    $expense = wflStart($this->requester, [], 'expense_report');
+
+    $bulk = wflCall($this->boss, 'POST', '/approval-requests/bulk-approve', ['ids' => [$a->id, $b->id, $expense->id]]);
+    $bulk->assertOk();
+    $this->assertMatchesOpenApi($bulk, 'post', '/approval-requests/bulk-approve', 200);
+    expect($bulk->json('data.approved'))->toEqualCanonicalizing([$a->id, $b->id])
+        ->and($bulk->json('data.failed.0'))->toBe(['id' => $expense->id, 'code' => 'bulk_not_allowed']);
+
+    TenancyScope::runAs(WFL_TENANT, function () use ($a, $b, $expense): void {
+        expect(DB::table('audit_events')->whereIn('entity_id', [$a->id, $b->id])->where('action', 'approval_request.approved')->count())->toBe(2)
+            ->and(ApprovalRequest::query()->find($expense->id)->status)->toBe('running');
+    });
+    wflCall($this->boss, 'GET', '/approval-requests/'.$expense->id)->assertJsonPath('data.bulk_safe', false);
+});
+
+test('la bandeja de pendientes reúne aprobaciones y tareas y el contador coincide', function (): void {
+    wflFlow($this->admin, [['mode' => 'sequential', 'approvers' => [['kind' => 'user', 'user_id' => $this->boss->id]]]]);
+    $req = wflStart($this->requester);
+    wflCall($this->hr, 'POST', '/tasks', ['title' => 'Revisar contrato', 'assignee_user_id' => $this->boss->id, 'due_on' => now()->subDay()->toDateString()])->assertCreated();
+
+    $inbox = wflCall($this->boss, 'GET', '/inbox');
+    $inbox->assertOk()->assertJsonPath('data.total', 2)->assertJsonPath('data.counts.approval', 1)->assertJsonPath('data.counts.task', 1);
+    $this->assertMatchesOpenApi($inbox, 'get', '/inbox', 200);
+    // Lo vencido va primero y cada pendiente lleva a donde se resuelve.
+    expect($inbox->json('data.items.0.kind'))->toBe('task')->and($inbox->json('data.items.0.overdue'))->toBeTrue()
+        ->and($inbox->json('data.items.1.href'))->toBe('/aprobaciones?id='.$req->id);
+
+    wflCall($this->boss, 'POST', '/approval-requests/'.$req->id.'/approve', [])->assertOk();
+    wflCall($this->boss, 'GET', '/inbox')->assertJsonPath('data.total', 1);
+
+    // El solicitante no tiene pendientes.
+    wflCall($this->requester, 'GET', '/inbox')->assertJsonPath('data.total', 0);
+});

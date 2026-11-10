@@ -67,6 +67,10 @@ final class DomainEventTypes
 
     public const APPROVAL_REMINDER = 'approval.reminder.v1';
 
+    public const TASK_ASSIGNED = 'task.assigned.v1';
+
+    public const TASK_OVERDUE = 'task.overdue.v1';
+
     // Organización
     public const COMPANY_CREATED = 'company.created.v1';
 
@@ -201,6 +205,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['approval_request_id', 'subject_type', 'subject_id'],
             'description' => 'Recordatorio de tarea de aprobación por vencer',
+        ],
+        self::TASK_ASSIGNED => [
+            'version' => 1,
+            'required_fields' => ['task_id'],
+            'description' => 'Tarea interna asignada a una persona o a un rol',
+        ],
+        self::TASK_OVERDUE => [
+            'version' => 1,
+            'required_fields' => ['task_id', 'due_on'],
+            'description' => 'Tarea interna vencida sin completar (se avisa una vez)',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

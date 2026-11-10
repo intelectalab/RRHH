@@ -13,4 +13,7 @@ return [
     'approvers_required' => 'Cada nivel necesita al menos un aprobador.',
     'invalid_approver' => 'Aprobador no válido.',
     'invalid_sla' => 'El plazo debe ser de al menos una hora.',
+    'task_assignee_required' => 'Asigna la tarea a una persona o a un rol.',
+    'task_invalid_assignee' => 'Responsable no válido.',
+    'task_invalid_related' => 'El registro relacionado no existe.',
 ];

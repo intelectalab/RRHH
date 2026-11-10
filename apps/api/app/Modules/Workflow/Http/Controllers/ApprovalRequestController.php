@@ -5,6 +5,7 @@ namespace App\Modules\Workflow\Http\Controllers;
 use App\Modules\Workflow\Application\ApprovalEngine;
 use App\Modules\Workflow\Application\ApprovalRequestPresenter;
 use App\Modules\Workflow\Infrastructure\Models\ApprovalRequest;
+use App\Shared\Exceptions\AyniException;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
 use Illuminate\Http\JsonResponse;
@@ -82,6 +83,40 @@ final class ApprovalRequestController
         $data = $request->validate(['to_user_id' => ['required', 'uuid'], 'comment' => ['sometimes', 'nullable', 'string', 'max:2000']]);
 
         return $this->respond($request, $this->engine->delegate($approval, $this->userId($request), (string) $data['to_user_id'], $data['comment'] ?? null));
+    }
+
+    /**
+     * RN-WFL-12 · Aprobación masiva: solo tipos marcados como seguros; cada una se decide y audita por separado.
+     */
+    public function bulkApprove(Request $request): JsonResponse
+    {
+        $data = $request->validate(['ids' => ['required', 'array', 'min:1', 'max:100'], 'ids.*' => ['uuid'], 'comment' => ['sometimes', 'nullable', 'string', 'max:2000']]);
+        $userId = $this->userId($request);
+        $approved = [];
+        $failed = [];
+        foreach (array_values(array_unique($data['ids'])) as $id) {
+            $query = ApprovalRequest::query()->whereKey($id);
+            $this->presenter->applyScope($query, $userId, $this->viewScope($request), false);
+            $approval = $query->first();
+            if (! $approval instanceof ApprovalRequest) {
+                $failed[] = ['id' => $id, 'code' => 'not_found'];
+
+                continue;
+            }
+            if (! $this->presenter->bulkSafe($approval->subject_type)) {
+                $failed[] = ['id' => $id, 'code' => 'bulk_not_allowed'];
+
+                continue;
+            }
+            try {
+                $this->engine->decide($approval, $userId, 'approve', $data['comment'] ?? null);
+                $approved[] = $id;
+            } catch (AyniException $e) {
+                $failed[] = ['id' => $id, 'code' => $e->getErrorCode()];
+            }
+        }
+
+        return response()->json(['data' => ['approved' => $approved, 'failed' => $failed]]);
     }
 
     /**

@@ -6,6 +6,10 @@ use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserIdentity;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Modules\Workflow\Application\ApprovalFlowService;
+use App\Modules\Workflow\Application\TaskService;
+use App\Modules\Workflow\Infrastructure\Models\ApprovalFlow;
+use App\Modules\Workflow\Infrastructure\Models\Task;
 use App\Shared\Security\BlindIndex;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Seeder;
@@ -93,6 +97,32 @@ class DemoOrganizationSeeder extends Seeder
                     'country_code' => 'PE', 'currency' => 'PEN', 'timezone' => 'America/Lima', 'status' => 'active',
                 ]);
                 $entity->regimes()->create(['labor_regime_code' => $c['regime'], 'valid_from' => '2024-01-01']);
+            }
+        });
+
+        // Flujo de vacaciones publicado y tareas de RRHH coherentes con las empresas demo (WFL-1, WFL-8).
+        TenancyScope::runAs((string) $tenantId, function () use ($email): void {
+            $flows = app(ApprovalFlowService::class);
+            $rrhh = Role::query()->where('system_role_code', 'rrhh')->value('id');
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'vacation_request')->exists()) {
+                $flow = $flows->create(['name' => 'Vacaciones · aprobación estándar', 'subject_type' => 'vacation_request', 'steps' => ['levels' => [
+                    ['name' => 'Jefe directo', 'mode' => 'sequential', 'sla_hours' => 48, 'approvers' => [['kind' => 'manager']]],
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
+
+            $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
+            if ($admin === null || Task::query()->exists()) {
+                return;
+            }
+            $tasks = app(TaskService::class);
+            foreach ([
+                ['title' => 'Revisar el régimen laboral de Transportes Inti S.A.C.', 'description' => 'Confirmar que sigue en el régimen de pequeña empresa antes del próximo cierre.', 'assignee_user_id' => $admin, 'priority' => 'high', 'due_on' => now()->addDays(3)->toDateString()],
+                ['title' => 'Definir quién aprueba los gastos de viaje', 'description' => 'Crear el flujo de aprobación de gastos en Configuración → Flujos de aprobación.', 'assignee_user_id' => $admin, 'priority' => 'normal', 'due_on' => now()->subDay()->toDateString()],
+                ['title' => 'Cargar el organigrama de Comercial Los Andes S.A.C.', 'assignee_role_id' => $rrhh, 'priority' => 'normal', 'due_on' => now()->addWeek()->toDateString()],
+            ] as $task) {
+                $tasks->create($task, (string) $admin);
             }
         });
 

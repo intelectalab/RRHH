@@ -1664,6 +1664,7 @@ CREATE TABLE hr_tasks (
   title text NOT NULL,
   description text,
   assignee_user_id uuid,
+  assignee_role_id uuid,
   created_by_user_id uuid,
   subject_type text,
   subject_id uuid,
@@ -1678,10 +1679,12 @@ CREATE TABLE hr_tasks (
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_hr_tasks_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_hr_tasks_assignee_user_id FOREIGN KEY (tenant_id, assignee_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_hr_tasks_assignee_role_id FOREIGN KEY (tenant_id, assignee_role_id) REFERENCES roles (tenant_id, id),
   CONSTRAINT fk_hr_tasks_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE hr_tasks IS 'Tareas internas de RRHH con responsable, fecha, prioridad y vínculo a un proceso.';
 CREATE INDEX ix_hr_tasks_assignee_user_id ON hr_tasks (tenant_id, assignee_user_id);
+CREATE INDEX ix_hr_tasks_assignee_role_id ON hr_tasks (tenant_id, assignee_role_id);
 CREATE INDEX ix_hr_tasks_created_by_user_id ON hr_tasks (tenant_id, created_by_user_id);
 CREATE INDEX ix_hr_tasks_related_employment_id ON hr_tasks (tenant_id, related_employment_id);
 ALTER TABLE hr_tasks ENABLE ROW LEVEL SECURITY;

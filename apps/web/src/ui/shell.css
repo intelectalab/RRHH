@@ -171,3 +171,48 @@
 .paleta-lista small { color: var(--tx2); font-size: 12px; white-space: nowrap; }
 .paleta-pie { border-top: 1px solid var(--bd); padding: 8px 16px; }
 @media (max-width: 1100px) { .gsearch { min-width: 0; } .gsearch .ph, .gsearch kbd { display: none; } }
+
+/* Aprobaciones, tareas y pendientes (diseño aprobado: tarjetas de solicitud, barra masiva, contador ocre) */
+.cnt-mod { background: var(--oc); color: var(--tx); font-size: 11px; font-weight: 800; border-radius: 8px; padding: 0 6px; line-height: 16px; margin-left: 6px; }
+.card-header .ctx { font-size: var(--fs-s); color: var(--tx2); }
+.bulk { background: var(--pe-50); border-bottom: 1px solid var(--pe-100); padding: 8px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bulk .ms-auto { margin-left: auto; }
+.solicitud { padding: 16px; border-bottom: 1px solid var(--bd); display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 14px; align-items: start; transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+.solicitud:last-child { border-bottom: 0; }
+.solicitud.sel { background: var(--pe-50); }
+.solicitud.sale { opacity: 0; transform: translateX(12px); }
+.solicitud .nm { font-weight: 800; color: var(--tx); background: none; border: 0; padding: 0; font: inherit; font-weight: 800; cursor: pointer; text-align: left; }
+.solicitud .nm:hover { color: var(--primario); text-decoration: underline; }
+.solicitud .chk { width: 18px; margin-top: 8px; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.tag.er { background: var(--er-50); color: var(--er); } .tag.ok { background: var(--ok-50); color: var(--ok); }
+.acc-sol { display: flex; gap: 8px; width: 220px; }
+.acc-sol .btn-primary { flex-grow: 1; }
+.btn-pel-sec { background: var(--sup); border: 1px solid var(--er); color: var(--er); }
+.btn-pel-sec:hover { background: var(--er-50); color: var(--er); }
+.av.l { --av: 40px; } .av.s { --av: 26px; }
+.lista-compacta > li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--bd2); }
+.lista-compacta > li:last-child { border-bottom: 0; }
+.lista-compacta b { display: block; font-size: var(--fs-s); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.chips button { border: 1px solid var(--control-bd); background: var(--sup); color: var(--tx); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: var(--fs-s); font-weight: 700; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.chips button[aria-pressed="true"] { background: var(--pe-50); border-color: var(--pe-500); color: var(--pe-700); }
+.chips .n { font-variant-numeric: tabular-nums; color: var(--tx2); }
+.traza { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--bd); }
+.traza li { position: relative; padding: 0 0 14px 16px; }
+.traza li::before { content: ""; position: absolute; left: -6px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--sup); border: 2px solid var(--tx3); }
+.traza li.ok::before { border-color: var(--ok); background: var(--ok); } .traza li.er::before { border-color: var(--er); background: var(--er); } .traza li.wa::before { border-color: var(--wa); }
+.traza .sub2 { display: block; }
+.vencida td:first-child { box-shadow: inset 3px 0 0 var(--er); }
+.pend-btn { position: relative; }
+.pend-btn .cnt-mod { position: absolute; top: -2px; right: -4px; margin: 0; }
+.niveles { display: grid; gap: 12px; }
+.nivel { border: 1px solid var(--bd); border-radius: var(--r); padding: 12px; background: var(--sup); }
+.nivel-cab { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.nivel-cab b { flex: 1; }
+.aprobador { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 6px; margin-bottom: 6px; }
+@media (max-width: 900px) { .solicitud { grid-template-columns: auto auto minmax(0, 1fr); } .acc-sol { grid-column: 3; width: auto; } .aprobador { grid-template-columns: 1fr; } }
+.seg button { white-space: nowrap; }
+.barra-filtros { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.barra-filtros .seg, .phead .seg { margin-top: 0; }
+.barra-filtros .seg button, .phead .seg button { padding: 6px 12px; }

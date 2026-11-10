@@ -301,6 +301,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/tasks/{id}` | `workflow.tasks.{view,update}` | 0 |
 | POST | `/tasks/{id}/{complete,cancel}` | `workflow.tasks.{complete,cancel}` | 0 |
 | GET | `/inbox` | sesión | 0 |
+| POST | `/approval-requests/bulk-approve` | `workflow.approval_requests.approve` | 0 |
 
 **NOT · Notificaciones**
 

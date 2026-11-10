@@ -977,6 +977,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/approval-requests/bulk-approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aprobar en masa solicitudes de tipos marcados como seguros (RN-WFL-12) */
+        post: operations["postApprovalRequestsBulkApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/approval-requests/{id}": {
         parameters: {
             query?: never;
@@ -13359,6 +13376,7 @@ export interface components {
                 [key: string]: unknown;
             }[] | null;
             can_decide?: boolean | null;
+            bulk_safe?: boolean | null;
             /** Format: date-time */
             finished_at?: string | null;
             /** Format: date-time */
@@ -17122,17 +17140,26 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             title: string;
+            description?: string | null;
             /** @description Identificador opaco */
-            assignee_id?: string | null;
+            assignee_user_id?: string | null;
+            /** @description Identificador opaco */
+            assignee_role_id?: string | null;
+            assignee_name?: string | null;
+            created_by_name?: string | null;
             /** Format: date */
             due_on?: string | null;
             /** @enum {string} */
-            priority: "low" | "normal" | "high";
+            priority: "low" | "normal" | "high" | "urgent";
             /** @enum {string} */
-            status: "open" | "in_progress" | "done" | "cancelled";
+            status: "pending" | "in_progress" | "done" | "cancelled";
+            overdue?: boolean | null;
             related_type?: string | null;
             /** @description Identificador opaco */
             related_id?: string | null;
+            /** Format: date-time */
+            completed_at?: string | null;
+            allowed_actions?: string[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17140,15 +17167,24 @@ export interface components {
         };
         TaskInput: {
             title?: string;
+            description?: string | null;
             /** @description Identificador opaco */
-            assignee_id?: string | null;
+            assignee_user_id?: string | null;
+            /** @description Identificador opaco */
+            assignee_role_id?: string | null;
+            assignee_name?: string | null;
+            created_by_name?: string | null;
             /** Format: date */
             due_on?: string | null;
             /** @enum {string} */
-            priority?: "low" | "normal" | "high";
+            priority?: "low" | "normal" | "high" | "urgent";
+            overdue?: boolean | null;
             related_type?: string | null;
             /** @description Identificador opaco */
             related_id?: string | null;
+            /** Format: date-time */
+            completed_at?: string | null;
+            allowed_actions?: string[] | null;
         };
         Tenant: {
             /** @description Identificador opaco */
@@ -20204,6 +20240,38 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postApprovalRequestsBulkApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
     };

@@ -9,6 +9,7 @@ import { Icon } from '@/ui/components/Icon'
 import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
+import { InboxButton, useInboxCount } from './InboxButton'
 import { SessionProvider, useSession } from './SessionProvider'
 
 /** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
@@ -18,7 +19,9 @@ type ModuleLink = { href: string; key: string; module: string; visible: (can: (p
 const MODULES: ModuleLink[] = [
   { href: '/', key: 'shell.modules_home', module: 'base', visible: () => true },
   { href: '/organizacion/empresas', key: 'shell.modules_org', module: 'base', visible: (can) => can('org.legal_entities.view') },
-  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('audit.logs.view') },
+  { href: '/aprobaciones', key: 'shell.modules_approvals', module: 'base', visible: (can) => can('workflow.approval_requests.view') },
+  { href: '/tareas', key: 'shell.modules_tasks', module: 'base', visible: (can) => can('workflow.tasks.view') },
+  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('audit.logs.view') },
 ]
 
 function initials(name: string): string {
@@ -33,6 +36,7 @@ function Shell({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false)
   const [theme, setTheme] = useState<ThemeChoice>('system')
   const menuRef = useRef<HTMLDivElement>(null)
+  const inbox = useInboxCount()
 
   useEffect(() => setTheme(storedTheme()), [])
   useEffect(() => setNavOpen(false), [pathname])
@@ -62,6 +66,7 @@ function Shell({ children }: { children: ReactNode }) {
           <CompanySelector />
           <div className="espacio" />
           <CommandPalette />
+          <InboxButton counts={inbox} />
           <div className="menu" ref={menuRef}>
             <button type="button" className="userbtn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
               <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>
@@ -99,6 +104,8 @@ function Shell({ children }: { children: ReactNode }) {
           {MODULES.filter((m) => session.modules.includes(m.module) && m.visible(can)).map((m) => (
             <Link key={m.href} href={m.href} className={active(m.href) ? 'on' : undefined} aria-current={active(m.href) ? 'page' : undefined}>
               {t(m.key)}
+              {m.href === '/aprobaciones' && (inbox?.approval ?? 0) > 0 && <span className="cnt-mod" aria-label={t('shell.inbox_aria', { n: inbox?.approval ?? 0 })}>{inbox?.approval}</span>}
+              {m.href === '/tareas' && (inbox?.task ?? 0) > 0 && <span className="cnt-mod" aria-label={t('shell.inbox_aria', { n: inbox?.task ?? 0 })}>{inbox?.task}</span>}
             </Link>
           ))}
           </div>

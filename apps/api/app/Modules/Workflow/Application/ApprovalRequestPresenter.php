@@ -76,10 +76,19 @@ final class ApprovalRequestPresenter
             'requester_name' => $request->started_by_user_id !== null ? ($names[$request->started_by_user_id] ?? null) : null,
             'tasks' => $rows,
             'can_decide' => $canDecide,
+            'bulk_safe' => $this->bulkSafe($request->subject_type),
             'finished_at' => $request->finished_at?->toIso8601String(),
             'created_at' => $request->created_at?->toIso8601String(),
             'updated_at' => $request->updated_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * RN-WFL-12: tipos que el módulo dueño marcó como seguros para aprobar en masa.
+     */
+    public function bulkSafe(string $subjectType): bool
+    {
+        return (bool) (config('workflow.subject_types.'.$subjectType.'.bulk_safe') ?? false);
     }
 
     /**

@@ -13,4 +13,7 @@ return [
     'approvers_required' => 'Each level needs at least one approver.',
     'invalid_approver' => 'Invalid approver.',
     'invalid_sla' => 'The deadline must be at least one hour.',
+    'task_assignee_required' => 'Assign the task to a person or a role.',
+    'task_invalid_assignee' => 'Invalid assignee.',
+    'task_invalid_related' => 'The related record does not exist.',
 ];

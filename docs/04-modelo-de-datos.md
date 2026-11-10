@@ -840,7 +840,7 @@ erDiagram
 
 - **Propósito:** Tareas internas de RRHH con responsable, fecha, prioridad y vínculo a un proceso.
 - **Columnas clave:** `title`, `description`, `subject_type`, `subject_id`, `due_on`, `priority`, `status`, `completed_at`.
-- **Relaciones:** `assignee_user_id` → `users` (opcional); `created_by_user_id` → `users` (opcional); `related_employment_id` → `employments` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
+- **Relaciones:** `assignee_user_id` → `users` (opcional); `assignee_role_id` → `roles` (opcional, tarea para un rol; WFL-8); `created_by_user_id` → `users` (opcional); `related_employment_id` → `employments` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
 
