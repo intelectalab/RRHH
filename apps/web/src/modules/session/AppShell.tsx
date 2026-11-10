@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useT } from '@/lib/useT'
 import { Icon } from '@/ui/components/Icon'
+import { CompanyProvider } from './CompanyProvider'
+import { CompanySelector } from './CompanySelector'
 import { SessionProvider, useSession } from './SessionProvider'
 
 type ModuleLink = { href: string; key: string; visible: (can: (p: string) => boolean) => boolean }
@@ -12,6 +14,7 @@ type ModuleLink = { href: string; key: string; visible: (can: (p: string) => boo
 /** Módulos de la barra. Se agregan aquí a medida que existen pantallas (sin botones sin función). */
 const MODULES: ModuleLink[] = [
   { href: '/', key: 'shell.modules_home', visible: () => true },
+  { href: '/organizacion/empresas', key: 'shell.modules_org', visible: (can) => can('org.legal_entities.view') },
   { href: '/configuracion/usuarios', key: 'shell.modules_settings', visible: (can) => can('identity.users.view') || can('identity.roles.view') },
 ]
 
@@ -48,6 +51,7 @@ function Shell({ children }: { children: ReactNode }) {
             <span><b>Ayni</b><span>HR</span></span>
           </Link>
           {session.tenant && <span className="org">{session.tenant.name}</span>}
+          <CompanySelector />
           <div className="espacio" />
           <div className="menu" ref={menuRef}>
             <button type="button" className="userbtn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
@@ -84,7 +88,9 @@ function Shell({ children }: { children: ReactNode }) {
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <SessionProvider fallback={<div className="main" aria-busy="true"><span className="esq" style={{ width: 240 }} /></div>}>
-      <Shell>{children}</Shell>
+      <CompanyProvider>
+        <Shell>{children}</Shell>
+      </CompanyProvider>
     </SessionProvider>
   )
 }

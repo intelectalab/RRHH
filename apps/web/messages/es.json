@@ -73,7 +73,8 @@
     "loading": "Cargando…",
     "modules": "Módulos",
     "modules_home": "Inicio",
-    "modules_settings": "Configuración"
+    "modules_settings": "Configuración",
+    "modules_org": "Organización"
   },
   "home": {
     "title": "Hola, {name}",
@@ -156,5 +157,48 @@
     "created": "Rol creado.",
     "confirm_delete": "¿Eliminar el rol {name}?",
     "granted": "{count} permisos"
+  },
+  "company": {
+    "all": "Todas las empresas",
+    "count": "{count} empresas",
+    "select_aria": "Empresa activa: {name}",
+    "tax": "RUC {tax}"
+  },
+  "org": {
+    "title": "Organización",
+    "tab_companies": "Empresas",
+    "sub": "{active} activas de {total}",
+    "new": "Nueva empresa",
+    "col_name": "Razón social",
+    "col_tax": "Identificador fiscal",
+    "col_country": "País",
+    "col_currency": "Moneda",
+    "col_regime": "Régimen laboral",
+    "col_status": "Estado",
+    "status_active": "Activa",
+    "status_archived": "Archivada",
+    "edit": "Editar",
+    "archive": "Archivar",
+    "restore": "Restaurar",
+    "form_new": "Nueva empresa",
+    "form_edit": "Editar empresa",
+    "name": "Razón social",
+    "trade_name": "Nombre comercial",
+    "trade_optional": "(opcional)",
+    "tax_id": "Identificador fiscal",
+    "country": "País",
+    "currency": "Moneda",
+    "timezone": "Zona horaria",
+    "regime": "Régimen laboral por defecto",
+    "regime_help": "El cambio de régimen se guarda con fecha de vigencia; la historia anterior se conserva.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "created": "Empresa creada.",
+    "saved": "Empresa guardada.",
+    "archived": "Empresa archivada: ya no acepta altas.",
+    "restored": "Empresa restaurada.",
+    "confirm_archive": "¿Archivar {name}? Dejará de aceptar altas; su historia se conserva.",
+    "empty_title": "No hay empresas",
+    "empty_text": "Registre la primera razón social del grupo."
   }
 }

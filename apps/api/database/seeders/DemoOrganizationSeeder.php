@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserIdentity;
+use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Shared\Security\BlindIndex;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Seeder;
@@ -75,6 +76,24 @@ class DemoOrganizationSeeder extends Seeder
             $user->roleAssignments()->create(['role_id' => $adminRole->id]);
 
             return true;
+        });
+
+        // Empresas del grupo demo (las mismas de la versión de demostración aprobada).
+        TenancyScope::runAs((string) $tenantId, function (): void {
+            $companies = [
+                ['legal_name' => 'Comercial Los Andes S.A.C.', 'tax_id' => '20999999901', 'address' => 'Av. Nicolás Ayllón 4520, Ate, Lima', 'regime' => 'pe_general'],
+                ['legal_name' => 'Transportes Inti S.A.C.', 'tax_id' => '20999999902', 'address' => 'Antigua Panamericana Sur km 32, Lurín, Lima', 'regime' => 'pe_pequena'],
+            ];
+            foreach ($companies as $c) {
+                if (LegalEntity::query()->where('country_code', 'PE')->where('tax_id', $c['tax_id'])->exists()) {
+                    continue;
+                }
+                $entity = LegalEntity::create([
+                    'legal_name' => $c['legal_name'], 'tax_id' => $c['tax_id'], 'address' => $c['address'],
+                    'country_code' => 'PE', 'currency' => 'PEN', 'timezone' => 'America/Lima', 'status' => 'active',
+                ]);
+                $entity->regimes()->create(['labor_regime_code' => $c['regime'], 'valid_from' => '2024-01-01']);
+            }
         });
 
         if ($created && $this->command !== null) {

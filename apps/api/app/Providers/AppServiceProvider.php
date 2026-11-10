@@ -10,6 +10,7 @@ use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Outbox\ProcessedEventTracker;
+use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TenantCache::class);
         $this->app->singleton(PermissionResolver::class);
         $this->app->singleton(ModuleGate::class);
+        $this->app->singleton(DataScope::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);
         $this->app->singleton(IntegrationManager::class);
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(RequestHandled::class, function (): void {
             $this->app->make(PermissionResolver::class)->forget();
             $this->app->make(ModuleGate::class)->forget();
+            $this->app->make(DataScope::class)->forget();
         });
     }
 }

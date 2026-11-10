@@ -238,6 +238,7 @@ EXTRA = [
     ("SEG", 0, "post", "/auth/logout", "-", "Cerrar sesión", False),
     ("SEG", 0, "get", "/me", "-", "Usuario actual, permisos efectivos, alcance y módulos activos", False),
     ("SEG", 0, "get", "/permissions", "identity.roles.view", "Catálogo de permisos y permisos por campo", False),
+    ("TEN", 0, "get", "/catalogs/organization", "org.legal_entities.view", "Catálogos para registrar empresas: países, monedas y regímenes laborales", False),
     ("TEN", 0, "get", "/tenant", "settings.organization.view", "Organización actual: datos, plan, módulos y límites", False),
     ("TEN", 0, "patch", "/tenant", "settings.organization.update", "Actualizar datos de la organización", False),
     ("SAS", 0, "get", "/platform/health", "platform.health.view", "Salud de la plataforma: colas, trabajos fallidos, webhooks, conectores", False),

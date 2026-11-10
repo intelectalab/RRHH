@@ -73,7 +73,8 @@
     "loading": "Carregando…",
     "modules": "Módulos",
     "modules_home": "Início",
-    "modules_settings": "Configurações"
+    "modules_settings": "Configurações",
+    "modules_org": "Organização"
   },
   "home": {
     "title": "Olá, {name}",
@@ -156,5 +157,48 @@
     "created": "Papel criado.",
     "confirm_delete": "Excluir o papel {name}?",
     "granted": "{count} permissões"
+  },
+  "company": {
+    "all": "Todas as empresas",
+    "count": "{count} empresas",
+    "select_aria": "Empresa ativa: {name}",
+    "tax": "ID fiscal {tax}"
+  },
+  "org": {
+    "title": "Organização",
+    "tab_companies": "Empresas",
+    "sub": "{active} ativas de {total}",
+    "new": "Nova empresa",
+    "col_name": "Razão social",
+    "col_tax": "Identificador fiscal",
+    "col_country": "País",
+    "col_currency": "Moeda",
+    "col_regime": "Regime trabalhista",
+    "col_status": "Situação",
+    "status_active": "Ativa",
+    "status_archived": "Arquivada",
+    "edit": "Editar",
+    "archive": "Arquivar",
+    "restore": "Restaurar",
+    "form_new": "Nova empresa",
+    "form_edit": "Editar empresa",
+    "name": "Razão social",
+    "trade_name": "Nome fantasia",
+    "trade_optional": "(opcional)",
+    "tax_id": "Identificador fiscal",
+    "country": "País",
+    "currency": "Moeda",
+    "timezone": "Fuso horário",
+    "regime": "Regime trabalhista padrão",
+    "regime_help": "A mudança de regime é salva com data de vigência; o histórico anterior é mantido.",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "created": "Empresa criada.",
+    "saved": "Empresa salva.",
+    "archived": "Empresa arquivada: não aceita mais admissões.",
+    "restored": "Empresa restaurada.",
+    "confirm_archive": "Arquivar {name}? Deixará de aceitar admissões; o histórico é mantido.",
+    "empty_title": "Não há empresas",
+    "empty_text": "Cadastre a primeira razão social do grupo."
   }
 }

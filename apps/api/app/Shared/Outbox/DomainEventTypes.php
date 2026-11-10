@@ -52,6 +52,11 @@ final class DomainEventTypes
 
     public const USER_INVITED = 'user.invited.v1';
 
+    // Organización
+    public const COMPANY_CREATED = 'company.created.v1';
+
+    public const COMPANY_ARCHIVED = 'company.archived.v1';
+
     public const USER_ACTIVATED = 'user.activated.v1';
 
     public const USER_SUSPENDED = 'user.suspended.v1';
@@ -146,6 +151,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['user_id', 'user_token_id', 'token_enc', 'expires_at'],
             'description' => 'Se solicitó el enlace de recuperación de clave (token cifrado, nunca en claro)',
+        ],
+        self::COMPANY_CREATED => [
+            'version' => 1,
+            'required_fields' => ['legal_entity_id', 'country_code'],
+            'description' => 'Empresa (razón social) creada en el grupo',
+        ],
+        self::COMPANY_ARCHIVED => [
+            'version' => 1,
+            'required_fields' => ['legal_entity_id'],
+            'description' => 'Empresa archivada: deja de aceptar altas',
         ],
         self::USER_INVITED => [
             'version' => 1,

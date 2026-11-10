@@ -73,7 +73,8 @@
     "loading": "Loading…",
     "modules": "Modules",
     "modules_home": "Home",
-    "modules_settings": "Settings"
+    "modules_settings": "Settings",
+    "modules_org": "Organization"
   },
   "home": {
     "title": "Hello, {name}",
@@ -156,5 +157,48 @@
     "created": "Role created.",
     "confirm_delete": "Delete the role {name}?",
     "granted": "{count} permissions"
+  },
+  "company": {
+    "all": "All companies",
+    "count": "{count} companies",
+    "select_aria": "Active company: {name}",
+    "tax": "Tax ID {tax}"
+  },
+  "org": {
+    "title": "Organization",
+    "tab_companies": "Companies",
+    "sub": "{active} active of {total}",
+    "new": "New company",
+    "col_name": "Legal name",
+    "col_tax": "Tax ID",
+    "col_country": "Country",
+    "col_currency": "Currency",
+    "col_regime": "Labor regime",
+    "col_status": "Status",
+    "status_active": "Active",
+    "status_archived": "Archived",
+    "edit": "Edit",
+    "archive": "Archive",
+    "restore": "Restore",
+    "form_new": "New company",
+    "form_edit": "Edit company",
+    "name": "Legal name",
+    "trade_name": "Trade name",
+    "trade_optional": "(optional)",
+    "tax_id": "Tax ID",
+    "country": "Country",
+    "currency": "Currency",
+    "timezone": "Time zone",
+    "regime": "Default labor regime",
+    "regime_help": "Regime changes are saved with an effective date; prior history is kept.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "created": "Company created.",
+    "saved": "Company saved.",
+    "archived": "Company archived: it no longer accepts new hires.",
+    "restored": "Company restored.",
+    "confirm_archive": "Archive {name}? It will stop accepting new hires; its history is kept.",
+    "empty_title": "No companies",
+    "empty_text": "Register the group's first legal entity."
   }
 }

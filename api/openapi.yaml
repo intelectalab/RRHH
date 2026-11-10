@@ -4577,6 +4577,23 @@ paths:
       x-phase: 5
       x-permission: careers.paths.archive
       operationId: postCareerPathsIdArchive
+  /catalogs/organization:
+    get:
+      summary: 'Catálogos para registrar empresas: países, monedas y regímenes laborales'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - TEN
+      x-phase: 0
+      x-permission: org.legal_entities.view
+      operationId: getCatalogsOrganization
   /channels/whatsapp/settings:
     get:
       summary: Configuración del canal WhatsApp

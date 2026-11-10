@@ -267,6 +267,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET | `/catalogs/organization` | `org.legal_entities.view` | 0 |
 | GET | `/tenant` | `settings.organization.view` | 0 |
 | PATCH | `/tenant` | `settings.organization.update` | 0 |
 
