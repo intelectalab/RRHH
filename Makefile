@@ -72,5 +72,5 @@ contracts:
 	$(DOCKER_COMPOSE) run --rm web npm run contracts
 
 openapi:
-	$(DOCKER_COMPOSE) run --rm api python3 tools/gen_openapi.py
+	docker run --rm -v $(CURDIR):/workspace -w /workspace python:3.12-slim sh -c "pip install --quiet pyyaml openapi-spec-validator && python3 tools/gen_openapi.py"
 
