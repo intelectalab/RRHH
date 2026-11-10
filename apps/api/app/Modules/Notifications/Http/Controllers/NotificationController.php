@@ -27,7 +27,9 @@ final class NotificationController
         }
         $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'id', 'desc');
         $ids = array_column($page['data'], 'id');
-        $rows = Notification::query()->whereIn('id', $ids)->get()->keyBy('id')->only($ids)->values();
+        $rows = Notification::query()->whereIn('id', $ids)->get()->keyBy('id');
+        // Conserva el orden de la página (only() respetaría el orden de la consulta, no el de los ids).
+        $rows = collect($ids)->map(fn ($id) => $rows->get($id))->filter()->values();
 
         return response()->json([
             'data' => $rows->map(fn (Notification $n) => [

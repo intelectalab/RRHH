@@ -5,6 +5,7 @@ namespace Tests\Support\Isolation;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
 use App\Modules\Settings\Infrastructure\Models\TenantSetting;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,7 @@ final class CrossTenantHarness
         // Listados propios o de registro (sin esquema de recurso): se siembran avisos y entregas de A.
         '/notifications' => Notification::class,
         '/trash/{id}/restore' => User::class,
+        'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
     ];

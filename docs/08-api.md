@@ -327,6 +327,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/settings` | `settings.parameters.view` | 0 |
 | GET | `/settings/{group}` | `settings.parameters.view` | 0 |
 | PUT | `/settings/{group}` | `settings.parameters.update` | 0 |
+| GET | `/custom-fields/form` | sesión | 0 |
+| GET | `/exchange-rates/convert` | `settings.exchange_rates.view` | 0 |
 
 **PLT · Plataforma técnica**
 

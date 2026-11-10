@@ -8,4 +8,13 @@ return [
     'holiday_exists' => 'Ya hay un feriado el :date en este calendario.',
     'past_holiday_locked' => 'Un feriado que ya pasó no se quita: asistencia y planilla ya lo usaron.',
     'national_holiday_locked' => 'Los feriados nacionales los fija la ley: no se quitan del calendario.',
+    'no_exchange_rate' => 'No hay tipo de cambio de :from a :to vigente al :date.',
+    'rate_exists' => 'Ya hay un tipo de cambio para ese par y fecha; publica uno con otra fecha.',
+    'custom_field_unknown' => 'Este campo no existe para este registro.',
+    'custom_field_forbidden' => 'No tienes permiso para este campo.',
+    'custom_field_required' => 'Este campo es obligatorio.',
+    'custom_field_key_taken' => 'Ya existe un campo con esa clave para esta entidad (puede estar en la papelera).',
+    'custom_field_type_locked' => 'El campo ya tiene valores guardados: no se puede cambiar su tipo.',
+    'custom_field_options_required' => 'Indica las opciones de la lista.',
+    'custom_field_permission_required' => 'Un campo sensible necesita un permiso por campo.',
 ];

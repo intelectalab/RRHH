@@ -11,6 +11,7 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
+import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 
 type Company = Schema<'LegalEntity'> & { trade_name?: string | null; allowed_actions?: string[]; version?: number }
 type Catalog = {
@@ -137,6 +138,11 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
   })
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const custom = useCustomFields('legal_entity')
+  const [customValues, setCustomValues] = useState<CustomValues>({})
+  useEffect(() => {
+    if (company) void api.get<{ data: { custom_fields?: CustomValues } }>(`/legal-entities/${company.id}`).then((r) => setCustomValues(r.data.custom_fields ?? {}))
+  }, [company])
   const [error, setError] = useState<string | null>(null)
   const regimes = catalog.labor_regimes.filter((r) => r.country === form.country)
   const taxLabel = catalog.tax_id_labels[form.country] ?? t('org.tax_id')
@@ -147,7 +153,7 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
     setBusy(true)
     setErrors({})
     setError(null)
-    const body = { ...form, trade_name: form.trade_name || null }
+    const body = { ...form, trade_name: form.trade_name || null, ...(custom.fields.length > 0 ? { custom_fields: customValues } : {}) }
     try {
       if (company) {
         const { country: _country, ...patch } = body
@@ -206,6 +212,7 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
           </select>
         ))}
         {company && <p className="small text-secondary">{t('org.regime_help')}</p>}
+        <CustomFieldsEditor fields={custom.fields} values={customValues} onChange={setCustomValues} errors={errors} />
         {error && <div className="invalid-feedback" role="alert">{error}</div>}
       </form>
     </SidePanel>

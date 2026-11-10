@@ -51,7 +51,7 @@ final class ApprovalRequestController
         $models = ApprovalRequest::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         return response()->json([
-            'data' => $models->only($ids)->values()->map(fn (ApprovalRequest $r) => $this->presenter->present($r, $userId))->all(),
+            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (ApprovalRequest $r) => $this->presenter->present($r, $userId))->all(),
             'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
         ]);
     }

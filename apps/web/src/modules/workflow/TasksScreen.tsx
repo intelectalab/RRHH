@@ -12,6 +12,7 @@ import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
+import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 import { notifyInboxChanged } from './shared'
 
 type Task = Schema<'Task'> & { mine?: boolean; version?: number }
@@ -158,6 +159,11 @@ function TaskPanel({ task, onClose, onSaved, onTransition }: { task: Task | null
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const custom = useCustomFields('task')
+  const [customValues, setCustomValues] = useState<CustomValues>({})
+  useEffect(() => {
+    if (task) void api.get<{ data: { custom_fields?: CustomValues } }>(`/tasks/${task.id}`).then((r) => setCustomValues(r.data.custom_fields ?? {}))
+  }, [task])
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
   useEffect(() => {
@@ -178,6 +184,7 @@ function TaskPanel({ task, onClose, onSaved, onTransition }: { task: Task | null
       assignee_role_id: form.to === 'role' ? form.assignee_role_id || null : null,
       due_on: form.due_on || null,
       priority: form.priority,
+      ...(custom.fields.length > 0 ? { custom_fields: customValues } : {}),
     }
     try {
       if (task) await api.request(`/tasks/${task.id}`, 'PATCH', body)
@@ -249,6 +256,7 @@ function TaskPanel({ task, onClose, onSaved, onTransition }: { task: Task | null
               {(['low', 'normal', 'high', 'urgent'] as const).map((p) => <option key={p} value={p}>{t(`tasks.priority_${p}`)}</option>)}
             </select>
           ))}
+          <CustomFieldsEditor fields={custom.fields} values={customValues} onChange={setCustomValues} errors={errors} />
         </fieldset>
         {task?.created_by_name && <p className="small text-secondary">{t('tasks.created_by', { name: task.created_by_name })}</p>}
         {error && <div className="invalid-feedback" role="alert">{error}</div>}

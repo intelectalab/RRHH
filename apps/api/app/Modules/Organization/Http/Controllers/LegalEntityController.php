@@ -5,11 +5,14 @@ namespace App\Modules\Organization\Http\Controllers;
 use App\Modules\Organization\Application\LegalEntityService;
 use App\Modules\Organization\Http\Requests\LegalEntityRequest;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Shared\CustomFields\CustomFieldValues;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
 use App\Shared\Permissions\DataScope;
+use App\Shared\Permissions\EffectivePermissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * TEN-5 · Empresas del grupo. El listado respeta el alcance del usuario: con alcance de
@@ -20,6 +23,7 @@ final class LegalEntityController
     public function __construct(
         private readonly LegalEntityService $entities,
         private readonly DataScope $scope,
+        private readonly CustomFieldValues $customFields,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -59,8 +63,16 @@ final class LegalEntityController
     {
         /** @var array{name: string, trade_name?: string|null, tax_id: string, country: string, currency: string, timezone: string, payroll_regime: string} $input */
         $input = $request->validated();
+        $custom = $this->customFields->validate('legal_entity', $this->customInput($request), true, $this->permissions($request));
 
-        return $this->respond($this->entities->create($input), 201);
+        $entity = DB::transaction(function () use ($input, $custom): LegalEntity {
+            $entity = $this->entities->create($input);
+            $this->customFields->save('legal_entity', $entity->id, $custom);
+
+            return $entity;
+        });
+
+        return $this->respond($entity, 201);
     }
 
     public function update(LegalEntityRequest $request, string $id): JsonResponse
@@ -70,8 +82,16 @@ final class LegalEntityController
 
         /** @var array{name?: string, trade_name?: string|null, tax_id?: string, currency?: string, timezone?: string, payroll_regime?: string} $input */
         $input = $request->validated();
+        $custom = $this->customFields->validate('legal_entity', $this->customInput($request), false, $this->permissions($request));
 
-        return $this->respond($this->entities->update($entity, $input, $ifMatch === '' ? null : (int) $ifMatch));
+        $entity = DB::transaction(function () use ($entity, $input, $ifMatch, $custom): LegalEntity {
+            $entity = $this->entities->update($entity, $input, $ifMatch === '' ? null : (int) $ifMatch);
+            $this->customFields->save('legal_entity', $entity->id, $custom);
+
+            return $entity;
+        });
+
+        return $this->respond($entity);
     }
 
     public function archive(Request $request, string $id): JsonResponse
@@ -109,9 +129,30 @@ final class LegalEntityController
         return $query->firstOrFail();
     }
 
+    /**
+     * CFG-4 · Campos personalizados del formulario (los sensibles exigen su permiso por campo).
+     *
+     * @return array<string, mixed>
+     */
+    private function customInput(Request $request): array
+    {
+        $value = $request->input('custom_fields', []);
+
+        return is_array($value) ? $value : [];
+    }
+
+    private function permissions(Request $request): ?EffectivePermissions
+    {
+        $p = $request->attributes->get('effective_permissions');
+
+        return $p instanceof EffectivePermissions ? $p : null;
+    }
+
     private function respond(LegalEntity $entity, int $status = 200): JsonResponse
     {
-        return response()->json(['data' => $this->entities->present($entity)], $status)
+        $data = $this->entities->present($entity) + ['custom_fields' => (object) $this->customFields->read('legal_entity', $entity->id, $this->permissions(request()))];
+
+        return response()->json(['data' => $data], $status)
             ->header('ETag', '"'.$entity->lock_version.'"');
     }
 }

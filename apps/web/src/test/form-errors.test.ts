@@ -10,7 +10,10 @@ describe('UI-5 · errores del backend en el formulario', () => {
       { field: 'tax_id', rule: 'invalid', message: 'El RUC no tiene un formato válido.' },
       { field: 'role_assignments.0.site_ids', rule: 'required', message: 'Indique una sede.' },
     ])
-    expect(formErrors(e, t)).toEqual({ fields: { tax_id: 'El RUC no tiene un formato válido.', role_assignments: 'Indique una sede.' }, general: null })
+    expect(formErrors(e, t)).toEqual({
+      fields: { tax_id: 'El RUC no tiene un formato válido.', role_assignments: 'Indique una sede.', 'role_assignments.0.site_ids': 'Indique una sede.' },
+      general: null,
+    })
   })
 
   it('un error sin campo se muestra como mensaje general', () => {

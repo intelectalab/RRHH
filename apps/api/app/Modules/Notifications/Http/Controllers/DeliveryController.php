@@ -25,7 +25,9 @@ final class DeliveryController
         }
         $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'id', 'desc');
         $ids = array_column($page['data'], 'id');
-        $rows = NotificationDelivery::query()->whereIn('id', $ids)->get()->keyBy('id')->only($ids)->values();
+        $rows = NotificationDelivery::query()->whereIn('id', $ids)->get()->keyBy('id');
+        // Conserva el orden de la página (only() respetaría el orden de la consulta, no el de los ids).
+        $rows = collect($ids)->map(fn ($id) => $rows->get($id))->filter()->values();
         $notes = DB::table('notifications as n')->join('users as u', 'u.id', '=', 'n.recipient_user_id')
             ->whereIn('n.id', $rows->pluck('notification_id')->filter()->values())->get(['n.id', 'n.category', 'n.title', 'u.display_name'])->keyBy('id');
 

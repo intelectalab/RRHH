@@ -34,7 +34,7 @@ final class ApprovalFlowController
         $models = ApprovalFlow::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         return response()->json([
-            'data' => $models->only($ids)->values()->map(fn (ApprovalFlow $f) => $this->flows->present($f))->all(),
+            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (ApprovalFlow $f) => $this->flows->present($f))->all(),
             'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
         ]);
     }

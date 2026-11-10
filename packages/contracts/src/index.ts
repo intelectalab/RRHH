@@ -3313,6 +3313,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/custom-fields/form": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Campos personalizados del formulario de una entidad (?entity=) para quien puede verla; los sensibles solo con su permiso por campo */
+        get: operations["getCustomFieldsForm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/custom-fields/{id}": {
         parameters: {
             query?: never;
@@ -4357,6 +4374,23 @@ export interface paths {
         put?: never;
         /** Crear ExchangeRate */
         post: operations["postExchangeRates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exchange-rates/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha (indica el tipo aplicado) */
+        get: operations["getExchangeRatesConvert"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -14250,14 +14284,16 @@ export interface components {
             id: string;
             entity: string;
             key: string;
-            label: {
-                [key: string]: unknown;
-            };
+            label: string;
             /** @enum {string} */
-            type: "text" | "number" | "date" | "select" | "multiselect" | "checkbox" | "user" | "file" | "url" | "money" | "percent";
+            type: "text" | "number" | "date" | "select" | "multiselect" | "checkbox" | "user" | "file" | "url" | "currency" | "percent";
             options?: string[] | null;
             required: boolean;
             sensitive: boolean;
+            permission?: string | null;
+            section?: string | null;
+            sort_order?: number | null;
+            values_count?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -14266,14 +14302,16 @@ export interface components {
         CustomFieldInput: {
             entity?: string;
             key?: string;
-            label?: {
-                [key: string]: unknown;
-            };
+            label?: string;
             /** @enum {string} */
-            type?: "text" | "number" | "date" | "select" | "multiselect" | "checkbox" | "user" | "file" | "url" | "money" | "percent";
+            type?: "text" | "number" | "date" | "select" | "multiselect" | "checkbox" | "user" | "file" | "url" | "currency" | "percent";
             options?: string[] | null;
             required?: boolean;
             sensitive?: boolean;
+            permission?: string | null;
+            section?: string | null;
+            sort_order?: number | null;
+            values_count?: number | null;
         };
         Dashboard: {
             /** @description Identificador opaco */
@@ -14590,7 +14628,7 @@ export interface components {
             id: string;
             from_currency: string;
             to_currency: string;
-            rate: number;
+            rate: string;
             /** Format: date */
             valid_on: string;
             source: string;
@@ -14602,7 +14640,7 @@ export interface components {
         ExchangeRateInput: {
             from_currency?: string;
             to_currency?: string;
-            rate?: number;
+            rate?: string;
             /** Format: date */
             valid_on?: string;
             source?: string;
@@ -15241,6 +15279,9 @@ export interface components {
             payroll_regime: string;
             /** @enum {string} */
             status: "active" | "archived";
+            custom_fields?: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -15281,6 +15322,9 @@ export interface components {
             currency?: string;
             timezone?: string;
             payroll_regime?: string;
+            custom_fields?: {
+                [key: string]: unknown;
+            } | null;
         };
         LegalParameter: {
             /** @description Identificador opaco */
@@ -17208,6 +17252,9 @@ export interface components {
             /** Format: date-time */
             completed_at?: string | null;
             allowed_actions?: string[] | null;
+            custom_fields?: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17233,6 +17280,9 @@ export interface components {
             /** Format: date-time */
             completed_at?: string | null;
             allowed_actions?: string[] | null;
+            custom_fields?: {
+                [key: string]: unknown;
+            } | null;
         };
         Tenant: {
             /** @description Identificador opaco */
@@ -26213,6 +26263,28 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getCustomFieldsForm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getCustomFieldsId: {
         parameters: {
             query?: {
@@ -29115,6 +29187,28 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getExchangeRatesConvert: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getExpensePolicies: {

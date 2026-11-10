@@ -8,4 +8,13 @@ return [
     'holiday_exists' => 'There is already a holiday on :date in this calendar.',
     'past_holiday_locked' => 'A past holiday cannot be removed: attendance and payroll already used it.',
     'national_holiday_locked' => 'National holidays are set by law: they cannot be removed.',
+    'no_exchange_rate' => 'There is no :from to :to exchange rate in effect on :date.',
+    'rate_exists' => 'There is already a rate for that pair and date; publish one with another date.',
+    'custom_field_unknown' => 'This field does not exist for this record.',
+    'custom_field_forbidden' => 'You do not have permission for this field.',
+    'custom_field_required' => 'This field is required.',
+    'custom_field_key_taken' => 'A field with that key already exists for this entity (it may be in the trash).',
+    'custom_field_type_locked' => 'The field already has saved values: its type cannot change.',
+    'custom_field_options_required' => 'Enter the list options.',
+    'custom_field_permission_required' => 'A sensitive field needs a field permission.',
 ];

@@ -11,6 +11,8 @@ export function formErrors(error: unknown, t: (k: string) => string): { fields: 
   for (const d of error.details) {
     const key = d.field.split('.')[0] ?? d.field
     fields[key] ??= d.message
+    // También con la ruta completa (p. ej. custom_fields.zona) para campos anidados.
+    if (d.field !== key) fields[d.field] ??= d.message
   }
   return { fields, general: Object.keys(fields).length > 0 ? null : error.message }
 }

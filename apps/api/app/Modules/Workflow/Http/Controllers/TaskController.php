@@ -4,12 +4,15 @@ namespace App\Modules\Workflow\Http\Controllers;
 
 use App\Modules\Workflow\Application\TaskService;
 use App\Modules\Workflow\Infrastructure\Models\Task;
+use App\Shared\CustomFields\CustomFieldValues;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
 use App\Shared\Permissions\DataScope;
+use App\Shared\Permissions\EffectivePermissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * WFL-8 · Tareas de RRHH.
@@ -19,6 +22,7 @@ final class TaskController
     public function __construct(
         private readonly TaskService $tasks,
         private readonly DataScope $dataScope,
+        private readonly CustomFieldValues $customFields,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -48,7 +52,7 @@ final class TaskController
         $models = Task::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         return response()->json([
-            'data' => $models->only($ids)->values()->map(fn (Task $t) => $this->tasks->present($t, $userId))->all(),
+            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (Task $t) => $this->tasks->present($t, $userId))->all(),
             'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
         ]);
     }
@@ -61,16 +65,30 @@ final class TaskController
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate($this->rules(true));
+        $custom = $this->customFields->validate('task', $this->customInput($request), true, $this->permissions($request));
+        $task = DB::transaction(function () use ($data, $request, $custom): Task {
+            $task = $this->tasks->create($data, $this->userId($request));
+            $this->customFields->save('task', $task->id, $custom);
 
-        return $this->respond($request, $this->tasks->create($data, $this->userId($request)), 201);
+            return $task;
+        });
+
+        return $this->respond($request, $task, 201);
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
         $task = $this->find($request, $id, 'workflow.tasks.update');
         $data = $request->validate($this->rules(false));
+        $custom = $this->customFields->validate('task', $this->customInput($request), false, $this->permissions($request));
+        $task = DB::transaction(function () use ($task, $data, $custom): Task {
+            $task = $this->tasks->update($task, $data);
+            $this->customFields->save('task', $task->id, $custom);
 
-        return $this->respond($request, $this->tasks->update($task, $data));
+            return $task;
+        });
+
+        return $this->respond($request, $task);
     }
 
     public function complete(Request $request, string $id): JsonResponse
@@ -138,8 +156,27 @@ final class TaskController
         return (string) $request->user()?->getAuthIdentifier();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function customInput(Request $request): array
+    {
+        $value = $request->input('custom_fields', []);
+
+        return is_array($value) ? $value : [];
+    }
+
+    private function permissions(Request $request): ?EffectivePermissions
+    {
+        $p = $request->attributes->get('effective_permissions');
+
+        return $p instanceof EffectivePermissions ? $p : null;
+    }
+
     private function respond(Request $request, Task $task, int $status = 200): JsonResponse
     {
-        return response()->json(['data' => $this->tasks->present($task->refresh(), $this->userId($request))], $status);
+        $data = $this->tasks->present($task->refresh(), $this->userId($request)) + ['custom_fields' => (object) $this->customFields->read('task', $task->id, $this->permissions($request))];
+
+        return response()->json(['data' => $data], $status);
     }
 }
