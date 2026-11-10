@@ -15,7 +15,7 @@ type ModuleLink = { href: string; key: string; visible: (can: (p: string) => boo
 const MODULES: ModuleLink[] = [
   { href: '/', key: 'shell.modules_home', visible: () => true },
   { href: '/organizacion/empresas', key: 'shell.modules_org', visible: (can) => can('org.legal_entities.view') },
-  { href: '/configuracion/usuarios', key: 'shell.modules_settings', visible: (can) => can('identity.users.view') || can('identity.roles.view') },
+  { href: '/configuracion', key: 'shell.modules_settings', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('audit.logs.view') },
 ]
 
 function initials(name: string): string {

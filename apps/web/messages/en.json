@@ -87,7 +87,9 @@
   "settings": {
     "title": "Settings",
     "tab_users": "Users",
-    "tab_roles": "Roles and permissions"
+    "tab_roles": "Roles and permissions",
+    "tab_audit": "Audit",
+    "tab_sensitive": "Sensitive access"
   },
   "users": {
     "sub": "{active} active of {total}",
@@ -207,5 +209,47 @@
     "confirm_archive": "Archive {name}? It will stop accepting new hires; its history is kept.",
     "empty_title": "No companies",
     "empty_text": "Register the group's first legal entity."
+  },
+  "audit": {
+    "sub": "Who changed what, when and from where. Read only.",
+    "col_when": "Date and time",
+    "col_user": "User",
+    "col_action": "Action",
+    "col_entity": "Record",
+    "col_fields": "Changed fields",
+    "system": "System",
+    "search": "Search action, record or user",
+    "entity_all": "All records",
+    "from": "From",
+    "to": "To",
+    "export": "Export CSV",
+    "more": "Load more",
+    "empty": "No entries match these filters.",
+    "detail": "Change detail",
+    "field": "Field",
+    "before": "Before",
+    "after": "After",
+    "reason": "Reason",
+    "ip": "IP",
+    "history": "See record history",
+    "sensitive": "Contains sensitive data",
+    "entity_user": "User",
+    "entity_role": "Role",
+    "entity_legal_entity": "Company",
+    "entity_employment": "Employment",
+    "sens_sub": "Sensitive data reads: who, which fields, which record and when.",
+    "sens_fields": "Fields",
+    "sens_category": "Category",
+    "sens_channel": "Channel",
+    "sens_empty": "No sensitive data reads yet.",
+    "cat_salary": "Compensation",
+    "cat_health": "Health",
+    "cat_complaint": "Complaint",
+    "cat_disciplinary": "Discipline",
+    "cat_biometric": "Biometrics",
+    "cat_bank_account": "Bank account",
+    "cat_identity_document": "Identity document",
+    "cat_union": "Union membership",
+    "cat_other": "Other"
   }
 }

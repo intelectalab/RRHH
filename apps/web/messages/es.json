@@ -87,7 +87,9 @@
   "settings": {
     "title": "Configuración",
     "tab_users": "Usuarios",
-    "tab_roles": "Roles y permisos"
+    "tab_roles": "Roles y permisos",
+    "tab_audit": "Auditoría",
+    "tab_sensitive": "Accesos sensibles"
   },
   "users": {
     "sub": "{active} activos de {total}",
@@ -207,5 +209,47 @@
     "confirm_archive": "¿Archivar {name}? Dejará de aceptar altas; su historia se conserva.",
     "empty_title": "No hay empresas",
     "empty_text": "Registre la primera razón social del grupo."
+  },
+  "audit": {
+    "sub": "Quién cambió qué, cuándo y desde dónde. Solo lectura.",
+    "col_when": "Fecha y hora",
+    "col_user": "Usuario",
+    "col_action": "Acción",
+    "col_entity": "Registro",
+    "col_fields": "Campos cambiados",
+    "system": "Sistema",
+    "search": "Buscar acción, registro o usuario",
+    "entity_all": "Todos los registros",
+    "from": "Desde",
+    "to": "Hasta",
+    "export": "Exportar CSV",
+    "more": "Cargar más",
+    "empty": "No hay entradas con estos filtros.",
+    "detail": "Detalle del cambio",
+    "field": "Campo",
+    "before": "Antes",
+    "after": "Después",
+    "reason": "Motivo",
+    "ip": "IP",
+    "history": "Ver historia del registro",
+    "sensitive": "Contiene datos sensibles",
+    "entity_user": "Usuario",
+    "entity_role": "Rol",
+    "entity_legal_entity": "Empresa",
+    "entity_employment": "Relación laboral",
+    "sens_sub": "Lecturas de datos sensibles: quién, qué campos, de qué registro y cuándo.",
+    "sens_fields": "Campos",
+    "sens_category": "Categoría",
+    "sens_channel": "Canal",
+    "sens_empty": "Todavía no hay lecturas de datos sensibles.",
+    "cat_salary": "Remuneración",
+    "cat_health": "Salud",
+    "cat_complaint": "Denuncia",
+    "cat_disciplinary": "Disciplina",
+    "cat_biometric": "Biometría",
+    "cat_bank_account": "Cuenta bancaria",
+    "cat_identity_document": "Documento de identidad",
+    "cat_union": "Afiliación sindical",
+    "cat_other": "Otro"
   }
 }

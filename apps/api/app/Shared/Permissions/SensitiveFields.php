@@ -79,7 +79,7 @@ final class SensitiveFields
                     'entity_id' => isset($row['id']) && is_string($row['id']) && preg_match('/^[0-9a-f-]{36}$/i', $row['id']) === 1 ? $row['id'] : null,
                     'fields' => '{'.implode(',', $read).'}',
                     'ip' => request()->ip(),
-                    'occurred_at' => now(),
+                    'occurred_at' => now()->format('Y-m-d H:i:s.uP'),
                 ];
             }
         }

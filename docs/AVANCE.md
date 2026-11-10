@@ -52,10 +52,10 @@ Generado el **2026-11-02**. Actualizar manualmente al cerrar cada historia.
 | SAS-11 | Facturación de la suscripción y estado de cuenta | SAS | Fase 0 · Cimientos | Story | pendiente | — |  |
 | SAS-12 | Copias de seguridad y restauración | SAS | Fase 0 · Cimientos | Story | pendiente | — |  |
 | SAS-13 | Configuración global y registros de la consola | SAS | Fase 0 · Cimientos | Story | pendiente | — |  |
-| AUD-1 | Bitácora de auditoría de solo inserción | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
-| AUD-2 | Captura automática de antes y después | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
+| AUD-1 | Bitácora de auditoría de solo inserción | AUD | Fase 0 · Cimientos | Task | hecha | 2026-11-10 | audit_events de solo inserción: triggers reject_mutation y REVOKE UPDATE/DELETE al rol de la aplicación (prueba con ayni_app); no existe ruta que la modifique (prueba sobre todas las rutas); cada entrada guarda organización, actor, acción, entidad, id, IP, agente, request_id y momento con microsegundos. |
+| AUD-2 | Captura automática de antes y después | AUD | Fase 0 · Cimientos | Task | hecha | 2026-11-10 | AuditLogger cifra los campos sensibles del esquema (config/audit.php → sensitive_fields) y calcula los campos cambiados; trait Auditable captura altas, cambios y bajas por campo (una entrada por registro, también en acciones masivas que iteran modelos); el visor enmascara el valor a quien no tiene el permiso del campo ni audit.logs.sensitive_values.view. |
 | AUD-3 | Actividad de usuario y logs técnicos separados | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
-| AUD-4 | Visor de auditoría | AUD | Fase 0 · Cimientos | Story | pendiente | — |  |
+| AUD-4 | Visor de auditoría | AUD | Fase 0 · Cimientos | Story | hecha | 2026-11-10 | GET /audit-logs (filtros por usuario, entidad, registro, acción, fechas y búsqueda; cursor), GET /audit-logs/{id}, GET /sensitive-access-logs; pantallas Configuración → Auditoría (detalle antes/después, historia completa del registro, exportación CSV con campos ya enmascarados) y → Accesos sensibles; prueba de que el rol Auditor no tiene ningún permiso de escritura. |
 | AUD-5 | Integridad y retención de la auditoría | AUD | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-1 | Fundamentos visuales y temas claro y oscuro | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-2 | Armazón de navegación | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
