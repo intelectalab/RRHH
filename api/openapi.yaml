@@ -3462,6 +3462,60 @@ paths:
       x-permission: public
       operationId: postAuthOtp
       security: []
+  /auth/password/forgot:
+    post:
+      summary: Solicitar el enlace de recuperación de clave (misma respuesta exista o no el correo)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: public
+      operationId: postAuthPasswordForgot
+      security: []
+  /auth/password/reset:
+    post:
+      summary: Restablecer la clave con el enlace de un solo uso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: public
+      operationId: postAuthPasswordReset
+      security: []
   /benefit-enrollments:
     get:
       summary: Listar BenefitEnrollment

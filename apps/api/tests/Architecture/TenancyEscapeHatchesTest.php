@@ -19,7 +19,7 @@
  */
 function appSourceFiles(): array
 {
-    $root = base_path('app');
+    $root = dirname(__DIR__, 2).'/app';
     $files = [];
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS));
     foreach ($iterator as $file) {
@@ -109,7 +109,7 @@ test('el almacenamiento de archivos se usa solo a través de FileService', funct
 });
 
 test('la cabecera X-Tenant-Id solo se acepta en el entorno de pruebas', function (): void {
-    $source = (string) file_get_contents(base_path('app/Shared/Tenancy/Resolution/TestingHeaderTenantResolver.php'));
+    $source = (string) file_get_contents(dirname(__DIR__, 2).'/app/Shared/Tenancy/Resolution/TestingHeaderTenantResolver.php');
 
     expect($source)->toContain("app()->environment('testing')");
 });

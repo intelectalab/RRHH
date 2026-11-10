@@ -1,0 +1,16 @@
+<?php
+
+/*
+ * Identidad y sesiones (M-SEG). Son valores técnicos de seguridad por defecto,
+ * no parámetros legales; las políticas por organización (SEG-4, SEG-5) los
+ * acotarán dentro de estos márgenes.
+ */
+return [
+    'session_cookie' => env('IDENTITY_SESSION_COOKIE', 'ayni_session'),
+    'xsrf_cookie' => 'XSRF-TOKEN',
+    'session_lifetime_minutes' => (int) env('IDENTITY_SESSION_LIFETIME', 480),
+    'password_reset_ttl_minutes' => (int) env('IDENTITY_PASSWORD_RESET_TTL', 30),
+    'password_min_length' => 12,
+    'login_attempts_per_minute' => 10,
+    'secure_cookies' => (bool) env('IDENTITY_SECURE_COOKIES', env('APP_ENV') === 'production'),
+];

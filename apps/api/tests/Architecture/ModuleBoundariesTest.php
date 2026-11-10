@@ -65,6 +65,17 @@ arch('Platform no importa capas internas de otros módulos')
         'App\Modules\CoreHR\Infrastructure',
     ]);
 
+arch('Identity no importa capas internas de otros módulos')
+    ->expect('App\Modules\Identity')
+    ->not->toUse([
+        'App\Modules\Platform\Domain',
+        'App\Modules\Platform\Application',
+        'App\Modules\Platform\Infrastructure',
+        'App\Modules\CoreHR\Domain',
+        'App\Modules\CoreHR\Application',
+        'App\Modules\CoreHR\Infrastructure',
+    ]);
+
 arch('CoreHR no importa capas internas de otros módulos')
     ->expect('App\Modules\CoreHR')
     ->not->toUse([

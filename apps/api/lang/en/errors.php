@@ -28,4 +28,7 @@ return [
     'internal_error' => 'An unexpected server error occurred.',
     'upstream_unavailable' => 'An upstream external service is currently unavailable.',
     'maintenance' => 'The platform is undergoing scheduled maintenance.',
+    'invalid_credentials' => 'The sign-in details are incorrect.',
+    'invalid_token' => 'The link is invalid or has expired. Request a new one.',
+    'csrf_mismatch' => 'The session could not be verified. Reload the page and try again.',
 ];

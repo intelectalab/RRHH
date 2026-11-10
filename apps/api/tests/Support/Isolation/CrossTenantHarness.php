@@ -28,6 +28,14 @@ final class CrossTenantHarness
     /** @var array<string, class-string<Model>> Excepciones a la convención: esquema OpenAPI => modelo */
     public const MODEL_OVERRIDES = [];
 
+    /**
+     * Listados sin esquema de recurso propio que igual devuelven datos de la
+     * organización: exigen un modelo declarado en MODEL_OVERRIDES con su ruta.
+     *
+     * @var array<int, string>
+     */
+    public const AGGREGATING_COLLECTIONS = ['/search'];
+
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
 
@@ -135,7 +143,15 @@ final class CrossTenantHarness
             }
 
             $schema = $this->resourceSchema($op['path'], $op['method']);
-            $model = $schema !== null ? $this->modelFor($schema) : null;
+            $hasParam = str_contains($op['path'], '{');
+
+            // Acciones sobre la propia sesión o el propio usuario (logout, preferencias):
+            // no hay recurso de organización que sembrar.
+            if (! $hasParam && $schema === null && ! in_array($op['path'], self::AGGREGATING_COLLECTIONS, true)) {
+                continue;
+            }
+
+            $model = $this->modelFor($schema ?? $op['path']);
             if ($model === null) {
                 $uncovered[] = $label.' (esquema '.($schema ?? '¿?').' sin modelo con HasFactory)';
 
@@ -228,7 +244,8 @@ final class CrossTenantHarness
      */
     public function modelFor(string $schema): ?string
     {
-        $candidates = isset(self::MODEL_OVERRIDES[$schema]) ? [self::MODEL_OVERRIDES[$schema]] : [];
+        $overrides = self::MODEL_OVERRIDES;
+        $candidates = isset($overrides[$schema]) ? [$overrides[$schema]] : [];
         foreach (glob(base_path('app/Modules/*'), GLOB_ONLYDIR) ?: [] as $dir) {
             $candidates[] = 'App\\Modules\\'.basename($dir).'\\Infrastructure\\Models\\'.$schema;
         }

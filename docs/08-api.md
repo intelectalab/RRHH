@@ -64,6 +64,7 @@ Error:
 |---|---|---|---|
 | 400 | `bad_request` | JSON inválido, parámetro mal formado | — |
 | 400 | `invalid_filter` | Filtro, orden o campo no permitido | `meta.allowed` |
+| 400 | `missing_tenant_context` | El host no corresponde a ninguna organización operable | — |
 | 401 | `unauthenticated` | Sin sesión o token inválido o caducado | — |
 | 401 | `mfa_required` | Falta el segundo factor | `meta.methods` |
 | 403 | `forbidden` | Falta el permiso | `meta.permission` |
@@ -71,6 +72,7 @@ Error:
 | 403 | `module_not_enabled` | La organización no tiene el módulo | `meta.module` |
 | 403 | `feature_not_enabled` | Feature flag apagado | `meta.feature` |
 | 403 | `tenant_suspended` | Organización suspendida | — |
+| 403 | `csrf_mismatch` | Escritura con cookie de sesión sin `X-XSRF-TOKEN` válido | — |
 | 403 | `plan_limit_reached` | Se superaría un límite del plan | `meta.limit`, `meta.current`, `meta.max` |
 | 404 | `not_found` | No existe, es de otra organización o está fuera de alcance | — |
 | 409 | `invalid_transition` | La acción no procede en el estado actual | `meta.current_status`, `meta.allowed_actions` |
@@ -81,6 +83,8 @@ Error:
 | 409 | `period_closed` | El periodo de planilla o asistencia está cerrado | `meta.period` |
 | 409 | `in_use` | No se puede eliminar o archivar: tiene dependencias | `meta.references` |
 | 422 | `validation_failed` | Datos inválidos | `details[] {field, rule, message}` |
+| 422 | `invalid_credentials` | Ingreso fallido; no revela si la cuenta existe | `details[] {field: credentials}` |
+| 422 | `invalid_token` | Enlace o código de un solo uso inválido, usado o caducado | `details[] {field: token}` |
 | 422 | `business_rule_violated` | Regla de negocio (saldo insuficiente, tope de contrato, sin posición aprobada) | `meta.rule` |
 | 422 | `approval_required` | La operación debe pasar por aprobación | `meta.approval_request_id` |
 | 423 | `locked` | Recurso bloqueado por un proceso en curso (cálculo de planilla) | `meta.job_id` |
@@ -229,6 +233,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/api-tokens/{id}` | `identity.api_tokens.view` | 0 |
 | POST | `/api-tokens/{id}/revoke` | `identity.api_tokens.revoke` | 0 |
 | POST | `/auth/login` | público | 0 |
+| POST | `/auth/password/forgot` | público | 0 |
+| POST | `/auth/password/reset` | público | 0 |
 | POST | `/auth/otp` | público | 0 |
 | POST | `/auth/mfa/verify` | público | 0 |
 | POST | `/auth/logout` | sesión | 0 |

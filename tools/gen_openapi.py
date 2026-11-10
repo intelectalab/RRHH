@@ -230,6 +230,8 @@ RES = [
 EXTRA = [
     ("PLT", 0, "get", "/health", None, "Salud de la API: disponible sin sesión ni organización", True),
     ("SEG", 0, "post", "/auth/login", None, "Iniciar sesión (correo o documento de identidad + clave)", True),
+    ("SEG", 0, "post", "/auth/password/forgot", None, "Solicitar el enlace de recuperación de clave (misma respuesta exista o no el correo)", True),
+    ("SEG", 0, "post", "/auth/password/reset", None, "Restablecer la clave con el enlace de un solo uso", True),
     ("SEG", 0, "post", "/auth/otp", None, "Solicitar o verificar un código de un solo uso", True),
     ("SEG", 0, "post", "/auth/mfa/verify", None, "Verificar segundo factor", True),
     ("SEG", 0, "post", "/auth/logout", "-", "Cerrar sesión", False),

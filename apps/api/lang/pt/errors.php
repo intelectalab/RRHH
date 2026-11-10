@@ -28,4 +28,7 @@ return [
     'internal_error' => 'Ocorreu um erro inesperado no servidor.',
     'upstream_unavailable' => 'Um serviço externo necessário não está disponível.',
     'maintenance' => 'O sistema está temporariamente em manutenção.',
+    'invalid_credentials' => 'Os dados de acesso estão incorretos.',
+    'invalid_token' => 'O link é inválido ou expirou. Solicite um novo.',
+    'csrf_mismatch' => 'Não foi possível verificar a sessão. Recarregue a página e tente novamente.',
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Http\Middleware\VerifyXsrfToken;
 use App\Shared\Commands\EnvironmentCheckCommand;
 use App\Shared\Commands\GenerateDataDictionaryCommand;
 use App\Shared\Commands\VerifyDatabaseConventionsCommand;
@@ -33,10 +34,16 @@ return Application::configure(basePath: dirname(__DIR__))
         GenerateDataDictionaryCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
+        // La API no redirige a una pantalla de ingreso: responde 401 unauthenticated.
+        $middleware->redirectGuestsTo(fn () => null);
+
         $middleware->api(prepend: [
             EnsureRequestId::class,
             ResolveTenantContext::class,
             EnsureIdempotency::class,
+        ]);
+        $middleware->api(append: [
+            VerifyXsrfToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -61,7 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // AuthenticationException → 401 unauthenticated
         $exceptions->render(function (AuthenticationException $e, $request) {
-            if ($request->expectsJson()) {
+            if ($request->expectsJson() || $request->is('api/*')) {
                 return ProblemDetailsResponse::make(401, 'unauthenticated');
             }
         });
