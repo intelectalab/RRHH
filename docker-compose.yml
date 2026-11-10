@@ -96,6 +96,8 @@ services:
     container_name: aynihr-api
     restart: unless-stopped
     working_dir: /var/www/html
+    # --no-reload: respeta las variables de este archivo aunque exista apps/api/.env
+    command: php artisan serve --host=0.0.0.0 --port=8000 --no-reload
     environment:
       APP_NAME: "Ayni HR"
       APP_ENV: local

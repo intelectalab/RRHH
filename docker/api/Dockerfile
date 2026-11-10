@@ -34,5 +34,7 @@ WORKDIR /var/www/html
 EXPOSE 8000
 
 # Comando por defecto: servidor de desarrollo de Laravel
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# --no-reload: sin esta opción, artisan serve descarta las variables de entorno del contenedor
+# cuando existe apps/api/.env y la API toma DB_HOST y demás del .env local.
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
 
