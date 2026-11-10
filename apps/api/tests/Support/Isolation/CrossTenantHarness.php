@@ -35,6 +35,7 @@ final class CrossTenantHarness
         '/search' => User::class,
         // Listados propios o de registro (sin esquema de recurso): se siembran avisos y entregas de A.
         '/notifications' => Notification::class,
+        '/trash/{id}/restore' => User::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
     ];

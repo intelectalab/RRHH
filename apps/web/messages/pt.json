@@ -607,7 +607,11 @@
     "no": "Não",
     "empty_value": "Não definido",
     "edit": "Alterar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "card_holidays": "Feriados",
+    "card_holidays_help": "Feriados nacionais pré-carregados e os de cada unidade ou empresa.",
+    "card_trash": "Lixeira",
+    "card_trash_help": "Registros excluídos que ainda podem ser restaurados."
   },
   "cfgroup": {
     "analitica": "Análise",
@@ -645,5 +649,50 @@
     "es": "Espanhol",
     "en": "Inglês",
     "pt": "Português"
+  },
+  "hol": {
+    "title": "Feriados",
+    "sub": "Frequência e folha usam o calendário padrão, exceto o de cada unidade.",
+    "calendar": "Calendário",
+    "default": "Padrão",
+    "make_default": "Usar como padrão",
+    "new_calendar": "Novo calendário",
+    "calendar_name": "Nome do calendário",
+    "year": "Ano",
+    "col_date": "Data",
+    "col_name": "Feriado",
+    "col_kind": "Tipo",
+    "kind_national": "Nacional",
+    "kind_regional": "Regional",
+    "kind_company": "Da empresa",
+    "kind_non_working_compensable": "Dia não útil compensável",
+    "to_validate": "A validar",
+    "to_validate_help": "Datas de um ano ainda não publicado oficialmente: revise quando o calendário sair.",
+    "past": "Já passou",
+    "add": "Adicionar feriado",
+    "remove": "Remover",
+    "confirm_remove": "Remover “{name}” em {date}?",
+    "added": "Feriado adicionado",
+    "removed": "Feriado removido",
+    "created": "Calendário criado",
+    "saved": "Calendário atualizado",
+    "empty": "Não há feriados em {year}.",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "trash": {
+    "title": "Lixeira",
+    "sub": "Pode ser restaurado até a data de depuração ({days} dias).",
+    "sub_nodays": "Registros excluídos que ainda podem ser restaurados.",
+    "col_record": "Registro",
+    "col_deleted": "Excluído",
+    "col_purge": "Depurado em",
+    "by": "por {name}",
+    "restore": "Restaurar",
+    "restored": "Registro restaurado",
+    "type_role": "Papel",
+    "empty_title": "A lixeira está vazia",
+    "empty_text": "O que for excluído aparecerá aqui e poderá ser restaurado.",
+    "search": "Buscar na lixeira"
   }
 }

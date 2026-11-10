@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * Rol de la organización: de sistema (copiado de la plantilla) o personalizado.
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $lock_version
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
+ * @property Carbon|null $deleted_at
  */
 class Role extends Model
 {

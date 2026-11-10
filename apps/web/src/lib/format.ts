@@ -30,3 +30,9 @@ export function relativeTime(locale: string, iso: string | null | undefined, now
 export function initials(name: string | null | undefined): string {
   return (name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('')
 }
+
+/** Fecha de hoy (AAAA-MM-DD) en la hora local del navegador, no en UTC. */
+export function localToday(now: Date = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+}

@@ -104,7 +104,7 @@ RES = [
     ("TUR", 2, "time.schedules", "/work-schedules", "WorkSchedule", "name:s weekly_hours:n days:j tolerance_minutes:i break_minutes:i status:e(active|archived)", "LCRU", "archive"),
     ("TUR", 2, "time.shifts", "/shifts", "Shift", "name:s starts_at:s ends_at:s crosses_midnight:b color?:s status:e(active|archived)", "LCRU", "archive"),
     ("TUR", 2, "time.shift_assignments", "/shift-assignments", "ShiftAssignment", "employment_id:id shift_id:id date:d status:e(draft|published|swapped|cancelled)", "LCRUD", "publish"),
-    ("TUR", 2, "time.holiday_calendars", "/holiday-calendars", "HolidayCalendar", "name:s country:s scope:j holidays:j", "LCRU", ""),
+    ("TUR", 2, "time.holiday_calendars", "/holiday-calendars", "HolidayCalendar", "code?:s name:s country:s scope:j holidays:ao is_default?:b", "LCRU", ""),
     ("VAC", 2, "time.vacation_balances", "/vacation-balances", "VacationBalance", "employment_id:id period_start:d period_end:d accrued_days:n taken_days:n scheduled_days:n available_days:n expires_on?:d", "LR", "adjust"),
     ("VAC", 2, "time.vacation_requests", "/vacation-requests", "VacationRequest", "employment_id:id starts_on:d ends_on:d days:n advance:b status:e(draft|pending|approved|rejected|cancelled|taken) approval_request_id?:id", "LCRU", "submit approve reject cancel"),
     ("AUS", 2, "time.absence_types", "/absence-types", "AbsenceType", "code:s name:s paid:b requires_attachment:b affects_payroll_concept?:s max_days?:i sensitive:b status:e(active|archived)", "LCRU", "archive"),

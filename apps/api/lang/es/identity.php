@@ -11,6 +11,7 @@ return [
         'system_immutable' => 'Los roles de sistema no se editan ni se eliminan; duplíquelos para ajustarlos.',
         'unknown_permission' => 'El permiso :code no existe en el catálogo o no es de este tipo.',
         'cannot_grant' => 'No puede conceder permisos que usted no tiene: :codes.',
+        'name_taken' => 'Ya existe un rol activo con ese nombre; cámbiele el nombre antes de restaurar este.',
     ],
     'users' => [
         'scope_units_required' => 'Indique al menos una empresa, sede o unidad para ese alcance.',

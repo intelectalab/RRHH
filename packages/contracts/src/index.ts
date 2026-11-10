@@ -14992,6 +14992,7 @@ export interface components {
         HolidayCalendar: {
             /** @description Identificador opaco */
             id: string;
+            code?: string | null;
             name: string;
             country: string;
             scope: {
@@ -14999,13 +15000,15 @@ export interface components {
             };
             holidays: {
                 [key: string]: unknown;
-            };
+            }[];
+            is_default?: boolean | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
         HolidayCalendarInput: {
+            code?: string | null;
             name?: string;
             country?: string;
             scope?: {
@@ -15013,7 +15016,8 @@ export interface components {
             };
             holidays?: {
                 [key: string]: unknown;
-            };
+            }[];
+            is_default?: boolean | null;
         };
         ImportJob: {
             /** @description Identificador opaco */

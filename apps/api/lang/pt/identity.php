@@ -11,6 +11,7 @@ return [
         'system_immutable' => 'Papéis do sistema não podem ser editados nem excluídos; duplique-os para ajustar.',
         'unknown_permission' => 'A permissão :code não existe no catálogo ou não é deste tipo.',
         'cannot_grant' => 'Você não pode conceder permissões que não possui: :codes.',
+        'name_taken' => 'Já existe um papel ativo com esse nome; renomeie-o antes de restaurar este.',
     ],
     'users' => [
         'scope_units_required' => 'Indique pelo menos uma empresa, unidade física ou área para esse alcance.',

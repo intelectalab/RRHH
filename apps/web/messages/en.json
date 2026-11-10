@@ -607,7 +607,11 @@
     "no": "No",
     "empty_value": "Not set",
     "edit": "Change",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "card_holidays": "Holidays",
+    "card_holidays_help": "Preloaded national holidays plus each site or company’s own.",
+    "card_trash": "Trash",
+    "card_trash_help": "Deleted records that can still be restored."
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -645,5 +649,50 @@
     "es": "Spanish",
     "en": "English",
     "pt": "Portuguese"
+  },
+  "hol": {
+    "title": "Holidays",
+    "sub": "Attendance and payroll use the default calendar, except each site’s own.",
+    "calendar": "Calendar",
+    "default": "Default",
+    "make_default": "Use as default",
+    "new_calendar": "New calendar",
+    "calendar_name": "Calendar name",
+    "year": "Year",
+    "col_date": "Date",
+    "col_name": "Holiday",
+    "col_kind": "Type",
+    "kind_national": "National",
+    "kind_regional": "Regional",
+    "kind_company": "Company",
+    "kind_non_working_compensable": "Compensable non-working day",
+    "to_validate": "To be validated",
+    "to_validate_help": "Dates for a year not yet officially published: review them once the calendar is out.",
+    "past": "Past",
+    "add": "Add holiday",
+    "remove": "Remove",
+    "confirm_remove": "Remove “{name}” on {date}?",
+    "added": "Holiday added",
+    "removed": "Holiday removed",
+    "created": "Calendar created",
+    "saved": "Calendar updated",
+    "empty": "No holidays in {year}.",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "trash": {
+    "title": "Trash",
+    "sub": "Can be restored until the purge date ({days} days).",
+    "sub_nodays": "Deleted records that can still be restored.",
+    "col_record": "Record",
+    "col_deleted": "Deleted",
+    "col_purge": "Purged on",
+    "by": "by {name}",
+    "restore": "Restore",
+    "restored": "Record restored",
+    "type_role": "Role",
+    "empty_title": "The trash is empty",
+    "empty_text": "Deleted records will appear here and can be restored.",
+    "search": "Search the trash"
   }
 }

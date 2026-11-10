@@ -607,7 +607,11 @@
     "no": "No",
     "empty_value": "Sin definir",
     "edit": "Cambiar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "card_holidays": "Feriados",
+    "card_holidays_help": "Feriados nacionales precargados y los de cada sede o empresa.",
+    "card_trash": "Papelera",
+    "card_trash_help": "Registros eliminados que aún se pueden restaurar."
   },
   "cfgroup": {
     "analitica": "Analítica",
@@ -645,5 +649,50 @@
     "es": "Español",
     "en": "Inglés",
     "pt": "Portugués"
+  },
+  "hol": {
+    "title": "Feriados",
+    "sub": "Asistencia y planilla usan el calendario por defecto, salvo el de cada sede.",
+    "calendar": "Calendario",
+    "default": "Por defecto",
+    "make_default": "Usar por defecto",
+    "new_calendar": "Nuevo calendario",
+    "calendar_name": "Nombre del calendario",
+    "year": "Año",
+    "col_date": "Fecha",
+    "col_name": "Feriado",
+    "col_kind": "Tipo",
+    "kind_national": "Nacional",
+    "kind_regional": "Regional",
+    "kind_company": "De la empresa",
+    "kind_non_working_compensable": "No laborable compensable",
+    "to_validate": "Por validar",
+    "to_validate_help": "Fechas de un año aún no publicado oficialmente: revísalas cuando salga el calendario.",
+    "past": "Ya pasó",
+    "add": "Agregar feriado",
+    "remove": "Quitar",
+    "confirm_remove": "¿Quitar «{name}» del {date}?",
+    "added": "Feriado agregado",
+    "removed": "Feriado quitado",
+    "created": "Calendario creado",
+    "saved": "Calendario actualizado",
+    "empty": "No hay feriados en {year}.",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "trash": {
+    "title": "Papelera",
+    "sub": "Se puede restaurar hasta la fecha de depuración ({days} días).",
+    "sub_nodays": "Registros eliminados que aún se pueden restaurar.",
+    "col_record": "Registro",
+    "col_deleted": "Eliminado",
+    "col_purge": "Se depura",
+    "by": "por {name}",
+    "restore": "Restaurar",
+    "restored": "Registro restaurado",
+    "type_role": "Rol",
+    "empty_title": "La papelera está vacía",
+    "empty_text": "Lo que se elimine aparecerá aquí y se podrá restaurar.",
+    "search": "Buscar en la papelera"
   }
 }

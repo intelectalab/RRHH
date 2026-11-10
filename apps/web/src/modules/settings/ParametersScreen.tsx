@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatDate } from '@/lib/format'
+import { formatDate, localToday } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useCompany } from '@/modules/session/CompanyProvider'
 import { useSession } from '@/modules/session/SessionProvider'
@@ -127,7 +127,7 @@ export function ParametersScreen({ group }: { group: string }) {
 function ParamForm({ param, company, onCancel, onSaved }: { param: Param; company: string | null; onCancel: () => void; onSaved: () => Promise<void> }) {
   const { t } = useT()
   const [value, setValue] = useState<Value>(param.value ?? param.default)
-  const [from, setFrom] = useState(new Date().toISOString().slice(0, 10))
+  const [from, setFrom] = useState(localToday())
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)

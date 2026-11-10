@@ -11,6 +11,7 @@ return [
         'system_immutable' => 'System roles cannot be edited or deleted; duplicate them to adjust.',
         'unknown_permission' => 'The permission :code does not exist in the catalog or is not of this kind.',
         'cannot_grant' => 'You cannot grant permissions you do not have: :codes.',
+        'name_taken' => 'An active role already has that name; rename it before restoring this one.',
     ],
     'users' => [
         'scope_units_required' => 'Specify at least one company, site or unit for that scope.',

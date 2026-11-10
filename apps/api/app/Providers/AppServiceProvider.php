@@ -16,6 +16,7 @@ use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
+use App\Shared\Trash\TrashRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Support\Facades\Event;
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(DataScope::class);
         $this->app->singleton(SearchRegistry::class);
         $this->app->singleton(InboxRegistry::class);
+        $this->app->singleton(TrashRegistry::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);
         $this->app->singleton(IntegrationManager::class);

@@ -7,9 +7,11 @@ use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
+use App\Modules\Identity\Infrastructure\Trash\RoleTrashSource;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Trash\TrashRegistry;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +54,7 @@ final class IdentityServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(SendPasswordResetLink::class));
         $outbox->subscribe($this->app->make(SendInvitation::class));
 
+        $this->app->make(TrashRegistry::class)->register($this->app->make(RoleTrashSource::class));
         $search = $this->app->make(SearchRegistry::class);
         $search->register($this->app->make(UserSearchSource::class));
         $search->register($this->app->make(RoleSearchSource::class));
