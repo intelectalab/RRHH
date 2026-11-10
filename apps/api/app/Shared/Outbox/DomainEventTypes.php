@@ -50,6 +50,12 @@ final class DomainEventTypes
     // Identidad
     public const USER_PASSWORD_RESET_REQUESTED = 'user.password_reset_requested.v1';
 
+    public const USER_INVITED = 'user.invited.v1';
+
+    public const USER_ACTIVATED = 'user.activated.v1';
+
+    public const USER_SUSPENDED = 'user.suspended.v1';
+
     /**
      * Catálogo de esquemas de payload versionados por tipo de evento.
      *
@@ -140,6 +146,21 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['user_id', 'user_token_id', 'token_enc', 'expires_at'],
             'description' => 'Se solicitó el enlace de recuperación de clave (token cifrado, nunca en claro)',
+        ],
+        self::USER_INVITED => [
+            'version' => 1,
+            'required_fields' => ['user_id', 'user_token_id', 'token_enc', 'expires_at'],
+            'description' => 'Invitación emitida o reenviada (token cifrado, nunca en claro)',
+        ],
+        self::USER_ACTIVATED => [
+            'version' => 1,
+            'required_fields' => ['user_id'],
+            'description' => 'Cuenta activada o reactivada',
+        ],
+        self::USER_SUSPENDED => [
+            'version' => 1,
+            'required_fields' => ['user_id', 'reason'],
+            'description' => 'Cuenta bloqueada; sesiones cerradas',
         ],
         self::DOCUMENT_UPLOADED => [
             'version' => 1,

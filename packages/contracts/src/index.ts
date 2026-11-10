@@ -1315,6 +1315,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/invitation/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activar la cuenta con el enlace de invitación y definir la clave */
+        post: operations["postAuthInvitationAccept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -17366,9 +17383,10 @@ export interface components {
             /** @description Identificador opaco */
             person_id?: string | null;
             login: string;
+            display_name: string;
             email?: string | null;
             /** @enum {string} */
-            status: "invited" | "active" | "suspended";
+            status: "invited" | "active" | "locked" | "alumni" | "disabled";
             mfa_enabled: boolean;
             role_ids: string[];
             /** Format: date-time */
@@ -17382,6 +17400,7 @@ export interface components {
             /** @description Identificador opaco */
             person_id?: string | null;
             login?: string;
+            display_name?: string;
             email?: string | null;
             mfa_enabled?: boolean;
             role_ids?: string[];
@@ -20867,6 +20886,36 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    postAuthInvitationAccept: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postAuthLogin: {

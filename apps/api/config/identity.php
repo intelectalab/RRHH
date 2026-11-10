@@ -10,6 +10,7 @@ return [
     'xsrf_cookie' => 'XSRF-TOKEN',
     'session_lifetime_minutes' => (int) env('IDENTITY_SESSION_LIFETIME', 480),
     'password_reset_ttl_minutes' => (int) env('IDENTITY_PASSWORD_RESET_TTL', 30),
+    'invitation_ttl_hours' => (int) env('IDENTITY_INVITATION_TTL', 72),
     'password_min_length' => 12,
     'login_attempts_per_minute' => 10,
     'secure_cookies' => (bool) env('IDENTITY_SECURE_COOKIES', env('APP_ENV') === 'production'),

@@ -26,6 +26,8 @@ class UserToken extends Model
 
     public const PURPOSE_PASSWORD_RESET = 'password_reset';
 
+    public const PURPOSE_INVITE = 'invite';
+
     protected $table = 'user_tokens';
 
     protected $guarded = ['id', 'tenant_id'];

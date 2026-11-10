@@ -76,9 +76,10 @@ final class RoleController
 
     public function duplicate(Request $request, string $id): JsonResponse
     {
+        $source = $this->find($id);
         $request->validate(['name' => ['sometimes', 'string', 'min:2', 'max:120']]);
         $name = $request->input('name');
-        $role = $this->roles->duplicate($this->find($id), is_string($name) ? $name : null);
+        $role = $this->roles->duplicate($source, is_string($name) ? $name : null);
 
         // Las acciones responden 200 según el contrato (POST /recurso/{id}/accion).
         return $this->respond($role);

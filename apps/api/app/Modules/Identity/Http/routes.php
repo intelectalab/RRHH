@@ -4,6 +4,7 @@ use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
 use App\Modules\Identity\Http\Controllers\RoleController;
+use App\Modules\Identity\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:ayni-login');
     Route::post('/auth/password/forgot', [AuthController::class, 'forgotPassword'])->middleware('throttle:ayni-login');
     Route::post('/auth/password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:ayni-login');
+    Route::post('/auth/invitation/accept', [AuthController::class, 'acceptInvitation'])->middleware('throttle:ayni-login');
 
     Route::middleware('auth:ayni')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -29,6 +31,16 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::get('/roles/{id}', [RoleController::class, 'show'])->middleware('permission:identity.roles.view');
         Route::patch('/roles/{id}', [RoleController::class, 'update'])->middleware('permission:identity.roles.update');
         Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->middleware('permission:identity.roles.delete');
+        Route::get('/users', [UserController::class, 'index'])->middleware('permission:identity.users.view');
+        Route::post('/users', [UserController::class, 'store'])->middleware('permission:identity.users.create');
+        Route::get('/users/{id}', [UserController::class, 'show'])->middleware('permission:identity.users.view');
+        Route::patch('/users/{id}', [UserController::class, 'update'])->middleware('permission:identity.users.update');
+        Route::post('/users/{id}/invite', [UserController::class, 'invite'])->middleware('permission:identity.users.invite');
+        Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->middleware('permission:identity.users.suspend');
+        Route::post('/users/{id}/reactivate', [UserController::class, 'reactivate'])->middleware('permission:identity.users.reactivate');
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->middleware('permission:identity.users.reset_password');
+        Route::post('/users/{id}/reset-mfa', [UserController::class, 'resetMfa'])->middleware('permission:identity.users.reset_mfa');
+
         Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->middleware('permission:identity.roles.duplicate');
     });
 });

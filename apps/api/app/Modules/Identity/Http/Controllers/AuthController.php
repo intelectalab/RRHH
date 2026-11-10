@@ -6,6 +6,7 @@ use App\Modules\Identity\Application\Actions\LoginWithPassword;
 use App\Modules\Identity\Application\Actions\RequestPasswordReset;
 use App\Modules\Identity\Application\Actions\ResetPassword;
 use App\Modules\Identity\Application\SessionManager;
+use App\Modules\Identity\Application\UserService;
 use App\Modules\Identity\Http\Requests\ForgotPasswordRequest;
 use App\Modules\Identity\Http\Requests\LoginRequest;
 use App\Modules\Identity\Http\Requests\ResetPasswordRequest;
@@ -21,9 +22,11 @@ final class AuthController
 
     public function login(LoginRequest $request, LoginWithPassword $login): JsonResponse
     {
-        [$kind, $identifier] = $request->filled('email')
-            ? ['email', (string) $request->input('email')]
-            : ['national_id', (string) $request->input('document_type').':'.(string) $request->input('document_number')];
+        [$kind, $identifier] = match (true) {
+            $request->filled('email') => ['email', (string) $request->input('email')],
+            $request->filled('login') => ['username', (string) $request->input('login')],
+            default => ['national_id', (string) $request->input('document_type').':'.(string) $request->input('document_number')],
+        };
 
         $user = $login($kind, $identifier, (string) $request->input('password'));
 
@@ -75,6 +78,25 @@ final class AuthController
         }
 
         return response()->json(['data' => ['password_reset' => true]]);
+    }
+
+    public function acceptInvitation(ResetPasswordRequest $request, UserService $users): JsonResponse
+    {
+        $user = $users->acceptInvitation((string) $request->input('token'), (string) $request->input('password'));
+        if ($user === null) {
+            return ProblemDetailsResponse::make(422, 'invalid_token', null, null, [
+                ['field' => 'token', 'rule' => 'invalid', 'message' => (string) trans('errors.invalid_token')],
+            ]);
+        }
+
+        // Activar la cuenta abre la sesión (ME-02: activar_cuenta → crea sesión).
+        ['session' => $session, 'token' => $token] = $this->sessions->open($user, $request);
+        $response = response()->json(['data' => $this->payload($user, $session)]);
+        foreach ($this->sessions->cookies($token, $session) as $cookie) {
+            $response->headers->setCookie($cookie);
+        }
+
+        return $response;
     }
 
     /**

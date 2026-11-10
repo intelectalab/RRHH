@@ -12,4 +12,14 @@ return [
         'unknown_permission' => 'The permission :code does not exist in the catalog or is not of this kind.',
         'cannot_grant' => 'You cannot grant permissions you do not have: :codes.',
     ],
+    'users' => [
+        'invite_without_email' => 'The user has no email: give them an activation code from HR.',
+        'reset_without_email' => 'The user has no email to receive the link.',
+        'unknown_role' => 'One or more roles do not exist in this organization.',
+        'last_admin' => 'The organization cannot be left without an active Company administrator.',
+    ],
+    'invitation' => [
+        'subject' => 'Activate your Ayni HR account',
+        'body' => "Your company created an Ayni HR account for you.\n\nActivate it and set your password with this link (valid for :hours hours):\n:link",
+    ],
 ];

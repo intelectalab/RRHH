@@ -235,6 +235,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/auth/login` | público | 0 |
 | POST | `/auth/password/forgot` | público | 0 |
 | POST | `/auth/password/reset` | público | 0 |
+| POST | `/auth/invitation/accept` | público | 0 |
 | POST | `/auth/otp` | público | 0 |
 | POST | `/auth/mfa/verify` | público | 0 |
 | POST | `/auth/logout` | sesión | 0 |

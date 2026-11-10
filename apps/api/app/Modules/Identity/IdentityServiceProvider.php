@@ -3,6 +3,7 @@
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Application\SessionManager;
+use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Tenancy\TenancyScope;
@@ -38,13 +39,15 @@ final class IdentityServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('ayni-login', function (Request $request) {
-            $identifier = strtolower((string) ($request->input('email') ?? $request->input('document_number') ?? ''));
+            $identifier = strtolower((string) ($request->input('email') ?? $request->input('login') ?? $request->input('document_number') ?? ''));
 
             return Limit::perMinute((int) config('identity.login_attempts_per_minute'))
                 ->by(sha1($request->ip().'|'.$request->getHost().'|'.$identifier));
         });
 
-        $this->app->make(OutboxService::class)->subscribe($this->app->make(SendPasswordResetLink::class));
+        $outbox = $this->app->make(OutboxService::class);
+        $outbox->subscribe($this->app->make(SendPasswordResetLink::class));
+        $outbox->subscribe($this->app->make(SendInvitation::class));
 
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }

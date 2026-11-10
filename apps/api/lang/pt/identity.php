@@ -12,4 +12,14 @@ return [
         'unknown_permission' => 'A permissão :code não existe no catálogo ou não é deste tipo.',
         'cannot_grant' => 'Você não pode conceder permissões que não possui: :codes.',
     ],
+    'users' => [
+        'invite_without_email' => 'O usuário não tem e-mail: entregue um código de ativação pelo RH.',
+        'reset_without_email' => 'O usuário não tem e-mail para receber o link.',
+        'unknown_role' => 'Um ou mais papéis não existem nesta organização.',
+        'last_admin' => 'A organização não pode ficar sem um Administrador da empresa ativo.',
+    ],
+    'invitation' => [
+        'subject' => 'Ative sua conta Ayni HR',
+        'body' => "Sua empresa criou uma conta Ayni HR para você.\n\nAtive-a e defina sua senha com este link (válido por :hours horas):\n:link",
+    ],
 ];
