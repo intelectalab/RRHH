@@ -118,3 +118,4 @@ Toda historia o tarea técnica se considera terminada únicamente cuando satisfa
    - Actualizar `docs/AVANCE.md` marcando la historia como `hecha` con resumen de artefactos.
    - Realizar commit convencional (`feat(...)`, `fix(...)`).
    - Subir cambios (`git push`) y verificar el resultado en GitHub Actions (`gh run list`).
+

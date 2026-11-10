@@ -53,7 +53,8 @@ test-golden:
 	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest --group=golden
 
 test-isolation:
-	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest --group=isolation
+	$(DOCKER_COMPOSE) exec -T postgres psql -U ayni -d aynihr -v ON_ERROR_STOP=1 -f /database/pruebas_aislamiento.sql
+	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest tests/Feature/TenancyIsolationTest.php
 
 test-e2e:
 	$(DOCKER_COMPOSE) run --rm web npm run test:e2e

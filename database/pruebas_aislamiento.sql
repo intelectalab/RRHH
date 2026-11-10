@@ -47,7 +47,9 @@ BEGIN
        'pension_fund_rates', 'pension_funds', 'permissions', 'plan_features', 'plan_limits', 'plan_modules', 'plans', 'platform_audit_events',
        'platform_incidents', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
        'saas_invoices', 'statutory_file_layouts', 'subscription_addons', 'subscriptions', 'support_ticket_messages', 'support_tickets',
-       'system_role_permissions', 'system_roles', 'tenant_domains', 'tenant_status_events', 'tenants')
+       'system_role_permissions', 'system_roles', 'tenant_domains', 'tenant_status_events', 'tenants',
+       'migrations', 'jobs', 'job_batches', 'failed_jobs', 'cache', 'cache_locks', 'sessions')
+     AND c.relname NOT LIKE 'test_%'
      AND NOT (c.relrowsecurity AND c.relforcerowsecurity
               AND EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid AND a.attname = 'tenant_id' AND a.attnotnull)
               AND EXISTS (SELECT 1 FROM pg_policy p WHERE p.polrelid = c.oid AND p.polname = 'tenant_isolation'

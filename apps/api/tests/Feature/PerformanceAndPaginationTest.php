@@ -182,13 +182,13 @@ test('tenant cache isolates keys between organizations', function (): void {
     $tenantCache = app(TenantCache::class);
 
     // Tenant Alpha writes a key
-    TenancyScope::set('tenant-alpha');
+    TenancyScope::set('00000000-0000-0000-0000-000000000011');
     $tenantCache->put('config.max_users', 50);
 
     expect((int) $tenantCache->get('config.max_users'))->toBe(50);
 
     // Tenant Beta tries to read the same key
-    TenancyScope::set('tenant-beta');
+    TenancyScope::set('00000000-0000-0000-0000-000000000022');
     expect($tenantCache->get('config.max_users'))->toBeNull();
 
     // Tenant Beta writes their own value
@@ -196,13 +196,13 @@ test('tenant cache isolates keys between organizations', function (): void {
     expect((int) $tenantCache->get('config.max_users'))->toBe(100);
 
     // Verify Tenant Alpha value is unchanged
-    TenancyScope::set('tenant-alpha');
+    TenancyScope::set('00000000-0000-0000-0000-000000000011');
     expect((int) $tenantCache->get('config.max_users'))->toBe(50);
 
     // Verify actual key in store has tenant prefix
-    expect(Cache::has('tenant:tenant-alpha:config.max_users'))->toBeTrue();
-    expect((int) Cache::get('tenant:tenant-alpha:config.max_users'))->toBe(50);
-    expect((int) Cache::get('tenant:tenant-beta:config.max_users'))->toBe(100);
+    expect(Cache::has('tenant:00000000-0000-0000-0000-000000000011:config.max_users'))->toBeTrue();
+    expect((int) Cache::get('tenant:00000000-0000-0000-0000-000000000011:config.max_users'))->toBe(50);
+    expect((int) Cache::get('tenant:00000000-0000-0000-0000-000000000022:config.max_users'))->toBe(100);
 
     TenancyScope::clear();
 });

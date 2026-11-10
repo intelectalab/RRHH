@@ -6,6 +6,7 @@ use App\Shared\Commands\VerifyDatabaseConventionsCommand;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
+use App\Shared\Http\Middleware\ResolveTenantContext;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             EnsureRequestId::class,
+            ResolveTenantContext::class,
             EnsureIdempotency::class,
         ]);
     })

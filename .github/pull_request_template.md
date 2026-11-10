@@ -47,3 +47,4 @@ Historia / Tarea relacionada:
 - [ ] `vendor/bin/phpstan analyse --memory-limit=2G` en nivel 8 sin errores.
 - [ ] Suite de pruebas (`make test`) pasando al 100% en verde.
 - [ ] `docs/AVANCE.md` actualizado con el estado de la historia y el resumen de artefactos.
+

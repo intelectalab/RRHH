@@ -147,6 +147,23 @@ jobs:
           sudo apt-get update && sudo apt-get install -y postgresql-client
           PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -f database/schema.sql
 
+      - name: Run Database Isolation Tests
+        run: |
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -v ON_ERROR_STOP=1 -f database/pruebas_aislamiento.sql
+
+      - name: Verify Database Conventions
+        working-directory: apps/api
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: aynihr_testing
+          DB_USERNAME: ayni
+          DB_PASSWORD: secret
+        run: php artisan db:verify-conventions
+
       - name: Run Backend Tests with Coverage
         working-directory: apps/api
         env:

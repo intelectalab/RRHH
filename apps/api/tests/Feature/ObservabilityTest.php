@@ -36,14 +36,14 @@ test('request_id from X-Request-Id header appears in log entry extra when contai
 });
 
 test('tenant_id appears in log entry extra when TenancyScope is active', function (): void {
-    TenancyScope::set('org-abc');
+    TenancyScope::set('00000000-0000-0000-0000-000000000abc');
     app()->instance('request.id', 'req-xyz');
 
     $processor = new RequestContextProcessor;
     $result = $processor(makeRecord());
 
     expect($result->extra)
-        ->toHaveKey('tenant_id', 'org-abc')
+        ->toHaveKey('tenant_id', '00000000-0000-0000-0000-000000000abc')
         ->toHaveKey('request_id', 'req-xyz');
 
     TenancyScope::clear();
@@ -143,7 +143,7 @@ test('logging a message with structured channel produces JSON with request_id', 
     config(['logging.default' => 'structured']);
 
     app()->instance('request.id', 'struct-req-999');
-    TenancyScope::set('org-struct');
+    TenancyScope::set('00000000-0000-0000-0000-000000000002');
 
     Log::info('observability test', ['action' => 'plt10']);
 
@@ -157,7 +157,7 @@ test('logging a message with structured channel produces JSON with request_id', 
 
     expect($decoded)->toHaveKey('message', 'observability test');
     expect($decoded['extra'] ?? [])->toHaveKey('request_id', 'struct-req-999');
-    expect($decoded['extra'] ?? [])->toHaveKey('tenant_id', 'org-struct');
+    expect($decoded['extra'] ?? [])->toHaveKey('tenant_id', '00000000-0000-0000-0000-000000000002');
     expect($decoded['context'] ?? [])->toHaveKey('action', 'plt10');
 
     TenancyScope::clear();

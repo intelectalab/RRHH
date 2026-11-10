@@ -116,12 +116,14 @@ class IdempotencyTest extends TestCase
 
         $res1 = $this->withHeaders([
             'Idempotency-Key' => $idempotencyKey,
+            'X-Tenant-Id' => $this->tenantId,
         ])->postJson('/api/v1/test-auto-idempotent', $payload);
 
         $res1->assertStatus(200);
 
         $res2 = $this->withHeaders([
             'Idempotency-Key' => $idempotencyKey,
+            'X-Tenant-Id' => $this->tenantId,
         ])->postJson('/api/v1/test-auto-idempotent', $payload);
 
         $res2->assertStatus(200);
