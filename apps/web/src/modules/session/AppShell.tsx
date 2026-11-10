@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useT } from '@/lib/useT'
 import { applyTheme, storedTheme, type ThemeChoice } from '@/lib/theme'
 import { Icon } from '@/ui/components/Icon'
+import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { SessionProvider, useSession } from './SessionProvider'
@@ -60,6 +61,7 @@ function Shell({ children }: { children: ReactNode }) {
           {session.tenant && <span className="org">{session.tenant.name}</span>}
           <CompanySelector />
           <div className="espacio" />
+          <CommandPalette />
           <div className="menu" ref={menuRef}>
             <button type="button" className="userbtn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
               <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>

@@ -27,7 +27,10 @@ use Tests\TestCase;
 final class CrossTenantHarness
 {
     /** @var array<string, class-string<Model>> Excepciones a la convención: esquema OpenAPI => modelo */
-    public const MODEL_OVERRIDES = [];
+    public const MODEL_OVERRIDES = [
+        // La búsqueda global se prueba sembrando usuarios de A: B no debe encontrarlos.
+        '/search' => User::class,
+    ];
 
     /**
      * Listados sin esquema de recurso propio que igual devuelven datos de la
@@ -178,7 +181,9 @@ final class CrossTenantHarness
 
             // Búsqueda: el mismo listado con q= y el id de A no debe devolverlo.
             if ($op['method'] === 'get' && ! str_contains($op['path'], '{')) {
-                $search = $this->callAsTenant($test, $tenantB, 'get', $op['path'].'?q='.urlencode((string) $record->getKey()));
+                // Se busca por el nombre visible del recurso (o su id si no tiene).
+                $term = (string) ($record->getAttribute('display_name') ?? $record->getAttribute('name') ?? $record->getAttribute('legal_name') ?? $record->getKey());
+                $search = $this->callAsTenant($test, $tenantB, 'get', $op['path'].'?q='.urlencode($term));
                 if ($search->isSuccessful() && $this->bodyMentions($search, (string) $record->getKey())) {
                     $violations[] = "{$label}?q=: la búsqueda de B devuelve un recurso de A";
                 }

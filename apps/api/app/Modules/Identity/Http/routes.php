@@ -5,6 +5,7 @@ use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
 use App\Modules\Identity\Http\Controllers\RoleController;
 use App\Modules\Identity\Http\Controllers\UserController;
+use App\Shared\Search\SearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +24,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::middleware('auth:ayni')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', MeController::class);
+        Route::get('/search', SearchController::class);
 
         Route::get('/permissions', PermissionCatalogController::class)->middleware('permission:identity.roles.view');
 

@@ -28,6 +28,12 @@ export function UsersScreen() {
   const [suspending, setSuspending] = useState<User | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
+  // Enlace desde la búsqueda global: /configuracion/usuarios?q=…
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get('q')
+    if (initial) setQ(initial)
+  }, [])
+
   const load = useCallback(async () => {
     const params = new URLSearchParams({ per_page: '100' })
     if (q.trim() !== '') params.set('q', q.trim())

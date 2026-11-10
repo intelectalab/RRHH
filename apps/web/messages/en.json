@@ -256,5 +256,23 @@
     "cat_identity_document": "Identity document",
     "cat_union": "Union membership",
     "cat_other": "Other"
+  },
+  "palette": {
+    "open": "Search",
+    "shortcut": "Ctrl K",
+    "placeholder": "Search people, companies, roles or go to a screen…",
+    "pages": "Go to",
+    "results": "Results",
+    "empty": "No results for “{q}”.",
+    "hint": "↑↓ to move · Enter to open · Esc to close",
+    "type_user": "User",
+    "type_role": "Role",
+    "type_legal_entity": "Company",
+    "go_home": "Home",
+    "go_companies": "Organization · Companies",
+    "go_users": "Settings · Users",
+    "go_roles": "Settings · Roles and permissions",
+    "go_audit": "Settings · Audit",
+    "go_sensitive": "Settings · Sensitive access"
   }
 }

@@ -3,9 +3,12 @@
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Application\SessionManager;
+use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
+use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
 use App\Shared\Outbox\OutboxService;
+use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -48,6 +51,10 @@ final class IdentityServiceProvider extends ServiceProvider
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(SendPasswordResetLink::class));
         $outbox->subscribe($this->app->make(SendInvitation::class));
+
+        $search = $this->app->make(SearchRegistry::class);
+        $search->register($this->app->make(UserSearchSource::class));
+        $search->register($this->app->make(RoleSearchSource::class));
 
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }

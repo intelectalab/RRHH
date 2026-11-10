@@ -256,5 +256,23 @@
     "cat_identity_document": "Documento de identidade",
     "cat_union": "Filiação sindical",
     "cat_other": "Outro"
+  },
+  "palette": {
+    "open": "Buscar",
+    "shortcut": "Ctrl K",
+    "placeholder": "Buscar pessoas, empresas, papéis ou ir para uma tela…",
+    "pages": "Ir para",
+    "results": "Resultados",
+    "empty": "Sem resultados para «{q}».",
+    "hint": "↑↓ para mover · Enter para abrir · Esc para fechar",
+    "type_user": "Usuário",
+    "type_role": "Papel",
+    "type_legal_entity": "Empresa",
+    "go_home": "Início",
+    "go_companies": "Organização · Empresas",
+    "go_users": "Configurações · Usuários",
+    "go_roles": "Configurações · Papéis e permissões",
+    "go_audit": "Configurações · Auditoria",
+    "go_sensitive": "Configurações · Acessos sensíveis"
   }
 }

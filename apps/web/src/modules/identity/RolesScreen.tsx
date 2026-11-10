@@ -34,7 +34,8 @@ export function RolesScreen() {
   }, [selectedId])
 
   useEffect(() => {
-    void load()
+    // Enlace desde la búsqueda global: /configuracion/roles?id=…
+    void load(new URLSearchParams(window.location.search).get('id') ?? undefined)
     void api.get<{ data: Permission[] }>('/permissions').then((r) => setCatalog(r.data))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

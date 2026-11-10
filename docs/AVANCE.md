@@ -63,7 +63,7 @@ Generado el **2026-11-02**. Actualizar manualmente al cerrar cada historia.
 | UI-4 | Tablas profesionales | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-5 | Formularios y validación en interfaz | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
 | UI-6 | Estados vacíos, carga y error | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
-| UI-7 | Paleta de comandos y búsqueda global | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
+| UI-7 | Paleta de comandos y búsqueda global | UI | Fase 0 · Cimientos | Story | hecha | 2026-11-10 | GET /search con registro de fuentes por módulo (usuarios, roles, empresas) que aplican permiso, módulo contratado y alcance en la consulta; cubierto por la batería de aislamiento; paleta de comandos con Ctrl/⌘+K y botón Buscar en la barra superior: resultados del servidor + accesos a pantallas permitidas, navegación con flechas, Enter y Esc. Las demás fuentes (personas, documentos, vacantes…) se registran al construir sus módulos. |
 | UI-8 | Botón de creación rápida | UI | Fase 0 · Cimientos | Story | pendiente | — |  |
 | UI-9 | Experiencia móvil y aplicación instalable | UI | Fase 0 · Cimientos | Task | en_curso | 2026-11-10 | Manifiesto de aplicación instalable con íconos 192/512 y maskable, color de tema por modo, viewport móvil; el armazón funciona a 360 px sin desplazamiento horizontal (verificado con Playwright). Falta el service worker para uso sin conexión del portal (va con el portal del colaborador). |
 | UI-10 | Divulgación progresiva | UI | Fase 0 · Cimientos | Task | pendiente | — |  |
