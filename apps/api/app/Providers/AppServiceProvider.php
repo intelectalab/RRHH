@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Shared\Cache\TenantCache;
 use App\Shared\Files\Contracts\FileStorageService;
 use App\Shared\Files\FileService;
+use App\Shared\Integrations\IntegrationManager;
+use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Outbox\ProcessedEventTracker;
@@ -26,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FileStorageService::class, FileService::class);
 
         $this->app->singleton(TenantCache::class);
+
+        $this->app->singleton(IntegrationCallRecorder::class);
+        $this->app->singleton(IntegrationManager::class);
     }
 
     /**

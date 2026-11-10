@@ -72,3 +72,13 @@ arch('CoreHR no importa capas internas de otros módulos')
         'App\Modules\Platform\Application',
         'App\Modules\Platform\Infrastructure',
     ]);
+
+/*
+ * Regla 4: ningún módulo importa implementaciones falsas o concretas de adaptadores.
+ * Deben depender de los puertos (App\Shared\Integrations\Ports) o de IntegrationManager.
+ */
+arch('módulos no importan implementaciones falsas de integración directamente')
+    ->expect('App\Modules')
+    ->not->toUse([
+        'App\Shared\Integrations\Fake',
+    ]);
