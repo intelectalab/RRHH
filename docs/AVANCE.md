@@ -6,8 +6,8 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 47 | 9 | 19,5 % |
-| Backlog completo | 512 | 47 | 9 | 9,2 % |
+| Primer corte comercial (MVP) | 241 | 48 | 9 | 19,9 % |
+| Backlog completo | 512 | 48 | 9 | 9,4 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -78,7 +78,7 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 | WFL-2 | Motor de aprobaciones de N niveles | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | ApprovalEngine: 1 a N niveles secuenciales, paralelos «todos» o «cualquiera» (con mínimo de aprobaciones para mayoría); aprobar/rechazar idempotente y auditado, rechazo con motivo obligatorio (RN-WFL-04); el resultado sale una sola vez por outbox (approval.approved/rejected.v1) hacia el módulo dueño; cancelación por el origen (RN-WFL-13). API /approval-requests (listado con alcance y filtro «asignadas a mí», detalle con tareas, approve/reject/delegate). La «devolución para corrección» queda para cuando la use el primer módulo (VAC). |
 | WFL-3 | Resolución de aprobadores, delegación y escalamiento | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | ApproverResolver: usuario fijo, rol, jefe directo y jefe del jefe (por la asignación vigente, con excepción por relación); delegación vigente por ausencia (RN-WFL-07) y delegación manual; aprobador inactivo → su jefe; nadie aprueba lo suyo (RN-WFL-05: se salta el nivel o va a RRHH); vencimiento: primer aviso con recordatorio y luego escalamiento al destino configurado, al jefe del aprobador o a RRHH, auditado (comando workflow:process-overdue cada 15 min por organización). |
 | WFL-4 | Centro de aprobaciones | WFL | Fase 0 · Cimientos | Story | sí | en_curso | 2026-11-10 | Pantalla Aprobaciones (barra de módulos con contador): bandeja única «por resolver» (y «todas» con alcance amplio) con conteo por tipo, tarjeta con solicitante, tipo, nivel en curso, antigüedad y vencimiento, detalle con el recorrido completo, aprobar, rechazar con motivo obligatorio y delegar; aprobación masiva solo en tipos marcados como seguros (config/workflow.php, validado en POST /approval-requests/bulk-approve, RN-WFL-12, auditoría por solicitud). Falta verificar «actualiza de inmediato el módulo de origen» con el primer módulo consumidor (VAC): el motor ya emite approval.approved/rejected.v1 en la misma transacción. |
-| WFL-5 | Reglas CUANDO → SI → ENTONCES | WFL | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
+| WFL-5 | Reglas CUANDO → SI → ENTONCES | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Reglas CUANDO→SI→ENTONCES sobre eventos del outbox, idempotentes por regla y evento, lista cerrada de acciones, centro de ejecuciones con reintento/cancelación, protección contra bucles, simulación y pantalla Automatizaciones. Pendiente: reglas programadas y vínculo con workflow_definition_id. |
 | WFL-6 | Constructor visual de flujos | WFL | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | WFL-7 | Centro de automatizaciones | WFL | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | WFL-8 | Tareas de RRHH | WFL | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-10 | Tareas de RRHH (hr_tasks + migración que agrega assignee_role_id con FK compuesta): a una persona o a un rol, prioridad, vencimiento, vínculo al registro relacionado; completar y cancelar por acciones (409 invalid_transition), edición solo abiertas, alcance (propio/asignado, equipo, organización); vencidas resaltadas y avisadas una sola vez (task.overdue.v1 desde workflow:process-overdue); evento task.assigned.v1. Pantalla Tareas con filtros (mías/todas, abiertas/vencidas/hechas) y panel de alta/edición; enlace directo /tareas?id=. Demo con tres tareas coherentes con las empresas demo. |
