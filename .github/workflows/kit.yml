@@ -40,6 +40,10 @@ jobs:
       - run: pip install pyyaml openapi-spec-validator
       - run: command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
 
+      - name: Nombres de archivo válidos en Windows
+        run: |
+          git ls-files | python3 -c "import sys,re; bad=[p for p in sys.stdin.read().split() if any(re.fullmatch(r'(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])', x.split('.')[0].upper()) or re.search(r'[<>:\"|?*]', x) for x in p.split('/'))]; print('\n'.join(bad)); sys.exit(1 if bad else 0)"
+
       - name: Cargar schema.sql en PostgreSQL 17
         run: psql -v ON_ERROR_STOP=1 -q -f kit/database/schema.sql
 

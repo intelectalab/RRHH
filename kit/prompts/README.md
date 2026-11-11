@@ -20,7 +20,7 @@ Cada archivo trae el prompt para avanzar una épica en una sesión nueva de Clau
 | 1 | POS · Posiciones y headcount | 7 | 7 | [POS.md](POS.md) |
 | 1 | COL · Colaboradores y ficha 360 | 12 | 12 | [COL.md](COL.md) |
 | 1 | HIS · Historia con vigencia | 6 | 6 | [HIS.md](HIS.md) |
-| 1 | CON · Contratos y adendas | 6 | 6 | [CON.md](CON.md) |
+| 1 | CON · Contratos y adendas | 6 | 6 | [CON-epica.md](CON-epica.md) |
 | 1 | DOC · Gestión documental, plantillas y firma | 8 | 8 | [DOC.md](DOC.md) |
 | 1 | ESS · Portal del colaborador | 6 | 6 | [ESS.md](ESS.md) |
 | 1 | MSS · Portal del manager | 4 | 4 | [MSS.md](MSS.md) |

@@ -12,7 +12,7 @@ Abre Claude Code en la raíz del repositorio y pega:
 
 ```
 Avanzamos la épica CON · Contratos y adendas de GestiaHR.
-Lee CLAUDE.md, kit/docs/modulos/M-CON.md, kit/prompts/CON.md y la sección CON de
+Lee CLAUDE.md, kit/docs/modulos/M-CON.md, kit/prompts/CON-epica.md y la sección CON de
 kit/backlog/backlog.md (grep -n "^### CON-" kit/backlog/backlog.md).
 Trabaja las actividades en este orden, cada una con /historia <clave>, en su propia rama
 (feat/<clave>-<resumen>) y con su propio pull request:

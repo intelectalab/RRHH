@@ -1605,7 +1605,7 @@ Con Claude Code, en la raíz del repositorio: /historia HIS-6",140,,Backend,fase
 147,Epic,[CON] Contratos y adendas,"Contratos por modalidad con vigencia, renovaciones, adendas, alertas de vencimiento y de tope acumulado.
 
 Especificación: kit/docs/modulos/M-CON.md
-Prompt para avanzar la épica con Claude Code: kit/prompts/CON.md",,CON · Contratos y adendas,Backend + Frontend,fase-1-core-hr,modulo-core-hr,mvp,producto-personas,CON,,,,,
+Prompt para avanzar la épica con Claude Code: kit/prompts/CON-epica.md",,CON · Contratos y adendas,Backend + Frontend,fase-1-core-hr,modulo-core-hr,mvp,producto-personas,CON,,,,,
 148,Task,[CON-1] Tipos de contrato y modalidades,"Cargar el catálogo de tipos de contrato (indeterminado, modalidades a plazo, tiempo parcial, convenios formativos) con sus plazos máximos y periodo de prueba como parámetros con vigencia por país. Cada tipo indica si exige fecha de fin, causa objetiva y qué plantilla de documento usa.
 
 Criterios de aceptación:

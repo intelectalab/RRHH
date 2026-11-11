@@ -307,7 +307,7 @@ def escribir_csv(epicas, ruta):
         for e in epicas:
             etq = FASES[e["fase"]][1]
             w.writerow([e["issue_id"], "Epic", f"[{e['codigo']}] {e['nombre']}",
-                        f"{e['descripcion']}\n\nEspecificación: kit/docs/modulos/M-{e['codigo']}.md\nPrompt para avanzar la épica con Claude Code: kit/prompts/{e['codigo']}.md", "",
+                        f"{e['descripcion']}\n\nEspecificación: kit/docs/modulos/M-{e['codigo']}.md\nPrompt para avanzar la épica con Claude Code: kit/prompts/{e['codigo'] + ('-epica' if e['codigo'].upper() in ('CON', 'PRN', 'AUX', 'NUL') else '')}.md", "",
                         f"{e['codigo']} · {e['nombre']}", e["componente"], etq, e["modulo"],
                         ETIQUETA_MVP if any(es_mvp(a) for a in e["actividades"]) else (ETIQUETA_OLA2 if any(es_ola2(a) for a in e["actividades"]) else (ETIQUETA_WEB if any(es_web(a) for a in e["actividades"]) else "")),
                         etiqueta_producto(e["codigo"]), e["codigo"]] + [""] * 5)

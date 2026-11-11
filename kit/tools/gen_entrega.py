@@ -19,6 +19,15 @@ KIT = Path(__file__).resolve().parent.parent
 BACKLOG = json.loads((KIT / 'backlog/backlog.json').read_text(encoding='utf-8'))
 OPENAPI = yaml.safe_load((KIT / 'api/openapi.yaml').read_text(encoding='utf-8'))
 MODULOS = json.loads((KIT / 'database/catalogos/modulos.json').read_text(encoding='utf-8'))
+# Windows no admite archivos con nombres reservados (CON, PRN, AUX, NUL, COM1…, LPT1…): esas épicas
+# llevan un sufijo para que el repositorio se pueda clonar en cualquier sistema.
+RESERVADOS_WINDOWS = {'CON', 'PRN', 'AUX', 'NUL', *(f'COM{i}' for i in range(1, 10)), *(f'LPT{i}' for i in range(1, 10))}
+
+
+def archivo_prompt(codigo):
+    return f'{codigo}-epica.md' if codigo.upper() in RESERVADOS_WINDOWS else f'{codigo}.md'
+
+
 DOC13 = (KIT / 'docs/13-decisiones-abiertas.md').read_text(encoding='utf-8')
 DOC19 = (KIT / 'docs/19-parametros-legales-por-validar.md').read_text(encoding='utf-8')
 
@@ -147,7 +156,7 @@ def prompt_epica(e):
     lineas += ['', '## Prompt para una sesión nueva de Claude Code', '',
                'Abre Claude Code en la raíz del repositorio y pega:', '', '```',
                f'Avanzamos la épica {c} · {e["nombre"]} de GestiaHR.',
-               f'Lee CLAUDE.md, kit/docs/modulos/M-{c}.md, kit/prompts/{c}.md y la sección {c} de',
+               f'Lee CLAUDE.md, kit/docs/modulos/M-{c}.md, kit/prompts/{archivo_prompt(c)} y la sección {c} de',
                f'kit/backlog/backlog.md (grep -n "^### {c}-" kit/backlog/backlog.md).',
                'Trabaja las actividades en este orden, cada una con /historia <clave>, en su propia rama',
                '(feat/<clave>-<resumen>) y con su propio pull request:',
@@ -179,7 +188,7 @@ def prompt_epica(e):
     return '\n'.join(lineas)
 
 for e in epicas:
-    (out_prompts / f'{e["codigo"]}.md').write_text(prompt_epica(e), encoding='utf-8')
+    (out_prompts / archivo_prompt(e['codigo'])).write_text(prompt_epica(e), encoding='utf-8')
 
 idx = ['# Prompts por épica', '',
        'Generado por `kit/tools/gen_entrega.py`. No se edita a mano.', '',
@@ -189,7 +198,7 @@ idx = ['# Prompts por épica', '',
        '| Fase | Épica | Actividades | MVP | Prompt |', '|---|---|---|---|---|']
 for e in epicas:
     lst = e['actividades']
-    idx.append(f'| {e["fase"]} | {e["codigo"]} · {e["nombre"]} | {len(lst)} | {sum(a["mvp"] for a in lst)} | [{e["codigo"]}.md]({e["codigo"]}.md) |')
+    idx.append(f'| {e["fase"]} | {e["codigo"]} · {e["nombre"]} | {len(lst)} | {sum(a["mvp"] for a in lst)} | [{archivo_prompt(e['codigo'])}]({archivo_prompt(e['codigo'])}) |')
 (out_prompts / 'README.md').write_text('\n'.join(idx) + '\n', encoding='utf-8')
 
 # ---- docs/20 --------------------------------------------------------------------------------------------
@@ -201,7 +210,7 @@ for e in epicas:
     c, lst = e['codigo'], e['actividades']
     av = 'Sí' if c in AVANCE else '—'
     dec = ', '.join(decisiones_de.get(c, [])) or '—'
-    filas.append(f'| {e["fase"]} | [{c}](../prompts/{c}.md) · {e["nombre"]} | {modulo_de.get(c, "—")} | '
+    filas.append(f'| {e["fase"]} | [{c}](../prompts/{archivo_prompt(c)}) · {e["nombre"]} | {modulo_de.get(c, "—")} | '
                  f'{sum(a["tipo"] == "Story" for a in lst)} | {sum(a["tipo"] != "Story" for a in lst)} | '
                  f'{sum(a["mvp"] for a in lst)} | {ops.get(c, 0)} | {av} | {dec} |')
 
