@@ -99,6 +99,16 @@ final class MfaService
         if ($this->hasActiveFactor($user)) {
             throw new BusinessRuleViolatedException('mfa_already_enabled', (string) trans('identity.mfa.mfa_already_enabled'));
         }
+        // Si ya hay una configuración reciente sin confirmar, se reutiliza su secreto: abrir la pantalla
+        // dos veces (o dos peticiones simultáneas) no debe invalidar el QR que el usuario ya escaneó.
+        $recent = DB::table('user_mfa_factors')->where('user_id', $user->id)->where('kind', 'totp')
+            ->whereNull('confirmed_at')->whereNull('disabled_at')->where('created_at', '>=', now()->subMinutes(30))
+            ->orderByDesc('created_at')->first();
+        if ($recent !== null) {
+            $secret = Crypt::decryptString((string) $recent->secret_enc);
+
+            return ['secret' => $secret, 'otpauth_uri' => Totp::uri($secret, (string) config('app.name'), $account)];
+        }
         $secret = Totp::newSecret();
         DB::transaction(function () use ($user, $secret): void {
             DB::table('user_mfa_factors')->where('user_id', $user->id)->where('kind', 'totp')->whereNull('confirmed_at')->delete();
@@ -126,10 +136,16 @@ final class MfaService
         if ($pending === null) {
             throw new BusinessRuleViolatedException('mfa_enrollment_not_started', (string) trans('identity.mfa.mfa_enrollment_not_started'));
         }
-        $step = Totp::match(Crypt::decryptString((string) $pending->secret_enc), $code);
+        $secret = Crypt::decryptString((string) $pending->secret_enc);
+        $step = Totp::match($secret, $code);
         if ($step === null) {
             $this->lockout->activity($user, 'auth.mfa_failed');
-            throw ValidationException::withMessages(['code' => [(string) trans('identity.mfa.invalid_code')]]);
+            // Diagnóstico al configurar: si el código corresponde a otra hora, el reloj del teléfono
+            // o del servidor está desfasado. No se acepta; solo se explica.
+            $drift = Totp::drift($secret, $code);
+            throw ValidationException::withMessages(['code' => [$drift === null
+                ? (string) trans('identity.mfa.invalid_code')
+                : (string) trans('identity.mfa.clock_skew', ['minutes' => max(1, (int) round(abs($drift) / 60))])]]);
         }
 
         return DB::transaction(function () use ($user, $pending, $step, $session): array {

@@ -63,6 +63,30 @@ final class Totp
         return null;
     }
 
+    /**
+     * Segundos de desfase si el código corresponde a otra hora dentro de ±$hours horas; null si no corresponde.
+     * Solo para explicar un error al configurar: nunca se acepta un código fuera de la ventana.
+     */
+    public static function drift(string $secret, string $code, int $hours = 12, ?int $time = null): ?int
+    {
+        $code = preg_replace('/\s+/', '', $code) ?? '';
+        if (preg_match('/^\d{'.self::DIGITS.'}$/', $code) !== 1) {
+            return null;
+        }
+        $key = self::base32Decode($secret);
+        $now = self::currentStep($time);
+        $range = intdiv($hours * 3600, self::PERIOD);
+        for ($i = 1; $i <= $range; $i++) {
+            foreach ([$i, -$i] as $offset) {
+                if (hash_equals(self::at($key, $now + $offset), $code)) {
+                    return $offset * self::PERIOD;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public static function at(string $key, int $step): string
     {
         $hash = hash_hmac('sha1', pack('N2', intdiv($step, 1 << 32), $step & 0xFFFFFFFF), $key, true);

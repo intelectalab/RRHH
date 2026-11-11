@@ -35,6 +35,7 @@ return [
     ],
     'mfa' => [
         'authenticator_label' => 'Authenticator app',
+        'clock_skew' => 'The code belongs to a different time: your phone or the server clock is about :minutes minutes off. Turn on automatic time on your phone and check the server clock.',
         'invalid_code' => 'The code is not valid or was already used.',
         'mfa_already_enabled' => 'Two-step verification is already on.',
         'mfa_enrollment_not_started' => 'Start the authenticator app setup first.',

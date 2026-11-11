@@ -35,6 +35,7 @@ return [
     ],
     'mfa' => [
         'authenticator_label' => 'Aplicación autenticadora',
+        'clock_skew' => 'El código corresponde a otra hora: el reloj de tu teléfono o del servidor está desfasado unos :minutes minutos. Activa la hora automática en el teléfono y revisa la hora del servidor.',
         'invalid_code' => 'El código no es válido o ya se usó.',
         'mfa_already_enabled' => 'La verificación en dos pasos ya está activa.',
         'mfa_enrollment_not_started' => 'Primero inicia la configuración de la aplicación autenticadora.',

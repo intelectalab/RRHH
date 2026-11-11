@@ -238,3 +238,15 @@ test('el administrador restablece el segundo factor de un usuario con motivo', f
     });
     mfLogin('rosa@andes.pe')->assertJsonPath('data.mfa_step', 'ok');
 });
+
+test('abrir la configuración dos veces no invalida el QR y un reloj desfasado se explica', function (): void {
+    $cookie = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $first = (string) mfAs($cookie, 'POST', '/me/mfa/totp')->json('data.secret');
+    $second = (string) mfAs($cookie, 'POST', '/me/mfa/totp')->json('data.secret');
+    expect($second)->toBe($first);
+
+    $skewed = Totp::at(Totp::base32Decode($first), Totp::currentStep() + 10); // 5 minutos adelantado
+    mfAs($cookie, 'POST', '/me/mfa/totp/confirm', ['code' => $skewed])->assertStatus(422)
+        ->assertJsonPath('error.details.0.message', trans('identity.mfa.clock_skew', ['minutes' => 5]));
+    mfAs($cookie, 'POST', '/me/mfa/totp/confirm', ['code' => mfCode($first)])->assertOk();
+});
