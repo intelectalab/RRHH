@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **40 parámetros sin valor verificado**; **33** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **43 parámetros sin valor verificado**; **36** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -24,6 +24,9 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `host_descargos_dias` | Hostigamiento: plazo interno de descargos | Todos | days | DS 014-2019-MIMP art. 29.5 | Sí | Lo fija el comité dentro de sus 15 días; por confirmar. | |
 | `jornada_maxima_semanal_horas` | Jornada máxima semanal | Todos | hours | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `lactario_minimo_mujeres_edad_fertil` | Mujeres en edad fértil por centro de trabajo que obligan a lactario | Todos | count | Ley 29896 | Sí | Umbral no verificado. | |
+| `licencia_fallecimiento_familiar_dias` | Licencia por fallecimiento de un familiar directo (días) | Todos | days | Por confirmar | Sí | Por confirmar si existe licencia general en el régimen privado o solo por convenio. | |
+| `licencia_maternidad_dias` | Licencia por maternidad (días naturales, prenatal y postnatal) | Todos | days | Ley 26644 | Sí | Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad). | |
+| `licencia_paternidad_dias` | Licencia por paternidad (días naturales consecutivos) | Todos | days | Ley 29409 y Ley 30807 | Sí | Por confirmar la duración vigente y los supuestos con más días. | |
 | `liquidacion_plazo_pago_horas` | Plazo de pago de la liquidación | Todos | hours | DS 001-97-TR | Sí | Las 48 horas no fueron verificadas. | |
 | `mype_recontratacion_meses` | Meses sin recontratación para aplicar el régimen especial a un extrabajador | Todos | months | Ley 32353 | Sí | Por confirmar con el TUO vigente. | |
 | `mype_sis_aporte` | Aporte al SIS de la microempresa | Microempresa | amount | DS 013-2013-PRODUCE | Sí | Lo fija el SIS; por confirmar. | |

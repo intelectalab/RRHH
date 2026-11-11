@@ -60,6 +60,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/absence-types/{id}/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia de las reglas de un tipo de ausencia (vigencias de la más reciente a la más antigua) */
+        get: operations["getAbsenceTypesIdRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/absences": {
         parameters: {
             query?: never;
@@ -14694,11 +14711,20 @@ export interface components {
             id: string;
             code: string;
             name: string;
-            paid: boolean;
-            requires_attachment: boolean;
-            affects_payroll_concept?: string | null;
-            max_days?: number | null;
-            sensitive: boolean;
+            /** @enum {string} */
+            category: "medical_leave" | "maternity" | "paternity" | "personal" | "bereavement" | "union" | "compensatory" | "remote_work" | "unpaid" | "suspension" | "other";
+            country_code?: string | null;
+            is_system: boolean;
+            is_confidential: boolean;
+            legal_duration_parameter_code?: string | null;
+            legal_duration?: {
+                [key: string]: unknown;
+            } | null;
+            rules: {
+                [key: string]: unknown;
+            };
+            /** Format: date */
+            effective_from?: string | null;
             /** @enum {string} */
             status: "active" | "archived";
             /** Format: date-time */
@@ -14709,11 +14735,20 @@ export interface components {
         AbsenceTypeInput: {
             code?: string;
             name?: string;
-            paid?: boolean;
-            requires_attachment?: boolean;
-            affects_payroll_concept?: string | null;
-            max_days?: number | null;
-            sensitive?: boolean;
+            /** @enum {string} */
+            category?: "medical_leave" | "maternity" | "paternity" | "personal" | "bereavement" | "union" | "compensatory" | "remote_work" | "unpaid" | "suspension" | "other";
+            country_code?: string | null;
+            is_system?: boolean;
+            is_confidential?: boolean;
+            legal_duration_parameter_code?: string | null;
+            legal_duration?: {
+                [key: string]: unknown;
+            } | null;
+            rules?: {
+                [key: string]: unknown;
+            };
+            /** Format: date */
+            effective_from?: string | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): lines */
         AccountingEntry: {
@@ -19962,6 +19997,31 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getAbsenceTypesIdRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getAbsences: {

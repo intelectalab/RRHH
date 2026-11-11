@@ -98,13 +98,18 @@
   created_by_user_id ?-> users ; idx employment_id, effective_on
 
 #E AUS | Ausencias y permisos
-@absence_types soft lock | Tipos de ausencia configurables, cada uno con sus reglas (pagada, tope, sustento, subsidio, concepto de planilla).
+@absence_types soft lock | Tipo de ausencia configurable (descanso médico, licencias, permiso personal, compensación, trabajo remoto…). Las reglas viven en absence_type_rules con vigencia; los del paquete de país (is_system) no se editan.
   code ; name
   category enum(medical_leave,maternity,paternity,personal,bereavement,union,compensatory,remote_work,unpaid,suspension,other)!
-  is_paid bool=t ; affects_attendance bool=t ; requires_document bool=f ; max_days_per_year numeric(6,2)
-  unit enum(days,hours)=days ; payroll_concept_id ?-> payroll_concepts ; statutory_suspension_code
+  country_code ?~> countries.code ; is_system bool=f ; is_confidential bool=f ; legal_duration_parameter_code
+  status enum(active,archived)=active ; uniq code
+@absence_type_rules lock | Reglas de un tipo de ausencia con vigencia (AUS-1): goce, unidad, tope por periodo, anticipación, sustento, quién la solicita, flujo de aprobación, efecto en planilla y alcance por empresa o régimen. Cambiar una regla cierra la fila vigente e inserta otra.
+  absence_type_id -> absence_types ; is_paid bool=t ; affects_attendance bool=t ; unit enum(days,hours)=days
+  max_quantity numeric(8,2) ; max_period enum(event,month,year)=year ; min_notice_days integer
+  requires_document bool=f ; document_grace_days integer ; requestable_by enum(employee,manager,hr)=employee
+  approval_workflow_definition_id ?-> workflow_definitions ; payroll_concept_code ; statutory_suspension_code
   subsidy_kind enum(none,illness,maternity)=none ; counts_as_worked_for_benefits bool=t
-  approval_workflow_definition_id ?-> workflow_definitions ; rules j ; uniq code
+  legal_entity_ids j ; labor_regime_codes j ; vig absence_type_id
 @absence_requests main soft lock | Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados.
   employment_id -> employments ; absence_type_id -> absence_types ; starts_at ts! ; ends_at ts! ; days numeric(6,2)
   hours numeric(6,2) ; status enum(draft,pending,approved,rejected,cancelled,pending_document,in_progress,completed)=draft ; reason

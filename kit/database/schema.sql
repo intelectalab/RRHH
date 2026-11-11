@@ -4947,32 +4947,63 @@ CREATE TABLE absence_types (
   code text NOT NULL,
   name text NOT NULL,
   category text NOT NULL CHECK (category IN ('medical_leave','maternity','paternity','personal','bereavement','union','compensatory','remote_work','unpaid','suspension','other')),
-  is_paid boolean NOT NULL DEFAULT true,
-  affects_attendance boolean NOT NULL DEFAULT true,
-  requires_document boolean NOT NULL DEFAULT false,
-  max_days_per_year numeric(6,2),
-  unit text NOT NULL DEFAULT 'days' CHECK (unit IN ('days','hours')),
-  payroll_concept_id uuid,
-  statutory_suspension_code text,
-  subsidy_kind text NOT NULL DEFAULT 'none' CHECK (subsidy_kind IN ('none','illness','maternity')),
-  counts_as_worked_for_benefits boolean NOT NULL DEFAULT true,
-  approval_workflow_definition_id uuid,
-  rules jsonb,
+  country_code text,
+  is_system boolean NOT NULL DEFAULT false,
+  is_confidential boolean NOT NULL DEFAULT false,
+  legal_duration_parameter_code text,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_absence_types_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_absence_types_approval_workflow_definition_id FOREIGN KEY (tenant_id, approval_workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id)
+  CONSTRAINT fk_absence_types_country_code FOREIGN KEY (country_code) REFERENCES countries (code)
 );
-COMMENT ON TABLE absence_types IS 'Tipos de ausencia configurables, cada uno con sus reglas (pagada, tope, sustento, subsidio, concepto de planilla).';
+COMMENT ON TABLE absence_types IS 'Tipo de ausencia configurable (descanso médico, licencias, permiso personal, compensación, trabajo remoto…). Las reglas viven en absence_type_rules con vigencia; los del paquete de país (is_system) no se editan.';
 CREATE UNIQUE INDEX uq_absence_types_code ON absence_types (tenant_id, code) WHERE deleted_at IS NULL;
-CREATE INDEX ix_absence_types_payroll_concept_id ON absence_types (tenant_id, payroll_concept_id);
-CREATE INDEX ix_absence_types_approval_workflow_definition_id ON absence_types (tenant_id, approval_workflow_definition_id);
+CREATE INDEX ix_absence_types_country_code ON absence_types (tenant_id, country_code);
 ALTER TABLE absence_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE absence_types FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON absence_types USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_absence_types_touch BEFORE UPDATE ON absence_types FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE absence_type_rules (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  absence_type_id uuid NOT NULL,
+  is_paid boolean NOT NULL DEFAULT true,
+  affects_attendance boolean NOT NULL DEFAULT true,
+  unit text NOT NULL DEFAULT 'days' CHECK (unit IN ('days','hours')),
+  max_quantity numeric(8,2),
+  max_period text NOT NULL DEFAULT 'year' CHECK (max_period IN ('event','month','year')),
+  min_notice_days integer,
+  requires_document boolean NOT NULL DEFAULT false,
+  document_grace_days integer,
+  requestable_by text NOT NULL DEFAULT 'employee' CHECK (requestable_by IN ('employee','manager','hr')),
+  approval_workflow_definition_id uuid,
+  payroll_concept_code text,
+  statutory_suspension_code text,
+  subsidy_kind text NOT NULL DEFAULT 'none' CHECK (subsidy_kind IN ('none','illness','maternity')),
+  counts_as_worked_for_benefits boolean NOT NULL DEFAULT true,
+  legal_entity_ids jsonb,
+  labor_regime_codes jsonb,
+  valid_from date NOT NULL,
+  valid_to date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_absence_type_rules_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_absence_type_rules_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ex_absence_type_rules_vigencia EXCLUDE USING gist (tenant_id WITH =, absence_type_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_absence_type_rules_absence_type_id FOREIGN KEY (tenant_id, absence_type_id) REFERENCES absence_types (tenant_id, id),
+  CONSTRAINT fk_absence_type_rules_approval_workflow_definition_id FOREIGN KEY (tenant_id, approval_workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id)
+);
+COMMENT ON TABLE absence_type_rules IS 'Reglas de un tipo de ausencia con vigencia (AUS-1): goce, unidad, tope por periodo, anticipación, sustento, quién la solicita, flujo de aprobación, efecto en planilla y alcance por empresa o régimen. Cambiar una regla cierra la fila vigente e inserta otra.';
+CREATE INDEX ix_absence_type_rules_approval_workflow_definition_id ON absence_type_rules (tenant_id, approval_workflow_definition_id);
+ALTER TABLE absence_type_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absence_type_rules FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON absence_type_rules USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_absence_type_rules_touch BEFORE UPDATE ON absence_type_rules FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE absence_requests (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -13858,7 +13889,6 @@ ALTER TABLE attendance_days ADD CONSTRAINT fk_attendance_days_absence_request_id
 ALTER TABLE attendance_days ADD CONSTRAINT fk_attendance_days_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id);
 ALTER TABLE biometric_enrollments ADD CONSTRAINT fk_biometric_enrollments_consent_id FOREIGN KEY (tenant_id, consent_id) REFERENCES consents (tenant_id, id);
 ALTER TABLE vacation_policies ADD CONSTRAINT fk_vacation_policies_labor_regime_code FOREIGN KEY (labor_regime_code) REFERENCES labor_regimes (code);
-ALTER TABLE absence_types ADD CONSTRAINT fk_absence_types_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id);
 ALTER TABLE overtime_records ADD CONSTRAINT fk_overtime_records_payroll_incident_id FOREIGN KEY (tenant_id, payroll_incident_id) REFERENCES payroll_incidents (tenant_id, id);
 ALTER TABLE payroll_payment_items ADD CONSTRAINT fk_payroll_payment_items_payslip_id FOREIGN KEY (tenant_id, payslip_id) REFERENCES payslips (tenant_id, id);
 ALTER TABLE statutory_filing_files ADD CONSTRAINT fk_statutory_filing_files_statutory_file_layout_id FOREIGN KEY (statutory_file_layout_id) REFERENCES statutory_file_layouts (id);

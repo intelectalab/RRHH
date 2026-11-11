@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Absences\AbsencesServiceProvider;
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
@@ -22,4 +23,5 @@ return [
     ContractsServiceProvider::class,
     ReportsServiceProvider::class,
     PlatformServiceProvider::class,
+    AbsencesServiceProvider::class,
 ];
