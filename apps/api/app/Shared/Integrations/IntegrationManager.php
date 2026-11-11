@@ -27,6 +27,9 @@ final class IntegrationManager
 
     private ?MessagingPort $messagingAdapter = null;
 
+    /** @var array<string, MessagingPort> */
+    private array $messagingProviders = [];
+
     private ?BankingPort $bankingAdapter = null;
 
     private ?BiometricPort $biometricAdapter = null;
@@ -80,6 +83,36 @@ final class IntegrationManager
         }
 
         throw new RuntimeException('No live Messaging provider configured for production.');
+    }
+
+    /**
+     * NOT-5 · Adaptador del proveedor que la organización configuró para el canal (message_channels).
+     * Un proveedor nuevo se registra en config('integrations.messaging_providers') sin tocar a quien
+     * envía; sin proveedor configurado se usa el adaptador por defecto (falso fuera de producción).
+     */
+    public function messagingFor(?string $provider): MessagingPort
+    {
+        if ($provider === null || $provider === '') {
+            return $this->messaging();
+        }
+        if (isset($this->messagingProviders[$provider])) {
+            return $this->messagingProviders[$provider];
+        }
+        /** @var array<string, class-string<MessagingPort>> $registered */
+        $registered = (array) config('integrations.messaging_providers', []);
+        if (isset($registered[$provider])) {
+            /** @var MessagingPort $adapter */
+            $adapter = app($registered[$provider]);
+
+            return $this->messagingProviders[$provider] = $adapter;
+        }
+
+        return $this->messaging();
+    }
+
+    public function setMessagingProvider(string $provider, MessagingPort $adapter): void
+    {
+        $this->messagingProviders[$provider] = $adapter;
     }
 
     public function banking(): BankingPort

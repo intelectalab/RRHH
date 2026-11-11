@@ -62,4 +62,17 @@ return [
     'mandatory_in_app' => 'Este aviso es obligatorio y no se puede desactivar en la aplicación.',
     'template_exists' => 'Ya existe una plantilla para ese aviso, canal e idioma.',
     'unsupported_channel' => 'Ese canal aún no está disponible.',
+    // NOT-5 · Mensajes directos por SMS y WhatsApp (variables entre llaves).
+    'messages' => [
+        'identity.login_code' => [
+            'sms' => 'GestiaHR: tu código de ingreso es {code}. Vence en {minutes} minutos. No lo compartas con nadie.',
+            'whatsapp' => 'GestiaHR: tu código de ingreso es {code}. Vence en {minutes} minutos. No lo compartas con nadie.',
+        ],
+        'identity.activation_code' => [
+            'sms' => 'GestiaHR: tu código para activar tu cuenta es {code}. Vence en {hours} horas. Ingresa con tu documento y este código.',
+            'whatsapp' => 'GestiaHR: tu código para activar tu cuenta es {code}. Vence en {hours} horas. Ingresa con tu documento y este código.',
+        ],
+    ],
+    'approval_only_whatsapp' => 'Solo las plantillas de WhatsApp necesitan aprobación del proveedor.',
+    'approval_reset' => 'La plantilla cambió y debe aprobarse otra vez antes de usarse en WhatsApp.',
 ];

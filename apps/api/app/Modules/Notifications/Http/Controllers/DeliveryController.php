@@ -23,6 +23,10 @@ final class DeliveryController
         if (is_string($status) && in_array($status, ['queued', 'sent', 'delivered', 'failed', 'bounced', 'suppressed'], true)) {
             $query->where('status', $status);
         }
+        $channel = $request->input('filter.channel', $request->query('channel'));
+        if (is_string($channel) && in_array($channel, ['email', 'push', 'whatsapp', 'sms'], true)) {
+            $query->where('channel', $channel);
+        }
         $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'id', 'desc');
         $ids = array_column($page['data'], 'id');
         $rows = NotificationDelivery::query()->whereIn('id', $ids)->get()->keyBy('id');
@@ -42,6 +46,9 @@ final class DeliveryController
                     'recipient_name' => $n->display_name ?? null,
                     'category' => $n->category ?? null,
                     'title' => $n->title ?? null,
+                    'purpose' => $d->purpose,
+                    'template_code' => $d->template_code,
+                    'fallback_from' => $d->fallback_from,
                     'status' => $d->status,
                     'provider' => $d->provider,
                     'attempts' => $d->attempts,
@@ -60,6 +67,10 @@ final class DeliveryController
             return null;
         }
         $address = FieldCipher::decrypt($enc);
+        // NOT-5: un número de celular muestra solo sus tres últimos dígitos.
+        if (! str_contains($address, '@')) {
+            return str_repeat('•', max(1, mb_strlen($address) - 3)).mb_substr($address, -3);
+        }
         [$local, $domain] = array_pad(explode('@', $address, 2), 2, '');
 
         return mb_substr($local, 0, 2).str_repeat('•', max(1, mb_strlen($local) - 2)).($domain !== '' ? '@'.$domain : '');

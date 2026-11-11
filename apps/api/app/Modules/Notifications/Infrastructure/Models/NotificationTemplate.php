@@ -22,6 +22,11 @@ use Illuminate\Support\Carbon;
  * @property string $body
  * @property array<int, string>|null $variables
  * @property bool $is_system
+ * @property string $approval_status
+ * @property string|null $provider_template_ref
+ * @property Carbon|null $approval_requested_at
+ * @property Carbon|null $approval_decided_at
+ * @property string|null $rejection_reason
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -39,7 +44,7 @@ class NotificationTemplate extends Model
 
     protected $guarded = ['id', 'tenant_id'];
 
-    protected $casts = ['variables' => 'array', 'is_system' => 'boolean'];
+    protected $casts = ['variables' => 'array', 'is_system' => 'boolean', 'approval_requested_at' => 'datetime', 'approval_decided_at' => 'datetime'];
 
     protected static function newFactory(): NotificationTemplateFactory
     {

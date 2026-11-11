@@ -27,7 +27,36 @@ final class NotificationCatalog
      */
     public function category(string $code): ?array
     {
+        $message = $this->messages()[$code] ?? null;
+        if ($message !== null) {
+            return ['variables' => $message['variables'], 'link' => '/', 'channels' => $this->messageChannels(), 'mandatory' => true, 'urgent' => true];
+        }
+
         return $this->categories()[$code] ?? null;
+    }
+
+    /**
+     * NOT-5 · Mensajes directos (códigos de ingreso y activación) que se envían por SMS o WhatsApp.
+     *
+     * @return array<string, array{variables: array<int, string>}>
+     */
+    public function messages(): array
+    {
+        /** @var array<string, array{variables: array<int, string>}> */
+        return (array) config('notifications.messages', []);
+    }
+
+    public function isMessage(string $code): bool
+    {
+        return array_key_exists($code, $this->messages());
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function messageChannels(): array
+    {
+        return array_values((array) config('notifications.message_channels', ['sms', 'whatsapp']));
     }
 
     /**

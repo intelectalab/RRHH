@@ -26,6 +26,17 @@ return [
         'account.security' => ['variables' => ['event'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 
+    /*
+     * NOT-5 · Mensajes directos por SMS/WhatsApp que envían los módulos por App\Shared\Messaging\MessageSender
+     * (no son avisos del centro de notificaciones ni tienen preferencias: siempre se envían).
+     * Sus plantillas de WhatsApp requieren aprobación del proveedor; sin ella el mensaje sale por SMS.
+     */
+    'message_channels' => ['sms', 'whatsapp'],
+    'messages' => [
+        'identity.login_code' => ['variables' => ['code', 'minutes']],
+        'identity.activation_code' => ['variables' => ['code', 'hours']],
+    ],
+
     // Variables comunes disponibles en todas las plantillas.
     'common_variables' => ['name', 'organization', 'link'],
 ];

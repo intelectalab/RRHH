@@ -57,6 +57,14 @@ final class TemplateRenderer
      */
     public function default(string $category, string $channel, string $locale): array
     {
+        // NOT-5: los mensajes directos (códigos) tienen su propio texto corto por canal.
+        if (array_key_exists($category, (array) config('notifications.messages', []))) {
+            $messages = trans('notifications.messages', [], $locale);
+            $text = is_array($messages) ? ($messages[$category][$channel] ?? $messages[$category]['sms'] ?? null) : null;
+
+            return ['', is_string($text) ? $text : ''];
+        }
+
         $base = $channel === 'in_app' ? 'in_app' : 'email';
         // Las claves de tipo llevan punto (approval.pending): se lee el arreglo completo, no con notación de puntos.
         $all = trans('notifications.templates', [], $locale);

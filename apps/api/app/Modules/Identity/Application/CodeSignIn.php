@@ -8,6 +8,7 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserIdentity;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
+use App\Shared\Messaging\MessageSender;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Security\BlindIndex;
@@ -37,6 +38,7 @@ final class CodeSignIn
         private readonly UserAccountStateMachine $machine,
         private readonly UserService $users,
         private readonly AuditLogger $audit,
+        private readonly MessageSender $messages,
     ) {}
 
     /** Parámetro seguridad.acceso_con_documento: la organización puede apagar el ingreso con documento. */
@@ -73,7 +75,7 @@ final class CodeSignIn
         }
         DB::transaction(function () use ($user, $channel): void {
             $issued = $this->codes->issue($user, 'otp_login', $channel, self::LOGIN_DIGITS);
-            $this->send($user, 'otp_login', $channel, $issued['code'], $this->codes->ttlMinutes());
+            $this->send($user, 'otp_login', $channel, $issued['code'], $this->codes->ttlMinutes(), $issued['id']);
             $this->lockout->activity($user, 'auth.login_code_sent');
         });
     }
@@ -117,7 +119,7 @@ final class CodeSignIn
         return DB::transaction(function () use ($user, $channel, $hours): array {
             $issued = $this->codes->issue($user, 'invite', $channel, self::ACTIVATION_DIGITS, $hours * 60);
             if ($channel !== 'in_app') {
-                $this->send($user, 'invite', $channel, $issued['code'], $hours * 60);
+                $this->send($user, 'invite', $channel, $issued['code'], $hours * 60, $issued['id']);
             }
             // El código nunca va a la auditoría: solo el canal y la vigencia.
             $this->audit->record('user.activation_code_issued', 'user', $user->id, null, ['channel' => $channel, 'expires_at' => $issued['expires_at']->toIso8601String()]);
@@ -165,16 +167,42 @@ final class CodeSignIn
         return UserIdentity::query()->where('user_id', $user->id)->where('kind', $channel === 'email' ? 'email' : 'phone')->exists();
     }
 
-    private function send(User $user, string $purpose, string $channel, string $code, int $minutes): void
+    /**
+     * Correo: aviso propio de identidad (SEG-2). SMS y WhatsApp: capa de mensajería (NOT-5), que elige
+     * el proveedor y registra la entrega; el código viaja cifrado y nunca queda en la entrega.
+     */
+    private function send(User $user, string $purpose, string $channel, string $code, int $minutes, string $codeId): void
     {
-        $event = $this->outbox->record(DomainEventTypes::USER_MESSAGE_CODE_ISSUED, 'user', $user->id, [
-            'user_id' => $user->id,
-            'purpose' => $purpose,
-            'channel' => $channel,
-            'code_enc' => Crypt::encryptString($code),
-            'minutes' => $minutes,
-        ]);
-        $this->outbox->deliverSoon($event);
+        if ($channel === 'email') {
+            $event = $this->outbox->record(DomainEventTypes::USER_MESSAGE_CODE_ISSUED, 'user', $user->id, [
+                'user_id' => $user->id,
+                'purpose' => $purpose,
+                'channel' => $channel,
+                'code_enc' => Crypt::encryptString($code),
+                'minutes' => $minutes,
+            ]);
+            $this->outbox->deliverSoon($event);
+
+            return;
+        }
+        /** @var UserIdentity|null $phone */
+        $phone = UserIdentity::query()->where('user_id', $user->id)->where('kind', 'phone')->first();
+        if ($phone === null) {
+            return;
+        }
+        $variables = $purpose === 'invite'
+            ? ['code' => $code, 'hours' => intdiv($minutes, 60)]
+            : ['code' => $code, 'minutes' => $minutes];
+        $this->messages->send(
+            $channel,
+            '+'.$phone->identifier(),
+            $purpose === 'invite' ? 'identity.activation_code' : 'identity.login_code',
+            $variables,
+            $user->locale ?? (string) config('app.locale', 'es'),
+            $purpose,
+            // Un mensaje por código emitido: reprocesar o repetir la petición no envía otro.
+            'message_code:'.$codeId,
+        );
     }
 
     private function markVerified(User $user): void

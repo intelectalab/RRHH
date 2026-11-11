@@ -604,7 +604,9 @@
     "task_overdue": "Tarea vencida",
     "account_security": "Seguridad de la cuenta",
     "automation_notice": "Aviso de una automatización",
-    "automation_paused": "Automatización pausada"
+    "automation_paused": "Automatización pausada",
+    "identity_login_code": "Código de ingreso",
+    "identity_activation_code": "Código de activación de cuenta"
   },
   "nchannel": {
     "in_app": "En la aplicación",
@@ -689,7 +691,16 @@
     "sample_title": "Revisar el contrato de Carlos",
     "sample_reason": "Cierre de mes",
     "sample_event": "Se cambió tu clave.",
-    "sample_type": "vacaciones"
+    "sample_type": "vacaciones",
+    "approval_draft": "Sin aprobar",
+    "approval_pending": "Aprobación pendiente",
+    "approval_approved": "Aprobada por WhatsApp",
+    "approval_rejected": "Rechazada",
+    "approval_not_required": "No requiere aprobación",
+    "request_approval": "Pedir aprobación",
+    "approval_requested": "Plantilla enviada a aprobación de WhatsApp.",
+    "approval_edit_note": "Si cambias el texto, la plantilla vuelve a borrador y debe aprobarse otra vez. Mientras tanto los mensajes salen por SMS.",
+    "d_fallback": "Enviado por SMS: la plantilla de {from} no estaba aprobada"
   },
   "cfg": {
     "title": "Configuración",
