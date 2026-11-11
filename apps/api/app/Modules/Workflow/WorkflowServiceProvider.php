@@ -4,10 +4,12 @@ namespace App\Modules\Workflow;
 
 use App\Modules\Workflow\Console\ProcessOverdueApprovals;
 use App\Modules\Workflow\Console\RetryFailedAutomations;
+use App\Modules\Workflow\Infrastructure\Calendar\TaskCalendarSource;
 use App\Modules\Workflow\Infrastructure\Inbox\ApprovalInboxSource;
 use App\Modules\Workflow\Infrastructure\Inbox\TaskInboxSource;
 use App\Modules\Workflow\Infrastructure\Subscribers\NotifyWorkflowParticipants;
 use App\Modules\Workflow\Infrastructure\Subscribers\RunAutomationRules;
+use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Inbox\InboxRegistry;
 use App\Shared\Outbox\OutboxService;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,6 +24,8 @@ final class WorkflowServiceProvider extends ServiceProvider
         $inbox = $this->app->make(InboxRegistry::class);
         $inbox->register($this->app->make(ApprovalInboxSource::class));
         $inbox->register($this->app->make(TaskInboxSource::class));
+        // CFG-8 · Tareas con fecha límite en el calendario central.
+        $this->app->make(CalendarRegistry::class)->register($this->app->make(TaskCalendarSource::class));
 
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(NotifyWorkflowParticipants::class));

@@ -23,4 +23,17 @@ interface TrashSource
 
     /** Restaura; lanza AyniException si no se puede (p. ej. 409 por un duplicado activo). */
     public function restore(string $id): void;
+
+    /**
+     * Ids de los registros eliminados antes de la fecha (vencieron su plazo en la papelera).
+     *
+     * @return array<int, string>
+     */
+    public function expired(\DateTimeInterface $deletedBefore): array;
+
+    /**
+     * Eliminación definitiva al vencer la retención (RN-CFG-09). Devuelve false si el registro sigue
+     * referenciado por otros datos: entonces se conserva y se reintenta en la próxima depuración.
+     */
+    public function purge(string $id): bool;
 }

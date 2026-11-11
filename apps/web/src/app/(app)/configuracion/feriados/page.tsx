@@ -1,5 +1,10 @@
+import { Suspense } from 'react'
 import { HolidaysScreen } from '@/modules/settings/HolidaysScreen'
 
 export default function FeriadosPage() {
-  return <HolidaysScreen />
+  return (
+    <Suspense>
+      <HolidaysScreen />
+    </Suspense>
+  )
 }

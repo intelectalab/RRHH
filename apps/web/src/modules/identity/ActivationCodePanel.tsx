@@ -3,15 +3,16 @@
 import { useState, type FormEvent } from 'react'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatDateTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { SidePanel } from '@/ui/components/SidePanel'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Issued = { code: string | null; channel: string; expires_at: string }
 
 /** SEG-2 · RRHH emite el código de activación de quien no tiene correo: se muestra una vez o se envía. */
 export function ActivationCodePanel({ user, onClose, onSent }: { user: { id: string; display_name: string; phone_masked?: string | null }; onClose: () => void; onSent: (msg: string) => void }) {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const [channel, setChannel] = useState<'in_app' | 'sms' | 'whatsapp'>('in_app')
   const [issued, setIssued] = useState<Issued | null>(null)
   const [busy, setBusy] = useState(false)
@@ -51,7 +52,7 @@ export function ActivationCodePanel({ user, onClose, onSent }: { user: { id: str
         <div>
           <div className="nota" role="status">{t('users.code_shown')}</div>
           <p className="codigo-grande" aria-label={t('auth.activation_code')}>{issued.code?.replace(/(\d{4})(\d{4})/, '$1 $2')}</p>
-          <p className="sub2">{t('users.code_expires', { date: formatDateTime(locale, issued.expires_at) })}</p>
+          <p className="sub2">{t('users.code_expires', { date: fmtDT(issued.expires_at) })}</p>
         </div>
       ) : (
         <form id="codigo-activacion" onSubmit={submit} noValidate>

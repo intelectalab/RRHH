@@ -6,6 +6,7 @@ use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Permissions\PermissionResolver;
+use App\Shared\Trash\PurgesSafely;
 use App\Shared\Trash\TrashSource;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\DB;
  */
 final class RoleTrashSource implements TrashSource
 {
+    use PurgesSafely;
+
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly PermissionResolver $permissions,
@@ -61,5 +64,28 @@ final class RoleTrashSource implements TrashSource
             $this->audit->record('role.restored', 'role', $role->id, null, ['name' => $role->name]);
         });
         $this->permissions->forget();
+    }
+
+    public function expired(\DateTimeInterface $deletedBefore): array
+    {
+        return Role::onlyTrashed()->where('deleted_at', '<', $deletedBefore)->pluck('id')->map(fn ($id): string => (string) $id)->all();
+    }
+
+    /**
+     * Se borran sus permisos con el rol. Si alguien aún lo tiene asignado o un flujo lo usa, se conserva.
+     */
+    public function purge(string $id): bool
+    {
+        /** @var Role|null $role */
+        $role = Role::onlyTrashed()->whereKey($id)->first();
+        if ($role === null) {
+            return true;
+        }
+
+        return $this->purgeSafely(function () use ($role): void {
+            DB::table('role_permissions')->where('role_id', $role->id)->delete();
+            $role->forceDelete();
+            $this->audit->record('role.purged', 'role', $role->id, ['name' => $role->name], null);
+        }, fn () => $this->permissions->forget());
     }
 }

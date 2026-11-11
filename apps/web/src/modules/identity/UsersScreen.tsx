@@ -15,6 +15,7 @@ import { formErrors } from '@/lib/errors'
 import { useCompany } from '@/modules/session/CompanyProvider'
 import { ExportButton } from '@/modules/exports/ExportButton'
 import { settingsTabs } from './settingsTabs'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Assignment = { role_id: string; scope: string | null; legal_entity_ids: string[]; site_ids: string[]; org_unit_ids: string[] }
 type User = Schema<'User'> & { allowed_actions?: string[]; role_assignments?: Assignment[]; version?: number }
@@ -24,6 +25,7 @@ const STATUS_CLASS: Record<string, string> = { invited: 'in', active: 'ok', lock
 
 export function UsersScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { session, can } = useSession()
   const { toast, node: toastNode } = useToast()
   const [users, setUsers] = useState<User[] | null>(null)
@@ -79,7 +81,7 @@ export function UsersScreen() {
   }
 
   const fmt = (iso: string | null | undefined) =>
-    iso ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso)) : null
+    iso ? fmtDT(iso) : null
 
   return (
     <>

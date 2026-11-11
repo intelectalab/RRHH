@@ -128,7 +128,8 @@
     "language": "Idioma",
     "lang_es": "Español",
     "lang_en": "English",
-    "lang_pt": "Português"
+    "lang_pt": "Português",
+    "modules_calendar": "Calendario"
   },
   "home": {
     "title": "Hola, {name}",
@@ -300,7 +301,28 @@
     "restored": "Empresa restaurada.",
     "confirm_archive": "¿Archivar {name}? Dejará de aceptar altas; su historia se conserva.",
     "empty_title": "No hay empresas",
-    "empty_text": "Registre la primera razón social del grupo."
+    "empty_text": "Registre la primera razón social del grupo.",
+    "section_profile": "Datos fiscales y de presentación",
+    "profile_help": "Lo que dejes vacío se toma de la organización.",
+    "locale": "Idioma de la empresa",
+    "locale_inherit": "El de la organización",
+    "locale_es": "Español",
+    "locale_en": "Inglés",
+    "locale_pt": "Portugués",
+    "tax_regime": "Régimen tributario",
+    "activity_code": "Actividad económica (CIIU)",
+    "address": "Domicilio fiscal",
+    "district_code": "Ubigeo del distrito",
+    "district_help": "En Perú, los 6 dígitos del ubigeo INEI (por ejemplo, 150101 para Lima).",
+    "legal_rep": "Representante legal",
+    "logo": "Logo",
+    "logo_alt": "Logo de {name}",
+    "logo_upload": "Subir logo",
+    "logo_replace": "Cambiar logo",
+    "logo_remove": "Quitar",
+    "logo_help": "PNG, JPEG o WebP de hasta 1 MB. Se usa en documentos y en el selector de empresa.",
+    "logo_saved": "Logo actualizado",
+    "logo_removed": "Logo quitado"
   },
   "audit": {
     "sub": "Quién cambió qué, cuándo y desde dónde. Solo lectura.",
@@ -1271,5 +1293,17 @@
       "account_locked": "Cuenta bloqueada por intentos fallidos",
       "user_created": "Se creó un usuario de la consola"
     }
+  },
+  "cal": {
+    "title": "Calendario de RRHH",
+    "sub": "Feriados, tareas y fechas de los módulos que tienes, en la zona horaria de la empresa.",
+    "prev": "Mes anterior",
+    "next": "Mes siguiente",
+    "today": "Hoy",
+    "sources": "Qué mostrar",
+    "source_holidays": "Feriados",
+    "source_tasks": "Tareas",
+    "empty_title": "Nada en este mes",
+    "empty_text": "No hay feriados ni fechas visibles para ti en este mes con los filtros elegidos."
   }
 }

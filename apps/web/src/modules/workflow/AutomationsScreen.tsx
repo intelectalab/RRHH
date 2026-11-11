@@ -12,6 +12,7 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { typeLabel } from './shared'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Op = 'eq' | 'neq' | 'in' | 'not_in' | 'contains' | 'gt' | 'gte' | 'lt' | 'lte' | 'exists' | 'not_exists'
 type Condition = { field: string; op: Op; value?: string | number | string[] }
@@ -53,6 +54,7 @@ export function eventLabel(t: (k: string) => string, event: string): string {
 /** Configuración → Automatizaciones (WFL-5): reglas CUANDO → SI → ENTONCES y el centro de ejecuciones. */
 export function AutomationsScreen() {
   const { t } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
   const [view, setView] = useState<'rules' | 'runs'>('rules')
@@ -100,7 +102,7 @@ export function AutomationsScreen() {
 
   const ruleTone = (s: string) => (s === 'active' ? 'ok' : s === 'draft' ? 'wa' : 'gr')
   const runTone = (s: string) => (s === 'succeeded' ? 'ok' : s === 'failed' ? 'er' : s === 'skipped' || s === 'cancelled' ? 'gr' : 'wa')
-  const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString() : '—')
+  const when = (iso?: string | null) => (iso ? fmtDT(iso) : '—')
   const canCreate = can('workflow.workflows.create')
 
   return (

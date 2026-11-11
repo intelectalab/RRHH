@@ -17,4 +17,8 @@ return [
     'custom_field_type_locked' => 'The field already has saved values: its type cannot change.',
     'custom_field_options_required' => 'Enter the list options.',
     'custom_field_permission_required' => 'A sensitive field needs a field permission.',
+    'calendar' => [
+        'invalid_range' => 'Enter a valid range: from and to as YYYY-MM-DD, to not before from and up to 100 days.',
+        'unknown_source' => 'The calendar has no source «:source».',
+    ],
 ];

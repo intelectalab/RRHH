@@ -19,6 +19,9 @@ const paths: Record<string, string> = {
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0',
   sidebar: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM9 5v14',
   download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
+  calendar: 'M5 6h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM4 10h16M8 3v5M16 3v5',
+  chevronLeft: 'M15 6l-6 6 6 6',
+  chevronRight: 'M9 6l6 6-6 6',
 }
 
 export function Icon({ name, size = 18 }: { name: keyof typeof paths; size?: number }) {

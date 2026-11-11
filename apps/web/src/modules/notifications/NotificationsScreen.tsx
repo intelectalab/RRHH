@@ -3,17 +3,19 @@
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
-import { formatDateTime, relativeTime } from '@/lib/format'
+import { relativeTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { NOTIFICATIONS_CHANGED, notifyNotificationsChanged, type AppNotification, type NotificationPage } from './shared'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 const GROUPS = ['approval', 'task', 'account'] as const
 
 /** Centro de notificaciones (NOT-2): todas o sin leer, por tipo, ir al registro. */
 export function NotificationsScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const router = useRouter()
   const [unreadOnly, setUnreadOnly] = useState(false)
   const [group, setGroup] = useState<string | null>(null)
@@ -98,7 +100,7 @@ export function NotificationsScreen() {
                 {!n.read && <span className="tag oc" style={{ marginLeft: 8 }}>{t('notif.new')}</span>}
                 {n.body && <span className="sub2">{n.body}</span>}
               </span>
-              <time className="sub2" dateTime={n.created_at ?? undefined} title={formatDateTime(locale, n.created_at)}>{relativeTime(locale, n.created_at)}</time>
+              <time className="sub2" dateTime={n.created_at ?? undefined} title={fmtDT(n.created_at)}>{relativeTime(locale, n.created_at)}</time>
             </button>
           ))}
           {cursor && <div style={{ padding: 12, textAlign: 'center' }}><button type="button" className="btn btn-sec btn-sm" onClick={() => void more()}>{t('notif.load_more')}</button></div>}

@@ -11,8 +11,10 @@ use App\Shared\Permissions\DataScope;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 uses(DatabaseTransactions::class);
 
@@ -165,7 +167,7 @@ test('RN-TEN-05: la empresa no se elimina, se archiva y se restaura con acciones
     $restore = empCall($this->admin, 'POST', '/legal-entities/'.$this->e3->id.'/restore', []);
     $restore->assertOk()->assertJsonPath('data.status', 'active');
 
-    expect(collect(app('router')->getRoutes()->getRoutes())->contains(fn ($r) => in_array('DELETE', $r->methods(), true) && str_contains($r->uri(), 'legal-entities')))->toBeFalse();
+    expect(collect(app('router')->getRoutes()->getRoutes())->contains(fn ($r) => in_array('DELETE', $r->methods(), true) && str_contains($r->uri(), 'legal-entities') && ! str_ends_with($r->uri(), '/logo')))->toBeFalse();
 });
 
 test('RN-TEN-07: con el límite del plan alcanzado no se crea otra empresa', function (): void {
@@ -195,4 +197,72 @@ test('el catálogo para registrar empresas viene de la base', function (): void 
         ->and(collect($response->json('data.currencies'))->pluck('code'))->toContain('PEN')
         ->and($response->json('data.tax_id_labels.PE'))->toBe('RUC');
     $this->assertMatchesOpenApi($response, 'get', '/catalogs/organization', 200);
+});
+
+/** PNG de 1×1 válido (sin depender de GD). */
+function empPng(): string
+{
+    return (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+}
+
+function empUpload(User $user, string $id, UploadedFile $file)
+{
+    TenancyScope::clear();
+    app('auth')->forgetGuards();
+    app(DataScope::class)->forget();
+
+    return test()->actingAs($user, 'ayni')
+        ->withHeaders(['X-Tenant-Id' => $user->tenant_id, 'Accept' => 'application/json'])
+        ->post('/api/v1/legal-entities/'.$id.'/logo', ['file' => $file]);
+}
+
+test('CFG-2: la empresa guarda sus datos fiscales y de presentación; sin valor hereda', function (): void {
+    $patch = empCall($this->admin, 'PATCH', '/legal-entities/'.$this->e1->id, [
+        'tax_regime' => 'Régimen MYPE Tributario', 'economic_activity_code' => '4711', 'address' => 'Av. Arequipa 123, Lima',
+        'district_code' => '150101', 'legal_representative_name' => 'Rosa Quispe', 'locale' => 'en',
+    ]);
+    $patch->assertOk()->assertJsonPath('data.tax_regime', 'Régimen MYPE Tributario')->assertJsonPath('data.district_code', '150101')
+        ->assertJsonPath('data.legal_representative_name', 'Rosa Quispe')->assertJsonPath('data.locale', 'en')->assertJsonPath('data.has_logo', false);
+    $this->assertMatchesOpenApi($patch, 'patch', '/legal-entities/{id}', 200);
+    // La otra empresa no cambia: sin idioma propio usa el de la organización.
+    empCall($this->admin, 'GET', '/legal-entities/'.$this->e2->id)->assertOk()->assertJsonPath('data.locale', null)->assertJsonPath('data.tax_regime', null);
+
+    TenancyScope::runAs(EMP_TENANT, function (): void {
+        $audit = DB::table('audit_events')->where('entity_id', $this->e1->id)->where('action', 'legal_entity.updated')->first();
+        expect($audit)->not->toBeNull();
+    });
+
+    $bad = empCall($this->admin, 'PATCH', '/legal-entities/'.$this->e1->id, ['district_code' => 'Lima centro', 'locale' => 'fr']);
+    $bad->assertStatus(422);
+    expect(collect($bad->json('error.details'))->pluck('field')->all())->toContain('district_code', 'locale');
+    empCall($this->admin, 'PATCH', '/legal-entities/'.$this->e1->id, ['has_logo' => true])->assertStatus(422);
+});
+
+test('CFG-2: logo de la empresa: subir, ver, reemplazar y quitar, con permiso y alcance', function (): void {
+    Storage::fake('s3');
+    $up = empUpload($this->admin, $this->e1->id, UploadedFile::fake()->createWithContent('logo.png', empPng()));
+    $up->assertOk()->assertJsonPath('data.has_logo', true);
+    $this->assertMatchesOpenApi($up, 'post', '/legal-entities/{id}/logo', 200);
+
+    $logo = empCall($this->admin, 'GET', '/legal-entities/'.$this->e1->id.'/logo');
+    $logo->assertOk()->assertHeader('Content-Type', 'image/png');
+    expect($logo->getContent())->toBe(empPng());
+    empCall($this->admin, 'GET', '/legal-entities/'.$this->e2->id.'/logo')->assertNotFound();
+
+    // Solo imágenes: un texto no sirve como logo.
+    empUpload($this->admin, $this->e1->id, UploadedFile::fake()->createWithContent('logo.txt', 'hola'))->assertStatus(422);
+
+    // Fuera de su empresa, 404; sin permiso de edición, 403.
+    $hr = empUser('rrhh', 'legal_entity', [$this->e2->id]);
+    empCall($hr, 'GET', '/legal-entities/'.$this->e1->id.'/logo')->assertNotFound();
+    empUpload(empUser('empleado'), $this->e1->id, UploadedFile::fake()->createWithContent('logo.png', empPng()))->assertStatus(403);
+
+    $removed = empCall($this->admin, 'DELETE', '/legal-entities/'.$this->e1->id.'/logo');
+    $removed->assertOk()->assertJsonPath('data.has_logo', false);
+    $this->assertMatchesOpenApi($removed, 'delete', '/legal-entities/{id}/logo', 200);
+    empCall($this->admin, 'GET', '/legal-entities/'.$this->e1->id.'/logo')->assertNotFound();
+
+    TenancyScope::runAs(EMP_TENANT, function (): void {
+        expect(DB::table('audit_events')->where('entity_id', $this->e1->id)->whereIn('action', ['legal_entity.logo_changed', 'legal_entity.logo_removed'])->count())->toBe(2);
+    });
 });

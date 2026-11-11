@@ -131,6 +131,70 @@ export function CompaniesScreen() {
   )
 }
 
+/** CFG-2 · Logo de la empresa: se sube y se quita al momento (no espera a «Guardar»). */
+function LogoField({ company }: { company: Company }) {
+  const { t } = useT()
+  const [hasLogo, setHasLogo] = useState(Boolean(company.has_logo))
+  const [stamp, setStamp] = useState(0)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<string | null>(null)
+
+  async function upload(file: File | undefined) {
+    if (!file) return
+    setBusy(true)
+    setError(null)
+    try {
+      await api.upload(`/legal-entities/${company.id}/logo`, file, file.name)
+      setHasLogo(true)
+      setStamp(Date.now())
+      setStatus(t('org.logo_saved'))
+    } catch (err) {
+      const { fields, general } = formErrors(err, t)
+      setError(fields.file ?? general)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function remove() {
+    setBusy(true)
+    setError(null)
+    try {
+      await api.request(`/legal-entities/${company.id}/logo`, 'DELETE')
+      setHasLogo(false)
+      setStatus(t('org.logo_removed'))
+    } catch (err) {
+      setError(err instanceof ApiRequestError ? err.message : t('auth.generic_error'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <fieldset className="cf-grupo">
+      <legend>{t('org.logo')}</legend>
+      <div className="logo-campo">
+        <div className="logo-vista" aria-hidden={!hasLogo}>
+          {hasLogo
+            // La imagen sale de la API con la sesión del usuario: el optimizador de next/image no la alcanza.
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={`/api/v1/legal-entities/${company.id}/logo${stamp ? `?v=${stamp}` : ''}`} alt={t('org.logo_alt', { name: company.name })} />
+            : <Icon name="building" size={28} />}
+        </div>
+        <div>
+          <label className="btn btn-sec btn-sm" htmlFor="c-logo">{busy && <span className="spin" aria-hidden="true" />}{t(hasLogo ? 'org.logo_replace' : 'org.logo_upload')}</label>
+          <input id="c-logo" type="file" className="vh" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={(e) => { void upload(e.target.files?.[0]); e.target.value = '' }} />
+          {hasLogo && <button type="button" className="btn btn-ter btn-sm" onClick={() => void remove()} disabled={busy}>{t('org.logo_remove')}</button>}
+          <p className="small text-secondary">{t('org.logo_help')}</p>
+        </div>
+      </div>
+      {error && <div className="invalid-feedback" style={{ display: 'block' }} role="alert">{error}</div>}
+      <span className="vh" role="status">{status}</span>
+    </fieldset>
+  )
+}
+
 function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company | null; catalog: Catalog; onClose: () => void; onSaved: (created: boolean) => Promise<void> }) {
   const { t } = useT()
   const [form, setForm] = useState({
@@ -141,6 +205,12 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
     currency: company?.currency ?? catalog.countries[0]?.default_currency ?? '',
     timezone: company?.timezone ?? 'America/Lima',
     payroll_regime: company?.payroll_regime ?? '',
+    locale: company?.locale ?? '',
+    tax_regime: company?.tax_regime ?? '',
+    economic_activity_code: company?.economic_activity_code ?? '',
+    address: company?.address ?? '',
+    district_code: company?.district_code ?? '',
+    legal_representative_name: company?.legal_representative_name ?? '',
   })
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -159,7 +229,9 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
     setBusy(true)
     setErrors({})
     setError(null)
-    const body = { ...form, trade_name: form.trade_name || null, ...(custom.fields.length > 0 ? { custom_fields: customValues } : {}) }
+    // CFG-2: un dato propio vacío vuelve a heredar el de la organización (se envía null).
+    const optional = ['trade_name', 'locale', 'tax_regime', 'economic_activity_code', 'address', 'district_code', 'legal_representative_name'] as const
+    const body = { ...form, ...Object.fromEntries(optional.map((k) => [k, form[k].trim() || null])), ...(custom.fields.length > 0 ? { custom_fields: customValues } : {}) }
     try {
       if (company) {
         const { country: _country, ...patch } = body
@@ -218,6 +290,26 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
           </select>
         ))}
         {company && <p className="small text-secondary">{t('org.regime_help')}</p>}
+
+        <fieldset className="cf-grupo">
+          <legend>{t('org.section_profile')}</legend>
+          <p className="small text-secondary">{t('org.profile_help')}</p>
+          {field('locale', t('org.locale'), (
+            <select id="c-locale" className={`form-select${errors.locale ? ' is-invalid' : ''}`} value={form.locale} onChange={set('locale')}>
+              <option value="">{t('org.locale_inherit')}</option>
+              {(['es', 'en', 'pt'] as const).map((l) => <option key={l} value={l}>{t(`org.locale_${l}`)}</option>)}
+            </select>
+          ))}
+          {field('tax_regime', t('org.tax_regime'), <input id="c-tax_regime" className={`form-control${errors.tax_regime ? ' is-invalid' : ''}`} value={form.tax_regime} onChange={set('tax_regime')} />)}
+          {field('economic_activity_code', t('org.activity_code'), <input id="c-economic_activity_code" className={`form-control${errors.economic_activity_code ? ' is-invalid' : ''}`} inputMode="numeric" value={form.economic_activity_code} onChange={set('economic_activity_code')} />)}
+          {field('address', t('org.address'), <input id="c-address" className={`form-control${errors.address ? ' is-invalid' : ''}`} value={form.address} onChange={set('address')} autoComplete="street-address" />)}
+          {field('district_code', t('org.district_code'), <input id="c-district_code" className={`form-control${errors.district_code ? ' is-invalid' : ''}`} inputMode="numeric" value={form.district_code} onChange={set('district_code')} aria-describedby="c-district_help" />)}
+          <p id="c-district_help" className="small text-secondary">{t('org.district_help')}</p>
+          {field('legal_representative_name', t('org.legal_rep'), <input id="c-legal_representative_name" className={`form-control${errors.legal_representative_name ? ' is-invalid' : ''}`} value={form.legal_representative_name} onChange={set('legal_representative_name')} />)}
+        </fieldset>
+
+        {company && <LogoField company={company} />}
+
         <CustomFieldsEditor fields={custom.fields} values={customValues} onChange={setCustomValues} errors={errors} />
         {error && <div className="invalid-feedback" role="alert">{error}</div>}
       </form>

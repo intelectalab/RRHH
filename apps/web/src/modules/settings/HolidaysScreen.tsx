@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
@@ -23,9 +24,14 @@ export function HolidaysScreen() {
   const { t, locale } = useT()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
+  // CFG-8: el calendario central enlaza aquí con ?calendario=…&anio=….
+  const params = useSearchParams()
   const [calendars, setCalendars] = useState<Calendar[] | null>(null)
-  const [selected, setSelected] = useState<string | null>(null)
-  const [year, setYear] = useState(new Date().getFullYear())
+  const [selected, setSelected] = useState<string | null>(params.get('calendario'))
+  const [year, setYear] = useState(() => {
+    const y = Number(params.get('anio'))
+    return Number.isInteger(y) && y >= 2000 && y <= 2100 ? y : new Date().getFullYear()
+  })
   const [loadError, setLoadError] = useState(false)
   const [adding, setAdding] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -34,7 +40,7 @@ export function HolidaysScreen() {
     try {
       const res = await api.get<{ data: Calendar[] }>('/holiday-calendars')
       setCalendars(res.data)
-      setSelected((s) => s ?? res.data[0]?.id ?? null)
+      setSelected((s) => (s && res.data.some((c) => c.id === s) ? s : res.data[0]?.id ?? null))
       setLoadError(false)
     } catch {
       setLoadError(true)

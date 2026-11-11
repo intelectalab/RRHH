@@ -6,12 +6,14 @@ import { useT } from '@/lib/useT'
 import { settingsTabs } from '@/modules/identity/settingsTabs'
 import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Access = { id: string; actor_name: string | null; entity: string; entity_id: string; fields: string[]; category: string; channel: string; occurred_at: string }
 
 /** Configuración → Accesos sensibles: lecturas de datos sensibles (regla 7). */
 export function SensitiveAccessScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const [rows, setRows] = useState<Access[] | null>(null)
 
@@ -19,7 +21,7 @@ export function SensitiveAccessScreen() {
     void api.get<{ data: Access[] }>('/sensitive-access-logs?per_page=100').then((r) => setRows(r.data))
   }, [])
 
-  const fmt = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(iso))
+  const fmt = (iso: string) => fmtDT(iso, true)
 
   return (
     <>

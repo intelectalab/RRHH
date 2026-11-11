@@ -29,6 +29,7 @@ const MENU: NavLink[] = [
   { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
   { href: '/aprobaciones', key: 'shell.modules_approvals', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
   { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
+  { href: '/calendario', key: 'shell.modules_calendar', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
 ]
 
 const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'audit.activity.view']

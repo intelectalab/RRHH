@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatDateTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { settingsTabs } from '@/modules/identity/settingsTabs'
 import { useSession } from '@/modules/session/SessionProvider'
@@ -12,6 +11,7 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { categoryLabel } from './shared'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Template = { id: string; key: string; channel: string; locale: string; subject: string | null; body: string; variables: string[]; mandatory: boolean; customized: boolean; default_subject: string; default_body: string }
 type Delivery = { id: string; channel: string; recipient: string | null; recipient_name: string | null; category: string | null; title: string | null; status: string; provider: string | null; attempts: number; error: string | null; sent_at: string | null; created_at: string | null }
@@ -21,6 +21,7 @@ const TONE: Record<string, string> = { sent: 'ok', delivered: 'ok', queued: 'wa'
 /** Configuración → Mensajes (NOT-1): plantillas por tipo, canal e idioma, y registro de envíos. */
 export function MessagesScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
   const [view, setView] = useState<'templates' | 'deliveries'>(can('notifications.templates.view') ? 'templates' : 'deliveries')
@@ -104,7 +105,7 @@ export function MessagesScreen() {
                   {deliveries?.length === 0 && <tr><td colSpan={4}><EmptyState title={t('msgs.d_empty_title')} text={t('msgs.d_empty_text')} /></td></tr>}
                   {deliveries?.map((d) => (
                     <tr key={d.id}>
-                      <td className="nowrap">{formatDateTime(locale, d.sent_at ?? d.created_at)}</td>
+                      <td className="nowrap">{fmtDT(d.sent_at ?? d.created_at)}</td>
                       <td>{d.recipient_name ?? '—'}<span className="sub2">{t(`nchannel.${d.channel}`)} · {d.recipient}</span></td>
                       <td>{d.category ? categoryLabel(t, d.category) : '—'}{d.title && <span className="sub2">{d.title}</span>}</td>
                       <td>

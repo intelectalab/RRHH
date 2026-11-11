@@ -7,9 +7,18 @@ export function formatDate(locale: string, iso: string | null | undefined): stri
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d)
 }
 
-export function formatDateTime(locale: string, iso: string | null | undefined): string {
+/**
+ * Fecha y hora (guardadas en UTC) en la zona indicada, que en la aplicación es la de la empresa
+ * (CFG-2). Una zona inválida no rompe la pantalla: se usa la del navegador.
+ */
+export function formatDateTime(locale: string, iso: string | null | undefined, timeZone?: string | null, seconds = false): string {
   if (!iso) return ''
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+  const options: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: seconds ? 'medium' : 'short' }
+  try {
+    return new Intl.DateTimeFormat(locale, { ...options, ...(timeZone ? { timeZone } : {}) }).format(new Date(iso))
+  } catch {
+    return new Intl.DateTimeFormat(locale, options).format(new Date(iso))
+  }
 }
 
 /** «hace 3 días», «en 2 horas». */

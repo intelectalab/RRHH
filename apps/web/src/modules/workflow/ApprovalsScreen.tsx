@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatDateTime, initials, relativeTime } from '@/lib/format'
+import { initials, relativeTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
@@ -13,10 +13,12 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { notifyInboxChanged, typeLabel, type Approval } from './shared'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 /** Centro de aprobaciones (WFL-4): bandeja única por tipo, detalle, aprobar, rechazar con motivo y lote seguro. */
 export function ApprovalsScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { session, can } = useSession()
   const params = useSearchParams()
   const { toast, node: toastNode } = useToast()
@@ -210,7 +212,7 @@ export function ApprovalsScreen() {
           intent={open.intent}
           onClose={() => setOpen(null)}
           onDone={(msg, id) => { setOpen(null); toast(msg); removeRows([id]) }}
-          formatWhen={(iso) => formatDateTime(locale, iso)}
+          formatWhen={(iso) => fmtDT(iso)}
         />
       )}
       {toastNode}

@@ -365,3 +365,44 @@
 .consola-cifra .card-body { display: flex; flex-direction: column; gap: 4px; }
 .consola-cifra b { font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) { .consola-user { display: none; } }
+
+/* Solo para lectores de pantalla. */
+.vh { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* CFG-2 · Logo de la empresa en su ficha. */
+.logo-campo { display: flex; gap: 16px; align-items: flex-start; }
+.logo-campo .btn { margin: 0 8px 8px 0; }
+.logo-vista { flex: none; width: 72px; height: 72px; border: 1px solid var(--bd); border-radius: var(--r); background: var(--sup2); display: grid; place-items: center; color: var(--tx3); overflow: hidden; }
+.logo-vista img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+/* CFG-8 · Calendario central de RRHH. */
+.cal-barra { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--bd); }
+.cal-barra h2 { font-size: var(--fs-h2); font-weight: 700; margin: 0; text-transform: capitalize; }
+.cal-nav { display: flex; gap: 4px; align-items: center; }
+.cal-fuentes { display: flex; flex-wrap: wrap; gap: 6px; }
+.cal-fuentes button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--bd); background: var(--sup); color: var(--tx); border-radius: 999px; padding: 4px 10px; font-size: var(--fs-s); cursor: pointer; }
+.cal-fuentes button[aria-pressed="false"] { color: var(--tx3); background: transparent; }
+.cal-fuentes button[aria-pressed="false"] .cal-punto { opacity: .35; }
+.cal-punto { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--tx3); }
+.cal-punto.holidays { background: var(--oc); }
+.cal-punto.tasks { background: var(--pe-500); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-dow { padding: 8px; font-size: var(--fs-s); color: var(--tx2); font-weight: 600; border-bottom: 1px solid var(--bd); text-transform: capitalize; }
+.cal-dia { min-height: 108px; padding: 6px; border-right: 1px solid var(--bd); border-bottom: 1px solid var(--bd); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cal-dia:nth-child(7n) { border-right: 0; }
+.cal-dia.fuera { background: var(--sup2); }
+.cal-dia.fuera .cal-num { color: var(--tx3); }
+.cal-num { font-size: var(--fs-s); font-weight: 600; color: var(--tx2); }
+.cal-dia.hoy .cal-num { color: var(--side-hi); background: var(--pe-600); border-radius: 999px; padding: 0 7px; align-self: flex-start; }
+.cal-item { display: flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--tx); text-decoration: none; padding: 2px 4px; border-radius: 4px; min-width: 0; }
+.cal-item:hover, .cal-item:focus-visible { background: var(--sup2); }
+.cal-item span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-item.overdue { color: var(--er); }
+.cal-mas { font-size: 12px; color: var(--tx2); padding: 0 4px; }
+.cal-lista { display: none; }
+@media (max-width: 767px) {
+  .cal-grid, .cal-dow-row { display: none; }
+  .cal-lista { display: block; list-style: none; margin: 0; padding: 0; }
+  .cal-lista > li { padding: 12px 16px; border-bottom: 1px solid var(--bd); }
+  .cal-lista h3 { font-size: var(--fs-s); font-weight: 700; color: var(--tx2); margin: 0 0 6px; text-transform: capitalize; }
+}

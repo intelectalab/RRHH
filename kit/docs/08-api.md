@@ -352,6 +352,9 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/settings/{group}` | `settings.parameters.view` | 0 |
 | PUT | `/settings/{group}` | `settings.parameters.update` | 0 |
 | GET | `/custom-fields/form` | sesión | 0 |
+| GET | `/legal-entities/{id}/logo` | `org.legal_entities.view` | 0 |
+| POST | `/legal-entities/{id}/logo` | `org.legal_entities.update` | 0 |
+| DELETE | `/legal-entities/{id}/logo` | `org.legal_entities.update` | 0 |
 | GET | `/exchange-rates/convert` | `settings.exchange_rates.view` | 0 |
 | GET | `/catalogs` | sesión | 0 |
 | POST | `/catalogs` | `settings.catalogs.update` | 0 |
@@ -361,6 +364,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/catalog-items/{id}/archive` | `settings.catalogs.update` | 0 |
 | POST | `/catalog-items/{id}/reactivate` | `settings.catalogs.update` | 0 |
 | PATCH | `/me/preferences` | sesión | 0 |
+| GET | `/calendar` | `time.calendar.view` | 0 |
 
 **PLT · Plataforma técnica**
 
@@ -597,7 +601,6 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/vacation-requests` | `time.vacation_requests.{view,create}` | 2 |
 | GET, PATCH | `/vacation-requests/{id}` | `time.vacation_requests.{view,update}` | 2 |
 | POST | `/vacation-requests/{id}/{submit,approve,reject,cancel}` | `time.vacation_requests.{submit,approve,reject,cancel}` | 2 |
-| GET | `/calendar` | `time.calendar.view` | 2 |
 
 **AUS · Ausencias y permisos**
 

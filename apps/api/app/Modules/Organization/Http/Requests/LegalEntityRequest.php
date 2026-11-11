@@ -26,7 +26,15 @@ final class LegalEntityRequest extends FormRequest
             'currency' => [$req, 'string', 'size:3'],
             'timezone' => [$req, 'string', 'timezone:all'],
             'payroll_regime' => [$req, 'string', 'max:40'],
+            // CFG-2 · Datos fiscales y de presentación propios de la empresa (sin valor, hereda de la organización).
+            'locale' => ['sometimes', 'nullable', 'string', 'in:es,en,pt'],
+            'tax_regime' => ['sometimes', 'nullable', 'string', 'max:60'],
+            'economic_activity_code' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'address' => ['sometimes', 'nullable', 'string', 'max:300'],
+            'district_code' => ['sometimes', 'nullable', 'string', 'regex:/^[0-9A-Za-z-]{2,12}$/'],
+            'legal_representative_name' => ['sometimes', 'nullable', 'string', 'max:200'],
             'status' => ['prohibited'],
+            'has_logo' => ['prohibited'],
         ];
     }
 }
