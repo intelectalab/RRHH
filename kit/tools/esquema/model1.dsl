@@ -199,7 +199,15 @@
 @audit_events imm main part | Auditoría de negocio de solo inserción (C-07): quién, qué, cuándo, desde dónde, valor anterior y nuevo.
   actor_user_id ?-> users ; actor_kind enum(user,api_token,system,platform_support,ai_assistant)=user ; action text!
   entity_type text! ; entity_id uuid ; before_data j #S ; after_data j #S ; changed_fields text[] ; reason ; ip inet ; user_agent
-  request_id uuid ; occurred_at ts=now ; idx entity_type, entity_id ; idx occurred_at
+  request_id uuid ; occurred_at ts=now ; chain_seq bigint ; prev_hash ; row_hash ; idx entity_type, entity_id ; idx occurred_at ; idx chain_seq
+@audit_chain_heads | Cabeza de la cadena de hash de la auditoría por organización (AUD-5): último número de secuencia y último hash. Solo la escribe el trigger.
+  last_seq bigint=0 ; last_hash ; raw UNIQUE (tenant_id)
+@audit_integrity_checks ao | Resultado de cada verificación programada de la cadena de hash de la auditoría (AUD-5).
+  status enum(ok,failed)! ; checked_rows integer=0 ; archived_rows integer=0 ; unchained_rows integer=0 ; first_seq bigint ; last_seq bigint
+  issues j ; started_at ts! ; finished_at ts ; idx started_at
+@audit_archives | Manifiesto del archivado en frío de la auditoría por mes (AUD-5): rango de la cadena, huella del archivo y plazo de consulta.
+  period_month date! ; from_seq bigint ; to_seq bigint ; row_count integer! ; first_prev_hash ; last_hash ; storage_disk text! ; storage_key text!
+  sha256 text! ; size_bytes bigint ; archived_at ts=now ; purge_after date! ; purged_at ts ; uniq period_month
 @activity_events ao part | Actividad del usuario (navegación y acciones no sensibles), separada de la auditoría y de los logs técnicos.
   user_id ?-> users ; activity text! ; subject_type ; subject_id uuid ; metadata j ; occurred_at ts=now ; idx occurred_at
 @data_access_logs imm part | Registro inalterable de cada acceso a datos sensibles (sueldo, salud, denuncias, sanciones, biometría).

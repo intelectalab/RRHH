@@ -227,6 +227,7 @@ PARAMS = [
  ('gastos.dias_para_rendir', 'expenses', 'Días para rendir', 'integer', 10, [O, E], 'Días para rendir un anticipo tras el viaje.', None),
  ('gastos.descontar_no_rendido', 'expenses', 'Descontar lo no rendido', 'boolean', False, [O, E], 'El saldo no rendido se descuenta por planilla, con autorización del trabajador.', None),
  ('cumplimiento.aviso_vencimiento_dias', 'compliance', 'Aviso de obligación por vencer', 'integer', 15, [O, E], 'Días de anticipación del semáforo en ámbar.', None),
+ ('privacidad.retencion_actividad_dias', 'base', 'Conservación de la actividad de usuarios (días)', 'integer', 365, [O], 'Días que se conserva la actividad de los usuarios (ingresos, vistas, descargas, búsquedas). No afecta la auditoría ni los logs técnicos.', None),
  ('privacidad.retencion_auditoria_anios', 'compliance', 'Conservación de auditoría (años)', 'integer', 5, [O], 'Años de conservación de la auditoría de negocio.', None),
  ('analitica.tamano_minimo_segmento', 'analytics', 'Tamaño mínimo de segmento', 'integer', 5, [O], 'No se muestran indicadores de segmentos más pequeños.', None),
  ('ia.habilitada', 'ai', 'Asistente de IA habilitado', 'boolean', False, [O], 'Activa la capa de IA; requiere evaluación de impacto aprobada.', None),

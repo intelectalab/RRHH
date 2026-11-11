@@ -29,4 +29,15 @@ return [
     'ignored_attributes' => ['created_at', 'updated_at', 'lock_version', 'password_hash', 'session_hash', 'token_hash', 'identifier_hash', 'identifier_enc', 'remember_token'],
 
     'mask' => '••••',
+
+    /*
+     * AUD-3 / AUD-5 · Retención de los tres registros, cada uno por separado:
+     *  - auditoría de negocio: parámetro privacidad.retencion_auditoria_anios (por organización); pasados
+     *    hot_months meses se archiva en frío (archive_disk) y se sigue consultando hasta cumplir el plazo;
+     *  - actividad de usuarios: parámetro privacidad.retencion_actividad_dias (por organización);
+     *  - logs técnicos: config/logging.php (canal daily, LOG_RETENTION_DAYS), los fija la plataforma.
+     */
+    'hot_months' => (int) env('AUDIT_HOT_MONTHS', 12),
+    'archive_disk' => env('AUDIT_ARCHIVE_DISK', env('FILESYSTEM_DISK', 's3')),
+    'archive_prefix' => 'audit-archives',
 ];

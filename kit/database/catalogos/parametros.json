@@ -965,6 +965,18 @@
       "opciones": null
     },
     {
+      "codigo": "privacidad.retencion_actividad_dias",
+      "modulo": "base",
+      "nombre": "Conservación de la actividad de usuarios (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 365,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Días que se conserva la actividad de los usuarios (ingresos, vistas, descargas, búsquedas). No afecta la auditoría ni los logs técnicos.",
+      "opciones": null
+    },
+    {
       "codigo": "privacidad.retencion_auditoria_anios",
       "modulo": "compliance",
       "nombre": "Conservación de auditoría (años)",

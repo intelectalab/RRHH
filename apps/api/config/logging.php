@@ -4,6 +4,7 @@ use App\Shared\Logging\RequestContextProcessor;
 use App\Shared\Logging\SensitiveDataScrubber;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
@@ -27,6 +28,19 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
+        ],
+
+        /*
+         * AUD-3 · Logs técnicos con retención propia (días), distinta de la auditoría y de la
+         * actividad de usuarios. Sin datos personales: SensitiveDataScrubber los oculta.
+         */
+        'daily' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => RotatingFileHandler::class,
+            'with' => ['filename' => storage_path('logs/laravel.log'), 'maxFiles' => (int) env('LOG_RETENTION_DAYS', 14)],
+            'days' => (int) env('LOG_RETENTION_DAYS', 14),
+            'processors' => [PsrLogMessageProcessor::class, RequestContextProcessor::class, SensitiveDataScrubber::class],
         ],
 
         'stderr' => [

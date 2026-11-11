@@ -323,6 +323,47 @@ CREATE INDEX ix_help_articles_search ON help_articles USING gin (search_vector);
 CREATE INDEX ix_kb_articles_search ON kb_articles USING gin (search_vector);
 
 -- ====================================================================================================
+-- CADENA DE HASH DE LA AUDITORÍA (AUD-5)
+-- Cada entrada de audit_events recibe, al insertarse, su número de secuencia por organización, el hash
+-- de la entrada anterior y su propio hash (sha256 de sus campos + el hash anterior). Alterar o borrar
+-- una entrada (aun saltándose el trigger de inalterabilidad) rompe la cadena y lo detecta
+-- audit:verify-integrity. La cabeza de la cadena solo la escribe el trigger (SECURITY DEFINER).
+-- ====================================================================================================
+CREATE OR REPLACE FUNCTION audit_event_hash(p_tenant uuid, p_seq bigint, p_prev text, p_id uuid, p_occurred timestamptz,
+  p_actor uuid, p_kind text, p_action text, p_entity_type text, p_entity_id uuid, p_before jsonb, p_after jsonb,
+  p_fields text[], p_reason text, p_ip inet, p_user_agent text, p_request uuid) RETURNS text
+LANGUAGE sql IMMUTABLE
+AS $$
+  SELECT encode(sha256(convert_to(concat_ws(chr(31),
+    p_tenant::text, p_seq::text, coalesce(p_prev, ''), p_id::text, ((extract(epoch FROM p_occurred) * 1000000)::bigint)::text,
+    coalesce(p_actor::text, ''), coalesce(p_kind, ''), coalesce(p_action, ''), coalesce(p_entity_type, ''), coalesce(p_entity_id::text, ''),
+    coalesce(p_before::text, ''), coalesce(p_after::text, ''), coalesce(array_to_string(p_fields, chr(30)), ''),
+    coalesce(p_reason, ''), coalesce(host(p_ip), ''), coalesce(p_user_agent, ''), coalesce(p_request::text, '')), 'UTF8')), 'hex')
+$$;
+COMMENT ON FUNCTION audit_event_hash(uuid, bigint, text, uuid, timestamptz, uuid, text, text, text, uuid, jsonb, jsonb, text[], text, inet, text, uuid) IS 'Hash sha256 de una entrada de auditoría encadenada a la anterior (AUD-5).';
+
+CREATE OR REPLACE FUNCTION audit_events_chain() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_seq bigint;
+  v_prev text;
+BEGIN
+  INSERT INTO audit_chain_heads (tenant_id, last_seq) VALUES (NEW.tenant_id, 0) ON CONFLICT (tenant_id) DO NOTHING;
+  SELECT last_seq, last_hash INTO v_seq, v_prev FROM audit_chain_heads WHERE tenant_id = NEW.tenant_id FOR UPDATE;
+  NEW.chain_seq := v_seq + 1;
+  NEW.prev_hash := v_prev;
+  NEW.row_hash := audit_event_hash(NEW.tenant_id, NEW.chain_seq, NEW.prev_hash, NEW.id, NEW.occurred_at, NEW.actor_user_id, NEW.actor_kind,
+    NEW.action, NEW.entity_type, NEW.entity_id, NEW.before_data, NEW.after_data, NEW.changed_fields, NEW.reason, NEW.ip, NEW.user_agent, NEW.request_id);
+  UPDATE audit_chain_heads SET last_seq = NEW.chain_seq, last_hash = NEW.row_hash, updated_at = now() WHERE tenant_id = NEW.tenant_id;
+  RETURN NEW;
+END
+$$;
+COMMENT ON FUNCTION audit_events_chain() IS 'Encadena cada entrada nueva de audit_events (secuencia, hash anterior y hash propio) y avanza la cabeza de la organización.';
+REVOKE ALL ON FUNCTION audit_events_chain() FROM PUBLIC;
+CREATE TRIGGER trg_audit_events_chain BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION audit_events_chain();
+
+-- ====================================================================================================
 -- PRIVILEGIOS
 -- ====================================================================================================
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
@@ -343,6 +384,10 @@ REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
 REVOKE UPDATE, DELETE ON {{IMMUTABLE}} FROM gestia_app, gestia_platform;
+-- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
+-- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
+REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;
+REVOKE UPDATE, DELETE ON audit_archives, audit_integrity_checks FROM gestia_app;
 
 -- Tablas de registro particionadas por mes (decisión A-06): se crean el mes en curso y los tres
 -- siguientes. Las particiones no tienen privilegios propios: solo se accede por la tabla madre.

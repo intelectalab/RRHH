@@ -79,6 +79,9 @@ final class DomainEventTypes
 
     public const TASK_OVERDUE = 'task.overdue.v1';
 
+    // Auditoría (AUD-5)
+    public const AUDIT_INTEGRITY_FAILED = 'audit.integrity_failed.v1';
+
     // Organización
     public const COMPANY_CREATED = 'company.created.v1';
 
@@ -223,6 +226,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['delivery_id', 'category', 'locale'],
             'description' => 'Entrega de un aviso por canal externo (correo); la dirección va cifrada en la entrega, no en el evento',
+        ],
+        self::AUDIT_INTEGRITY_FAILED => [
+            'version' => 1,
+            'required_fields' => ['check_id', 'issues_count'],
+            'description' => 'La verificación programada encontró entradas de auditoría alteradas o faltantes',
         ],
         self::TASK_ASSIGNED => [
             'version' => 1,

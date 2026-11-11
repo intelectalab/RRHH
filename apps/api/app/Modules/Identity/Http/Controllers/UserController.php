@@ -6,6 +6,7 @@ use App\Modules\Identity\Application\CodeSignIn;
 use App\Modules\Identity\Application\UserService;
 use App\Modules\Identity\Http\Requests\UserRequest;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Shared\Audit\ActivityLogger;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
 use App\Shared\Permissions\EffectivePermissions;
@@ -48,7 +49,11 @@ final class UserController
 
     public function show(string $id): JsonResponse
     {
-        return $this->respond($this->find($id));
+        $user = $this->find($id);
+        // AUD-3: la vista de la ficha va a la actividad del usuario (no a la auditoría).
+        app(ActivityLogger::class)->record('record.viewed', 'user', $user->id);
+
+        return $this->respond($user);
     }
 
     public function store(UserRequest $request): JsonResponse
