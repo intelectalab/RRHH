@@ -6,8 +6,8 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 63 | 6 | 26,1 % |
-| Backlog completo | 512 | 63 | 6 | 12,3 % |
+| Primer corte comercial (MVP) | 241 | 64 | 6 | 26,6 % |
+| Backlog completo | 512 | 64 | 6 | 12,5 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -168,7 +168,7 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 | MSS-2 | Mi equipo | MSS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | MSS-3 | Aprobaciones y solicitudes del equipo | MSS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | MSS-4 | Fechas clave y alertas del equipo | MSS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| IMP-1 | Motor de importación | IMP | Fase 1 · Core HR | Task | sí | pendiente | — |  |
+| IMP-1 | Motor de importación | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-11 | Motor por pasos: CSV (detecta separador y codificación) o Excel, mapeo propuesto y guardable, validación con vista previa sin escribir (RN-IMP-01), política de errores por parámetro (RN-IMP-02), columnas sensibles ignoradas sin permiso (RN-IMP-04), aviso de archivo repetido (RN-IMP-08), importación en segundo plano por lotes transaccionales, deshacer con bloqueos explicados (RN-IMP-07) y descarga de filas con error; primer importador: empresas; pantalla Configuración → Importar datos. Pendiente: importadores de Core HR (IMP-2), crear faltantes (RN-IMP-03) e históricos (RN-IMP-05). |
 | IMP-2 | Importadores de Core HR | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | IMP-3 | Asistente de primeros pasos | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | IMP-4 | Plantillas peruanas listas para usar | IMP | Fase 1 · Core HR | Task | sí | pendiente | — |  |
