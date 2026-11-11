@@ -21,11 +21,11 @@ export class ApiRequestError extends Error {
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 
-/** Lee la cookie XSRF-TOKEN emitida por la API al iniciar sesión (doble envío). */
-export function readXsrfToken(cookieString: string): string | null {
+/** Lee la cookie XSRF emitida por la API al iniciar sesión (doble envío). La consola SaaS usa la suya. */
+export function readXsrfToken(cookieString: string, cookieName = 'XSRF-TOKEN'): string | null {
   for (const part of cookieString.split(';')) {
     const [name, ...rest] = part.trim().split('=')
-    if (name === 'XSRF-TOKEN') return decodeURIComponent(rest.join('='))
+    if (name === cookieName) return decodeURIComponent(rest.join('='))
   }
   return null
 }
@@ -39,6 +39,7 @@ export class ApiClient {
     private readonly baseUrl: string = '/api/v1',
     private readonly fetcher: typeof fetch = (...args) => fetch(...args),
     private readonly cookies: () => string = () => (typeof document === 'undefined' ? '' : document.cookie),
+    private readonly xsrfCookie: string = 'XSRF-TOKEN',
   ) {}
 
   async get<T>(endpoint: string, init?: RequestInit): Promise<T> {
@@ -92,7 +93,7 @@ export class ApiClient {
     }
 
     if (!SAFE_METHODS.has(method)) {
-      const xsrf = readXsrfToken(this.cookies())
+      const xsrf = readXsrfToken(this.cookies(), this.xsrfCookie)
       if (xsrf) headers['X-XSRF-TOKEN'] = xsrf
     }
 

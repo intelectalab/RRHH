@@ -354,3 +354,14 @@
 .cat-cab h2 { font-size: var(--fs-h2); font-weight: 700; margin: 0; }
 @media (max-width: 1000px) { .cat-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
 .codigo-grande {font-family: var(--fuente-mono); font-size: 32px; font-weight: 700; letter-spacing: .12em; margin: 16px 0 8px; color: var(--tx); }
+
+/* Consola de la plataforma (SAS-1, docs/10 §3.12): mismo armazón sin barra lateral */
+.consola { min-height: 100dvh; display: flex; flex-direction: column; }
+.consola-logo { display: inline-flex; flex: none; width: 32px; height: 32px; }
+.consola-logo svg { width: 100%; height: 100%; }
+.consola-user { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+.consola-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.consola-cifras .card { margin-bottom: 0; }
+.consola-cifra .card-body { display: flex; flex-direction: column; gap: 4px; }
+.consola-cifra b { font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .consola-user { display: none; } }

@@ -20,6 +20,11 @@ final class VerifyXsrfToken
             return $next($request);
         }
 
+        // La consola SaaS verifica su propia cookie y su propio token (SAS-1).
+        if (str_starts_with($request->path(), 'api/v1/platform/')) {
+            return $next($request);
+        }
+
         $sessionToken = $request->cookie((string) config('identity.session_cookie'));
         if (! is_string($sessionToken) || $sessionToken === '') {
             return $next($request); // sin cookie de sesión no hay CSRF que proteger

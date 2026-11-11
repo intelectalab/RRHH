@@ -28,6 +28,8 @@ final class ResolveTenantContext
      */
     private array $exemptPrefixes = [
         'api/v1/health',
+        // SAS-1: la consola opera fuera de toda organización (desde un host de organización responde 404).
+        'api/v1/platform/',
         'api/documentation',
         'docs',
         'up',
