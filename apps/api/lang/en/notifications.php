@@ -34,6 +34,14 @@ return [
             'in_app' => ['subject' => 'Overdue task', 'body' => '{title} was due on {due_on}.'],
             'email' => ['subject' => 'You have an overdue task', 'body' => "Hi {name},\n\nThe task “{title}” was due on {due_on}.\n\nOpen it here: {link}"],
         ],
+        'automation.notice' => [
+            'in_app' => ['subject' => '{title}', 'body' => '{message}'],
+            'email' => ['subject' => '{title}', 'body' => "Hi {name},\n\n{message}\n\nMore details here: {link}"],
+        ],
+        'automation.paused' => [
+            'in_app' => ['subject' => 'An automation paused itself', 'body' => 'The rule “{rule}” was paused because it ran too many times in a row. Review it before turning it back on.'],
+            'email' => ['subject' => 'An automation paused itself', 'body' => "Hi {name},\n\nThe automation rule “{rule}” paused itself because it ran too many times in one hour (possible loop). Review it before turning it back on.\n\nOpen it here: {link}"],
+        ],
         'account.security' => [
             'in_app' => ['subject' => 'Account security notice', 'body' => '{event}'],
             'email' => ['subject' => 'Account security notice', 'body' => "Hi {name},\n\n{event}\n\nIf this was not you, contact HR right away."],

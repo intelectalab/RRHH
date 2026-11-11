@@ -180,6 +180,8 @@ PARAMS = [
  ('aprobaciones.recordatorio_horas', 'base', 'Recordatorio de aprobación', 'integer', 24, [O], 'Horas tras las que se recuerda una aprobación pendiente.', None),
  ('aprobaciones.escalar_horas', 'base', 'Escalamiento de aprobación', 'integer', 72, [O], 'Horas tras las que una aprobación pendiente sube al siguiente nivel.', None),
  ('aprobaciones.permitir_masivas', 'base', 'Aprobaciones masivas', 'boolean', True, [O], 'Permite aprobar varias solicitudes a la vez cuando el tipo lo admite.', None),
+ ('automatizaciones.max_ejecuciones_hora', 'base', 'Ejecuciones por hora de una regla', 'integer', 100, [O], 'Ejecuciones de una misma regla en una hora a partir de las cuales se pausa sola y se avisa al administrador (protección contra bucles, RN-WFL-11).', {'min': 10, 'max': 10000}),
+ ('automatizaciones.reintentos', 'base', 'Reintentos de una acción fallida', 'integer', 3, [O], 'Veces que se reintenta automáticamente una ejecución fallida antes de dejarla para revisión manual (RN-WFL-10).', {'min': 0, 'max': 10}),
  ('notificaciones.canales_activos', 'base', 'Canales de notificación', 'list', ['in_app', 'email'], [O], 'Canales habilitados para la organización.', ['in_app', 'email', 'push', 'whatsapp', 'sms']),
  ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'time', None, [O], 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', None),
  ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'time', None, [O], 'Hora local en que se entregan los avisos que esperaron por el silencio.', None),

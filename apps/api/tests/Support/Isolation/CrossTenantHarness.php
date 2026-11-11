@@ -7,6 +7,8 @@ use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
 use App\Modules\Settings\Infrastructure\Models\TenantSetting;
+use App\Modules\Workflow\Infrastructure\Models\AutomationRule;
+use App\Modules\Workflow\Infrastructure\Models\AutomationRun;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +43,9 @@ final class CrossTenantHarness
         'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
+        // WFL-5 · Las reglas y su centro de ejecuciones usan el contrato Workflow / WorkflowRun.
+        'Workflow' => AutomationRule::class,
+        'WorkflowRun' => AutomationRun::class,
     ];
 
     /**

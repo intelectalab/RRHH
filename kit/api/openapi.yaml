@@ -35465,6 +35465,24 @@ paths:
       x-phase: 0
       x-permission: workflow.workflows.create
       operationId: postWorkflows
+  /workflows/catalog:
+    get:
+      summary: 'Catálogo para armar reglas: eventos disparadores con sus campos, operadores de condición y la lista cerrada
+        de acciones (WFL-5)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - WFL
+      x-phase: 0
+      x-permission: workflow.workflows.view
+      operationId: getWorkflowsCatalog
   /workflows/{id}:
     get:
       summary: Ver Workflow
@@ -35651,6 +35669,40 @@ paths:
       x-phase: 0
       x-permission: workflow.workflows.retire
       operationId: postWorkflowsIdRetire
+  /workflows/{id}/test:
+    post:
+      summary: 'Probar una regla en seco con datos de ejemplo: si se cumple y qué haría cada acción, sin efectos (WFL-5)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - WFL
+      x-phase: 0
+      x-permission: workflow.workflows.update
+      operationId: postWorkflowsIdTest
 components:
   securitySchemes:
     sessionCookie:
@@ -44279,8 +44331,10 @@ components:
       - id
       - name
       - trigger_event
-      - graph
+      - conditions
+      - actions
       - status
+      - allowed_actions
       - version
       properties:
         id:
@@ -44290,9 +44344,12 @@ components:
           type: string
         trigger_event: &id860
           type: string
-        graph: &id861
+        conditions: &id861
           type: object
           additionalProperties: true
+        actions: &id862
+          type: array
+          items: *id346
         status:
           type: string
           enum:
@@ -44300,6 +44357,13 @@ components:
           - active
           - paused
           - retired
+        allowed_actions: &id863
+          type: array
+          items: *id034
+        last_run_at: &id864
+          type: string
+          format: date-time
+          nullable: true
         version:
           type: integer
         created_at:
@@ -44313,13 +44377,19 @@ components:
       properties:
         name: *id859
         trigger_event: *id860
-        graph: *id861
+        conditions: *id861
+        actions: *id862
+        allowed_actions: *id863
+        last_run_at: *id864
     WorkflowRun:
       type: object
       required:
       - id
       - workflow_id
       - status
+      - attempts
+      - actions
+      - allowed_actions
       - started_at
       properties:
         id:
@@ -44328,14 +44398,38 @@ components:
         workflow_id:
           type: string
           description: Identificador opaco
+        workflow_name:
+          type: string
+          nullable: true
+        trigger_event_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        event_type:
+          type: string
+          nullable: true
         status:
           type: string
           enum:
           - running
-          - waiting
-          - completed
+          - succeeded
           - failed
+          - skipped
+          - queued
+          - waiting
           - cancelled
+        attempts:
+          type: integer
+        next_retry_at:
+          type: string
+          format: date-time
+          nullable: true
+        actions:
+          type: array
+          items: *id346
+        allowed_actions:
+          type: array
+          items: *id034
         started_at:
           type: string
           format: date-time

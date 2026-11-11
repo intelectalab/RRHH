@@ -14089,6 +14089,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/workflows/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catálogo para armar reglas: eventos disparadores con sus campos, operadores de condición y la lista cerrada de acciones (WFL-5) */
+        get: operations["getWorkflowsCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workflows/{id}": {
         parameters: {
             query?: never;
@@ -14161,6 +14178,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postWorkflowsIdRetire"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workflows/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Probar una regla en seco con datos de ejemplo: si se cumple y qué haría cada acción, sin efectos (WFL-5) */
+        post: operations["postWorkflowsIdTest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -19062,11 +19096,17 @@ export interface components {
             id: string;
             name: string;
             trigger_event: string;
-            graph: {
+            conditions: {
                 [key: string]: unknown;
             };
+            actions: {
+                [key: string]: unknown;
+            }[];
             /** @enum {string} */
             status: "draft" | "active" | "paused" | "retired";
+            allowed_actions: string[];
+            /** Format: date-time */
+            last_run_at?: string | null;
             version: number;
             /** Format: date-time */
             created_at?: string;
@@ -19076,17 +19116,34 @@ export interface components {
         WorkflowInput: {
             name?: string;
             trigger_event?: string;
-            graph?: {
+            conditions?: {
                 [key: string]: unknown;
             };
+            actions?: {
+                [key: string]: unknown;
+            }[];
+            allowed_actions?: string[];
+            /** Format: date-time */
+            last_run_at?: string | null;
         };
         WorkflowRun: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
             workflow_id: string;
+            workflow_name?: string | null;
+            /** @description Identificador opaco */
+            trigger_event_id?: string | null;
+            event_type?: string | null;
             /** @enum {string} */
-            status: "running" | "waiting" | "completed" | "failed" | "cancelled";
+            status: "running" | "succeeded" | "failed" | "skipped" | "queued" | "waiting" | "cancelled";
+            attempts: number;
+            /** Format: date-time */
+            next_retry_at?: string | null;
+            actions: {
+                [key: string]: unknown;
+            }[];
+            allowed_actions: string[];
             /** Format: date-time */
             started_at: string;
             /** Format: date-time */
@@ -54901,6 +54958,28 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getWorkflowsCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getWorkflowsId: {
         parameters: {
             query?: {
@@ -55076,6 +55155,41 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postWorkflowsIdTest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
 }

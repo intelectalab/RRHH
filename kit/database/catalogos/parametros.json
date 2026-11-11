@@ -317,6 +317,36 @@
       "opciones": null
     },
     {
+      "codigo": "automatizaciones.max_ejecuciones_hora",
+      "modulo": "base",
+      "nombre": "Ejecuciones por hora de una regla",
+      "tipo": "integer",
+      "valor_por_defecto": 100,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Ejecuciones de una misma regla en una hora a partir de las cuales se pausa sola y se avisa al administrador (protección contra bucles, RN-WFL-11).",
+      "opciones": {
+        "min": 10,
+        "max": 10000
+      }
+    },
+    {
+      "codigo": "automatizaciones.reintentos",
+      "modulo": "base",
+      "nombre": "Reintentos de una acción fallida",
+      "tipo": "integer",
+      "valor_por_defecto": 3,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Veces que se reintenta automáticamente una ejecución fallida antes de dejarla para revisión manual (RN-WFL-10).",
+      "opciones": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    {
       "codigo": "notificaciones.canales_activos",
       "modulo": "base",
       "nombre": "Canales de notificación",

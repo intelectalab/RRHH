@@ -34,6 +34,14 @@ return [
             'in_app' => ['subject' => 'Tarea vencida', 'body' => '{title} venció el {due_on}.'],
             'email' => ['subject' => 'Tienes una tarea vencida', 'body' => "Hola {name}:\n\nLa tarea «{title}» venció el {due_on}.\n\nÁbrela aquí: {link}"],
         ],
+        'automation.notice' => [
+            'in_app' => ['subject' => '{title}', 'body' => '{message}'],
+            'email' => ['subject' => '{title}', 'body' => "Hola {name}:\n\n{message}\n\nMás detalle aquí: {link}"],
+        ],
+        'automation.paused' => [
+            'in_app' => ['subject' => 'Una automatización se pausó sola', 'body' => 'La regla «{rule}» se pausó porque se ejecutó demasiadas veces seguidas. Revísala antes de reactivarla.'],
+            'email' => ['subject' => 'Una automatización se pausó sola', 'body' => "Hola {name}:\n\nLa regla de automatización «{rule}» se pausó sola porque se ejecutó demasiadas veces en una hora (posible bucle). Revísala antes de reactivarla.\n\nÁbrela aquí: {link}"],
+        ],
         'account.security' => [
             'in_app' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => '{event}'],
             'email' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => "Hola {name}:\n\n{event}\n\nSi no fuiste tú, avisa a RRHH de inmediato."],
