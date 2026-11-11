@@ -7,6 +7,7 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { useToast } from '@/ui/components/Toast'
+import { RoleMfaControl } from './RoleMfaControl'
 import { settingsTabs } from './settingsTabs'
 
 type Role = Schema<'Role'> & { code?: string; description?: string | null; version?: number }
@@ -158,6 +159,7 @@ export function RolesScreen() {
                   <select id="r-scope" className="form-select" style={{ maxWidth: 320 }} disabled={!editable} value={draft.scope} onChange={(e) => setDraft({ ...draft, scope: e.target.value as Scope })}>
                     {SCOPES.map((s) => <option key={s} value={s}>{t(`roles.scope_${s}`)}</option>)}
                   </select>
+                  <RoleMfaControl key={`${draft.id}-${String(draft.mfa_required)}`} roleId={draft.id} required={draft.mfa_required === true} canChange={can('identity.security_policies.update')} onChanged={(msg) => { toast(msg); void load(draft.id) }} />
                 </div>
                 {byModule.map(([module, perms]) => (
                   <div key={module} className="modulo-permisos">

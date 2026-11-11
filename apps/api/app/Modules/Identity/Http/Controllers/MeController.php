@@ -2,9 +2,11 @@
 
 namespace App\Modules\Identity\Http\Controllers;
 
+use App\Modules\Identity\Application\Mfa\MfaService;
 use App\Modules\Identity\Application\RoleScopes;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Identity\Infrastructure\Models\UserSession;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use Illuminate\Http\JsonResponse;
@@ -17,14 +19,18 @@ use Illuminate\Support\Facades\DB;
  */
 final class MeController
 {
-    public function __invoke(Request $request, PermissionResolver $resolver, ModuleGate $modules): JsonResponse
+    public function __invoke(Request $request, PermissionResolver $resolver, ModuleGate $modules, MfaService $mfa): JsonResponse
     {
         /** @var User $user */
         $user = $request->user();
-        $effective = $resolver->for($user->id);
+        $session = $request->attributes->get('ayni_session');
+        $mfaStep = $mfa->sessionStatus($user, $session instanceof UserSession ? $session : null);
         $tenant = DB::table('current_tenant')->first(['id', 'slug', 'name', 'default_locale', 'timezone', 'default_currency']);
+        // SEG-3: con el segundo paso pendiente no se entregan roles, permisos ni módulos.
+        $pending = $mfaStep !== 'ok';
+        $effective = $resolver->for($user->id);
 
-        $roles = Role::query()
+        $roles = $pending ? collect() : Role::query()
             ->whereIn('id', $user->roleAssignments()->pluck('role_id'))
             ->orderBy('name')
             ->get(['id', 'code', 'name', 'is_system']);
@@ -36,6 +42,7 @@ final class MeController
                 'locale' => $user->locale ?? $tenant?->default_locale,
                 'timezone' => $user->timezone ?? $tenant?->timezone,
                 'must_change_password' => $user->must_change_password,
+                'mfa_step' => $mfaStep,
             ],
             'tenant' => $tenant === null ? null : [
                 'id' => $tenant->id,
@@ -44,10 +51,10 @@ final class MeController
                 'currency' => $tenant->default_currency,
             ],
             'roles' => $roles->map(fn (Role $r) => ['id' => $r->id, 'code' => $r->code, 'name' => $r->name, 'system' => $r->is_system])->all(),
-            'permissions' => array_keys($effective->actions),
-            'field_permissions' => array_keys($effective->fields),
-            'scopes' => array_map(fn (string $s) => RoleScopes::toApi($s), $effective->actions + $effective->fields),
-            'modules' => $modules->activeModules(),
+            'permissions' => $pending ? [] : array_keys($effective->actions),
+            'field_permissions' => $pending ? [] : array_keys($effective->fields),
+            'scopes' => $pending ? [] : array_map(fn (string $s) => RoleScopes::toApi($s), $effective->actions + $effective->fields),
+            'modules' => $pending ? [] : $modules->activeModules(),
         ]]);
     }
 }

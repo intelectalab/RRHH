@@ -3465,7 +3465,7 @@ paths:
       operationId: postAuthLogout
   /auth/mfa/verify:
     post:
-      summary: Verificar segundo factor
+      summary: 'Segundo paso del ingreso: código de la aplicación autenticadora o código de respaldo'
       requestBody:
         required: true
         content:
@@ -3482,14 +3482,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
         '400': *id001
+        '401': *id002
+        '403': *id003
         '422': *id007
         '429': *id004
       tags:
       - SEG
       x-phase: 0
-      x-permission: public
+      x-permission: authenticated
       operationId: postAuthMfaVerify
-      security: []
   /auth/otp:
     post:
       summary: Solicitar o verificar un código de un solo uso
@@ -16410,6 +16411,135 @@ paths:
       x-phase: 1
       x-permission: authenticated
       operationId: getMeHome
+  /me/mfa:
+    get:
+      summary: Estado del segundo factor del usuario actual (activo, exigido, códigos de respaldo restantes, paso pendiente)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: getMeMfa
+  /me/mfa/disable:
+    post:
+      summary: Desactivar el segundo factor (exige la clave, auditado; no procede si un rol lo exige)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMeMfaDisable
+  /me/mfa/recovery-codes:
+    post:
+      summary: Generar códigos de respaldo nuevos (exige la clave; invalida los anteriores)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMeMfaRecoveryCodes
+  /me/mfa/totp:
+    post:
+      summary: Iniciar la configuración de la aplicación autenticadora (secreto y URI otpauth)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMeMfaTotp
+  /me/mfa/totp/confirm:
+    post:
+      summary: Confirmar la aplicación autenticadora con un código; devuelve los códigos de respaldo una sola vez
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMeMfaTotpConfirm
   /me/password:
     post:
       summary: Cambiar la propia clave (exige la actual, aplica la política y cierra las demás sesiones)
@@ -24704,6 +24834,40 @@ paths:
       x-phase: 0
       x-permission: identity.roles.duplicate
       operationId: postRolesIdDuplicate
+  /roles/{id}/mfa-requirement:
+    post:
+      summary: Exigir o no el segundo factor a quienes tengan el rol (RN-SEG-08, con motivo, auditado)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: identity.security_policies.update
+      operationId: postRolesIdMfaRequirement
   /salary-advances:
     get:
       summary: Listar SalaryAdvance
@@ -39669,6 +39833,9 @@ components:
           type: string
         system: &id594
           type: boolean
+        mfa_required:
+          type: boolean
+          nullable: true
         permissions: &id595
           type: array
           items: *id034

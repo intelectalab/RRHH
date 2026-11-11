@@ -31,6 +31,8 @@ beforeEach(function (): void {
 
         return $u;
     });
+    // Estas pruebas no cubren el segundo factor (SEG-3, MfaTest): el rol administrador no lo exige aquí.
+    TenancyScope::runAs(SP_TENANT, fn () => DB::table('roles')->where('system_role_code', 'admin_empresa')->update(['mfa_required' => false]));
     $this->admin = TenancyScope::runAs(SP_TENANT, function (): User {
         $u = User::factory()->withPassword(SP_PASSWORD)->withEmail('admin@andes.pe')->create();
         $u->roleAssignments()->create(['role_id' => Role::query()->where('system_role_code', 'admin_empresa')->value('id')]);

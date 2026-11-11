@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Http\Middleware\EnsureSecondFactor;
 use App\Modules\Identity\Http\Middleware\VerifyXsrfToken;
 use App\Shared\Commands\EnvironmentCheckCommand;
 use App\Shared\Commands\GenerateDataDictionaryCommand;
@@ -55,6 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(append: [
             VerifyXsrfToken::class,
+            EnsureSecondFactor::class,
             'throttle:ayni-api',
         ]);
     })

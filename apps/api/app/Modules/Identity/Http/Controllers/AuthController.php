@@ -5,6 +5,7 @@ namespace App\Modules\Identity\Http\Controllers;
 use App\Modules\Identity\Application\Actions\LoginWithPassword;
 use App\Modules\Identity\Application\Actions\RequestPasswordReset;
 use App\Modules\Identity\Application\Actions\ResetPassword;
+use App\Modules\Identity\Application\Mfa\MfaService;
 use App\Modules\Identity\Application\SessionManager;
 use App\Modules\Identity\Application\UserService;
 use App\Modules\Identity\Http\Requests\ForgotPasswordRequest;
@@ -18,7 +19,10 @@ use Illuminate\Http\Request;
 
 final class AuthController
 {
-    public function __construct(private readonly SessionManager $sessions) {}
+    public function __construct(
+        private readonly SessionManager $sessions,
+        private readonly MfaService $mfa,
+    ) {}
 
     public function login(LoginRequest $request, LoginWithPassword $login): JsonResponse
     {
@@ -115,6 +119,8 @@ final class AuthController
                 'id' => $session->id,
                 'expires_at' => $session->expires_at->toIso8601String(),
             ],
+            // SEG-3: ok, verify (pedir el código) o enroll (configurarlo antes de operar).
+            'mfa_step' => $this->mfa->sessionStatus($user, $session),
         ];
     }
 }

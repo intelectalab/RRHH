@@ -29,6 +29,7 @@ export function UsersScreen() {
   const [creating, setCreating] = useState(false)
   const [suspending, setSuspending] = useState<User | null>(null)
   const [revoking, setRevoking] = useState<User | null>(null)
+  const [resettingMfa, setResettingMfa] = useState<User | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
   // Enlace desde la búsqueda global: /configuracion/usuarios?q=…
@@ -118,7 +119,7 @@ export function UsersScreen() {
                       <td>
                         <div className="who">
                           <div className="min-w-0">
-                            <b>{u.display_name}</b> {self && <span className="tag in">{t('users.you')}</span>}
+                            <b>{u.display_name}</b> {self && <span className="tag in">{t('users.you')}</span>} {u.mfa_enabled && <span className="tag ok" title={t('users.mfa_on_title')}>{t('users.mfa_on')}</span>}
                             <span className="sub2">{u.login}{u.email && u.email !== u.login ? ` · ${u.email}` : ''}</span>
                           </div>
                         </div>
@@ -138,6 +139,9 @@ export function UsersScreen() {
                         )}
                         {u.status === 'active' && can('identity.users.suspend') && !self && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => setRevoking(u)}>{t('users.action_revoke_sessions')}</button>
+                        )}
+                        {u.mfa_enabled && (u.status === 'active' || u.status === 'locked') && can('identity.users.reset_mfa') && !self && (
+                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setResettingMfa(u)}>{t('users.action_reset_mfa')}</button>
                         )}
                         {actions.includes('suspend') && can('identity.users.suspend') && !self && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => setSuspending(u)}>{t('users.action_suspend')}</button>
@@ -185,6 +189,18 @@ export function UsersScreen() {
           onDone={async () => {
             setRevoking(null)
             toast(t('users.done_sessions_revoked'))
+          }}
+        />
+      )}
+      {resettingMfa && (
+        <SuspendPanel
+          mode="reset-mfa"
+          user={resettingMfa}
+          onClose={() => setResettingMfa(null)}
+          onDone={async () => {
+            setResettingMfa(null)
+            toast(t('users.done_mfa_reset'))
+            await load()
           }}
         />
       )}
@@ -261,7 +277,7 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
   )
 }
 
-function SuspendPanel({ user, onClose, onDone, mode = 'suspend' }: { user: User; onClose: () => void; onDone: () => Promise<void>; mode?: 'suspend' | 'revoke' }) {
+function SuspendPanel({ user, onClose, onDone, mode = 'suspend' }: { user: User; onClose: () => void; onDone: () => Promise<void>; mode?: 'suspend' | 'revoke' | 'reset-mfa' }) {
   const { t } = useT()
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
@@ -272,7 +288,7 @@ function SuspendPanel({ user, onClose, onDone, mode = 'suspend' }: { user: User;
     setBusy(true)
     setError(null)
     try {
-      await api.post(`/users/${user.id}/${mode === 'revoke' ? 'revoke-sessions' : 'suspend'}`, { reason })
+      await api.post(`/users/${user.id}/${mode === 'revoke' ? 'revoke-sessions' : mode}`, { reason })
       await onDone()
     } catch (err) {
       setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
@@ -283,16 +299,16 @@ function SuspendPanel({ user, onClose, onDone, mode = 'suspend' }: { user: User;
 
   return (
     <SidePanel
-      title={t(mode === 'revoke' ? 'users.revoke_title' : 'users.suspend_title', { name: user.display_name })}
+      title={t(`users.${mode.replace('-', '_')}_title`, { name: user.display_name })}
       onClose={onClose}
       closeLabel={t('common.close')}
       footer={<>
         <button type="button" className="btn btn-sec" onClick={onClose}>{t('users.cancel')}</button>
-        <button type="submit" form="bloquear-usuario" className="btn btn-primary" disabled={busy}>{t(mode === 'revoke' ? 'users.confirm_revoke' : 'users.confirm_suspend')}</button>
+        <button type="submit" form="bloquear-usuario" className="btn btn-primary" disabled={busy}>{t(`users.confirm_${mode.replace('-', '_')}`)}</button>
       </>}
     >
       <form id="bloquear-usuario" onSubmit={submit} noValidate>
-        <p className="text-secondary mb-3">{t(mode === 'revoke' ? 'users.revoke_text' : 'users.suspend_text')}</p>
+        <p className="text-secondary mb-3">{t(`users.${mode.replace('-', '_')}_text`)}</p>
         <label className="form-label" htmlFor="s-reason">{t('users.reason')}</label>
         <textarea id="s-reason" className="form-control mb-2" rows={3} required value={reason} onChange={(e) => setReason(e.target.value)} />
         {error && <div className="invalid-feedback" role="alert">{error}</div>}

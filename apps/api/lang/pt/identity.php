@@ -33,4 +33,14 @@ return [
         'locked_event' => 'Sua conta foi bloqueada após várias tentativas de acesso com falha. Tente novamente em :minutes minutos ou redefina sua senha.',
         'changed_event' => 'A senha da sua conta foi alterada.',
     ],
+    'mfa' => [
+        'authenticator_label' => 'Aplicativo autenticador',
+        'invalid_code' => 'O código não é válido ou já foi usado.',
+        'mfa_already_enabled' => 'A verificação em duas etapas já está ativa.',
+        'mfa_enrollment_not_started' => 'Primeiro inicie a configuração do aplicativo autenticador.',
+        'mfa_not_enabled' => 'A verificação em duas etapas não está ativa.',
+        'mfa_required_by_policy' => 'Sua função ou organização exige a verificação em duas etapas: não é possível desativá-la.',
+        'enabled_event' => 'A verificação em duas etapas foi ativada na sua conta.',
+        'disabled_event' => 'A verificação em duas etapas foi desativada na sua conta.',
+    ],
 ];

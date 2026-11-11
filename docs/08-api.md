@@ -237,13 +237,19 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/auth/password/reset` | público | 0 |
 | POST | `/auth/invitation/accept` | público | 0 |
 | POST | `/auth/otp` | público | 0 |
-| POST | `/auth/mfa/verify` | público | 0 |
 | POST | `/auth/logout` | sesión | 0 |
 | GET | `/me` | sesión | 0 |
 | GET | `/me/sessions` | sesión | 0 |
 | POST | `/me/sessions/{id}/revoke` | sesión | 0 |
 | POST | `/me/password` | sesión | 0 |
 | POST | `/users/{id}/revoke-sessions` | `identity.users.suspend` | 0 |
+| POST | `/auth/mfa/verify` | sesión | 0 |
+| GET | `/me/mfa` | sesión | 0 |
+| POST | `/me/mfa/totp` | sesión | 0 |
+| POST | `/me/mfa/totp/confirm` | sesión | 0 |
+| POST | `/me/mfa/recovery-codes` | sesión | 0 |
+| POST | `/me/mfa/disable` | sesión | 0 |
+| POST | `/roles/{id}/mfa-requirement` | `identity.security_policies.update` | 0 |
 | GET | `/permissions` | `identity.roles.view` | 0 |
 
 **SAS · Consola SaaS**

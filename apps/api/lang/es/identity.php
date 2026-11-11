@@ -33,4 +33,14 @@ return [
         'locked_event' => 'Tu cuenta se bloqueó por varios intentos fallidos de ingreso. Podrás volver a intentarlo en :minutes minutos o restablecer tu clave.',
         'changed_event' => 'Se cambió la clave de tu cuenta.',
     ],
+    'mfa' => [
+        'authenticator_label' => 'Aplicación autenticadora',
+        'invalid_code' => 'El código no es válido o ya se usó.',
+        'mfa_already_enabled' => 'La verificación en dos pasos ya está activa.',
+        'mfa_enrollment_not_started' => 'Primero inicia la configuración de la aplicación autenticadora.',
+        'mfa_not_enabled' => 'La verificación en dos pasos no está activa.',
+        'mfa_required_by_policy' => 'Tu rol o tu organización exige la verificación en dos pasos: no se puede desactivar.',
+        'enabled_event' => 'Se activó la verificación en dos pasos en tu cuenta.',
+        'disabled_event' => 'Se desactivó la verificación en dos pasos en tu cuenta.',
+    ],
 ];

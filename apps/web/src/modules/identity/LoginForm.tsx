@@ -21,8 +21,9 @@ export function LoginForm() {
     setBusy(true)
     setError(null)
     try {
-      await api.post('/auth/login', { email, password })
-      router.replace('/')
+      const res = await api.post<{ data: { mfa_step?: 'ok' | 'verify' | 'enroll' } }>('/auth/login', { email, password })
+      // SEG-3: con el segundo paso pendiente, primero el código (o configurarlo si el rol lo exige).
+      router.replace(res.data.mfa_step && res.data.mfa_step !== 'ok' ? '/verificacion' : '/')
     } catch (e) {
       // El servidor ya responde un mensaje que no revela si la cuenta existe.
       setError(e instanceof ApiRequestError && e.status === 422 ? e.message : t(authErrorKey(e)))

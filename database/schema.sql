@@ -1050,6 +1050,22 @@ ALTER TABLE user_tokens FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON user_tokens USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_user_tokens_touch BEFORE UPDATE ON user_tokens FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+CREATE TABLE user_mfa_recovery_codes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  user_id uuid NOT NULL,
+  code_hash text NOT NULL,  -- SENSIBLE (HMAC del código; el código solo se muestra una vez)
+  used_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_user_mfa_recovery_codes_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_user_mfa_recovery_codes_user_id FOREIGN KEY (tenant_id, user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE user_mfa_recovery_codes IS 'Códigos de respaldo del segundo factor (SEG-3): de un solo uso, guardados como HMAC.';
+CREATE INDEX ix_user_mfa_recovery_codes_user_id ON user_mfa_recovery_codes (tenant_id, user_id);
+ALTER TABLE user_mfa_recovery_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_mfa_recovery_codes FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON user_mfa_recovery_codes USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+
 CREATE TABLE password_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
@@ -1147,6 +1163,7 @@ CREATE TABLE system_roles (
   name text NOT NULL,
   description text,
   realm text NOT NULL DEFAULT 'tenant' CHECK (realm IN ('platform','tenant')),
+  mfa_required_default boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_system_roles_code UNIQUE (code)
@@ -1195,6 +1212,7 @@ CREATE TABLE roles (
   description text,
   is_system boolean NOT NULL DEFAULT false,
   system_role_code text,
+  mfa_required boolean,  -- SEG-3 · RN-SEG-08: NULL hereda system_roles.mfa_required_default
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -13551,6 +13569,8 @@ INSERT INTO system_roles (code, name, description, realm) VALUES
   ('sst', 'SST', 'Seguridad y salud en el trabajo, equipos de protección y capacitación obligatoria.', 'tenant'),
   ('investigador_denuncias', 'Investigador de denuncias', 'Acceso restringido al canal de denuncias: solo los casos que tiene asignados (complaint_assignments).', 'tenant'),
   ('contador', 'Contador', 'Solo lectura de planilla y asientos; puede exportar asientos contables.', 'tenant');
+-- SEG-3 · RN-SEG-08 · ADR 0009: roles con acceso a datos sensibles traen el segundo factor obligatorio.
+UPDATE system_roles SET mfa_required_default = true WHERE code IN ('superadmin_saas', 'admin_empresa', 'payroll', 'investigador_denuncias');
 INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive, description) VALUES
   ('audit.trash.view', 'base', 'trash', 'view', 'action', false, 'Ver la papelera'),
   ('audit.trash.restore', 'base', 'trash', 'restore', 'action', false, 'Restaurar la papelera'),
@@ -17068,7 +17088,8 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('seguridad.intentos_maximos', 'base', 'Intentos fallidos antes del bloqueo', 'Ingresos fallidos seguidos que bloquean la cuenta temporalmente.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
   ('seguridad.bloqueo_minutos', 'base', 'Duración del bloqueo (minutos)', 'Tiempo que la cuenta queda bloqueada tras superar los intentos.', 'integer', '15'::jsonb, ARRAY['organization'], '{"min": 5, "max": 1440}'::jsonb),
   ('seguridad.sesion_duracion_minutos', 'base', 'Duración máxima de la sesión (minutos)', 'Tiempo tras el cual hay que volver a ingresar aunque se esté usando.', 'integer', '480'::jsonb, ARRAY['organization'], '{"min": 30, "max": 1440}'::jsonb),
-  ('seguridad.inactividad_minutos', 'base', 'Cierre por inactividad (minutos)', 'Minutos sin uso tras los cuales la sesión se cierra.', 'integer', '30'::jsonb, ARRAY['organization'], '{"min": 5, "max": 240}'::jsonb);
+  ('seguridad.inactividad_minutos', 'base', 'Cierre por inactividad (minutos)', 'Minutos sin uso tras los cuales la sesión se cierra.', 'integer', '30'::jsonb, ARRAY['organization'], '{"min": 5, "max": 240}'::jsonb),
+  ('seguridad.mfa_todos', 'base', 'Verificación en dos pasos para todos', 'Exige el segundo factor a todos los usuarios, además de los roles que ya lo exigen.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL);
 
 -- NOT-1 · NOT-6: horario de silencio, avisos obligatorios y retención del centro de notificaciones.
 INSERT INTO parameter_definitions (code, module_code, name, description, data_type, default_value, allowed_scopes, options) VALUES

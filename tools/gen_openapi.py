@@ -63,7 +63,7 @@ RES = [
     ("SAS", 0, "platform.feature_flags", "/platform/feature-flags", "FeatureFlag", "key:s description:s default_on:b rules:j", "LCRU", ""),
     ("SAS", 0, "platform.support_sessions", "/platform/support-sessions", "SupportSession", "tenant_id:id reason:s status:e(requested|granted|ended|denied) expires_at:dt", "LCR", "end"),
     ("SEG", 0, "identity.users", "/users", "User", "person_id?:id login:s display_name:s email?:s status:e(invited|active|locked|alumni|disabled) mfa_enabled:b role_ids:a role_assignments?:ao last_login_at?:dt", "LCRU", "invite suspend reactivate reset-mfa reset-password"),
-    ("SEG", 0, "identity.roles", "/roles", "Role", "name:s system:b permissions:a field_permissions:a scope:e(organization|legal_entity|site|unit|team|self)", "LCRUD", "duplicate"),
+    ("SEG", 0, "identity.roles", "/roles", "Role", "name:s system:b mfa_required?:b permissions:a field_permissions:a scope:e(organization|legal_entity|site|unit|team|self)", "LCRUD", "duplicate"),
     ("SEG", 0, "identity.api_tokens", "/api-tokens", "ApiToken", "name:s scopes:a expires_at?:dt last_used_at?:dt status:e(active|revoked)", "LCR", "revoke"),
     ("AUD", 0, "audit.logs", "/audit-logs", "AuditLog", "actor_id?:id action:s entity:s entity_id:s before?:j after?:j ip?:s occurred_at:dt sensitive:b", "LR", ""),
     ("AUD", 0, "audit.sensitive_access", "/sensitive-access-logs", "SensitiveAccessLog", "actor_id:id entity:s entity_id:s fields:a purpose?:s occurred_at:dt", "L", ""),
@@ -234,13 +234,19 @@ EXTRA = [
     ("SEG", 0, "post", "/auth/password/reset", None, "Restablecer la clave con el enlace de un solo uso", True),
     ("SEG", 0, "post", "/auth/invitation/accept", None, "Activar la cuenta con el enlace de invitación y definir la clave", True),
     ("SEG", 0, "post", "/auth/otp", None, "Solicitar o verificar un código de un solo uso", True),
-    ("SEG", 0, "post", "/auth/mfa/verify", None, "Verificar segundo factor", True),
     ("SEG", 0, "post", "/auth/logout", "-", "Cerrar sesión", False),
     ("SEG", 0, "get", "/me", "-", "Usuario actual, permisos efectivos, alcance y módulos activos", False),
     ("SEG", 0, "get", "/me/sessions", "-", "Sesiones abiertas del usuario actual (dispositivo, IP, último uso) y márgenes de sesión", False),
     ("SEG", 0, "post", "/me/sessions/{id}/revoke", "-", "Cerrar una de las propias sesiones", False),
     ("SEG", 0, "post", "/me/password", "-", "Cambiar la propia clave (exige la actual, aplica la política y cierra las demás sesiones)", False),
     ("SEG", 0, "post", "/users/{id}/revoke-sessions", "identity.users.suspend", "Forzar el cierre de todas las sesiones de un usuario (con motivo, auditado)", False),
+    ("SEG", 0, "post", "/auth/mfa/verify", "-", "Segundo paso del ingreso: código de la aplicación autenticadora o código de respaldo", False),
+    ("SEG", 0, "get", "/me/mfa", "-", "Estado del segundo factor del usuario actual (activo, exigido, códigos de respaldo restantes, paso pendiente)", False),
+    ("SEG", 0, "post", "/me/mfa/totp", "-", "Iniciar la configuración de la aplicación autenticadora (secreto y URI otpauth)", False),
+    ("SEG", 0, "post", "/me/mfa/totp/confirm", "-", "Confirmar la aplicación autenticadora con un código; devuelve los códigos de respaldo una sola vez", False),
+    ("SEG", 0, "post", "/me/mfa/recovery-codes", "-", "Generar códigos de respaldo nuevos (exige la clave; invalida los anteriores)", False),
+    ("SEG", 0, "post", "/me/mfa/disable", "-", "Desactivar el segundo factor (exige la clave, auditado; no procede si un rol lo exige)", False),
+    ("SEG", 0, "post", "/roles/{id}/mfa-requirement", "identity.security_policies.update", "Exigir o no el segundo factor a quienes tengan el rol (RN-SEG-08, con motivo, auditado)", False),
     ("SEG", 0, "get", "/permissions", "identity.roles.view", "Catálogo de permisos y permisos por campo", False),
     ("TEN", 0, "get", "/catalogs/organization", "org.legal_entities.view", "Catálogos para registrar empresas: países, monedas y regímenes laborales", False),
     ("TEN", 0, "get", "/tenant", "settings.organization.view", "Organización actual: datos, plan, módulos y límites", False),
@@ -322,7 +328,7 @@ TYPES = {
     "a": {"type": "array", "items": {"type": "string"}},
     "ao": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
 }
-READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at"}
+READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required"}
 
 
 def parse_fields(spec):

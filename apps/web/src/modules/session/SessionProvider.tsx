@@ -6,7 +6,7 @@ import { api, ApiRequestError } from '@/lib/api'
 
 /** Respuesta de GET /me (el contrato la publica como sobre genérico). */
 export type SessionData = {
-  user: { id: string; display_name: string; locale: string | null; timezone: string | null; must_change_password: boolean }
+  user: { id: string; display_name: string; locale: string | null; timezone: string | null; must_change_password: boolean; mfa_step?: 'ok' | 'verify' | 'enroll' }
   tenant: { id: string; slug: string; name: string; currency: string } | null
   roles: Array<{ id: string; code: string; name: string; system: boolean }>
   permissions: string[]
@@ -35,10 +35,15 @@ export function SessionProvider({ children, fallback }: { children: ReactNode; f
   const load = useCallback(async () => {
     try {
       const res = await api.get<{ data: SessionData }>('/me')
+      // SEG-3: sin el segundo paso no se opera; la pantalla de verificación lo resuelve.
+      if (res.data.user.mfa_step && res.data.user.mfa_step !== 'ok') {
+        router.replace('/verificacion')
+        return
+      }
       setSession(res.data)
     } catch (e) {
       if (e instanceof ApiRequestError && (e.status === 401 || e.status === 400)) {
-        router.replace('/ingresar')
+        router.replace(e.code === 'mfa_required' ? '/verificacion' : '/ingresar')
         return
       }
       throw e

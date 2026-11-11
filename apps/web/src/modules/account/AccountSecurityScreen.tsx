@@ -6,6 +6,7 @@ import { formErrors } from '@/lib/errors'
 import { formatDateTime, relativeTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
+import { MfaCard } from './MfaCard'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
@@ -13,7 +14,7 @@ import { useToast } from '@/ui/components/Toast'
 type SessionRow = { id: string; device: string; ip: string | null; current: boolean; last_seen_at: string | null; created_at: string | null }
 type Data = { sessions: SessionRow[]; idle_minutes: number; lifetime_minutes: number; password_min_length: number }
 
-/** Menú de usuario → Seguridad de la cuenta (SEG-4, SEG-5): sesiones abiertas y cambio de clave. */
+/** Menú de usuario → Seguridad de la cuenta (SEG-3, SEG-4, SEG-5): sesiones, clave y verificación en dos pasos. */
 export function AccountSecurityScreen() {
   const { t, locale } = useT()
   const { session, reload } = useSession()
@@ -94,6 +95,7 @@ export function AccountSecurityScreen() {
               ))}
             </ul>
           </section>
+          <div>
           <section className="bloque-plano">
             <div className="cab"><h2>{t('acct.password')}</h2></div>
             {data && <p className="sub2">{t('acct.password_help', { min: data.password_min_length })}</p>}
@@ -104,6 +106,8 @@ export function AccountSecurityScreen() {
               <button type="submit" className="btn btn-primary" disabled={busy}>{busy && <span className="spin" aria-hidden="true" />}{t('acct.save')}</button>
             </form>
           </section>
+          <MfaCard onToast={(text) => toast(text)} />
+          </div>
         </div>
       </main>
       {toastNode}

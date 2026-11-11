@@ -33,4 +33,14 @@ return [
         'locked_event' => 'Your account was locked after several failed sign-in attempts. You can try again in :minutes minutes or reset your password.',
         'changed_event' => 'Your account password was changed.',
     ],
+    'mfa' => [
+        'authenticator_label' => 'Authenticator app',
+        'invalid_code' => 'The code is not valid or was already used.',
+        'mfa_already_enabled' => 'Two-step verification is already on.',
+        'mfa_enrollment_not_started' => 'Start the authenticator app setup first.',
+        'mfa_not_enabled' => 'Two-step verification is not on.',
+        'mfa_required_by_policy' => 'Your role or organization requires two-step verification: it cannot be turned off.',
+        'enabled_event' => 'Two-step verification was turned on for your account.',
+        'disabled_event' => 'Two-step verification was turned off for your account.',
+    ],
 ];

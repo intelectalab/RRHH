@@ -3,6 +3,7 @@
 use App\Modules\Identity\Http\Controllers\AccountSecurityController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\MeController;
+use App\Modules\Identity\Http\Controllers\MfaController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
 use App\Modules\Identity\Http\Controllers\RoleController;
 use App\Modules\Identity\Http\Controllers\UserController;
@@ -29,6 +30,12 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::get('/me/sessions', [AccountSecurityController::class, 'sessions']);
         Route::post('/me/sessions/{id}/revoke', [AccountSecurityController::class, 'revokeSession']);
         Route::post('/me/password', [AccountSecurityController::class, 'changePassword'])->middleware('throttle:ayni-login');
+        Route::post('/auth/mfa/verify', [MfaController::class, 'verify'])->middleware('throttle:ayni-login');
+        Route::get('/me/mfa', [MfaController::class, 'show']);
+        Route::post('/me/mfa/totp', [MfaController::class, 'startTotp']);
+        Route::post('/me/mfa/totp/confirm', [MfaController::class, 'confirmTotp'])->middleware('throttle:ayni-login');
+        Route::post('/me/mfa/recovery-codes', [MfaController::class, 'regenerateRecoveryCodes'])->middleware('throttle:ayni-login');
+        Route::post('/me/mfa/disable', [MfaController::class, 'disable'])->middleware('throttle:ayni-login');
 
         Route::get('/permissions', PermissionCatalogController::class)->middleware('permission:identity.roles.view');
 
@@ -48,6 +55,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::post('/users/{id}/revoke-sessions', [UserController::class, 'revokeSessions'])->middleware('permission:identity.users.suspend');
         Route::post('/users/{id}/reset-mfa', [UserController::class, 'resetMfa'])->middleware('permission:identity.users.reset_mfa');
 
+        Route::post('/roles/{id}/mfa-requirement', [RoleController::class, 'mfaRequirement'])->middleware('permission:identity.security_policies.update');
         Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->middleware('permission:identity.roles.duplicate');
     });
 });

@@ -85,6 +85,17 @@ final class RoleController
         return $this->respond($role);
     }
 
+    public function mfaRequirement(Request $request, string $id): JsonResponse
+    {
+        $role = $this->find($id);
+        $data = $request->validate([
+            'required' => ['required', 'boolean'],
+            'reason' => ['required', 'string', 'min:5', 'max:500'],
+        ]);
+
+        return $this->respond($this->roles->setMfaRequirement($role, (bool) $data['required'], (string) $data['reason']));
+    }
+
     private function find(string $id): Role
     {
         /** @var Role */

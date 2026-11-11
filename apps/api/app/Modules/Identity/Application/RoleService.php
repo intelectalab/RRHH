@@ -44,6 +44,7 @@ final class RoleService
             'name' => $role->name,
             'description' => $role->description,
             'system' => $role->is_system,
+            'mfa_required' => $this->mfaRequired($role),
             'permissions' => $grants->where('kind', 'action')->pluck('permission_code')->values()->all(),
             'field_permissions' => $grants->where('kind', 'field')->pluck('permission_code')->values()->all(),
             'scope' => RoleScopes::toApi((string) ($scopes->keys()->first() ?? 'organization')),
@@ -111,6 +112,29 @@ final class RoleService
 
             return $role;
         });
+    }
+
+    /**
+     * SEG-3 · RN-SEG-08: exigir (o no) el segundo factor a quienes tengan el rol. Vale también para
+     * los roles de sistema, que por lo demás no se editan. Las sesiones abiertas lo piden en su próxima petición.
+     */
+    public function setMfaRequirement(Role $role, bool $required, ?string $reason): Role
+    {
+        return DB::transaction(function () use ($role, $required, $reason): Role {
+            $before = $this->mfaRequired($role);
+            DB::table('roles')->where('id', $role->id)->update(['mfa_required' => $required, 'updated_at' => now()]);
+            $this->audit->record('role.mfa_requirement_changed', 'role', $role->id, ['mfa_required' => $before], ['mfa_required' => $required], $reason);
+
+            return $role->refresh();
+        });
+    }
+
+    private function mfaRequired(Role $role): bool
+    {
+        $row = DB::table('roles as r')->leftJoin('system_roles as sr', 'sr.code', '=', 'r.system_role_code')
+            ->where('r.id', $role->id)->selectRaw('COALESCE(r.mfa_required, sr.mfa_required_default, false) AS required')->first();
+
+        return $row !== null && (bool) $row->required;
     }
 
     public function delete(Role $role): void

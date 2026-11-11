@@ -235,6 +235,7 @@ final class UserService
             $factors = DB::table('user_mfa_factors')->where('user_id', $user->id)->whereNull('disabled_at');
             $count = $factors->count();
             $factors->update(['disabled_at' => now()]);
+            DB::table('user_mfa_recovery_codes')->where('user_id', $user->id)->delete();
             $this->sessions->revokeAllFor($user);
             $this->audit->record('user.mfa_reset', 'user', $user->id, ['active_factors' => $count], ['active_factors' => 0], $reason);
         });

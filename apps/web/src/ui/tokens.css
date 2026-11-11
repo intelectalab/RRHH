@@ -5,6 +5,9 @@
  */
 
 :root {
+  /* Código QR: siempre oscuro sobre claro para que la cámara lo lea, también en modo oscuro (SEG-3). */
+  --qr-claro: #FFFFFF;
+  --qr-oscuro: #000000;
   /* Marca: petróleo (principal) y ocre andino (acento puntual) */
   --pe-800: #0B4350;
   --pe-700: #0E4F5C;
