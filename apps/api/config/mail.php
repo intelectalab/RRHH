@@ -20,7 +20,7 @@ return [
         ],
     ],
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'soporte@aynihr.pe'),
-        'name' => env('MAIL_FROM_NAME', 'Ayni HR'),
+        'address' => env('MAIL_FROM_ADDRESS', 'soporte@gestiahr.com'),
+        'name' => env('MAIL_FROM_NAME', 'GestiaHR'),
     ],
 ];

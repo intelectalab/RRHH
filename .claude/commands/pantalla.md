@@ -5,8 +5,8 @@ argument-hint: <nombre o ruta de la pantalla en el prototipo>
 
 Construye la pantalla **$ARGUMENTS** en `apps/web`.
 
-1. Abre el prototipo y recorre la pantalla (flujo, columnas, filtros, acciones, estados vacíos). Lee `docs/10-pantallas-y-ux.md` y `docs/15-que-no-copiar-del-prototipo.md`: se copia el flujo y la jerarquía visual, **no** el código, los datos en el navegador ni los cálculos.
-2. Identifica los endpoints en `api/openapi.yaml` y usa los tipos de `packages/contracts`. Si falta un endpoint, créalo primero con `/endpoint`.
+1. Abre el prototipo y recorre la pantalla (flujo, columnas, filtros, acciones, estados vacíos). Lee `kit/docs/10-pantallas-y-ux.md` y `kit/docs/15-que-no-copiar-del-prototipo.md`: se copia el flujo y la jerarquía visual, **no** el código, los datos en el navegador ni los cálculos.
+2. Identifica los endpoints en `kit/api/openapi.yaml` y usa los tipos de `packages/contracts`. Si falta un endpoint, créalo primero con `/endpoint`.
 3. Implementa:
    - Ruta en `src/app/(app)/...`; componentes del módulo en `src/modules/<modulo>/`.
    - Solo componentes de `src/ui` (DataTable, Drawer, Modal, Timeline, Kanban, Calendar, EmptyState, FormField…). Si falta uno, créalo en `src/ui` con tokens, no en el módulo.

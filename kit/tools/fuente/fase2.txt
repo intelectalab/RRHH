@@ -1,0 +1,297 @@
+# ASI | 2 | asistencia | Asistencia y marcación | Backend + Frontend | Registro inalterable de marcaciones por múltiples medios, cálculo diario, incidencias y reportes legales.
+
+@ 1 | T | B | Registro de marcaciones inalterable
+D Modelar las marcaciones como registros de solo inserción con trabajador, empresa, momento con zona horaria, tipo (entrada, salida, inicio y fin de descanso), medio, ubicación y evidencia. Las correcciones son registros nuevos enlazados al original, con motivo y autor.
+- No existe operación que modifique o borre una marcación
+- Cada corrección conserva el original y muestra quién la hizo y por qué
+- El registro contiene los datos exigidos por el DS 004-2006-TR
+R 06; 05; 04; 14; C-07; §22; ME-13; RN-ASI-01 a RN-ASI-14
+X HIS-1, AUD-1
+
+@ 2 | H | BF | Marcación web
+D Permitir marcar entrada, salida y descansos desde la web con verificación de la política aplicable (red permitida o ubicación) y confirmación visible de la marca. La marca toma la hora del servidor, no la del navegador.
+- El colaborador ve sus marcas del día y el tiempo trabajado
+- Una marca fuera de la política se registra como observada, no se descarta
+R 06; §22; RN-ASI-01 a RN-ASI-14; P Tiempo → Asistencia → Tablero del día
+X ASI-1, ESS-1
+
+@ 3 | H | BF | Marcación desde la app con selfie y geocerca
+D Permitir marcar desde el teléfono con foto, ubicación y validación de geocerca de la sede o del punto de trabajo asignado. La biometría facial es opcional y requiere consentimiento y evaluación de impacto.
+- Una marca fuera de la geocerca se acepta como observada y avisa al supervisor
+- La foto se guarda como evidencia con acceso restringido
+- Sin consentimiento registrado no se activa la comparación facial
+R 06; 14; E-07; §22; §85; C-08; RN-ASI-01 a RN-ASI-14; P Tiempo → Asistencia → Tablero del día
+X ASI-2, ESS-6, ORG-2
+
+@ 4 | H | BF | Kiosko con QR y PIN
+D Ofrecer el modo kiosko para una tableta compartida: el trabajador se identifica con QR personal rotativo o con documento y PIN, con foto opcional. El kiosko se registra como dispositivo autorizado de una sede.
+- El QR personal caduca y no puede reutilizarse como captura de pantalla
+- El kiosko solo permite marcar; no expone otros datos
+- El PIN se bloquea tras intentos fallidos
+R 06; E-07; §22; RN-ASI-01 a RN-ASI-14
+X ASI-1, SEG-2
+
+@ 5 | H | BF | Marcación de cuadrilla
+D Permitir que un supervisor marque la entrada y salida de su cuadrilla en campo, uno a uno o en bloque, con ubicación y foto del grupo. La asignación de cuadrillas se mantiene por supervisor y fecha.
+- El supervisor solo puede marcar a los trabajadores asignados a su cuadrilla
+- Cada marca indica que fue registrada por el supervisor
+R 06; E-07; §22; RN-ASI-01 a RN-ASI-14
+X ASI-3, SEG-10
+
+@ 6 | T | BF | Marcación sin conexión
+D Guardar las marcas en el dispositivo cuando no hay conexión, con hora del dispositivo y control de manipulación del reloj, y sincronizarlas al recuperar señal sin duplicar. El dispositivo guarda las marcas cifradas hasta sincronizarlas.
+- Una marca hecha sin conexión llega al servidor al reconectar con su hora original
+- La sincronización repetida no duplica marcas
+- Un desfase sospechoso de reloj marca el registro como observado
+R 06; 02; E-07; RN-ASI-01 a RN-ASI-14
+X ASI-3, PLT-8
+
+@ 7 | T | B | Conectores abiertos a relojes biométricos
+D Publicar la interfaz de ingesta de marcaciones para relojes biométricos (API de recepción, carga de archivos y adaptador por fabricante) con mapeo de identificadores de reloj a trabajadores. Cada reloj se registra con su sede y su zona horaria.
+- Las marcas de un reloj entran por API o por archivo con el mismo resultado
+- Las marcas de identificadores sin mapear quedan en una bandeja para resolver
+- El formato de ingesta está documentado para terceros
+R 06; 08; E-07; §22; §75; RN-ASI-01 a RN-ASI-14
+X ASI-1, PLT-13
+
+@ 8 | T | B | Cálculo diario de asistencia
+D Calcular por trabajador y día las horas trabajadas, tardanzas, faltas, salidas anticipadas, sobretiempo y horas nocturnas comparando las marcas con el horario y las ausencias aprobadas. El cálculo se rehace cuando cambia una marca, un turno o una ausencia.
+- Una ausencia aprobada no genera falta
+- El recálculo de una fecha no altera periodos de planilla ya cerrados: genera una diferencia
+- Las tolerancias se leen de la política vigente
+- Con el módulo activo, el resumen de ausencias para planilla (AUS-6) toma de este cálculo los días laborados
+R 06; §22; RN-ASI-01 a RN-ASI-14
+X ASI-1, TUR-2, AUS-6
+
+@ 9 | H | BF | Incidencias y regularización
+D Listar incidencias (marca faltante, tardanza, falta, marca observada) y permitir que el trabajador solicite la regularización y que su jefe la apruebe. La regularización indica la hora correcta y su sustento.
+- Aprobar una regularización crea la corrección enlazada a la marca original
+- El jefe ve las incidencias de su equipo por día
+R 06; 05; §22; C-07; ME-14; RN-ASI-01 a RN-ASI-14; P Tiempo → Asistencia → Registro
+X ASI-8, WFL-2
+
+@ 10 | H | BF | Tablero y reporte legal de asistencia
+D Construir el tablero de asistencia en vivo y el reporte de control de asistencia con el contenido legal (razón social, RUC, trabajador, documento, fecha, horas y minutos de ingreso y salida, sobretiempo), exportable por periodo. El reporte se genera desde el registro inalterable e incluye las correcciones con su motivo.
+- El reporte legal puede generarse para cualquier periodo dentro del plazo de conservación
+- El tablero muestra presentes, ausentes y tardanzas del día por sede
+R 06; 14; §22; RN-ASI-01 a RN-ASI-14; P Tiempo → Asistencia
+X ASI-8, UI-11
+
+@ 11 | H | BF | Importación de asistencia
+D Registrar el importador de marcaciones y de resúmenes de asistencia para la carga inicial o para empresas que aún no marcan en el sistema. Usa el motor de importación y las mismas validaciones que la ingesta por conectores.
+- Las marcas importadas se identifican por su origen
+- La importación valida trabajador, fecha y solapamientos
+R 06; §71; RN-ASI-01 a RN-ASI-14
+X ASI-1, IMP-1
+
+# TUR | 2 | asistencia | Horarios, jornadas y turnos | Backend + Frontend | Jornadas, horarios, políticas de tiempo, turnos y planificación visual.
+
+@ 1 | H | BF | Jornadas y horarios
+D Definir jornadas (horas diarias y jornada semanal máxima) y horarios con entrada, salida, descansos y días laborables, con vigencia y asignación por trabajador. Un horario puede ser fijo, flexible con franja de entrada o por turnos.
+- Un horario se asigna a un trabajador con fecha efectiva
+- La jornada máxima se lee de parámetros por país y régimen
+R 06; 04; §24; RN-TUR-01 a RN-TUR-08; P Tiempo → Turnos y horarios → Horarios
+X HIS-1, CFG-3
+
+@ 2 | H | BF | Políticas de tiempo por empresa, sede o grupo
+D Configurar políticas de tolerancia, descansos, redondeo, tratamiento de sobretiempo y feriados, aplicables por empresa, sede o grupo de trabajadores. La política se resuelve del nivel más específico al más general.
+- Dos sedes de la misma empresa pueden tener tolerancias distintas
+- La política aplicable a un trabajador en una fecha es determinable y visible
+R 06; §24; RN-TUR-01 a RN-TUR-08
+X TUR-1, CFG-8
+
+@ 3 | H | BF | Catálogo de turnos
+D Crear turnos (mañana, tarde, noche, partido, rotativo) con horas, descansos, color y si generan horas nocturnas. Los turnos se agrupan por sede y se reutilizan en el planificador.
+- Un turno partido admite dos tramos en el mismo día
+- Un turno nocturno que cruza la medianoche se calcula sobre el día de inicio
+R 06; 04; §23; RN-TUR-01 a RN-TUR-08
+X TUR-1
+
+@ 4 | H | BF | Calendario de turnos con arrastrar y soltar
+D Construir el planificador visual por equipo y periodo: arrastrar turnos sobre personas y días, copiar un periodo anterior y ver conflictos con ausencias y descansos mínimos. El planificador muestra las horas planificadas por persona frente a su jornada.
+- Asignar un turno a alguien con vacaciones aprobadas muestra el conflicto
+- El planificador avisa si no se respeta el descanso mínimo entre turnos
+- Los cambios se guardan como borrador hasta publicar
+R 06; §23; RN-TUR-01 a RN-TUR-08; P Tiempo → Turnos y horarios
+X TUR-3, UI-12
+
+@ 5 | H | BF | Asignación masiva y patrones rotativos
+D Asignar turnos en bloque por unidad o grupo y definir patrones rotativos que se repiten en el tiempo. Los patrones se guardan como plantillas reutilizables.
+- Un patrón rotativo se aplica a un grupo por un rango de fechas
+- La asignación masiva informa cuántas personas y días afecta antes de confirmar
+R 06; §23; RN-TUR-01 a RN-TUR-08
+X TUR-4
+
+@ 6 | H | BF | Publicación de turnos y cambios entre compañeros
+D Publicar la planificación para que cada trabajador vea su horario en el portal, y permitir solicitar intercambio de turno con un compañero con aprobación del jefe. Los cambios posteriores a la publicación quedan registrados con autor.
+- Al publicar, los trabajadores afectados reciben aviso
+- Un intercambio aprobado actualiza ambos calendarios
+R 06; §8; §108; RN-TUR-01 a RN-TUR-08; P Tiempo → Turnos y horarios
+X TUR-4, ESS-1, WFL-2
+
+# VAC | 2 | vacaciones | Vacaciones | Backend + Frontend | Saldos, solicitudes con aprobación, programación y calendario del equipo.
+
+@ 1 | T | B | Política de vacaciones por régimen
+D Configurar con parámetros los días de vacaciones por régimen laboral, el requisito de récord, el fraccionamiento, el adelanto y la reducción por venta de días. La política se asigna por empresa y puede variar por grupo de trabajadores.
+- Un trabajador de microempresa y uno del régimen general devengan días distintos según parámetros
+- La política se cambia con vigencia sin tocar el código
+R 06; 14; §25; C-05; RN-VAC-01 a RN-VAC-13
+X CFG-3, ORG-1
+
+@ 2 | T | B | Devengo y saldos de vacaciones
+D Calcular el devengo por periodo vacacional de cada relación laboral y mantener un libro de movimientos de saldo: generadas, tomadas, programadas, pendientes y disponibles. El saldo es la suma del libro.
+- El saldo mostrado siempre se puede explicar por sus movimientos
+- El saldo se lleva por relación laboral, no por persona
+- Los periodos vencidos se identifican
+R 04; 06; §25; C-11; RN-VAC-01 a RN-VAC-13
+X VAC-1, COL-2
+
+@ 3 | H | BF | Solicitud y aprobación de vacaciones
+D Permitir que el colaborador solicite vacaciones viendo su saldo y el calendario del equipo; aprueba el responsable y RRHH valida si la política lo exige. Al aprobar se actualizan saldo, calendario y tableros, y se emite `leave.approved`.
+- No se puede solicitar más días que los disponibles salvo adelanto permitido
+- Aprobar actualiza solicitud, saldo, calendario, tablero y actividad en una sola operación
+- Anular una solicitud aprobada devuelve los días al saldo
+R 06; 05; §25; §115; ME-15; RN-VAC-01 a RN-VAC-13; P Tiempo → Vacaciones
+X VAC-2, WFL-2, ESS-1
+
+@ 4 | H | BF | Calendario de ausencias del equipo
+D Mostrar el calendario del equipo con vacaciones y ausencias aprobadas y pendientes, y avisar cuando se supera el máximo de ausentes simultáneos definido. El calendario reutiliza el componente común y respeta el alcance de quien lo consulta.
+- El manager ve los cruces antes de aprobar
+- El colaborador ve quién de su equipo estará ausente, sin el motivo
+R 06; §25; §9; RN-VAC-01 a RN-VAC-13; P Tiempo → Vacaciones
+X VAC-3, UI-12, CFG-8
+
+@ 5 | H | BF | Programación anual y vacaciones acumuladas
+D Permitir a RRHH y a los jefes programar el rol anual de vacaciones y alertar sobre trabajadores con periodos acumulados o próximos a vencer. La programación propuesta se confirma con el trabajador y se convierte en solicitudes.
+- La alerta explica cuántos periodos acumula cada trabajador y desde cuándo
+- El rol anual se puede exportar
+R 06; §25; §68; RN-VAC-01 a RN-VAC-13
+X VAC-3
+
+@ 6 | H | BF | Fraccionamiento, adelanto y venta de vacaciones
+D Soportar el goce fraccionado según la norma, el adelanto de días a cuenta del periodo en curso y el acuerdo de reducción por venta de días, cada uno con su documento firmado. Cada modalidad valida los límites que fija la norma mediante parámetros.
+- La venta de días genera el concepto para planilla y descuenta el saldo
+- El acuerdo de fraccionamiento queda firmado y archivado en el legajo
+R 06; 14; §25; RN-VAC-01 a RN-VAC-13
+X VAC-3, DOC-6
+
+@ 7 | H | BF | Importación de saldos de vacaciones
+D Registrar el importador de saldos iniciales por periodo vacacional como movimientos de apertura del libro. Usa el motor de importación con su plantilla descargable.
+- El saldo importado aparece como movimiento de apertura con su fecha
+- La importación valida que el trabajador y el periodo existan
+R 06; §71; RN-VAC-01 a RN-VAC-13
+X VAC-2, IMP-1
+
+# AUS | 2 | vacaciones | Ausencias y permisos | Backend + Frontend | Tipos de ausencia configurables con reglas propias, descansos médicos, licencias y teletrabajo.
+
+@ 1 | H | BF | Tipos de ausencia con reglas propias
+D Configurar tipos (descanso médico, licencia, permiso personal, maternidad, paternidad, compensación, trabajo remoto y otros) con reglas: con o sin goce, unidad en días u horas, tope, sustento obligatorio, flujo de aprobación y efecto en planilla. Los tipos se guardan con vigencia y pueden limitarse por empresa o régimen.
+- Cada tipo define si descuenta remuneración y a qué concepto de planilla se asocia
+- Un tipo puede exigir adjunto y limitar quién puede solicitarlo
+R 04; 06; §26; RN-AUS-01 a RN-AUS-09; P Tiempo → Ausencias y permisos
+X CFG-3, WFL-2
+
+@ 2 | H | BF | Solicitud y registro de ausencias
+D Permitir que el colaborador solicite una ausencia o que RRHH la registre, con sustento, aprobación y efecto en asistencia y calendario. La solicitud valida las reglas del tipo antes de enviarse a aprobación.
+- Una ausencia aprobada aparece en el calendario del equipo y evita la falta en asistencia
+- No se admiten ausencias solapadas para el mismo trabajador
+R 06; 05; §26; §8; ME-16; RN-AUS-01 a RN-AUS-09; P Tiempo → Ausencias y permisos
+X AUS-1, VAC-4
+
+@ 3 | H | BF | Descansos médicos y subsidios
+D Registrar descansos médicos con certificado, llevar el conteo de días acumulados en el año para distinguir lo que paga el empleador y lo que corresponde a subsidio, y dar seguimiento al trámite de reembolso. Los umbrales y plazos del subsidio son parámetros con vigencia.
+- El diagnóstico es dato sensible y solo lo ve quien tiene el permiso
+- El sistema avisa cuando el acumulado del año alcanza el umbral de subsidio configurado
+- El estado del trámite de subsidio es consultable
+R 06; 14; 07; §26; §105; RN-AUS-01 a RN-AUS-09
+X AUS-2, SEG-9
+
+@ 4 | H | BF | Licencias de maternidad, paternidad y otras de ley
+D Precargar las licencias legales con su duración parametrizada, requisitos y documentos, y calcular fechas de inicio y fin. Cada licencia se registra como ausencia del tipo correspondiente con su sustento.
+- La duración de cada licencia legal se lee de parámetros con vigencia
+- La licencia calcula la fecha de retorno y la muestra al jefe
+R 06; 14; §26; RN-AUS-01 a RN-AUS-09
+X AUS-1
+
+@ 5 | H | BF | Trabajo remoto y desconexión digital
+D Registrar los días de trabajo remoto según el acuerdo de teletrabajo y aplicar la regla de desconexión digital: fuera de la jornada no se envían avisos no urgentes ni se exigen respuestas. El horario de desconexión se toma del acuerdo y de la jornada asignada.
+- Los días remotos se distinguen en asistencia y no generan falta
+- Las notificaciones no urgentes a un teletrabajador se difieren fuera de su jornada
+R 06; 14; E-20; §26; RN-AUS-01 a RN-AUS-09
+X AUS-2, CON-6, NOT-6
+
+@ 6 | T | B | Ausencias como incidencias para planilla
+D Publicar el resumen por trabajador y periodo de días y horas de cada tipo de ausencia, con su efecto remunerativo, para que la planilla lo consuma. El resumen se obtiene de las ausencias aprobadas y, si la organización tiene el módulo de asistencia, del cálculo diario; sin ese módulo, los días laborados salen del calendario laboral y de las incidencias del periodo.
+- El resumen de un periodo es reproducible y explica cada día
+- Un cambio posterior al cierre del periodo se reporta como diferencia
+- Sin el módulo de asistencia, el resumen se arma con el calendario laboral, las ausencias aprobadas y las incidencias importadas
+R 06; 08; C-11; RN-AUS-01 a RN-AUS-09
+X AUS-2
+
+# BHO | 2 | asistencia | Horas extra y bolsa de horas | Backend + Frontend | Autorización y cálculo de sobretiempo, y bolsa de horas con saldos para compensar con descanso.
+
+@ 1 | H | BF | Solicitud y autorización de horas extra
+D Permitir solicitar horas extra antes o después de trabajarlas, con motivo, y que el jefe las autorice. Sin autorización, el sobretiempo detectado queda pendiente de decisión.
+- El sobretiempo no autorizado se lista para que el jefe lo apruebe o rechace
+- La autorización indica si se paga o se compensa
+R 06; 05; §56; §22; ME-17; RN-BHO-01 a RN-BHO-09; P Tiempo → Horas extra y bolsa
+X ASI-8, WFL-2
+
+@ 2 | T | B | Cálculo de sobretiempo
+D Calcular las horas extra por tramos con las sobretasas vigentes, el trabajo en feriado y descanso semanal, y el recargo nocturno, todo desde parámetros. El resultado se entrega por trabajador y periodo para que la planilla lo consuma.
+- Las sobretasas se leen de parámetros con vigencia
+- El cálculo distingue horas de cada tramo y las explica
+- El resultado se publica por el puerto de horas extra que lee el contexto de cálculo de la planilla (NOM-5)
+R 06; 14; §24; RN-BHO-01 a RN-BHO-09
+X BHO-1, TUR-2
+
+@ 3 | T | B | Bolsa de horas con saldos
+D Llevar un libro de bolsa de horas por trabajador: acumulación por sobretiempo a compensar, consumo por descansos y ajustes, con saldo consultable. Cada movimiento referencia la asistencia o la solicitud que lo originó.
+- El saldo se explica por sus movimientos
+- Ninguna hora puede pagarse y además acumularse en la bolsa
+R 06; 04; E-06; RN-BHO-01 a RN-BHO-09
+X BHO-2
+
+@ 4 | H | BF | Compensación con descanso
+D Permitir solicitar descanso contra la bolsa de horas con aprobación, y registrar el acuerdo de compensación firmado cuando corresponda. La solicitud sigue el flujo de aprobación de ausencias.
+- No se puede solicitar más descanso que el saldo disponible
+- El descanso compensatorio aparece en el calendario como ausencia justificada
+R 06; E-06; §26; RN-BHO-01 a RN-BHO-09
+X BHO-3, AUS-2
+
+@ 5 | H | BF | Vencimiento de saldos y reporte
+D Aplicar la regla de vencimiento de la bolsa (pago de lo no compensado al vencer el plazo configurado) y entregar el reporte de sobretiempo por unidad. El reporte compara horas pagadas, compensadas y pendientes.
+- El plazo de vencimiento es un parámetro de política
+- Lo vencido se envía a planilla como horas extra por pagar
+R 06; E-06; RN-BHO-01 a RN-BHO-09
+X BHO-3
+
+# TSH | 2 | asistencia | Hojas de tiempo por proyecto | Backend + Frontend | Registro de tiempo por proyecto y tarea con aprobación y costeo.
+
+@ 1 | H | BF | Proyectos y tareas imputables
+D Crear proyectos con cliente, centro de costo, responsable, fechas, tareas y miembros que pueden imputar tiempo. Los proyectos pueden marcarse como facturables o internos.
+- Solo los miembros de un proyecto pueden imputarle tiempo
+- Un proyecto cerrado no admite nuevas imputaciones
+R 06; 04; E-13; RN-TSH-01 a RN-TSH-07
+X ORG-4
+
+@ 2 | H | BF | Hoja de tiempo
+D Permitir que el colaborador registre su tiempo por proyecto y tarea en una grilla por periodo, con cronómetro opcional y comparación contra su asistencia. La hoja admite copiar el periodo anterior y registrar desde el móvil.
+- La hoja muestra la diferencia entre lo imputado y lo trabajado según asistencia
+- La hoja se envía a aprobación por periodo
+R 06; E-13; RN-TSH-01 a RN-TSH-07; P Tiempo → Hojas de tiempo
+X TSH-1, ASI-8
+
+@ 3 | H | BF | Aprobación de hojas de tiempo
+D Enviar la hoja al responsable del proyecto o al jefe para aprobarla o devolverla con observaciones. El flujo usa el motor de aprobaciones con el aprobador que define el proyecto.
+- Una hoja aprobada no se edita sin reabrirla
+- El responsable ve las hojas pendientes de su proyecto
+R 06; 05; E-13; ME-18; RN-TSH-01 a RN-TSH-07
+X TSH-2, WFL-2
+
+@ 4 | H | BF | Costeo y reporte por proyecto
+D Calcular el costo de cada proyecto a partir del tiempo aprobado y el costo por hora derivado de la compensación, y reportar por proyecto, cliente y centro de costo. El costo por hora se obtiene del servicio de datos maestros a la fecha de cada registro.
+- El costo por persona solo es visible con permiso de sueldos; sin él se ve el total del proyecto
+- El reporte se exporta
+R 06; E-13; C-11; RN-TSH-01 a RN-TSH-07
+X TSH-3, HIS-6

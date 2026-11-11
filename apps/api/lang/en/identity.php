@@ -2,7 +2,7 @@
 
 return [
     'password_reset' => [
-        'subject' => 'Recover your Ayni HR password',
+        'subject' => 'Recover your GestiaHR password',
         'body' => "We received a request to reset your password.\n\nUse this link (valid for :minutes minutes, one time only):\n:link\n\nIf you did not request it, ignore this message.",
         'requested' => 'If the email belongs to an active account, we will send a link to reset the password.',
     ],
@@ -22,8 +22,8 @@ return [
         'last_admin' => 'The organization cannot be left without an active Company administrator.',
     ],
     'invitation' => [
-        'subject' => 'Activate your Ayni HR account',
-        'body' => "Your company created an Ayni HR account for you.\n\nActivate it and set your password with this link (valid for :hours hours):\n:link",
+        'subject' => 'Activate your GestiaHR account',
+        'body' => "Your company created an GestiaHR account for you.\n\nActivate it and set your password with this link (valid for :hours hours):\n:link",
     ],
     'password' => [
         'too_short' => 'The password must have at least :min characters.',
@@ -45,9 +45,9 @@ return [
         'disabled_event' => 'Two-step verification was turned off for your account.',
     ],
     'codes' => [
-        'login_message' => 'Ayni HR: your sign-in code is :code. It expires in :minutes minutes. Do not share it.',
-        'activation_message' => 'Ayni HR: your account activation code is :code. It expires in :hours hours. Sign in with your ID document and this code.',
-        'email_subject' => 'Your Ayni HR code',
+        'login_message' => 'GestiaHR: your sign-in code is :code. It expires in :minutes minutes. Do not share it.',
+        'activation_message' => 'GestiaHR: your account activation code is :code. It expires in :hours hours. Sign in with your ID document and this code.',
+        'email_subject' => 'Your GestiaHR code',
         'invalid' => 'The document or the code is not valid, or the code has expired.',
         'activation_not_pending' => 'The account is already active: it does not need an activation code.',
         'no_phone' => 'The user has no mobile number to send the code to.',

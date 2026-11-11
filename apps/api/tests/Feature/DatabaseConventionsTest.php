@@ -133,7 +133,7 @@ test('data dictionary generator produces markdown documentation with all tables 
     $generator = new DataDictionaryGenerator;
     $markdown = $generator->generateMarkdown();
 
-    expect($markdown)->toContain('# Diccionario de Datos — Ayni HR');
+    expect($markdown)->toContain('# Diccionario de Datos — GestiaHR');
     expect($markdown)->toContain('### employments');
     expect($markdown)->toContain('`tenant_id`');
     expect($markdown)->toContain('### tenants');

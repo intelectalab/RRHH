@@ -14,7 +14,7 @@ final class DataDictionaryGenerator
         $tables = $this->getTables();
         $totalTables = count($tables);
 
-        $out = "# Diccionario de Datos — Ayni HR\n\n";
+        $out = "# Diccionario de Datos — GestiaHR\n\n";
         $out .= sprintf("Generado automáticamente desde el catálogo de la base de datos PostgreSQL. Total de tablas documentadas: **%d**.\n\n", $totalTables);
 
         foreach ($tables as $tableName) {

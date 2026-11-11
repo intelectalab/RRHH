@@ -39,7 +39,7 @@ final class IdentityServiceProvider extends ServiceProvider
                 return null;
             }
 
-            $request->attributes->set('ayni_session', $session);
+            $request->attributes->set('gestia_session', $session);
 
             return $session->user;
         });

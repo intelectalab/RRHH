@@ -1,0 +1,1049 @@
+{
+  "nota": "Parámetros configurables del producto (no legales). Se guardan en parameter_definitions y su valor por organización, empresa, sede o unidad en tenant_settings. Los valores por defecto son propuestas de producto a confirmar.",
+  "alcances": {
+    "organization": "Organización",
+    "legal_entity": "Empresa",
+    "location": "Sede",
+    "org_unit": "Unidad"
+  },
+  "parametros": [
+    {
+      "codigo": "org.idioma_defecto",
+      "modulo": "base",
+      "nombre": "Idioma por defecto",
+      "tipo": "select",
+      "valor_por_defecto": "es",
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Idioma de la interfaz y de los documentos.",
+      "opciones": [
+        "es",
+        "en",
+        "pt"
+      ]
+    },
+    {
+      "codigo": "org.zona_horaria",
+      "modulo": "base",
+      "nombre": "Zona horaria",
+      "tipo": "text",
+      "valor_por_defecto": "America/Lima",
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site"
+      ],
+      "descripcion": "Zona horaria para fechas, marcaciones y vencimientos.",
+      "opciones": null
+    },
+    {
+      "codigo": "org.moneda_defecto",
+      "modulo": "base",
+      "nombre": "Moneda por defecto",
+      "tipo": "text",
+      "valor_por_defecto": "PEN",
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Moneda ISO 4217 de los montos nuevos.",
+      "opciones": null
+    },
+    {
+      "codigo": "org.inicio_semana",
+      "modulo": "base",
+      "nombre": "Primer día de la semana",
+      "tipo": "select",
+      "valor_por_defecto": "lunes",
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Día en que empieza la semana en calendarios.",
+      "opciones": [
+        "lunes",
+        "domingo"
+      ]
+    },
+    {
+      "codigo": "seguridad.acceso_con_documento",
+      "modulo": "base",
+      "nombre": "Acceso con documento de identidad",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Permite ingresar con documento y clave u OTP, sin correo (C-09).",
+      "opciones": null
+    },
+    {
+      "codigo": "seguridad.canal_otp",
+      "modulo": "base",
+      "nombre": "Canal de clave temporal",
+      "tipo": "select",
+      "valor_por_defecto": "sms",
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Canal para enviar la clave temporal.",
+      "opciones": [
+        "sms",
+        "whatsapp",
+        "email"
+      ]
+    },
+    {
+      "codigo": "seguridad.clave_longitud_minima",
+      "modulo": "base",
+      "nombre": "Longitud mínima de la clave",
+      "tipo": "integer",
+      "valor_por_defecto": 12,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Cantidad mínima de caracteres de una clave nueva.",
+      "opciones": {
+        "min": 10,
+        "max": 64
+      }
+    },
+    {
+      "codigo": "seguridad.clave_historial",
+      "modulo": "base",
+      "nombre": "Claves anteriores que no se pueden repetir",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Cuántas claves anteriores se recuerdan para impedir reutilizarlas. 0: no se controla.",
+      "opciones": {
+        "min": 0,
+        "max": 24
+      }
+    },
+    {
+      "codigo": "seguridad.clave_vencimiento_dias",
+      "modulo": "base",
+      "nombre": "Vencimiento de la clave (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 0,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Días tras los cuales se pide cambiar la clave. 0: no vence.",
+      "opciones": {
+        "min": 0,
+        "max": 365
+      }
+    },
+    {
+      "codigo": "seguridad.intentos_maximos",
+      "modulo": "base",
+      "nombre": "Intentos fallidos antes del bloqueo",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Ingresos fallidos seguidos que bloquean la cuenta temporalmente.",
+      "opciones": {
+        "min": 3,
+        "max": 10
+      }
+    },
+    {
+      "codigo": "seguridad.bloqueo_minutos",
+      "modulo": "base",
+      "nombre": "Duración del bloqueo (minutos)",
+      "tipo": "integer",
+      "valor_por_defecto": 15,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Tiempo que la cuenta queda bloqueada tras superar los intentos.",
+      "opciones": {
+        "min": 5,
+        "max": 1440
+      }
+    },
+    {
+      "codigo": "seguridad.sesion_duracion_minutos",
+      "modulo": "base",
+      "nombre": "Duración máxima de la sesión (minutos)",
+      "tipo": "integer",
+      "valor_por_defecto": 480,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Tiempo tras el cual hay que volver a ingresar aunque se esté usando.",
+      "opciones": {
+        "min": 30,
+        "max": 1440
+      }
+    },
+    {
+      "codigo": "seguridad.inactividad_minutos",
+      "modulo": "base",
+      "nombre": "Cierre por inactividad (minutos)",
+      "tipo": "integer",
+      "valor_por_defecto": 30,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Minutos sin uso tras los cuales la sesión se cierra.",
+      "opciones": {
+        "min": 5,
+        "max": 240
+      }
+    },
+    {
+      "codigo": "seguridad.mfa_todos",
+      "modulo": "base",
+      "nombre": "Verificación en dos pasos para todos",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Exige el segundo factor a todos los usuarios, además de los roles que ya lo exigen.",
+      "opciones": null
+    },
+    {
+      "codigo": "seguridad.otp_minutos",
+      "modulo": "base",
+      "nombre": "Vigencia del código por mensaje (minutos)",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Minutos que dura el código de ingreso o de activación enviado por SMS o WhatsApp.",
+      "opciones": {
+        "min": 2,
+        "max": 15
+      }
+    },
+    {
+      "codigo": "seguridad.otp_intentos",
+      "modulo": "base",
+      "nombre": "Intentos por código",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Intentos fallidos que admite un código antes de anularse.",
+      "opciones": {
+        "min": 3,
+        "max": 10
+      }
+    },
+    {
+      "codigo": "seguridad.otp_reenvio_segundos",
+      "modulo": "base",
+      "nombre": "Espera para pedir otro código (segundos)",
+      "tipo": "integer",
+      "valor_por_defecto": 60,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Tiempo mínimo entre dos envíos de código al mismo usuario.",
+      "opciones": {
+        "min": 30,
+        "max": 600
+      }
+    },
+    {
+      "codigo": "seguridad.registrar_acceso_sensible",
+      "modulo": "base",
+      "nombre": "Registrar accesos a datos sensibles",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Deja constancia de cada consulta de sueldo, salud, denuncias, sanciones o biometría.",
+      "opciones": null
+    },
+    {
+      "codigo": "papelera.dias_restauracion",
+      "modulo": "base",
+      "nombre": "Días en papelera",
+      "tipo": "integer",
+      "valor_por_defecto": 30,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Días durante los que un registro eliminado puede restaurarse desde la papelera.",
+      "opciones": null
+    },
+    {
+      "codigo": "aprobaciones.recordatorio_horas",
+      "modulo": "base",
+      "nombre": "Recordatorio de aprobación",
+      "tipo": "integer",
+      "valor_por_defecto": 24,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Horas tras las que se recuerda una aprobación pendiente.",
+      "opciones": null
+    },
+    {
+      "codigo": "aprobaciones.escalar_horas",
+      "modulo": "base",
+      "nombre": "Escalamiento de aprobación",
+      "tipo": "integer",
+      "valor_por_defecto": 72,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Horas tras las que una aprobación pendiente sube al siguiente nivel.",
+      "opciones": null
+    },
+    {
+      "codigo": "aprobaciones.permitir_masivas",
+      "modulo": "base",
+      "nombre": "Aprobaciones masivas",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Permite aprobar varias solicitudes a la vez cuando el tipo lo admite.",
+      "opciones": null
+    },
+    {
+      "codigo": "notificaciones.canales_activos",
+      "modulo": "base",
+      "nombre": "Canales de notificación",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "in_app",
+        "email"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Canales habilitados para la organización.",
+      "opciones": [
+        "in_app",
+        "email",
+        "push",
+        "whatsapp",
+        "sms"
+      ]
+    },
+    {
+      "codigo": "notificaciones.silencio_desde",
+      "modulo": "base",
+      "nombre": "Inicio del horario de silencio",
+      "tipo": "time",
+      "valor_por_defecto": null,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.",
+      "opciones": null
+    },
+    {
+      "codigo": "notificaciones.silencio_hasta",
+      "modulo": "base",
+      "nombre": "Fin del horario de silencio",
+      "tipo": "time",
+      "valor_por_defecto": null,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Hora local en que se entregan los avisos que esperaron por el silencio.",
+      "opciones": null
+    },
+    {
+      "codigo": "notificaciones.obligatorias",
+      "modulo": "base",
+      "nombre": "Avisos obligatorios",
+      "tipo": "list",
+      "valor_por_defecto": [],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.",
+      "opciones": [
+        "approval.pending",
+        "approval.reminder",
+        "approval.escalated",
+        "approval.approved",
+        "approval.rejected",
+        "task.assigned",
+        "task.overdue"
+      ]
+    },
+    {
+      "codigo": "notificaciones.retencion_dias",
+      "modulo": "base",
+      "nombre": "Retención de avisos leídos (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 180,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.",
+      "opciones": null
+    },
+    {
+      "codigo": "colaboradores.codigo_automatico",
+      "modulo": "core",
+      "nombre": "Código de colaborador automático",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Genera el código con el correlativo de la empresa.",
+      "opciones": null
+    },
+    {
+      "codigo": "colaboradores.registrar_sexo",
+      "modulo": "core",
+      "nombre": "Registrar sexo",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Activa el campo cuando la norma lo exige (planilla, igualdad salarial).",
+      "opciones": null
+    },
+    {
+      "codigo": "colaboradores.cambios_perfil_requieren_aprobacion",
+      "modulo": "core",
+      "nombre": "Cambios de perfil con aprobación",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Los cambios que pide el colaborador pasan por RRHH antes de aplicarse.",
+      "opciones": null
+    },
+    {
+      "codigo": "posiciones.contratar_solo_con_posicion",
+      "modulo": "core",
+      "nombre": "Contratar solo contra posición aprobada",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Impide el ingreso de un colaborador sin una posición aprobada y libre.",
+      "opciones": null
+    },
+    {
+      "codigo": "contratos.alerta_vencimiento_dias",
+      "modulo": "core",
+      "nombre": "Aviso de vencimiento de contrato",
+      "tipo": "list",
+      "valor_por_defecto": [
+        60,
+        30,
+        15
+      ],
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación con que se avisa el vencimiento.",
+      "opciones": null
+    },
+    {
+      "codigo": "contratos.alerta_tope_acumulado_dias",
+      "modulo": "core",
+      "nombre": "Aviso de tope acumulado",
+      "tipo": "integer",
+      "valor_por_defecto": 90,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación con que se avisa que un contrato a modalidad se acerca a su plazo máximo.",
+      "opciones": null
+    },
+    {
+      "codigo": "documentos.firma_nivel_defecto",
+      "modulo": "core",
+      "nombre": "Nivel de firma por defecto",
+      "tipo": "select",
+      "valor_por_defecto": "simple",
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Nivel de firma electrónica para documentos laborales.",
+      "opciones": [
+        "simple",
+        "advanced",
+        "digital_certificate"
+      ]
+    },
+    {
+      "codigo": "documentos.firma_otp_obligatorio",
+      "modulo": "core",
+      "nombre": "OTP al firmar",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Exige clave temporal como parte de la evidencia de firma.",
+      "opciones": null
+    },
+    {
+      "codigo": "documentos.tamano_maximo_mb",
+      "modulo": "core",
+      "nombre": "Tamaño máximo de archivo (MB)",
+      "tipo": "integer",
+      "valor_por_defecto": 20,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Tamaño máximo por archivo subido.",
+      "opciones": null
+    },
+    {
+      "codigo": "asistencia.metodos_permitidos",
+      "modulo": "attendance",
+      "nombre": "Métodos de marcación",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "web",
+        "app"
+      ],
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site",
+        "org_unit"
+      ],
+      "descripcion": "Métodos de marcación habilitados.",
+      "opciones": [
+        "web",
+        "app",
+        "qr",
+        "kiosk",
+        "pin",
+        "biometric",
+        "crew",
+        "api"
+      ]
+    },
+    {
+      "codigo": "asistencia.tolerancia_minutos",
+      "modulo": "attendance",
+      "nombre": "Tolerancia de ingreso (min)",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site",
+        "org_unit"
+      ],
+      "descripcion": "Minutos de tolerancia antes de contar tardanza.",
+      "opciones": null
+    },
+    {
+      "codigo": "asistencia.exigir_geocerca",
+      "modulo": "attendance",
+      "nombre": "Exigir geocerca",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site",
+        "org_unit"
+      ],
+      "descripcion": "Solo acepta marcaciones de la app dentro de una geocerca.",
+      "opciones": null
+    },
+    {
+      "codigo": "asistencia.exigir_selfie",
+      "modulo": "attendance",
+      "nombre": "Exigir selfie",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site",
+        "org_unit"
+      ],
+      "descripcion": "Pide foto al marcar desde la app. Requiere evaluación de impacto aprobada.",
+      "opciones": null
+    },
+    {
+      "codigo": "asistencia.modo_sin_conexion",
+      "modulo": "attendance",
+      "nombre": "Marcación sin conexión",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site"
+      ],
+      "descripcion": "El dispositivo guarda y sincroniza después.",
+      "opciones": null
+    },
+    {
+      "codigo": "asistencia.redondeo_minutos",
+      "modulo": "attendance",
+      "nombre": "Redondeo (min)",
+      "tipo": "integer",
+      "valor_por_defecto": 0,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Redondeo del tiempo trabajado; 0 = sin redondeo.",
+      "opciones": null
+    },
+    {
+      "codigo": "vacaciones.anticipacion_minima_dias",
+      "modulo": "time_off",
+      "nombre": "Anticipación mínima",
+      "tipo": "integer",
+      "valor_por_defecto": 7,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación para solicitar vacaciones.",
+      "opciones": null
+    },
+    {
+      "codigo": "vacaciones.valida_rrhh",
+      "modulo": "time_off",
+      "nombre": "Validación de RRHH",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Tras el jefe, RRHH valida la solicitud.",
+      "opciones": null
+    },
+    {
+      "codigo": "vacaciones.alerta_acumulacion_dias",
+      "modulo": "time_off",
+      "nombre": "Aviso de vacaciones acumuladas",
+      "tipo": "integer",
+      "valor_por_defecto": 30,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Saldo desde el que se alerta acumulación.",
+      "opciones": null
+    },
+    {
+      "codigo": "horas_extra.requiere_autorizacion",
+      "modulo": "attendance",
+      "nombre": "Autorización previa",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site",
+        "org_unit"
+      ],
+      "descripcion": "El sobretiempo solo se reconoce si fue autorizado.",
+      "opciones": null
+    },
+    {
+      "codigo": "horas_extra.compensacion",
+      "modulo": "attendance",
+      "nombre": "Compensación del sobretiempo",
+      "tipo": "select",
+      "valor_por_defecto": "pay",
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Pago, bolsa de horas o a elección.",
+      "opciones": [
+        "pay",
+        "time_bank",
+        "choice"
+      ]
+    },
+    {
+      "codigo": "horas_extra.vencimiento_bolsa_dias",
+      "modulo": "attendance",
+      "nombre": "Vencimiento de la bolsa (días)",
+      "tipo": "integer",
+      "valor_por_defecto": null,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días tras los que vence un abono en bolsa; vacío = según acuerdo.",
+      "opciones": null
+    },
+    {
+      "codigo": "nomina.variacion_neto_alerta_pct",
+      "modulo": "payroll",
+      "nombre": "Variación de neto para alertar (%)",
+      "tipo": "decimal",
+      "valor_por_defecto": 20,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Variación frente al periodo anterior que genera una anomalía a revisar.",
+      "opciones": null
+    },
+    {
+      "codigo": "nomina.publicar_boletas_al_cerrar",
+      "modulo": "payroll",
+      "nombre": "Publicar boletas al cerrar",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Publica las boletas en el portal al cerrar el periodo.",
+      "opciones": null
+    },
+    {
+      "codigo": "nomina.exigir_acuse_boleta",
+      "modulo": "payroll",
+      "nombre": "Exigir acuse de boleta",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "El trabajador confirma la recepción de su boleta.",
+      "opciones": null
+    },
+    {
+      "codigo": "nomina.doble_aprobacion_cierre",
+      "modulo": "payroll",
+      "nombre": "Doble aprobación de cierre",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Quien procesa no puede aprobar ni cerrar.",
+      "opciones": null
+    },
+    {
+      "codigo": "prestamos.adelanto_tope_pct_devengado",
+      "modulo": "advances",
+      "nombre": "Tope de adelanto sobre lo devengado (%)",
+      "tipo": "decimal",
+      "valor_por_defecto": 50,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).",
+      "opciones": null
+    },
+    {
+      "codigo": "prestamos.adelantos_por_periodo",
+      "modulo": "advances",
+      "nombre": "Adelantos por periodo",
+      "tipo": "integer",
+      "valor_por_defecto": 2,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Número máximo de adelantos por periodo de planilla.",
+      "opciones": null
+    },
+    {
+      "codigo": "reclutamiento.retencion_candidatos_meses",
+      "modulo": "recruiting",
+      "nombre": "Retención de candidatos (meses)",
+      "tipo": "integer",
+      "valor_por_defecto": 24,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Meses que se conservan los datos de candidatos no contratados, según el consentimiento.",
+      "opciones": null
+    },
+    {
+      "codigo": "reclutamiento.mostrar_rango_salarial",
+      "modulo": "recruiting",
+      "nombre": "Mostrar rango salarial",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Publica el rango salarial en el portal de empleos.",
+      "opciones": null
+    },
+    {
+      "codigo": "onboarding.dias_preingreso",
+      "modulo": "onboarding",
+      "nombre": "Inicio del pre-ingreso (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 7,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días antes del ingreso en que empieza el pre-onboarding.",
+      "opciones": null
+    },
+    {
+      "codigo": "desempeno.minimo_respuestas_anonimas",
+      "modulo": "performance",
+      "nombre": "Mínimo de respuestas de pares",
+      "tipo": "integer",
+      "valor_por_defecto": 3,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Menos respuestas que este mínimo no se muestran, para proteger el anonimato de pares.",
+      "opciones": null
+    },
+    {
+      "codigo": "aprendizaje.aviso_vencimiento_dias",
+      "modulo": "learning",
+      "nombre": "Aviso de curso por vencer",
+      "tipo": "integer",
+      "valor_por_defecto": 7,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Días de anticipación del recordatorio.",
+      "opciones": null
+    },
+    {
+      "codigo": "compensaciones.tamano_minimo_grupo",
+      "modulo": "compensation",
+      "nombre": "Tamaño mínimo de grupo",
+      "tipo": "integer",
+      "valor_por_defecto": 3,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Grupo mínimo para mostrar promedios salariales en el reporte de brecha.",
+      "opciones": null
+    },
+    {
+      "codigo": "encuestas.umbral_anonimato",
+      "modulo": "engagement",
+      "nombre": "Umbral de anonimato",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Mínimo de respuestas por segmento para mostrar resultados (C-06).",
+      "opciones": null
+    },
+    {
+      "codigo": "mesa_ayuda.sla_respuesta_horas",
+      "modulo": "helpdesk",
+      "nombre": "Primera respuesta (horas)",
+      "tipo": "integer",
+      "valor_por_defecto": 8,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Plazo por defecto de primera respuesta.",
+      "opciones": null
+    },
+    {
+      "codigo": "mesa_ayuda.sla_resolucion_horas",
+      "modulo": "helpdesk",
+      "nombre": "Resolución (horas)",
+      "tipo": "integer",
+      "valor_por_defecto": 48,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Plazo por defecto de resolución.",
+      "opciones": null
+    },
+    {
+      "codigo": "sst.aviso_examen_dias",
+      "modulo": "sst",
+      "nombre": "Aviso de examen médico",
+      "tipo": "integer",
+      "valor_por_defecto": 30,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación del aviso de examen ocupacional por vencer.",
+      "opciones": null
+    },
+    {
+      "codigo": "sst.aviso_epp_dias",
+      "modulo": "sst",
+      "nombre": "Aviso de equipo por vencer",
+      "tipo": "integer",
+      "valor_por_defecto": 15,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación del aviso de vencimiento de equipo de protección.",
+      "opciones": null
+    },
+    {
+      "codigo": "denuncias.permitir_anonimas",
+      "modulo": "grievances",
+      "nombre": "Permitir denuncias anónimas",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Acepta denuncias sin identificar al denunciante.",
+      "opciones": null
+    },
+    {
+      "codigo": "gastos.dias_para_rendir",
+      "modulo": "expenses",
+      "nombre": "Días para rendir",
+      "tipo": "integer",
+      "valor_por_defecto": 10,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días para rendir un anticipo tras el viaje.",
+      "opciones": null
+    },
+    {
+      "codigo": "gastos.descontar_no_rendido",
+      "modulo": "expenses",
+      "nombre": "Descontar lo no rendido",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "El saldo no rendido se descuenta por planilla, con autorización del trabajador.",
+      "opciones": null
+    },
+    {
+      "codigo": "cumplimiento.aviso_vencimiento_dias",
+      "modulo": "compliance",
+      "nombre": "Aviso de obligación por vencer",
+      "tipo": "integer",
+      "valor_por_defecto": 15,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Días de anticipación del semáforo en ámbar.",
+      "opciones": null
+    },
+    {
+      "codigo": "privacidad.retencion_auditoria_anios",
+      "modulo": "compliance",
+      "nombre": "Conservación de auditoría (años)",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Años de conservación de la auditoría de negocio.",
+      "opciones": null
+    },
+    {
+      "codigo": "analitica.tamano_minimo_segmento",
+      "modulo": "analytics",
+      "nombre": "Tamaño mínimo de segmento",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "No se muestran indicadores de segmentos más pequeños.",
+      "opciones": null
+    },
+    {
+      "codigo": "ia.habilitada",
+      "modulo": "ai",
+      "nombre": "Asistente de IA habilitado",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Activa la capa de IA; requiere evaluación de impacto aprobada.",
+      "opciones": null
+    },
+    {
+      "codigo": "ia.casos_de_uso",
+      "modulo": "ai",
+      "nombre": "Casos de uso de IA",
+      "tipo": "list",
+      "valor_por_defecto": [],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Casos de uso permitidos (redacción, resumen, consulta en lenguaje natural...).",
+      "opciones": null
+    },
+    {
+      "codigo": "api.limite_por_minuto",
+      "modulo": "integrations",
+      "nombre": "Límite de llamadas por minuto",
+      "tipo": "integer",
+      "valor_por_defecto": 120,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Límite por token.",
+      "opciones": null
+    },
+    {
+      "codigo": "whatsapp.acciones_permitidas",
+      "modulo": "whatsapp",
+      "nombre": "Acciones por WhatsApp",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "boleta",
+        "vacaciones",
+        "constancia"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Trámites habilitados en el canal.",
+      "opciones": [
+        "boleta",
+        "vacaciones",
+        "constancia",
+        "marcacion"
+      ]
+    }
+  ]
+}

@@ -38,7 +38,7 @@ class CiContractsTest extends TestCase
 
     public function test_openapi_contract_file_exists_and_is_valid_yaml(): void
     {
-        $openapiPath = $this->resolvePath('api/openapi.yaml');
+        $openapiPath = $this->resolvePath('kit/api/openapi.yaml');
         $this->assertFileExists($openapiPath, 'El archivo api/openapi.yaml debe existir.');
 
         $content = (string) file_get_contents($openapiPath);

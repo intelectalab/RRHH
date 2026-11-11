@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * ProblemDetailsResponse — Genera respuestas de error con estructura unificada
- * { "error": { ... } } para toda la API de Ayni HR (ver docs/08-api.md §4).
+ * { "error": { ... } } para toda la API de GestiaHR (ver docs/08-api.md §4).
  */
 final class ProblemDetailsResponse
 {

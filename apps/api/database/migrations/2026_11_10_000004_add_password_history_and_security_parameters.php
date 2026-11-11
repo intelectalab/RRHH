@@ -34,8 +34,8 @@ return new class extends Migration
               END IF;
             END $$;
             DO $$ BEGIN
-              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ayni_app') THEN
-                GRANT SELECT, INSERT, UPDATE, DELETE ON password_history TO ayni_app;
+              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gestia_app') THEN
+                GRANT SELECT, INSERT, UPDATE, DELETE ON password_history TO gestia_app;
               END IF;
             END $$;
             SQL);

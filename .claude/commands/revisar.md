@@ -1,5 +1,5 @@
 ---
-description: Revisa un cambio contra las reglas no negociables de Ayni HR
+description: Revisa un cambio contra las reglas no negociables de GestiaHR
 argument-hint: [rama, commit o rango; por defecto los cambios sin confirmar]
 ---
 

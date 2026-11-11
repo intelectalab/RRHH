@@ -1,6 +1,6 @@
-# Guía de trabajo del repositorio — Ayni HR
+# Guía de trabajo del repositorio — GestiaHR
 
-Esta guía define las normas operativas, el orden de construcción por fases, la Definición de «Hecho» (Definition of Done) por actividad y el procedimiento obligatorio para colaborar en el repositorio de **Ayni HR**.
+Esta guía define las normas operativas, el orden de construcción por fases, la Definición de «Hecho» (Definition of Done) por actividad y el procedimiento obligatorio para colaborar en el repositorio de **GestiaHR**.
 
 ---
 
@@ -18,7 +18,7 @@ Antes de refactorizar o modificar código existente:
 
 ## 2. Orden de construcción por fases
 
-El desarrollo de Ayni HR sigue una secuencia ordenada e incremental. No se avanza a la siguiente fase hasta que los cimientos de la fase previa estén completados y verificados:
+El desarrollo de GestiaHR sigue una secuencia ordenada e incremental. No se avanza a la siguiente fase hasta que los cimientos de la fase previa estén completados y verificados:
 
 ```mermaid
 flowchart TD

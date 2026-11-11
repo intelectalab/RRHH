@@ -126,7 +126,7 @@ test('el invitado activa su cuenta con el enlace, define su clave y queda con se
     ]);
     $response->assertOk();
     $this->assertMatchesOpenApi($response, 'post', '/auth/invitation/accept', 200);
-    expect($response->getCookie('ayni_session', false))->not->toBeNull();
+    expect($response->getCookie('gestia_session', false))->not->toBeNull();
 
     usrCall($this->admin, 'GET', "/users/{$id}")->assertJsonPath('data.status', 'active');
 

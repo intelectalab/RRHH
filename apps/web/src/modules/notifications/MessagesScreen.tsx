@@ -136,7 +136,7 @@ function TemplatePanel({ template, onClose, onSaved }: { template: Template; onC
 
   // Datos de ejemplo solo para la vista previa (el envío real los toma de la API).
   const sample = useMemo<Record<string, string>>(() => ({
-    name: 'Carlos Mendoza', organization: 'Comercial Los Andes S.A.C.', link: 'https://demo.aynihr.pe/…', requester: t('msgs.sample_requester'),
+    name: 'Carlos Mendoza', organization: 'Comercial Los Andes S.A.C.', link: 'https://demo.gestiahr.com/…', requester: t('msgs.sample_requester'),
     type: t('msgs.sample_type'), level: '1', title: t('msgs.sample_title'), due_on: '2026-11-20', reason: t('msgs.sample_reason'), event: t('msgs.sample_event'),
   }), [t])
   const fill = (s: string) => s.replace(/\{([a-z_]+)\}/g, (_, k: string) => sample[k] ?? `{${k}}`)

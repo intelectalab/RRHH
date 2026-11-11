@@ -13,6 +13,16 @@ final class DatabaseConventionsChecker
      */
     public const PLATFORM_TABLES = [
         'addons',
+        'addon_modules',
+        'help_article_versions',
+        'help_articles',
+        'web_chat_sessions',
+        'web_complaints',
+        'web_demo_bookings',
+        'web_leads',
+        'web_product_modules',
+        'web_products',
+        'web_signups',
         'backup_restores',
         'backup_runs',
         'compliance_obligation_templates',
@@ -131,7 +141,8 @@ final class DatabaseConventionsChecker
             SELECT c.relname
               FROM pg_class c
               JOIN pg_namespace ns ON ns.oid = c.relnamespace AND ns.nspname = 'public'
-             WHERE c.relkind = 'r'
+             WHERE c.relkind IN ('r', 'p')
+               AND NOT c.relispartition  -- las particiones heredan de su tabla madre (A-06)
                AND c.relname NOT IN ('{$quotedPlatform}')
                AND c.relname NOT LIKE 'test_%'
                AND NOT EXISTS (
@@ -167,7 +178,8 @@ final class DatabaseConventionsChecker
             SELECT c.relname
               FROM pg_class c
               JOIN pg_namespace ns ON ns.oid = c.relnamespace AND ns.nspname = 'public'
-             WHERE c.relkind = 'r'
+             WHERE c.relkind IN ('r', 'p')
+               AND NOT c.relispartition  -- las particiones heredan de su tabla madre (A-06)
                AND c.relname NOT IN ('{$quotedPlatform}')
                AND c.relname NOT LIKE 'test_%'
                AND NOT (c.relrowsecurity AND c.relforcerowsecurity)
@@ -197,7 +209,8 @@ final class DatabaseConventionsChecker
             SELECT c.relname
               FROM pg_class c
               JOIN pg_namespace ns ON ns.oid = c.relnamespace AND ns.nspname = 'public'
-             WHERE c.relkind = 'r'
+             WHERE c.relkind IN ('r', 'p')
+               AND NOT c.relispartition  -- las particiones heredan de su tabla madre (A-06)
                AND c.relname NOT IN ('{$quotedPlatform}')
                AND c.relname NOT LIKE 'test_%'
                AND NOT EXISTS (

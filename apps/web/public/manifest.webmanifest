@@ -1,6 +1,6 @@
 {
-  "name": "Ayni HR",
-  "short_name": "Ayni HR",
+  "name": "GestiaHR",
+  "short_name": "GestiaHR",
   "description": "Gestión de personas",
   "start_url": "/",
   "scope": "/",

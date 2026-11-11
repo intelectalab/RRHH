@@ -2,7 +2,7 @@
 
 /*
  * SEG-9 · Campos sensibles por esquema del contrato (x-sensitive-fields de api/openapi.yaml)
- * y el permiso que exige su lectura, según docs/07-permisos-y-roles.md §2.
+ * y el permiso que exige su lectura, según kit/docs/07-permisos-y-roles.md §2.
  *
  * esquema => [campo => [permiso de lectura, categoría del registro de accesos]]
  * Categorías: salary, health, complaint, disciplinary, biometric, bank_account,

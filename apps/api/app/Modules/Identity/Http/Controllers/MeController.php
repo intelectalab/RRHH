@@ -23,7 +23,7 @@ final class MeController
     {
         /** @var User $user */
         $user = $request->user();
-        $session = $request->attributes->get('ayni_session');
+        $session = $request->attributes->get('gestia_session');
         $mfaStep = $mfa->sessionStatus($user, $session instanceof UserSession ? $session : null);
         $tenant = DB::table('current_tenant')->first(['id', 'slug', 'name', 'default_locale', 'timezone', 'default_currency']);
         // SEG-3: con el segundo paso pendiente no se entregan roles, permisos ni módulos.

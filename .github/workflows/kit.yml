@@ -1,0 +1,107 @@
+# GestiaHR · integración continua del kit (parte de PLT-3; copiada de kit/referencia/arranque).
+# Comprueba lo que ya existe desde el primer día:
+#   1. schema.sql carga en PostgreSQL 17 y pruebas_aislamiento.sql pasa;
+#   2. los archivos generados del kit coinciden con sus fuentes (backlog, OpenAPI, esquema y catálogos);
+#   3. los 70 diagramas mermaid de kit/docs se leen sin error;
+#   4. la calculadora de planilla de referencia pasa sus pruebas sobre PostgreSQL 17.
+# La canalización de la aplicación (Pest, Vitest, lint, contratos, imágenes) se agrega en PLT-3.
+
+name: kit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  esquema-y-generadores:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: gestiahr
+          POSTGRES_USER: gestia_owner
+          POSTGRES_PASSWORD: gestia_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U gestia_owner -d gestiahr"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGUSER: gestia_owner
+      PGPASSWORD: gestia_ci
+      PGDATABASE: gestiahr
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml openapi-spec-validator
+      - run: command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Cargar schema.sql en PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -q -f kit/database/schema.sql
+
+      - name: Pruebas de aislamiento
+        run: |
+          psql -v ON_ERROR_STOP=1 -f kit/database/pruebas_aislamiento.sql 2>&1 | tee aislamiento.log
+          grep -q "TODAS LAS PRUEBAS PASARON" aislamiento.log
+
+      - name: Regenerar el kit y comparar
+        run: |
+          (cd kit/tools/esquema && python3 gen.py)
+          (cd kit/tools && python3 generar_backlog.py && python3 gen_ruta.py)
+          python3 kit/tools/gen_openapi.py
+          python3 kit/tools/gen_entrega.py
+          cp kit/backlog/backlog.csv GestiaHR_backlog_jira.csv
+          git diff --stat --exit-code -- kit/database kit/backlog kit/api kit/docs/20-entrega-al-equipo.md kit/prompts GestiaHR_backlog_jira.csv
+
+  diagramas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-save mermaid@11.4.1 playwright@1.49.1 && npx playwright install --with-deps chromium
+      - name: Validar los diagramas mermaid de kit/docs
+        run: node kit/tools/verificar_mermaid.js kit/docs
+
+  calculadora-de-referencia:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: calc
+          POSTGRES_USER: gestia_owner
+          POSTGRES_PASSWORD: gestia_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U gestia_owner -d calc"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_pgsql, bcmath
+      - name: Proyecto Laravel 12 de prueba con la referencia
+        run: |
+          composer create-project laravel/laravel:^12.0 /tmp/calc --no-interaction --quiet
+          cd /tmp/calc
+          composer require brick/math --no-interaction --quiet
+          cp -r "$GITHUB_WORKSPACE"/kit/referencia/calculadora-planilla/{app,config,database,tests} .
+          ln -s "$GITHUB_WORKSPACE"/kit kit
+          php -r '$f="bootstrap/providers.php"; $s=file_get_contents($f); if (!str_contains($s,"PayrollServiceProvider")) file_put_contents($f, str_replace("];", "    App\\Providers\\PayrollServiceProvider::class,\n];", $s));'
+      - name: Pruebas
+        working-directory: /tmp/calc
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_DATABASE: calc
+          DB_USERNAME: gestia_owner
+          DB_PASSWORD: gestia_ci
+        run: php vendor/bin/phpunit

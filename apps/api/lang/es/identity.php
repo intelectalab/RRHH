@@ -2,7 +2,7 @@
 
 return [
     'password_reset' => [
-        'subject' => 'Recupere su clave de Ayni HR',
+        'subject' => 'Recupere su clave de GestiaHR',
         'body' => "Recibimos una solicitud para restablecer su clave.\n\nUse este enlace (válido por :minutes minutos, una sola vez):\n:link\n\nSi usted no lo pidió, ignore este mensaje.",
         'requested' => 'Si el correo pertenece a una cuenta activa, enviaremos un enlace para restablecer la clave.',
     ],
@@ -22,8 +22,8 @@ return [
         'last_admin' => 'La organización no puede quedar sin un Administrador empresa activo.',
     ],
     'invitation' => [
-        'subject' => 'Active su cuenta de Ayni HR',
-        'body' => "Su empresa le creó una cuenta en Ayni HR.\n\nActívela y defina su contraseña con este enlace (válido por :hours horas):\n:link",
+        'subject' => 'Active su cuenta de GestiaHR',
+        'body' => "Su empresa le creó una cuenta en GestiaHR.\n\nActívela y defina su contraseña con este enlace (válido por :hours horas):\n:link",
     ],
     'password' => [
         'too_short' => 'La clave debe tener al menos :min caracteres.',
@@ -45,9 +45,9 @@ return [
         'disabled_event' => 'Se desactivó la verificación en dos pasos en tu cuenta.',
     ],
     'codes' => [
-        'login_message' => 'Ayni HR: tu código de ingreso es :code. Vence en :minutes minutos. No lo compartas con nadie.',
-        'activation_message' => 'Ayni HR: tu código para activar tu cuenta es :code. Vence en :hours horas. Ingresa con tu documento y este código.',
-        'email_subject' => 'Tu código de Ayni HR',
+        'login_message' => 'GestiaHR: tu código de ingreso es :code. Vence en :minutes minutos. No lo compartas con nadie.',
+        'activation_message' => 'GestiaHR: tu código para activar tu cuenta es :code. Vence en :hours horas. Ingresa con tu documento y este código.',
+        'email_subject' => 'Tu código de GestiaHR',
         'invalid' => 'El documento o el código no son válidos, o el código ya venció.',
         'activation_not_pending' => 'La cuenta ya está activa: no necesita código de activación.',
         'no_phone' => 'El usuario no tiene celular registrado para enviarle el código.',

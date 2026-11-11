@@ -5,10 +5,10 @@ import '@/ui/shell.css'
 import { themeBootScript } from '@/lib/theme'
 
 export const metadata: Metadata = {
-  title: 'Ayni HR',
+  title: 'GestiaHR',
   icons: { icon: '/favicon.svg', apple: '/icon-192.png' },
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'Ayni HR', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'GestiaHR', statusBarStyle: 'default' },
 }
 
 export const viewport: Viewport = {

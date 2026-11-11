@@ -40,7 +40,7 @@ final class EnsureSecondFactor
         }
 
         $user = $request->user();
-        $session = $request->attributes->get('ayni_session');
+        $session = $request->attributes->get('gestia_session');
         if (! $user instanceof User || ! $session instanceof UserSession) {
             return $next($request);
         }

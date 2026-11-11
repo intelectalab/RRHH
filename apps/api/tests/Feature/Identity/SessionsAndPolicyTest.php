@@ -57,7 +57,7 @@ function spAs(string $cookie, string $method, string $path, array $body = [])
     app('auth')->forgetGuards();
     $xsrf = hash_hmac('sha256', 'xsrf|'.$cookie, (string) config('app.key'));
 
-    return test()->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    return test()->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => SP_TENANT, 'X-XSRF-TOKEN' => $xsrf, 'Idempotency-Key' => (string) Str::uuid()])
         ->json($method, '/api/v1'.$path, $body);
 }
@@ -68,8 +68,8 @@ function spSet(string $code, mixed $value): void
 }
 
 test('el usuario ve sus sesiones con dispositivo y cierra cualquiera', function (): void {
-    $pc = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
-    $phone = spLogin('rosa@andes.pe', SP_PASSWORD, 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Safari/604.1')->getCookie('ayni_session', false)->getValue();
+    $pc = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
+    $phone = spLogin('rosa@andes.pe', SP_PASSWORD, 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Safari/604.1')->getCookie('gestia_session', false)->getValue();
     // Una sesión abandonada más allá de la inactividad ya no cuenta como abierta.
     spLogin('rosa@andes.pe', SP_PASSWORD, 'Mozilla/5.0 (X11; Linux x86_64) Firefox/131.0');
     TenancyScope::runAs(SP_TENANT, fn () => DB::table('user_sessions')->where('user_id', $this->user->id)->where('user_agent', 'like', '%Firefox%')->update(['last_seen_at' => now()->subHours(3)]));
@@ -91,8 +91,8 @@ test('el usuario ve sus sesiones con dispositivo y cierra cualquiera', function 
 });
 
 test('cambiar la clave aplica la política, la recuerda y cierra las demás sesiones', function (): void {
-    $pc = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
-    $phone = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $pc = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
+    $phone = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
 
     spAs($pc, 'POST', '/me/password', ['current_password' => 'otra', 'password' => 'Nueva-Clave-2027', 'password_confirmation' => 'Nueva-Clave-2027'])
         ->assertStatus(422)->assertJsonPath('error.details.0.field', 'current_password');
@@ -117,8 +117,8 @@ test('cambiar la clave aplica la política, la recuerda y cierra las demás sesi
 });
 
 test('un administrador fuerza el cierre de sesión de un usuario', function (): void {
-    $rosa = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
-    $admin = spLogin('admin@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $rosa = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
+    $admin = spLogin('admin@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
 
     spAs($admin, 'POST', '/users/'.$this->user->id.'/revoke-sessions', [])->assertStatus(422);
     $r = spAs($admin, 'POST', '/users/'.$this->user->id.'/revoke-sessions', ['reason' => 'Equipo extraviado']);
@@ -130,7 +130,7 @@ test('un administrador fuerza el cierre de sesión de un usuario', function (): 
 
 test('la sesión se cierra por inactividad según la organización', function (): void {
     spSet('seguridad.inactividad_minutos', 10);
-    $cookie = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $cookie = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
     $this->travel(9)->minutes();
     spAs($cookie, 'GET', '/me')->assertOk();
     $this->travel(9)->minutes();
@@ -162,7 +162,7 @@ test('superar el tope de intentos bloquea la cuenta, lo registra y avisa al titu
 
 test('superar el límite de peticiones responde 429 con el formato único de error', function (): void {
     config(['identity.api_requests_per_minute_user' => 3]);
-    $cookie = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $cookie = spLogin('rosa@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
     foreach (range(1, 3) as $i) {
         spAs($cookie, 'GET', '/me')->assertOk();
     }
@@ -172,14 +172,14 @@ test('superar el límite de peticiones responde 429 con el formato único de err
 });
 
 test('la política se edita en Configuración → Seguridad dentro de los márgenes y queda auditada', function (): void {
-    $admin = spLogin('admin@andes.pe', SP_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $admin = spLogin('admin@andes.pe', SP_PASSWORD)->getCookie('gestia_session', false)->getValue();
     spAs($admin, 'PUT', '/settings/seguridad', ['values' => [['code' => 'seguridad.intentos_maximos', 'value' => 50]]])->assertStatus(422);
     spAs($admin, 'PUT', '/settings/seguridad', ['values' => [['code' => 'seguridad.clave_longitud_minima', 'value' => 14]], 'reason' => 'Política 2027'])->assertOk();
     TenancyScope::runAs(SP_TENANT, fn () => expect(DB::table('audit_events')->where('action', 'setting.changed')->where('reason', 'Política 2027')->count())->toBe(1));
 
     $login = spLogin('rosa@andes.pe', SP_PASSWORD);
     $login->assertOk();
-    $rosa = $login->getCookie('ayni_session', false)->getValue();
+    $rosa = $login->getCookie('gestia_session', false)->getValue();
     spAs($rosa, 'POST', '/me/password', ['current_password' => SP_PASSWORD, 'password' => 'Clave-Nueva-1', 'password_confirmation' => 'Clave-Nueva-1'])->assertStatus(422);
     spAs($rosa, 'POST', '/me/password', ['current_password' => SP_PASSWORD, 'password' => 'Clave-Nueva-2027x', 'password_confirmation' => 'Clave-Nueva-2027x'])->assertOk();
 });

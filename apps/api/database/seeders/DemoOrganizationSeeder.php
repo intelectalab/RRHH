@@ -46,7 +46,7 @@ class DemoOrganizationSeeder extends Seeder
         // Roles de sistema, sus permisos por defecto, política de seguridad y módulos base.
         DB::select('SELECT seed_tenant_defaults(?)', [$tenantId]);
 
-        $email = (string) env('DEMO_ADMIN_EMAIL', 'admin@demo.aynihr.test');
+        $email = (string) env('DEMO_ADMIN_EMAIL', 'admin@demo.gestiahr.test');
         $password = env('DEMO_ADMIN_PASSWORD');
         $generated = ! is_string($password) || $password === '';
         $password = $generated ? Str::password(16) : $password;

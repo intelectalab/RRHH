@@ -9,7 +9,7 @@ final class VerifyDatabaseConventionsCommand extends Command
 {
     protected $signature = 'db:verify-conventions';
 
-    protected $description = 'Verifica que todas las tablas y claves foráneas cumplan las convenciones de Ayni HR (tenant_id, RLS, FK compuestas y sin borrado en cascada en historia laboral)';
+    protected $description = 'Verifica que todas las tablas y claves foráneas cumplan las convenciones de GestiaHR (tenant_id, RLS, FK compuestas y sin borrado en cascada en historia laboral)';
 
     public function handle(DatabaseConventionsChecker $checker): int
     {
@@ -18,7 +18,7 @@ final class VerifyDatabaseConventionsCommand extends Command
         $violations = $checker->check();
 
         if (empty($violations)) {
-            $this->info('✓ Todas las tablas cumplen las convenciones de Ayni HR:');
+            $this->info('✓ Todas las tablas cumplen las convenciones de GestiaHR:');
             $this->line('  - tenant_id NOT NULL en todas las tablas de negocio');
             $this->line('  - RLS activado y forzado con política tenant_isolation');
             $this->line('  - Claves foráneas compuestas (tenant_id, x_id)');

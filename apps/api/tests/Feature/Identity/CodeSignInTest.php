@@ -45,7 +45,7 @@ function csCall(string $method, string $path, array $body = [], ?string $cookie 
     app('auth')->forgetGuards();
     $req = test()->withHeaders(['X-Tenant-Id' => CS_TENANT, 'Idempotency-Key' => (string) Str::uuid()]);
     if ($cookie !== null) {
-        $req = $req->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+        $req = $req->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
             ->withHeaders(['X-XSRF-TOKEN' => hash_hmac('sha256', 'xsrf|'.$cookie, (string) config('app.key'))]);
     }
 
@@ -54,7 +54,7 @@ function csCall(string $method, string $path, array $body = [], ?string $cookie 
 
 function csAdmin(): string
 {
-    return csCall('POST', '/auth/login', ['email' => 'admin@andes.pe', 'password' => CS_PASSWORD])->getCookie('ayni_session', false)->getValue();
+    return csCall('POST', '/auth/login', ['email' => 'admin@andes.pe', 'password' => CS_PASSWORD])->getCookie('gestia_session', false)->getValue();
 }
 
 /** Alta de un operario sin correo ni usuario; devuelve su id. */
@@ -164,7 +164,7 @@ test('ingreso con documento y código por mensaje: caduca, sirve una vez y tiene
     $ok = csCall('POST', '/auth/otp/verify', ['document_type' => 'dni', 'document_number' => '45678912', 'code' => $otp]);
     $ok->assertOk()->assertJsonPath('data.user.display_name', 'Juan Quispe');
     $this->assertMatchesOpenApi($ok, 'post', '/auth/otp/verify', 200);
-    expect($ok->getCookie('ayni_session', false))->not->toBeNull();
+    expect($ok->getCookie('gestia_session', false))->not->toBeNull();
     // Un solo uso.
     $reused = csCall('POST', '/auth/otp/verify', ['document_type' => 'dni', 'document_number' => '45678912', 'code' => $otp]);
     $reused->assertStatus(422);
@@ -199,6 +199,19 @@ test('sin permiso de invitar no se emiten códigos de activación', function ():
 
         return $u;
     });
-    $cookie = csCall('POST', '/auth/login', ['email' => 'rosa@andes.pe', 'password' => CS_PASSWORD])->getCookie('ayni_session', false)->getValue();
+    $cookie = csCall('POST', '/auth/login', ['email' => 'rosa@andes.pe', 'password' => CS_PASSWORD])->getCookie('gestia_session', false)->getValue();
     csCall('POST', "/users/{$id}/activation-code", ['channel' => 'in_app'], $cookie)->assertStatus(403);
+});
+
+test('la organización puede apagar el ingreso con documento', function (): void {
+    $admin = csAdmin();
+    $id = csWorker($admin);
+    $code = (string) csCall('POST', "/users/{$id}/activation-code", ['channel' => 'in_app'], $admin)->json('data.code');
+    csCall('POST', '/auth/activation/code', ['document_type' => 'dni', 'document_number' => '45678912', 'code' => $code, 'password' => CS_PASSWORD, 'password_confirmation' => CS_PASSWORD])->assertOk();
+    $before = count($this->messages->getMessages());
+
+    TenancyScope::runAs(CS_TENANT, fn () => DB::table('tenant_settings')->insert(['tenant_id' => CS_TENANT, 'parameter_code' => 'seguridad.acceso_con_documento', 'value' => 'false']));
+    csCall('POST', '/auth/login', ['document_type' => 'dni', 'document_number' => '45678912', 'password' => CS_PASSWORD])->assertStatus(422);
+    csCall('POST', '/auth/otp/request', ['document_type' => 'dni', 'document_number' => '45678912'])->assertOk();
+    expect($this->messages->getMessages())->toHaveCount($before);
 });

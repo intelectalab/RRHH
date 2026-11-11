@@ -94,7 +94,7 @@ final class MfaController
 
     private function session(Request $request): ?UserSession
     {
-        $session = $request->attributes->get('ayni_session');
+        $session = $request->attributes->get('gestia_session');
 
         return $session instanceof UserSession ? $session : null;
     }

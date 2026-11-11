@@ -61,7 +61,7 @@ test('el ingreso correcto abre una sesión con cookie HttpOnly y XSRF', function
     $response->assertOk()->assertJsonPath('data.user.display_name', 'Ana Quispe');
     $this->assertMatchesOpenApi($response, 'post', '/auth/login', 200);
 
-    $session = $response->getCookie('ayni_session', false);
+    $session = $response->getCookie('gestia_session', false);
     $xsrf = $response->getCookie('XSRF-TOKEN', false);
     expect($session)->not->toBeNull()
         ->and($session->isHttpOnly())->toBeTrue()
@@ -124,11 +124,11 @@ test('el mismo correo y clave no sirven en otra organización', function (): voi
 });
 
 test('la cookie de una organización no autentica en otra', function (): void {
-    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('gestia_session', false)->getValue();
     $xsrf = hash_hmac('sha256', 'xsrf|'.$cookie, (string) config('app.key'));
 
     TenancyScope::clear();
-    $this->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    $this->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => SEG_TENANT_B, 'X-XSRF-TOKEN' => $xsrf])
         ->postJson('/api/v1/auth/logout')
         ->assertStatus(401);
@@ -148,32 +148,32 @@ test('el ingreso sin organización en el host responde 400', function (): void {
 });
 
 test('cerrar sesión revoca la sesión y borra las cookies', function (): void {
-    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('gestia_session', false)->getValue();
     $xsrf = hash_hmac('sha256', 'xsrf|'.$cookie, (string) config('app.key'));
 
-    $response = $this->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    $response = $this->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => SEG_TENANT_A, 'X-XSRF-TOKEN' => $xsrf])
         ->postJson('/api/v1/auth/logout');
 
     $response->assertOk();
     $this->assertMatchesOpenApi($response, 'post', '/auth/logout', 200);
-    expect($response->getCookie('ayni_session', false)->getValue())->toBe('');
+    expect($response->getCookie('gestia_session', false)->getValue())->toBe('');
     TenancyScope::runAs(SEG_TENANT_A, fn () => expect(UserSession::query()->sole()->revoked_at)->not->toBeNull());
 
     // La misma cookie ya no sirve (petición nueva: guard sin estado previo).
     TenancyScope::clear();
     app('auth')->forgetGuards();
-    $this->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    $this->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => SEG_TENANT_A, 'X-XSRF-TOKEN' => $xsrf])
         ->postJson('/api/v1/auth/logout')
         ->assertStatus(401);
 });
 
 test('cerrar sesión sin cabecera XSRF responde 403 csrf_mismatch', function (): void {
-    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('ayni_session', false)->getValue();
+    $cookie = segLogin('ana.quispe@empresa-a.pe', SEG_PASSWORD)->getCookie('gestia_session', false)->getValue();
 
     TenancyScope::clear();
-    $this->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    $this->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => SEG_TENANT_A])
         ->postJson('/api/v1/auth/logout')
         ->assertStatus(403)

@@ -1,0 +1,504 @@
+@@ ORG | Estructura organizacional | 1
+#obj
+Modelar la empresa tal como es (razones sociales, sedes, unidades, centros de costo, puestos de catálogo, niveles y categorías) y mostrarla en un organigrama que se actualiza solo.
+#alc
+- Sedes, sucursales y ubicaciones (con datos de establecimiento para declaraciones, geocerca y marca de riesgo SCTR).
+- Unidades organizativas en árbol de profundidad libre con tipo configurable (gerencia, área, departamento, subdepartamento, unidad, equipo) y responsable.
+- Centros de costo (árbol, vigencia, distribución porcentual).
+- Catálogo de puestos (`job_profiles`): nombre, familia, nivel, categoría laboral, descripción, funciones, requisitos, competencias, banda, marca de riesgo, marca de puesto de dirección o confianza.
+- Niveles, cargos y categorías laborales (base del cuadro de categorías y funciones de la Ley 30709).
+- Organigrama dinámico por personas y por unidades; directorio.
+- Reorganizaciones con fecha de vigencia.
+#fue
+- Posiciones, presupuesto y vacantes (M-POS). Bandas salariales (M-COM).
+#act
+- Administrador y RRHH administran. Todos consultan directorio y organigrama según permiso.
+#flu
+**Crear o mover una unidad.** 1) Se indica nombre, tipo, unidad superior, responsable, centro de costo y fecha de vigencia. 2) Al mover, el sistema muestra el impacto (personas, aprobaciones pendientes, alcance de managers). 3) Se confirma; el cambio rige desde la fecha indicada y el organigrama lo refleja ese día.
+
+**Cambio de responsable.** 1) Se elige el nuevo responsable (una posición ocupada). 2) Se actualiza la línea de reporte de los integrantes que reportaban al anterior por ser jefe de unidad. 3) Se reasignan aprobaciones pendientes.
+
+**Alta de puesto de catálogo.** 1) Se registra el puesto con nivel, categoría, funciones y requisitos. 2) La IA puede proponer un borrador de descripción que una persona edita y aprueba. 3) El puesto queda disponible para crear posiciones.
+#pan
+Estructura :: Pestañas Empresas, Sedes, Unidades, Puestos (y Centros de costo, Niveles y categorías); tablas con crear, editar, archivar, ver archivados :: Organización → Estructura
+Organigrama :: Árbol por personas o por unidades, búsqueda, plegar ramas, filtro por empresa; ir a la ficha :: Personas → Organigrama
+Directorio :: Tarjetas de colaboradores con puesto, unidad, sede y contacto permitido; búsqueda :: Personas → Directorio
+Reorganización :: Asistente para mover unidades o personas en bloque con fecha y vista previa de impacto :: Organización → Estructura → Reorganizar
+#dat
+Sedes (`locations`), unidades organizativas (`org_units`, árbol con vigencia), tipos de unidad, centros de costo (`cost_centers`), puestos de catálogo (`job_profiles`), niveles, familias, categorías laborales.
+#rn
+[F] Si una unidad tiene posiciones activas o subunidades → no se archiva hasta moverlas o cerrarlas.
+[F] Si se mueve una unidad bajo uno de sus propios descendientes → se rechaza (el árbol no admite ciclos).
+[F] Si cambia el responsable de una unidad o el jefe de una persona → el organigrama, el alcance de managers y los aprobadores se recalculan desde la fecha de vigencia sin intervención manual.
+[F] Si un puesto de catálogo tiene posiciones o historial → no se elimina; se archiva y no admite nuevas posiciones.
+[F] Si una sede tiene relaciones laborales activas → no se archiva.
+[F] Si la distribución de un centro de costo entre varios → los porcentajes deben sumar 100.
+[F] Si un puesto no tiene categoría laboral asignada → aparece como pendiente en el cuadro de categorías y funciones (M-COM) y en el tablero de cumplimiento.
+[F] Si el directorio se muestra a un Empleado → solo incluye nombre, puesto, unidad, sede y los datos de contacto laboral que la organización decidió publicar.
+#eve
+- `org_unit.created`, `org_unit.moved`, `org_unit.manager_changed`, `org_unit.archived`, `job_profile.created`, `job_profile.updated`, `location.created`.
+#evc
+- `employment.assignment_changed`, `position.filled`, `position.vacated` (para redibujar el organigrama).
+#bor
+- Unidad sin responsable: sus integrantes reportan al responsable de la unidad superior.
+- Reorganización futura: el organigrama permite ver «a la fecha».
+- Matriz: una persona con jefe funcional distinto del jerárquico (línea punteada, sin efecto en aprobaciones salvo configuración).
+#acc
+- Cambiar un jefe o un cargo actualiza organigrama, directorio y alcance sin pasos adicionales.
+- La estructura admite los niveles razón social, sede, área, departamento, subdepartamento, unidad y equipo sin límite fijo de profundidad.
+
+@@ POS | Posiciones y headcount | 1
+#obj
+Gestionar la plantilla por posiciones (plazas presupuestadas): cuántas hay, cuáles están ocupadas o vacantes, cuánto cuestan y cómo se comparan con el presupuesto y con escenarios.
+#alc
+- Posición (`positions`): puesto de catálogo, unidad, sede, centro de costo, jefe (otra posición), tipo, fecha de vigencia, costo presupuestado, criticidad.
+- Estados: propuesta, aprobada, vacante, en reclutamiento, ocupada, congelada, cerrada.
+- Solicitud de posición con aprobación y presupuesto; enlace a vacante (M-ATS) y a contratación.
+- Política opcional «no contratar sin posición aprobada».
+- Presupuesto de plantilla por periodo, costo proyectado, desviaciones.
+- Escenarios: actual, conservador, crecimiento, personalizado.
+- Organigrama por posiciones con vacantes y costo.
+#fue
+- Proceso de selección (M-ATS). Cálculo real de planilla (M-NOM); aquí se usa costo estimado con factores de carga.
+#act
+- Manager solicita. RRHH y finanzas aprueban. Administrador define política y presupuesto.
+#flu
+**Solicitud de posición.** 1) El manager solicita (puesto, unidad, motivo, fecha, costo estimado). 2) El motor de aprobaciones la envía a RRHH y finanzas. 3) Aprobada, se crea la posición «Aprobada» con cargo al presupuesto. 4) RRHH abre la vacante: la posición pasa a «En reclutamiento». 5) Al contratar, se asigna la relación laboral y pasa a «Ocupada».
+
+**Cese o traslado del ocupante.** 1) Al cesar o moverse, la posición vuelve a «Vacante». 2) RRHH decide reemplazar, congelar o cerrar.
+
+**Escenario.** 1) Se duplica la plantilla actual. 2) Se añaden, congelan o eliminan posiciones y se ajustan fechas y costos. 3) Se compara con el presupuesto y con otros escenarios. 4) Un escenario aprobado puede convertirse en solicitudes reales.
+#pan
+Posiciones :: Tabla con puesto, unidad, ocupante, estado, costo (con permiso); filtros por estado y unidad; crear, congelar, cerrar :: Personas → Posiciones
+Solicitudes de posición :: Lista con estado de aprobación; detalle y decisión :: Personas → Posiciones → Solicitudes
+Headcount :: Aprobadas, ocupadas, vacantes, congeladas; presupuesto frente a real y desviación por unidad :: Personas → Posiciones → Headcount
+Escenarios :: Comparador de escenarios con costo y dotación por periodo :: Personas → Posiciones → Escenarios
+Organigrama por posiciones :: Árbol con plazas ocupadas y vacantes :: Personas → Organigrama → vista Posiciones
+#dat
+`positions` (con vigencia), solicitudes de posición, presupuesto de plantilla por periodo y centro de costo, escenarios y sus posiciones, factores de carga para costo estimado.
+#rn
+[P] Si la empresa tiene activa la política «contratar solo contra posición» → no se puede registrar un ingreso ni emitir una oferta sin una posición aprobada o vacante.
+[F] Si una posición ya tiene un ocupante activo → no admite otro, salvo que esté marcada como compartida con número de cupos.
+[F] Si una posición está congelada o cerrada → no se puede abrir vacante ni asignar ocupante.
+[F] Si el ocupante cesa o se traslada → la posición pasa a «Vacante» en la fecha efectiva.
+[P] Si el costo de una solicitud supera el presupuesto disponible de la unidad → la aprobación exige el nivel adicional configurado (parámetro).
+[F] Si se cierra una posición ocupada → se rechaza; primero debe quedar vacante.
+[F] Si se calcula el costo proyectado → usa la compensación vigente del ocupante o el punto medio de la banda si está vacante, más los factores de carga del régimen (parámetros del paquete de país).
+[F] Si un escenario se modifica → no altera posiciones reales hasta convertirlo de forma explícita en solicitudes.
+#eve
+- `position.requested`, `position.approved`, `position.opened`, `position.filled`, `position.vacated`, `position.frozen`, `position.closed`.
+#evc
+- `employee.hired`, `employee.terminated`, `employment.assignment_changed`, `vacancy.opened`, `vacancy.closed`, `approval.approved`.
+#bor
+- Reemplazo con traslape: nuevo ocupante entra antes de que salga el anterior (cupo temporal doble con fecha fin).
+- Posición con ocupante en licencia larga y suplente temporal.
+- Empresa sin política activa: se crea la posición de forma implícita al registrar el ingreso.
+#acc
+- El flujo solicitud → aprobación → presupuesto → reclutamiento → contratación → ocupada funciona de extremo a extremo.
+- El tablero muestra aprobadas, ocupadas, vacantes, nuevas, congeladas, eliminadas, costo proyectado y desviación.
+
+@@ COL | Colaboradores y ficha 360 | 1
+#obj
+Ser la fuente única de información del colaborador: quién es la persona, qué relaciones laborales tiene y todo lo que los demás módulos saben de ella, en una sola ficha.
+#alc
+- Persona (`people`): identidad, documento, nacimiento, sexo cuando la norma lo requiere, nacionalidad, estado civil, dirección, teléfonos, correo opcional, foto, contacto de emergencia.
+- Relación laboral (`employments`): empresa, código, fecha de ingreso, tipo de trabajador, régimen laboral, modalidad, estado.
+- Derechohabientes (cónyuge, conviviente, hijos) con sustento; datos de pago (banco, cuenta, CCI, billetera); régimen pensionario y de salud; seguros.
+- Ficha con pestañas: Resumen, Información, Contrato, Compensación, Asistencia, Vacaciones, Planilla, Documentos, Activos, Desempeño, Objetivos, Competencias, Capacitaciones, Beneficios, Encuestas, Reconocimientos, Historial, Actividad. Cada pestaña aparece solo si el módulo está contratado y el usuario tiene permiso.
+- Alta, reingreso, relaciones simultáneas en empresas del grupo, cese.
+- Solicitudes de cambio de datos por el propio colaborador con aprobación.
+#fue
+- Movimientos con vigencia (M-HIS), contrato (M-CON), liquidación (M-LIQ).
+#act
+- RRHH registra y edita. Payroll ve y edita compensación y datos de pago. Manager ve a su equipo sin campos sensibles. Empleado ve y propone cambios de lo propio.
+#flu
+**Ingreso.** 1) RRHH busca a la persona por documento (evita duplicados; si existe, ofrece reingreso o segunda relación). 2) Completa persona, relación, posición o puesto, jefe, sede, régimen, compensación y contrato inicial. 3) El sistema valida límites del plan y la política de posiciones. 4) Crea la relación «Por ingresar» o «Activa» según la fecha. 5) Emite `employee.hired`, que dispara onboarding, alta en T-Registro, invitación al portal y seguros.
+
+**Reingreso.** 1) Se encuentra a la persona con relaciones anteriores. 2) Se crea una relación nueva; las anteriores quedan intactas. 3) La antigüedad para cada beneficio se calcula según la regla del paquete de país.
+
+**Cese.** 1) RRHH registra fecha, motivo y tipo de cese. 2) Se validan pendientes (activos, préstamos, vacaciones). 3) Se lanza offboarding y liquidación. 4) En la fecha efectiva la relación pasa a «Cesada», se libera la posición y se emite `employee.terminated`.
+
+**Cambio de datos por el colaborador.** 1) Propone el cambio con sustento. 2) Los campos de bajo riesgo se aplican de inmediato; los demás van a aprobación. 3) Aprobado, se actualiza y se audita.
+#pan
+Colaboradores :: Tabla con búsqueda, filtros (empresa, unidad, estado), orden, columnas, vistas guardadas, exportar; nuevo ingreso :: Personas → Colaboradores
+Ficha · Resumen :: Datos clave, antigüedad, jefe, estado, pendientes, alertas del colaborador :: Personas → Colaboradores → Ficha → pestaña Resumen
+Ficha · Información :: Datos personales y laborales, emergencia, derechohabientes, pago, pensión y salud (según permisos) :: Personas → Colaboradores → Ficha → pestaña Información
+Ficha · Contrato :: Contrato vigente, renovaciones, periodo de prueba, jornada, documentos :: Personas → Colaboradores → Ficha → pestaña Contrato
+Ficha · Compensación :: Sueldo, moneda, bonos, comisiones, asignaciones, historial salarial, posición en banda :: Personas → Colaboradores → Ficha → pestaña Compensación
+Ficha · Historial :: Línea de tiempo de movimientos; registrar movimiento :: Personas → Colaboradores → Ficha → pestaña Historial
+Ficha · Actividad :: Auditoría del registro :: Personas → Colaboradores → Ficha → pestaña Actividad
+Ficha · pestañas de módulos :: Asistencia, Vacaciones, Planilla, Documentos, Activos, Desempeño, Objetivos, Competencias, Capacitaciones, Beneficios, Encuestas, Reconocimientos :: Personas → Colaboradores → Ficha → pestañas de módulo
+Registrar ingreso :: Formulario por pasos con búsqueda de persona, validaciones y resumen :: Personas → Colaboradores → Nuevo ingreso
+Registrar cese :: Fecha, motivo, tipo, observaciones, pendientes detectados :: Personas → Colaboradores → Ficha → Registrar cese
+#dat
+`people`, `employments`, documentos de identidad, direcciones, contactos de emergencia, derechohabientes (`dependents`), datos de pago, afiliaciones (pensión, salud, seguros), solicitudes de cambio de datos, motivos de cese.
+#rn
+[F] Si se registra un ingreso con un documento de identidad que ya existe en la organización → no se crea otra persona; se ofrece reingreso o relación adicional.
+[F] Si una persona tiene una relación activa en una empresa → no puede abrirse otra relación activa en la misma empresa con fechas que se solapen.
+[F] Si se cesa una relación → la persona, sus relaciones anteriores y todo su historial se conservan; nunca se borran.
+[F] Si la fecha de ingreso es futura → la relación queda «Por ingresar» y pasa a «Activa» automáticamente ese día.
+[F] Si otro módulo necesita sueldo, jefe, puesto o saldo → lo lee de la relación y su historia vigente; ningún módulo guarda su propia copia editable.
+[P] Si el colaborador propone un cambio en un campo de la lista «requiere aprobación» (parámetro por empresa) → no se aplica hasta que RRHH lo aprueba.
+[F] Si se registra un hijo como derechohabiente → se exige sustento y fecha de nacimiento; de ello depende la asignación familiar (M-BSO).
+[F] Si el campo sexo, discapacidad u otro dato sensible se registra → se guarda con finalidad y base legal, y la discapacidad además con consentimiento expreso (M-PRI).
+[F] Si se registra un cese con fecha anterior al último periodo de planilla cerrado → se rechaza o se exige el flujo de ajuste retroactivo (M-PER).
+[P] Si el cese se registra con activos sin devolver, préstamos con saldo o vacaciones aprobadas futuras → se advierte y se crean tareas de offboarding; el bloqueo es configurable.
+[F] Si cambia el número de cuenta de pago → requiere permiso de campo, se notifica al titular por un canal distinto y queda auditado.
+[F] Si el usuario no tiene permiso de un campo sensible → la pestaña o el bloque correspondiente no se muestra ni se envía.
+[P] Si el alta supera el límite de colaboradores del plan → se rechaza con mensaje al administrador.
+[F] Si la empresa opera en Perú → la ficha incluye los datos del registro laboral (tipo de trabajador, ocupación, situación educativa, indicadores de jornada, tipo de pago, seguros de riesgo) con vigencia, sin duplicar lo que ya vive en persona, relación, contrato o afiliaciones.
+[F] Si faltan datos obligatorios del registro laboral → la contratación puede guardarse, pero el alta queda bloqueada con la lista de faltantes.
+#eve
+- `employee.hired`, `employee.updated`, `employee.terminated`, `employee.rehired`, `employment.activated`, `person.data_change_requested`, `person.data_change_approved`, `dependent.added`, `payment_data.changed`.
+#evc
+- `candidate.hired` (precarga el ingreso), `offer.accepted`, `offboarding.completed`, `settlement.paid`.
+#int
+Validación de identidad contra el registro nacional y verificación de cuenta bancaria, ambas por adaptador opcional.
+#bor
+- Persona con dos relaciones simultáneas (dos empresas del grupo): dos fichas laborales bajo una misma persona; cada una con su planilla.
+- Reingreso el mismo mes del cese.
+- Cambio de documento de identidad (carné de extranjería a DNI): se conserva el historial de documentos.
+- Ingreso registrado con fecha pasada: dispara cálculos retroactivos en periodos abiertos.
+- Fallecimiento: cese con tratamiento especial de beneficiarios (M-LIQ).
+#acc
+- La ficha reúne todas las pestañas del pedido y cada una refleja datos reales de su módulo.
+- Un colaborador creado sigue existiendo y aparece en directorio, organigrama, tableros y auditoría.
+- Un administrador sin permiso de sueldos no ve compensación en ningún lugar.
+
+@@ HIS | Historia con vigencia | 1
+#obj
+Guardar con fecha de inicio y fin todo lo que cambia en una relación laboral, para no perder la historia, poder programar cambios futuros y recalcular planilla hacia atrás.
+#alc
+- Dimensiones con vigencia: asignación (posición, puesto, unidad, sede, centro de costo), jefe, compensación, contrato, horario, estado, régimen laboral y pensionario.
+- Movimientos tipificados: ingreso, promoción, traslado, cambio de jefe, incremento, cambio de jornada, cambio de sede, cambio de régimen, suspensión, cese.
+- Cambios futuros programados y correcciones retroactivas controladas.
+- Línea de tiempo y consulta «a la fecha».
+- Movimientos masivos.
+#fue
+- La auditoría de quién registró (M-AUD). El contenido del contrato (M-CON).
+#act
+- RRHH registra movimientos. Payroll registra cambios de compensación. Manager propone (vía aprobación). Empleado consulta su historia.
+#flu
+**Registrar un movimiento.** 1) Se elige tipo, fecha de vigencia y nuevos valores. 2) El sistema cierra el registro vigente el día anterior y crea el nuevo. 3) Si la fecha es futura, queda «programado» y se aplica ese día. 4) Emite el evento de la dimensión afectada.
+
+**Corrección retroactiva.** 1) Se elige el registro erróneo. 2) Se indica el valor correcto y el motivo. 3) El sistema crea el registro corregido, marca el anterior como «reemplazado» (no lo borra). 4) Si afecta periodos de planilla cerrados, genera diferencias para el periodo abierto.
+
+**Consulta a la fecha.** 1) Se elige una fecha. 2) La ficha, el organigrama y los reportes muestran los valores vigentes ese día.
+#pan
+Línea de tiempo :: Movimientos ordenados con antes y después, tipo, vigencia y autor; filtro por dimensión :: Personas → Colaboradores → Ficha → pestaña Historial
+Registrar movimiento :: Tipo, fecha de vigencia, nuevos valores, motivo; aviso de impacto :: Personas → Colaboradores → Ficha → Registrar movimiento
+Movimientos programados :: Cambios futuros pendientes de aplicarse; editar o cancelar :: Personas → Colaboradores → Movimientos programados
+Movimientos masivos :: Selección de personas y cambio común con fecha; vista previa :: Personas → Colaboradores → Acciones masivas
+#dat
+Asignaciones (`employment_assignments`), compensaciones (`compensations`), líneas de reporte, estados de la relación, tipos de movimiento; todas con `valid_from`, `valid_to`, motivo y referencia al registro reemplazado.
+#rn
+[F] Si se registra un cambio en una dimensión con vigencia → se inserta un registro nuevo y se cierra el anterior el día previo; nunca se actualiza el valor en sitio.
+[F] Si dos registros de la misma dimensión y relación se solaparan en fechas → la base lo impide.
+[F] Si entre dos registros de una dimensión obligatoria quedara un hueco de fechas → se rechaza.
+[F] Si la fecha de vigencia es futura → el cambio no afecta permisos, organigrama ni planilla hasta ese día.
+[F] Si la fecha de vigencia cae en un periodo de planilla cerrado → el cambio se acepta solo con permiso de corrección y genera una diferencia retroactiva en el periodo abierto; el periodo cerrado no se altera.
+[F] Si se corrige un movimiento → el registro original queda marcado como reemplazado y visible en la línea de tiempo con el motivo.
+[F] Si un movimiento cambia puesto, categoría o remuneración → se genera la evidencia de comunicación de la política salarial (Ley 30709) para firma o acuse.
+[F] Si un incremento salarial proviene de un ciclo de revisión o de una promoción → queda enlazado a su origen y a su aprobación.
+[F] Si se pide un dato «a la fecha X» → se devuelve el registro cuya vigencia contiene X.
+#eve
+- `employment.assignment_changed`, `employment.manager_changed`, `employment.compensation_changed`, `employment.schedule_changed`, `employment.status_changed`, `employment.regime_changed`, `employee.promoted`, `employee.transferred`.
+#evc
+- `salary_review.applied`, `approval.approved` (propuestas de manager), `contract.signed`.
+#bor
+- Dos cambios el mismo día en la misma dimensión: gana el último registrado; el anterior queda reemplazado.
+- Cancelar un cambio futuro ya comunicado.
+- Reorganización masiva con fecha futura y bajas intermedias.
+- Cambio de régimen pensionario a mitad de mes.
+#acc
+- La línea de tiempo muestra cargo, área, sede, jefe, salario, contrato, horario, centro de costo y estado con sus fechas.
+- Un cambio con fecha futura se aplica solo, y uno retroactivo produce diferencias en planilla sin alterar periodos cerrados.
+
+@@ CON | Contratos y adendas | 1
+#obj
+Administrar los contratos de trabajo, sus renovaciones y adendas, con alertas de vencimiento y de tope acumulado para evitar la desnaturalización.
+#alc
+- Tipos de contrato por país (indeterminado, modalidades sujetas a plazo, tiempo parcial, convenios formativos) con plazo máximo y causa objetiva.
+- Contrato con inicio, fin, periodo de prueba, jornada, remuneración pactada, causa objetiva, documento.
+- Renovaciones y prórrogas, adendas (cambio de remuneración, puesto, jornada, teletrabajo), terminación.
+- Alertas de vencimiento y de tope acumulado; renovación masiva con generación y firma.
+- Acuerdo de teletrabajo con contenido mínimo.
+#fue
+- Plantillas y firma (M-DOC). Convenios de locación de servicios (M-LOC).
+#act
+- RRHH redacta y renueva. Asesor legal o administrador aprueba. Colaborador firma. Manager recibe alertas de su equipo.
+#flu
+**Contrato inicial.** 1) Al registrar el ingreso se elige tipo, fechas, periodo de prueba, jornada y causa objetiva si es a plazo. 2) Se genera el documento desde plantilla. 3) Se aprueba y se envía a firma. 4) Firmado por ambas partes pasa a «Vigente» en su fecha de inicio.
+
+**Renovación.** 1) El sistema alerta con la anticipación configurada. 2) RRHH decide renovar, convertir a indeterminado o no renovar. 3) Al renovar se valida el tope de la modalidad y el tope total. 4) Se genera la prórroga y se firma.
+
+**Renovación masiva.** 1) Se filtran contratos por vencer. 2) Se elige nueva fecha fin común o por regla. 3) El sistema excluye y explica los que superarían un tope. 4) Genera documentos y lanza las firmas.
+
+**Adenda.** 1) Se registra el cambio pactado con fecha. 2) Se genera y firma la adenda. 3) Firmada, crea el movimiento con vigencia en M-HIS.
+#pan
+Contratos :: Tabla con tipo, inicio, fin, estado, días para vencer, acumulado frente al tope; filtros y renovación masiva :: Personas → Contratos
+Por vencer :: Contratos que vencen en la ventana elegida con acción sugerida :: Personas → Contratos → Por vencer
+Contrato del colaborador :: Contrato vigente, historial de renovaciones y adendas, periodo de prueba, documento :: Personas → Colaboradores → Ficha → pestaña Contrato
+Tipos de contrato :: Catálogo con plazo máximo, causa objetiva, plantilla asociada :: Configuración → Contratos
+#dat
+Contratos (`contracts`, con vigencia), renovaciones, adendas, tipos de contrato y sus topes (parámetros del paquete de país), acuerdos de teletrabajo.
+#rn
+[F] Si el contrato es a plazo fijo (modalidad) → exige fecha de fin y causa objetiva escrita.
+[P] Si la suma de plazos de una misma modalidad para la persona en la empresa supera el máximo de esa modalidad (parámetro del paquete de país) → no se permite renovar bajo esa modalidad.
+[P] Si la suma de todos los contratos a modalidad supera el tope total (parámetro del paquete de país, a confirmar con la norma vigente) → se bloquea la renovación y se propone convertir a indeterminado.
+[P] Si faltan N días para el vencimiento (parámetro, varias anticipaciones) → se genera alerta a RRHH y al jefe con explicación.
+[F] Si un contrato a plazo vence sin renovación ni cese registrado y la persona sigue activa → se marca «vencido sin regularizar», se alerta como riesgo de desnaturalización y aparece en cumplimiento.
+[F] Si un contrato no está firmado por ambas partes → no pasa a «Vigente» (salvo carga de contrato físico escaneado con marca de origen).
+[P] Si el periodo de prueba supera el máximo del tipo de puesto (parámetro del paquete de país, a confirmar) → se rechaza.
+[F] Si una adenda firmada cambia remuneración, puesto o jornada → se registra el movimiento con vigencia correspondiente de forma automática.
+[F] Si el contrato es de tiempo parcial o modalidad formativa → el régimen de beneficios de la relación se ajusta según el paquete de país.
+[F] Si se pacta teletrabajo → el acuerdo debe contener todos los campos mínimos (modalidad, jornada, desconexión, lugar, supervisión, equipos, compensación) antes de enviarse a firma.
+#eve
+- `contract.created`, `contract.sent_for_signature`, `contract.signed`, `contract.renewed`, `contract.amended`, `contract.expiring`, `contract.expired`, `contract.terminated`.
+#evc
+- `employee.hired`, `employee.terminated`, `signature.completed`, `signature.rejected`.
+#int
+Firma electrónica y digital (M-DOC). T-Registro recibe tipo de contrato (M-DEC).
+#bor
+- Reingreso: los plazos anteriores cuentan para el tope según la regla del paquete de país.
+- Renovación firmada después de la fecha de vencimiento.
+- Conversión a indeterminado a mitad de contrato.
+- Contrato suspendido por licencia: el plazo sigue corriendo salvo regla distinta.
+#acc
+- Se listan los contratos próximos a vencer y los que alcanzan topes, con explicación.
+- Una renovación masiva genera documentos, lanza firmas y actualiza vigencias al completarse.
+
+@@ DOC | Gestión documental, plantillas y firma | 1
+#obj
+Guardar, generar y firmar los documentos laborales con permisos por documento, versiones y evidencia suficiente para una inspección.
+#alc
+- Repositorio por colaborador y por empresa con carpetas (personal, contratos, boletas, certificados, vacaciones, SST, evaluaciones, capacitaciones) y tipos documentales.
+- Subir, descargar, previsualizar, versionar, archivar, solicitar al colaborador, aprobar, vencimientos.
+- Generador con plantillas y variables (`{{empleado.nombre}}`), salida PDF, generación individual y masiva.
+- Firma electrónica propia (hash, sello de tiempo, IP, OTP, constancia) y capa de proveedor para firma digital con certificado; firmantes en orden o en paralelo.
+- Certificados a pedido (trabajo, constancias) con emisión automática o con aprobación.
+- Acuses de lectura de políticas y reglamentos.
+#fue
+- Boletas (M-BOL las genera y las deposita aquí). Contenido de contratos (M-CON).
+#act
+- RRHH administra. Colaborador sube lo solicitado, firma y descarga. Manager firma lo que le corresponde. Representante legal firma por la empresa.
+#flu
+**Solicitar un documento.** 1) RRHH pide un tipo documental a una o varias personas con fecha límite. 2) El colaborador lo sube desde el portal. 3) RRHH aprueba o rechaza con motivo. 4) Aprobado queda vigente; si tiene vencimiento, se agenda la alerta.
+
+**Generar y firmar.** 1) Se elige plantilla y destinatarios. 2) Se rellenan variables con datos vigentes y se revisa la vista previa. 3) Se definen firmantes y orden. 4) Cada firmante recibe el aviso, ve el documento, confirma con OTP y firma. 5) Al completarse se sella el PDF, se guarda la constancia de evidencia y se archiva en la carpeta.
+
+**Certificado a pedido.** 1) El colaborador lo pide desde el portal. 2) Si el tipo es de emisión automática, se genera con firma del representante precargada o sello de la empresa; si no, pasa por RRHH. 3) Queda en sus documentos.
+#pan
+Documentos :: Repositorio por carpeta y tipo; búsqueda, filtros, vencimientos, subir, solicitar :: Operaciones → Documentos
+Documentos del colaborador :: Carpetas de la persona con estado y versión; previsualizar, descargar :: Personas → Colaboradores → Ficha → pestaña Documentos
+Solicitudes de documentos :: Pendientes de entrega y de revisión; aprobar, rechazar :: Operaciones → Documentos → Solicitudes
+Plantillas :: Lista con versión y uso; editor con variables y vista previa con datos reales :: Operaciones → Documentos → Plantillas
+Firma :: Envíos con estado por firmante (enviado, visto, firmado), recordar, cancelar, constancia :: Operaciones → Firma
+Firmar documento :: Vista del documento, aceptación, OTP, firma; rechazo con motivo :: Portal → Pendientes → Firmar
+#dat
+Documentos y versiones, tipos documentales, carpetas, solicitudes de documento, plantillas y versiones, envíos de firma, firmantes, eventos de firma (visto, OTP, firma), constancias de evidencia, acuses de lectura.
+#rn
+[F] Si se sube una nueva versión de un documento → la anterior se conserva y queda consultable.
+[F] Si un documento está firmado → no se modifica ni se reemplaza; un cambio exige un documento nuevo (adenda o nueva versión con nueva firma).
+[F] Si un firmante firma → se registran hash del documento, sello de tiempo, IP, método de verificación (OTP) y se añade a la constancia de evidencia.
+[F] Si el envío es secuencial → el firmante siguiente no recibe el documento hasta que firme el anterior.
+[F] Si un firmante rechaza → el envío termina «Rechazado» con motivo y se notifica al emisor.
+[P] Si el envío no se completa antes de su fecha de caducidad (parámetro) → pasa a «Vencido» y se puede reenviar.
+[F] Si el hash del documento almacenado no coincide con el de la constancia → se marca como alterado y se alerta.
+[F] Si el tipo documental es confidencial → solo lo ven el titular y quienes tengan el permiso de confidenciales dentro de su alcance; cada descarga queda en el registro de accesos.
+[P] Si un documento con vencimiento llega a la ventana de aviso (parámetro por tipo) → se genera alerta al responsable y al titular.
+[F] Si una plantilla usa una variable que el emisor no puede ver (sueldo) → la generación exige que el emisor tenga el permiso del campo.
+[F] Si una plantilla cambia → los documentos ya generados conservan la versión con la que se emitieron.
+[P] Si un tipo documental requiere firma con certificado digital (parámetro por tipo) → el envío usa el proveedor de firma digital; en otro caso, la firma electrónica propia.
+[F] Si el colaborador cesa → conserva acceso a sus documentos personales en modo ex-colaborador durante el periodo configurado.
+#eve
+- `document.uploaded`, `document.requested`, `document.approved`, `document.rejected`, `document.expiring`, `document.generated`, `signature.sent`, `signature.viewed`, `signature.signed`, `signature.completed`, `signature.rejected`, `signature.expired`.
+#evc
+- `employee.hired` (solicita documentos de ingreso), `payslip.published`, `contract.created`, `policy.published`.
+#int
+Proveedores de firma digital con certificado, sellado de tiempo, OCR opcional; todos por adaptador.
+#bor
+- Firmante sin correo: firma con documento + OTP al teléfono.
+- Firmante que cesa antes de firmar: el envío se cancela o se reasigna.
+- Generación masiva con datos incompletos: se listan los omitidos y el motivo.
+- Documento físico histórico escaneado: se marca «firma manuscrita, digitalizado».
+#acc
+- El flujo documento → firmantes → orden → enviado → visto → firmado → completado deja una constancia verificable.
+- Cambiar de proveedor de firma no modifica el módulo.
+- Un certificado de trabajo se genera con datos vigentes de la ficha.
+
+@@ ESS | Portal del colaborador | 1
+#obj
+Dar a cada colaborador un autoservicio sencillo, pensado primero para el móvil, donde consulta lo suyo y hace sus trámites sin depender de RRHH.
+#alc
+- Inicio personal con saludo, vacaciones disponibles, próximo pago y pendientes.
+- Perfil y actualización de datos permitidos; contrato y documentos; boletas; vacaciones y permisos; asistencia y horario; beneficios; gastos; encuestas; evaluaciones; objetivos; cursos; firma; certificados; solicitudes a RRHH.
+- Acceso sin correo, modo ex-colaborador, aplicación web instalable.
+#fue
+- La lógica de cada trámite (vive en su módulo). El canal WhatsApp (M-WHA).
+#act
+- Empleado (alcance propio). Ex-colaborador (lectura limitada).
+#flu
+**Pendientes.** 1) El portal lista lo que espera al colaborador (firmar, evaluar, curso obligatorio, documento por subir). 2) Cada elemento abre la acción directa. 3) Al completarla, desaparece y actualiza el contador.
+
+**Trámite típico (vacaciones).** 1) Ve su saldo. 2) Elige fechas; el sistema valida en línea. 3) Envía. 4) Sigue el estado y recibe el aviso de la decisión.
+
+**Descarga de boleta.** 1) Abre Mis boletas. 2) Elige periodo. 3) Ve o descarga; queda constancia de acceso.
+#pan
+Inicio del colaborador :: Saludo, vacaciones disponibles, próximo pago, pendientes, accesos rápidos :: Inicio
+Mi perfil :: Datos personales y laborales, emergencia, derechohabientes; proponer cambios :: Portal → Mi perfil
+Mis documentos y contrato :: Documentos propios, contrato vigente, firma pendiente :: Portal → Mis documentos
+Mis boletas :: Historial de boletas y certificados de renta; descargar :: Portal → Mis boletas
+Mi tiempo :: Marcar, ver asistencia, horario, vacaciones, permisos, horas extra y bolsa :: Portal → Mi tiempo
+Mis solicitudes :: Trámites enviados con estado; nueva solicitud a RRHH :: Portal → Mis solicitudes
+Mi desarrollo :: Objetivos, evaluaciones, cursos, beneficios, reconocimientos, encuestas :: Portal → Mi desarrollo
+#dat
+No tiene datos propios; consume los de cada módulo con alcance «propio».
+#rn
+[F] Si el usuario tiene alcance «propio» → toda consulta del portal se limita a sus relaciones laborales; no existe parámetro para pedir datos de otra persona.
+[F] Si el módulo de un bloque no está contratado → el bloque no aparece en el portal.
+[F] Si el colaborador ve o descarga una boleta → se registra fecha y hora de acceso como constancia de entrega.
+[F] Si el colaborador tiene varias relaciones activas → elige con cuál opera y ve boletas y saldos separados por empresa.
+[P] Si el colaborador cesó → mantiene acceso de solo lectura a boletas, certificados, liquidación y documentos de cese por el periodo configurado (parámetro).
+[F] Si una acción del portal exige confirmar identidad (firmar, cambiar cuenta de pago) → se pide OTP aunque la sesión esté activa.
+#evc
+- Todos los que generan pendientes para la persona.
+#bor
+- Colaborador sin teléfono inteligente: kiosko compartido en sede con cierre de sesión automático.
+- Conectividad baja: pantallas ligeras y marcación sin conexión (M-ASI).
+- Menor de edad en modalidad formativa: avisos también al tutor si la empresa lo configura.
+#acc
+- Desde un móvil se completa: marcar asistencia, pedir vacaciones, ver boletas, firmar, responder encuestas, ver horario y crear solicitudes.
+- El inicio muestra saldo de vacaciones, próximo pago y pendientes reales.
+
+@@ MSS | Portal del manager | 1
+#obj
+Dar a cada responsable una vista de su equipo y una bandeja para decidir, sin exponerle datos que no le corresponden.
+#alc
+- Mi equipo (directos e indirectos), ausentes hoy, asistencia, vacaciones, solicitudes, objetivos, evaluaciones, capacitaciones, carga, cumpleaños, aniversarios, alertas.
+- Aprobaciones, propuestas de movimiento e incremento, solicitud de posición, 1:1, reconocimientos.
+- Calendario del equipo y control de traslapes.
+#fue
+- Datos sensibles sin permiso de campo (sueldo, salud, sanciones). Lógica de cada trámite.
+#act
+- Manager (alcance equipo). Suplente o delegado.
+#flu
+**Revisión diaria.** 1) Ve quién está ausente y qué solicitudes esperan. 2) Aprueba o rechaza desde la misma pantalla. 3) Revisa alertas (contrato por vencer, evaluación pendiente, vacaciones acumuladas) con su explicación.
+
+**Propuesta de movimiento.** 1) Abre la ficha de un integrante. 2) Propone promoción, traslado o incremento con sustento. 3) Va al flujo de aprobación; aprobada, RRHH la aplica con vigencia.
+#pan
+Inicio del manager :: Mi equipo, ausentes, solicitudes, objetivos, evaluaciones, cumpleaños, pendientes :: Inicio
+Mi equipo :: Lista o tarjetas de integrantes con estado del día, saldo de vacaciones, pendientes; ir a la ficha limitada :: Portal → Mi equipo
+Calendario del equipo :: Vacaciones, ausencias, turnos y eventos; traslapes :: Portal → Mi equipo → Calendario
+Solicitudes del equipo :: Bandeja filtrada de aprobaciones de su equipo :: Portal → Mi equipo → Solicitudes
+#dat
+Sin datos propios; usa la línea de reporte vigente (M-HIS) y los datos de cada módulo con alcance «equipo».
+#rn
+[F] Si el usuario tiene alcance «equipo» → ve a quienes le reportan directa o indirectamente según la línea de reporte vigente; nadie más.
+[F] Si el rol Manager no trae permiso de un campo sensible → la ficha de sus reportes omite sueldo, salud, sanciones y documentos confidenciales.
+[P] Si una ausencia solicitada deja al equipo por debajo de la dotación mínima (parámetro por unidad) → el manager ve la advertencia antes de aprobar.
+[F] Si el manager propone un cambio de sueldo o de puesto → nunca se aplica directo; pasa por aprobación y lo ejecuta RRHH o Payroll.
+[F] Si el manager está ausente → su suplente recibe las aprobaciones y ve al equipo durante la suplencia.
+#evc
+- `employment.manager_changed`, `approval.requested`, eventos de ausencia y asistencia del equipo.
+#bor
+- Manager sin equipo aún (posición nueva): estado vacío útil.
+- Integrante con dos jefes (matriz): aprueba el jerárquico, el funcional es informado.
+- Manager que es también colaborador: conmuta entre «mi equipo» y «lo mío».
+#acc
+- El manager ve equipo, asistencia, vacaciones, solicitudes, objetivos, evaluaciones, capacitaciones, carga, cumpleaños, aniversarios y alertas, y aprueba según permisos.
+
+@@ IMP | Importador y puesta en marcha | 1
+#obj
+Poner en marcha una organización en poco tiempo y cargar datos en bloque con validación, sin importar nunca a ciegas.
+#alc
+- Asistente de primeros pasos: empresa, estructura, plantillas del país, usuarios, primera carga, activación de módulos; lista de avance.
+- Plantillas peruanas listas: conceptos de planilla, tipos de contrato, políticas de vacaciones y asistencia, plantillas de documentos, catálogos.
+- Importador CSV/Excel de colaboradores, contratos, saldos de vacaciones, salarios, asistencia, conceptos, históricos (movimientos, boletas, planillas previas), estructura, posiciones.
+- Proceso: subir → mapear columnas → validar → previsualizar → importar; deshacer por lote.
+- Detección de datos sucios (duplicados, formatos, faltantes) con sugerencias.
+#fue
+- Migración a medida desde otros sistemas (servicio, fuera del producto). Integraciones continuas (M-INT).
+#act
+- Administrador y RRHH. Payroll para conceptos e históricos de planilla. Socio implementador o estudio contable (M-EST).
+#flu
+**Importación.** 1) Se elige el tipo de datos y se descarga la plantilla (opcional). 2) Se sube el archivo. 3) El sistema propone el mapeo de columnas y recuerda mapeos anteriores. 4) Valida fila por fila (formato, catálogos, duplicados, reglas de negocio, permisos de campo). 5) Muestra vista previa con filas correctas, con advertencias y con errores. 6) El usuario corrige o descarga los errores. 7) Confirma; se importa en segundo plano. 8) Queda el informe del lote con opción de deshacer mientras sea posible.
+
+**Puesta en marcha guiada.** 1) El asistente pide datos de la empresa. 2) Aplica plantillas del país. 3) Guía la carga de estructura y personas. 4) Propone los siguientes pasos por módulo contratado. 5) Marca el avance y sugiere lo que falta para cumplir (enlace a M-CUM).
+#pan
+Primeros pasos :: Lista de pasos con avance, pendientes y accesos directos :: Inicio → Primeros pasos
+Importaciones :: Historial de lotes con estado, filas, errores, autor; nueva importación :: Configuración → Importar datos
+Asistente de importación :: Pasos subir, mapear, validar, previsualizar, confirmar :: Configuración → Importar datos → Nueva
+Resultado del lote :: Resumen, registros creados o actualizados, errores descargables, deshacer :: Configuración → Importar datos → Detalle
+Plantillas del país :: Conjuntos disponibles con su contenido; aplicar :: Configuración → Plantillas
+#dat
+Lotes de importación, filas con estado y errores, mapeos guardados, avance de puesta en marcha, plantillas aplicadas.
+#rn
+[F] Si un archivo no ha pasado por validación y vista previa → no se puede importar.
+[P] Si hay filas con error → el usuario elige entre importar solo las válidas o corregir todo primero (política por tipo de datos).
+[F] Si una fila apunta a un catálogo inexistente (unidad, puesto, banco) → es error, salvo que el usuario active «crear faltantes» y tenga permiso para administrar ese catálogo.
+[F] Si la importación incluye columnas sensibles (sueldo, cuenta) → el usuario debe tener el permiso de edición de ese campo; si no, la columna se ignora con aviso.
+[F] Si se importan históricos (boletas, movimientos pasados) → se cargan como historia de solo lectura marcada «importado», sin disparar eventos de negocio ni notificaciones.
+[F] Si se importan colaboradores vigentes → cada alta respeta las mismas reglas que el alta manual (documento único, límites del plan, vigencias sin solape).
+[F] Si se deshace un lote → solo es posible mientras ningún registro del lote haya sido usado por otro proceso (planilla cerrada, firma, aprobación); en ese caso se indica qué lo impide.
+[F] Si el mismo archivo se sube dos veces → se detecta por huella y se advierte antes de continuar.
+[F] Si se importan saldos de vacaciones → entran como saldo inicial con fecha de corte y sustento, no como movimientos inventados.
+#eve
+- `import.validated`, `import.completed`, `import.failed`, `import.reverted`, `onboarding_setup.completed`.
+#evc
+- `organization.created` (inicia el asistente).
+#bor
+- Archivo con 50 000 filas: validación y carga por lotes con avance.
+- Codificación o separador inesperado: detección automática y vista previa.
+- Jefes que referencian a personas del mismo archivo: resolución en dos pasadas.
+- Fechas en formatos mixtos.
+#acc
+- Ninguna importación escribe sin vista previa confirmada.
+- Una empresa nueva queda operativa con plantillas peruanas aplicadas y su plantilla cargada siguiendo solo el asistente.
+
+@@ AYU | Centro de ayuda | 1
+#obj
+Que cualquier persona, en cualquier rol y pantalla, resuelva sola sus dudas sobre cómo usar GestiaHR y sobre las políticas de su empresa, y que derive a RRHH lo que la ayuda no resuelve.
+#alc
+- Botón de ayuda en la barra superior de todas las pantallas y en el portal móvil, para los once roles de sistema y los roles personalizados.
+- Ayuda del producto redactada y versionada por GestiaHR: guías por rol y módulo, ayuda contextual por pantalla, ayudas de campo, recorridos de primer ingreso y novedades de versión.
+- Artículos propios de la organización (reglamento interno, políticas de vacaciones, permisos, gastos) con audiencia, responsable, versión y fecha de revisión.
+- Buscador de texto completo sobre ambos contenidos, valoración «¿te sirvió?» y registro de búsquedas sin resultado.
+- Derivación de la consulta a RRHH como solicitud y, para el administrador, al soporte de GestiaHR.
+- Asistente de ayuda con IA (IAR-9 a IAR-11) dentro del centro de ayuda, que puede encenderse o apagarse (M-IAR).
+#fue
+- Mesa de ayuda con colas y SLA (M-HSD): el centro de ayuda solo crea la solicitud. Respuestas con datos del propio usuario (IAR-12, fase 8).
+#act
+- Todos los roles consultan. Administrador y RRHH publican artículos de la organización y configuran el asistente. El superadministrador SaaS publica la ayuda del producto y atiende el soporte.
+#flu
+**Consulta.** 1) El usuario pulsa el botón de ayuda en una pantalla. 2) El centro abre en «Esta pantalla» con sus artículos. 3) El usuario busca o pregunta al asistente si está habilitado. 4) Valora el artículo. 5) Si no se resolvió, deriva la consulta a RRHH con la pregunta y los artículos consultados.
+
+**Publicación de la organización.** 1) RRHH redacta el artículo y elige audiencia, responsable y fecha de revisión. 2) Lo publica y queda versionado. 3) Al vencer la revisión, el responsable recibe un aviso.
+
+**Ayuda del producto.** 1) GestiaHR redacta el artículo con módulo, roles y pantallas. 2) Lo publica en la consola con la versión del producto. 3) Se actualiza el índice de búsqueda y el asistente lo usa desde ese momento.
+#pan
+Centro de ayuda :: Pestañas Esta pantalla, Guías, Asistente (si está habilitado) y Mis consultas; buscador, valoración y derivación :: Barra superior → Ayuda
+Ayuda y asistente :: Pestañas Asistente (activación, roles, límite y aviso), Artículos de la organización y Consultas (indicadores y búsquedas sin resultado) :: Configuración → Ayuda y asistente
+Ayuda del producto :: Artículos del producto por módulo y rol, versiones, publicación, búsquedas sin resultado y consultas de soporte de las organizaciones :: Consola de la plataforma → Ayuda del producto
+#dat
+Artículos del producto (`help_articles`, de plataforma, con versiones en `help_article_versions`), artículos de la organización (`kb_categories`, `kb_articles`, `kb_article_feedback`), valoraciones de artículos del producto (`help_article_feedback`), búsquedas registradas (`help_search_queries`), consultas derivadas (`help_escalations`) y recorridos vistos (`help_tour_progress`).
+#rn
+[F] Si un usuario abre la ayuda → solo ve artículos de módulos contratados y activos, dirigidos a su rol y de pantallas que puede abrir.
+[F] Si un artículo del producto se publica en una versión nueva → la anterior se conserva y el artículo indica la versión del producto a la que corresponde.
+[F] Si la organización publica un artículo propio → solo lo ve la audiencia elegida (roles, empresas o sedes) y lleva responsable, versión y fecha de revisión.
+[P] Si un artículo propio supera su fecha de revisión (parámetro de anticipación) → se avisa al responsable y se marca «por revisar» sin ocultarse.
+[F] Si una búsqueda no da resultados → se registra el texto buscado, la pantalla y el rol, sin datos de la persona, para mejorar el contenido.
+[F] Si la ayuda no resuelve la duda → el usuario puede derivarla a RRHH como solicitud con la pregunta y los artículos consultados; solo el administrador puede escribir al soporte de GestiaHR.
+[F] Si el artículo no tiene traducción al idioma del usuario → se muestra en español con un aviso.
+#eve
+- `help.article_published`, `help.search_without_result`, `help.escalated`.
+#evc
+- `module.activated`, `module.deactivated` (cambian los artículos visibles).
+#int
+Índice de búsqueda de texto completo de PostgreSQL en español; sin servicios externos.
+#bor
+- Organización con marca blanca: la ayuda del producto se muestra con la marca de la organización.
+- Artículo propio que contradice la ayuda del producto: prevalece el de la organización para sus políticas y se indica la fuente.
+- Usuario sin relación laboral (auditor externo, contador de un estudio): ve la ayuda de su rol y no puede derivar a RRHH.
+#acc
+- Los once roles de sistema abren la ayuda desde cualquier pantalla, ven solo artículos permitidos y pueden derivar una consulta; con el asistente apagado el centro de ayuda funciona igual.

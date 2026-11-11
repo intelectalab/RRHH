@@ -40,11 +40,11 @@ return new class extends Migration
               END IF;
             END $$;
             DO $$ BEGIN
-              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ayni_app') THEN
-                GRANT SELECT, INSERT, UPDATE, DELETE ON user_mfa_recovery_codes TO ayni_app;
+              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gestia_app') THEN
+                GRANT SELECT, INSERT, UPDATE, DELETE ON user_mfa_recovery_codes TO gestia_app;
               END IF;
-              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ayni_platform') THEN
-                GRANT SELECT, INSERT, UPDATE, DELETE ON user_mfa_recovery_codes TO ayni_platform;
+              IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gestia_platform') THEN
+                GRANT SELECT, INSERT, UPDATE, DELETE ON user_mfa_recovery_codes TO gestia_platform;
               END IF;
             END $$;
 

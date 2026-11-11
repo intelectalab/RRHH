@@ -12,8 +12,8 @@ services:
       - "${FORWARD_DB_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./database:/database:ro
+      - ./kit/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./kit:/kit:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-ayni} -d ${DB_DATABASE:-aynihr}"]
       interval: 5s
@@ -99,7 +99,7 @@ services:
     # --no-reload: respeta las variables de este archivo aunque exista apps/api/.env
     command: php artisan serve --host=0.0.0.0 --port=8000 --no-reload
     environment:
-      APP_NAME: "Ayni HR"
+      APP_NAME: "GestiaHR"
       APP_ENV: local
       TENANCY_BASE_DOMAIN: localhost
       # El web (Next.js) reenvía /api con X-Forwarded-Host: la organización sale de ese host.
@@ -129,9 +129,7 @@ services:
       AWS_USE_PATH_STYLE_ENDPOINT: "true"
     volumes:
       - ./apps/api:/var/www/html
-      - ./database:/var/www/database
-      - ./tools:/var/www/tools
-      - ./api:/var/www/api
+      - ./kit:/var/www/kit
       - ./packages:/var/www/packages
       - ./.github:/var/www/.github
       - ./scripts:/var/www/scripts
@@ -159,7 +157,7 @@ services:
     volumes:
       - ./apps/web:/app
       - ./packages:/packages
-      - ./api:/api
+      - ./kit/api:/api
     ports:
       - "${FORWARD_WEB_PORT:-3000}:3000"
     depends_on:
@@ -195,7 +193,7 @@ services:
       INTEGRATIONS_DEV_INBOX: mailpit
     volumes:
       - ./apps/api:/var/www/html
-      - ./database:/var/www/database
+      - ./kit:/var/www/kit
     depends_on:
       postgres:
         condition: service_healthy
@@ -234,7 +232,7 @@ services:
       INTEGRATIONS_DEV_INBOX: mailpit
     volumes:
       - ./apps/api:/var/www/html
-      - ./database:/var/www/database
+      - ./kit:/var/www/kit
     depends_on:
       postgres:
         condition: service_healthy

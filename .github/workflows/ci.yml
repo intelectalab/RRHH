@@ -79,16 +79,16 @@ jobs:
         run: npm ci
 
       - name: Regenerate OpenAPI specification
-        run: python3 tools/gen_openapi.py
+        run: python3 kit/tools/gen_openapi.py
 
       - name: Regenerate TypeScript contracts
         working-directory: apps/web
-        run: npx openapi-typescript ../../api/openapi.yaml -o ../../packages/contracts/src/index.ts
+        run: npx openapi-typescript ../../kit/api/openapi.yaml -o ../../packages/contracts/src/index.ts
 
       - name: Check for contracts drift
         run: |
           git status --porcelain
-          git diff --exit-code api/openapi.yaml packages/contracts/src/index.ts
+          git diff --exit-code kit/api/openapi.yaml packages/contracts/src/index.ts
 
   tests:
     name: Automated Tests & Coverage
@@ -146,11 +146,11 @@ jobs:
         run: |
           # La imagen del runner ya trae psql; solo se instala si falta (evita depender del espejo de apt).
           command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
-          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -f database/schema.sql
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -f kit/database/schema.sql
 
       - name: Run Database Isolation Tests
         run: |
-          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -v ON_ERROR_STOP=1 -f database/pruebas_aislamiento.sql
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -v ON_ERROR_STOP=1 -f kit/database/pruebas_aislamiento.sql
 
       - name: Verify Database Conventions
         working-directory: apps/api

@@ -5,6 +5,7 @@ namespace App\Modules\Identity\Http\Controllers;
 use App\Modules\Identity\Application\Actions\LoginWithPassword;
 use App\Modules\Identity\Application\Actions\RequestPasswordReset;
 use App\Modules\Identity\Application\Actions\ResetPassword;
+use App\Modules\Identity\Application\CodeSignIn;
 use App\Modules\Identity\Application\Mfa\MfaService;
 use App\Modules\Identity\Application\SessionManager;
 use App\Modules\Identity\Application\UserService;
@@ -24,7 +25,7 @@ final class AuthController
         private readonly MfaService $mfa,
     ) {}
 
-    public function login(LoginRequest $request, LoginWithPassword $login): JsonResponse
+    public function login(LoginRequest $request, LoginWithPassword $login, CodeSignIn $codes): JsonResponse
     {
         [$kind, $identifier] = match (true) {
             $request->filled('email') => ['email', (string) $request->input('email')],
@@ -32,7 +33,10 @@ final class AuthController
             default => ['national_id', (string) $request->input('document_type').':'.(string) $request->input('document_number')],
         };
 
-        $user = $login($kind, $identifier, (string) $request->input('password'));
+        // SEG-2: con seguridad.acceso_con_documento apagado, el documento no sirve para ingresar.
+        $user = $kind === 'national_id' && ! $codes->documentAccessEnabled()
+            ? null
+            : $login($kind, $identifier, (string) $request->input('password'));
 
         if ($user === null) {
             return ProblemDetailsResponse::make(422, 'invalid_credentials', null, null, [
@@ -52,7 +56,7 @@ final class AuthController
 
     public function logout(Request $request): JsonResponse
     {
-        $session = $request->attributes->get('ayni_session');
+        $session = $request->attributes->get('gestia_session');
         if ($session instanceof UserSession) {
             $this->sessions->revoke($session);
         }

@@ -116,7 +116,7 @@ final class TenancyScope
         try {
             if (DB::getDriverName() === 'pgsql') {
                 DB::statement("SELECT set_config('app.tenant_id', ?, false)", [$tenantId]);
-                DB::statement('SET ROLE ayni_app');
+                DB::statement('SET ROLE gestia_app');
             }
         } catch (Throwable) {
             // Silencioso si no hay conexión de BD activa o la conexión está en inicialización

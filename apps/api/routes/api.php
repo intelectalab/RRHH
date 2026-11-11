@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return response()->json([
-        'name' => 'Ayni HR API',
+        'name' => 'GestiaHR API',
         'version' => 'v1',
         'status' => 'operational',
     ]);

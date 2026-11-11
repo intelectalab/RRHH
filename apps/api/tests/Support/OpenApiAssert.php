@@ -114,12 +114,12 @@ trait OpenApiAssert
         }
 
         $candidates = [
-            '/var/www/api/openapi.yaml',
-            base_path('../../api/openapi.yaml'),
-            base_path('../api/openapi.yaml'),
-            base_path('api/openapi.yaml'),
-            dirname(base_path()).'/api/openapi.yaml',
-            dirname(dirname(base_path())).'/api/openapi.yaml',
+            '/var/www/kit/api/openapi.yaml',
+            base_path('../../kit/api/openapi.yaml'),
+            base_path('../kit/api/openapi.yaml'),
+            base_path('kit/api/openapi.yaml'),
+            dirname(base_path()).'/kit/api/openapi.yaml',
+            dirname(dirname(base_path())).'/kit/api/openapi.yaml',
         ];
 
         $found = null;

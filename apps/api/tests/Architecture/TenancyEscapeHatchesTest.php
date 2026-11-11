@@ -73,7 +73,7 @@ test('ningún código fuera de Shared/Tenancy o Platform desactiva el aislamient
         "/set_config\\(\\s*'app\\.tenant_id'/",
         '/\bRESET\s+ROLE\b|\bSET\s+ROLE\b/i',
         '/BYPASSRLS/i',
-        "/DB::connection\\(\\s*'(platform|ayni_platform|migrator)'/",
+        "/DB::connection\\(\\s*'(platform|gestia_platform|migrator)'/",
     ], array_merge(TENANCY_ALLOWED, ['app/Shared/Http/Middleware/ResolveTenantContext.php']));
 
     expect($violations)->toBe([], "Escapes del contexto de organización:\n".implode("\n", $violations));

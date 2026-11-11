@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /consola-sitio-web
+Disallow: /portada
+Disallow: /sistema
+
+Sitemap: https://gestiahr.com/sitemap.xml

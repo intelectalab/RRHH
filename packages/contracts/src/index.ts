@@ -362,6 +362,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/help-assistant/answers/{id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valorar una respuesta del asistente de ayuda */
+        post: operations["postAiHelpAssistantAnswersIdFeedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/help-assistant/ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preguntar al asistente de ayuda; responde solo con artículos visibles para el usuario y los cita (404 si el asistente no está habilitado para el usuario) */
+        post: operations["postAiHelpAssistantAsk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/help-assistant/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Si el asistente de ayuda está disponible para el usuario actual (plan, organización y rol) */
+        get: operations["getAiHelpAssistantAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/usage-logs": {
         parameters: {
             query?: never;
@@ -394,6 +445,41 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/ai/use-case-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar AiUseCaseSetting */
+        get: operations["getAiUseCaseSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/use-case-settings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver AiUseCaseSetting */
+        get: operations["getAiUseCaseSettingsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar AiUseCaseSetting */
+        patch: operations["patchAiUseCaseSettingsId"];
         trace?: never;
     };
     "/alert-rules": {
@@ -5444,6 +5530,236 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/help/articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Artículos de ayuda visibles para el usuario (producto y organización), filtrados por rol, módulo y pantalla */
+        get: operations["getHelpArticles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/articles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalle de un artículo de ayuda con su versión */
+        get: operations["getHelpArticlesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/articles/{id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Valorar un artículo («¿te sirvió?») */
+        post: operations["postHelpArticlesIdFeedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consultas derivadas desde la ayuda y su estado */
+        get: operations["getHelpEscalations"];
+        put?: never;
+        /** Derivar una consulta a RRHH (o a soporte de GestiaHR, solo el administrador) con la pregunta y los artículos consultados */
+        post: operations["postHelpEscalations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consultas, búsquedas sin resultado y valoración de la ayuda en la organización */
+        get: operations["getHelpInsights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/org-articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar HelpOrgArticle */
+        get: operations["getHelpOrgArticles"];
+        put?: never;
+        /** Crear HelpOrgArticle */
+        post: operations["postHelpOrgArticles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/org-articles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver HelpOrgArticle */
+        get: operations["getHelpOrgArticlesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar HelpOrgArticle */
+        patch: operations["patchHelpOrgArticlesId"];
+        trace?: never;
+    };
+    "/help/org-articles/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «archive» sobre HelpOrgArticle
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postHelpOrgArticlesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/org-articles/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «publish» sobre HelpOrgArticle
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postHelpOrgArticlesIdPublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/screens/{screen_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Artículos de una pantalla (ayuda contextual y ayudas de campo) */
+        get: operations["getHelpScreensScreenKey"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Búsqueda de texto completo en la ayuda visible para el usuario */
+        get: operations["getHelpSearch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/tours/{tour_key}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marcar un recorrido guiado como visto o saltado */
+        post: operations["postHelpToursTourKeyComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/help/whats-new": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Novedades de versión de los módulos contratados */
+        get: operations["getHelpWhatsNew"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/holiday-calendars": {
         parameters: {
             query?: never;
@@ -6024,82 +6340,6 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postJobRequisitionsIdSubmit"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/kb-articles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Listar KbArticle */
-        get: operations["getKbArticles"];
-        put?: never;
-        /** Crear KbArticle */
-        post: operations["postKbArticles"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/kb-articles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Ver KbArticle */
-        get: operations["getKbArticlesId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Actualizar KbArticle */
-        patch: operations["patchKbArticlesId"];
-        trace?: never;
-    };
-    "/kb-articles/{id}/archive": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acción «archive» sobre KbArticle
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postKbArticlesIdArchive"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/kb-articles/{id}/publish": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acción «publish» sobre KbArticle
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postKbArticlesIdPublish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8251,6 +8491,116 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/help-articles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar HelpArticle */
+        get: operations["getPlatformHelpArticles"];
+        put?: never;
+        /** Crear HelpArticle */
+        post: operations["postPlatformHelpArticles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/help-articles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver HelpArticle */
+        get: operations["getPlatformHelpArticlesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar HelpArticle */
+        patch: operations["patchPlatformHelpArticlesId"];
+        trace?: never;
+    };
+    "/platform/help-articles/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «archive» sobre HelpArticle
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformHelpArticlesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/help-articles/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «publish» sobre HelpArticle
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformHelpArticlesIdPublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/help-escalations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consultas de soporte enviadas por administradores de las organizaciones */
+        get: operations["getPlatformHelpEscalations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/help-insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Búsquedas sin resultado y valoración de la ayuda del producto en todas las organizaciones */
+        get: operations["getPlatformHelpInsights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/metrics": {
         parameters: {
             query?: never;
@@ -8609,6 +8959,360 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/platform/web-complaints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar WebComplaint */
+        get: operations["getPlatformWebComplaints"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-complaints/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver WebComplaint */
+        get: operations["getPlatformWebComplaintsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-complaints/{id}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «answer» sobre WebComplaint
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebComplaintsIdAnswer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-complaints/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «close» sobre WebComplaint
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebComplaintsIdClose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-demo-bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar WebDemoBooking */
+        get: operations["getPlatformWebDemoBookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-demo-bookings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver WebDemoBooking */
+        get: operations["getPlatformWebDemoBookingsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar WebDemoBooking */
+        patch: operations["patchPlatformWebDemoBookingsId"];
+        trace?: never;
+    };
+    "/platform/web-demo-bookings/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «cancel» sobre WebDemoBooking
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebDemoBookingsIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-demo-bookings/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «complete» sobre WebDemoBooking
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebDemoBookingsIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar WebLead */
+        get: operations["getPlatformWebLeads"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-leads/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver WebLead */
+        get: operations["getPlatformWebLeadsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar WebLead */
+        patch: operations["patchPlatformWebLeadsId"];
+        trace?: never;
+    };
+    "/platform/web-leads/{id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «assign» sobre WebLead
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebLeadsIdAssign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-leads/{id}/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «convert» sobre WebLead
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebLeadsIdConvert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-leads/{id}/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «discard» sobre WebLead
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebLeadsIdDiscard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Embudo del sitio: visitas, registros, demos, pagos y lista de espera */
+        get: operations["getPlatformWebMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar WebProduct */
+        get: operations["getPlatformWebProducts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver WebProduct */
+        get: operations["getPlatformWebProductsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar WebProduct */
+        patch: operations["patchPlatformWebProductsId"];
+        trace?: never;
+    };
+    "/platform/web-products/{id}/hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «hide» sobre WebProduct
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebProductsIdHide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-products/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «publish» sobre WebProduct
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformWebProductsIdPublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/web-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ajustes del sitio: chatbot, popups, cookies y prueba social */
+        get: operations["getPlatformWebSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambiar los ajustes del sitio */
+        patch: operations["patchPlatformWebSettings"];
         trace?: never;
     };
     "/positions": {
@@ -9306,6 +10010,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitio: productos, planes públicos con módulos, límites y complementos, y estado de cada módulo */
+        get: operations["getPublicCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/chat/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: mensaje al chatbot comercial (solo contenido público) */
+        post: operations["postPublicChatMessages"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/complaints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: registrar un reclamo o queja en el libro de reclamaciones virtual */
+        post: operations["postPublicComplaints"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/demo-bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: agendar una demo */
+        post: operations["postPublicDemoBookings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/demo-bookings/{token}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: cancelar o reprogramar una demo desde el enlace del correo */
+        post: operations["postPublicDemoBookingsTokenCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/demo-slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitio: horarios libres para agendar una demo */
+        get: operations["getPublicDemoSlots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/grievances": {
         parameters: {
             query?: never;
@@ -9402,6 +10208,108 @@ export interface paths {
         put?: never;
         /** Postular a una vacante (con consentimiento) */
         post: operations["postPublicJobsSlugApplications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: formulario de contacto, partner, boletín, calculadora o lista de espera (con consentimiento) */
+        post: operations["postPublicLeads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/ruc/{ruc}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado) */
+        get: operations["getPublicRucRuc"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/signups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: iniciar un registro de prueba o suscripción (paso cuenta) */
+        post: operations["postPublicSignups"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/signups/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Sitio: guardar el paso empresa o plan de un registro en curso */
+        patch: operations["patchPublicSignupsToken"];
+        trace?: never;
+    };
+    "/public/signups/{token}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sitio: completar el registro; crea la organización o inicia el pago */
+        post: operations["postPublicSignupsTokenComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/subdomains/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sitio: disponibilidad de un subdominio */
+        get: operations["getPublicSubdomainsSlug"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -13476,6 +14384,28 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
+        AiUseCaseSetting: {
+            /** @description Identificador opaco */
+            id: string;
+            use_case: string;
+            enabled: boolean;
+            role_ids: string[];
+            question_limit?: number | null;
+            notice?: string | null;
+            plan_allows: boolean;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        AiUseCaseSettingInput: {
+            use_case?: string;
+            enabled?: boolean;
+            role_ids?: string[];
+            question_limit?: number | null;
+            notice?: string | null;
+            plan_allows?: boolean;
+        };
         Alert: {
             /** @description Identificador opaco */
             id: string;
@@ -15248,6 +16178,69 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        HelpArticle: {
+            /** @description Identificador opaco */
+            id: string;
+            slug: string;
+            locale: string;
+            title: string;
+            body: string;
+            module_code: string;
+            roles: string[];
+            screen_keys: string[];
+            product_version: string;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        HelpArticleInput: {
+            slug?: string;
+            locale?: string;
+            title?: string;
+            body?: string;
+            module_code?: string;
+            roles?: string[];
+            screen_keys?: string[];
+            product_version?: string;
+        };
+        HelpOrgArticle: {
+            /** @description Identificador opaco */
+            id: string;
+            title: string;
+            /** @description Identificador opaco */
+            category_id?: string | null;
+            body: string;
+            audience: {
+                [key: string]: unknown;
+            };
+            /** @description Identificador opaco */
+            owner_user_id: string;
+            /** Format: date */
+            review_on?: string | null;
+            version: number;
+            /** @enum {string} */
+            status: "draft" | "published" | "in_review" | "archived";
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        HelpOrgArticleInput: {
+            title?: string;
+            /** @description Identificador opaco */
+            category_id?: string | null;
+            body?: string;
+            audience?: {
+                [key: string]: unknown;
+            };
+            /** @description Identificador opaco */
+            owner_user_id?: string;
+            /** Format: date */
+            review_on?: string | null;
+        };
         HolidayCalendar: {
             /** @description Identificador opaco */
             id: string;
@@ -15462,30 +16455,6 @@ export interface components {
             } | null;
             internal?: boolean;
             pipeline?: {
-                [key: string]: unknown;
-            };
-        };
-        KbArticle: {
-            /** @description Identificador opaco */
-            id: string;
-            title: string;
-            category: string;
-            body: string;
-            audience: {
-                [key: string]: unknown;
-            };
-            /** @enum {string} */
-            status: "draft" | "published" | "archived";
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-        };
-        KbArticleInput: {
-            title?: string;
-            category?: string;
-            body?: string;
-            audience?: {
                 [key: string]: unknown;
             };
         };
@@ -17897,6 +18866,134 @@ export interface components {
             };
             verified?: boolean;
         };
+        WebComplaint: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            /** @enum {string} */
+            kind: "claim" | "complaint";
+            consumer_name: string;
+            consumer_email: string;
+            detail: string;
+            request: string;
+            /** @enum {string} */
+            status: "received" | "in_review" | "answered" | "closed";
+            answer?: string | null;
+            /** Format: date-time */
+            answered_at?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        WebDemoBooking: {
+            /** @description Identificador opaco */
+            id: string;
+            /** @description Identificador opaco */
+            web_lead_id: string;
+            /** Format: date-time */
+            starts_at: string;
+            /** Format: date-time */
+            ends_at: string;
+            /** @enum {string} */
+            channel: "video" | "phone";
+            /** @description Identificador opaco */
+            host_platform_user_id?: string | null;
+            meeting_url?: string | null;
+            /** @enum {string} */
+            status: "scheduled" | "rescheduled" | "cancelled" | "done" | "no_show";
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        WebDemoBookingInput: {
+            /** @description Identificador opaco */
+            web_lead_id?: string;
+            /** Format: date-time */
+            starts_at?: string;
+            /** Format: date-time */
+            ends_at?: string;
+            /** @enum {string} */
+            channel?: "video" | "phone";
+            /** @description Identificador opaco */
+            host_platform_user_id?: string | null;
+            meeting_url?: string | null;
+        };
+        WebLead: {
+            /** @description Identificador opaco */
+            id: string;
+            /** @enum {string} */
+            kind: "demo" | "waitlist" | "partner" | "contact" | "newsletter" | "calculator" | "signup";
+            full_name?: string | null;
+            email: string;
+            phone?: string | null;
+            company_name?: string | null;
+            ruc?: string | null;
+            product_code?: string | null;
+            module_code?: string | null;
+            source_page?: string | null;
+            utm?: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            status: "new" | "contacted" | "qualified" | "converted" | "discarded";
+            /** @description Identificador opaco */
+            assigned_platform_user_id?: string | null;
+            /** Format: date-time */
+            notified_at?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        WebLeadInput: {
+            /** @enum {string} */
+            kind?: "demo" | "waitlist" | "partner" | "contact" | "newsletter" | "calculator" | "signup";
+            full_name?: string | null;
+            email?: string;
+            phone?: string | null;
+            company_name?: string | null;
+            ruc?: string | null;
+            product_code?: string | null;
+            module_code?: string | null;
+            source_page?: string | null;
+            utm?: {
+                [key: string]: unknown;
+            } | null;
+            /** @description Identificador opaco */
+            assigned_platform_user_id?: string | null;
+            /** Format: date-time */
+            notified_at?: string | null;
+        };
+        WebProduct: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            acronym: string;
+            slug: string;
+            tagline?: string | null;
+            module_codes: string[];
+            is_suite: boolean;
+            sort_order: number;
+            /** @enum {string} */
+            status: "draft" | "published" | "hidden";
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        WebProductInput: {
+            code?: string;
+            name?: string;
+            acronym?: string;
+            slug?: string;
+            tagline?: string | null;
+            module_codes?: string[];
+            is_suite?: boolean;
+            sort_order?: number;
+        };
         WebhookDelivery: {
             /** @description Identificador opaco */
             id: string;
@@ -19074,6 +20171,95 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postAiHelpAssistantAnswersIdFeedback: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAiHelpAssistantAsk: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getAiHelpAssistantAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getAiUsageLogs: {
         parameters: {
             query?: {
@@ -19146,6 +20332,117 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getAiUseCaseSettings: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AiUseCaseSetting"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getAiUseCaseSettingsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AiUseCaseSetting"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchAiUseCaseSettingsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiUseCaseSettingInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AiUseCaseSetting"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     getAlertRules: {
@@ -31922,6 +33219,486 @@ export interface operations {
             };
         };
     };
+    getHelpArticles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getHelpArticlesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postHelpArticlesIdFeedback: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHelpEscalations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postHelpEscalations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHelpInsights: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getHelpOrgArticles: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHelpOrgArticles: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HelpOrgArticleInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHelpOrgArticlesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchHelpOrgArticlesId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HelpOrgArticleInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postHelpOrgArticlesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postHelpOrgArticlesIdPublish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpOrgArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getHelpScreensScreenKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                screen_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getHelpSearch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postHelpToursTourKeyComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                tour_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHelpWhatsNew: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getHolidayCalendars: {
         parameters: {
             query?: {
@@ -33406,224 +35183,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["JobRequisition"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-        };
-    };
-    getKbArticles: {
-        parameters: {
-            query?: {
-                page?: components["parameters"]["Page"];
-                per_page?: components["parameters"]["PerPage"];
-                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
-                cursor?: components["parameters"]["Cursor"];
-                /** @description Campos separados por coma; prefijo - para descendente. */
-                sort?: components["parameters"]["Sort"];
-                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
-                filter?: components["parameters"]["Filter"];
-                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
-                q?: components["parameters"]["Q"];
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"][];
-                        meta: components["schemas"]["PageMeta"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    postKbArticles: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["KbArticleInput"];
-            };
-        };
-        responses: {
-            /** @description Creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    getKbArticlesId: {
-        parameters: {
-            query?: {
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
-            };
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    patchKbArticlesId: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Versión del registro (ETag) para control de concurrencia. */
-                "If-Match"?: components["parameters"]["IfMatch"];
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["KbArticleInput"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-        };
-    };
-    postKbArticlesIdArchive: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-        };
-    };
-    postKbArticlesIdPublish: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["KbArticle"];
                     };
                 };
             };
@@ -38842,6 +40401,268 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getPlatformHelpArticles: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformHelpArticles: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HelpArticleInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformHelpArticlesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformHelpArticlesId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HelpArticleInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformHelpArticlesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformHelpArticlesIdPublish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HelpArticle"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformHelpEscalations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getPlatformHelpInsights: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getPlatformMetrics: {
         parameters: {
             query?: never;
@@ -39769,6 +41590,810 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformWebComplaints: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebComplaint"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformWebComplaintsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebComplaint"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPlatformWebComplaintsIdAnswer: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebComplaint"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebComplaintsIdClose: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebComplaint"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformWebDemoBookings: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebDemoBooking"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformWebDemoBookingsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebDemoBooking"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformWebDemoBookingsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebDemoBookingInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebDemoBooking"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebDemoBookingsIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebDemoBooking"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebDemoBookingsIdComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebDemoBooking"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformWebLeads: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformWebLeadsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformWebLeadsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebLeadInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebLeadsIdAssign: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebLeadsIdConvert: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebLeadsIdDiscard: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebLead"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformWebMetrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getPlatformWebProducts: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebProduct"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformWebProductsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebProduct"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformWebProductsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebProductInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebProduct"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebProductsIdHide: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebProduct"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformWebProductsIdPublish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebProduct"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformWebSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    patchPlatformWebSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPositions: {
@@ -41663,6 +44288,169 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getPublicCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+        };
+    };
+    postPublicChatMessages: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPublicComplaints: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPublicDemoBookings: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPublicDemoBookingsTokenCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPublicDemoSlots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+        };
+    };
     postPublicGrievances: {
         parameters: {
             query?: never;
@@ -41823,6 +44611,175 @@ export interface operations {
             404: components["responses"]["NotFound"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPublicLeads: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPublicRucRuc: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ruc: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPublicSignups: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchPublicSignupsToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPublicSignupsTokenComplete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPublicSubdomainsSlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            404: components["responses"]["NotFound"];
         };
     };
     getPunchDevices: {

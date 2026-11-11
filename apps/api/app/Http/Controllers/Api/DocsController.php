@@ -25,7 +25,7 @@ final class DocsController extends Controller
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ayni HR · Referencia de API</title>
+  <title>GestiaHR · Referencia de API</title>
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" >
   <style>
     html { box-sizing: border-box; overflow-y: scroll; }
@@ -70,12 +70,12 @@ HTML;
         }
 
         $possiblePaths = [
-            '/var/www/api/openapi.yaml',
-            base_path('../../api/openapi.yaml'),
-            base_path('../api/openapi.yaml'),
-            base_path('api/openapi.yaml'),
-            dirname(base_path()).'/api/openapi.yaml',
-            dirname(dirname(base_path())).'/api/openapi.yaml',
+            '/var/www/kit/api/openapi.yaml',
+            base_path('../../kit/api/openapi.yaml'),
+            base_path('../kit/api/openapi.yaml'),
+            base_path('kit/api/openapi.yaml'),
+            dirname(base_path()).'/kit/api/openapi.yaml',
+            dirname(dirname(base_path())).'/kit/api/openapi.yaml',
         ];
 
         $specPath = null;

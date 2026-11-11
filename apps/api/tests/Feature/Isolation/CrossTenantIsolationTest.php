@@ -45,7 +45,7 @@ function isolationHarness(): CrossTenantHarness
 test('toda ruta registrada bajo /api/v1 está declarada en openapi.yaml', function (): void {
     $missing = isolationHarness()->routesMissingFromContract(Route::getRoutes()->getRoutes());
 
-    expect($missing)->toBe([], "Rutas sin contrato (actualiza tools/gen_openapi.py y ejecuta make openapi):\n".implode("\n", $missing));
+    expect($missing)->toBe([], "Rutas sin contrato (actualiza kit/tools/gen_openapi.py y ejecuta make openapi):\n".implode("\n", $missing));
 });
 
 test('ningún endpoint del contrato filtra datos entre organizaciones', function (): void {

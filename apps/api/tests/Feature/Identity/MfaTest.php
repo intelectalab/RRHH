@@ -50,7 +50,7 @@ function mfAs(string $cookie, string $method, string $path, array $body = [])
     app('auth')->forgetGuards();
     $xsrf = hash_hmac('sha256', 'xsrf|'.$cookie, (string) config('app.key'));
 
-    return test()->withCredentials()->withUnencryptedCookie('ayni_session', $cookie)
+    return test()->withCredentials()->withUnencryptedCookie('gestia_session', $cookie)
         ->withHeaders(['X-Tenant-Id' => MF_TENANT, 'X-XSRF-TOKEN' => $xsrf, 'Idempotency-Key' => (string) Str::uuid()])
         ->json($method, '/api/v1'.$path, $body);
 }
@@ -73,7 +73,7 @@ function mfEnroll(string $cookie): array
 }
 
 test('el usuario activa la aplicación autenticadora y el ingreso pide el segundo paso', function (): void {
-    $cookie = mfLogin('rosa@andes.pe')->assertOk()->assertJsonPath('data.mfa_step', 'ok')->getCookie('ayni_session', false)->getValue();
+    $cookie = mfLogin('rosa@andes.pe')->assertOk()->assertJsonPath('data.mfa_step', 'ok')->getCookie('gestia_session', false)->getValue();
 
     $start = mfAs($cookie, 'POST', '/me/mfa/totp');
     $start->assertOk();
@@ -103,7 +103,7 @@ test('el usuario activa la aplicación autenticadora y el ingreso pide el segund
     // Ingreso nuevo: la clave sola no basta.
     $login = mfLogin('rosa@andes.pe');
     $login->assertOk()->assertJsonPath('data.mfa_step', 'verify');
-    $pending = $login->getCookie('ayni_session', false)->getValue();
+    $pending = $login->getCookie('gestia_session', false)->getValue();
     $blocked = mfAs($pending, 'GET', '/me/sessions');
     $blocked->assertStatus(401)->assertJsonPath('error.code', 'mfa_required')->assertJsonPath('error.meta.step', 'verify');
     mfAs($pending, 'GET', '/me')->assertOk()->assertJsonPath('data.user.mfa_step', 'verify')->assertJsonPath('data.permissions', []);
@@ -116,18 +116,18 @@ test('el usuario activa la aplicación autenticadora y el ingreso pide el segund
 });
 
 test('un mismo código no sirve dos veces y los fallos cuentan para el bloqueo', function (): void {
-    $cookie = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $cookie = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     [$secret] = mfEnroll($cookie);
 
     // El código con el que se confirmó ya no sirve para ingresar.
-    $pending = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $pending = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     $reused = mfAs($pending, 'POST', '/auth/mfa/verify', ['code' => mfCode($secret)]);
     $reused->assertStatus(422);
     $this->assertMatchesOpenApi($reused, 'post', '/auth/mfa/verify', 422);
 
     // Volver a ingresar la clave no reinicia el contador de fallos del segundo paso.
     mfAs($pending, 'POST', '/auth/mfa/verify', ['code' => '111111'])->assertStatus(422);
-    $again = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $again = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfAs($again, 'POST', '/auth/mfa/verify', ['code' => '222222'])->assertStatus(422);
     mfAs($again, 'POST', '/auth/mfa/verify', ['code' => '333333'])->assertStatus(422);
     mfAs($again, 'POST', '/auth/mfa/verify', ['code' => '444444'])->assertStatus(422); // 5.º fallo seguido: bloqueo
@@ -140,13 +140,13 @@ test('un mismo código no sirve dos veces y los fallos cuentan para el bloqueo',
 });
 
 test('los códigos de respaldo se muestran una vez y se invalidan al usarse', function (): void {
-    $cookie = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $cookie = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     [, $codes] = mfEnroll($cookie);
 
-    $pending = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $pending = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfAs($pending, 'POST', '/auth/mfa/verify', ['code' => strtoupper($codes[0])])->assertOk()->assertJsonPath('data.recovery_codes_left', 9);
 
-    $other = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $other = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfAs($other, 'POST', '/auth/mfa/verify', ['code' => $codes[0]])->assertStatus(422);
     // Ningún endpoint vuelve a mostrar los códigos.
     expect(json_encode(mfAs($pending, 'GET', '/me/mfa')->json()))->not->toContain($codes[1]);
@@ -161,7 +161,7 @@ test('los códigos de respaldo se muestran una vez y se invalidan al usarse', fu
 });
 
 test('desactivar exige la clave, queda auditado y no procede si el rol lo exige', function (): void {
-    $cookie = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $cookie = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($cookie);
 
     mfAs($cookie, 'POST', '/me/mfa/disable', ['password' => 'otra-clave'])->assertStatus(422)->assertJsonPath('error.details.0.field', 'password');
@@ -172,7 +172,7 @@ test('desactivar exige la clave, queda auditado y no procede si el rol lo exige'
     mfLogin('rosa@andes.pe')->assertJsonPath('data.mfa_step', 'ok');
 
     // El administrador lo trae obligatorio por defecto: no puede apagarlo.
-    $admin = mfLogin('admin@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $admin = mfLogin('admin@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($admin);
     $refused = mfAs($admin, 'POST', '/me/mfa/disable', ['password' => MF_PASSWORD]);
     $refused->assertStatus(422)->assertJsonPath('error.meta.rule', 'mfa_required_by_policy');
@@ -182,7 +182,7 @@ test('desactivar exige la clave, queda auditado y no procede si el rol lo exige'
 test('un rol con MFA obligatorio no puede operar sin configurarlo', function (): void {
     $login = mfLogin('admin@andes.pe');
     $login->assertOk()->assertJsonPath('data.mfa_step', 'enroll');
-    $cookie = $login->getCookie('ayni_session', false)->getValue();
+    $cookie = $login->getCookie('gestia_session', false)->getValue();
 
     mfAs($cookie, 'GET', '/users')->assertStatus(401)->assertJsonPath('error.meta.step', 'enroll');
     mfAs($cookie, 'GET', '/me/mfa')->assertOk()->assertJsonPath('data.required', true)->assertJsonPath('data.step', 'enroll');
@@ -197,7 +197,7 @@ test('la organización y los roles definen quién debe usar el segundo factor', 
     TenancyScope::runAs(MF_TENANT, fn () => DB::table('tenant_settings')->where('parameter_code', 'seguridad.mfa_todos')->delete());
 
     // Un rol (incluso de sistema) se marca con motivo y queda auditado.
-    $admin = mfLogin('admin@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $admin = mfLogin('admin@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($admin);
     $roleId = TenancyScope::runAs(MF_TENANT, fn () => Role::query()->where('system_role_code', 'empleado')->value('id'));
     mfAs($admin, 'POST', "/roles/{$roleId}/mfa-requirement", ['required' => true])->assertStatus(422);
@@ -208,7 +208,7 @@ test('la organización y los roles definen quién debe usar el segundo factor', 
     mfLogin('rosa@andes.pe')->assertJsonPath('data.mfa_step', 'enroll');
 
     // Sin el permiso de políticas de seguridad no se cambia.
-    $rosa = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $rosa = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($rosa);
     mfAs($rosa, 'POST', "/roles/{$roleId}/mfa-requirement", ['required' => false, 'reason' => 'Quiero quitarlo'])->assertStatus(403);
 });
@@ -224,9 +224,9 @@ test('el algoritmo TOTP coincide con los vectores del RFC 6238', function (): vo
 });
 
 test('el administrador restablece el segundo factor de un usuario con motivo', function (): void {
-    $rosa = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $rosa = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($rosa);
-    $admin = mfLogin('admin@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $admin = mfLogin('admin@andes.pe')->getCookie('gestia_session', false)->getValue();
     mfEnroll($admin);
 
     $r = mfAs($admin, 'POST', "/users/{$this->rosa->id}/reset-mfa", ['reason' => 'Cambió de teléfono']);
@@ -240,7 +240,7 @@ test('el administrador restablece el segundo factor de un usuario con motivo', f
 });
 
 test('abrir la configuración dos veces no invalida el QR y un reloj desfasado se explica', function (): void {
-    $cookie = mfLogin('rosa@andes.pe')->getCookie('ayni_session', false)->getValue();
+    $cookie = mfLogin('rosa@andes.pe')->getCookie('gestia_session', false)->getValue();
     $first = (string) mfAs($cookie, 'POST', '/me/mfa/totp')->json('data.secret');
     $second = (string) mfAs($cookie, 'POST', '/me/mfa/totp')->json('data.secret');
     expect($second)->toBe($first);

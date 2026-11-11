@@ -39,8 +39,17 @@ final class CodeSignIn
         private readonly AuditLogger $audit,
     ) {}
 
+    /** Parámetro seguridad.acceso_con_documento: la organización puede apagar el ingreso con documento. */
+    public function documentAccessEnabled(): bool
+    {
+        return $this->parameters->value('seguridad.acceso_con_documento') !== false;
+    }
+
     public function findByDocument(string $type, string $number): ?User
     {
+        if (! $this->documentAccessEnabled()) {
+            return null;
+        }
         $identity = UserIdentity::query()->where('kind', 'national_id')
             ->where('identifier_hash', BlindIndex::for('national_id', LoginDocument::identifier($type, $number)))->first();
 

@@ -2,7 +2,7 @@
 
 return [
     'password_reset' => [
-        'subject' => 'Recupere sua senha do Ayni HR',
+        'subject' => 'Recupere sua senha do GestiaHR',
         'body' => "Recebemos uma solicitação para redefinir sua senha.\n\nUse este link (válido por :minutes minutos, uma única vez):\n:link\n\nSe você não solicitou, ignore esta mensagem.",
         'requested' => 'Se o e-mail pertencer a uma conta ativa, enviaremos um link para redefinir a senha.',
     ],
@@ -22,8 +22,8 @@ return [
         'last_admin' => 'A organização não pode ficar sem um Administrador da empresa ativo.',
     ],
     'invitation' => [
-        'subject' => 'Ative sua conta Ayni HR',
-        'body' => "Sua empresa criou uma conta Ayni HR para você.\n\nAtive-a e defina sua senha com este link (válido por :hours horas):\n:link",
+        'subject' => 'Ative sua conta GestiaHR',
+        'body' => "Sua empresa criou uma conta GestiaHR para você.\n\nAtive-a e defina sua senha com este link (válido por :hours horas):\n:link",
     ],
     'password' => [
         'too_short' => 'A senha deve ter pelo menos :min caracteres.',
@@ -45,9 +45,9 @@ return [
         'disabled_event' => 'A verificação em duas etapas foi desativada na sua conta.',
     ],
     'codes' => [
-        'login_message' => 'Ayni HR: seu código de acesso é :code. Vence em :minutes minutos. Não o compartilhe.',
-        'activation_message' => 'Ayni HR: seu código para ativar a conta é :code. Vence em :hours horas. Entre com seu documento e este código.',
-        'email_subject' => 'Seu código do Ayni HR',
+        'login_message' => 'GestiaHR: seu código de acesso é :code. Vence em :minutes minutos. Não o compartilhe.',
+        'activation_message' => 'GestiaHR: seu código para ativar a conta é :code. Vence em :hours horas. Entre com seu documento e este código.',
+        'email_subject' => 'Seu código do GestiaHR',
         'invalid' => 'O documento ou o código não são válidos, ou o código venceu.',
         'activation_not_pending' => 'A conta já está ativa: não precisa de código de ativação.',
         'no_phone' => 'O usuário não tem celular cadastrado para enviar o código.',

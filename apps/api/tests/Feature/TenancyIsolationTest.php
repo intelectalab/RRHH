@@ -39,20 +39,20 @@ afterEach(function (): void {
     }
 });
 
-test('ayni_app role has NO BYPASSRLS and is NOT superuser', function (): void {
+test('gestia_app role has NO BYPASSRLS and is NOT superuser', function (): void {
     $role = DB::selectOne("
         SELECT rolname, rolsuper, rolbypassrls
         FROM pg_roles
-        WHERE rolname = 'ayni_app'
+        WHERE rolname = 'gestia_app'
     ");
 
     expect($role)->not->toBeNull()
-        ->and($role->rolname)->toBe('ayni_app')
+        ->and($role->rolname)->toBe('gestia_app')
         ->and($role->rolsuper)->toBeFalse()
         ->and($role->rolbypassrls)->toBeFalse();
 });
 
-test('tenancy scope applies tenant to database session and switches to ayni_app', function (): void {
+test('tenancy scope applies tenant to database session and switches to gestia_app', function (): void {
     TenancyScope::set(TEST_TENANT_A);
 
     expect(TenancyScope::current())->toBe(TEST_TENANT_A);
@@ -61,14 +61,14 @@ test('tenancy scope applies tenant to database session and switches to ayni_app'
     expect($currentSetting)->toBe(TEST_TENANT_A);
 
     $currentUser = DB::scalar('SELECT current_user');
-    expect($currentUser)->toBe('ayni_app');
+    expect($currentUser)->toBe('gestia_app');
 
     TenancyScope::clear();
 
     expect(TenancyScope::current())->toBeNull();
 
     $resetUser = DB::scalar('SELECT current_user');
-    expect($resetUser)->not->toBe('ayni_app');
+    expect($resetUser)->not->toBe('gestia_app');
 });
 
 test('tenant B cannot read, list, modify or delete data belonging to tenant A', function (): void {

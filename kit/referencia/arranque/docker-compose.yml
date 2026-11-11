@@ -1,0 +1,54 @@
+# GestiaHR · servicios de apoyo para desarrollo local (PLT-2)
+#
+# Se copia a la raíz del repositorio. Levanta lo que la API y la web necesitan para correr en local:
+# PostgreSQL 17, Redis, almacenamiento compatible con S3 y un buzón de correo de pruebas.
+# Los contenedores de la API, la web, Horizon y el programador de tareas se agregan en PLT-2,
+# cuando existan apps/api y apps/web (PLT-1). Las credenciales son solo para desarrollo.
+
+name: gestiahr
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: gestiahr
+      POSTGRES_USER: gestia_owner        # dueño del esquema; la aplicación usa un rol que hereda de gestia_app
+      POSTGRES_PASSWORD: gestia_local
+    ports:
+      - "${PG_PORT:-5432}:5432"         # PG_PORT=5433 make up, si ya hay otro PostgreSQL local
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./kit/database:/kit/database:ro  # para `make kit-db` y `make kit-isolation`
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gestia_owner -d gestiahr"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  s3:                                    # almacenamiento compatible con S3 (PLT-7); en local no exige credenciales
+    image: chrislusf/seaweedfs:latest
+    command: server -dir=/data -s3 -s3.port=8333
+    ports:
+      - "8333:8333"
+    volumes:
+      - s3data:/data
+
+  mailpit:                               # buzón de pruebas: ningún correo sale a internet
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"                      # SMTP
+      - "8025:8025"                      # interfaz web
+
+volumes:
+  pgdata:
+  s3data:

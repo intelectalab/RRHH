@@ -6,7 +6,7 @@
  * acotarán dentro de estos márgenes.
  */
 return [
-    'session_cookie' => env('IDENTITY_SESSION_COOKIE', 'ayni_session'),
+    'session_cookie' => env('IDENTITY_SESSION_COOKIE', 'gestia_session'),
     'xsrf_cookie' => 'XSRF-TOKEN',
     'session_lifetime_minutes' => (int) env('IDENTITY_SESSION_LIFETIME', 480),
     'password_reset_ttl_minutes' => (int) env('IDENTITY_PASSWORD_RESET_TTL', 30),
