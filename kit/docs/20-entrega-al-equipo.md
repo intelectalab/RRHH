@@ -64,7 +64,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [AUD](../prompts/AUD.md) · Auditoría | Plataforma base | 1 | 4 | 5 | 11 | Sí | — |
 | 0 | [UI](../prompts/UI.md) · Sistema de diseño y armazón | Plataforma base | 3 | 9 | 12 | 0 | Sí | — |
 | 0 | [WFL](../prompts/WFL.md) · Motor de aprobaciones y workflows | Plataforma base | 5 | 4 | 9 | 32 | — | — |
-| 0 | [NOT](../prompts/NOT.md) · Notificaciones y mensajería | Plataforma base | 2 | 4 | 6 | 9 | — | D-11 |
+| 0 | [NOT](../prompts/NOT.md) · Notificaciones y mensajería | Plataforma base | 2 | 4 | 6 | 10 | — | D-11 |
 | 0 | [CFG](../prompts/CFG.md) · Configuración, campos personalizados, i18n y multimoneda | Plataforma base | 5 | 5 | 10 | 25 | — | — |
 | 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 35 | Sí | D-39, D-40, D-41 |
 | 1 | [ORG](../prompts/ORG.md) · Estructura organizacional | Core HR | 7 | 0 | 7 | 32 | — | — |
