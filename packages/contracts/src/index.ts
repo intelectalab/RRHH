@@ -1961,7 +1961,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Calendario central de RRHH */
+        /** Calendario central de RRHH (CFG-8): elementos entre from y to de las fuentes de los módulos contratados que el usuario puede ver (feriados, tareas y las que sumen los módulos), cada uno con el enlace a su registro */
         get: operations["getCalendar"];
         put?: never;
         post?: never;
@@ -6656,6 +6656,25 @@ export interface paths {
          */
         post: operations["postLegalEntitiesIdArchive"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-entities/{id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Logo de la empresa (imagen PNG, JPEG o WebP); 404 si no tiene */
+        get: operations["getLegalEntitiesIdLogo"];
+        put?: never;
+        /** Subir o reemplazar el logo de la empresa (multipart, campo file; PNG, JPEG o WebP de hasta 1 MB) */
+        post: operations["postLegalEntitiesIdLogo"];
+        /** Quitar el logo de la empresa */
+        delete: operations["deleteLegalEntitiesIdLogo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -17055,11 +17074,19 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             name: string;
+            trade_name?: string | null;
             tax_id: string;
             country: string;
             currency: string;
             timezone: string;
+            locale?: string | null;
             payroll_regime: string;
+            tax_regime?: string | null;
+            economic_activity_code?: string | null;
+            address?: string | null;
+            district_code?: string | null;
+            legal_representative_name?: string | null;
+            has_logo?: boolean | null;
             /** @enum {string} */
             status: "active" | "archived";
             custom_fields?: {
@@ -17100,11 +17127,18 @@ export interface components {
         };
         LegalEntityInput: {
             name?: string;
+            trade_name?: string | null;
             tax_id?: string;
             country?: string;
             currency?: string;
             timezone?: string;
+            locale?: string | null;
             payroll_regime?: string;
+            tax_regime?: string | null;
+            economic_activity_code?: string | null;
+            address?: string | null;
+            district_code?: string | null;
+            legal_representative_name?: string | null;
             custom_fields?: {
                 [key: string]: unknown;
             } | null;
@@ -24422,7 +24456,14 @@ export interface operations {
     };
     getCalendar: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Primer día (AAAA-MM-DD) */
+                from: string;
+                /** @description Último día, inclusive; hasta 100 días después de from */
+                to: string;
+                /** @description Fuentes separadas por coma (holidays, tasks…); vacío = todas las visibles */
+                sources?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -24438,6 +24479,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };
@@ -36617,6 +36659,96 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getLegalEntitiesIdLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Imagen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/webp": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postLegalEntitiesIdLogo: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    deleteLegalEntitiesIdLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postLegalEntitiesIdRestore: {

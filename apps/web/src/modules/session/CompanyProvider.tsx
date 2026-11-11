@@ -74,6 +74,11 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>
 }
 
+/** Igual que useCompany, pero null fuera del armazón (pantallas públicas o de la consola). */
+export function useOptionalCompany(): CompanyContextValue | null {
+  return useContext(CompanyContext)
+}
+
 export function useCompany(): CompanyContextValue {
   const value = useContext(CompanyContext)
   if (value === null) throw new Error('useCompany fuera de CompanyProvider')

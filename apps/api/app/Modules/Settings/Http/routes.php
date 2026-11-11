@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Settings\Http\Controllers\CalendarController;
 use App\Modules\Settings\Http\Controllers\CatalogController;
 use App\Modules\Settings\Http\Controllers\CustomFieldController;
 use App\Modules\Settings\Http\Controllers\ExchangeRateController;
@@ -16,6 +17,9 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/holiday-calendars', [HolidayCalendarController::class, 'store'])->middleware('permission:time.holiday_calendars.create');
     Route::get('/holiday-calendars/{id}', [HolidayCalendarController::class, 'show'])->middleware('permission:time.holiday_calendars.view');
     Route::patch('/holiday-calendars/{id}', [HolidayCalendarController::class, 'update'])->middleware('permission:time.holiday_calendars.update');
+
+    // CFG-8 · Calendario central de RRHH (fuentes de los módulos contratados, con el alcance de cada una).
+    Route::get('/calendar', [CalendarController::class, 'index'])->middleware('permission:time.calendar.view');
 
     Route::get('/exchange-rates', [ExchangeRateController::class, 'index'])->middleware('permission:settings.exchange_rates.view');
     Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->middleware('permission:settings.exchange_rates.create');

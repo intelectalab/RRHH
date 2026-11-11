@@ -170,6 +170,25 @@ class FileService implements FileStorageService
     }
 
     /**
+     * CFG-2 · Contenido de un archivo público de la organización (logo de una empresa) para mostrarlo
+     * en la interfaz. Solo para la clasificación pública: no deja registro de descarga.
+     *
+     * @return array{mime: string, contents: string}|null
+     */
+    public function publicContents(string $fileId, ?string $tenantId = null): ?array
+    {
+        $file = $this->findOwnedFile($fileId, $tenantId);
+        if ($file->classification !== StoredFile::CLASSIFICATION_PUBLIC) {
+            return null;
+        }
+        /** @var string $diskName */
+        $diskName = config('files.disk', 's3');
+        $contents = Storage::disk($diskName)->get($file->storage_key);
+
+        return $contents === null ? null : ['mime' => (string) $file->mime_type, 'contents' => $contents];
+    }
+
+    /**
      * Elimina lógicamente el archivo de la base de datos y físicamente del almacenamiento.
      */
     public function delete(string $fileId, ?string $tenantId = null): void

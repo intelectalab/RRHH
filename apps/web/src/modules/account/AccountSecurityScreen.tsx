@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatDateTime, relativeTime } from '@/lib/format'
+import { relativeTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
 import { MfaCard } from './MfaCard'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type SessionRow = { id: string; device: string; ip: string | null; current: boolean; last_seen_at: string | null; created_at: string | null }
 type Data = { sessions: SessionRow[]; idle_minutes: number; lifetime_minutes: number; password_min_length: number }
@@ -17,6 +18,7 @@ type Data = { sessions: SessionRow[]; idle_minutes: number; lifetime_minutes: nu
 /** Menú de usuario → Seguridad de la cuenta (SEG-3, SEG-4, SEG-5): sesiones, clave y verificación en dos pasos. */
 export function AccountSecurityScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { session, reload } = useSession()
   const { toast, node: toastNode } = useToast()
   const [data, setData] = useState<Data | null>(null)
@@ -88,7 +90,7 @@ export function AccountSecurityScreen() {
                 <li key={s.id} className="sesion">
                   <div className="min-w-0">
                     <b>{s.device}</b>{s.current && <span className="tag ok" style={{ marginLeft: 8 }}>{t('acct.this_device')}</span>}
-                    <span className="sub2">{s.ip ?? ''}{s.ip ? ' · ' : ''}{t('acct.last_seen', { when: relativeTime(locale, s.last_seen_at) })} · <span title={formatDateTime(locale, s.created_at)}>{t('acct.since', { when: relativeTime(locale, s.created_at) })}</span></span>
+                    <span className="sub2">{s.ip ?? ''}{s.ip ? ' · ' : ''}{t('acct.last_seen', { when: relativeTime(locale, s.last_seen_at) })} · <span title={fmtDT(s.created_at)}>{t('acct.since', { when: relativeTime(locale, s.created_at) })}</span></span>
                   </div>
                   {!s.current && <button type="button" className="btn btn-ter btn-sm" onClick={() => void revoke(s.id)}>{t('acct.revoke')}</button>}
                 </li>

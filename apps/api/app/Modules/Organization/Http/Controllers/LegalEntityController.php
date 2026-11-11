@@ -12,6 +12,8 @@ use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -61,7 +63,7 @@ final class LegalEntityController
 
     public function store(LegalEntityRequest $request): JsonResponse
     {
-        /** @var array{name: string, trade_name?: string|null, tax_id: string, country: string, currency: string, timezone: string, payroll_regime: string} $input */
+        /** @var array{name: string, trade_name?: string|null, tax_id: string, country: string, currency: string, timezone: string, payroll_regime: string, locale?: string|null, tax_regime?: string|null, economic_activity_code?: string|null, address?: string|null, district_code?: string|null, legal_representative_name?: string|null} $input */
         $input = $request->validated();
         $custom = $this->customFields->validate('legal_entity', $this->customInput($request), true, $this->permissions($request));
 
@@ -80,7 +82,7 @@ final class LegalEntityController
         $entity = $this->find($request, $id, 'org.legal_entities.update');
         $ifMatch = trim((string) $request->header('If-Match', ''), ' "W/');
 
-        /** @var array{name?: string, trade_name?: string|null, tax_id?: string, currency?: string, timezone?: string, payroll_regime?: string} $input */
+        /** @var array{name?: string, trade_name?: string|null, tax_id?: string, currency?: string, timezone?: string, payroll_regime?: string, locale?: string|null, tax_regime?: string|null, economic_activity_code?: string|null, address?: string|null, district_code?: string|null, legal_representative_name?: string|null} $input */
         $input = $request->validated();
         $custom = $this->customFields->validate('legal_entity', $this->customInput($request), false, $this->permissions($request));
 
@@ -108,6 +110,36 @@ final class LegalEntityController
         $data = $request->validate(['reason' => ['sometimes', 'nullable', 'string', 'max:500']]);
 
         return $this->respond($this->entities->transition($entity, 'restore', isset($data['reason']) ? (string) $data['reason'] : null));
+    }
+
+    /** CFG-2 · Logo de la empresa (imagen pública de la organización; 404 si no tiene). */
+    public function logo(Request $request, string $id): Response
+    {
+        $logo = $this->entities->logo($this->find($request, $id, 'org.legal_entities.view'));
+        abort_if($logo === null, 404);
+
+        return response($logo['contents'], 200, [
+            'Content-Type' => $logo['mime'],
+            'Cache-Control' => 'private, max-age=300',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    public function uploadLogo(Request $request, string $id): JsonResponse
+    {
+        $entity = $this->find($request, $id, 'org.legal_entities.update');
+        $request->validate(['file' => ['required', 'file']]);
+        $file = $request->file('file');
+        abort_unless($file instanceof UploadedFile, 422);
+
+        $entity = $this->entities->setLogo($entity, (string) $file->getContent(), $file->getClientOriginalName(), (string) $file->getMimeType(), (string) $request->user()?->getAuthIdentifier());
+
+        return $this->respond($entity);
+    }
+
+    public function removeLogo(Request $request, string $id): JsonResponse
+    {
+        return $this->respond($this->entities->removeLogo($this->find($request, $id, 'org.legal_entities.update')));
     }
 
     /**

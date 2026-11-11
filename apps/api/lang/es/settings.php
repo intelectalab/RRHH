@@ -17,4 +17,8 @@ return [
     'custom_field_type_locked' => 'El campo ya tiene valores guardados: no se puede cambiar su tipo.',
     'custom_field_options_required' => 'Indica las opciones de la lista.',
     'custom_field_permission_required' => 'Un campo sensible necesita un permiso por campo.',
+    'calendar' => [
+        'invalid_range' => 'Indica un rango válido: from y to en formato AAAA-MM-DD, to no anterior a from y de hasta 100 días.',
+        'unknown_source' => 'La fuente «:source» no existe en el calendario.',
+    ],
 ];

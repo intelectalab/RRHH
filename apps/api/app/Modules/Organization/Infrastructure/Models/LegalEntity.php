@@ -22,6 +22,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $tax_id
  * @property string $currency
  * @property string $timezone
+ * @property string|null $locale
+ * @property string|null $tax_regime
+ * @property string|null $economic_activity_code
+ * @property string|null $address
+ * @property string|null $district_code
+ * @property string|null $legal_representative_name
+ * @property string|null $logo_file_id
  * @property string $status
  * @property int $lock_version
  * @property CarbonInterface $created_at

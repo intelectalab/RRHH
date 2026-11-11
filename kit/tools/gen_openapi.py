@@ -84,7 +84,7 @@ RES = [
     ("CFG", 0, "settings.exchange_rates", "/exchange-rates", "ExchangeRate", "from_currency:s to_currency:s rate:s valid_on:d source:s", "LC", ""),
     ("CFG", 0, "settings.saved_views", "/saved-views", "SavedView", "resource:s name:s filters:j columns:a sort:s shared:b", "LCRUD", ""),
     # ---------- Fase 1 ----------
-    ("ORG", 1, "org.legal_entities", "/legal-entities", "LegalEntity", "name:s tax_id:s country:s currency:s timezone:s payroll_regime:s status:e(active|archived) custom_fields?:j", "LCRU", "archive restore"),
+    ("ORG", 1, "org.legal_entities", "/legal-entities", "LegalEntity", "name:s trade_name?:s tax_id:s country:s currency:s timezone:s locale?:s payroll_regime:s tax_regime?:s economic_activity_code?:s address?:s district_code?:s legal_representative_name?:s has_logo?:b status:e(active|archived) custom_fields?:j", "LCRU", "archive restore"),
     ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id:id name:s address:s timezone:s risk_site:b status:e(active|archived)", "LCRU", "archive restore"),
     ("ORG", 1, "org.units", "/org-units", "OrgUnit", "name:s type:s parent_id?:id manager_position_id?:id valid_from:d valid_to?:d status:e(active|archived)", "LCRU", "archive restore move"),
     ("ORG", 1, "org.cost_centers", "/cost-centers", "CostCenter", "code:s name:s legal_entity_id:id status:e(active|archived)", "LCRU", "archive restore"),
@@ -302,6 +302,9 @@ EXTRA = [
     ("CFG", 0, "get", "/settings/{group}", "settings.parameters.view", "Parámetros de una sección con valor vigente, origen (empresa, organización o por defecto) e historial; ?legal_entity_id= y ?as_of=", False),
     ("CFG", 0, "put", "/settings/{group}", "settings.parameters.update", "Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa empresa y value null vuelve a heredar", False),
     ("CFG", 0, "get", "/custom-fields/form", "-", "Campos personalizados del formulario de una entidad (?entity=) para quien puede verla; los sensibles solo con su permiso por campo", False),
+    ("CFG", 0, "get", "/legal-entities/{id}/logo", "org.legal_entities.view", "Logo de la empresa (imagen PNG, JPEG o WebP); 404 si no tiene", False),
+    ("CFG", 0, "post", "/legal-entities/{id}/logo", "org.legal_entities.update", "Subir o reemplazar el logo de la empresa (multipart, campo file; PNG, JPEG o WebP de hasta 1 MB)", False),
+    ("CFG", 0, "delete", "/legal-entities/{id}/logo", "org.legal_entities.update", "Quitar el logo de la empresa", False),
     ("CFG", 0, "get", "/exchange-rates/convert", "settings.exchange_rates.view", "Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha (indica el tipo aplicado)", False),
     ("CFG", 0, "get", "/catalogs", "-", "Catálogos maestros y de la organización (CFG-10): código, nombre, si la organización puede extenderlo y cantidad de elementos", False),
     ("CFG", 0, "post", "/catalogs", "settings.catalogs.update", "Crear un catálogo propio de la organización (tipos, motivos, categorías)", False),
@@ -343,7 +346,7 @@ EXTRA = [
     ("ASI", 2, "post", "/time-punches/batch", "time.punches.create", "Sincronizar marcaciones sin conexión o de un dispositivo (idempotente por client_id)", False),
     ("ASI", 2, "post", "/attendance-periods/{period}/close", "time.attendance_days.close", "Cerrar la asistencia de un periodo para planilla", False),
     ("TUR", 2, "post", "/shift-assignments/bulk", "time.shift_assignments.create", "Asignación masiva de turnos", False),
-    ("VAC", 2, "get", "/calendar", "time.calendar.view", "Calendario central de RRHH", False),
+    ("CFG", 0, "get", "/calendar", "time.calendar.view", "Calendario central de RRHH (CFG-8): elementos entre from y to de las fuentes de los módulos contratados que el usuario puede ver (feriados, tareas y las que sumen los módulos), cada uno con el enlace a su registro", False),
     ("PER", 3, "get", "/payroll-periods/{id}/variance", "payroll.periods.view", "Comparación contra el periodo anterior y anomalías explicadas", False),
     ("BOL", 3, "get", "/me/payslips", "-", "Boletas propias", False),
     ("LIQ", 3, "post", "/settlements/simulate", "payroll.settlements.simulate", "Simular una liquidación sin guardarla", False),
@@ -398,7 +401,18 @@ TYPES = {
 STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
 CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
-READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+# Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
+_q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
+                                                   "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
+QUERY = {
+    ("get", "/calendar"): [
+        _q("from", "Primer día (AAAA-MM-DD)", True, "date"),
+        _q("to", "Último día, inclusive; hasta 100 días después de from", True, "date"),
+        _q("sources", "Fuentes separadas por coma (holidays, tasks…); vacío = todas las visibles"),
+    ],
+}
+
+READONLY = {"status", "version", "has_logo", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):
@@ -572,11 +586,19 @@ def build():
             # Descarga directa del archivo (no es JSON).
             res["200"] = {"description": "Archivo", "content": {"text/csv": {"schema": {"type": "string"}}}}
             res.update(errs("409"))
+        if path.endswith("/logo") and method == "get":
+            res["200"] = {"description": "Imagen", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("image/png", "image/jpeg", "image/webp")}}
+        if (method, path) in QUERY:
+            op["parameters"] = QUERY[(method, path)]
+            res.update(errs("400"))
         if method in ("post", "put", "patch"):
             op["requestBody"] = body(ref("schemas/GenericInput"))
             if method == "post":
                 op["parameters"] = [ref("parameters/IdempotencyKey")]
             res.update(errs("400", "422", "429"))
+            if path.endswith("/logo"):
+                op["requestBody"] = {"required": True, "content": {"multipart/form-data": {"schema": {
+                    "type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary"}}}}}}
         if not public:
             res.update(errs("401", "403"))
         # La consola SaaS responde 404 desde el host de una organización (SAS-1).

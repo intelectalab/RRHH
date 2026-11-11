@@ -4,6 +4,7 @@ namespace App\Modules\Settings\Infrastructure\Trash;
 
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
 use App\Shared\Audit\AuditLogger;
+use App\Shared\Trash\PurgesSafely;
 use App\Shared\Trash\TrashSource;
 use Illuminate\Support\Facades\DB;
 
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
  */
 final class CustomFieldTrashSource implements TrashSource
 {
+    use PurgesSafely;
+
     public function __construct(private readonly AuditLogger $audit) {}
 
     public function type(): string
@@ -51,6 +54,27 @@ final class CustomFieldTrashSource implements TrashSource
         DB::transaction(function () use ($d): void {
             $d->restore();
             $this->audit->record('custom_field.restored', 'custom_field', $d->id, null, ['key' => $d->key]);
+        });
+    }
+
+    public function expired(\DateTimeInterface $deletedBefore): array
+    {
+        return CustomFieldDefinition::onlyTrashed()->where('deleted_at', '<', $deletedBefore)->pluck('id')->map(fn ($id): string => (string) $id)->all();
+    }
+
+    /** Al vencer la retención se borran la definición y sus valores. */
+    public function purge(string $id): bool
+    {
+        /** @var CustomFieldDefinition|null $d */
+        $d = CustomFieldDefinition::onlyTrashed()->whereKey($id)->first();
+        if ($d === null) {
+            return true;
+        }
+
+        return $this->purgeSafely(function () use ($d): void {
+            $values = DB::table('custom_field_values')->where('custom_field_definition_id', $d->id)->delete();
+            $d->forceDelete();
+            $this->audit->record('custom_field.purged', 'custom_field', $d->id, ['key' => $d->key, 'values' => $values], null);
         });
     }
 }

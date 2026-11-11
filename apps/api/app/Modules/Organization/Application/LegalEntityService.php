@@ -8,6 +8,8 @@ use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Exceptions\PlanLimitReachedException;
 use App\Shared\Exceptions\VersionConflictException;
+use App\Shared\Files\FileService;
+use App\Shared\Files\Models\StoredFile;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
 use Illuminate\Support\Carbon;
@@ -25,11 +27,63 @@ final class LegalEntityService
 {
     public const LIMIT_CODE = 'legal_entities';
 
+    /** CFG-2 · Campos propios de la empresa que se editan tal cual (sin valor: se usa el de la organización). */
+    private const PROFILE_FIELDS = ['locale', 'tax_regime', 'economic_activity_code', 'address', 'district_code', 'legal_representative_name'];
+
+    /** Tipos de imagen aceptados para el logo. */
+    private const LOGO_MIMES = ['image/png', 'image/jpeg', 'image/webp'];
+
     public function __construct(
         private readonly LegalEntityStateMachine $machine,
         private readonly AuditLogger $audit,
         private readonly OutboxWriter $outbox,
+        private readonly FileService $files,
     ) {}
+
+    /**
+     * CFG-2 · Sube o reemplaza el logo. El anterior se conserva en el almacén (auditoría) pero deja de usarse.
+     */
+    public function setLogo(LegalEntity $entity, string $contents, string $name, string $mime, ?string $userId): LegalEntity
+    {
+        if (! in_array($mime, self::LOGO_MIMES, true)) {
+            throw ValidationException::withMessages(['file' => [(string) trans('organization.logo_type')]]);
+        }
+        if (strlen($contents) > (int) config('files.logo_max_bytes', 1048576)) {
+            throw ValidationException::withMessages(['file' => [(string) trans('organization.logo_size')]]);
+        }
+
+        return DB::transaction(function () use ($entity, $contents, $name, $mime, $userId): LegalEntity {
+            $before = $entity->logo_file_id;
+            $file = $this->files->upload($contents, $name, $mime, $entity->tenant_id, $userId, StoredFile::CLASSIFICATION_PUBLIC);
+            $entity->forceFill(['logo_file_id' => $file->id])->save();
+            $this->audit->record('legal_entity.logo_changed', 'legal_entity', $entity->id, ['logo_file_id' => $before], ['logo_file_id' => $file->id]);
+
+            return $entity->refresh();
+        });
+    }
+
+    public function removeLogo(LegalEntity $entity): LegalEntity
+    {
+        if ($entity->logo_file_id === null) {
+            return $entity;
+        }
+
+        return DB::transaction(function () use ($entity): LegalEntity {
+            $before = $entity->logo_file_id;
+            $entity->forceFill(['logo_file_id' => null])->save();
+            $this->audit->record('legal_entity.logo_removed', 'legal_entity', $entity->id, ['logo_file_id' => $before], ['logo_file_id' => null]);
+
+            return $entity->refresh();
+        });
+    }
+
+    /**
+     * @return array{mime: string, contents: string}|null
+     */
+    public function logo(LegalEntity $entity): ?array
+    {
+        return $entity->logo_file_id === null ? null : $this->files->publicContents($entity->logo_file_id);
+    }
 
     /**
      * @return array<string, mixed>
@@ -46,7 +100,14 @@ final class LegalEntityService
             'country' => $entity->country_code,
             'currency' => $entity->currency,
             'timezone' => $entity->timezone,
+            'locale' => $entity->locale,
             'payroll_regime' => $regime === null ? '' : (string) $regime->labor_regime_code,
+            'tax_regime' => $entity->tax_regime,
+            'economic_activity_code' => $entity->economic_activity_code,
+            'address' => $entity->address,
+            'district_code' => $entity->district_code,
+            'legal_representative_name' => $entity->legal_representative_name,
+            'has_logo' => $entity->logo_file_id !== null,
             'status' => $entity->status === 'active' ? 'active' : 'archived',
             'allowed_actions' => $this->machine->allowedActions($entity->status),
             'version' => $entity->lock_version,
@@ -56,7 +117,7 @@ final class LegalEntityService
     }
 
     /**
-     * @param  array{name: string, trade_name?: string|null, tax_id: string, country: string, currency: string, timezone: string, payroll_regime: string}  $input
+     * @param  array{name: string, trade_name?: string|null, tax_id: string, country: string, currency: string, timezone: string, payroll_regime: string, locale?: string|null, tax_regime?: string|null, economic_activity_code?: string|null, address?: string|null, district_code?: string|null, legal_representative_name?: string|null}  $input
      */
     public function create(array $input): LegalEntity
     {
@@ -73,7 +134,7 @@ final class LegalEntityService
                 'currency' => $input['currency'],
                 'timezone' => $input['timezone'],
                 'status' => 'active',
-            ]);
+            ] + array_intersect_key($input, array_flip(self::PROFILE_FIELDS)));
             $entity->regimes()->create(['labor_regime_code' => $input['payroll_regime'], 'valid_from' => now()->toDateString()]);
 
             $this->outbox->record(DomainEventTypes::COMPANY_CREATED, 'legal_entity', $entity->id, [
@@ -86,7 +147,7 @@ final class LegalEntityService
     }
 
     /**
-     * @param  array{name?: string, trade_name?: string|null, tax_id?: string, currency?: string, timezone?: string, payroll_regime?: string}  $input
+     * @param  array{name?: string, trade_name?: string|null, tax_id?: string, currency?: string, timezone?: string, payroll_regime?: string, locale?: string|null, tax_regime?: string|null, economic_activity_code?: string|null, address?: string|null, district_code?: string|null, legal_representative_name?: string|null}  $input
      */
     public function update(LegalEntity $entity, array $input, ?int $expectedVersion): LegalEntity
     {
@@ -106,7 +167,8 @@ final class LegalEntityService
         return DB::transaction(function () use ($entity, $input): LegalEntity {
             $before = $this->present($entity);
 
-            $map = ['name' => 'legal_name', 'trade_name' => 'trade_name', 'tax_id' => 'tax_id', 'currency' => 'currency', 'timezone' => 'timezone'];
+            $map = ['name' => 'legal_name', 'trade_name' => 'trade_name', 'tax_id' => 'tax_id', 'currency' => 'currency', 'timezone' => 'timezone']
+                + array_combine(self::PROFILE_FIELDS, self::PROFILE_FIELDS);
             foreach ($map as $in => $column) {
                 if (array_key_exists($in, $input)) {
                     $entity->setAttribute($column, $input[$in]);

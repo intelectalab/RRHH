@@ -59,6 +59,13 @@ export class ApiClient {
     return this.send<T>(endpoint, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined })
   }
 
+  /** Sube un archivo (multipart, campo `file`); el navegador fija el límite del multipart. */
+  async upload<T>(endpoint: string, file: Blob, filename?: string): Promise<T> {
+    const form = new FormData()
+    form.append('file', file, filename)
+    return this.send<T>(endpoint, { method: 'POST', body: form, headers: { 'Content-Type': '' } })
+  }
+
   /** Descarga un archivo (no JSON): devuelve el contenido y el nombre que sugiere la API. */
   async download(endpoint: string): Promise<{ blob: Blob; filename: string }> {
     const url = endpoint.startsWith('http') || endpoint.startsWith('/api/') ? endpoint : `${this.baseUrl}${endpoint}`
@@ -91,6 +98,9 @@ export class ApiClient {
       ...(typeof window !== 'undefined' ? { 'Accept-Language': getLocale() } : {}),
       ...(init.headers as Record<string, string> | undefined),
     }
+
+    // Un multipart lleva su propio Content-Type con el límite: no se fija a mano.
+    if (headers['Content-Type'] === '') delete headers['Content-Type']
 
     if (!SAFE_METHODS.has(method)) {
       const xsrf = readXsrfToken(this.cookies(), this.xsrfCookie)

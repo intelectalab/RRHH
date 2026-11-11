@@ -128,7 +128,8 @@
     "language": "Idioma",
     "lang_es": "Español",
     "lang_en": "English",
-    "lang_pt": "Português"
+    "lang_pt": "Português",
+    "modules_calendar": "Calendário"
   },
   "home": {
     "title": "Olá, {name}",
@@ -300,7 +301,28 @@
     "restored": "Empresa restaurada.",
     "confirm_archive": "Arquivar {name}? Deixará de aceitar admissões; o histórico é mantido.",
     "empty_title": "Não há empresas",
-    "empty_text": "Cadastre a primeira razão social do grupo."
+    "empty_text": "Cadastre a primeira razão social do grupo.",
+    "section_profile": "Dados fiscais e de apresentação",
+    "profile_help": "O que ficar em branco é herdado da organização.",
+    "locale": "Idioma da empresa",
+    "locale_inherit": "O da organização",
+    "locale_es": "Espanhol",
+    "locale_en": "Inglês",
+    "locale_pt": "Português",
+    "tax_regime": "Regime tributário",
+    "activity_code": "Atividade econômica (CIIU)",
+    "address": "Domicílio fiscal",
+    "district_code": "Código do distrito",
+    "district_help": "No Peru, os 6 dígitos do ubigeo INEI (por exemplo, 150101 para Lima).",
+    "legal_rep": "Representante legal",
+    "logo": "Logo",
+    "logo_alt": "Logo de {name}",
+    "logo_upload": "Enviar logo",
+    "logo_replace": "Trocar logo",
+    "logo_remove": "Remover",
+    "logo_help": "PNG, JPEG ou WebP de até 1 MB. Usado em documentos e no seletor de empresa.",
+    "logo_saved": "Logo atualizado",
+    "logo_removed": "Logo removido"
   },
   "audit": {
     "sub": "Quem alterou o quê, quando e de onde. Somente leitura.",
@@ -1506,5 +1528,17 @@
     "cat_unpaid": "Não remunerada",
     "cat_suspension": "Suspensão",
     "cat_other": "Outro"
+  },
+  "cal": {
+    "title": "Calendário de RH",
+    "sub": "Feriados, tarefas e datas dos seus módulos, no fuso horário da empresa.",
+    "prev": "Mês anterior",
+    "next": "Próximo mês",
+    "today": "Hoje",
+    "sources": "O que mostrar",
+    "source_holidays": "Feriados",
+    "source_tasks": "Tarefas",
+    "empty_title": "Nada neste mês",
+    "empty_text": "Não há feriados nem datas visíveis para você neste mês com os filtros escolhidos."
   }
 }

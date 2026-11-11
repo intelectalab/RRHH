@@ -128,7 +128,8 @@
     "language": "Language",
     "lang_es": "Español",
     "lang_en": "English",
-    "lang_pt": "Português"
+    "lang_pt": "Português",
+    "modules_calendar": "Calendar"
   },
   "home": {
     "title": "Hello, {name}",
@@ -300,7 +301,28 @@
     "restored": "Company restored.",
     "confirm_archive": "Archive {name}? It will stop accepting new hires; its history is kept.",
     "empty_title": "No companies",
-    "empty_text": "Register the group's first legal entity."
+    "empty_text": "Register the group's first legal entity.",
+    "section_profile": "Tax and display details",
+    "profile_help": "Anything left blank is taken from the organization.",
+    "locale": "Company language",
+    "locale_inherit": "Same as the organization",
+    "locale_es": "Spanish",
+    "locale_en": "English",
+    "locale_pt": "Portuguese",
+    "tax_regime": "Tax regime",
+    "activity_code": "Economic activity (ISIC)",
+    "address": "Registered address",
+    "district_code": "District code",
+    "district_help": "In Peru, the 6-digit INEI ubigeo (for example, 150101 for Lima).",
+    "legal_rep": "Legal representative",
+    "logo": "Logo",
+    "logo_alt": "{name} logo",
+    "logo_upload": "Upload logo",
+    "logo_replace": "Change logo",
+    "logo_remove": "Remove",
+    "logo_help": "PNG, JPEG or WebP up to 1 MB. Used on documents and in the company selector.",
+    "logo_saved": "Logo updated",
+    "logo_removed": "Logo removed"
   },
   "audit": {
     "sub": "Who changed what, when and from where. Read only.",
@@ -1506,5 +1528,17 @@
     "cat_unpaid": "Unpaid",
     "cat_suspension": "Suspension",
     "cat_other": "Other"
+  },
+  "cal": {
+    "title": "HR calendar",
+    "sub": "Holidays, tasks and dates from your modules, in the company time zone.",
+    "prev": "Previous month",
+    "next": "Next month",
+    "today": "Today",
+    "sources": "What to show",
+    "source_holidays": "Holidays",
+    "source_tasks": "Tasks",
+    "empty_title": "Nothing this month",
+    "empty_text": "There are no holidays or dates you can see this month with the chosen filters."
   }
 }

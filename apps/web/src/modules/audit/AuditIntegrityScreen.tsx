@@ -6,6 +6,7 @@ import { useT } from '@/lib/useT'
 import { settingsTabs } from '@/modules/identity/settingsTabs'
 import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Issue = { type: string; seq?: number; from_seq?: number; to_seq?: number; period?: string; count?: number }
 type Check = { id: string; status: 'ok' | 'failed'; checked_rows: number; archived_rows: number; unchained_rows: number; issues: Issue[]; started_at: string }
@@ -23,6 +24,7 @@ type Entry = { id: string; actor_name: string | null; action: string; entity: st
  */
 export function AuditIntegrityScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const [retention, setRetention] = useState<Retention | null>(null)
   const [checks, setChecks] = useState<Check[] | null>(null)
@@ -43,7 +45,7 @@ export function AuditIntegrityScreen() {
     void api.get<{ data: Entry[] }>(`/audit-archives/${id}/entries?per_page=50`).then((r) => setEntries(r.data)).catch(() => setEntries([]))
   }
 
-  const fmt = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso))
+  const fmt = (iso: string) => fmtDT(iso)
   const month = (d: string) => new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${d}T00:00:00Z`))
   const day = (d: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(`${d}T00:00:00Z`))
   const last = checks?.[0]

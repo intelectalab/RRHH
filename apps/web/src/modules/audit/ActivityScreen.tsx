@@ -6,6 +6,7 @@ import { useT } from '@/lib/useT'
 import { settingsTabs } from '@/modules/identity/settingsTabs'
 import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Activity = { id: string; user_id: string | null; user_name: string | null; activity: string; subject_type: string | null; subject_id: string | null; occurred_at: string }
 const KINDS = ['auth.login', 'auth.login_failed', 'record.viewed', 'file.downloaded', 'search.performed']
@@ -15,6 +16,7 @@ type Page = { data: Activity[]; meta: { next_cursor: string | null } }
 /** Configuración → Actividad (AUD-3): ingresos, vistas, descargas y búsquedas; separada de la auditoría. */
 export function ActivityScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const [rows, setRows] = useState<Activity[] | null>(null)
   const [next, setNext] = useState<string | null>(null)
@@ -45,7 +47,7 @@ export function ActivityScreen() {
     void api.get<Page>(query(next)).then((r) => { setRows((prev) => [...(prev ?? []), ...r.data]); setNext(r.meta.next_cursor) })
   }
 
-  const fmt = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(iso))
+  const fmt = (iso: string) => fmtDT(iso, true)
   const label = (code: string) => {
     const key = `audit.act_${code.replace(/\./g, '_')}`
     const text = t(key)

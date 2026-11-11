@@ -7,6 +7,7 @@ import { settingsTabs } from '@/modules/identity/settingsTabs'
 import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Entry = {
   id: string
@@ -35,6 +36,7 @@ function show(value: unknown): string {
 /** Configuración → Auditoría (AUD-4): solo lectura, con historia por registro y exportación. */
 export function AuditScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const [rows, setRows] = useState<Entry[] | null>(null)
   const [cursor, setCursor] = useState<string | null>(null)
@@ -72,7 +74,7 @@ export function AuditScreen() {
     setCursor(res.meta.next_cursor)
   }
 
-  const fmt = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(iso))
+  const fmt = (iso: string) => fmtDT(iso, true)
   const entityLabel = (e: string) => ((ENTITIES as readonly string[]).includes(e) ? t(`audit.entity_${e}`) : e)
 
   function exportCsv() {

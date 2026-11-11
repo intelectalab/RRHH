@@ -3,18 +3,20 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
-import { formatDate, formatDateTime } from '@/lib/format'
+import { formatDate } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Item = { type: string; id: string; title: string; subtitle: string | null; deleted_at: string; deleted_by: string | null; purge_on: string | null }
 
 /** Configuración → Papelera (CFG-9): quién eliminó, cuándo, cuándo se depura y restaurar. */
 export function TrashScreen() {
   const { t, locale } = useT()
+  const fmtDT = useDateTime()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
   const [rows, setRows] = useState<Item[] | null>(null)
@@ -64,7 +66,7 @@ export function TrashScreen() {
                 {rows?.map((r) => (
                   <tr key={r.id}>
                     <td><span className="tag gr" style={{ marginRight: 6 }}>{typeLabel(r.type)}</span><b>{r.title}</b>{r.subtitle && <span className="sub2">{r.subtitle}</span>}</td>
-                    <td className="nowrap">{formatDateTime(locale, r.deleted_at)}{r.deleted_by && <span className="sub2">{t('trash.by', { name: r.deleted_by })}</span>}</td>
+                    <td className="nowrap">{fmtDT(r.deleted_at)}{r.deleted_by && <span className="sub2">{t('trash.by', { name: r.deleted_by })}</span>}</td>
                     <td className="nowrap">{r.purge_on ? formatDate(locale, r.purge_on) : '—'}</td>
                     <td className="text-end">{can('audit.trash.restore') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void restore(r)}>{t('trash.restore')}</button>}</td>
                   </tr>
