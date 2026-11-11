@@ -144,7 +144,8 @@ jobs:
 
       - name: Initialize PostgreSQL database schema
         run: |
-          sudo apt-get update && sudo apt-get install -y postgresql-client
+          # La imagen del runner ya trae psql; solo se instala si falta (evita depender del espejo de apt).
+          command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
           PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -f database/schema.sql
 
       - name: Run Database Isolation Tests
