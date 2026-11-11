@@ -8,6 +8,7 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserSession;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
+use App\Shared\Security\Totp;
 use App\Shared\Settings\ParameterResolver;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Carbon;

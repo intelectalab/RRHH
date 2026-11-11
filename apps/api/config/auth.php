@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Platform\Infrastructure\Models\PlatformUser;
 
 return [
     'defaults' => [
@@ -14,6 +15,11 @@ return [
             'driver' => 'ayni-session',
             'provider' => 'users',
         ],
+        // SAS-1: consola del superadministrador; cookie, tabla y sesiones propias, sin organización.
+        'platform' => [
+            'driver' => 'platform-session',
+            'provider' => 'platform_users',
+        ],
     ],
 
     'providers' => [
@@ -21,6 +27,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => User::class,
+        ],
+        'platform_users' => [
+            'driver' => 'eloquent',
+            'model' => PlatformUser::class,
         ],
     ],
 ];

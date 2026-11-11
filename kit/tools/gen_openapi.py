@@ -262,6 +262,13 @@ EXTRA = [
     ("TEN", 0, "patch", "/tenant", "settings.organization.update", "Actualizar datos de la organización", False),
     ("SAS", 0, "get", "/platform/health", "platform.health.view", "Salud de la plataforma: colas, trabajos fallidos, webhooks, conectores", False),
     ("SAS", 0, "get", "/platform/metrics", "platform.metrics.view", "Indicadores de la consola SaaS", False),
+    ("SAS", 0, "post", "/platform/auth/login", None, "Consola SaaS: ingresar con correo y clave; abre la sesión de la consola con el segundo paso pendiente (siempre obligatorio)", True),
+    ("SAS", 0, "post", "/platform/auth/logout", "platform", "Consola SaaS: cerrar la sesión de la consola", False),
+    ("SAS", 0, "get", "/platform/me", "platform", "Consola SaaS: usuario actual, rol interno, paso del segundo factor y permisos de la consola", False),
+    ("SAS", 0, "post", "/platform/auth/mfa/totp", "platform", "Consola SaaS: iniciar la configuración de la aplicación autenticadora (primer ingreso)", False),
+    ("SAS", 0, "post", "/platform/auth/mfa/totp/confirm", "platform", "Consola SaaS: confirmar la aplicación autenticadora con un código; completa el ingreso", False),
+    ("SAS", 0, "post", "/platform/auth/mfa/verify", "platform", "Consola SaaS: segundo paso del ingreso con el código de la aplicación autenticadora", False),
+    ("SAS", 0, "get", "/platform/audit-events", "platform.audit.view", "Consola SaaS: auditoría propia de la consola (solo inserción)", False),
     ("WEB", 0, "get", "/public/catalog", None, "Sitio: productos, planes públicos con módulos, límites y complementos, y estado de cada módulo", True),
     ("WEB", 0, "get", "/public/ruc/{ruc}", None, "Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado)", True),
     ("WEB", 0, "get", "/public/subdomains/{slug}", None, "Sitio: disponibilidad de un subdominio", True),
@@ -541,7 +548,8 @@ def build():
             res.update(errs("400", "422", "429"))
         if not public:
             res.update(errs("401", "403"))
-        if "{" in path:
+        # La consola SaaS responde 404 desde el host de una organización (SAS-1).
+        if "{" in path or path.startswith("/platform/"):
             res.update(errs("404"))
         op["responses"] = dict(sorted(res.items()))
         p = None if perm in (None, "-") else perm
@@ -557,7 +565,7 @@ def build():
             "description": (
                 "Contrato de la API REST de GestiaHR. Generado por kit/tools/gen_openapi.py; no editar a mano.\n\n"
                 "Extensiones: `x-permission` (permiso exigido; `authenticated` = basta la sesión, "
-                "`public` = sin autenticación) y `x-phase` (fase en la que se construye). "
+                "`public` = sin autenticación, `platform` = basta la sesión de la consola SaaS) y `x-phase` (fase en la que se construye). "
                 "Los campos listados en `x-sensitive-fields` solo se devuelven con permiso por campo."),
         },
         "servers": [{"url": "https://{tenant}.example.test/api/v1", "variables": {"tenant": {"default": "demo"}}}],

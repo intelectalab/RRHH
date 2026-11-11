@@ -4,9 +4,9 @@
  * SEG-3 · Segundo factor (TOTP) y códigos de respaldo; MFA obligatorio por rol (RN-SEG-08, ADR 0009).
  */
 
-use App\Modules\Identity\Application\Mfa\Totp;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Shared\Security\Totp;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;

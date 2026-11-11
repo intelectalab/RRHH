@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Identity\Application\Mfa;
+namespace App\Shared\Security;
 
 use Illuminate\Support\Carbon;
 

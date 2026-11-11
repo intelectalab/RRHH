@@ -271,6 +271,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/platform/support-sessions/{id}/end` | `platform.support_sessions.end` | 0 |
 | GET | `/platform/health` | `platform.health.view` | 0 |
 | GET | `/platform/metrics` | `platform.metrics.view` | 0 |
+| POST | `/platform/auth/login` | público | 0 |
+| POST | `/platform/auth/logout` | `platform` | 0 |
+| GET | `/platform/me` | `platform` | 0 |
+| POST | `/platform/auth/mfa/totp` | `platform` | 0 |
+| POST | `/platform/auth/mfa/totp/confirm` | `platform` | 0 |
+| POST | `/platform/auth/mfa/verify` | `platform` | 0 |
+| GET | `/platform/audit-events` | `platform.audit.view` | 0 |
 
 **TEN · Organización (tenant)**
 

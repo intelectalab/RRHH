@@ -159,6 +159,11 @@ final class CrossTenantHarness
             if (in_array($permission, self::EXEMPT_PERMISSIONS, true) && ! str_contains($op['path'], '{')) {
                 continue;
             }
+            // Consola SaaS (SAS-1): opera entre organizaciones por diseño y responde 404 desde el
+            // host de una organización; su frontera se prueba en tests/Feature/Platform.
+            if (str_starts_with($op['path'], '/platform/') && ($permission === 'public' || str_starts_with($permission, 'platform'))) {
+                continue;
+            }
 
             $schema = $this->resourceSchema($op['path'], $op['method']);
             $hasParam = str_contains($op['path'], '{');

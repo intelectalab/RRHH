@@ -62,7 +62,11 @@
   uniq feature_flag_code
 @platform_users P soft lock | Usuarios de la consola del propietario del SaaS, separados por completo de los usuarios de las organizaciones.
   email text! ; full_name text! ; password_hash text #S ; role enum(superadmin,support,billing,readonly)=support ; mfa_secret_enc
-  status enum(active,blocked)=active ; last_login_at ; uniq email
+  status enum(active,blocked)=active ; last_login_at ; mfa_confirmed_at ; mfa_last_used_step bigint ; failed_attempts integer=0
+  locked_until ts ; uniq email
+@platform_sessions P | Sesiones de la consola SaaS (SAS-1): cookie propia, segundo factor siempre obligatorio, revocables.
+  platform_user_id => platform_users ; session_hash text! #S ; ip inet ; user_agent ; mfa_passed bool=f ; last_seen_at
+  expires_at ts! ; revoked_at ; uniq session_hash
 @platform_audit_events P imm part | Auditoría inalterable de la consola SaaS (quién, qué, sobre qué organización, antes y después).
   platform_user_id ?=> platform_users ; tenant_id ?=> tenants ; action text! ; entity_type ; entity_id uuid ; before_data j ; after_data j
   ip inet ; user_agent ; occurred_at ts=now

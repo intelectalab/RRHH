@@ -586,6 +586,10 @@ CREATE TABLE platform_users (
   mfa_secret_enc text,  -- SENSIBLE (cifrado en la aplicación)
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','blocked')),
   last_login_at timestamptz,
+  mfa_confirmed_at timestamptz,
+  mfa_last_used_step bigint,
+  failed_attempts integer NOT NULL DEFAULT 0,
+  locked_until timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -594,6 +598,25 @@ CREATE TABLE platform_users (
 COMMENT ON TABLE platform_users IS 'Usuarios de la consola del propietario del SaaS, separados por completo de los usuarios de las organizaciones.';
 CREATE UNIQUE INDEX uq_platform_users_email ON platform_users (email) WHERE deleted_at IS NULL;
 CREATE TRIGGER trg_platform_users_touch BEFORE UPDATE ON platform_users FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE platform_sessions (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  platform_user_id uuid NOT NULL,
+  session_hash text NOT NULL,  -- SENSIBLE
+  ip inet,
+  user_agent text,
+  mfa_passed boolean NOT NULL DEFAULT false,
+  last_seen_at timestamptz,
+  expires_at timestamptz NOT NULL,
+  revoked_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_platform_sessions_session_hash UNIQUE (session_hash),
+  CONSTRAINT fk_platform_sessions_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id)
+);
+COMMENT ON TABLE platform_sessions IS 'Sesiones de la consola SaaS (SAS-1): cookie propia, segundo factor siempre obligatorio, revocables.';
+CREATE INDEX ix_platform_sessions_platform_user_id ON platform_sessions (platform_user_id);
+CREATE TRIGGER trg_platform_sessions_touch BEFORE UPDATE ON platform_sessions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE platform_audit_events (
   id uuid NOT NULL DEFAULT uuid_v7(),
@@ -17879,7 +17902,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_ap
 -- Catálogos de plataforma: solo lectura para la aplicación.
 REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, feature_flag_rules, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, feature_flag_rules, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 

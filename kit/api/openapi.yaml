@@ -5,8 +5,9 @@ info:
   description: 'Contrato de la API REST de GestiaHR. Generado por kit/tools/gen_openapi.py; no editar a mano.
 
 
-    Extensiones: `x-permission` (permiso exigido; `authenticated` = basta la sesión, `public` = sin autenticación) y `x-phase`
-    (fase en la que se construye). Los campos listados en `x-sensitive-fields` solo se devuelven con permiso por campo.'
+    Extensiones: `x-permission` (permiso exigido; `authenticated` = basta la sesión, `public` = sin autenticación, `platform`
+    = basta la sesión de la consola SaaS) y `x-phase` (fase en la que se construye). Los campos listados en `x-sensitive-fields`
+    solo se devuelven con permiso por campo.'
 servers:
 - url: https://{tenant}.example.test/api/v1
   variables:
@@ -20948,6 +20949,169 @@ paths:
       x-phase: 0
       x-permission: identity.roles.view
       operationId: getPermissions
+  /platform/audit-events:
+    get:
+      summary: 'Consola SaaS: auditoría propia de la consola (solo inserción)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+        '404': *id005
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.audit.view
+      operationId: getPlatformAuditEvents
+  /platform/auth/login:
+    post:
+      summary: 'Consola SaaS: ingresar con correo y clave; abre la sesión de la consola con el segundo paso pendiente (siempre
+        obligatorio)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: public
+      operationId: postPlatformAuthLogin
+      security: []
+  /platform/auth/logout:
+    post:
+      summary: 'Consola SaaS: cerrar la sesión de la consola'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform
+      operationId: postPlatformAuthLogout
+  /platform/auth/mfa/totp:
+    post:
+      summary: 'Consola SaaS: iniciar la configuración de la aplicación autenticadora (primer ingreso)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform
+      operationId: postPlatformAuthMfaTotp
+  /platform/auth/mfa/totp/confirm:
+    post:
+      summary: 'Consola SaaS: confirmar la aplicación autenticadora con un código; completa el ingreso'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform
+      operationId: postPlatformAuthMfaTotpConfirm
+  /platform/auth/mfa/verify:
+    post:
+      summary: 'Consola SaaS: segundo paso del ingreso con el código de la aplicación autenticadora'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform
+      operationId: postPlatformAuthMfaVerify
   /platform/feature-flags:
     get:
       summary: Listar FeatureFlag
@@ -21100,6 +21264,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - SAS
       x-phase: 0
@@ -21335,6 +21500,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - AYU
       x-phase: 1
@@ -21352,11 +21518,30 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - AYU
       x-phase: 1
       x-permission: platform.help_articles.view
       operationId: getPlatformHelpInsights
+  /platform/me:
+    get:
+      summary: 'Consola SaaS: usuario actual, rol interno, paso del segundo factor y permisos de la consola'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+        '404': *id005
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform
+      operationId: getPlatformMe
   /platform/metrics:
     get:
       summary: Indicadores de la consola SaaS
@@ -21369,6 +21554,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - SAS
       x-phase: 0
@@ -22854,6 +23040,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - WEB
       x-phase: 0
@@ -23056,6 +23243,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - WEB
       x-phase: 0
@@ -23079,6 +23267,7 @@ paths:
         '400': *id001
         '401': *id002
         '403': *id003
+        '404': *id005
         '422': *id007
         '429': *id004
       tags:
