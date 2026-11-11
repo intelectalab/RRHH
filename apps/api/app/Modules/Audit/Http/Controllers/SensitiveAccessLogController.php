@@ -2,6 +2,7 @@
 
 namespace App\Modules\Audit\Http\Controllers;
 
+use App\Shared\Exceptions\InvalidFilterException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,12 @@ use Illuminate\Support\Facades\DB;
  */
 final class SensitiveAccessLogController
 {
+    /** Categorías del registro (enum data_category). */
+    private const CATEGORIES = ['salary', 'health', 'complaint', 'disciplinary', 'biometric', 'bank_account', 'identity_document', 'union', 'other'];
+
+    /** Canales del registro (enum access_kind). */
+    private const CHANNELS = ['view', 'export', 'download', 'print', 'api', 'ai'];
+
     public function __invoke(Request $request): JsonResponse
     {
         $perPage = max(1, min(100, (int) $request->query('per_page', '50')));
@@ -23,7 +30,17 @@ final class SensitiveAccessLogController
             $query->where('l.user_id', $filter['actor_id']);
         }
         if (is_string($filter['category'] ?? null) && $filter['category'] !== '') {
+            if (! in_array($filter['category'], self::CATEGORIES, true)) {
+                throw new InvalidFilterException('Categoría de dato no válida.', self::CATEGORIES);
+            }
             $query->where('l.data_category', $filter['category']);
+        }
+        // SEG-12: las exportaciones y descargas se consultan por canal.
+        if (is_string($filter['channel'] ?? null) && $filter['channel'] !== '') {
+            if (! in_array($filter['channel'], self::CHANNELS, true)) {
+                throw new InvalidFilterException('Canal no válido.', self::CHANNELS);
+            }
+            $query->where('l.access_kind', $filter['channel']);
         }
 
         $rows = $query->orderByDesc('l.occurred_at')->limit($perPage)->get();

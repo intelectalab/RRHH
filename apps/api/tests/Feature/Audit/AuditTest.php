@@ -182,9 +182,13 @@ test('el Auditor consulta todo y no puede modificar nada en el sistema', functio
     $permissions = TenancyScope::runAs(AUD_TENANT, fn () => DB::table('role_permissions as rp')->join('roles as r', 'r.id', '=', 'rp.role_id')
         ->where('r.system_role_code', 'auditor')->pluck('rp.permission_code')->all());
 
+    // SEG-12: exportar un listado es una lectura (genera un archivo, no cambia datos del sistema);
+    // el catálogo (kit/docs/07) le da reports.exports.create al Auditor.
+    $readOnlyPosts = ['api/v1/exports'];
+
     $writes = [];
     foreach (Route::getRoutes()->getRoutes() as $route) {
-        if (array_diff($route->methods(), ['GET', 'HEAD']) === []) {
+        if (array_diff($route->methods(), ['GET', 'HEAD']) === [] || in_array($route->uri(), $readOnlyPosts, true)) {
             continue;
         }
         foreach ($route->gatherMiddleware() as $m) {

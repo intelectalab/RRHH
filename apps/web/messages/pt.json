@@ -901,5 +901,10 @@
     "cancel_login": "Sair",
     "enroll_title": "Configure a verificação em duas etapas",
     "enroll_intro": "Sua função ou organização exige uma segunda etapa ao entrar. Configure-a agora para continuar."
+  },
+  "exports": {
+    "csv": "Exportar CSV",
+    "working": "Exportando…",
+    "error": "Não foi possível exportar a lista."
   }
 }

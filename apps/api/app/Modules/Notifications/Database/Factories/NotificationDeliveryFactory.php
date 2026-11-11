@@ -3,8 +3,8 @@
 namespace App\Modules\Notifications\Database\Factories;
 
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Shared\Security\FieldCipher;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Crypt;
 
 /**
  * @extends Factory<NotificationDelivery>
@@ -17,7 +17,7 @@ class NotificationDeliveryFactory extends Factory
     {
         return [
             'channel' => 'email',
-            'recipient_address_enc' => Crypt::encryptString($this->faker->safeEmail()),
+            'recipient_address_enc' => FieldCipher::encrypt($this->faker->safeEmail()),
             'status' => 'sent',
             'provider' => 'fake_email',
             'attempts' => 1,

@@ -8,10 +8,10 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserSession;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
+use App\Shared\Security\FieldCipher;
 use App\Shared\Settings\ParameterResolver;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -105,7 +105,7 @@ final class MfaService
             ->whereNull('confirmed_at')->whereNull('disabled_at')->where('created_at', '>=', now()->subMinutes(30))
             ->orderByDesc('created_at')->first();
         if ($recent !== null) {
-            $secret = Crypt::decryptString((string) $recent->secret_enc);
+            $secret = FieldCipher::decrypt((string) $recent->secret_enc);
 
             return ['secret' => $secret, 'otpauth_uri' => Totp::uri($secret, (string) config('app.name'), $account)];
         }
@@ -116,7 +116,7 @@ final class MfaService
                 'tenant_id' => TenancyScope::requireTenant(),
                 'user_id' => $user->id,
                 'kind' => 'totp',
-                'secret_enc' => Crypt::encryptString($secret),
+                'secret_enc' => FieldCipher::encrypt($secret),
                 'label' => (string) trans('identity.mfa.authenticator_label'),
             ]);
         });
@@ -136,7 +136,7 @@ final class MfaService
         if ($pending === null) {
             throw new BusinessRuleViolatedException('mfa_enrollment_not_started', (string) trans('identity.mfa.mfa_enrollment_not_started'));
         }
-        $secret = Crypt::decryptString((string) $pending->secret_enc);
+        $secret = FieldCipher::decrypt((string) $pending->secret_enc);
         $step = Totp::match($secret, $code);
         if ($step === null) {
             $this->lockout->activity($user, 'auth.mfa_failed');
@@ -172,7 +172,7 @@ final class MfaService
             return false;
         }
         $ok = DB::transaction(function () use ($user, $factor, $code): bool {
-            $step = Totp::match(Crypt::decryptString((string) $factor->secret_enc), $code);
+            $step = Totp::match(FieldCipher::decrypt((string) $factor->secret_enc), $code);
             $lastStep = $factor->last_used_at === null ? null : Totp::currentStep(Carbon::parse((string) $factor->last_used_at)->getTimestamp());
             if ($step !== null && ($lastStep === null || $step > $lastStep)) {
                 DB::table('user_mfa_factors')->where('id', $factor->id)->update(['last_used_at' => $this->stepTime($step)]);

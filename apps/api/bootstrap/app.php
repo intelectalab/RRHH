@@ -4,6 +4,7 @@ use App\Modules\Identity\Http\Middleware\EnsureSecondFactor;
 use App\Modules\Identity\Http\Middleware\VerifyXsrfToken;
 use App\Shared\Commands\EnvironmentCheckCommand;
 use App\Shared\Commands\GenerateDataDictionaryCommand;
+use App\Shared\Commands\RotateFieldKeysCommand;
 use App\Shared\Commands\VerifyDatabaseConventionsCommand;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Http\Middleware\EnsureIdempotency;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         EnvironmentCheckCommand::class,
         VerifyDatabaseConventionsCommand::class,
         GenerateDataDictionaryCommand::class,
+        RotateFieldKeysCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         // La API no redirige a una pantalla de ingreso: responde 401 unauthenticated.

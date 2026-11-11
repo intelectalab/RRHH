@@ -901,5 +901,10 @@
     "cancel_login": "Sign out",
     "enroll_title": "Set up two-step verification",
     "enroll_intro": "Your role or organization requires a second step to sign in. Set it up now to continue."
+  },
+  "exports": {
+    "csv": "Export CSV",
+    "working": "Exporting…",
+    "error": "The list could not be exported."
   }
 }

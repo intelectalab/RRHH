@@ -380,6 +380,14 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/platform/web-settings` | `platform.web_settings.view` | 0 |
 | PATCH | `/platform/web-settings` | `platform.web_settings.update` | 0 |
 
+**RPT · Reportes**
+
+| Método | Ruta | Permiso | Fase |
+|---|---|---|---|
+| GET, POST | `/exports` | `reports.exports.{view,create}` | 0 |
+| GET | `/exports/{id}` | `reports.exports.view` | 0 |
+| GET | `/exports/{id}/download` | `reports.exports.view` | 0 |
+
 ### Fase 1 · Core HR
 
 
@@ -1079,8 +1087,6 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/reports` | `reports.reports.{view,create}` | 8 |
 | GET, PATCH, DELETE | `/reports/{id}` | `reports.reports.{view,update,delete}` | 8 |
 | POST | `/reports/{id}/run` | `reports.reports.run` | 8 |
-| GET, POST | `/exports` | `reports.exports.{view,create}` | 8 |
-| GET | `/exports/{id}` | `reports.exports.view` | 8 |
 
 **ALE · Alertas**
 

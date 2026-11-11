@@ -18,6 +18,7 @@ const paths: Record<string, string> = {
   sliders: 'M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4',
   user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20a7.5 7.5 0 0 1 15 0',
   sidebar: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM9 5v14',
+  download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
 }
 
 export function Icon({ name, size = 18 }: { name: keyof typeof paths; size?: number }) {

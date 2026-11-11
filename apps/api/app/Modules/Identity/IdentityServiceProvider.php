@@ -3,12 +3,14 @@
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Application\SessionManager;
+use App\Modules\Identity\Infrastructure\Exports\UsersExportSource;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendMessageCode;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
 use App\Modules\Identity\Infrastructure\Trash\RoleTrashSource;
+use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\TenancyScope;
@@ -70,6 +72,7 @@ final class IdentityServiceProvider extends ServiceProvider
         $search->register($this->app->make(UserSearchSource::class));
         $search->register($this->app->make(RoleSearchSource::class));
 
+        $this->app->make(ExportRegistry::class)->register($this->app->make(UsersExportSource::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }
 }

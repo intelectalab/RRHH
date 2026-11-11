@@ -901,5 +901,10 @@
     "cancel_login": "Salir",
     "enroll_title": "Configura la verificación en dos pasos",
     "enroll_intro": "Tu rol o tu organización exige un segundo paso al ingresar. Configúralo ahora para continuar."
+  },
+  "exports": {
+    "csv": "Exportar CSV",
+    "working": "Exportando…",
+    "error": "No se pudo exportar el listado."
   }
 }

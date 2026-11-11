@@ -7,9 +7,9 @@ use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Shared\Notifications\Notifier;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
+use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\Resolution\TenantDirectory;
 use App\Shared\Tenancy\TenancyScope;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -80,7 +80,7 @@ final class NotificationDispatcher implements Notifier
                     $delivery = NotificationDelivery::create([
                         'notification_id' => $notificationId,
                         'channel' => $channel,
-                        'recipient_address_enc' => Crypt::encryptString($address),
+                        'recipient_address_enc' => FieldCipher::encrypt($address),
                         'status' => 'queued',
                     ]);
                     $event = $this->outbox->record(DomainEventTypes::NOTIFICATION_DELIVERY_REQUESTED, 'notification_delivery', $delivery->id, [
@@ -114,7 +114,7 @@ final class NotificationDispatcher implements Notifier
         }
         $enc = DB::table('user_identities')->where('user_id', $userId)->where('kind', 'email')->orderByDesc('is_primary')->value('identifier_enc');
 
-        return is_string($enc) ? Crypt::decryptString($enc) : null;
+        return is_string($enc) ? FieldCipher::decrypt($enc) : null;
     }
 
     /**

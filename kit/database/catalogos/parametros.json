@@ -257,6 +257,18 @@
       }
     },
     {
+      "codigo": "seguridad.marca_agua_descargas",
+      "modulo": "base",
+      "nombre": "Marca de agua en exportaciones",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Agrega a cada archivo exportado el nombre de quien lo descargó y la fecha.",
+      "opciones": null
+    },
+    {
       "codigo": "seguridad.registrar_acceso_sensible",
       "modulo": "base",
       "nombre": "Registrar accesos a datos sensibles",

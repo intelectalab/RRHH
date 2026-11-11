@@ -4724,6 +4724,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/exports/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el archivo de una exportación propia (CSV); cuenta la descarga y la registra */
+        get: operations["getExportsIdDownload"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/external-income-declarations": {
         parameters: {
             query?: never;
@@ -15867,14 +15884,22 @@ export interface components {
             filters: {
                 [key: string]: unknown;
             };
+            row_count?: number | null;
+            contains_sensitive?: boolean | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
+            download_url?: string | null;
+            download_count?: number | null;
             /** Format: date-time */
             expires_at?: string | null;
-            /** @enum {string} */
-            status: "queued" | "running" | "ready" | "failed";
+            error?: string | null;
             /** Format: date-time */
             created_at?: string;
+            /** @enum {string} */
+            status: "queued" | "running" | "completed" | "failed" | "expired";
             /** Format: date-time */
             updated_at?: string;
         };
@@ -15885,10 +15910,20 @@ export interface components {
             filters?: {
                 [key: string]: unknown;
             };
+            row_count?: number | null;
+            contains_sensitive?: boolean | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
+            download_url?: string | null;
+            download_count?: number | null;
             /** Format: date-time */
             expires_at?: string | null;
+            error?: string | null;
+            /** Format: date-time */
+            created_at?: string | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): gross_income, exempt_income, tax_withheld, monthly_detail */
         ExternalIncomeDeclaration: {
@@ -31381,6 +31416,32 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getExportsIdDownload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     getExternalIncomeDeclarations: {
