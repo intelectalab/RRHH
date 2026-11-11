@@ -123,6 +123,8 @@ const VIG_WITHOUT_EXCLUSION = [
     'advance_policies', 'collective_agreement_clauses', 'collective_agreements', 'concept_account_mappings',
     'country_concept_templates', 'expense_policies', 'org_units', 'salary_bands', 'salary_policies',
     'tenant_settings', 'time_policies', 'user_roles', 'vacation_policies',
+    // CFG-10: una sola fila por (master_catalog_id, code) por restricción única; no puede haber solape.
+    'master_catalog_items',
 ];
 
 test('toda tabla con vigencia tiene restricción de exclusión o está justificada', function (): void {

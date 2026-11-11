@@ -1031,7 +1031,8 @@
     "run_test": "Test",
     "sample_invalid": "The sample data is not valid JSON.",
     "test_matches": "Matches",
-    "test_no_match": "Does not match"
+    "test_no_match": "Does not match",
+    "preview_titled": " · “{title}”"
   },
   "autoev": {
     "employee_hired": "Employee hired",

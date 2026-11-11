@@ -1031,7 +1031,8 @@
     "run_test": "Testar",
     "sample_invalid": "Os dados de exemplo não são um JSON válido.",
     "test_matches": "Atende",
-    "test_no_match": "Não atende"
+    "test_no_match": "Não atende",
+    "preview_titled": " · «{title}»"
   },
   "autoev": {
     "employee_hired": "Colaborador contratado",

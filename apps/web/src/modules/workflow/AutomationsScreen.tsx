@@ -436,7 +436,7 @@ function RulePanel({ rule, catalog, onClose, onSaved }: { rule: Rule | null; cat
                 <span className={`st ${preview.matches ? 'ok' : 'gr'}`}>{t(preview.matches ? 'auto.test_matches' : 'auto.test_no_match')}</span>
                 <ol style={{ margin: '8px 0 0', paddingLeft: 18 }}>
                   {preview.actions.map((p) => (
-                    <li key={p.index}>{t(`auto.action_${p.type}`)}{typeof p.params?.title === 'string' && <> · «{p.params.title}»</>}{p.error && <span className="invalid-feedback" style={{ display: 'block' }}>{p.error}</span>}</li>
+                    <li key={p.index}>{t(`auto.action_${p.type}`)}{typeof p.params?.title === 'string' && <>{t('auto.preview_titled', { title: p.params.title })}</>}{p.error && <span className="invalid-feedback" style={{ display: 'block' }}>{p.error}</span>}</li>
                   ))}
                 </ol>
               </div>
