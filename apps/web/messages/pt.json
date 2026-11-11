@@ -87,7 +87,11 @@
     "use_password": "Usar senha",
     "have_activation_code": "Tem um código de ativação?",
     "activate_code_intro": "Digite seu documento, o código de ativação que o RH entregou ou que você recebeu por mensagem, e defina sua senha.",
-    "activation_code": "Código de ativação (8 dígitos)"
+    "activation_code": "Código de ativação (8 dígitos)",
+    "brand_title": "Toda a gestão de pessoas da sua empresa, em um só lugar.",
+    "benefit_1": "Folha peruana com parâmetros legais vigentes e rastreáveis.",
+    "benefit_2": "Cada colaborador cuida do que é seu pelo celular, mesmo sem e-mail.",
+    "benefit_3": "Permissões por função e por campo, com auditoria de cada mudança."
   },
   "app": {
     "name": "GestiaHR"
@@ -114,12 +118,18 @@
     "notifications": "Notificações",
     "notifications_aria": "Notificações: {n} não lidas",
     "my_notifications": "Minhas notificações",
-    "account_security": "Segurança da conta"
+    "account_security": "Segurança da conta",
+    "account_section": "Conta",
+    "expand_menu": "Expandir o menu",
+    "collapse_menu": "Recolher o menu",
+    "close_menu": "Fechar o menu",
+    "open_menu": "Abrir o menu",
+    "menu_section": "Menu"
   },
   "home": {
     "title": "Olá, {name}",
     "sub": "{tenant}",
-    "intro": "Esta é a base do GestiaHR. Os módulos aparecem na barra superior conforme são ativados para sua organização e de acordo com suas permissões.",
+    "intro": "Esta é a base do GestiaHR. Os módulos aparecem no menu lateral conforme são ativados para sua organização e de acordo com suas permissões.",
     "your_roles": "Seus papéis",
     "your_modules": "Módulos ativos",
     "none": "Nenhum"

@@ -1,173 +1,194 @@
 /*
  * tokens.css — Sistema de tokens de diseño de GestiaHR.
- * Fuente autoritativa en modo claro: variables.css de la versión aprobada.
- * Modo oscuro calculado con contraste WCAG AA.
+ * Valores de kit/docs/10-pantallas-y-ux.md §1 y del prototipo del kit v1.13 (azul de marca, ADR 0014).
+ * Ambos temas tienen valores propios (no se invierten colores).
  */
 
 :root {
   /* Código QR: siempre oscuro sobre claro para que la cámara lo lea, también en modo oscuro (SEG-3). */
   --qr-claro: #FFFFFF;
   --qr-oscuro: #000000;
-  /* Marca: petróleo (principal) y ocre andino (acento puntual) */
-  --pe-800: #0B4350;
-  --pe-700: #0E4F5C;
-  --pe-600: #125F6E;
-  --pe-500: #17788A;
-  --pe-200: #B7D9E0;
-  --pe-100: #D5EAEE;
-  --pe-50: #EEF6F7;
 
-  --oc: #C98A1B;
-  --oc-600: #A9720F;
-  --oc-50: #FBF1DC;
+  /* Marca GestiaHR (kit v1.13 · docs/10 §1.1 y prototipo): azul de acción, amarillo activo (ADR 0014).
+     La escala --pe-* conserva su nombre en los componentes y apunta al azul de marca. */
+  --pe-800: #062448;
+  --pe-700: #082F5E;
+  --pe-600: #0A3A73;             /* --accent */
+  --pe-500: #1D5FAF;             /* foco y bordes activos */
+  --pe-200: #B9D2F1;
+  --pe-100: #D6E6F9;
+  --pe-50: #E6F0FB;              /* --accent-soft */
+
+  --oc: #F4B400;                 /* amarillo de marca: indicador activo y contadores */
+  --oc-600: #8A6100;
+  --oc-50: #FFF4D6;
+  --oc-tx: #15202E;               /* texto sobre el amarillo */
 
   /* Texto y superficies */
-  --tx: #1C2630;
-  --tx2: #55616E;
-  --tx3: #8A96A3;
-  --bd: #E1E6EB;
-  --bd2: #EDF0F3;
-  --bg: #F4F6F8;
-  --sup: #FFFFFF;
-  --sup2: #F8FAFB;
+  --tx: #15202E;                 /* --ink */
+  --tx2: #5B6678;                /* --muted */
+  --tx3: #8A94A6;
+  --bd: #E1E6EE;                 /* --line */
+  --bd2: #EDF1F6;
+  --bg: #F3F5F9;
+  --sup: #FFFFFF;                /* --surface */
+  --sup2: #F6F8FB;               /* --surface2 */
 
   /* Estados (siempre acompañados de texto o ícono) */
-  --ok: #276B42;
-  --ok-50: #E3F1E8;
-  --wa: #8E5510;
-  --wa-50: #FBEEDC;
-  --er: #A8321F;
-  --er-50: #FAE5E2;
-  --in: #245B91;
-  --in-50: #E2EDF8;
+  --ok: #1E7F4A;
+  --ok-50: #E3F5EA;
+  --wa: #9A5B0B;
+  --wa-50: #FFF2D9;
+  --er: #C0353A;
+  --er-50: #FDE9EA;
+  --in: #0A3A73;
+  --in-50: #E6F0FB;
 
   /* Gráficos: serie principal y contraste (daltonismo), gris de contexto */
-  --g1: #00809A;
-  --g1-wash: rgba(0, 128, 154, 0.10);
+  --g1: #1D5FAF;
+  --g1-wash: rgba(29, 95, 175, 0.10);
   --g2: #C65A2E;
   --g-gris: #9AA6B2;
-  --g-grid: #E6EAEE;
+  --g-grid: #E6EAF0;
 
-  /* Tipografía */
-  --fuente: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Barra lateral (docs/10 §3.12) */
+  --side: #0A3A73;
+  --side-fg: #DCE7F5;
+  --side-muted: #9DB4D3;
+  --side-hi: #FFFFFF;
+  --side-active: #11509A;
+  --side-accent: #F4B400;
+  --side-hr: #5FD1BE;             /* «HR» del logo sobre fondo oscuro */
+  --marca-hr: #0E7C6B;            /* «HR» del logo sobre fondo claro (ADR 0014) */
+  --sbw: 252px;
+  --hd: 60px;
+
+  /* Tipografía (IBM Plex, servida desde el propio dominio) */
+  --fuente: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fuente-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   --fs-xs: 12px;
   --fs-s: 13px;
   --fs-m: 14px;
   --fs-l: 15px;
-  --fs-h2: 15px;
+  --fs-h2: 17px;
   --fs-h1: 24px;
   --fs-cifra: 28px;
   --fs-heroe: 48px;
 
-  /* Forma y profundidad */
-  --r-s: 3px;
-  --r: 4px;
-  --r-l: 6px;
-  --r-xl: 10px;
-  --sombra-1: 0 1px 2px rgba(28, 38, 48, 0.06);
-  --sombra-2: 0 6px 18px rgba(28, 38, 48, 0.12);
-  --sombra-3: 0 12px 32px rgba(28, 38, 48, 0.18);
+  /* Forma y profundidad: control 7 px, panel 10 px, modal 12 px */
+  --r-s: 5px;
+  --r: 7px;
+  --r-l: 10px;
+  --r-xl: 12px;
+  --sombra-1: 0 1px 2px rgba(16, 35, 61, 0.06);
+  --sombra-2: 0 6px 18px rgba(16, 35, 61, 0.12);
+  --sombra-3: 0 12px 40px rgba(16, 35, 61, 0.18);
 
-  /* Movimiento: rápido y con salida fuerte */
+  /* Movimiento: rápido y con salida fuerte (≤ 200 ms) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-panel: cubic-bezier(0.32, 0.72, 0, 1);
   --t-rapido: 120ms;
   --t-medio: 180ms;
-  --t-panel: 240ms;
+  --t-panel: 200ms;
 
   /* Semánticos de componentes (UI-1): los componentes solo usan variables */
-  --sobre-marca: #FFFFFF;          /* texto sobre botones y fondos de marca */
+  --sobre-marca: #FFFFFF;          /* --accent-ink */
   --primario: var(--pe-600);
   --primario-hover: var(--pe-700);
   --primario-activo: var(--pe-800);
-  --control-bd: #C3CCD5;
-  --control-bd-hover: #A9B5C1;
-  --foco-anillo: rgba(23, 120, 138, 0.18);
-  --error-anillo: rgba(168, 50, 31, 0.15);
-  --neutro-50: #EEF1F4;
-  --av-bg: #E4E9EE;
-  --av-tx: #3D4A57;
-  --demo-bd: #E5C99B;
-  --barra: #0E4F5C;                /* barra de módulos */
-  --barra-tx: #D3E4E8;
-  --barra-tx-on: #FFFFFF;
-  --barra-hover: rgba(255, 255, 255, 0.05);
-  --marca-velo: rgba(11, 67, 80, 0.86);
-  --velo: rgba(28, 38, 48, 0.3);
-  --aviso-bg: #1C2630;
+  --control-bd: #C9D1DC;
+  --control-bd-hover: #AAB5C4;
+  --foco-anillo: rgba(29, 95, 175, 0.22);
+  --error-anillo: rgba(192, 53, 58, 0.15);
+  --neutro-50: #EEF1F5;
+  --av-bg: #E6F0FB;
+  --av-tx: #0A3A73;
+  --demo-bd: #E8C766;
+  --barra: var(--side);
+  --barra-tx: var(--side-fg);
+  --barra-tx-on: var(--side-hi);
+  --barra-hover: var(--side-active);
+  --marca-velo: rgba(7, 26, 51, 0.86);
+  --velo: rgba(13, 21, 36, 0.4);
+  --aviso-bg: #15202E;
   --aviso-tx: #FFFFFF;
-  --sombra-panel: -8px 0 24px rgba(28, 38, 48, 0.12);
+  --sombra-panel: -8px 0 24px rgba(16, 35, 61, 0.14);
   --sombra-boton: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  /* Marca: inversión armónica con contraste WCAG AA */
-  --pe-800: #8BD0DD;
-  --pe-700: #74C1D0;
-  --pe-600: #4AAABF;
-  --pe-500: #2A93A7;
-  --pe-200: #125F6E;
-  --pe-100: #0B4450;
-  --pe-50: #0A2B33;
+  --pe-800: #B5D6FA;
+  --pe-700: #93C3F6;
+  --pe-600: #6FB1F2;             /* --accent */
+  --pe-500: #4F9AE6;
+  --pe-200: #1E3E68;
+  --pe-100: #1A385F;
+  --pe-50: #17335A;              /* --accent-soft */
 
-  --oc: #E5A83B;
-  --oc-600: #C98A1B;
-  --oc-50: #3D2806;
+  --oc: #F4B400;
+  --oc-600: #F6C744;
+  --oc-50: #3A2C07;
+  --oc-tx: #15202E;
 
-  /* Texto y superficies oscuras (contraste >= 4.5:1) */
-  --tx: #E6ECF1;
-  --tx2: #9DAEC0;
-  --tx3: #6E8094;
-  --bd: #2E3C48;
-  --bd2: #25323D;
-  --bg: #10171D;
-  --sup: #18222A;
-  --sup2: #1F2B35;
+  --tx: #E6EDF7;
+  --tx2: #9AA9C0;
+  --tx3: #6F7F98;
+  --bd: #243754;
+  --bd2: #1D2E47;
+  --bg: #0B1524;
+  --sup: #132137;
+  --sup2: #182A45;
 
-  /* Estados accesibles en modo oscuro */
-  --ok: #48B876;
-  --ok-50: #0E2B1A;
-  --wa: #E5A245;
-  --wa-50: #362006;
-  --er: #F06550;
-  --er-50: #38120D;
-  --in: #5DA5E8;
-  --in-50: #0F243D;
+  --ok: #6CC58C;
+  --ok-50: #173224;
+  --wa: #E3A44B;
+  --wa-50: #38290F;
+  --er: #EE8179;
+  --er-50: #3B1B19;
+  --in: #6FB1F2;
+  --in-50: #17335A;
 
-  /* Gráficos para modo oscuro */
-  --g1: #22A8C4;
-  --g1-wash: rgba(34, 168, 196, 0.15);
+  --g1: #6FB1F2;
+  --g1-wash: rgba(111, 177, 242, 0.15);
   --g2: #E27447;
-  --g-gris: #6E8094;
-  --g-grid: #24323E;
+  --g-gris: #6F7F98;
+  --g-grid: #22344F;
 
-  /* Sombras adaptadas a fondo oscuro */
+  --side: #071A33;
+  --side-fg: #DCE7F5;
+  --side-muted: #8CA3C4;
+  --side-hi: #FFFFFF;
+  --side-active: #12305A;
+  --side-accent: #F4B400;
+  --side-hr: #5FD1BE;
+  --marca-hr: #5FD1BE;
+
+  /* En oscuro la elevación se expresa con superficie más clara y borde, no con sombra (docs/10 §8). */
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.35);
   --sombra-2: 0 6px 18px rgba(0, 0, 0, 0.45);
-  --sombra-3: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --sombra-3: 0 12px 40px rgba(0, 0, 0, 0.5);
 
-  /* Semánticos de componentes en oscuro */
-  --sobre-marca: #FFFFFF;
-  --primario: #17788A;
-  --primario-hover: #1B8CA1;
-  --primario-activo: #125F6E;
-  --control-bd: #3A4B59;
-  --control-bd-hover: #4D6172;
-  --foco-anillo: rgba(74, 170, 191, 0.30);
-  --error-anillo: rgba(240, 101, 80, 0.25);
-  --neutro-50: #25323D;
-  --av-bg: #2E3C48;
-  --av-tx: #D7E0E8;
-  --demo-bd: #6B4A12;
-  --barra: #0B3A44;
-  --barra-tx: #B9D3D9;
-  --barra-tx-on: #FFFFFF;
-  --barra-hover: rgba(255, 255, 255, 0.06);
-  --marca-velo: rgba(5, 33, 40, 0.88);
+  --sobre-marca: #06203F;          /* --accent-ink oscuro */
+  --primario: var(--pe-600);
+  --primario-hover: var(--pe-700);
+  --primario-activo: var(--pe-800);
+  --control-bd: #2E4566;
+  --control-bd-hover: #3E5A82;
+  --foco-anillo: rgba(111, 177, 242, 0.30);
+  --error-anillo: rgba(238, 129, 121, 0.25);
+  --neutro-50: #1D2E47;
+  --av-bg: #17335A;
+  --av-tx: #DCE7F5;
+  --demo-bd: #6B5214;
+  --barra: var(--side);
+  --barra-tx: var(--side-fg);
+  --barra-tx-on: var(--side-hi);
+  --barra-hover: var(--side-active);
+  --marca-velo: rgba(4, 13, 26, 0.9);
   --velo: rgba(0, 0, 0, 0.55);
-  --aviso-bg: #E6ECF1;
-  --aviso-tx: #10171D;
+  --aviso-bg: #E6EDF7;
+  --aviso-tx: #0B1524;
   --sombra-panel: -8px 0 24px rgba(0, 0, 0, 0.5);
   --sombra-boton: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   color-scheme: dark;

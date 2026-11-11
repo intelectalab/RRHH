@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useT } from '@/lib/useT'
 import { applyTheme, storedTheme, type ThemeChoice } from '@/lib/theme'
+import { BrandMark } from '@/ui/components/BrandMark'
 import { Icon } from '@/ui/components/Icon'
 import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
@@ -12,18 +13,24 @@ import { CompanySelector } from './CompanySelector'
 import { InboxButton, useInboxCount } from './InboxButton'
 import { NotificationBell } from '@/modules/notifications/NotificationBell'
 import { SessionProvider, useSession } from './SessionProvider'
+import { ShellTitleProvider, useShellTitle } from './ShellTitle'
+
+type IconName = Parameters<typeof Icon>[0]['name']
 
 /** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
-type ModuleLink = { href: string; key: string; module: string; visible: (can: (p: string) => boolean) => boolean }
+type NavLink = { href: string; key: string; icon: IconName; module: string; visible: (can: (p: string) => boolean) => boolean; count?: 'approval' | 'task' }
 
-/** Módulos de la barra. Se agregan aquí a medida que existen pantallas (sin botones sin función). */
-const MODULES: ModuleLink[] = [
-  { href: '/', key: 'shell.modules_home', module: 'base', visible: () => true },
-  { href: '/organizacion/empresas', key: 'shell.modules_org', module: 'base', visible: (can) => can('org.legal_entities.view') },
-  { href: '/aprobaciones', key: 'shell.modules_approvals', module: 'base', visible: (can) => can('workflow.approval_requests.view') },
-  { href: '/tareas', key: 'shell.modules_tasks', module: 'base', visible: (can) => can('workflow.tasks.view') },
-  { href: '/configuracion', key: 'shell.modules_settings', module: 'base', visible: (can) => can('identity.users.view') || can('identity.roles.view') || can('workflow.approval_flows.view') || can('notifications.templates.view') || can('settings.parameters.view') || can('time.holiday_calendars.view') || can('audit.trash.view') || can('settings.custom_fields.view') || can('settings.exchange_rates.view') || can('audit.logs.view') },
+/** Menú principal (docs/10 §3.12 y §4). Se agregan entradas a medida que existen pantallas (sin botones sin función). */
+const MENU: NavLink[] = [
+  { href: '/', key: 'shell.modules_home', icon: 'home', module: 'base', visible: () => true },
+  { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
+  { href: '/aprobaciones', key: 'shell.modules_approvals', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
+  { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
 ]
+
+const SETTINGS_PERMS = ['identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view']
+
+const MIN_KEY = 'gestia.side_min'
 
 function initials(name: string): string {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('')
@@ -33,56 +40,122 @@ function Shell({ children }: { children: ReactNode }) {
   const { t } = useT()
   const { session, can, logout } = useSession()
   const pathname = usePathname()
-  const [open, setOpen] = useState(false)
-  const [navOpen, setNavOpen] = useState(false)
+  const router = useRouter()
+  const title = useShellTitle()
+  const [userOpen, setUserOpen] = useState(false)
+  const [drawer, setDrawer] = useState(false)
+  const [min, setMin] = useState(false)
   const [theme, setTheme] = useState<ThemeChoice>('system')
   const menuRef = useRef<HTMLDivElement>(null)
   const inbox = useInboxCount()
 
-  useEffect(() => setTheme(storedTheme()), [])
-  useEffect(() => setNavOpen(false), [pathname])
+  useEffect(() => {
+    setTheme(storedTheme())
+    try { setMin(window.localStorage.getItem(MIN_KEY) === '1') } catch { /* sin almacenamiento: barra completa */ }
+  }, [])
+  useEffect(() => setDrawer(false), [pathname])
   // SEG-5: con la clave vencida o temporal, todo lleva a cambiarla primero.
-  const router = useRouter()
   useEffect(() => {
     if (session.user.must_change_password && pathname !== '/cuenta/seguridad') router.replace('/cuenta/seguridad')
   }, [session.user.must_change_password, pathname, router])
 
   useEffect(() => {
-    if (!open) return
+    if (!userOpen) return
     const close = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setUserOpen(false)
     }
     document.addEventListener('mousedown', close)
     return () => document.removeEventListener('mousedown', close)
-  }, [open])
+  }, [userOpen])
+
+  useEffect(() => {
+    if (!drawer) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawer(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [drawer])
+
+  function toggleMin() {
+    setMin((v) => {
+      try { window.localStorage.setItem(MIN_KEY, v ? '0' : '1') } catch { /* preferencia solo en memoria */ }
+      return !v
+    })
+  }
 
   const active = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href.split('/').slice(0, 2).join('/')))
+  const role = session.roles[0]?.name ?? ''
+  const items = MENU.filter((m) => session.modules.includes(m.module) && m.visible(can))
+  const showSettings = session.modules.includes('base') && SETTINGS_PERMS.some((p) => can(p))
+
+  const navLink = (href: string, label: string, icon: IconName, count = 0) => (
+    <Link key={href} href={href} className={`nav${active(href) ? ' on' : ''}`} aria-current={active(href) ? 'page' : undefined} title={min ? label : undefined}>
+      <Icon name={icon} size={20} />
+      <span className="l">{label}</span>
+      {count > 0 && <span className="badge-n" aria-label={t('shell.inbox_aria', { n: count })}>{count}</span>}
+    </Link>
+  )
 
   return (
-    <>
+    <div className={`app${min ? ' min' : ''}${drawer ? ' sopen' : ''}`}>
       <a href="#contenido" className="saltar">{t('shell.skip')}</a>
-      <header className="topbar">
-        <div className="in">
+      <aside className="side" id="menu-principal" aria-label={t('shell.modules')}>
+        <div className="brand">
           <Link className="logo" href="/" aria-label={t('shell.home_aria')}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-aynihr.svg" alt="" />
-            <span><b>Ayni</b><span>HR</span></span>
+            <BrandMark />
+            <b>Gestia<span>HR</span></b>
           </Link>
-          {session.tenant && <span className="org">{session.tenant.name}</span>}
-          <CompanySelector />
-          <div className="espacio" />
+          <button type="button" className="sbtn side-min" onClick={toggleMin} aria-label={t(min ? 'shell.expand_menu' : 'shell.collapse_menu')} aria-pressed={min}>
+            <Icon name="sidebar" />
+          </button>
+          <button type="button" className="sbtn side-close" onClick={() => setDrawer(false)} aria-label={t('shell.close_menu')}>
+            <Icon name="close" />
+          </button>
+        </div>
+        <div className="side-user">
+          <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>
+          <div>
+            <b>{session.user.display_name}</b>
+            <span className="r">{role}</span>
+          </div>
+        </div>
+        <nav className="side-nav">
+          <div className="side-sec">{t('shell.menu_section')}</div>
+          {items.map((m) => navLink(m.href, t(m.key), m.icon, m.count ? (inbox?.[m.count] ?? 0) : 0))}
+        </nav>
+        <div className="side-foot">
+          <div className="side-sec">{t('shell.account_section')}</div>
+          {navLink('/cuenta/seguridad', t('shell.account_security'), 'user')}
+          {showSettings && navLink('/configuracion', t('shell.modules_settings'), 'sliders')}
+          <button type="button" className="nav" onClick={() => void logout()} title={min ? t('shell.logout') : undefined}>
+            <Icon name="signOut" size={20} />
+            <span className="l">{t('shell.logout')}</span>
+          </button>
+        </div>
+      </aside>
+      {drawer && <div className="side-velo" onClick={() => setDrawer(false)} aria-hidden="true" />}
+
+      <div className="app-main">
+        <header className="top">
+          <button type="button" className="ibtn top-menu" onClick={() => setDrawer(true)} aria-label={t('shell.open_menu')} aria-expanded={drawer} aria-controls="menu-principal">
+            <Icon name="menu" />
+          </button>
+          <div className="top-t">
+            <span className="crumb">{[session.tenant?.name, role].filter(Boolean).join(' · ')}</span>
+            {title && <h1 className="ttl">{title}</h1>}
+          </div>
           <CommandPalette />
+          <CompanySelector />
           <InboxButton counts={inbox} />
           <NotificationBell />
           <div className="menu" ref={menuRef}>
-            <button type="button" className="userbtn" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
+            <button type="button" className="userbtn" onClick={() => setUserOpen((v) => !v)} aria-expanded={userOpen} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
               <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>
-              <span>
+              <span className="userbtn-t">
                 <b>{session.user.display_name}</b>
-                <small>{session.roles[0]?.name ?? ''}</small>
+                <small>{role}</small>
               </span>
             </button>
-            {open && (
+            {userOpen && (
               <div className="menu-lista" role="menu">
                 <div className="menu-grupo" role="group" aria-label={t('shell.theme')}>
                   <span className="small text-secondary">{t('shell.theme')}</span>
@@ -94,10 +167,10 @@ function Shell({ children }: { children: ReactNode }) {
                     ))}
                   </div>
                 </div>
-                <Link href="/cuenta/seguridad" className="menu-item" role="menuitem" onClick={() => setOpen(false)}>
+                <Link href="/cuenta/seguridad" className="menu-item" role="menuitem" onClick={() => setUserOpen(false)}>
                   <Icon name="lock" /> {t('shell.account_security')}
                 </Link>
-                <Link href="/cuenta/notificaciones" className="menu-item" role="menuitem" onClick={() => setOpen(false)}>
+                <Link href="/cuenta/notificaciones" className="menu-item" role="menuitem" onClick={() => setUserOpen(false)}>
                   <Icon name="bell" /> {t('shell.my_notifications')}
                 </Link>
                 <button type="button" className="menu-item" role="menuitem" onClick={() => void logout()}>
@@ -106,26 +179,10 @@ function Shell({ children }: { children: ReactNode }) {
               </div>
             )}
           </div>
-        </div>
-      </header>
-      <nav className={`modbar${navOpen ? ' abierto' : ''}`} aria-label={t('shell.modules')}>
-        <div className="in">
-          <button type="button" className="modbar-toggle" aria-expanded={navOpen} aria-controls="modbar-lista" onClick={() => setNavOpen((v) => !v)}>
-            <Icon name="menu" /> {t('shell.menu')}
-          </button>
-          <div className="modbar-lista" id="modbar-lista">
-          {MODULES.filter((m) => session.modules.includes(m.module) && m.visible(can)).map((m) => (
-            <Link key={m.href} href={m.href} className={active(m.href) ? 'on' : undefined} aria-current={active(m.href) ? 'page' : undefined}>
-              {t(m.key)}
-              {m.href === '/aprobaciones' && (inbox?.approval ?? 0) > 0 && <span className="cnt-mod" aria-label={t('shell.inbox_aria', { n: inbox?.approval ?? 0 })}>{inbox?.approval}</span>}
-              {m.href === '/tareas' && (inbox?.task ?? 0) > 0 && <span className="cnt-mod" aria-label={t('shell.inbox_aria', { n: inbox?.task ?? 0 })}>{inbox?.task}</span>}
-            </Link>
-          ))}
-          </div>
-        </div>
-      </nav>
-      {children}
-    </>
+        </header>
+        <div className="app-content">{children}</div>
+      </div>
+    </div>
   )
 }
 
@@ -133,7 +190,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <SessionProvider fallback={<div className="main" aria-busy="true"><span className="esq" style={{ width: 240 }} /></div>}>
       <CompanyProvider>
-        <Shell>{children}</Shell>
+        <ShellTitleProvider>
+          <Shell>{children}</Shell>
+        </ShellTitleProvider>
       </CompanyProvider>
     </SessionProvider>
   )

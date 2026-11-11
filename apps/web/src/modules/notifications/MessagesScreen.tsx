@@ -194,7 +194,7 @@ function TemplatePanel({ template, onClose, onSaved }: { template: Template; onC
         </div>
         <p id="p-vars-h" className="small text-secondary">{t('msgs.variables_help')}</p>
       </form>
-      <h3 className="small" style={{ fontWeight: 800, margin: '16px 0 8px' }}>{t('msgs.preview')}</h3>
+      <h3 className="small" style={{ fontWeight: 700, margin: '16px 0 8px' }}>{t('msgs.preview')}</h3>
       <div className="vista-previa">
         <b>{fill(subject)}</b>
         <p>{fill(body)}</p>

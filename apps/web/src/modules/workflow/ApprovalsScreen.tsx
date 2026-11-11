@@ -288,7 +288,7 @@ function ApprovalPanel({ id, intent, onClose, onDone, formatWhen }: { id: string
             <dt>{t('approvals.flow')}</dt><dd>{row.flow_name}</dd>
             <dt>{t('tasks.col_status')}</dt><dd><span className={`st ${row.status === 'approved' ? 'ok' : row.status === 'rejected' ? 'er' : row.status === 'pending' ? 'wa' : 'gr'}`}>{t(`approvals.status_${row.status}`)}</span>{row.escalated && <span className="tag wa" style={{ marginLeft: 6 }}>{t('approvals.escalated')}</span>}</dd>
           </dl>
-          <h3 className="small" style={{ fontWeight: 800, margin: '16px 0 8px' }}>{t('approvals.trace')}</h3>
+          <h3 className="small" style={{ fontWeight: 700, margin: '16px 0 8px' }}>{t('approvals.trace')}</h3>
           <ol className="traza">
             {row.tasks?.map((task) => (
               <li key={task.id} className={task.status === 'approved' ? 'ok' : task.status === 'rejected' ? 'er' : task.status === 'pending' ? 'wa' : undefined}>

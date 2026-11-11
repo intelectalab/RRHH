@@ -87,7 +87,11 @@
     "use_password": "Use password",
     "have_activation_code": "Do you have an activation code?",
     "activate_code_intro": "Type your document, the activation code HR gave you or you received by message, and set your password.",
-    "activation_code": "Activation code (8 digits)"
+    "activation_code": "Activation code (8 digits)",
+    "brand_title": "All your company's people management, in one place.",
+    "benefit_1": "Peruvian payroll with current, traceable legal parameters.",
+    "benefit_2": "Each employee handles their own requests from their phone, even without email.",
+    "benefit_3": "Role and field permissions, with an audit trail of every change."
   },
   "app": {
     "name": "GestiaHR"
@@ -114,12 +118,18 @@
     "notifications": "Notifications",
     "notifications_aria": "Notifications: {n} unread",
     "my_notifications": "My notifications",
-    "account_security": "Account security"
+    "account_security": "Account security",
+    "account_section": "Account",
+    "expand_menu": "Expand menu",
+    "collapse_menu": "Collapse menu",
+    "close_menu": "Close menu",
+    "open_menu": "Open menu",
+    "menu_section": "Menu"
   },
   "home": {
     "title": "Hello, {name}",
     "sub": "{tenant}",
-    "intro": "This is the GestiaHR foundation. Modules appear in the top bar as they are enabled for your organization and according to your permissions.",
+    "intro": "This is the GestiaHR foundation. Modules appear in the side menu as they are enabled for your organization and according to your permissions.",
     "your_roles": "Your roles",
     "your_modules": "Active modules",
     "none": "None"

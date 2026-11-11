@@ -170,7 +170,7 @@ function FlowPanel({ flow, onClose, onSaved, onPublish }: { flow: Flow | null; o
             {SUBJECT_TYPES.map((s) => <option key={s} value={s}>{typeLabel(t, s)}</option>)}
           </select>
         </div>
-        <h3 className="small" style={{ fontWeight: 800, margin: '16px 0 4px' }}>{t('flows.levels')}</h3>
+        <h3 className="small" style={{ fontWeight: 700, margin: '16px 0 4px' }}>{t('flows.levels')}</h3>
         <p className="small text-secondary">{t('flows.levels_help')}</p>
         <div className="niveles">
           {levels.map((l, i) => (

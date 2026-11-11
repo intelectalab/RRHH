@@ -43,7 +43,7 @@
     "show_password": "Mostrar u ocultar la contraseña",
     "submitting": "Ingresando…",
     "help": "¿Problemas para ingresar? Comuníquese con el área de RR. HH. de su empresa.",
-    "tagline": "GestiaHR · Gestión de personal",
+    "tagline": "GestiaHR · Gestión de personas",
     "forgot_title": "Recuperar contraseña",
     "forgot_intro": "Escriba su correo. Si pertenece a una cuenta activa, le enviaremos un enlace para crear una nueva contraseña.",
     "forgot_submit": "Enviar enlace",
@@ -87,7 +87,11 @@
     "use_password": "Usar contraseña",
     "have_activation_code": "¿Tiene un código de activación?",
     "activate_code_intro": "Escriba su documento, el código de activación que le entregó RR. HH. o que recibió por mensaje, y defina su contraseña.",
-    "activation_code": "Código de activación (8 dígitos)"
+    "activation_code": "Código de activación (8 dígitos)",
+    "brand_title": "Toda la gestión de personas de tu empresa, en un solo lugar.",
+    "benefit_1": "Planilla peruana con parámetros legales vigentes y trazables.",
+    "benefit_2": "Cada colaborador gestiona lo suyo desde el celular, aunque no tenga correo.",
+    "benefit_3": "Permisos por rol y por campo, con auditoría de cada cambio."
   },
   "app": {
     "name": "GestiaHR"
@@ -114,12 +118,18 @@
     "notifications": "Notificaciones",
     "notifications_aria": "Notificaciones: {n} sin leer",
     "my_notifications": "Mis notificaciones",
-    "account_security": "Seguridad de la cuenta"
+    "account_security": "Seguridad de la cuenta",
+    "account_section": "Cuenta",
+    "expand_menu": "Expandir el menú",
+    "collapse_menu": "Contraer el menú",
+    "close_menu": "Cerrar el menú",
+    "open_menu": "Abrir el menú",
+    "menu_section": "Menú"
   },
   "home": {
     "title": "Hola, {name}",
     "sub": "{tenant}",
-    "intro": "Esta es la base de GestiaHR. Los módulos aparecen en la barra superior a medida que se activan para su organización y según sus permisos.",
+    "intro": "Esta es la base de GestiaHR. Los módulos aparecen en el menú lateral a medida que se activan para su organización y según sus permisos.",
     "your_roles": "Sus roles",
     "your_modules": "Módulos activos",
     "none": "Ninguno"
