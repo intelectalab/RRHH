@@ -16410,6 +16410,34 @@ paths:
       x-phase: 1
       x-permission: authenticated
       operationId: getMeHome
+  /me/password:
+    post:
+      summary: Cambiar la propia clave (exige la actual, aplica la política y cierra las demás sesiones)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMePassword
   /me/payslips:
     get:
       summary: Boletas propias
@@ -16427,6 +16455,57 @@ paths:
       x-phase: 3
       x-permission: authenticated
       operationId: getMePayslips
+  /me/sessions:
+    get:
+      summary: Sesiones abiertas del usuario actual (dispositivo, IP, último uso) y márgenes de sesión
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: getMeSessions
+  /me/sessions/{id}/revoke:
+    post:
+      summary: Cerrar una de las propias sesiones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: postMeSessionsIdRevoke
   /my-team:
     get:
       summary: Equipo directo e indirecto del manager
@@ -31912,6 +31991,40 @@ paths:
       x-phase: 0
       x-permission: identity.users.reset_password
       operationId: postUsersIdResetPassword
+  /users/{id}/revoke-sessions:
+    post:
+      summary: Forzar el cierre de todas las sesiones de un usuario (con motivo, auditado)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: identity.users.suspend
+      operationId: postUsersIdRevokeSessions
   /users/{id}/suspend:
     post:
       summary: Acción «suspend» sobre User

@@ -13,5 +13,8 @@ return [
     'invitation_ttl_hours' => (int) env('IDENTITY_INVITATION_TTL', 72),
     'password_min_length' => 12,
     'login_attempts_per_minute' => 10,
+    // Márgenes de la plataforma para el límite general de peticiones (SEG-5).
+    'api_requests_per_minute_user' => (int) env('IDENTITY_API_RATE_USER', 600),
+    'api_requests_per_minute_ip' => (int) env('IDENTITY_API_RATE_IP', 300),
     'secure_cookies' => (bool) env('IDENTITY_SECURE_COOKIES', env('APP_ENV') === 'production'),
 ];

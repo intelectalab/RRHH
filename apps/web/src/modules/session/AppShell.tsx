@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useT } from '@/lib/useT'
 import { applyTheme, storedTheme, type ThemeChoice } from '@/lib/theme'
@@ -41,6 +41,11 @@ function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => setTheme(storedTheme()), [])
   useEffect(() => setNavOpen(false), [pathname])
+  // SEG-5: con la clave vencida o temporal, todo lleva a cambiarla primero.
+  const router = useRouter()
+  useEffect(() => {
+    if (session.user.must_change_password && pathname !== '/cuenta/seguridad') router.replace('/cuenta/seguridad')
+  }, [session.user.must_change_password, pathname, router])
 
   useEffect(() => {
     if (!open) return
@@ -89,6 +94,9 @@ function Shell({ children }: { children: ReactNode }) {
                     ))}
                   </div>
                 </div>
+                <Link href="/cuenta/seguridad" className="menu-item" role="menuitem" onClick={() => setOpen(false)}>
+                  <Icon name="lock" /> {t('shell.account_security')}
+                </Link>
                 <Link href="/cuenta/notificaciones" className="menu-item" role="menuitem" onClick={() => setOpen(false)}>
                   <Icon name="bell" /> {t('shell.my_notifications')}
                 </Link>

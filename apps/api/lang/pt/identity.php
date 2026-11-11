@@ -25,4 +25,12 @@ return [
         'subject' => 'Ative sua conta Ayni HR',
         'body' => "Sua empresa criou uma conta Ayni HR para você.\n\nAtive-a e defina sua senha com este link (válido por :hours horas):\n:link",
     ],
+    'password' => [
+        'too_short' => 'A senha deve ter pelo menos :min caracteres.',
+        'letters_numbers' => 'A senha deve combinar letras e números.',
+        'reused' => 'Você não pode repetir nenhuma das suas últimas :n senhas.',
+        'current_wrong' => 'A senha atual não está correta.',
+        'locked_event' => 'Sua conta foi bloqueada após várias tentativas de acesso com falha. Tente novamente em :minutes minutos ou redefina sua senha.',
+        'changed_event' => 'A senha da sua conta foi alterada.',
+    ],
 ];

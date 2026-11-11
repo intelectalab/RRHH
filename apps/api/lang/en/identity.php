@@ -25,4 +25,12 @@ return [
         'subject' => 'Activate your Ayni HR account',
         'body' => "Your company created an Ayni HR account for you.\n\nActivate it and set your password with this link (valid for :hours hours):\n:link",
     ],
+    'password' => [
+        'too_short' => 'The password must have at least :min characters.',
+        'letters_numbers' => 'The password must combine letters and numbers.',
+        'reused' => 'You cannot reuse any of your last :n passwords.',
+        'current_wrong' => 'The current password is not correct.',
+        'locked_event' => 'Your account was locked after several failed sign-in attempts. You can try again in :minutes minutes or reset your password.',
+        'changed_event' => 'Your account password was changed.',
+    ],
 ];

@@ -36,6 +36,7 @@ final class UserService
         private readonly OutboxWriter $outbox,
         private readonly PermissionResolver $permissions,
         private readonly RequestPasswordReset $passwordReset,
+        private readonly PasswordPolicy $passwordPolicy,
     ) {}
 
     /**
@@ -241,6 +242,21 @@ final class UserService
         return $user->refresh();
     }
 
+    public function revokeSessions(User $user, string $reason): User
+    {
+        return DB::transaction(function () use ($user, $reason): User {
+            $open = DB::table('user_sessions')->where('user_id', $user->id)->whereNull('revoked_at')->where('expires_at', '>', now())->count();
+            $this->sessions->revokeAllFor($user);
+            $this->audit->record('user.sessions_revoked', 'user', $user->id, ['open_sessions' => $open], ['open_sessions' => 0], $reason);
+            DB::table('activity_events')->insert([
+                'tenant_id' => $user->tenant_id, 'user_id' => $user->id, 'activity' => 'auth.sessions_revoked_by_admin',
+                'subject_type' => 'user', 'subject_id' => $user->id, 'occurred_at' => now(),
+            ]);
+
+            return $user;
+        });
+    }
+
     /**
      * El propio usuario activa su cuenta con el enlace de invitación (activar_cuenta).
      */
@@ -257,9 +273,12 @@ final class UserService
                 return null;
             }
 
+            $this->passwordPolicy->assertAcceptable($user, $password);
+            $hash = Hash::make($password);
+            $this->passwordPolicy->remember($user, $hash);
             $user->forceFill([
                 'status' => User::STATUS_ACTIVE,
-                'password_hash' => Hash::make($password),
+                'password_hash' => $hash,
                 'password_changed_at' => now(),
                 'must_change_password' => false,
             ])->save();

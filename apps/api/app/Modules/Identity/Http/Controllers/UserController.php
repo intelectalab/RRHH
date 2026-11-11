@@ -83,6 +83,17 @@ final class UserController
         return $this->respond($this->users->suspend($user, (string) $data['reason']));
     }
 
+    /**
+     * SEG-4 · Un administrador fuerza el cierre de todas las sesiones de un usuario.
+     */
+    public function revokeSessions(Request $request, string $id): JsonResponse
+    {
+        $user = $this->find($id);
+        $data = $request->validate(['reason' => ['required', 'string', 'min:3', 'max:500']]);
+
+        return $this->respond($this->users->revokeSessions($user, (string) $data['reason']));
+    }
+
     public function reactivate(Request $request, string $id): JsonResponse
     {
         $user = $this->find($id);

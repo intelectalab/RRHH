@@ -3,7 +3,6 @@
 namespace App\Modules\Identity\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 
 final class ResetPasswordRequest extends FormRequest
 {
@@ -19,8 +18,9 @@ final class ResetPasswordRequest extends FormRequest
     {
         return [
             'token' => ['required', 'string', 'size:64'],
-            'password' => ['required', 'string', 'confirmed', 'max:200',
-                Password::min((int) config('identity.password_min_length'))->letters()->numbers()],
+            // La política (longitud, letras y números, historial) la aplica PasswordPolicy con los
+            // parámetros de la organización (SEG-5).
+            'password' => ['required', 'string', 'confirmed', 'max:200'],
         ];
     }
 }

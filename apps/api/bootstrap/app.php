@@ -55,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(append: [
             VerifyXsrfToken::class,
+            'throttle:ayni-api',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

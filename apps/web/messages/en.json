@@ -89,7 +89,8 @@
     "inbox_aria": "To-do: {n}",
     "notifications": "Notifications",
     "notifications_aria": "Notifications: {n} unread",
-    "my_notifications": "My notifications"
+    "my_notifications": "My notifications",
+    "account_security": "Account security"
   },
   "home": {
     "title": "Hello, {name}",
@@ -154,7 +155,12 @@
     "scope_default": "Role default",
     "scope_companies": "Included companies",
     "done_saved": "User saved.",
-    "scope_note": "Scope limits which employees and records they see with that role. Sites and units can be chosen once they are registered."
+    "scope_note": "Scope limits which employees and records they see with that role. Sites and units can be chosen once they are registered.",
+    "action_revoke_sessions": "Sign out everywhere",
+    "revoke_title": "Sign out {name} everywhere",
+    "revoke_text": "All their open sessions on any device will be closed. They can sign in again with their password.",
+    "confirm_revoke": "Sign out everywhere",
+    "done_sessions_revoked": "Sessions closed"
   },
   "roles": {
     "sub": "{count} roles",
@@ -772,5 +778,25 @@
     "inverse": "(inverse)",
     "save": "Publish",
     "cancel": "Cancel"
+  },
+  "acct": {
+    "title": "Account security",
+    "sub": "Your open sessions and your password",
+    "must_change": "You must change your password before continuing.",
+    "sessions": "Open sessions",
+    "sessions_help": "They close after {idle} minutes of inactivity or {hours} hours after sign-in.",
+    "this_device": "This device",
+    "last_seen": "Last used {when}",
+    "since": "Signed in {when}",
+    "revoke": "Sign out",
+    "revoked": "Session closed",
+    "password": "Change password",
+    "password_help": "At least {min} characters, with letters and numbers, different from your previous passwords. Changing it signs out your other sessions.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Repeat the new password",
+    "save": "Change password",
+    "changed": "Password changed. Your other sessions were closed.",
+    "mismatch": "The new passwords do not match."
   }
 }

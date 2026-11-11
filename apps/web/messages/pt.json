@@ -89,7 +89,8 @@
     "inbox_aria": "Pendências: {n}",
     "notifications": "Notificações",
     "notifications_aria": "Notificações: {n} não lidas",
-    "my_notifications": "Minhas notificações"
+    "my_notifications": "Minhas notificações",
+    "account_security": "Segurança da conta"
   },
   "home": {
     "title": "Olá, {name}",
@@ -154,7 +155,12 @@
     "scope_default": "O do papel",
     "scope_companies": "Empresas incluídas",
     "done_saved": "Usuário salvo.",
-    "scope_note": "O alcance limita quais colaboradores e registros vê com esse papel. Unidades físicas e áreas poderão ser escolhidas quando estiverem cadastradas."
+    "scope_note": "O alcance limita quais colaboradores e registros vê com esse papel. Unidades físicas e áreas poderão ser escolhidas quando estiverem cadastradas.",
+    "action_revoke_sessions": "Encerrar sessões",
+    "revoke_title": "Encerrar as sessões de {name}",
+    "revoke_text": "Todas as sessões abertas em qualquer dispositivo serão encerradas. A pessoa poderá entrar de novo com sua senha.",
+    "confirm_revoke": "Encerrar sessões",
+    "done_sessions_revoked": "Sessões encerradas"
   },
   "roles": {
     "sub": "{count} papéis",
@@ -772,5 +778,25 @@
     "inverse": "(inverso)",
     "save": "Publicar",
     "cancel": "Cancelar"
+  },
+  "acct": {
+    "title": "Segurança da conta",
+    "sub": "Suas sessões abertas e sua senha",
+    "must_change": "Você deve alterar sua senha antes de continuar.",
+    "sessions": "Sessões abertas",
+    "sessions_help": "Encerram após {idle} minutos sem uso ou {hours} horas desde a entrada.",
+    "this_device": "Este dispositivo",
+    "last_seen": "Último uso {when}",
+    "since": "Entrou {when}",
+    "revoke": "Encerrar",
+    "revoked": "Sessão encerrada",
+    "password": "Alterar senha",
+    "password_help": "Pelo menos {min} caracteres, com letras e números, diferente das senhas anteriores. Ao alterá-la, suas outras sessões são encerradas.",
+    "current": "Senha atual",
+    "new": "Nova senha",
+    "confirm": "Repita a nova senha",
+    "save": "Alterar senha",
+    "changed": "Senha alterada. Suas outras sessões foram encerradas.",
+    "mismatch": "As novas senhas não coincidem."
   }
 }

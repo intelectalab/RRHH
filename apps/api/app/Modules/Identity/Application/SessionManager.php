@@ -4,6 +4,7 @@ namespace App\Modules\Identity\Application;
 
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserSession;
+use App\Shared\Settings\ParameterResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -32,7 +33,9 @@ final class SessionManager
             'ip' => $request->ip(),
             'user_agent' => Str::limit((string) $request->userAgent(), 500, ''),
             'last_seen_at' => now(),
-            'expires_at' => now()->addMinutes((int) config('identity.session_lifetime_minutes')),
+            'device_label' => self::deviceLabel((string) $request->userAgent()),
+            // SEG-4: duración según la organización, dentro de los márgenes de la plataforma.
+            'expires_at' => now()->addMinutes($this->lifetimeMinutes()),
         ]);
 
         return ['session' => $session, 'token' => $token];
@@ -48,7 +51,61 @@ final class SessionManager
         /** @var UserSession|null $session */
         $session = UserSession::query()->with('user')->where('session_hash', self::hash($token))->first();
 
-        return $session !== null && $session->isActive() ? $session : null;
+        if ($session === null || ! $session->isActive()) {
+            return null;
+        }
+
+        // RN-SEG-14: sin uso durante el tiempo configurado, la sesión se cierra.
+        $idle = $this->idleMinutes();
+        if ($session->last_seen_at !== null && $session->last_seen_at->lt(now()->subMinutes($idle))) {
+            $this->revoke($session);
+
+            return null;
+        }
+        if ($session->last_seen_at === null || $session->last_seen_at->lt(now()->subMinute())) {
+            $session->forceFill(['last_seen_at' => now()])->saveQuietly();
+        }
+
+        return $session;
+    }
+
+    public function lifetimeMinutes(): int
+    {
+        $v = (int) (app(ParameterResolver::class)->value('seguridad.sesion_duracion_minutos') ?? config('identity.session_lifetime_minutes'));
+
+        return min(1440, max(30, $v));
+    }
+
+    public function idleMinutes(): int
+    {
+        $v = (int) (app(ParameterResolver::class)->value('seguridad.inactividad_minutos') ?? 30);
+
+        return min(240, max(5, $v));
+    }
+
+    /**
+     * Etiqueta legible del dispositivo a partir del agente (navegador y sistema).
+     */
+    public static function deviceLabel(string $ua): string
+    {
+        $browser = match (true) {
+            str_contains($ua, 'Edg/') => 'Edge',
+            str_contains($ua, 'OPR/') => 'Opera',
+            str_contains($ua, 'Chrome/') => 'Chrome',
+            str_contains($ua, 'Firefox/') => 'Firefox',
+            str_contains($ua, 'Safari/') => 'Safari',
+            default => '',
+        };
+        $os = match (true) {
+            str_contains($ua, 'Android') => 'Android',
+            str_contains($ua, 'iPhone') || str_contains($ua, 'iPad') => 'iOS',
+            str_contains($ua, 'Windows') => 'Windows',
+            str_contains($ua, 'Mac OS X') => 'macOS',
+            str_contains($ua, 'Linux') => 'Linux',
+            default => '',
+        };
+
+        return trim($browser.($browser !== '' && $os !== '' ? ' · ' : '').$os) ?: 'Otro dispositivo';
     }
 
     public function revoke(UserSession $session): void

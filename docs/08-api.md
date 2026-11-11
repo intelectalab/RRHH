@@ -240,6 +240,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/auth/mfa/verify` | público | 0 |
 | POST | `/auth/logout` | sesión | 0 |
 | GET | `/me` | sesión | 0 |
+| GET | `/me/sessions` | sesión | 0 |
+| POST | `/me/sessions/{id}/revoke` | sesión | 0 |
+| POST | `/me/password` | sesión | 0 |
+| POST | `/users/{id}/revoke-sessions` | `identity.users.suspend` | 0 |
 | GET | `/permissions` | `identity.roles.view` | 0 |
 
 **SAS · Consola SaaS**

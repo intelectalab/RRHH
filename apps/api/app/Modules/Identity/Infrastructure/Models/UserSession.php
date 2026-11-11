@@ -18,6 +18,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface $expires_at
  * @property CarbonInterface|null $revoked_at
  * @property CarbonInterface|null $last_seen_at
+ * @property string|null $ip
+ * @property string|null $user_agent
+ * @property string|null $device_label
+ * @property CarbonInterface|null $created_at
  */
 class UserSession extends Model
 {

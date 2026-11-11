@@ -7,6 +7,7 @@ const paths: Record<string, string> = {
   chevron: 'M6 9l6 6 6-6',
   menu: 'M4 7h16M4 12h16M4 17h16',
   check: 'M5 12l5 5L20 7',
+  lock: 'M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z',
   bell: 'M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0',
   inbox: 'M4 13l2.5-7h11L20 13M4 13v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5M4 13h4.5l1.5 2.5h4l1.5-2.5H20',
   arrowRight: 'M5 12h14M13 6l6 6-6 6',

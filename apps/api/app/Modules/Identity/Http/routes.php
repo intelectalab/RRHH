@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Http\Controllers\AccountSecurityController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
@@ -25,6 +26,9 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', MeController::class);
         Route::get('/search', SearchController::class);
+        Route::get('/me/sessions', [AccountSecurityController::class, 'sessions']);
+        Route::post('/me/sessions/{id}/revoke', [AccountSecurityController::class, 'revokeSession']);
+        Route::post('/me/password', [AccountSecurityController::class, 'changePassword'])->middleware('throttle:ayni-login');
 
         Route::get('/permissions', PermissionCatalogController::class)->middleware('permission:identity.roles.view');
 
@@ -41,6 +45,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->middleware('permission:identity.users.suspend');
         Route::post('/users/{id}/reactivate', [UserController::class, 'reactivate'])->middleware('permission:identity.users.reactivate');
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->middleware('permission:identity.users.reset_password');
+        Route::post('/users/{id}/revoke-sessions', [UserController::class, 'revokeSessions'])->middleware('permission:identity.users.suspend');
         Route::post('/users/{id}/reset-mfa', [UserController::class, 'resetMfa'])->middleware('permission:identity.users.reset_mfa');
 
         Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->middleware('permission:identity.roles.duplicate');

@@ -28,6 +28,7 @@ export function UsersScreen() {
   const [q, setQ] = useState('')
   const [creating, setCreating] = useState(false)
   const [suspending, setSuspending] = useState<User | null>(null)
+  const [revoking, setRevoking] = useState<User | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
   // Enlace desde la búsqueda global: /configuracion/usuarios?q=…
@@ -135,6 +136,9 @@ export function UsersScreen() {
                         {u.status === 'active' && u.email && can('identity.users.reset_password') && !self && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'reset-password', 'users.done_reset')}>{t('users.action_reset_password')}</button>
                         )}
+                        {u.status === 'active' && can('identity.users.suspend') && !self && (
+                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setRevoking(u)}>{t('users.action_revoke_sessions')}</button>
+                        )}
                         {actions.includes('suspend') && can('identity.users.suspend') && !self && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => setSuspending(u)}>{t('users.action_suspend')}</button>
                         )}
@@ -170,6 +174,17 @@ export function UsersScreen() {
             setEditingUser(null)
             toast(t('users.done_saved'))
             await load()
+          }}
+        />
+      )}
+      {revoking && (
+        <SuspendPanel
+          mode="revoke"
+          user={revoking}
+          onClose={() => setRevoking(null)}
+          onDone={async () => {
+            setRevoking(null)
+            toast(t('users.done_sessions_revoked'))
           }}
         />
       )}
@@ -246,7 +261,7 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
   )
 }
 
-function SuspendPanel({ user, onClose, onDone }: { user: User; onClose: () => void; onDone: () => Promise<void> }) {
+function SuspendPanel({ user, onClose, onDone, mode = 'suspend' }: { user: User; onClose: () => void; onDone: () => Promise<void>; mode?: 'suspend' | 'revoke' }) {
   const { t } = useT()
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
@@ -257,7 +272,7 @@ function SuspendPanel({ user, onClose, onDone }: { user: User; onClose: () => vo
     setBusy(true)
     setError(null)
     try {
-      await api.post(`/users/${user.id}/suspend`, { reason })
+      await api.post(`/users/${user.id}/${mode === 'revoke' ? 'revoke-sessions' : 'suspend'}`, { reason })
       await onDone()
     } catch (err) {
       setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
@@ -268,16 +283,16 @@ function SuspendPanel({ user, onClose, onDone }: { user: User; onClose: () => vo
 
   return (
     <SidePanel
-      title={t('users.suspend_title', { name: user.display_name })}
+      title={t(mode === 'revoke' ? 'users.revoke_title' : 'users.suspend_title', { name: user.display_name })}
       onClose={onClose}
       closeLabel={t('common.close')}
       footer={<>
         <button type="button" className="btn btn-sec" onClick={onClose}>{t('users.cancel')}</button>
-        <button type="submit" form="bloquear-usuario" className="btn btn-primary" disabled={busy}>{t('users.confirm_suspend')}</button>
+        <button type="submit" form="bloquear-usuario" className="btn btn-primary" disabled={busy}>{t(mode === 'revoke' ? 'users.confirm_revoke' : 'users.confirm_suspend')}</button>
       </>}
     >
       <form id="bloquear-usuario" onSubmit={submit} noValidate>
-        <p className="text-secondary mb-3">{t('users.suspend_text')}</p>
+        <p className="text-secondary mb-3">{t(mode === 'revoke' ? 'users.revoke_text' : 'users.suspend_text')}</p>
         <label className="form-label" htmlFor="s-reason">{t('users.reason')}</label>
         <textarea id="s-reason" className="form-control mb-2" rows={3} required value={reason} onChange={(e) => setReason(e.target.value)} />
         {error && <div className="invalid-feedback" role="alert">{error}</div>}

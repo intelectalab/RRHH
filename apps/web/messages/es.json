@@ -89,7 +89,8 @@
     "inbox_aria": "Pendientes: {n}",
     "notifications": "Notificaciones",
     "notifications_aria": "Notificaciones: {n} sin leer",
-    "my_notifications": "Mis notificaciones"
+    "my_notifications": "Mis notificaciones",
+    "account_security": "Seguridad de la cuenta"
   },
   "home": {
     "title": "Hola, {name}",
@@ -154,7 +155,12 @@
     "scope_default": "El del rol",
     "scope_companies": "Empresas incluidas",
     "done_saved": "Usuario guardado.",
-    "scope_note": "El alcance limita qué colaboradores y registros ve con ese rol. Sedes y unidades se podrán elegir cuando estén registradas."
+    "scope_note": "El alcance limita qué colaboradores y registros ve con ese rol. Sedes y unidades se podrán elegir cuando estén registradas.",
+    "action_revoke_sessions": "Cerrar sesiones",
+    "revoke_title": "Cerrar las sesiones de {name}",
+    "revoke_text": "Se cerrarán todas sus sesiones abiertas en cualquier dispositivo. Podrá volver a ingresar con su clave.",
+    "confirm_revoke": "Cerrar sesiones",
+    "done_sessions_revoked": "Sesiones cerradas"
   },
   "roles": {
     "sub": "{count} roles",
@@ -772,5 +778,25 @@
     "inverse": "(inverso)",
     "save": "Publicar",
     "cancel": "Cancelar"
+  },
+  "acct": {
+    "title": "Seguridad de la cuenta",
+    "sub": "Tus sesiones abiertas y tu clave",
+    "must_change": "Debes cambiar tu clave antes de continuar.",
+    "sessions": "Sesiones abiertas",
+    "sessions_help": "Se cierran solas tras {idle} minutos sin uso o {hours} horas desde el ingreso.",
+    "this_device": "Este dispositivo",
+    "last_seen": "Último uso {when}",
+    "since": "Ingresó {when}",
+    "revoke": "Cerrar",
+    "revoked": "Sesión cerrada",
+    "password": "Cambiar clave",
+    "password_help": "Al menos {min} caracteres, con letras y números, distinta de tus claves anteriores. Al cambiarla se cierran tus demás sesiones.",
+    "current": "Clave actual",
+    "new": "Clave nueva",
+    "confirm": "Repite la clave nueva",
+    "save": "Cambiar clave",
+    "changed": "Clave cambiada. Cerramos tus demás sesiones.",
+    "mismatch": "Las claves nuevas no coinciden."
   }
 }

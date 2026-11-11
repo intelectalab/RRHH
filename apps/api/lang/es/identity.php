@@ -25,4 +25,12 @@ return [
         'subject' => 'Active su cuenta de Ayni HR',
         'body' => "Su empresa le creó una cuenta en Ayni HR.\n\nActívela y defina su contraseña con este enlace (válido por :hours horas):\n:link",
     ],
+    'password' => [
+        'too_short' => 'La clave debe tener al menos :min caracteres.',
+        'letters_numbers' => 'La clave debe combinar letras y números.',
+        'reused' => 'No puedes repetir ninguna de tus últimas :n claves.',
+        'current_wrong' => 'La clave actual no es correcta.',
+        'locked_event' => 'Tu cuenta se bloqueó por varios intentos fallidos de ingreso. Podrás volver a intentarlo en :minutes minutos o restablecer tu clave.',
+        'changed_event' => 'Se cambió la clave de tu cuenta.',
+    ],
 ];

@@ -43,6 +43,15 @@ final class IdentityServiceProvider extends ServiceProvider
             return $session->user;
         });
 
+        // SEG-5 · Límite general por usuario (o por IP sin sesión); 429 con el formato único de error.
+        RateLimiter::for('ayni-api', function (Request $request) {
+            $user = $request->user();
+
+            return $user !== null
+                ? Limit::perMinute((int) config('identity.api_requests_per_minute_user'))->by('u:'.$user->getAuthIdentifier())
+                : Limit::perMinute((int) config('identity.api_requests_per_minute_ip'))->by('ip:'.$request->ip().'|'.$request->getHost());
+        });
+
         RateLimiter::for('ayni-login', function (Request $request) {
             $identifier = strtolower((string) ($request->input('email') ?? $request->input('login') ?? $request->input('document_number') ?? ''));
 

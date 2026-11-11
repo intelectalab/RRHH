@@ -138,11 +138,16 @@ final class ParameterResolver
             'text' => is_string($value) && mb_strlen($value) <= 500,
             'date' => is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1,
             'time' => is_string($value) && preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $value) === 1,
-            'select' => is_string($value) && (! is_array($options) || in_array($value, $options, true)),
+            'select' => is_string($value) && (! is_array($options) || ! array_is_list($options) || in_array($value, $options, true)),
             'list' => is_array($value) && array_is_list($value) && (! is_array($options) || array_diff($value, $options) === []),
             'json' => is_array($value),
             default => false,
         };
+        // Márgenes que fija la plataforma (options {"min", "max"} en el catálogo de parámetros).
+        if ($ok && in_array((string) $definition->data_type, ['integer', 'decimal'], true) && is_array($options) && ! array_is_list($options)) {
+            $n = (float) $value;
+            $ok = (! isset($options['min']) || $n >= (float) $options['min']) && (! isset($options['max']) || $n <= (float) $options['max']);
+        }
         if (! $ok) {
             throw ValidationException::withMessages(['value' => [(string) trans('settings.invalid_value')]]);
         }

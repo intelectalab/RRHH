@@ -1050,6 +1050,21 @@ ALTER TABLE user_tokens FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON user_tokens USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_user_tokens_touch BEFORE UPDATE ON user_tokens FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+CREATE TABLE password_history (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  user_id uuid NOT NULL,
+  password_hash text NOT NULL,  -- SENSIBLE (solo el hash argon2id)
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_password_history_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_password_history_user_id FOREIGN KEY (tenant_id, user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE password_history IS 'Hashes de claves anteriores para impedir reutilizarlas (SEG-5, parámetro seguridad.clave_historial).';
+CREATE INDEX ix_password_history_user_id ON password_history (tenant_id, user_id, created_at DESC);
+ALTER TABLE password_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE password_history FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON password_history USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+
 CREATE TABLE user_sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
@@ -17044,6 +17059,16 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('ia.casos_de_uso', 'ai', 'Casos de uso de IA', 'Casos de uso permitidos (redacción, resumen, consulta en lenguaje natural...).', 'list', '[]'::jsonb, ARRAY['organization'], NULL),
   ('api.limite_por_minuto', 'integrations', 'Límite de llamadas por minuto', 'Límite por token.', 'integer', '120'::jsonb, ARRAY['organization'], NULL),
   ('whatsapp.acciones_permitidas', 'whatsapp', 'Acciones por WhatsApp', 'Trámites habilitados en el canal.', 'list', '["boleta", "vacaciones", "constancia"]'::jsonb, ARRAY['organization'], '["boleta", "vacaciones", "constancia", "marcacion"]'::jsonb);
+
+-- SEG-4 · SEG-5: política de claves, bloqueo y sesiones (dentro de los márgenes de la plataforma: options.min/max).
+INSERT INTO parameter_definitions (code, module_code, name, description, data_type, default_value, allowed_scopes, options) VALUES
+  ('seguridad.clave_longitud_minima', 'base', 'Longitud mínima de la clave', 'Cantidad mínima de caracteres de una clave nueva.', 'integer', '12'::jsonb, ARRAY['organization'], '{"min": 10, "max": 64}'::jsonb),
+  ('seguridad.clave_historial', 'base', 'Claves anteriores que no se pueden repetir', 'Cuántas claves anteriores se recuerdan para impedir reutilizarlas. 0: no se controla.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 0, "max": 24}'::jsonb),
+  ('seguridad.clave_vencimiento_dias', 'base', 'Vencimiento de la clave (días)', 'Días tras los cuales se pide cambiar la clave. 0: no vence.', 'integer', '0'::jsonb, ARRAY['organization'], '{"min": 0, "max": 365}'::jsonb),
+  ('seguridad.intentos_maximos', 'base', 'Intentos fallidos antes del bloqueo', 'Ingresos fallidos seguidos que bloquean la cuenta temporalmente.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
+  ('seguridad.bloqueo_minutos', 'base', 'Duración del bloqueo (minutos)', 'Tiempo que la cuenta queda bloqueada tras superar los intentos.', 'integer', '15'::jsonb, ARRAY['organization'], '{"min": 5, "max": 1440}'::jsonb),
+  ('seguridad.sesion_duracion_minutos', 'base', 'Duración máxima de la sesión (minutos)', 'Tiempo tras el cual hay que volver a ingresar aunque se esté usando.', 'integer', '480'::jsonb, ARRAY['organization'], '{"min": 30, "max": 1440}'::jsonb),
+  ('seguridad.inactividad_minutos', 'base', 'Cierre por inactividad (minutos)', 'Minutos sin uso tras los cuales la sesión se cierra.', 'integer', '30'::jsonb, ARRAY['organization'], '{"min": 5, "max": 240}'::jsonb);
 
 -- NOT-1 · NOT-6: horario de silencio, avisos obligatorios y retención del centro de notificaciones.
 INSERT INTO parameter_definitions (code, module_code, name, description, data_type, default_value, allowed_scopes, options) VALUES

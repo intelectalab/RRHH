@@ -28,6 +28,8 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="IDENTITY_API_RATE_USER" value="100000"/>
+        <env name="IDENTITY_API_RATE_IP" value="100000"/>
         <env name="DB_CONNECTION" value="pgsql"/>
         <env name="DB_DATABASE" value="aynihr_test"/>
         <env name="MAIL_MAILER" value="array"/>

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Identity\Application\Actions;
 
+use App\Modules\Identity\Application\PasswordPolicy;
 use App\Modules\Identity\Application\SessionManager;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserToken;
@@ -14,7 +15,10 @@ use Illuminate\Support\Facades\Hash;
  */
 final class ResetPassword
 {
-    public function __construct(private readonly SessionManager $sessions) {}
+    public function __construct(
+        private readonly SessionManager $sessions,
+        private readonly PasswordPolicy $policy,
+    ) {}
 
     public function __invoke(string $rawToken, string $newPassword): bool
     {
@@ -36,9 +40,12 @@ final class ResetPassword
                 return false;
             }
 
+            $this->policy->assertAcceptable($user, $newPassword);
             $token->forceFill(['consumed_at' => now()])->save();
+            $hash = Hash::make($newPassword);
+            $this->policy->remember($user, $hash);
             $user->forceFill([
-                'password_hash' => Hash::make($newPassword),
+                'password_hash' => $hash,
                 'password_changed_at' => now(),
                 'must_change_password' => false,
                 'failed_attempts' => 0,
