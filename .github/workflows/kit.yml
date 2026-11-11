@@ -64,7 +64,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npm install --no-save mermaid@11.4.1 playwright@1.49.1 && npx playwright install --with-deps chromium
+      - run: npm install --no-save mermaid@11.4.1 playwright@1.49.1 && npx playwright install chromium  # la imagen del runner ya trae las dependencias de sistema; sin apt
       - name: Validar los diagramas mermaid de kit/docs
         run: node kit/tools/verificar_mermaid.js kit/docs
 
