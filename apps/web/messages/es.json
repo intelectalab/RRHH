@@ -124,7 +124,11 @@
     "collapse_menu": "Contraer el menú",
     "close_menu": "Cerrar el menú",
     "open_menu": "Abrir el menú",
-    "menu_section": "Menú"
+    "menu_section": "Menú",
+    "language": "Idioma",
+    "lang_es": "Español",
+    "lang_en": "English",
+    "lang_pt": "Português"
   },
   "home": {
     "title": "Hola, {name}",
@@ -335,7 +339,9 @@
     "cat_bank_account": "Cuenta bancaria",
     "cat_identity_document": "Documento de identidad",
     "cat_union": "Afiliación sindical",
-    "cat_other": "Otro"
+    "cat_other": "Otro",
+    "entity_filter": "ID {id}… ×",
+    "sensitive_short": "S"
   },
   "palette": {
     "open": "Buscar",
@@ -418,7 +424,8 @@
     "bulk_done": "{ok} aprobadas",
     "bulk_partial": "{ok} aprobadas · {fail} no se pudieron aprobar",
     "not_yours": "Esta solicitud no espera tu decisión.",
-    "by": "{name}"
+    "by": "{name}",
+    "quoted": "«{text}»"
   },
   "tasks": {
     "title": "Tareas",
@@ -683,7 +690,9 @@
     "card_fields": "Campos personalizados",
     "card_fields_help": "Datos propios de tu organización en empresas, tareas y más.",
     "card_money": "Monedas y tipos de cambio",
-    "card_money_help": "Tipos de cambio con fecha para consolidar reportes."
+    "card_money_help": "Tipos de cambio con fecha para consolidar reportes.",
+    "card_catalogs": "Catálogos",
+    "card_catalogs_help": "Tipos de documento, países, ubigeo, bancos, motivos y listas propias"
   },
   "cfgroup": {
     "analitica": "Analítica",
@@ -901,5 +910,49 @@
     "cancel_login": "Salir",
     "enroll_title": "Configura la verificación en dos pasos",
     "enroll_intro": "Tu rol o tu organización exige un segundo paso al ingresar. Configúralo ahora para continuar."
+  },
+  "catalogs": {
+    "title": "Catálogos",
+    "sub": "Listas comunes con código estable para formularios, integraciones y declaraciones",
+    "help": "Los catálogos maestros los mantiene la plataforma con el código oficial y se actualizan sin interrumpir el servicio. En los extensibles y en los propios puedes agregar elementos; un elemento en uso no se borra: se archiva y deja de ofrecerse.",
+    "list": "Catálogos",
+    "new_catalog": "Nuevo catálogo",
+    "new_item": "Agregar elemento",
+    "edit_item": "Editar elemento",
+    "source_master": "Maestro",
+    "source_system": "Del sistema",
+    "source_organization": "Propio de la organización",
+    "extensible": "Admite elementos propios",
+    "locked": "Solo lo cambia la plataforma",
+    "search": "Buscar por nombre o código",
+    "show_archived": "Ver archivados",
+    "col_label": "Nombre",
+    "col_code": "Código",
+    "col_statutory": "Código oficial",
+    "col_state": "Estado",
+    "empty_title": "Sin elementos",
+    "empty_text": "Este catálogo todavía no tiene elementos.",
+    "empty_search": "Ningún elemento coincide con la búsqueda.",
+    "parent": "Pertenece a {code}",
+    "no_statutory": "Sin código oficial",
+    "own": "Propio",
+    "archived_tag": "Archivado",
+    "unverified": "Por validar",
+    "unverified_help": "Aún no se contrastó con la fuente oficial.",
+    "archive": "Archivar",
+    "reactivate": "Reactivar",
+    "archived": "Elemento archivado.",
+    "reactivated": "Elemento reactivado.",
+    "catalog_created": "Catálogo creado.",
+    "item_created": "Elemento agregado.",
+    "item_saved": "Cambios guardados.",
+    "name": "Nombre",
+    "code": "Código",
+    "code_help": "Minúsculas, números y guion bajo; no cambia después (lo usan integraciones e importaciones).",
+    "item_code_help": "Código estable del elemento: minúsculas, números y guion bajo. No se puede cambiar.",
+    "label_es": "Nombre en español",
+    "label_en": "Nombre en inglés (opcional)",
+    "label_pt": "Nombre en portugués (opcional)",
+    "sort_order": "Orden"
   }
 }

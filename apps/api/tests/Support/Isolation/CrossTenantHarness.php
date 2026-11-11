@@ -5,6 +5,8 @@ namespace Tests\Support\Isolation;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Settings\Infrastructure\Models\Catalog;
+use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
 use App\Modules\Settings\Infrastructure\Models\TenantSetting;
 use App\Shared\Tenancy\TenancyScope;
@@ -41,6 +43,12 @@ final class CrossTenantHarness
         'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
+        // CFG-10: catálogos propios de A (por código) y sus elementos (por id).
+        '/catalogs' => Catalog::class,
+        '/catalogs/{code}/items' => Catalog::class,
+        '/catalog-items/{id}' => CatalogItem::class,
+        '/catalog-items/{id}/archive' => CatalogItem::class,
+        '/catalog-items/{id}/reactivate' => CatalogItem::class,
     ];
 
     /**
@@ -49,7 +57,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

@@ -38,6 +38,8 @@ final class DatabaseConventionsChecker
         'integration_connectors',
         'labor_regimes',
         'legal_parameters',
+        'master_catalog_items',
+        'master_catalogs',
         'metric_definitions',
         'module_dependencies',
         'modules',

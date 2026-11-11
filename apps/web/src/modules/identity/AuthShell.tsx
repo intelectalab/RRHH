@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { useT } from '@/lib/useT'
 import { Icon } from '@/ui/components/Icon'
 import { BrandMark } from '@/ui/components/BrandMark'
+import { BrandName } from '@/ui/components/BrandName'
 
 /**
  * Marco de las pantallas de acceso (docs/10 §3.12 «Ingreso»): panel de marca con mensaje y tres
@@ -17,7 +18,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
       <div className="login-marca">
         <div className="logo">
           <BrandMark />
-          <b>Gestia<span>HR</span></b>
+          <BrandName />
         </div>
         <div>
           <h2>{t('auth.brand_title')}</h2>
@@ -33,7 +34,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
         <div className="caja">
           <div className="logo mb-4">
             <BrandMark />
-            <b>Gestia<span>HR</span></b>
+            <BrandName />
           </div>
           {children}
         </div>

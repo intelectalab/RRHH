@@ -9,6 +9,7 @@ use App\Shared\Exceptions\AyniException;
 use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Middleware\ResolveTenantContext;
+use App\Shared\Http\Middleware\SetRequestLocale;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use App\Shared\Permissions\RequirePermission;
@@ -57,6 +58,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(append: [
             VerifyXsrfToken::class,
             EnsureSecondFactor::class,
+            SetRequestLocale::class,
             'throttle:ayni-api',
         ]);
     })

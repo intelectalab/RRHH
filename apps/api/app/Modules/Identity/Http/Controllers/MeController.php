@@ -40,6 +40,9 @@ final class MeController
                 'id' => $user->id,
                 'display_name' => $user->display_name,
                 'locale' => $user->locale ?? $tenant?->default_locale,
+                // CFG-6: preferencia propia (null = sigue el idioma de la organización).
+                'locale_preference' => $user->locale,
+                'tenant_locale' => $tenant?->default_locale,
                 'timezone' => $user->timezone ?? $tenant?->timezone,
                 'must_change_password' => $user->must_change_password,
                 'mfa_step' => $mfaStep,

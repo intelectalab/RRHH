@@ -4,6 +4,7 @@ use App\Modules\Identity\Http\Controllers\AccountSecurityController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\CodeSignInController;
 use App\Modules\Identity\Http\Controllers\MeController;
+use App\Modules\Identity\Http\Controllers\MePreferencesController;
 use App\Modules\Identity\Http\Controllers\MfaController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
 use App\Modules\Identity\Http\Controllers\RoleController;
@@ -30,6 +31,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::middleware('auth:ayni')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', MeController::class);
+        Route::patch('/me/preferences', MePreferencesController::class);
         Route::get('/search', SearchController::class);
         Route::get('/me/sessions', [AccountSecurityController::class, 'sessions']);
         Route::post('/me/sessions/{id}/revoke', [AccountSecurityController::class, 'revokeSession']);

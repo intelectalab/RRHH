@@ -295,7 +295,7 @@ function ApprovalPanel({ id, intent, onClose, onDone, formatWhen }: { id: string
                 <b>{t('approvals.level', { n: task.level, total: row.levels ?? task.level })}{task.level_name ? ` · ${task.level_name}` : ''}</b>
                 <span className="sub2">{task.assignee_name ?? '—'}{task.assignee_kind === 'role' ? ` (${t('tasks.role_tag')})` : ''} · {t(`approvals.task_${task.status}`)}{task.completed_at ? ` · ${formatWhen(task.completed_at)}` : ''}</span>
                 {task.delegated_from_name && <span className="sub2">{t('approvals.delegated', { name: task.delegated_from_name })}</span>}
-                {task.comment && <span className="sub2">«{task.comment}»</span>}
+                {task.comment && <span className="sub2">{t('approvals.quoted', { text: task.comment })}</span>}
               </li>
             ))}
           </ol>

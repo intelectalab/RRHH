@@ -293,7 +293,11 @@
 @catalogs | Listas configurables por la organización (motivos, parentescos, tipos).
   code ; name ; is_system ; uniq code
 @catalog_items soft | Elementos de una lista configurable.
-  catalog_id -> catalogs ; code ; label text! ; sort_order ; is_active bool=t ; metadata j ; uniq catalog_id, code
+  catalog_id -> catalogs ; code ; label text! ; labels j ; sort_order ; is_active bool=t ; metadata j ; uniq catalog_id, code
+@master_catalogs P cat | Catálogos maestros comunes (tipos de documento, países, ubigeo, bancos, motivos de cese). Los mantiene la plataforma sin desplegar; is_extensible permite que cada organización agregue elementos propios en catalogs con el mismo código.
+  code ; name ; description ; is_extensible ; country_code ?~> countries.code ; source ; uniq code
+@master_catalog_items P cat | Elementos de un catálogo maestro con código estable para integraciones y declaraciones (statutory_code), etiquetas por idioma y vigencia. is_verified = falso mientras no se contraste con la fuente oficial.
+  master_catalog_id => master_catalogs ; code ; label text! ; labels j ; statutory_code ; parent_code ; sort_order ; metadata j ; is_verified ; vigcols ; uniq master_catalog_id, code
 @translation_overrides | Textos de interfaz que la organización reemplaza sobre los archivos de traducción (es, en, pt).
   locale text! ; key text! ; value text! ; uniq locale, key
 @exchange_rates | Tipos de cambio por fecha para consolidar montos en grupos con varias monedas.

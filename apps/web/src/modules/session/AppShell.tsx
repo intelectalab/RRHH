@@ -3,9 +3,12 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { api } from '@/lib/api'
+import { locales, type Locale } from '@/lib/i18n'
 import { useT } from '@/lib/useT'
 import { applyTheme, storedTheme, type ThemeChoice } from '@/lib/theme'
 import { BrandMark } from '@/ui/components/BrandMark'
+import { BrandName } from '@/ui/components/BrandName'
 import { Icon } from '@/ui/components/Icon'
 import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
@@ -28,7 +31,7 @@ const MENU: NavLink[] = [
   { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
 ]
 
-const SETTINGS_PERMS = ['identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view']
+const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view']
 
 const MIN_KEY = 'gestia.side_min'
 
@@ -37,7 +40,7 @@ function initials(name: string): string {
 }
 
 function Shell({ children }: { children: ReactNode }) {
-  const { t } = useT()
+  const { t, locale, setLocale } = useT()
   const { session, can, logout } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -75,6 +78,17 @@ function Shell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [drawer])
 
+  // CFG-6: el idioma cambia al instante; se guarda en la cuenta para la API y las notificaciones.
+  async function changeLocale(next: Locale) {
+    const previous = locale
+    setLocale(next)
+    try {
+      await api.request('/me/preferences', 'PATCH', { locale: next })
+    } catch {
+      setLocale(previous)
+    }
+  }
+
   function toggleMin() {
     setMin((v) => {
       try { window.localStorage.setItem(MIN_KEY, v ? '0' : '1') } catch { /* preferencia solo en memoria */ }
@@ -102,7 +116,7 @@ function Shell({ children }: { children: ReactNode }) {
         <div className="brand">
           <Link className="logo" href="/" aria-label={t('shell.home_aria')}>
             <BrandMark />
-            <b>Gestia<span>HR</span></b>
+            <BrandName />
           </Link>
           <button type="button" className="sbtn side-min" onClick={toggleMin} aria-label={t(min ? 'shell.expand_menu' : 'shell.collapse_menu')} aria-pressed={min}>
             <Icon name="sidebar" />
@@ -163,6 +177,16 @@ function Shell({ children }: { children: ReactNode }) {
                     {(['light', 'dark', 'system'] as const).map((c) => (
                       <button key={c} type="button" role="menuitemradio" aria-checked={theme === c} className={theme === c ? 'on' : undefined} onClick={() => { applyTheme(c); setTheme(c) }}>
                         {t(`shell.theme_${c}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="menu-grupo" role="group" aria-label={t('shell.language')}>
+                  <span className="small text-secondary">{t('shell.language')}</span>
+                  <div className="seg">
+                    {locales.map((l) => (
+                      <button key={l} type="button" role="menuitemradio" lang={l} aria-checked={locale === l} className={locale === l ? 'on' : undefined} onClick={() => void changeLocale(l)}>
+                        {t(`shell.lang_${l}`)}
                       </button>
                     ))}
                   </div>
