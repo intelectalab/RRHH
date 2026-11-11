@@ -20,30 +20,30 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 500 |
+| Tablas | 503 |
 | Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 441 |
-| Tablas de plataforma (sin RLS de organización) | 59 |
+| Tablas de plataforma (sin RLS de organización) | 62 |
 | Políticas RLS | 441 |
-| Claves foráneas | 1576 |
+| Claves foráneas | 1579 |
 | — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1033 |
 | — simples `tenant_id` → `tenants(id)` | 453 |
-| — resto (hacia catálogos y tablas de plataforma) | 90 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2233 |
-| — creados con `CREATE INDEX` | 1114 |
-| Triggers | 516 |
+| — resto (hacia catálogos y tablas de plataforma) | 93 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2241 |
+| — creados con `CREATE INDEX` | 1116 |
+| Triggers | 519 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 23 |
-| Restricciones `CHECK` | 585 |
-| Restricciones `UNIQUE` | 596 |
-| Columnas | 6499 |
-| Columnas marcadas `-- SENSIBLE` | 163 |
+| Restricciones `CHECK` | 586 |
+| Restricciones `UNIQUE` | 599 |
+| Columnas | 6549 |
+| Columnas marcadas `-- SENSIBLE` | 164 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
-| Tablas con vigencia (`valid_from` / `valid_to`) | 34 |
+| Tablas con vigencia (`valid_from` / `valid_to`) | 35 |
 | Tablas inalterables (solo inserción, por trigger) | 22 |
 | Tablas con borrado lógico (`deleted_at`) | 164 |
 | Tablas con concurrencia optimista (`lock_version`) | 238 |
 | Funciones | 22 |
 | Vistas | 1 |
-| Permisos en el catálogo | 908 |
+| Permisos en el catálogo | 910 |
 | — de campo / marcados sensibles | 28 / 108 |
 | Roles de sistema | 11 |
 | Módulos comerciales | 28 |
@@ -55,7 +55,7 @@ Tablas por épica:
 | Fase | Épica | Título | Tablas |
 |---:|---|---|---:|
 | 0 | TEN | Multiempresa y aislamiento | 5 |
-| 0 | SAS | Consola SaaS: organizaciones, planes, módulos, límites, feature flags, soporte y salud | 28 |
+| 0 | SAS | Consola SaaS: organizaciones, planes, módulos, límites, feature flags, soporte y salud | 29 |
 | 0 | WEB | Sitio comercial gestiahr.com: productos, leads, demos, registros, chatbot y libro de reclamaciones | 7 |
 | 0 | PLT | Plataforma técnica: archivos, eventos, idempotencia | 12 |
 | 0 | SEG | Identidad, roles, permisos por campo y alcance | 16 |
@@ -63,7 +63,7 @@ Tablas por épica:
 | 0 | UI | Sistema de diseño y armazón (preferencias y vistas guardadas) | 2 |
 | 0 | WFL | Motor de aprobaciones y workflows | 11 |
 | 0 | NOT | Notificaciones y mensajería | 6 |
-| 0 | CFG | Configuración, parámetros, campos personalizados, i18n y multimoneda | 8 |
+| 0 | CFG | Configuración, parámetros, campos personalizados, i18n y multimoneda | 10 |
 | 1 | ORG | Estructura organizacional | 8 |
 | 1 | POS | Posiciones y headcount | 6 |
 | 1 | COL | Colaboradores y ficha 360 | 11 |
@@ -170,6 +170,7 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 |---|---|---|
 | `user_roles` | — | No: conviven filas de distinto alcance |
 | `tenant_settings` | — | No: conviven filas de distinto alcance |
+| `master_catalog_items` | — | No: conviven filas de distinto alcance |
 | `org_units` | — | No: conviven filas de distinto alcance |
 | `person_addresses` | — | No: conviven filas de distinto alcance |
 | `employment_assignments` | `employment_id` | Sí |
@@ -477,9 +478,16 @@ erDiagram
 #### `platform_users`
 
 - **Propósito:** Usuarios de la consola del propietario del SaaS, separados por completo de los usuarios de las organizaciones.
-- **Columnas clave:** `email`, `full_name`, `password_hash` (S), `role`, `mfa_secret_enc` (S), `status`, `last_login_at`.
+- **Columnas clave:** `email`, `full_name`, `password_hash` (S), `role`, `mfa_secret_enc` (S), `status`, `last_login_at`, `mfa_confirmed_at`, `mfa_last_used_step`, `failed_attempts`, `locked_until`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación; único: `email`.
+
+#### `platform_sessions`
+
+- **Propósito:** Sesiones de la consola SaaS (SAS-1): cookie propia, segundo factor siempre obligatorio, revocables.
+- **Columnas clave:** `session_hash` (S), `ip`, `user_agent`, `mfa_passed`, `last_seen_at`, `expires_at`, `revoked_at`.
+- **Relaciones:** `platform_user_id` → `platform_users`.
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; contiene columnas sensibles (S); único: `session_hash`.
 
 #### `platform_audit_events`
 
@@ -1028,9 +1036,23 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `catalog_items`
 
 - **Propósito:** Elementos de una lista configurable.
-- **Columnas clave:** `code`, `label`, `sort_order`, `is_active`, `metadata`.
+- **Columnas clave:** `code`, `label`, `labels`, `sort_order`, `is_active`, `metadata`.
 - **Relaciones:** `catalog_id` → `catalogs`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `catalog_id`, `code`.
+
+#### `master_catalogs`
+
+- **Propósito:** Catálogos maestros comunes (tipos de documento, países, ubigeo, bancos, motivos de cese). Los mantiene la plataforma sin desplegar; is_extensible permite que cada organización agregue elementos propios en catalogs con el mismo código.
+- **Columnas clave:** `code`, `name`, `description`, `is_extensible`, `source`.
+- **Relaciones:** `country_code` → `countries.code` (opcional).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación solo la lee; único: `code`.
+
+#### `master_catalog_items`
+
+- **Propósito:** Elementos de un catálogo maestro con código estable para integraciones y declaraciones (statutory_code), etiquetas por idioma y vigencia. is_verified = falso mientras no se contraste con la fuente oficial.
+- **Columnas clave:** `code`, `label`, `labels`, `statutory_code`, `parent_code`, `sort_order`, `metadata`, `is_verified`, `valid_from`, `valid_to`.
+- **Relaciones:** `master_catalog_id` → `master_catalogs`.
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación solo la lee; **vigencia** (`valid_from`/`valid_to`); se admiten filas simultáneas con distinto alcance; único: `master_catalog_id`, `code`.
 
 #### `translation_overrides`
 
@@ -1317,7 +1339,7 @@ erDiagram
 #### `contract_types`
 
 - **Propósito:** Tipos y modalidades de contrato, con el parámetro legal que fija su plazo máximo.
-- **Columnas clave:** `code`, `name`, `country_code`, `category`, `modality_code`, `max_duration_parameter_code`, `requires_objective_cause`.
+- **Columnas clave:** `code`, `name`, `country_code`, `category`, `modality_code`, `max_duration_parameter_code`, `trial_period_parameter_code`, `requires_objective_cause`, `requires_end_date`, `is_system`.
 - **Relaciones:** `document_template_id` → `document_templates` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
 
@@ -1471,14 +1493,14 @@ El portal del manager no tiene tablas propias: consume asignaciones (jefe), tare
 #### `import_jobs`
 
 - **Propósito:** Importación masiva por etapas: subir, mapear, validar, previsualizar e importar (nunca directo).
-- **Columnas clave:** `entity`, `status`, `column_mapping`, `total_rows`, `valid_rows`, `error_rows`, `imported_rows`, `started_at`, `finished_at`, `dry_run`.
+- **Columnas clave:** `entity`, `status`, `column_mapping`, `total_rows`, `valid_rows`, `error_rows`, `imported_rows`, `started_at`, `finished_at`, `dry_run`, `file_name`, `headers`, `batch_size`, `summary`, `error_message`.
 - **Relaciones:** `import_template_id` → `import_templates` (opcional); `stored_file_id` → `stored_files`; `created_by_user_id` → `users`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `import_job_rows`
 
 - **Propósito:** Filas de una importación con su validación y el registro creado.
-- **Columnas clave:** `row_number`, `raw_data`, `parsed_data`, `status`, `errors`, `entity_id`.
+- **Columnas clave:** `row_number`, `raw_data`, `parsed_data`, `status`, `errors`, `warnings`, `entity_id`, `previous_data`, `batch_number`.
 - **Relaciones:** `import_job_id` → `import_jobs`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `import_job_id`, `row_number`.
 

@@ -491,3 +491,25 @@
   .cal-lista > li { padding: 12px 16px; border-bottom: 1px solid var(--bd); }
   .cal-lista h3 { font-size: var(--fs-s); font-weight: 700; color: var(--tx2); margin: 0 0 6px; text-transform: capitalize; }
 }
+/* IMP-1 · Importar datos: pasos, mapeo de columnas, cifras de la vista previa y acciones. */
+.link-btn { border: 0; background: none; padding: 0; font: inherit; color: var(--pe-700); cursor: pointer; text-align: left; }
+.link-btn:hover { text-decoration: underline; }
+.imp-pasos { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--bd); font-size: var(--fs-s); color: var(--tx2); }
+.imp-pasos li { display: inline-flex; align-items: center; gap: 6px; padding-right: 12px; }
+.imp-pasos .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--control-bd); font-weight: 700; font-variant-numeric: tabular-nums; }
+.imp-pasos li.on { color: var(--tx); font-weight: 700; }
+.imp-pasos li.on .n { background: var(--primario); border-color: var(--primario); color: var(--sobre-marca); }
+.imp-pasos li.hecho .n { background: var(--ok-50); border-color: var(--ok); color: var(--ok); }
+.imp-subir { max-width: 640px; }
+.imp-mapa { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.imp-mapa .tag { margin-left: 6px; }
+.imp-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.imp-cifras > div { border: 1px solid var(--bd); border-radius: var(--r-l); padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.imp-cifras b { font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.imp-cifras span { font-size: var(--fs-s); color: var(--tx2); }
+.imp-cifras .ok b { color: var(--ok); } .imp-cifras .er b { color: var(--er); }
+.imp-aviso { border-color: var(--wa); background: var(--wa-50); }
+.imp-err { color: var(--er); }
+.imp-acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; margin-top: 16px; }
+.imp-paginas { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; font-size: var(--fs-s); }
+.imp-confirmo { display: flex; gap: 8px; align-items: center; margin-top: 16px; font-size: var(--fs-s); }

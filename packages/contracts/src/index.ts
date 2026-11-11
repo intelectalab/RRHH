@@ -6055,6 +6055,23 @@ export interface paths {
         patch: operations["patchHolidayCalendarsId"];
         trace?: never;
     };
+    "/import-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1) */
+        get: operations["getImportTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports": {
         parameters: {
             query?: never;
@@ -6110,6 +6127,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/imports/{id}/errors/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar en CSV las filas con error de una importación, con el motivo por fila */
+        get: operations["getImportsIdErrorsDownload"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports/{id}/execute": {
         parameters: {
             query?: never;
@@ -6144,6 +6178,43 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postImportsIdMap"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/imports/{id}/revert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «revert» sobre ImportJob
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postImportsIdRevert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Vista previa de una importación: filas con su estado, datos interpretados, errores y advertencias; ?filter[status]=valid|invalid|imported|skipped|failed */
+        get: operations["getImportsIdRows"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -16887,17 +16958,36 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @enum {string} */
-            kind: "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history";
+            entity: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions";
+            file_name?: string | null;
             /** @description Identificador opaco */
-            file_id: string;
-            mapping: {
+            file_id?: string | null;
+            headers?: string[] | null;
+            mapping?: {
                 [key: string]: unknown;
-            };
+            } | null;
+            suggested_mapping?: {
+                [key: string]: unknown;
+            } | null;
             /** @enum {string} */
-            status: "uploaded" | "mapped" | "validated" | "importing" | "completed" | "failed" | "cancelled";
+            status: "uploaded" | "mapped" | "validated" | "with_errors" | "importing" | "completed" | "failed" | "cancelled" | "reverted";
+            total_rows?: number | null;
+            valid_rows?: number | null;
+            error_rows?: number | null;
+            imported_rows?: number | null;
+            batch_size?: number | null;
             summary?: {
                 [key: string]: unknown;
             } | null;
+            error_message?: string | null;
+            /** @description Identificador opaco */
+            created_by_user_id?: string | null;
+            created_by_name?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            allowed_actions?: string[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -16905,15 +16995,36 @@ export interface components {
         };
         ImportJobInput: {
             /** @enum {string} */
-            kind?: "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history";
+            entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions";
+            file_name?: string | null;
             /** @description Identificador opaco */
-            file_id?: string;
+            file_id?: string | null;
+            headers?: string[] | null;
             mapping?: {
                 [key: string]: unknown;
-            };
+            } | null;
+            suggested_mapping?: {
+                [key: string]: unknown;
+            } | null;
+            total_rows?: number | null;
+            valid_rows?: number | null;
+            error_rows?: number | null;
+            imported_rows?: number | null;
+            batch_size?: number | null;
             summary?: {
                 [key: string]: unknown;
             } | null;
+            error_message?: string | null;
+            /** @description Identificador opaco */
+            created_by_user_id?: string | null;
+            created_by_name?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            allowed_actions?: string[] | null;
+            /** @description Contenido del archivo CSV o XLSX en base64 (IMP-1) */
+            content_base64?: string;
         };
         InspectionFile: {
             /** @description Identificador opaco */
@@ -35131,6 +35242,28 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getImportTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getImports: {
         parameters: {
             query?: {
@@ -35276,6 +35409,32 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getImportsIdErrorsDownload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
     postImportsIdExecute: {
         parameters: {
             query?: never;
@@ -35346,6 +35505,67 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postImportsIdRevert: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJob"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getImportsIdRows: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postImportsIdValidate: {

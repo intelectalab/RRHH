@@ -518,17 +518,17 @@
 
 #E IMP | Importador y puesta en marcha
 @import_templates soft | Plantilla de mapeo de columnas para el importador.
-  entity enum(employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
   name ; column_mapping j! ; is_system
 @import_jobs main lock | Importación masiva por etapas: subir, mapear, validar, previsualizar e importar (nunca directo).
-  entity enum(employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
   import_template_id ?-> import_templates ; stored_file_id -> stored_files
   status enum(uploaded,mapped,validating,validated,previewed,importing,completed,failed,cancelled,with_errors,reverted)=uploaded ; column_mapping j
   total_rows integer ; valid_rows integer ; error_rows integer ; imported_rows integer ; created_by_user_id -> users
-  started_at ; finished_at ; dry_run bool=t
+  started_at ; finished_at ; dry_run bool=t ; file_name ; headers j ; batch_size integer ; summary j ; error_message
 @import_job_rows | Filas de una importación con su validación y el registro creado.
   import_job_id -> import_jobs ; row_number integer! ; raw_data j! ; parsed_data j
-  status enum(pending,valid,invalid,imported,skipped,failed)=pending ; errors j ; entity_id uuid ; uniq import_job_id, row_number
+  status enum(pending,valid,invalid,imported,skipped,failed)=pending ; errors j ; warnings j ; entity_id uuid ; previous_data j ; batch_number integer ; uniq import_job_id, row_number
 @setup_checklist_items | Pasos del asistente de puesta en marcha (E-27) y su avance.
   code ; title ; module_code ?~> modules.code ; status enum(pending,in_progress,done,skipped)=pending
   completed_by_user_id ?-> users ; completed_at ; sort_order ; uniq code

@@ -281,6 +281,51 @@
       "opciones": null
     },
     {
+      "codigo": "importacion.politica_errores",
+      "modulo": "core",
+      "nombre": "Filas con error al importar",
+      "tipo": "select",
+      "valor_por_defecto": "only_valid",
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Si una importación tiene filas con error: importar solo las válidas (las demás se descargan con su motivo) o exigir que se corrija todo antes (RN-IMP-02).",
+      "opciones": [
+        "only_valid",
+        "fix_all"
+      ]
+    },
+    {
+      "codigo": "importacion.tamano_lote",
+      "modulo": "core",
+      "nombre": "Filas por lote de importación",
+      "tipo": "integer",
+      "valor_por_defecto": 500,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Filas que se confirman juntas en una transacción; si un lote falla, se deshace la importación completa.",
+      "opciones": {
+        "min": 50,
+        "max": 5000
+      }
+    },
+    {
+      "codigo": "importacion.max_filas",
+      "modulo": "core",
+      "nombre": "Filas máximas por archivo",
+      "tipo": "integer",
+      "valor_por_defecto": 50000,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Filas que admite un archivo de importación; los archivos más grandes se dividen.",
+      "opciones": {
+        "min": 100,
+        "max": 200000
+      }
+    },
+    {
       "codigo": "papelera.dias_restauracion",
       "modulo": "base",
       "nombre": "Días en papelera",
