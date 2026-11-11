@@ -688,7 +688,9 @@
     "card_money": "Monedas y tipos de cambio",
     "card_money_help": "Tipos de cambio con fecha para consolidar reportes.",
     "card_automations": "Automatizaciones",
-    "card_automations_help": "Reglas que crean tareas, avisan o piden aprobación cuando ocurre algo."
+    "card_automations_help": "Reglas que crean tareas, avisan o piden aprobación cuando ocurre algo.",
+    "card_contract_types": "Tipos de contrato",
+    "card_contract_types_help": "Modalidades del paquete de país y tipos propios, con plazos según parámetros legales."
   },
   "cfgroup": {
     "analitica": "Analítica",
@@ -1055,5 +1057,41 @@
     "company_archived": "Empresa archivada",
     "user_activated": "Cuenta activada",
     "user_suspended": "Cuenta bloqueada"
+  },
+  "ctype": {
+    "title": "Tipos de contrato",
+    "sub": "Modalidades y plazos que se usan al registrar contratos.",
+    "help": "Los tipos del paquete de país no se modifican. El plazo máximo y el periodo de prueba se leen de los parámetros legales vigentes a la fecha; si un valor no está validado se muestra «Por validar».",
+    "new": "Nuevo tipo",
+    "name": "Nombre",
+    "code": "Código",
+    "category": "Categoría",
+    "modality": "Modalidad",
+    "end_date": "Exige fecha de fin",
+    "cause": "Exige causa objetiva",
+    "max_duration": "Plazo máximo",
+    "trial": "Periodo de prueba",
+    "origin": "Origen",
+    "as_of": "Vigente al",
+    "origin_system": "Paquete de país",
+    "origin_own": "Propio",
+    "pending": "Por validar",
+    "yes": "Sí",
+    "no": "No",
+    "no_parameter": "Sin parámetro",
+    "created": "Tipo de contrato creado.",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "empty_title": "Sin tipos de contrato",
+    "empty_text": "La organización todavía no tiene tipos de contrato.",
+    "cat_indefinite": "Indeterminado",
+    "cat_fixed_term": "Plazo fijo (modalidad)",
+    "cat_part_time": "Tiempo parcial",
+    "cat_internship": "Modalidad formativa",
+    "cat_other": "Otro",
+    "unit_years": "{n} años",
+    "unit_months": "{n} meses",
+    "unit_days": "{n} días",
+    "unit_other": "{n}"
   }
 }

@@ -448,6 +448,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET, POST | `/contract-types` | `contracts.contract_types.{view,create}` | 1 |
+| GET, PATCH | `/contract-types/{id}` | `contracts.contract_types.{view,update}` | 1 |
 | GET, POST | `/contracts` | `contracts.contracts.{view,create}` | 1 |
 | GET, PATCH | `/contracts/{id}` | `contracts.contracts.{view,update}` | 1 |
 | POST | `/contracts/{id}/{issue,renew,terminate}` | `contracts.contracts.{issue,renew,terminate}` | 1 |

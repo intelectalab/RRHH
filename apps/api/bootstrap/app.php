@@ -10,6 +10,7 @@ use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Middleware\ResolveTenantContext;
 use App\Shared\Http\Responses\ProblemDetailsResponse;
+use App\Shared\LegalParameters\SyncLegalParametersCommand;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use App\Shared\Permissions\RequirePermission;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         EnvironmentCheckCommand::class,
         VerifyDatabaseConventionsCommand::class,
         GenerateDataDictionaryCommand::class,
+        SyncLegalParametersCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
         // La API no redirige a una pantalla de ingreso: responde 401 unauthenticated.

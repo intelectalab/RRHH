@@ -65,7 +65,7 @@ HIS | people.assignments | movimientos de puesto, unidad, sede, jefe y horario |
 HIS,COM | !people.compensations | registros de compensación con vigencia | AD RH PY AU CT | AD PY |
 CON | contracts.contracts | contratos | AD RH PY MG AU EM° | AD RH | +approve#Aprobar contratos y renovaciones antes de la firma:AD RH; +bulk_renew#Renovar contratos en bloque:AD RH
 CON | contracts.addenda | adendas | AD RH PY MG AU EM° | AD RH |
-CON | contracts.contract_types | tipos de contrato y topes |  |  | +update#Administrar tipos de contrato y sus topes:AD
+CON | contracts.contract_types | tipos de contrato y topes | AD RH PY AU | AD |
 DOC | documents.documents | documentos | AD RH PY MG AU ST EM° | AD RH | create:AD RH PY ST EM°; new_version:AD RH PY ST EM°; +approve#Aprobar o rechazar documentos entregados:AD RH; +request#Solicitar documentos a colaboradores:AD RH
 DOC | documents.templates | plantillas de documentos | AD RH PY AU | AD RH | generate:AD RH PY
 DOC | documents.signature_requests | envíos de firma | AD RH PY AU MG° EM° | AD RH PY | sign:AD° RH° PY° RC° MG° EM° ST° CT°; decline:AD° RH° PY° RC° MG° EM° ST° CT°; +evidence#Descargar la constancia de evidencia de firma:AD RH AU

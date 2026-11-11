@@ -44,7 +44,9 @@ Administrar los contratos de trabajo, sus renovaciones y adendas, con alertas de
 | `contracts.addenda.cancel` | Cancelar adendas | Administrador empresa, RRHH |
 | `contracts.addenda.create` | Crear adendas | Administrador empresa, RRHH |
 | `contracts.addenda.issue` | Emitir adendas | Administrador empresa, RRHH |
-| `contracts.contract_types.update` **(+)** | Administrar tipos de contrato y sus topes | Administrador empresa |
+| `contracts.contract_types.view` | Ver tipos de contrato y sus topes | Administrador empresa, RRHH, Payroll, Auditor |
+| `contracts.contract_types.create` | Crear tipos de contrato propios de la organización | Administrador empresa |
+| `contracts.contract_types.update` | Administrar tipos de contrato y sus topes | Administrador empresa |
 
 **(S)** sensible · **(+)** por añadir a `api/openapi.yaml`. Alcance, permisos por campo y matriz completa: `07-permisos-y-roles.md`.
 

@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 908,
+    "permisos": 910,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 139,
+    "fuera_del_contrato_api": 138,
     "roles": 11
   },
   "permisos": [
@@ -2666,6 +2666,30 @@
       "descripcion": "Emitir adendas"
     },
     {
+      "codigo": "contracts.contract_types.view",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "contract_types",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver tipos de contrato y sus topes"
+    },
+    {
+      "codigo": "contracts.contract_types.create",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "contract_types",
+      "accion": "create",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Crear tipos de contrato propios de la organización"
+    },
+    {
       "codigo": "contracts.contract_types.update",
       "epica": "CON",
       "modulo": "core",
@@ -2673,7 +2697,7 @@
       "accion": "update",
       "tipo": "accion",
       "sensible": false,
-      "en_contrato_api": false,
+      "en_contrato_api": true,
       "ambito": "organizacion",
       "descripcion": "Administrar tipos de contrato y sus topes"
     },
@@ -11872,6 +11896,14 @@
           "alcance": "organization"
         },
         {
+          "codigo": "contracts.contract_types.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.contract_types.create",
+          "alcance": "organization"
+        },
+        {
           "codigo": "contracts.contract_types.update",
           "alcance": "organization"
         },
@@ -14953,6 +14985,10 @@
           "alcance": "organization"
         },
         {
+          "codigo": "contracts.contract_types.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "documents.documents.view",
           "alcance": "organization"
         },
@@ -16943,6 +16979,10 @@
         },
         {
           "codigo": "contracts.addenda.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.contract_types.view",
           "alcance": "organization"
         },
         {
@@ -19895,6 +19935,10 @@
         },
         {
           "codigo": "contracts.addenda.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.contract_types.view",
           "alcance": "organization"
         },
         {

@@ -417,7 +417,8 @@
 #E CON | Contratos y adendas
 @contract_types soft | Tipos y modalidades de contrato, con el parámetro legal que fija su plazo máximo.
   code ; name ; country_code ; category enum(indefinite,fixed_term,part_time,internship,other)! ; modality_code
-  max_duration_parameter_code ; requires_objective_cause ; document_template_id ?-> document_templates ; uniq code
+  max_duration_parameter_code ; trial_period_parameter_code ; requires_objective_cause ; requires_end_date bool=f ; is_system
+  document_template_id ?-> document_templates ; uniq code
 @contracts main soft lock | Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08).
   employment_id -> employments ; contract_type_id -> contract_types ; number ; objective_cause ; trial_period_ends_on
   weekly_hours numeric(5,2) ; work_modality enum(onsite,remote,hybrid)=onsite
