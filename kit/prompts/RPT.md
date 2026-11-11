@@ -3,7 +3,7 @@
 Centro de reportes predefinidos y constructor de reportes con permisos sobre datos sensibles.
 
 - **Fase:** Fase 8 · Inteligencia. **Módulo comercial:** Analítica y reportes.
-- **Actividades:** 5 (4 historias y 1 tareas); 0 del MVP. **Operaciones de API:** 9.
+- **Actividades:** 5 (4 historias y 1 tareas); 0 del MVP. **Operaciones de API:** 10.
 - **Especificación:** `kit/docs/modulos/M-RPT.md`.
 
 ## Prompt para una sesión nueva de Claude Code

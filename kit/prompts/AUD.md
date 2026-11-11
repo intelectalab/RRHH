@@ -3,7 +3,7 @@
 Auditoría de negocio de solo inserción con antes y después, separada de la actividad de usuario y de los logs técnicos.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** Plataforma base.
-- **Actividades:** 5 (1 historias y 4 tareas); 5 del MVP. **Operaciones de API:** 5.
+- **Actividades:** 5 (1 historias y 4 tareas); 5 del MVP. **Operaciones de API:** 11.
 - **Especificación:** `kit/docs/modulos/M-AUD.md`.
 - **Ya avanzado en el kit:** Auditoría particionada por mes y de solo inserción en `schema.sql`, con su prueba en `pruebas_aislamiento.sql`.
 

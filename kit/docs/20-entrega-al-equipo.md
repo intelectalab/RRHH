@@ -60,8 +60,8 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [PLT](../prompts/PLT.md) · Plataforma técnica | Plataforma base | 0 | 14 | 14 | 4 | Sí | A-13, D-22 |
 | 0 | [TEN](../prompts/TEN.md) · Multiempresa y aislamiento | Plataforma base | 1 | 5 | 6 | 3 | Sí | — |
 | 0 | [SEG](../prompts/SEG.md) · Identidad, roles, permisos por campo y alcance | Plataforma base | 9 | 3 | 12 | 41 | Sí | D-23, D-24 |
-| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 31 | Sí | D-19 |
-| 0 | [AUD](../prompts/AUD.md) · Auditoría | Plataforma base | 1 | 4 | 5 | 5 | Sí | — |
+| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 38 | Sí | D-19 |
+| 0 | [AUD](../prompts/AUD.md) · Auditoría | Plataforma base | 1 | 4 | 5 | 11 | Sí | — |
 | 0 | [UI](../prompts/UI.md) · Sistema de diseño y armazón | Plataforma base | 3 | 9 | 12 | 0 | Sí | — |
 | 0 | [WFL](../prompts/WFL.md) · Motor de aprobaciones y workflows | Plataforma base | 5 | 4 | 9 | 32 | — | — |
 | 0 | [NOT](../prompts/NOT.md) · Notificaciones y mensajería | Plataforma base | 2 | 4 | 6 | 9 | — | D-11 |
@@ -119,7 +119,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 7 | [PRI](../prompts/PRI.md) · Privacidad y retención | Cumplimiento Perú | 6 | 1 | 0 | 22 | — | D-14 |
 | 7 | [SIN](../prompts/SIN.md) · Sindicatos y convenios | Cumplimiento Perú | 3 | 1 | 0 | 14 | — | D-33 |
 | 8 | [ANA](../prompts/ANA.md) · People analytics y tableros | Analítica y reportes | 4 | 2 | 0 | 7 | — | A-07, D-20 |
-| 8 | [RPT](../prompts/RPT.md) · Reportes y constructor | Analítica y reportes | 4 | 1 | 0 | 9 | — | A-07 |
+| 8 | [RPT](../prompts/RPT.md) · Reportes y constructor | Analítica y reportes | 4 | 1 | 0 | 10 | — | A-07 |
 | 8 | [ALE](../prompts/ALE.md) · Alertas explicadas | Analítica y reportes | 3 | 1 | 0 | 12 | — | D-20 |
 | 8 | [IAR](../prompts/IAR.md) · Asistente de IA y gobierno | Asistente de IA | 7 | 5 | 5 | 12 | — | A-09, D-21, D-38 |
 | 9 | [API](../prompts/API.md) · API pública, webhooks y MCP | API e integraciones | 3 | 2 | 0 | 14 | — | D-17, D-18, D-19, D-21 |
