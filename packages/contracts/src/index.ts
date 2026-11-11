@@ -2961,6 +2961,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/contract-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar ContractType */
+        get: operations["getContractTypes"];
+        put?: never;
+        /** Crear ContractType */
+        post: operations["postContractTypes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contract-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver ContractType */
+        get: operations["getContractTypesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar ContractType */
+        patch: operations["patchContractTypesId"];
+        trace?: never;
+    };
     "/contractor-invoices": {
         parameters: {
             query?: never;
@@ -15277,6 +15313,54 @@ export interface components {
             workday?: string;
             cause?: string | null;
         };
+        ContractType: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            country_code?: string | null;
+            /** @enum {string} */
+            category: "indefinite" | "fixed_term" | "part_time" | "internship" | "other";
+            modality_code?: string | null;
+            requires_end_date: boolean;
+            requires_objective_cause: boolean;
+            max_duration_parameter_code?: string | null;
+            trial_period_parameter_code?: string | null;
+            /** @description Identificador opaco */
+            document_template_id?: string | null;
+            is_system: boolean;
+            max_duration?: {
+                [key: string]: unknown;
+            } | null;
+            trial_period?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        ContractTypeInput: {
+            code?: string;
+            name?: string;
+            country_code?: string | null;
+            /** @enum {string} */
+            category?: "indefinite" | "fixed_term" | "part_time" | "internship" | "other";
+            modality_code?: string | null;
+            requires_end_date?: boolean;
+            requires_objective_cause?: boolean;
+            max_duration_parameter_code?: string | null;
+            trial_period_parameter_code?: string | null;
+            /** @description Identificador opaco */
+            document_template_id?: string | null;
+            is_system?: boolean;
+            max_duration?: {
+                [key: string]: unknown;
+            } | null;
+            trial_period?: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): fee */
         Contractor: {
             /** @description Identificador opaco */
@@ -26534,6 +26618,152 @@ export interface operations {
                     };
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getContractTypes: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContractType"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractTypes: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContractTypeInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContractType"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getContractTypesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContractType"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchContractTypesId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContractTypeInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ContractType"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];

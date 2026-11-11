@@ -683,7 +683,9 @@
     "card_fields": "Custom fields",
     "card_fields_help": "Your organization’s own data on companies, tasks and more.",
     "card_money": "Currencies and exchange rates",
-    "card_money_help": "Dated exchange rates to consolidate reports."
+    "card_money_help": "Dated exchange rates to consolidate reports.",
+    "card_contract_types": "Contract types",
+    "card_contract_types_help": "Country pack modalities and your own types, with terms from legal parameters."
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -901,5 +903,41 @@
     "cancel_login": "Sign out",
     "enroll_title": "Set up two-step verification",
     "enroll_intro": "Your role or organization requires a second step to sign in. Set it up now to continue."
+  },
+  "ctype": {
+    "title": "Contract types",
+    "sub": "Modalities and terms used when recording contracts.",
+    "help": "Country pack types cannot be changed. The maximum term and probation period are read from the legal parameters in force on the date; values not yet validated show as “To be validated”.",
+    "new": "New type",
+    "name": "Name",
+    "code": "Code",
+    "category": "Category",
+    "modality": "Modality",
+    "end_date": "Requires end date",
+    "cause": "Requires objective cause",
+    "max_duration": "Maximum term",
+    "trial": "Probation period",
+    "origin": "Origin",
+    "as_of": "In force on",
+    "origin_system": "Country pack",
+    "origin_own": "Own",
+    "pending": "To be validated",
+    "yes": "Yes",
+    "no": "No",
+    "no_parameter": "No parameter",
+    "created": "Contract type created.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "empty_title": "No contract types",
+    "empty_text": "The organization has no contract types yet.",
+    "cat_indefinite": "Indefinite",
+    "cat_fixed_term": "Fixed term (modality)",
+    "cat_part_time": "Part time",
+    "cat_internship": "Training agreement",
+    "cat_other": "Other",
+    "unit_years": "{n} years",
+    "unit_months": "{n} months",
+    "unit_days": "{n} days",
+    "unit_other": "{n}"
   }
 }

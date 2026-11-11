@@ -144,7 +144,7 @@ Leyenda de columnas: **SA** Superadmin SaaS · **AD** Administrador empresa · *
 
 `✓` concedido con el alcance por defecto del rol (sección 3). `○` concedido solo sobre lo propio o lo asignado a la persona (sus solicitudes, sus casos, sus tareas, lo que debe firmar o evaluar). Vacío = no concedido. **(S)** = permiso de campo o recurso sensible: su uso queda en el registro de accesos. **(+)** = no figura aún en `api/openapi.yaml`; debe añadirse al contrato (permisos de campo y acciones funcionales).
 
-Totales: 908 permisos · 769 tomados de `api/openapi.yaml` · 28 de campo · 111 acciones funcionales por añadir al contrato · 108 sensibles.
+Totales: 910 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 110 acciones funcionales por añadir al contrato · 108 sensibles.
 
 ### Fase 0 · Cimientos
 
@@ -442,7 +442,9 @@ Totales: 908 permisos · 769 tomados de `api/openapi.yaml` · 28 de campo · 111
 | `contracts.addenda.cancel` | Cancelar adendas |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `contracts.addenda.create` | Crear adendas |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `contracts.addenda.issue` | Emitir adendas |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
-| `contracts.contract_types.update` **(+)** | Administrar tipos de contrato y sus topes |  | ✓ |  |  |  |  |  |  |  |  |  |
+| `contracts.contract_types.view` | Ver tipos de contrato y sus topes |  | ✓ | ✓ | ✓ |  |  |  | ✓ |  |  |  |
+| `contracts.contract_types.create` | Crear tipos de contrato propios de la organización |  | ✓ |  |  |  |  |  |  |  |  |  |
+| `contracts.contract_types.update` | Administrar tipos de contrato y sus topes |  | ✓ |  |  |  |  |  |  |  |  |  |
 
 #### DOC · Gestión documental, plantillas y firma
 

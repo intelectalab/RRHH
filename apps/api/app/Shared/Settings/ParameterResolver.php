@@ -5,6 +5,7 @@ namespace App\Shared\Settings;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -113,10 +114,10 @@ final class ParameterResolver
 
     private function rowAt(string $code, string $scope, ?string $legalEntityId, string $date): ?\stdClass
     {
-        $row = $this->scoped($code, $scope, $legalEntityId)
-            ->where(fn ($q) => $q->whereNull('valid_from')->orWhere('valid_from', '<=', $date))
-            ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $date))
-            ->orderByRaw('valid_from desc nulls last')->first(['id', 'value', 'valid_from', 'valid_to']);
+        // HIS-1: el mismo filtro «vigente a la fecha» del patrón compartido de vigencia.
+        $query = $this->scoped($code, $scope, $legalEntityId);
+        EffectiveDated::applyAsOf($query, $date);
+        $row = $query->orderByRaw('valid_from desc nulls last')->first(['id', 'value', 'valid_from', 'valid_to']);
 
         return $row instanceof \stdClass ? $row : null;
     }

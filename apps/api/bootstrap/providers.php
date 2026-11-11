@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Audit\AuditServiceProvider;
+use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
@@ -16,4 +17,5 @@ return [
     WorkflowServiceProvider::class,
     NotificationsServiceProvider::class,
     SettingsServiceProvider::class,
+    ContractsServiceProvider::class,
 ];

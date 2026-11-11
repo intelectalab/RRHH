@@ -17,7 +17,7 @@ type Card = { href: string; title: string; help: string; keywords?: string }
  */
 export function SettingsHome() {
   const { t } = useT()
-  const { can } = useSession()
+  const { session, can } = useSession()
   const [groups, setGroups] = useState<Group[]>([])
   const [q, setQ] = useState('')
 
@@ -35,13 +35,13 @@ export function SettingsHome() {
       keywords: g.parameters.map((p) => `${p.name} ${p.description ?? ''}`).join(' '),
     })
     return [
-      { key: 'structure', cards: clean([card('/organizacion/empresas', 'companies', can('org.legal_entities.view')), card('/configuracion/feriados', 'holidays', can('time.holiday_calendars.view')), card('/configuracion/campos', 'fields', can('settings.custom_fields.view')), card('/configuracion/monedas', 'money', can('settings.exchange_rates.view')), ...groups.filter((g) => g.group === 'org').map(groupCard)]) },
+      { key: 'structure', cards: clean([card('/organizacion/empresas', 'companies', can('org.legal_entities.view')), card('/configuracion/feriados', 'holidays', can('time.holiday_calendars.view')), card('/configuracion/campos', 'fields', can('settings.custom_fields.view')), card('/configuracion/monedas', 'money', can('settings.exchange_rates.view')), card('/configuracion/tipos-contrato', 'contract_types', session.modules.includes('core') && can('contracts.contract_types.view')), ...groups.filter((g) => g.group === 'org').map(groupCard)]) },
       { key: 'access', cards: clean([card('/configuracion/usuarios', 'users', can('identity.users.view')), card('/configuracion/roles', 'roles', can('identity.roles.view')), ...groups.filter((g) => g.group === 'seguridad').map(groupCard)]) },
       { key: 'processes', cards: clean([card('/configuracion/flujos', 'flows', can('workflow.approval_flows.view')), card('/configuracion/mensajes', 'messages', can('notifications.templates.view') || can('notifications.deliveries.view')), ...groups.filter((g) => ['aprobaciones', 'notificaciones'].includes(g.group)).map(groupCard)]) },
       { key: 'control', cards: clean([card('/configuracion/auditoria', 'audit', can('audit.logs.view')), card('/configuracion/accesos-sensibles', 'sensitive', can('audit.sensitive_access.view')), card('/configuracion/papelera', 'trash', can('audit.trash.view')), ...groups.filter((g) => ['papelera', 'privacidad'].includes(g.group)).map(groupCard)]) },
       { key: 'parameters', cards: groups.filter((g) => !['org', 'seguridad', 'aprobaciones', 'notificaciones', 'papelera', 'privacidad'].includes(g.group)).map(groupCard).sort((a, b) => a.title.localeCompare(b.title)) },
     ]
-  }, [groups, can, t])
+  }, [groups, can, t, session.modules])
 
   const norm = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
   const term = norm(q.trim())
