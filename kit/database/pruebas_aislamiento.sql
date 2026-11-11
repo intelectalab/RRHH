@@ -43,7 +43,7 @@ BEGIN
        'addon_modules', 'addons', 'backup_restores', 'backup_runs', 'compliance_obligation_templates', 'countries',
        'country_concept_templates', 'country_document_templates', 'country_holidays', 'country_pack_versions',
        'country_packs', 'currencies', 'feature_flag_rules', 'feature_flags', 'help_article_versions', 'help_articles', 'integration_connectors', 'labor_regimes',
-       'legal_parameters', 'metric_definitions', 'module_dependencies', 'modules', 'parameter_definitions',
+       'legal_parameters', 'master_catalog_items', 'master_catalogs', 'metric_definitions', 'module_dependencies', 'modules', 'parameter_definitions',
        'partner_firm_tenants', 'partner_firm_users', 'partner_firms', 'pe_parametric_items', 'pe_parametric_tables',
        'pension_fund_rates', 'pension_funds', 'permissions', 'plan_features', 'plan_limits', 'plan_modules', 'plans', 'platform_audit_events',
        'platform_incidents', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
