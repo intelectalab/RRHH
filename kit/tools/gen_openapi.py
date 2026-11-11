@@ -103,7 +103,7 @@ RES = [
     ("DOC", 1, "documents.templates", "/document-templates", "DocumentTemplate", "name:s kind:s locale:s body:s variables:a status:e(draft|published|retired) version:i", "LCRU", "publish retire generate"),
     ("DOC", 1, "documents.signature_requests", "/signature-requests", "SignatureRequest", "document_id:id signers:j ordered:b provider:s status:e(draft|sent|viewed|partially_signed|completed|declined|cancelled|expired) evidence?:j", "LCR", "send sign decline cancel remind"),
     ("ESS", 1, "people.change_requests", "/profile-change-requests", "ProfileChangeRequest", "employment_id:id changes:j attachments:a status:e(pending|approved|rejected|cancelled)", "LCR", "approve reject cancel"),
-    ("IMP", 1, "imports.imports", "/imports", "ImportJob", "kind:e(employees|contracts|vacation_balances|salaries|attendance|concepts|history) file_id:id mapping:j status:e(uploaded|mapped|validated|importing|completed|failed|cancelled) summary?:j", "LCR", "map validate execute cancel"),
+    ("IMP", 1, "imports.imports", "/imports", "ImportJob", "entity:e(legal_entities|employees|contracts|vacation_balances|salaries|attendance|concepts|history|org_structure|dependents|positions) file_name?:s file_id?:id headers?:a mapping?:j suggested_mapping?:j status:e(uploaded|mapped|validated|with_errors|importing|completed|failed|cancelled|reverted) total_rows?:i valid_rows?:i error_rows?:i imported_rows?:i batch_size?:i summary?:j error_message?:s created_by_user_id?:id created_by_name?:s started_at?:dt finished_at?:dt allowed_actions?:a", "LCR", "map validate execute cancel revert"),
     ("AYU", 1, "platform.help_articles", "/platform/help-articles", "HelpArticle", "slug:s locale:s title:s body:s module_code:s roles:a screen_keys:a product_version:s status:e(draft|published|archived)", "LCRU", "publish archive"),
     ("AYU", 1, "help.org_articles", "/help/org-articles", "HelpOrgArticle", "title:s category_id?:id body:s audience:j owner_user_id:id review_on?:d version:i status:e(draft|published|in_review|archived)", "LCRU", "publish archive"),
     # ---------- Fase 2 ----------
@@ -326,6 +326,9 @@ EXTRA = [
     ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador: saldos, próximo pago, pendientes", False),
     ("MSS", 1, "get", "/my-team", "people.team.view", "Equipo directo e indirecto del manager", False),
     ("MSS", 1, "get", "/my-team/calendar", "people.team.view", "Calendario de ausencias del equipo", False),
+    ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
+    ("IMP", 1, "get", "/imports/{id}/rows", "imports.imports.view", "Vista previa de una importación: filas con su estado, datos interpretados, errores y advertencias; ?filter[status]=valid|invalid|imported|skipped|failed", False),
+    ("IMP", 1, "get", "/imports/{id}/errors/download", "imports.imports.view", "Descargar en CSV las filas con error de una importación, con el motivo por fila", False),
     ("IMP", 1, "get", "/setup-checklist", "imports.imports.view", "Avance de la puesta en marcha guiada", False),
     ("AYU", 1, "get", "/help/articles", "help.articles.view", "Artículos de ayuda visibles para el usuario (producto y organización), filtrados por rol, módulo y pantalla", False),
     ("AYU", 1, "get", "/help/articles/{id}", "help.articles.view", "Detalle de un artículo de ayuda con su versión", False),
@@ -394,6 +397,10 @@ TYPES = {
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
+# Campos que se envían al crear pero no vuelven en la respuesta (p. ej. el contenido del archivo).
+INPUT_EXTRA = {
+    "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
+}
 READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
@@ -497,6 +504,7 @@ def build():
         schemas[name] = sch
         if set("CU") & set(ops):
             inp = {k: v for k, v in props.items() if k not in READONLY}
+            inp.update(INPUT_EXTRA.get(name + "Input", {}))
             schemas[name + "Input"] = {"type": "object", "properties": inp}
         label = name
         item = path + "/{id}"

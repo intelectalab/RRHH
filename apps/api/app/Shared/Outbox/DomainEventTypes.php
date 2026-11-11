@@ -82,6 +82,17 @@ final class DomainEventTypes
     // Auditoría (AUD-5)
     public const AUDIT_INTEGRITY_FAILED = 'audit.integrity_failed.v1';
 
+    // Importaciones (IMP-1)
+    public const IMPORT_VALIDATED = 'import.validated.v1';
+
+    public const IMPORT_STARTED = 'import.started.v1';
+
+    public const IMPORT_COMPLETED = 'import.completed.v1';
+
+    public const IMPORT_FAILED = 'import.failed.v1';
+
+    public const IMPORT_REVERTED = 'import.reverted.v1';
+
     // Organización
     public const COMPANY_CREATED = 'company.created.v1';
 
@@ -241,6 +252,31 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['task_id', 'due_on'],
             'description' => 'Tarea interna vencida sin completar (se avisa una vez)',
+        ],
+        self::IMPORT_VALIDATED => [
+            'version' => 1,
+            'required_fields' => ['import_job_id', 'entity', 'valid_rows', 'error_rows'],
+            'description' => 'Importación validada: vista previa lista (con o sin filas con error)',
+        ],
+        self::IMPORT_STARTED => [
+            'version' => 1,
+            'required_fields' => ['import_job_id', 'entity'],
+            'description' => 'Importación confirmada: se procesa en segundo plano por lotes',
+        ],
+        self::IMPORT_COMPLETED => [
+            'version' => 1,
+            'required_fields' => ['import_job_id', 'entity', 'imported_rows'],
+            'description' => 'Importación terminada con su informe de lote',
+        ],
+        self::IMPORT_FAILED => [
+            'version' => 1,
+            'required_fields' => ['import_job_id', 'entity'],
+            'description' => 'Importación fallida: se deshizo lo que alcanzó a cargar',
+        ],
+        self::IMPORT_REVERTED => [
+            'version' => 1,
+            'required_fields' => ['import_job_id', 'entity', 'reverted_rows'],
+            'description' => 'Lote importado deshecho',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

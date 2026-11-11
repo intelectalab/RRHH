@@ -163,6 +163,52 @@ final class LegalEntityService
         $entity->regimes()->create(['labor_regime_code' => $code, 'valid_from' => $from->toDateString()]);
     }
 
+    /**
+     * IMP-1 · Problemas que impedirían crear la empresa, sin escribir nada (las mismas
+     * comprobaciones que create(): país, moneda, régimen, formato y unicidad del RUC).
+     *
+     * @param  array{tax_id: string, country: string, currency: string, payroll_regime: string}  $input
+     * @return array<string, array<int, string>>
+     */
+    public function creationErrors(array $input): array
+    {
+        $errors = [];
+        try {
+            $this->validateReferences($input['country'], $input['currency'], $input['payroll_regime'], $input['tax_id']);
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+        }
+        if (! isset($errors['tax_id']) && LegalEntity::query()->where('country_code', $input['country'])->where('tax_id', $input['tax_id'])->exists()) {
+            $errors['tax_id'][] = (string) trans('organization.duplicate_tax_id');
+        }
+
+        return $errors;
+    }
+
+    /** Empresas activas que todavía admite el plan (null: sin límite). */
+    public function remainingSlots(): ?int
+    {
+        $limit = DB::table('tenant_limits')->where('limit_code', self::LIMIT_CODE)->first(['limit_value', 'is_unlimited']);
+        if ($limit === null || $limit->is_unlimited || $limit->limit_value === null) {
+            return null;
+        }
+
+        return max(0, (int) $limit->limit_value - LegalEntity::query()->where('status', 'active')->count());
+    }
+
+    /**
+     * IMP-1 · Deshacer una empresa creada por una importación: pasa a la papelera (borrado lógico)
+     * con auditoría. Solo se llama si nada la usa (RN-IMP-07).
+     */
+    public function removeImported(LegalEntity $entity, string $importJobId): void
+    {
+        DB::transaction(function () use ($entity, $importJobId): void {
+            $before = $this->present($entity);
+            $entity->delete();
+            $this->audit->record('legal_entity.import_reverted', 'legal_entity', $entity->id, $before, null, 'import:'.$importJobId);
+        });
+    }
+
     private function guardPlanLimit(): void
     {
         $limit = DB::table('tenant_limits')->where('limit_code', self::LIMIT_CODE)->first(['limit_value', 'is_unlimited']);

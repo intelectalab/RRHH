@@ -523,7 +523,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 |---|---|---|---|
 | GET, POST | `/imports` | `imports.imports.{view,create}` | 1 |
 | GET | `/imports/{id}` | `imports.imports.view` | 1 |
-| POST | `/imports/{id}/{map,validate,execute,cancel}` | `imports.imports.{map,validate,execute,cancel}` | 1 |
+| POST | `/imports/{id}/{map,validate,execute,cancel,revert}` | `imports.imports.{map,validate,execute,cancel,revert}` | 1 |
+| GET | `/import-types` | `imports.imports.view` | 1 |
+| GET | `/imports/{id}/rows` | `imports.imports.view` | 1 |
+| GET | `/imports/{id}/errors/download` | `imports.imports.view` | 1 |
 | GET | `/setup-checklist` | `imports.imports.view` | 1 |
 
 **AYU · Centro de ayuda**

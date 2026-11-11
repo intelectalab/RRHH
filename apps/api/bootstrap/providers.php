@@ -3,6 +3,7 @@
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
+use App\Modules\Imports\ImportsServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
 use App\Modules\Platform\PlatformServiceProvider;
@@ -22,4 +23,5 @@ return [
     ContractsServiceProvider::class,
     ReportsServiceProvider::class,
     PlatformServiceProvider::class,
+    ImportsServiceProvider::class,
 ];
