@@ -16,32 +16,32 @@ Archivos relacionados:
 
 ## 1. El esquema en números
 
-Conteos obtenidos del catálogo de PostgreSQL (17.11 (Debian 17.11-1.pgdg13+2)) después de cargar `schema.sql` en una base vacía; no son estimaciones.
+Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)) después de cargar `schema.sql` en una base vacía; no son estimaciones.
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 495 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 436 |
+| Tablas | 500 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 441 |
 | Tablas de plataforma (sin RLS de organización) | 59 |
-| Políticas RLS | 436 |
-| Claves foráneas | 1568 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1030 |
-| — simples `tenant_id` → `tenants(id)` | 448 |
+| Políticas RLS | 441 |
+| Claves foráneas | 1576 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1033 |
+| — simples `tenant_id` → `tenants(id)` | 453 |
 | — resto (hacia catálogos y tablas de plataforma) | 90 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2216 |
-| — creados con `CREATE INDEX` | 1109 |
-| Triggers | 511 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2233 |
+| — creados con `CREATE INDEX` | 1114 |
+| Triggers | 516 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 23 |
-| Restricciones `CHECK` | 584 |
-| Restricciones `UNIQUE` | 589 |
-| Columnas | 6445 |
-| Columnas marcadas `-- SENSIBLE` | 161 |
+| Restricciones `CHECK` | 585 |
+| Restricciones `UNIQUE` | 596 |
+| Columnas | 6499 |
+| Columnas marcadas `-- SENSIBLE` | 163 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 34 |
 | Tablas inalterables (solo inserción, por trigger) | 22 |
 | Tablas con borrado lógico (`deleted_at`) | 164 |
 | Tablas con concurrencia optimista (`lock_version`) | 238 |
-| Funciones | 20 |
+| Funciones | 22 |
 | Vistas | 1 |
 | Permisos en el catálogo | 908 |
 | — de campo / marcados sensibles | 28 / 108 |
@@ -58,8 +58,8 @@ Tablas por épica:
 | 0 | SAS | Consola SaaS: organizaciones, planes, módulos, límites, feature flags, soporte y salud | 28 |
 | 0 | WEB | Sitio comercial gestiahr.com: productos, leads, demos, registros, chatbot y libro de reclamaciones | 7 |
 | 0 | PLT | Plataforma técnica: archivos, eventos, idempotencia | 12 |
-| 0 | SEG | Identidad, roles, permisos por campo y alcance | 14 |
-| 0 | AUD | Auditoría, actividad y accesos a datos sensibles | 3 |
+| 0 | SEG | Identidad, roles, permisos por campo y alcance | 16 |
+| 0 | AUD | Auditoría, actividad y accesos a datos sensibles | 6 |
 | 0 | UI | Sistema de diseño y armazón (preferencias y vistas guardadas) | 2 |
 | 0 | WFL | Motor de aprobaciones y workflows | 11 |
 | 0 | NOT | Notificaciones y mensajería | 6 |
@@ -709,6 +709,20 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 - **Relaciones:** `user_id` → `users`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación.
 
+#### `user_mfa_recovery_codes`
+
+- **Propósito:** Códigos de respaldo del segundo factor (SEG-3): de un solo uso, guardados como HMAC.
+- **Columnas clave:** `code_hash` (S), `used_at`.
+- **Relaciones:** `user_id` → `users`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S).
+
+#### `password_history`
+
+- **Propósito:** Hashes de claves anteriores para impedir reutilizarlas (SEG-5, parámetro seguridad.clave_historial).
+- **Columnas clave:** `password_hash` (S).
+- **Relaciones:** `user_id` → `users`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S).
+
 #### `user_tokens`
 
 - **Propósito:** Tokens de un solo uso: invitación, clave temporal (OTP), restablecimiento, verificación y OTP de firma.
@@ -740,7 +754,7 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `system_roles`
 
 - **Propósito:** Catálogo de los roles de sistema que se copian a cada organización (y el rol de la consola SaaS).
-- **Columnas clave:** `code`, `name`, `description`, `realm`.
+- **Columnas clave:** `code`, `name`, `description`, `realm`, `mfa_required_default`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación solo la lee; único: `code`.
 
@@ -761,7 +775,7 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `roles`
 
 - **Propósito:** Roles de la organización: los de sistema (copiados de la plantilla) y los personalizados.
-- **Columnas clave:** `code`, `name`, `description`, `is_system`.
+- **Columnas clave:** `code`, `name`, `description`, `is_system`, `mfa_required`.
 - **Relaciones:** `system_role_code` → `system_roles.code` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
@@ -792,9 +806,30 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `audit_events`
 
 - **Propósito:** Auditoría de negocio de solo inserción (C-07): quién, qué, cuándo, desde dónde, valor anterior y nuevo.
-- **Columnas clave:** `actor_kind`, `action`, `entity_type`, `entity_id`, `before_data` (S), `after_data` (S), `changed_fields`, `reason`, `ip`, `user_agent`, `request_id`, `occurred_at`.
+- **Columnas clave:** `actor_kind`, `action`, `entity_type`, `entity_id`, `before_data` (S), `after_data` (S), `changed_fields`, `reason`, `ip`, `user_agent`, `request_id`, `occurred_at`, `chain_seq`, `prev_hash`, `row_hash`.
 - **Relaciones:** `actor_user_id` → `users` (opcional); `entity_type` + `entity_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **particionada por mes** sobre `occurred_at` (A-06): clave primaria (`id`, `occurred_at`), particiones creadas con `ensure_monthly_partitions()` y retención por descarte de particiones; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001); contiene columnas sensibles (S).
+
+#### `audit_chain_heads`
+
+- **Propósito:** Cabeza de la cadena de hash de la auditoría por organización (AUD-5): último número de secuencia y último hash. Solo la escribe el trigger.
+- **Columnas clave:** `last_seq`, `last_hash`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas.
+
+#### `audit_integrity_checks`
+
+- **Propósito:** Resultado de cada verificación programada de la cadena de hash de la auditoría (AUD-5).
+- **Columnas clave:** `status`, `checked_rows`, `archived_rows`, `unchained_rows`, `first_seq`, `last_seq`, `issues`, `started_at`, `finished_at`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; registro de solo anexado por convención (sin `updated_at`); se depura por retención.
+
+#### `audit_archives`
+
+- **Propósito:** Manifiesto del archivado en frío de la auditoría por mes (AUD-5): rango de la cadena, huella del archivo y plazo de consulta.
+- **Columnas clave:** `period_month`, `from_seq`, `to_seq`, `row_count`, `first_prev_hash`, `last_hash`, `storage_disk`, `storage_key`, `sha256`, `size_bytes`, `archived_at`, `purge_after`, `purged_at`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `period_month`.
 
 #### `activity_events`
 
@@ -904,7 +939,7 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 
 - **Propósito:** Tareas internas de RRHH con responsable, fecha, prioridad y vínculo a un proceso.
 - **Columnas clave:** `title`, `description`, `subject_type`, `subject_id`, `due_on`, `priority`, `status`, `completed_at`.
-- **Relaciones:** `assignee_user_id` → `users` (opcional); `created_by_user_id` → `users` (opcional); `related_employment_id` → `employments` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
+- **Relaciones:** `assignee_user_id` → `users` (opcional); `assignee_role_id` → `roles` (opcional); `created_by_user_id` → `users` (opcional); `related_employment_id` → `employments` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
 

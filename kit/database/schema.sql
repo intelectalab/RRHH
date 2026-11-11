@@ -1576,6 +1576,9 @@ CREATE TABLE audit_events (
   user_agent text,
   request_id uuid,
   occurred_at timestamptz NOT NULL DEFAULT now(),
+  chain_seq bigint,
+  prev_hash text,
+  row_hash text,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT pk_audit_events PRIMARY KEY (id, occurred_at),
   CONSTRAINT uq_audit_events_tenant_id UNIQUE (tenant_id, id, occurred_at),
@@ -1585,6 +1588,7 @@ COMMENT ON TABLE audit_events IS 'Auditoría de negocio de solo inserción (C-07
 CREATE INDEX ix_audit_events_actor_user_id ON audit_events (tenant_id, actor_user_id);
 CREATE INDEX ix_audit_events_entity_type_entity_id ON audit_events (tenant_id, entity_type, entity_id);
 CREATE INDEX ix_audit_events_occurred_at ON audit_events (tenant_id, occurred_at);
+CREATE INDEX ix_audit_events_chain_seq ON audit_events (tenant_id, chain_seq);
 CREATE TABLE audit_events_default PARTITION OF audit_events DEFAULT;
 COMMENT ON TABLE audit_events_default IS 'Partición de respaldo de audit_events: no debería recibir filas; si las recibe, falta crear el mes con ensure_monthly_partitions().';
 ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
@@ -1595,6 +1599,70 @@ ALTER TABLE audit_events_default FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON audit_events_default USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_audit_events_inmutable BEFORE UPDATE OR DELETE ON audit_events FOR EACH ROW EXECUTE FUNCTION reject_mutation();
 CREATE TRIGGER trg_audit_events_no_truncate BEFORE TRUNCATE ON audit_events FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
+
+CREATE TABLE audit_chain_heads (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  last_seq bigint NOT NULL DEFAULT 0,
+  last_hash text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_audit_chain_heads_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_audit_chain_heads_r1 UNIQUE (tenant_id)
+);
+COMMENT ON TABLE audit_chain_heads IS 'Cabeza de la cadena de hash de la auditoría por organización (AUD-5): último número de secuencia y último hash. Solo la escribe el trigger.';
+ALTER TABLE audit_chain_heads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_chain_heads FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON audit_chain_heads USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_audit_chain_heads_touch BEFORE UPDATE ON audit_chain_heads FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE audit_integrity_checks (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  status text NOT NULL CHECK (status IN ('ok','failed')),
+  checked_rows integer NOT NULL DEFAULT 0,
+  archived_rows integer NOT NULL DEFAULT 0,
+  unchained_rows integer NOT NULL DEFAULT 0,
+  first_seq bigint,
+  last_seq bigint,
+  issues jsonb,
+  started_at timestamptz NOT NULL,
+  finished_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_audit_integrity_checks_tenant_id UNIQUE (tenant_id, id)
+);
+COMMENT ON TABLE audit_integrity_checks IS 'Resultado de cada verificación programada de la cadena de hash de la auditoría (AUD-5).';
+CREATE INDEX ix_audit_integrity_checks_started_at ON audit_integrity_checks (tenant_id, started_at);
+ALTER TABLE audit_integrity_checks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_integrity_checks FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON audit_integrity_checks USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+
+CREATE TABLE audit_archives (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  period_month date NOT NULL,
+  from_seq bigint,
+  to_seq bigint,
+  row_count integer NOT NULL,
+  first_prev_hash text,
+  last_hash text,
+  storage_disk text NOT NULL,
+  storage_key text NOT NULL,
+  sha256 text NOT NULL,
+  size_bytes bigint,
+  archived_at timestamptz NOT NULL DEFAULT now(),
+  purge_after date NOT NULL,
+  purged_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_audit_archives_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_audit_archives_period_month UNIQUE (tenant_id, period_month)
+);
+COMMENT ON TABLE audit_archives IS 'Manifiesto del archivado en frío de la auditoría por mes (AUD-5): rango de la cadena, huella del archivo y plazo de consulta.';
+ALTER TABLE audit_archives ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_archives FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON audit_archives USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_audit_archives_touch BEFORE UPDATE ON audit_archives FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE activity_events (
   id uuid NOT NULL DEFAULT uuid_v7(),
@@ -17842,6 +17910,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('gastos.dias_para_rendir', 'expenses', 'Días para rendir', 'Días para rendir un anticipo tras el viaje.', 'integer', '10'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('gastos.descontar_no_rendido', 'expenses', 'Descontar lo no rendido', 'El saldo no rendido se descuenta por planilla, con autorización del trabajador.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('cumplimiento.aviso_vencimiento_dias', 'compliance', 'Aviso de obligación por vencer', 'Días de anticipación del semáforo en ámbar.', 'integer', '15'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('privacidad.retencion_actividad_dias', 'base', 'Conservación de la actividad de usuarios (días)', 'Días que se conserva la actividad de los usuarios (ingresos, vistas, descargas, búsquedas). No afecta la auditoría ni los logs técnicos.', 'integer', '365'::jsonb, ARRAY['organization'], NULL),
   ('privacidad.retencion_auditoria_anios', 'compliance', 'Conservación de auditoría (años)', 'Años de conservación de la auditoría de negocio.', 'integer', '5'::jsonb, ARRAY['organization'], NULL),
   ('analitica.tamano_minimo_segmento', 'analytics', 'Tamaño mínimo de segmento', 'No se muestran indicadores de segmentos más pequeños.', 'integer', '5'::jsonb, ARRAY['organization'], NULL),
   ('ia.habilitada', 'ai', 'Asistente de IA habilitado', 'Activa la capa de IA; requiere evaluación de impacto aprobada.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL),
@@ -18243,6 +18312,47 @@ CREATE INDEX ix_help_articles_search ON help_articles USING gin (search_vector);
 CREATE INDEX ix_kb_articles_search ON kb_articles USING gin (search_vector);
 
 -- ====================================================================================================
+-- CADENA DE HASH DE LA AUDITORÍA (AUD-5)
+-- Cada entrada de audit_events recibe, al insertarse, su número de secuencia por organización, el hash
+-- de la entrada anterior y su propio hash (sha256 de sus campos + el hash anterior). Alterar o borrar
+-- una entrada (aun saltándose el trigger de inalterabilidad) rompe la cadena y lo detecta
+-- audit:verify-integrity. La cabeza de la cadena solo la escribe el trigger (SECURITY DEFINER).
+-- ====================================================================================================
+CREATE OR REPLACE FUNCTION audit_event_hash(p_tenant uuid, p_seq bigint, p_prev text, p_id uuid, p_occurred timestamptz,
+  p_actor uuid, p_kind text, p_action text, p_entity_type text, p_entity_id uuid, p_before jsonb, p_after jsonb,
+  p_fields text[], p_reason text, p_ip inet, p_user_agent text, p_request uuid) RETURNS text
+LANGUAGE sql IMMUTABLE
+AS $$
+  SELECT encode(sha256(convert_to(concat_ws(chr(31),
+    p_tenant::text, p_seq::text, coalesce(p_prev, ''), p_id::text, ((extract(epoch FROM p_occurred) * 1000000)::bigint)::text,
+    coalesce(p_actor::text, ''), coalesce(p_kind, ''), coalesce(p_action, ''), coalesce(p_entity_type, ''), coalesce(p_entity_id::text, ''),
+    coalesce(p_before::text, ''), coalesce(p_after::text, ''), coalesce(array_to_string(p_fields, chr(30)), ''),
+    coalesce(p_reason, ''), coalesce(host(p_ip), ''), coalesce(p_user_agent, ''), coalesce(p_request::text, '')), 'UTF8')), 'hex')
+$$;
+COMMENT ON FUNCTION audit_event_hash(uuid, bigint, text, uuid, timestamptz, uuid, text, text, text, uuid, jsonb, jsonb, text[], text, inet, text, uuid) IS 'Hash sha256 de una entrada de auditoría encadenada a la anterior (AUD-5).';
+
+CREATE OR REPLACE FUNCTION audit_events_chain() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_seq bigint;
+  v_prev text;
+BEGIN
+  INSERT INTO audit_chain_heads (tenant_id, last_seq) VALUES (NEW.tenant_id, 0) ON CONFLICT (tenant_id) DO NOTHING;
+  SELECT last_seq, last_hash INTO v_seq, v_prev FROM audit_chain_heads WHERE tenant_id = NEW.tenant_id FOR UPDATE;
+  NEW.chain_seq := v_seq + 1;
+  NEW.prev_hash := v_prev;
+  NEW.row_hash := audit_event_hash(NEW.tenant_id, NEW.chain_seq, NEW.prev_hash, NEW.id, NEW.occurred_at, NEW.actor_user_id, NEW.actor_kind,
+    NEW.action, NEW.entity_type, NEW.entity_id, NEW.before_data, NEW.after_data, NEW.changed_fields, NEW.reason, NEW.ip, NEW.user_agent, NEW.request_id);
+  UPDATE audit_chain_heads SET last_seq = NEW.chain_seq, last_hash = NEW.row_hash, updated_at = now() WHERE tenant_id = NEW.tenant_id;
+  RETURN NEW;
+END
+$$;
+COMMENT ON FUNCTION audit_events_chain() IS 'Encadena cada entrada nueva de audit_events (secuencia, hash anterior y hash propio) y avanza la cabeza de la organización.';
+REVOKE ALL ON FUNCTION audit_events_chain() FROM PUBLIC;
+CREATE TRIGGER trg_audit_events_chain BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION audit_events_chain();
+
+-- ====================================================================================================
 -- PRIVILEGIOS
 -- ====================================================================================================
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
@@ -18263,6 +18373,10 @@ REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
 REVOKE UPDATE, DELETE ON ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
+-- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
+-- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
+REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;
+REVOKE UPDATE, DELETE ON audit_archives, audit_integrity_checks FROM gestia_app;
 
 -- Tablas de registro particionadas por mes (decisión A-06): se crean el mes en curso y los tres
 -- siguientes. Las particiones no tienen privilegios propios: solo se accede por la tabla madre.

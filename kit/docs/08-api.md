@@ -287,8 +287,14 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/audit-logs` | `audit.logs.view` | 0 |
 | GET | `/audit-logs/{id}` | `audit.logs.view` | 0 |
 | GET | `/sensitive-access-logs` | `audit.sensitive_access.view` | 0 |
+| GET | `/activity-events` | `audit.activity.view` | 0 |
+| GET | `/audit-integrity-checks` | `audit.logs.view` | 0 |
+| GET | `/audit-archives` | `audit.logs.view` | 0 |
+| GET | `/audit-archives/{id}` | `audit.logs.view` | 0 |
 | GET | `/trash` | `audit.trash.view` | 0 |
 | POST | `/trash/{id}/restore` | `audit.trash.restore` | 0 |
+| GET | `/audit-archives/{id}/entries` | `audit.logs.view` | 0 |
+| GET | `/audit-retention` | `audit.logs.view` | 0 |
 
 **WFL · Aprobaciones y workflows**
 
