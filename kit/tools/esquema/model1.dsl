@@ -268,16 +268,17 @@
   status enum(pending,in_progress,done,cancelled)=pending ; completed_at
 
 #E NOT | Notificaciones y mensajería
-@notification_templates soft | Plantillas de mensaje por código, canal e idioma.
+@notification_templates soft | Plantillas de mensaje por código, canal e idioma. Las de WhatsApp requieren aprobación del proveedor (approval_status) antes de usarse; sin aprobación el mensaje sale por SMS.
   code ; channel enum(in_app,email,push,whatsapp,sms)! ; locale text=es ; subject ; body text! ; variables j ; is_system
+  approval_status enum(not_required,draft,pending,approved,rejected)=not_required ; provider_template_ref ; approval_requested_at ; approval_decided_at ; rejection_reason
   uniq code, channel, locale
 @notifications main | Notificación dentro de la aplicación para un usuario, enlazada al registro que la origina.
   recipient_user_id -> users ; category text! ; title ; body ; subject_type ; subject_id uuid ; action_url
   priority enum(low,normal,high)=normal ; read_at ; archived_at ; idx recipient_user_id, read_at
-@notification_deliveries | Envío de una notificación por un canal externo (correo, push, WhatsApp, SMS) con su estado.
+@notification_deliveries | Envío de una notificación o de un mensaje directo (código de ingreso, activación) por un canal externo (correo, push, WhatsApp, SMS) con su estado; idempotency_key evita enviar dos veces el mismo mensaje.
   notification_id ?-> notifications ; channel enum(email,push,whatsapp,sms)! ; recipient_address_enc
   status enum(queued,sent,delivered,failed,bounced,suppressed)=queued ; provider ; provider_message_id ; attempts integer=0
-  sent_at ; delivered_at ; error
+  sent_at ; delivered_at ; error ; purpose ; template_code ; fallback_from ; idempotency_key ; uniq idempotency_key
 @notification_preferences | Preferencias del usuario por categoría y canal.
   user_id -> users ; category text! ; channel enum(in_app,email,push,whatsapp,sms)! ; enabled bool=t ; uniq user_id, category, channel
 @push_devices | Dispositivos registrados para notificaciones push.

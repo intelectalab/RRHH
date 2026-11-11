@@ -7150,7 +7150,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Registro de entregas por canal externo con estado y error */
+        /** Registro de entregas por canal externo (correo, SMS, WhatsApp) con estado, propósito, canal de respaldo y error */
         get: operations["getNotificationDeliveries"];
         put?: never;
         post?: never;
@@ -7212,6 +7212,23 @@ export interface paths {
         head?: never;
         /** Actualizar NotificationTemplate */
         patch: operations["patchNotificationTemplatesId"];
+        trace?: never;
+    };
+    "/notification-templates/{id}/request-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enviar una plantilla de WhatsApp a aprobación del proveedor (NOT-5); 409 si su estado no lo permite */
+        post: operations["postNotificationTemplatesIdRequestApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/notifications": {
@@ -17167,6 +17184,11 @@ export interface components {
             customized?: boolean | null;
             default_subject?: string | null;
             default_body?: string | null;
+            /** @enum {string|null} */
+            approval_status?: "not_required" | "draft" | "pending" | "approved" | "rejected" | null;
+            rejection_reason?: string | null;
+            /** Format: date-time */
+            approval_decided_at?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17184,6 +17206,11 @@ export interface components {
             customized?: boolean | null;
             default_subject?: string | null;
             default_body?: string | null;
+            /** @enum {string|null} */
+            approval_status?: "not_required" | "draft" | "pending" | "approved" | "rejected" | null;
+            rejection_reason?: string | null;
+            /** Format: date-time */
+            approval_decided_at?: string | null;
         };
         Objective: {
             /** @description Identificador opaco */
@@ -37798,6 +37825,42 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postNotificationTemplatesIdRequestApproval: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getNotifications: {

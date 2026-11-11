@@ -62,4 +62,17 @@ return [
     'mandatory_in_app' => 'This notification is mandatory and cannot be turned off in the app.',
     'template_exists' => 'A template for that notification, channel and language already exists.',
     'unsupported_channel' => 'That channel is not available yet.',
+    // NOT-5 · Mensajes directos por SMS y WhatsApp (variables entre llaves).
+    'messages' => [
+        'identity.login_code' => [
+            'sms' => 'GestiaHR: your sign-in code is {code}. It expires in {minutes} minutes. Do not share it.',
+            'whatsapp' => 'GestiaHR: your sign-in code is {code}. It expires in {minutes} minutes. Do not share it.',
+        ],
+        'identity.activation_code' => [
+            'sms' => 'GestiaHR: your account activation code is {code}. It expires in {hours} hours. Sign in with your ID document and this code.',
+            'whatsapp' => 'GestiaHR: your account activation code is {code}. It expires in {hours} hours. Sign in with your ID document and this code.',
+        ],
+    ],
+    'approval_only_whatsapp' => 'Only WhatsApp templates need the provider\'s approval.',
+    'approval_reset' => 'The template changed and must be approved again before it is used on WhatsApp.',
 ];

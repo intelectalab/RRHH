@@ -7,4 +7,11 @@ return [
      * al probar a mano; las pruebas automáticas siguen con los falsos en memoria.
      */
     'dev_inbox' => env('INTEGRATIONS_DEV_INBOX'),
+
+    /*
+     * NOT-5 · Proveedores de SMS/WhatsApp disponibles: nombre (message_channels.provider) → clase que
+     * implementa App\Shared\Integrations\Ports\MessagingPort. Agregar un proveedor es registrar aquí su
+     * adaptador; los módulos que envían mensajes no cambian.
+     */
+    'messaging_providers' => [],
 ];

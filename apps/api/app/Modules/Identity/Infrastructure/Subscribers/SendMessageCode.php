@@ -11,8 +11,8 @@ use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Facades\Crypt;
 
 /**
- * SEG-2 · Envía el código de ingreso o de activación por el puerto de mensajería (SMS/WhatsApp)
- * o de correo, según el canal (regla 8 de CLAUDE.md).
+ * SEG-2 · Envía por correo el código de ingreso o de activación (regla 8 de CLAUDE.md). Por SMS o
+ * WhatsApp el código ya no pasa por aquí: va por la capa de mensajería (NOT-5, MessageSender).
  */
 final class SendMessageCode implements DomainEventSubscriber
 {
@@ -33,10 +33,11 @@ final class SendMessageCode implements DomainEventSubscriber
         TenancyScope::runAs($event->tenant_id, function () use ($event): void {
             /** @var array<string, mixed> $payload */
             $payload = $event->payload;
-            $channel = (string) $payload['channel'];
+            if ((string) $payload['channel'] !== 'email') {
+                return;
+            }
             /** @var UserIdentity|null $identity */
-            $identity = UserIdentity::query()->where('user_id', (string) $payload['user_id'])
-                ->where('kind', $channel === 'email' ? 'email' : 'phone')->first();
+            $identity = UserIdentity::query()->where('user_id', (string) $payload['user_id'])->where('kind', 'email')->first();
             if ($identity === null) {
                 return;
             }
@@ -47,12 +48,7 @@ final class SendMessageCode implements DomainEventSubscriber
                 'hours' => intdiv((int) $payload['minutes'], 60),
             ]);
 
-            if ($channel === 'email') {
-                $this->integrations->email()->send($identity->identifier(), (string) trans('identity.codes.email_subject'), $text);
-
-                return;
-            }
-            $this->integrations->messaging()->sendMessage('+'.$identity->identifier(), $text);
+            $this->integrations->email()->send($identity->identifier(), (string) trans('identity.codes.email_subject'), $text);
         });
     }
 }

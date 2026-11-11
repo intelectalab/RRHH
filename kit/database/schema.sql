@@ -2108,12 +2108,17 @@ CREATE TABLE notification_templates (
   body text NOT NULL,
   variables jsonb,
   is_system boolean NOT NULL DEFAULT false,
+  approval_status text NOT NULL DEFAULT 'not_required' CHECK (approval_status IN ('not_required','draft','pending','approved','rejected')),
+  provider_template_ref text,
+  approval_requested_at timestamptz,
+  approval_decided_at timestamptz,
+  rejection_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   CONSTRAINT uq_notification_templates_tenant_id UNIQUE (tenant_id, id)
 );
-COMMENT ON TABLE notification_templates IS 'Plantillas de mensaje por código, canal e idioma.';
+COMMENT ON TABLE notification_templates IS 'Plantillas de mensaje por código, canal e idioma. Las de WhatsApp requieren aprobación del proveedor (approval_status) antes de usarse; sin aprobación el mensaje sale por SMS.';
 CREATE UNIQUE INDEX uq_notification_templates_code_channel_locale ON notification_templates (tenant_id, code, channel, locale) WHERE deleted_at IS NULL;
 ALTER TABLE notification_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notification_templates FORCE ROW LEVEL SECURITY;
@@ -2158,12 +2163,17 @@ CREATE TABLE notification_deliveries (
   sent_at timestamptz,
   delivered_at timestamptz,
   error text,
+  purpose text,
+  template_code text,
+  fallback_from text,
+  idempotency_key text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_notification_deliveries_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_notification_deliveries_idempotency_key UNIQUE (tenant_id, idempotency_key),
   CONSTRAINT fk_notification_deliveries_notification_id FOREIGN KEY (tenant_id, notification_id) REFERENCES notifications (tenant_id, id)
 );
-COMMENT ON TABLE notification_deliveries IS 'Envío de una notificación por un canal externo (correo, push, WhatsApp, SMS) con su estado.';
+COMMENT ON TABLE notification_deliveries IS 'Envío de una notificación o de un mensaje directo (código de ingreso, activación) por un canal externo (correo, push, WhatsApp, SMS) con su estado; idempotency_key evita enviar dos veces el mismo mensaje.';
 CREATE INDEX ix_notification_deliveries_notification_id ON notification_deliveries (tenant_id, notification_id);
 ALTER TABLE notification_deliveries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notification_deliveries FORCE ROW LEVEL SECURITY;

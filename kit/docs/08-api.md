@@ -338,6 +338,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/notification-preferences` | sesión | 0 |
 | PUT | `/notification-preferences` | sesión | 0 |
 | GET | `/notification-deliveries` | `notifications.deliveries.view` | 0 |
+| POST | `/notification-templates/{id}/request-approval` | `notifications.templates.update` | 0 |
 
 **CFG · Configuración y campos personalizados**
 

@@ -604,7 +604,9 @@
     "task_overdue": "Overdue task",
     "account_security": "Account security",
     "automation_notice": "Automation notice",
-    "automation_paused": "Automation paused"
+    "automation_paused": "Automation paused",
+    "identity_login_code": "Sign-in code",
+    "identity_activation_code": "Account activation code"
   },
   "nchannel": {
     "in_app": "In the app",
@@ -689,7 +691,16 @@
     "sample_title": "Review Carlos's contract",
     "sample_reason": "Month-end close",
     "sample_event": "Your password was changed.",
-    "sample_type": "vacation"
+    "sample_type": "vacation",
+    "approval_draft": "Not approved",
+    "approval_pending": "Approval pending",
+    "approval_approved": "Approved by WhatsApp",
+    "approval_rejected": "Rejected",
+    "approval_not_required": "No approval needed",
+    "request_approval": "Request approval",
+    "approval_requested": "Template sent to WhatsApp for approval.",
+    "approval_edit_note": "If you change the text, the template goes back to draft and must be approved again. Meanwhile, messages go out by SMS.",
+    "d_fallback": "Sent by SMS: the {from} template was not approved"
   },
   "cfg": {
     "title": "Settings",

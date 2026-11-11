@@ -79,7 +79,7 @@ RES = [
     ("WFL", 0, "workflow.workflows", "/workflows", "Workflow", "name:s trigger_event:s conditions:j actions:ao status:e(draft|active|paused|retired) allowed_actions:a last_run_at?:dt version:i", "LCRU", "activate pause retire"),
     ("WFL", 0, "workflow.runs", "/workflow-runs", "WorkflowRun", "workflow_id:id workflow_name?:s trigger_event_id?:id event_type?:s status:e(running|succeeded|failed|skipped|queued|waiting|cancelled) attempts:i next_retry_at?:dt actions:ao allowed_actions:a started_at:dt finished_at?:dt error?:s", "LR", "retry cancel"),
     ("WFL", 0, "workflow.tasks", "/tasks", "Task", "title:s description?:s assignee_user_id?:id assignee_role_id?:id assignee_name?:s created_by_name?:s due_on?:d priority:e(low|normal|high|urgent) status:e(pending|in_progress|done|cancelled) overdue?:b related_type?:s related_id?:id completed_at?:dt allowed_actions?:a custom_fields?:j", "LCRU", "complete cancel"),
-    ("NOT", 0, "notifications.templates", "/notification-templates", "NotificationTemplate", "key:s channel:e(in_app|email|push|whatsapp|sms) locale:s subject?:s body:s variables?:a mandatory?:b customized?:b default_subject?:s default_body?:s", "LCRU", ""),
+    ("NOT", 0, "notifications.templates", "/notification-templates", "NotificationTemplate", "key:s channel:e(in_app|email|push|whatsapp|sms) locale:s subject?:s body:s variables?:a mandatory?:b customized?:b default_subject?:s default_body?:s approval_status?:e(not_required|draft|pending|approved|rejected) rejection_reason?:s approval_decided_at?:dt", "LCRU", ""),
     ("CFG", 0, "settings.custom_fields", "/custom-fields", "CustomField", "entity:s key:s label:s type:e(text|number|date|select|multiselect|checkbox|user|file|url|currency|percent) options?:a required:b sensitive:b permission?:s section?:s sort_order?:i values_count?:i", "LCRUD", ""),
     ("CFG", 0, "settings.exchange_rates", "/exchange-rates", "ExchangeRate", "from_currency:s to_currency:s rate:s valid_on:d source:s", "LC", ""),
     ("CFG", 0, "settings.saved_views", "/saved-views", "SavedView", "resource:s name:s filters:j columns:a sort:s shared:b", "LCRUD", ""),
@@ -296,7 +296,8 @@ EXTRA = [
     ("WFL", 0, "post", "/approval-requests/bulk-approve", "workflow.approval_requests.approve", "Aprobar en masa solicitudes de tipos marcados como seguros (RN-WFL-12)", False),
     ("WFL", 0, "get", "/workflows/catalog", "workflow.workflows.view", "Catálogo para armar reglas: eventos disparadores con sus campos, operadores de condición y la lista cerrada de acciones (WFL-5)", False),
     ("WFL", 0, "post", "/workflows/{id}/test", "workflow.workflows.update", "Probar una regla en seco con datos de ejemplo: si se cumple y qué haría cada acción, sin efectos (WFL-5)", False),
-    ("NOT", 0, "get", "/notification-deliveries", "notifications.deliveries.view", "Registro de entregas por canal externo con estado y error", False),
+    ("NOT", 0, "get", "/notification-deliveries", "notifications.deliveries.view", "Registro de entregas por canal externo (correo, SMS, WhatsApp) con estado, propósito, canal de respaldo y error", False),
+    ("NOT", 0, "post", "/notification-templates/{id}/request-approval", "notifications.templates.update", "Enviar una plantilla de WhatsApp a aprobación del proveedor (NOT-5); 409 si su estado no lo permite", False),
     ("CFG", 0, "get", "/settings", "settings.parameters.view", "Secciones de parámetros de los módulos contratados (para el centro de configuración y su buscador)", False),
     ("CFG", 0, "get", "/settings/{group}", "settings.parameters.view", "Parámetros de una sección con valor vigente, origen (empresa, organización o por defecto) e historial; ?legal_entity_id= y ?as_of=", False),
     ("CFG", 0, "put", "/settings/{group}", "settings.parameters.update", "Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa empresa y value null vuelve a heredar", False),
@@ -392,6 +393,8 @@ TYPES = {
     "ao": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
+# Rutas extra que son transiciones de estado (responden 409 invalid_transition).
+STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
 CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
 READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
@@ -561,6 +564,9 @@ def build():
     for epic, phase, method, path, perm, summary, public in EXTRA:
         op = {"summary": summary}
         res = {"201": ok(ref("schemas/GenericEnvelope"), "Creado")} if (method, path) in CREATED else {"200": ok(ref("schemas/GenericEnvelope"))}
+        if (method, path) in STATE_ACTIONS:
+            # Transición de estado: 409 invalid_transition si el estado actual no la admite (regla 3).
+            res.update(errs("409"))
         if path.endswith("/download"):
             # Descarga directa del archivo (no es JSON).
             res["200"] = {"description": "Archivo", "content": {"text/csv": {"schema": {"type": "string"}}}}

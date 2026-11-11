@@ -69,6 +69,12 @@ final class TemplateController
         return response()->json(['data' => $this->templates->present($this->templates->update($template, $data)->refresh())]);
     }
 
+    /** NOT-5 · Envía una plantilla de WhatsApp a aprobación del proveedor (409 si el estado no lo permite). */
+    public function requestApproval(string $id): JsonResponse
+    {
+        return response()->json(['data' => $this->templates->present($this->templates->requestApproval($this->find($id))->refresh())]);
+    }
+
     private function find(string $id): NotificationTemplate
     {
         abort_unless(preg_match('/^[0-9a-f-]{36}$/i', $id) === 1, 404);

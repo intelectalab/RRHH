@@ -23,6 +23,10 @@ use Illuminate\Support\Carbon;
  * @property int $attempts
  * @property Carbon|null $sent_at
  * @property string|null $error
+ * @property string|null $purpose
+ * @property string|null $template_code
+ * @property string|null $fallback_from
+ * @property string|null $idempotency_key
  * @property Carbon|null $created_at
  */
 class NotificationDelivery extends Model

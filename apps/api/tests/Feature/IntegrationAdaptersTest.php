@@ -14,6 +14,7 @@ use App\Shared\Integrations\Ports\BiometricPort;
 use App\Shared\Integrations\Ports\EmailPort;
 use App\Shared\Integrations\Ports\MessagingPort;
 use App\Shared\Integrations\Ports\SignaturePort;
+use App\Shared\Messaging\OutboundMessage;
 
 beforeEach(function () {
     $this->recorder = new IntegrationCallRecorder;
@@ -81,9 +82,12 @@ test('fake signature adapter creates request and checks status', function () {
 test('fake messaging adapter sends whatsapp message', function () {
     $adapter = new FakeMessagingAdapter($this->recorder);
 
-    $messageId = $adapter->sendMessage('+51987654321', 'Su recibo de pago está disponible.');
+    $message = new OutboundMessage('whatsapp', '+51987654321', 'Su recibo de pago está disponible.', 'ref-1');
+    $messageId = $adapter->send($message);
 
-    expect($messageId)->toStartWith('msg_');
+    expect($messageId)->toStartWith('msg_')
+        // La misma referencia no se envía dos veces (idempotencia del lado del proveedor).
+        ->and($adapter->send($message))->toBe($messageId);
 
     $messages = $adapter->getMessages();
     expect($messages)->toHaveCount(1)

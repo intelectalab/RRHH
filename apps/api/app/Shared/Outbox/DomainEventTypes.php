@@ -77,6 +77,15 @@ final class DomainEventTypes
     // Notificaciones (NOT)
     public const NOTIFICATION_DELIVERY_REQUESTED = 'notification.delivery_requested.v1';
 
+    /** NOT-5: mensaje directo por SMS/WhatsApp (variables cifradas: pueden llevar un código). */
+    public const MESSAGE_SEND_REQUESTED = 'message.send_requested.v1';
+
+    /** NOT-5: plantilla de WhatsApp enviada a aprobación del proveedor. */
+    public const MESSAGE_TEMPLATE_APPROVAL_REQUESTED = 'message.template_approval_requested.v1';
+
+    /** NOT-5: mensaje entrante de un colaborador por SMS/WhatsApp (lo consume M-WHA). */
+    public const MESSAGE_RECEIVED = 'message.received.v1';
+
     public const TASK_OVERDUE = 'task.overdue.v1';
 
     // Auditoría (AUD-5)
@@ -226,6 +235,21 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['delivery_id', 'category', 'locale'],
             'description' => 'Entrega de un aviso por canal externo (correo); la dirección va cifrada en la entrega, no en el evento',
+        ],
+        self::MESSAGE_SEND_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['delivery_id', 'template_code', 'locale', 'variables_enc'],
+            'description' => 'Mensaje directo por SMS/WhatsApp; el número va cifrado en la entrega y las variables cifradas en el evento',
+        ],
+        self::MESSAGE_TEMPLATE_APPROVAL_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['template_id'],
+            'description' => 'Plantilla de WhatsApp enviada a aprobación del proveedor',
+        ],
+        self::MESSAGE_RECEIVED => [
+            'version' => 1,
+            'required_fields' => ['channel', 'from_enc', 'body_enc', 'provider', 'provider_message_id'],
+            'description' => 'Mensaje entrante por SMS/WhatsApp (remitente y texto cifrados)',
         ],
         self::AUDIT_INTEGRITY_FAILED => [
             'version' => 1,

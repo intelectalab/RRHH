@@ -13,12 +13,16 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { categoryLabel } from './shared'
 
-type Template = { id: string; key: string; channel: string; locale: string; subject: string | null; body: string; variables: string[]; mandatory: boolean; customized: boolean; default_subject: string; default_body: string }
-type Delivery = { id: string; channel: string; recipient: string | null; recipient_name: string | null; category: string | null; title: string | null; status: string; provider: string | null; attempts: number; error: string | null; sent_at: string | null; created_at: string | null }
+type Template = { id: string; key: string; channel: string; locale: string; subject: string | null; body: string; variables: string[]; mandatory: boolean; customized: boolean; default_subject: string; default_body: string; approval_status?: Approval; rejection_reason?: string | null }
+type Approval = 'not_required' | 'draft' | 'pending' | 'approved' | 'rejected'
+type Delivery = { id: string; channel: string; recipient: string | null; recipient_name: string | null; category: string | null; title: string | null; purpose?: string | null; template_code?: string | null; fallback_from?: string | null; status: string; provider: string | null; attempts: number; error: string | null; sent_at: string | null; created_at: string | null }
 
 const TONE: Record<string, string> = { sent: 'ok', delivered: 'ok', queued: 'wa', failed: 'er', bounced: 'er', suppressed: 'gr' }
+const APPROVAL_TONE: Record<Approval, string> = { not_required: 'gr', draft: 'gr', pending: 'wa', approved: 'ok', rejected: 'er' }
+/** Canales directos (NOT-5): sin asunto, texto corto. */
+const SHORT = ['sms', 'whatsapp']
 
-/** Configuración → Mensajes (NOT-1): plantillas por tipo, canal e idioma, y registro de envíos. */
+/** Configuración → Mensajes (NOT-1, NOT-5): plantillas por tipo, canal e idioma (las de WhatsApp con aprobación del proveedor) y registro de envíos. */
 export function MessagesScreen() {
   const { t, locale } = useT()
   const { can } = useSession()
@@ -49,6 +53,20 @@ export function MessagesScreen() {
   useEffect(() => { void load() }, [load])
 
   const fake = deliveries?.some((d) => d.provider?.startsWith('fake')) ?? false
+  const [requesting, setRequesting] = useState<string | null>(null)
+
+  async function requestApproval(r: Template) {
+    setRequesting(r.id)
+    try {
+      await api.post(`/notification-templates/${r.id}/request-approval`, {})
+      toast(t('msgs.approval_requested'))
+      await load()
+    } catch (err) {
+      toast(formErrors(err, t).general ?? t('common.load_error'))
+    } finally {
+      setRequesting(null)
+    }
+  }
 
   return (
     <>
@@ -66,7 +84,7 @@ export function MessagesScreen() {
             <>
               <select className="form-select" style={{ width: 'auto' }} aria-label={t('msgs.col_channel')} value={channel} onChange={(e) => setChannel(e.target.value)}>
                 <option value="">{t('msgs.all_channels')}</option>
-                {['in_app', 'email'].map((c) => <option key={c} value={c}>{t(`nchannel.${c}`)}</option>)}
+                {['in_app', 'email', 'sms', 'whatsapp'].map((c) => <option key={c} value={c}>{t(`nchannel.${c}`)}</option>)}
               </select>
               <select className="form-select" style={{ width: 'auto' }} aria-label={t('msgs.col_locale')} value={lang} onChange={(e) => setLang(e.target.value)}>
                 <option value="">{t('msgs.all_locales')}</option>
@@ -89,8 +107,19 @@ export function MessagesScreen() {
                       <td><b>{categoryLabel(t, r.key)}</b>{r.mandatory && <span className="tag pe" style={{ marginLeft: 6 }}>{t('msgs.mandatory')}</span>}</td>
                       <td>{t(`nchannel.${r.channel}`)}</td>
                       <td>{t(`msgs.locale_${r.locale}`)}</td>
-                      <td>{r.subject}<span className="sub2">{r.customized ? t('msgs.customized') : t('msgs.default')}</span></td>
-                      <td className="text-end">{can('notifications.templates.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('common.edit')}</button>}</td>
+                      <td>
+                        {SHORT.includes(r.channel) ? <span className="text-secondary">{r.body}</span> : r.subject}
+                        <span className="sub2">{r.customized ? t('msgs.customized') : t('msgs.default')}</span>
+                        {r.approval_status && r.approval_status !== 'not_required' && (
+                          <span className="sub2"><span className={`st ${APPROVAL_TONE[r.approval_status]}`}>{t(`msgs.approval_${r.approval_status}`)}</span>{r.rejection_reason && <> {r.rejection_reason}</>}</span>
+                        )}
+                      </td>
+                      <td className="text-end nowrap">
+                        {can('notifications.templates.update') && (r.approval_status === 'draft' || r.approval_status === 'rejected') && (
+                          <button type="button" className="btn btn-ter btn-sm" disabled={requesting === r.id} onClick={() => void requestApproval(r)}>{requesting === r.id && <span className="spin" aria-hidden="true" />}{t('msgs.request_approval')}</button>
+                        )}
+                        {can('notifications.templates.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('common.edit')}</button>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -106,7 +135,11 @@ export function MessagesScreen() {
                     <tr key={d.id}>
                       <td className="nowrap">{formatDateTime(locale, d.sent_at ?? d.created_at)}</td>
                       <td>{d.recipient_name ?? '—'}<span className="sub2">{t(`nchannel.${d.channel}`)} · {d.recipient}</span></td>
-                      <td>{d.category ? categoryLabel(t, d.category) : '—'}{d.title && <span className="sub2">{d.title}</span>}</td>
+                      <td>
+                        {d.category ? categoryLabel(t, d.category) : d.template_code ? categoryLabel(t, d.template_code) : '—'}
+                        {d.title && <span className="sub2">{d.title}</span>}
+                        {d.fallback_from && <span className="sub2">{t('msgs.d_fallback', { from: t(`nchannel.${d.fallback_from}`) })}</span>}
+                      </td>
                       <td>
                         <span className={`st ${TONE[d.status] ?? 'gr'}`}>{t(`msgs.d_status_${d.status}`)}</span>
                         {d.attempts > 1 && <span className="sub2">{t('msgs.d_attempts', { n: d.attempts })}</span>}
@@ -138,6 +171,7 @@ function TemplatePanel({ template, onClose, onSaved }: { template: Template; onC
   const sample = useMemo<Record<string, string>>(() => ({
     name: 'Carlos Mendoza', organization: 'Comercial Los Andes S.A.C.', link: 'https://demo.gestiahr.com/…', requester: t('msgs.sample_requester'),
     type: t('msgs.sample_type'), level: '1', title: t('msgs.sample_title'), due_on: '2026-11-20', reason: t('msgs.sample_reason'), event: t('msgs.sample_event'),
+    code: '482913', minutes: '10', hours: '72',
   }), [t])
   const fill = (s: string) => s.replace(/\{([a-z_]+)\}/g, (_, k: string) => sample[k] ?? `{${k}}`)
 
@@ -177,15 +211,16 @@ function TemplatePanel({ template, onClose, onSaved }: { template: Template; onC
     >
       <p className="small text-secondary">{t(`nchannel.${template.channel}`)} · {t(`msgs.locale_${template.locale}`)}</p>
       {template.channel !== 'in_app' && <div className="nota">{t('msgs.external_note')}</div>}
+      {template.channel === 'whatsapp' && template.approval_status === 'approved' && <div className="nota">{t('msgs.approval_edit_note')}</div>}
       <form id="plantilla" onSubmit={submit} noValidate>
-        <div className="mb-3">
+        {!SHORT.includes(template.channel) && <div className="mb-3">
           <label className="form-label" htmlFor="p-subject">{t('msgs.subject')}</label>
           <input id="p-subject" className={`form-control${errors.subject ? ' is-invalid' : ''}`} value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={300} />
           {errors.subject && <div className="invalid-feedback" role="alert">{errors.subject}</div>}
-        </div>
+        </div>}
         <div className="mb-3">
           <label className="form-label" htmlFor="p-body">{t('msgs.body')}</label>
-          <textarea id="p-body" ref={bodyRef} className={`form-control${errors.body ? ' is-invalid' : ''}`} rows={template.channel === 'in_app' ? 3 : 9} value={body} onChange={(e) => setBody(e.target.value)} aria-describedby="p-vars-h" />
+          <textarea id="p-body" ref={bodyRef} className={`form-control${errors.body ? ' is-invalid' : ''}`} rows={template.channel === 'in_app' || SHORT.includes(template.channel) ? 3 : 9} value={body} onChange={(e) => setBody(e.target.value)} aria-describedby="p-vars-h" />
           {errors.body && <div className="invalid-feedback" role="alert">{errors.body}</div>}
         </div>
         <span className="form-label">{t('msgs.variables')}</span>

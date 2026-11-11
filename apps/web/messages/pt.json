@@ -604,7 +604,9 @@
     "task_overdue": "Tarefa vencida",
     "account_security": "Segurança da conta",
     "automation_notice": "Aviso de uma automação",
-    "automation_paused": "Automação pausada"
+    "automation_paused": "Automação pausada",
+    "identity_login_code": "Código de acesso",
+    "identity_activation_code": "Código de ativação da conta"
   },
   "nchannel": {
     "in_app": "No aplicativo",
@@ -689,7 +691,16 @@
     "sample_title": "Revisar o contrato de Carlos",
     "sample_reason": "Fechamento do mês",
     "sample_event": "Sua senha foi alterada.",
-    "sample_type": "férias"
+    "sample_type": "férias",
+    "approval_draft": "Não aprovado",
+    "approval_pending": "Aprovação pendente",
+    "approval_approved": "Aprovado pelo WhatsApp",
+    "approval_rejected": "Rejeitado",
+    "approval_not_required": "Não requer aprovação",
+    "request_approval": "Pedir aprovação",
+    "approval_requested": "Modelo enviado para aprovação do WhatsApp.",
+    "approval_edit_note": "Se você mudar o texto, o modelo volta a rascunho e precisa ser aprovado de novo. Enquanto isso, as mensagens saem por SMS.",
+    "d_fallback": "Enviado por SMS: o modelo de {from} não estava aprovado"
   },
   "cfg": {
     "title": "Configurações",
