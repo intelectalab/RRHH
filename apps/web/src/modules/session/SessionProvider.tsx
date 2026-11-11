@@ -3,10 +3,11 @@
 import { useRouter } from 'next/navigation'
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
+import { setLocale } from '@/lib/locale'
 
 /** Respuesta de GET /me (el contrato la publica como sobre genérico). */
 export type SessionData = {
-  user: { id: string; display_name: string; locale: string | null; timezone: string | null; must_change_password: boolean; mfa_step?: 'ok' | 'verify' | 'enroll' }
+  user: { id: string; display_name: string; locale: string | null; locale_preference?: string | null; tenant_locale?: string | null; timezone: string | null; must_change_password: boolean; mfa_step?: 'ok' | 'verify' | 'enroll' }
   tenant: { id: string; slug: string; name: string; currency: string } | null
   roles: Array<{ id: string; code: string; name: string; system: boolean }>
   permissions: string[]
@@ -40,6 +41,8 @@ export function SessionProvider({ children, fallback }: { children: ReactNode; f
         router.replace('/verificacion')
         return
       }
+      // CFG-6: el idioma del usuario (o el de la organización) rige toda la interfaz.
+      if (res.data.user.locale) setLocale(res.data.user.locale)
       setSession(res.data)
     } catch (e) {
       if (e instanceof ApiRequestError && (e.status === 401 || e.status === 400)) {

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re, json, hashlib, os, sys
 import catalogos as C
+import maestros as M
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 KIT = os.path.abspath(os.path.join(HERE, '..', '..'))
@@ -270,6 +271,7 @@ def seeds():
     for code, mod, name, typ, dflt, scopes, desc, opts in C.PARAMS:
         rows.append(f"  ({q(code)}, {q(mod)}, {q(name)}, {q(desc)}, {q(typ)}, {q(json.dumps(dflt, ensure_ascii=False))}::jsonb, ARRAY[{','.join(q(s) for s in scopes)}], {('NULL' if opts is None else q(json.dumps(opts, ensure_ascii=False)) + '::jsonb')})")
     o.append(',\n'.join(rows) + ';')
+    o.append(M.seed_sql(q))  # CFG-10 · catálogos maestros
     return '\n'.join(o)
 
 def build_schema(phases, epics, tables):
@@ -343,6 +345,7 @@ def build_json():
         nota_planes='Planes y complementos iniciales (docs/01 §4.2, ADR 0008 y 0009). Sin montos: el precio, la moneda y la prueba se fijan en la consola. tope_colaboradores null = a la medida.',
         planes=[dict(codigo=k, nombre=n, tope_colaboradores=lim, modulos=mods, funciones=feats, publico=pub) for k, n, lim, mods, feats, pub in C.PLANS],
         complementos=[dict(codigo=k, nombre=n, producto=pr, modulos=mods) for k, n, pr, mods in C.ADDONS]))
+    write_json('catalogos_maestros.json', M.as_json())  # CFG-10: la API los carga con catalogs:import
 
 if __name__ == '__main__':
     phases, epics, tables = parse([os.path.join(HERE, f'model{i}.dsl') for i in (1, 2, 3)])

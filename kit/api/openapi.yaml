@@ -4851,6 +4851,152 @@ paths:
       x-phase: 5
       x-permission: careers.paths.archive
       operationId: postCareerPathsIdArchive
+  /catalog-items/{id}:
+    patch:
+      summary: Cambiar etiquetas u orden de un elemento propio (el código no cambia)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.catalogs.update
+      operationId: patchCatalogItemsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /catalog-items/{id}/archive:
+    post:
+      summary: 'Archivar un elemento propio: deja de ofrecerse para registros nuevos y no se elimina (RN-CFG-09)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.catalogs.update
+      operationId: postCatalogItemsIdArchive
+  /catalog-items/{id}/reactivate:
+    post:
+      summary: Volver a ofrecer un elemento archivado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.catalogs.update
+      operationId: postCatalogItemsIdReactivate
+  /catalogs:
+    get:
+      summary: 'Catálogos maestros y de la organización (CFG-10): código, nombre, si la organización puede extenderlo y cantidad
+        de elementos'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: getCatalogs
+    post:
+      summary: Crear un catálogo propio de la organización (tipos, motivos, categorías)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.catalogs.update
+      operationId: postCatalogs
   /catalogs/organization:
     get:
       summary: 'Catálogos para registrar empresas: países, monedas y regímenes laborales'
@@ -4868,6 +5014,65 @@ paths:
       x-phase: 0
       x-permission: org.legal_entities.view
       operationId: getCatalogsOrganization
+  /catalogs/{code}/items:
+    get:
+      summary: Elementos de un catálogo con código estable y código oficial, etiqueta en el idioma del usuario y vigencia;
+        ?as_of= y ?include_archived=1. Une los del catálogo maestro con los propios de la organización
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+        '404': *id005
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: getCatalogsCodeItems
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Agregar un elemento propio a un catálogo de la organización o a un catálogo maestro extensible (etiquetas por
+        idioma)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: settings.catalogs.update
+      operationId: postCatalogsCodeItems
   /channels/whatsapp/settings:
     get:
       summary: Configuración del canal WhatsApp
@@ -17199,6 +17404,33 @@ paths:
       x-phase: 3
       x-permission: authenticated
       operationId: getMePayslips
+  /me/preferences:
+    patch:
+      summary: 'Preferencias propias (CFG-6): idioma de la interfaz y de las notificaciones (es, en, pt); null vuelve al idioma
+        de la organización'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - CFG
+      x-phase: 0
+      x-permission: authenticated
+      operationId: patchMePreferences
   /me/sessions:
     get:
       summary: Sesiones abiertas del usuario actual (dispositivo, IP, último uso) y márgenes de sesión

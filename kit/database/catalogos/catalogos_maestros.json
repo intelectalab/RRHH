@@ -1,0 +1,4137 @@
+{
+  "nota": "CFG-10 · Catálogos maestros de la plataforma. Generado por tools/esquema/gen.py desde tools/esquema/maestros.py. La API los carga y actualiza con «php artisan catalogs:import» (sin desplegar): inserta los códigos nuevos y actualiza etiquetas, código oficial, verificación y vigencia de los existentes; nunca borra (RN-CFG-09).",
+  "catalogos": [
+    {
+      "code": "document_types",
+      "name": "Tipos de documento de identidad",
+      "description": "Tabla 3 de la Planilla Electrónica; el código interno coincide con person_documents.doc_type.",
+      "is_extensible": false,
+      "country_code": "PE",
+      "source": "docs/18 · Tabla 3 (anexo RM 286-2023-TR)",
+      "items": [
+        {
+          "code": "dni",
+          "statutory_code": "01",
+          "labels": {
+            "es": "Documento nacional de identidad",
+            "en": "National identity document",
+            "pt": "Documento nacional de identidade"
+          },
+          "parent_code": null,
+          "sort_order": 1,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ce",
+          "statutory_code": "04",
+          "labels": {
+            "es": "Carné de extranjería",
+            "en": "Foreigner identity card",
+            "pt": "Carteira de estrangeiro"
+          },
+          "parent_code": null,
+          "sort_order": 2,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ruc",
+          "statutory_code": "06",
+          "labels": {
+            "es": "Registro único de contribuyentes",
+            "en": "Taxpayer registration number",
+            "pt": "Registro único de contribuintes"
+          },
+          "parent_code": null,
+          "sort_order": 3,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "passport",
+          "statutory_code": "07",
+          "labels": {
+            "es": "Pasaporte",
+            "en": "Passport",
+            "pt": "Passaporte"
+          },
+          "parent_code": null,
+          "sort_order": 4,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "refugee_card",
+          "statutory_code": "09",
+          "labels": {
+            "es": "Carné de solicitante de refugio",
+            "en": "Refugee applicant card",
+            "pt": "Carteira de solicitante de refúgio"
+          },
+          "parent_code": null,
+          "sort_order": 5,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "birth_certificate",
+          "statutory_code": "11",
+          "labels": {
+            "es": "Partida de nacimiento",
+            "en": "Birth certificate",
+            "pt": "Certidão de nascimento"
+          },
+          "parent_code": null,
+          "sort_order": 6,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "foreign_affairs_id",
+          "statutory_code": "22",
+          "labels": {
+            "es": "Carné de identidad – Relaciones Exteriores",
+            "en": "Foreign Affairs identity card",
+            "pt": "Carteira de identidade – Relações Exteriores"
+          },
+          "parent_code": null,
+          "sort_order": 7,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ptp",
+          "statutory_code": "23",
+          "labels": {
+            "es": "Permiso temporal de permanencia",
+            "en": "Temporary stay permit",
+            "pt": "Permissão temporária de permanência"
+          },
+          "parent_code": null,
+          "sort_order": 8,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "foreign_id",
+          "statutory_code": "24",
+          "labels": {
+            "es": "Documento de identidad extranjero",
+            "en": "Foreign identity document",
+            "pt": "Documento de identidade estrangeiro"
+          },
+          "parent_code": null,
+          "sort_order": 9,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "cpp",
+          "statutory_code": "26",
+          "labels": {
+            "es": "Carné de permiso temporal de permanencia",
+            "en": "Temporary stay permit card",
+            "pt": "Carteira de permissão temporária de permanência"
+          },
+          "parent_code": null,
+          "sort_order": 10,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        }
+      ]
+    },
+    {
+      "code": "countries",
+      "name": "Países",
+      "description": "ISO 3166-1 alfa-2 con nombres en es, en y pt (CLDR). También sirve de lista de nacionalidades.",
+      "is_extensible": false,
+      "country_code": null,
+      "source": "ISO 3166-1 · CLDR",
+      "items": [
+        {
+          "code": "AD",
+          "statutory_code": "AD",
+          "labels": {
+            "es": "Andorra",
+            "en": "Andorra",
+            "pt": "Andorra"
+          },
+          "parent_code": null,
+          "sort_order": 1,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AE",
+          "statutory_code": "AE",
+          "labels": {
+            "es": "Emiratos Árabes Unidos",
+            "en": "United Arab Emirates",
+            "pt": "Emirados Árabes Unidos"
+          },
+          "parent_code": null,
+          "sort_order": 2,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AF",
+          "statutory_code": "AF",
+          "labels": {
+            "es": "Afganistán",
+            "en": "Afghanistan",
+            "pt": "Afeganistão"
+          },
+          "parent_code": null,
+          "sort_order": 3,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AG",
+          "statutory_code": "AG",
+          "labels": {
+            "es": "Antigua y Barbuda",
+            "en": "Antigua & Barbuda",
+            "pt": "Antígua e Barbuda"
+          },
+          "parent_code": null,
+          "sort_order": 4,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AI",
+          "statutory_code": "AI",
+          "labels": {
+            "es": "Anguila",
+            "en": "Anguilla",
+            "pt": "Anguila"
+          },
+          "parent_code": null,
+          "sort_order": 5,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AL",
+          "statutory_code": "AL",
+          "labels": {
+            "es": "Albania",
+            "en": "Albania",
+            "pt": "Albânia"
+          },
+          "parent_code": null,
+          "sort_order": 6,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AM",
+          "statutory_code": "AM",
+          "labels": {
+            "es": "Armenia",
+            "en": "Armenia",
+            "pt": "Armênia"
+          },
+          "parent_code": null,
+          "sort_order": 7,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AO",
+          "statutory_code": "AO",
+          "labels": {
+            "es": "Angola",
+            "en": "Angola",
+            "pt": "Angola"
+          },
+          "parent_code": null,
+          "sort_order": 8,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AQ",
+          "statutory_code": "AQ",
+          "labels": {
+            "es": "Antártida",
+            "en": "Antarctica",
+            "pt": "Antártida"
+          },
+          "parent_code": null,
+          "sort_order": 9,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AR",
+          "statutory_code": "AR",
+          "labels": {
+            "es": "Argentina",
+            "en": "Argentina",
+            "pt": "Argentina"
+          },
+          "parent_code": null,
+          "sort_order": 10,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AS",
+          "statutory_code": "AS",
+          "labels": {
+            "es": "Samoa Americana",
+            "en": "American Samoa",
+            "pt": "Samoa Americana"
+          },
+          "parent_code": null,
+          "sort_order": 11,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AT",
+          "statutory_code": "AT",
+          "labels": {
+            "es": "Austria",
+            "en": "Austria",
+            "pt": "Áustria"
+          },
+          "parent_code": null,
+          "sort_order": 12,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AU",
+          "statutory_code": "AU",
+          "labels": {
+            "es": "Australia",
+            "en": "Australia",
+            "pt": "Austrália"
+          },
+          "parent_code": null,
+          "sort_order": 13,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AW",
+          "statutory_code": "AW",
+          "labels": {
+            "es": "Aruba",
+            "en": "Aruba",
+            "pt": "Aruba"
+          },
+          "parent_code": null,
+          "sort_order": 14,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AX",
+          "statutory_code": "AX",
+          "labels": {
+            "es": "Islas Aland",
+            "en": "Åland Islands",
+            "pt": "Ilhas Aland"
+          },
+          "parent_code": null,
+          "sort_order": 15,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "AZ",
+          "statutory_code": "AZ",
+          "labels": {
+            "es": "Azerbaiyán",
+            "en": "Azerbaijan",
+            "pt": "Azerbaijão"
+          },
+          "parent_code": null,
+          "sort_order": 16,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BA",
+          "statutory_code": "BA",
+          "labels": {
+            "es": "Bosnia y Herzegovina",
+            "en": "Bosnia & Herzegovina",
+            "pt": "Bósnia e Herzegovina"
+          },
+          "parent_code": null,
+          "sort_order": 17,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BB",
+          "statutory_code": "BB",
+          "labels": {
+            "es": "Barbados",
+            "en": "Barbados",
+            "pt": "Barbados"
+          },
+          "parent_code": null,
+          "sort_order": 18,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BD",
+          "statutory_code": "BD",
+          "labels": {
+            "es": "Bangladés",
+            "en": "Bangladesh",
+            "pt": "Bangladesh"
+          },
+          "parent_code": null,
+          "sort_order": 19,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BE",
+          "statutory_code": "BE",
+          "labels": {
+            "es": "Bélgica",
+            "en": "Belgium",
+            "pt": "Bélgica"
+          },
+          "parent_code": null,
+          "sort_order": 20,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BF",
+          "statutory_code": "BF",
+          "labels": {
+            "es": "Burkina Faso",
+            "en": "Burkina Faso",
+            "pt": "Burquina Faso"
+          },
+          "parent_code": null,
+          "sort_order": 21,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BG",
+          "statutory_code": "BG",
+          "labels": {
+            "es": "Bulgaria",
+            "en": "Bulgaria",
+            "pt": "Bulgária"
+          },
+          "parent_code": null,
+          "sort_order": 22,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BH",
+          "statutory_code": "BH",
+          "labels": {
+            "es": "Baréin",
+            "en": "Bahrain",
+            "pt": "Barein"
+          },
+          "parent_code": null,
+          "sort_order": 23,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BI",
+          "statutory_code": "BI",
+          "labels": {
+            "es": "Burundi",
+            "en": "Burundi",
+            "pt": "Burundi"
+          },
+          "parent_code": null,
+          "sort_order": 24,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BJ",
+          "statutory_code": "BJ",
+          "labels": {
+            "es": "Benín",
+            "en": "Benin",
+            "pt": "Benin"
+          },
+          "parent_code": null,
+          "sort_order": 25,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BL",
+          "statutory_code": "BL",
+          "labels": {
+            "es": "San Bartolomé",
+            "en": "St. Barthélemy",
+            "pt": "São Bartolomeu"
+          },
+          "parent_code": null,
+          "sort_order": 26,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BM",
+          "statutory_code": "BM",
+          "labels": {
+            "es": "Bermudas",
+            "en": "Bermuda",
+            "pt": "Bermudas"
+          },
+          "parent_code": null,
+          "sort_order": 27,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BN",
+          "statutory_code": "BN",
+          "labels": {
+            "es": "Brunéi",
+            "en": "Brunei",
+            "pt": "Brunei"
+          },
+          "parent_code": null,
+          "sort_order": 28,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BO",
+          "statutory_code": "BO",
+          "labels": {
+            "es": "Bolivia",
+            "en": "Bolivia",
+            "pt": "Bolívia"
+          },
+          "parent_code": null,
+          "sort_order": 29,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BQ",
+          "statutory_code": "BQ",
+          "labels": {
+            "es": "Caribe neerlandés",
+            "en": "Caribbean Netherlands",
+            "pt": "Países Baixos Caribenhos"
+          },
+          "parent_code": null,
+          "sort_order": 30,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BR",
+          "statutory_code": "BR",
+          "labels": {
+            "es": "Brasil",
+            "en": "Brazil",
+            "pt": "Brasil"
+          },
+          "parent_code": null,
+          "sort_order": 31,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BS",
+          "statutory_code": "BS",
+          "labels": {
+            "es": "Bahamas",
+            "en": "Bahamas",
+            "pt": "Bahamas"
+          },
+          "parent_code": null,
+          "sort_order": 32,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BT",
+          "statutory_code": "BT",
+          "labels": {
+            "es": "Bután",
+            "en": "Bhutan",
+            "pt": "Butão"
+          },
+          "parent_code": null,
+          "sort_order": 33,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BV",
+          "statutory_code": "BV",
+          "labels": {
+            "es": "Isla Bouvet",
+            "en": "Bouvet Island",
+            "pt": "Ilha Bouvet"
+          },
+          "parent_code": null,
+          "sort_order": 34,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BW",
+          "statutory_code": "BW",
+          "labels": {
+            "es": "Botsuana",
+            "en": "Botswana",
+            "pt": "Botsuana"
+          },
+          "parent_code": null,
+          "sort_order": 35,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BY",
+          "statutory_code": "BY",
+          "labels": {
+            "es": "Bielorrusia",
+            "en": "Belarus",
+            "pt": "Bielorrússia"
+          },
+          "parent_code": null,
+          "sort_order": 36,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "BZ",
+          "statutory_code": "BZ",
+          "labels": {
+            "es": "Belice",
+            "en": "Belize",
+            "pt": "Belize"
+          },
+          "parent_code": null,
+          "sort_order": 37,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CA",
+          "statutory_code": "CA",
+          "labels": {
+            "es": "Canadá",
+            "en": "Canada",
+            "pt": "Canadá"
+          },
+          "parent_code": null,
+          "sort_order": 38,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CC",
+          "statutory_code": "CC",
+          "labels": {
+            "es": "Islas Cocos",
+            "en": "Cocos (Keeling) Islands",
+            "pt": "Ilhas Cocos (Keeling)"
+          },
+          "parent_code": null,
+          "sort_order": 39,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CD",
+          "statutory_code": "CD",
+          "labels": {
+            "es": "República Democrática del Congo",
+            "en": "Congo - Kinshasa",
+            "pt": "Congo - Kinshasa"
+          },
+          "parent_code": null,
+          "sort_order": 40,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CF",
+          "statutory_code": "CF",
+          "labels": {
+            "es": "República Centroafricana",
+            "en": "Central African Republic",
+            "pt": "República Centro-Africana"
+          },
+          "parent_code": null,
+          "sort_order": 41,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CG",
+          "statutory_code": "CG",
+          "labels": {
+            "es": "Congo",
+            "en": "Congo - Brazzaville",
+            "pt": "República do Congo"
+          },
+          "parent_code": null,
+          "sort_order": 42,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CH",
+          "statutory_code": "CH",
+          "labels": {
+            "es": "Suiza",
+            "en": "Switzerland",
+            "pt": "Suíça"
+          },
+          "parent_code": null,
+          "sort_order": 43,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CI",
+          "statutory_code": "CI",
+          "labels": {
+            "es": "Côte d’Ivoire",
+            "en": "Côte d’Ivoire",
+            "pt": "Costa do Marfim"
+          },
+          "parent_code": null,
+          "sort_order": 44,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CK",
+          "statutory_code": "CK",
+          "labels": {
+            "es": "Islas Cook",
+            "en": "Cook Islands",
+            "pt": "Ilhas Cook"
+          },
+          "parent_code": null,
+          "sort_order": 45,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CL",
+          "statutory_code": "CL",
+          "labels": {
+            "es": "Chile",
+            "en": "Chile",
+            "pt": "Chile"
+          },
+          "parent_code": null,
+          "sort_order": 46,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CM",
+          "statutory_code": "CM",
+          "labels": {
+            "es": "Camerún",
+            "en": "Cameroon",
+            "pt": "Camarões"
+          },
+          "parent_code": null,
+          "sort_order": 47,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CN",
+          "statutory_code": "CN",
+          "labels": {
+            "es": "China",
+            "en": "China",
+            "pt": "China"
+          },
+          "parent_code": null,
+          "sort_order": 48,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CO",
+          "statutory_code": "CO",
+          "labels": {
+            "es": "Colombia",
+            "en": "Colombia",
+            "pt": "Colômbia"
+          },
+          "parent_code": null,
+          "sort_order": 49,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CR",
+          "statutory_code": "CR",
+          "labels": {
+            "es": "Costa Rica",
+            "en": "Costa Rica",
+            "pt": "Costa Rica"
+          },
+          "parent_code": null,
+          "sort_order": 50,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CU",
+          "statutory_code": "CU",
+          "labels": {
+            "es": "Cuba",
+            "en": "Cuba",
+            "pt": "Cuba"
+          },
+          "parent_code": null,
+          "sort_order": 51,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CV",
+          "statutory_code": "CV",
+          "labels": {
+            "es": "Cabo Verde",
+            "en": "Cape Verde",
+            "pt": "Cabo Verde"
+          },
+          "parent_code": null,
+          "sort_order": 52,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CW",
+          "statutory_code": "CW",
+          "labels": {
+            "es": "Curazao",
+            "en": "Curaçao",
+            "pt": "Curaçao"
+          },
+          "parent_code": null,
+          "sort_order": 53,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CX",
+          "statutory_code": "CX",
+          "labels": {
+            "es": "Isla de Navidad",
+            "en": "Christmas Island",
+            "pt": "Ilha Christmas"
+          },
+          "parent_code": null,
+          "sort_order": 54,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CY",
+          "statutory_code": "CY",
+          "labels": {
+            "es": "Chipre",
+            "en": "Cyprus",
+            "pt": "Chipre"
+          },
+          "parent_code": null,
+          "sort_order": 55,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "CZ",
+          "statutory_code": "CZ",
+          "labels": {
+            "es": "Chequia",
+            "en": "Czechia",
+            "pt": "Tchéquia"
+          },
+          "parent_code": null,
+          "sort_order": 56,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DE",
+          "statutory_code": "DE",
+          "labels": {
+            "es": "Alemania",
+            "en": "Germany",
+            "pt": "Alemanha"
+          },
+          "parent_code": null,
+          "sort_order": 57,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DJ",
+          "statutory_code": "DJ",
+          "labels": {
+            "es": "Yibuti",
+            "en": "Djibouti",
+            "pt": "Djibuti"
+          },
+          "parent_code": null,
+          "sort_order": 58,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DK",
+          "statutory_code": "DK",
+          "labels": {
+            "es": "Dinamarca",
+            "en": "Denmark",
+            "pt": "Dinamarca"
+          },
+          "parent_code": null,
+          "sort_order": 59,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DM",
+          "statutory_code": "DM",
+          "labels": {
+            "es": "Dominica",
+            "en": "Dominica",
+            "pt": "Dominica"
+          },
+          "parent_code": null,
+          "sort_order": 60,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DO",
+          "statutory_code": "DO",
+          "labels": {
+            "es": "República Dominicana",
+            "en": "Dominican Republic",
+            "pt": "República Dominicana"
+          },
+          "parent_code": null,
+          "sort_order": 61,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "DZ",
+          "statutory_code": "DZ",
+          "labels": {
+            "es": "Argelia",
+            "en": "Algeria",
+            "pt": "Argélia"
+          },
+          "parent_code": null,
+          "sort_order": 62,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "EC",
+          "statutory_code": "EC",
+          "labels": {
+            "es": "Ecuador",
+            "en": "Ecuador",
+            "pt": "Equador"
+          },
+          "parent_code": null,
+          "sort_order": 63,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "EE",
+          "statutory_code": "EE",
+          "labels": {
+            "es": "Estonia",
+            "en": "Estonia",
+            "pt": "Estônia"
+          },
+          "parent_code": null,
+          "sort_order": 64,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "EG",
+          "statutory_code": "EG",
+          "labels": {
+            "es": "Egipto",
+            "en": "Egypt",
+            "pt": "Egito"
+          },
+          "parent_code": null,
+          "sort_order": 65,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "EH",
+          "statutory_code": "EH",
+          "labels": {
+            "es": "Sáhara Occidental",
+            "en": "Western Sahara",
+            "pt": "Saara Ocidental"
+          },
+          "parent_code": null,
+          "sort_order": 66,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ER",
+          "statutory_code": "ER",
+          "labels": {
+            "es": "Eritrea",
+            "en": "Eritrea",
+            "pt": "Eritreia"
+          },
+          "parent_code": null,
+          "sort_order": 67,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ES",
+          "statutory_code": "ES",
+          "labels": {
+            "es": "España",
+            "en": "Spain",
+            "pt": "Espanha"
+          },
+          "parent_code": null,
+          "sort_order": 68,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ET",
+          "statutory_code": "ET",
+          "labels": {
+            "es": "Etiopía",
+            "en": "Ethiopia",
+            "pt": "Etiópia"
+          },
+          "parent_code": null,
+          "sort_order": 69,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FI",
+          "statutory_code": "FI",
+          "labels": {
+            "es": "Finlandia",
+            "en": "Finland",
+            "pt": "Finlândia"
+          },
+          "parent_code": null,
+          "sort_order": 70,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FJ",
+          "statutory_code": "FJ",
+          "labels": {
+            "es": "Fiyi",
+            "en": "Fiji",
+            "pt": "Fiji"
+          },
+          "parent_code": null,
+          "sort_order": 71,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FK",
+          "statutory_code": "FK",
+          "labels": {
+            "es": "Islas Malvinas",
+            "en": "Falkland Islands",
+            "pt": "Ilhas Malvinas"
+          },
+          "parent_code": null,
+          "sort_order": 72,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FM",
+          "statutory_code": "FM",
+          "labels": {
+            "es": "Micronesia",
+            "en": "Micronesia",
+            "pt": "Micronésia"
+          },
+          "parent_code": null,
+          "sort_order": 73,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FO",
+          "statutory_code": "FO",
+          "labels": {
+            "es": "Islas Feroe",
+            "en": "Faroe Islands",
+            "pt": "Ilhas Faroé"
+          },
+          "parent_code": null,
+          "sort_order": 74,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "FR",
+          "statutory_code": "FR",
+          "labels": {
+            "es": "Francia",
+            "en": "France",
+            "pt": "França"
+          },
+          "parent_code": null,
+          "sort_order": 75,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GA",
+          "statutory_code": "GA",
+          "labels": {
+            "es": "Gabón",
+            "en": "Gabon",
+            "pt": "Gabão"
+          },
+          "parent_code": null,
+          "sort_order": 76,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GB",
+          "statutory_code": "GB",
+          "labels": {
+            "es": "Reino Unido",
+            "en": "United Kingdom",
+            "pt": "Reino Unido"
+          },
+          "parent_code": null,
+          "sort_order": 77,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GD",
+          "statutory_code": "GD",
+          "labels": {
+            "es": "Granada",
+            "en": "Grenada",
+            "pt": "Granada"
+          },
+          "parent_code": null,
+          "sort_order": 78,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GE",
+          "statutory_code": "GE",
+          "labels": {
+            "es": "Georgia",
+            "en": "Georgia",
+            "pt": "Geórgia"
+          },
+          "parent_code": null,
+          "sort_order": 79,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GF",
+          "statutory_code": "GF",
+          "labels": {
+            "es": "Guayana Francesa",
+            "en": "French Guiana",
+            "pt": "Guiana Francesa"
+          },
+          "parent_code": null,
+          "sort_order": 80,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GG",
+          "statutory_code": "GG",
+          "labels": {
+            "es": "Guernesey",
+            "en": "Guernsey",
+            "pt": "Guernsey"
+          },
+          "parent_code": null,
+          "sort_order": 81,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GH",
+          "statutory_code": "GH",
+          "labels": {
+            "es": "Ghana",
+            "en": "Ghana",
+            "pt": "Gana"
+          },
+          "parent_code": null,
+          "sort_order": 82,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GI",
+          "statutory_code": "GI",
+          "labels": {
+            "es": "Gibraltar",
+            "en": "Gibraltar",
+            "pt": "Gibraltar"
+          },
+          "parent_code": null,
+          "sort_order": 83,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GL",
+          "statutory_code": "GL",
+          "labels": {
+            "es": "Groenlandia",
+            "en": "Greenland",
+            "pt": "Groenlândia"
+          },
+          "parent_code": null,
+          "sort_order": 84,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GM",
+          "statutory_code": "GM",
+          "labels": {
+            "es": "Gambia",
+            "en": "Gambia",
+            "pt": "Gâmbia"
+          },
+          "parent_code": null,
+          "sort_order": 85,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GN",
+          "statutory_code": "GN",
+          "labels": {
+            "es": "Guinea",
+            "en": "Guinea",
+            "pt": "Guiné"
+          },
+          "parent_code": null,
+          "sort_order": 86,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GP",
+          "statutory_code": "GP",
+          "labels": {
+            "es": "Guadalupe",
+            "en": "Guadeloupe",
+            "pt": "Guadalupe"
+          },
+          "parent_code": null,
+          "sort_order": 87,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GQ",
+          "statutory_code": "GQ",
+          "labels": {
+            "es": "Guinea Ecuatorial",
+            "en": "Equatorial Guinea",
+            "pt": "Guiné Equatorial"
+          },
+          "parent_code": null,
+          "sort_order": 88,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GR",
+          "statutory_code": "GR",
+          "labels": {
+            "es": "Grecia",
+            "en": "Greece",
+            "pt": "Grécia"
+          },
+          "parent_code": null,
+          "sort_order": 89,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GS",
+          "statutory_code": "GS",
+          "labels": {
+            "es": "Islas Georgia del Sur y Sandwich del Sur",
+            "en": "South Georgia & South Sandwich Islands",
+            "pt": "Ilhas Geórgia do Sul e Sandwich do Sul"
+          },
+          "parent_code": null,
+          "sort_order": 90,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GT",
+          "statutory_code": "GT",
+          "labels": {
+            "es": "Guatemala",
+            "en": "Guatemala",
+            "pt": "Guatemala"
+          },
+          "parent_code": null,
+          "sort_order": 91,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GU",
+          "statutory_code": "GU",
+          "labels": {
+            "es": "Guam",
+            "en": "Guam",
+            "pt": "Guam"
+          },
+          "parent_code": null,
+          "sort_order": 92,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GW",
+          "statutory_code": "GW",
+          "labels": {
+            "es": "Guinea-Bisáu",
+            "en": "Guinea-Bissau",
+            "pt": "Guiné-Bissau"
+          },
+          "parent_code": null,
+          "sort_order": 93,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "GY",
+          "statutory_code": "GY",
+          "labels": {
+            "es": "Guyana",
+            "en": "Guyana",
+            "pt": "Guiana"
+          },
+          "parent_code": null,
+          "sort_order": 94,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HK",
+          "statutory_code": "HK",
+          "labels": {
+            "es": "RAE de Hong Kong (China)",
+            "en": "Hong Kong SAR China",
+            "pt": "Hong Kong, RAE da China"
+          },
+          "parent_code": null,
+          "sort_order": 95,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HM",
+          "statutory_code": "HM",
+          "labels": {
+            "es": "Islas Heard y McDonald",
+            "en": "Heard & McDonald Islands",
+            "pt": "Ilhas Heard e McDonald"
+          },
+          "parent_code": null,
+          "sort_order": 96,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HN",
+          "statutory_code": "HN",
+          "labels": {
+            "es": "Honduras",
+            "en": "Honduras",
+            "pt": "Honduras"
+          },
+          "parent_code": null,
+          "sort_order": 97,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HR",
+          "statutory_code": "HR",
+          "labels": {
+            "es": "Croacia",
+            "en": "Croatia",
+            "pt": "Croácia"
+          },
+          "parent_code": null,
+          "sort_order": 98,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HT",
+          "statutory_code": "HT",
+          "labels": {
+            "es": "Haití",
+            "en": "Haiti",
+            "pt": "Haiti"
+          },
+          "parent_code": null,
+          "sort_order": 99,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "HU",
+          "statutory_code": "HU",
+          "labels": {
+            "es": "Hungría",
+            "en": "Hungary",
+            "pt": "Hungria"
+          },
+          "parent_code": null,
+          "sort_order": 100,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ID",
+          "statutory_code": "ID",
+          "labels": {
+            "es": "Indonesia",
+            "en": "Indonesia",
+            "pt": "Indonésia"
+          },
+          "parent_code": null,
+          "sort_order": 101,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IE",
+          "statutory_code": "IE",
+          "labels": {
+            "es": "Irlanda",
+            "en": "Ireland",
+            "pt": "Irlanda"
+          },
+          "parent_code": null,
+          "sort_order": 102,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IL",
+          "statutory_code": "IL",
+          "labels": {
+            "es": "Israel",
+            "en": "Israel",
+            "pt": "Israel"
+          },
+          "parent_code": null,
+          "sort_order": 103,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IM",
+          "statutory_code": "IM",
+          "labels": {
+            "es": "Isla de Man",
+            "en": "Isle of Man",
+            "pt": "Ilha de Man"
+          },
+          "parent_code": null,
+          "sort_order": 104,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IN",
+          "statutory_code": "IN",
+          "labels": {
+            "es": "India",
+            "en": "India",
+            "pt": "Índia"
+          },
+          "parent_code": null,
+          "sort_order": 105,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IO",
+          "statutory_code": "IO",
+          "labels": {
+            "es": "Territorio Británico del Océano Índico",
+            "en": "British Indian Ocean Territory",
+            "pt": "Território Britânico do Oceano Índico"
+          },
+          "parent_code": null,
+          "sort_order": 106,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IQ",
+          "statutory_code": "IQ",
+          "labels": {
+            "es": "Irak",
+            "en": "Iraq",
+            "pt": "Iraque"
+          },
+          "parent_code": null,
+          "sort_order": 107,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IR",
+          "statutory_code": "IR",
+          "labels": {
+            "es": "Irán",
+            "en": "Iran",
+            "pt": "Irã"
+          },
+          "parent_code": null,
+          "sort_order": 108,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IS",
+          "statutory_code": "IS",
+          "labels": {
+            "es": "Islandia",
+            "en": "Iceland",
+            "pt": "Islândia"
+          },
+          "parent_code": null,
+          "sort_order": 109,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "IT",
+          "statutory_code": "IT",
+          "labels": {
+            "es": "Italia",
+            "en": "Italy",
+            "pt": "Itália"
+          },
+          "parent_code": null,
+          "sort_order": 110,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "JE",
+          "statutory_code": "JE",
+          "labels": {
+            "es": "Jersey",
+            "en": "Jersey",
+            "pt": "Jersey"
+          },
+          "parent_code": null,
+          "sort_order": 111,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "JM",
+          "statutory_code": "JM",
+          "labels": {
+            "es": "Jamaica",
+            "en": "Jamaica",
+            "pt": "Jamaica"
+          },
+          "parent_code": null,
+          "sort_order": 112,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "JO",
+          "statutory_code": "JO",
+          "labels": {
+            "es": "Jordania",
+            "en": "Jordan",
+            "pt": "Jordânia"
+          },
+          "parent_code": null,
+          "sort_order": 113,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "JP",
+          "statutory_code": "JP",
+          "labels": {
+            "es": "Japón",
+            "en": "Japan",
+            "pt": "Japão"
+          },
+          "parent_code": null,
+          "sort_order": 114,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KE",
+          "statutory_code": "KE",
+          "labels": {
+            "es": "Kenia",
+            "en": "Kenya",
+            "pt": "Quênia"
+          },
+          "parent_code": null,
+          "sort_order": 115,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KG",
+          "statutory_code": "KG",
+          "labels": {
+            "es": "Kirguistán",
+            "en": "Kyrgyzstan",
+            "pt": "Quirguistão"
+          },
+          "parent_code": null,
+          "sort_order": 116,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KH",
+          "statutory_code": "KH",
+          "labels": {
+            "es": "Camboya",
+            "en": "Cambodia",
+            "pt": "Camboja"
+          },
+          "parent_code": null,
+          "sort_order": 117,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KI",
+          "statutory_code": "KI",
+          "labels": {
+            "es": "Kiribati",
+            "en": "Kiribati",
+            "pt": "Quiribati"
+          },
+          "parent_code": null,
+          "sort_order": 118,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KM",
+          "statutory_code": "KM",
+          "labels": {
+            "es": "Comoras",
+            "en": "Comoros",
+            "pt": "Comores"
+          },
+          "parent_code": null,
+          "sort_order": 119,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KN",
+          "statutory_code": "KN",
+          "labels": {
+            "es": "San Cristóbal y Nieves",
+            "en": "St. Kitts & Nevis",
+            "pt": "São Cristóvão e Névis"
+          },
+          "parent_code": null,
+          "sort_order": 120,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KP",
+          "statutory_code": "KP",
+          "labels": {
+            "es": "Corea del Norte",
+            "en": "North Korea",
+            "pt": "Coreia do Norte"
+          },
+          "parent_code": null,
+          "sort_order": 121,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KR",
+          "statutory_code": "KR",
+          "labels": {
+            "es": "Corea del Sur",
+            "en": "South Korea",
+            "pt": "Coreia do Sul"
+          },
+          "parent_code": null,
+          "sort_order": 122,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KW",
+          "statutory_code": "KW",
+          "labels": {
+            "es": "Kuwait",
+            "en": "Kuwait",
+            "pt": "Kuwait"
+          },
+          "parent_code": null,
+          "sort_order": 123,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KY",
+          "statutory_code": "KY",
+          "labels": {
+            "es": "Islas Caimán",
+            "en": "Cayman Islands",
+            "pt": "Ilhas Cayman"
+          },
+          "parent_code": null,
+          "sort_order": 124,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "KZ",
+          "statutory_code": "KZ",
+          "labels": {
+            "es": "Kazajistán",
+            "en": "Kazakhstan",
+            "pt": "Cazaquistão"
+          },
+          "parent_code": null,
+          "sort_order": 125,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LA",
+          "statutory_code": "LA",
+          "labels": {
+            "es": "Laos",
+            "en": "Laos",
+            "pt": "Laos"
+          },
+          "parent_code": null,
+          "sort_order": 126,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LB",
+          "statutory_code": "LB",
+          "labels": {
+            "es": "Líbano",
+            "en": "Lebanon",
+            "pt": "Líbano"
+          },
+          "parent_code": null,
+          "sort_order": 127,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LC",
+          "statutory_code": "LC",
+          "labels": {
+            "es": "Santa Lucía",
+            "en": "St. Lucia",
+            "pt": "Santa Lúcia"
+          },
+          "parent_code": null,
+          "sort_order": 128,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LI",
+          "statutory_code": "LI",
+          "labels": {
+            "es": "Liechtenstein",
+            "en": "Liechtenstein",
+            "pt": "Liechtenstein"
+          },
+          "parent_code": null,
+          "sort_order": 129,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LK",
+          "statutory_code": "LK",
+          "labels": {
+            "es": "Sri Lanka",
+            "en": "Sri Lanka",
+            "pt": "Sri Lanka"
+          },
+          "parent_code": null,
+          "sort_order": 130,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LR",
+          "statutory_code": "LR",
+          "labels": {
+            "es": "Liberia",
+            "en": "Liberia",
+            "pt": "Libéria"
+          },
+          "parent_code": null,
+          "sort_order": 131,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LS",
+          "statutory_code": "LS",
+          "labels": {
+            "es": "Lesoto",
+            "en": "Lesotho",
+            "pt": "Lesoto"
+          },
+          "parent_code": null,
+          "sort_order": 132,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LT",
+          "statutory_code": "LT",
+          "labels": {
+            "es": "Lituania",
+            "en": "Lithuania",
+            "pt": "Lituânia"
+          },
+          "parent_code": null,
+          "sort_order": 133,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LU",
+          "statutory_code": "LU",
+          "labels": {
+            "es": "Luxemburgo",
+            "en": "Luxembourg",
+            "pt": "Luxemburgo"
+          },
+          "parent_code": null,
+          "sort_order": 134,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LV",
+          "statutory_code": "LV",
+          "labels": {
+            "es": "Letonia",
+            "en": "Latvia",
+            "pt": "Letônia"
+          },
+          "parent_code": null,
+          "sort_order": 135,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "LY",
+          "statutory_code": "LY",
+          "labels": {
+            "es": "Libia",
+            "en": "Libya",
+            "pt": "Líbia"
+          },
+          "parent_code": null,
+          "sort_order": 136,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MA",
+          "statutory_code": "MA",
+          "labels": {
+            "es": "Marruecos",
+            "en": "Morocco",
+            "pt": "Marrocos"
+          },
+          "parent_code": null,
+          "sort_order": 137,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MC",
+          "statutory_code": "MC",
+          "labels": {
+            "es": "Mónaco",
+            "en": "Monaco",
+            "pt": "Mônaco"
+          },
+          "parent_code": null,
+          "sort_order": 138,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MD",
+          "statutory_code": "MD",
+          "labels": {
+            "es": "Moldavia",
+            "en": "Moldova",
+            "pt": "Moldávia"
+          },
+          "parent_code": null,
+          "sort_order": 139,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ME",
+          "statutory_code": "ME",
+          "labels": {
+            "es": "Montenegro",
+            "en": "Montenegro",
+            "pt": "Montenegro"
+          },
+          "parent_code": null,
+          "sort_order": 140,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MF",
+          "statutory_code": "MF",
+          "labels": {
+            "es": "San Martín",
+            "en": "St. Martin",
+            "pt": "São Martinho"
+          },
+          "parent_code": null,
+          "sort_order": 141,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MG",
+          "statutory_code": "MG",
+          "labels": {
+            "es": "Madagascar",
+            "en": "Madagascar",
+            "pt": "Madagascar"
+          },
+          "parent_code": null,
+          "sort_order": 142,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MH",
+          "statutory_code": "MH",
+          "labels": {
+            "es": "Islas Marshall",
+            "en": "Marshall Islands",
+            "pt": "Ilhas Marshall"
+          },
+          "parent_code": null,
+          "sort_order": 143,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MK",
+          "statutory_code": "MK",
+          "labels": {
+            "es": "Macedonia del Norte",
+            "en": "North Macedonia",
+            "pt": "Macedônia do Norte"
+          },
+          "parent_code": null,
+          "sort_order": 144,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ML",
+          "statutory_code": "ML",
+          "labels": {
+            "es": "Mali",
+            "en": "Mali",
+            "pt": "Mali"
+          },
+          "parent_code": null,
+          "sort_order": 145,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MM",
+          "statutory_code": "MM",
+          "labels": {
+            "es": "Myanmar (Birmania)",
+            "en": "Myanmar (Burma)",
+            "pt": "Mianmar (Birmânia)"
+          },
+          "parent_code": null,
+          "sort_order": 146,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MN",
+          "statutory_code": "MN",
+          "labels": {
+            "es": "Mongolia",
+            "en": "Mongolia",
+            "pt": "Mongólia"
+          },
+          "parent_code": null,
+          "sort_order": 147,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MO",
+          "statutory_code": "MO",
+          "labels": {
+            "es": "RAE de Macao (China)",
+            "en": "Macao SAR China",
+            "pt": "Macau, RAE da China"
+          },
+          "parent_code": null,
+          "sort_order": 148,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MP",
+          "statutory_code": "MP",
+          "labels": {
+            "es": "Islas Marianas del Norte",
+            "en": "Northern Mariana Islands",
+            "pt": "Ilhas Marianas do Norte"
+          },
+          "parent_code": null,
+          "sort_order": 149,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MQ",
+          "statutory_code": "MQ",
+          "labels": {
+            "es": "Martinica",
+            "en": "Martinique",
+            "pt": "Martinica"
+          },
+          "parent_code": null,
+          "sort_order": 150,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MR",
+          "statutory_code": "MR",
+          "labels": {
+            "es": "Mauritania",
+            "en": "Mauritania",
+            "pt": "Mauritânia"
+          },
+          "parent_code": null,
+          "sort_order": 151,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MS",
+          "statutory_code": "MS",
+          "labels": {
+            "es": "Montserrat",
+            "en": "Montserrat",
+            "pt": "Montserrat"
+          },
+          "parent_code": null,
+          "sort_order": 152,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MT",
+          "statutory_code": "MT",
+          "labels": {
+            "es": "Malta",
+            "en": "Malta",
+            "pt": "Malta"
+          },
+          "parent_code": null,
+          "sort_order": 153,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MU",
+          "statutory_code": "MU",
+          "labels": {
+            "es": "Mauricio",
+            "en": "Mauritius",
+            "pt": "Maurício"
+          },
+          "parent_code": null,
+          "sort_order": 154,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MV",
+          "statutory_code": "MV",
+          "labels": {
+            "es": "Maldivas",
+            "en": "Maldives",
+            "pt": "Maldivas"
+          },
+          "parent_code": null,
+          "sort_order": 155,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MW",
+          "statutory_code": "MW",
+          "labels": {
+            "es": "Malaui",
+            "en": "Malawi",
+            "pt": "Malaui"
+          },
+          "parent_code": null,
+          "sort_order": 156,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MX",
+          "statutory_code": "MX",
+          "labels": {
+            "es": "México",
+            "en": "Mexico",
+            "pt": "México"
+          },
+          "parent_code": null,
+          "sort_order": 157,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MY",
+          "statutory_code": "MY",
+          "labels": {
+            "es": "Malasia",
+            "en": "Malaysia",
+            "pt": "Malásia"
+          },
+          "parent_code": null,
+          "sort_order": 158,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "MZ",
+          "statutory_code": "MZ",
+          "labels": {
+            "es": "Mozambique",
+            "en": "Mozambique",
+            "pt": "Moçambique"
+          },
+          "parent_code": null,
+          "sort_order": 159,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NA",
+          "statutory_code": "NA",
+          "labels": {
+            "es": "Namibia",
+            "en": "Namibia",
+            "pt": "Namíbia"
+          },
+          "parent_code": null,
+          "sort_order": 160,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NC",
+          "statutory_code": "NC",
+          "labels": {
+            "es": "Nueva Caledonia",
+            "en": "New Caledonia",
+            "pt": "Nova Caledônia"
+          },
+          "parent_code": null,
+          "sort_order": 161,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NE",
+          "statutory_code": "NE",
+          "labels": {
+            "es": "Níger",
+            "en": "Niger",
+            "pt": "Níger"
+          },
+          "parent_code": null,
+          "sort_order": 162,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NF",
+          "statutory_code": "NF",
+          "labels": {
+            "es": "Isla Norfolk",
+            "en": "Norfolk Island",
+            "pt": "Ilha Norfolk"
+          },
+          "parent_code": null,
+          "sort_order": 163,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NG",
+          "statutory_code": "NG",
+          "labels": {
+            "es": "Nigeria",
+            "en": "Nigeria",
+            "pt": "Nigéria"
+          },
+          "parent_code": null,
+          "sort_order": 164,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NI",
+          "statutory_code": "NI",
+          "labels": {
+            "es": "Nicaragua",
+            "en": "Nicaragua",
+            "pt": "Nicarágua"
+          },
+          "parent_code": null,
+          "sort_order": 165,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NL",
+          "statutory_code": "NL",
+          "labels": {
+            "es": "Países Bajos",
+            "en": "Netherlands",
+            "pt": "Países Baixos"
+          },
+          "parent_code": null,
+          "sort_order": 166,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NO",
+          "statutory_code": "NO",
+          "labels": {
+            "es": "Noruega",
+            "en": "Norway",
+            "pt": "Noruega"
+          },
+          "parent_code": null,
+          "sort_order": 167,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NP",
+          "statutory_code": "NP",
+          "labels": {
+            "es": "Nepal",
+            "en": "Nepal",
+            "pt": "Nepal"
+          },
+          "parent_code": null,
+          "sort_order": 168,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NR",
+          "statutory_code": "NR",
+          "labels": {
+            "es": "Nauru",
+            "en": "Nauru",
+            "pt": "Nauru"
+          },
+          "parent_code": null,
+          "sort_order": 169,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NU",
+          "statutory_code": "NU",
+          "labels": {
+            "es": "Niue",
+            "en": "Niue",
+            "pt": "Niue"
+          },
+          "parent_code": null,
+          "sort_order": 170,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "NZ",
+          "statutory_code": "NZ",
+          "labels": {
+            "es": "Nueva Zelanda",
+            "en": "New Zealand",
+            "pt": "Nova Zelândia"
+          },
+          "parent_code": null,
+          "sort_order": 171,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "OM",
+          "statutory_code": "OM",
+          "labels": {
+            "es": "Omán",
+            "en": "Oman",
+            "pt": "Omã"
+          },
+          "parent_code": null,
+          "sort_order": 172,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PA",
+          "statutory_code": "PA",
+          "labels": {
+            "es": "Panamá",
+            "en": "Panama",
+            "pt": "Panamá"
+          },
+          "parent_code": null,
+          "sort_order": 173,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PE",
+          "statutory_code": "PE",
+          "labels": {
+            "es": "Perú",
+            "en": "Peru",
+            "pt": "Peru"
+          },
+          "parent_code": null,
+          "sort_order": 174,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PF",
+          "statutory_code": "PF",
+          "labels": {
+            "es": "Polinesia Francesa",
+            "en": "French Polynesia",
+            "pt": "Polinésia Francesa"
+          },
+          "parent_code": null,
+          "sort_order": 175,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PG",
+          "statutory_code": "PG",
+          "labels": {
+            "es": "Papúa Nueva Guinea",
+            "en": "Papua New Guinea",
+            "pt": "Papua-Nova Guiné"
+          },
+          "parent_code": null,
+          "sort_order": 176,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PH",
+          "statutory_code": "PH",
+          "labels": {
+            "es": "Filipinas",
+            "en": "Philippines",
+            "pt": "Filipinas"
+          },
+          "parent_code": null,
+          "sort_order": 177,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PK",
+          "statutory_code": "PK",
+          "labels": {
+            "es": "Pakistán",
+            "en": "Pakistan",
+            "pt": "Paquistão"
+          },
+          "parent_code": null,
+          "sort_order": 178,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PL",
+          "statutory_code": "PL",
+          "labels": {
+            "es": "Polonia",
+            "en": "Poland",
+            "pt": "Polônia"
+          },
+          "parent_code": null,
+          "sort_order": 179,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PM",
+          "statutory_code": "PM",
+          "labels": {
+            "es": "San Pedro y Miquelón",
+            "en": "St. Pierre & Miquelon",
+            "pt": "São Pedro e Miquelão"
+          },
+          "parent_code": null,
+          "sort_order": 180,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PN",
+          "statutory_code": "PN",
+          "labels": {
+            "es": "Islas Pitcairn",
+            "en": "Pitcairn Islands",
+            "pt": "Ilhas Pitcairn"
+          },
+          "parent_code": null,
+          "sort_order": 181,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PR",
+          "statutory_code": "PR",
+          "labels": {
+            "es": "Puerto Rico",
+            "en": "Puerto Rico",
+            "pt": "Porto Rico"
+          },
+          "parent_code": null,
+          "sort_order": 182,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PS",
+          "statutory_code": "PS",
+          "labels": {
+            "es": "Territorios Palestinos",
+            "en": "Palestinian Territories",
+            "pt": "Territórios palestinos"
+          },
+          "parent_code": null,
+          "sort_order": 183,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PT",
+          "statutory_code": "PT",
+          "labels": {
+            "es": "Portugal",
+            "en": "Portugal",
+            "pt": "Portugal"
+          },
+          "parent_code": null,
+          "sort_order": 184,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PW",
+          "statutory_code": "PW",
+          "labels": {
+            "es": "Palaos",
+            "en": "Palau",
+            "pt": "Palau"
+          },
+          "parent_code": null,
+          "sort_order": 185,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "PY",
+          "statutory_code": "PY",
+          "labels": {
+            "es": "Paraguay",
+            "en": "Paraguay",
+            "pt": "Paraguai"
+          },
+          "parent_code": null,
+          "sort_order": 186,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "QA",
+          "statutory_code": "QA",
+          "labels": {
+            "es": "Catar",
+            "en": "Qatar",
+            "pt": "Catar"
+          },
+          "parent_code": null,
+          "sort_order": 187,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "RE",
+          "statutory_code": "RE",
+          "labels": {
+            "es": "Reunión",
+            "en": "Réunion",
+            "pt": "Reunião"
+          },
+          "parent_code": null,
+          "sort_order": 188,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "RO",
+          "statutory_code": "RO",
+          "labels": {
+            "es": "Rumanía",
+            "en": "Romania",
+            "pt": "Romênia"
+          },
+          "parent_code": null,
+          "sort_order": 189,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "RS",
+          "statutory_code": "RS",
+          "labels": {
+            "es": "Serbia",
+            "en": "Serbia",
+            "pt": "Sérvia"
+          },
+          "parent_code": null,
+          "sort_order": 190,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "RU",
+          "statutory_code": "RU",
+          "labels": {
+            "es": "Rusia",
+            "en": "Russia",
+            "pt": "Rússia"
+          },
+          "parent_code": null,
+          "sort_order": 191,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "RW",
+          "statutory_code": "RW",
+          "labels": {
+            "es": "Ruanda",
+            "en": "Rwanda",
+            "pt": "Ruanda"
+          },
+          "parent_code": null,
+          "sort_order": 192,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SA",
+          "statutory_code": "SA",
+          "labels": {
+            "es": "Arabia Saudí",
+            "en": "Saudi Arabia",
+            "pt": "Arábia Saudita"
+          },
+          "parent_code": null,
+          "sort_order": 193,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SB",
+          "statutory_code": "SB",
+          "labels": {
+            "es": "Islas Salomón",
+            "en": "Solomon Islands",
+            "pt": "Ilhas Salomão"
+          },
+          "parent_code": null,
+          "sort_order": 194,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SC",
+          "statutory_code": "SC",
+          "labels": {
+            "es": "Seychelles",
+            "en": "Seychelles",
+            "pt": "Seicheles"
+          },
+          "parent_code": null,
+          "sort_order": 195,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SD",
+          "statutory_code": "SD",
+          "labels": {
+            "es": "Sudán",
+            "en": "Sudan",
+            "pt": "Sudão"
+          },
+          "parent_code": null,
+          "sort_order": 196,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SE",
+          "statutory_code": "SE",
+          "labels": {
+            "es": "Suecia",
+            "en": "Sweden",
+            "pt": "Suécia"
+          },
+          "parent_code": null,
+          "sort_order": 197,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SG",
+          "statutory_code": "SG",
+          "labels": {
+            "es": "Singapur",
+            "en": "Singapore",
+            "pt": "Singapura"
+          },
+          "parent_code": null,
+          "sort_order": 198,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SH",
+          "statutory_code": "SH",
+          "labels": {
+            "es": "Santa Elena",
+            "en": "St. Helena",
+            "pt": "Santa Helena"
+          },
+          "parent_code": null,
+          "sort_order": 199,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SI",
+          "statutory_code": "SI",
+          "labels": {
+            "es": "Eslovenia",
+            "en": "Slovenia",
+            "pt": "Eslovênia"
+          },
+          "parent_code": null,
+          "sort_order": 200,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SJ",
+          "statutory_code": "SJ",
+          "labels": {
+            "es": "Svalbard y Jan Mayen",
+            "en": "Svalbard & Jan Mayen",
+            "pt": "Svalbard e Jan Mayen"
+          },
+          "parent_code": null,
+          "sort_order": 201,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SK",
+          "statutory_code": "SK",
+          "labels": {
+            "es": "Eslovaquia",
+            "en": "Slovakia",
+            "pt": "Eslováquia"
+          },
+          "parent_code": null,
+          "sort_order": 202,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SL",
+          "statutory_code": "SL",
+          "labels": {
+            "es": "Sierra Leona",
+            "en": "Sierra Leone",
+            "pt": "Serra Leoa"
+          },
+          "parent_code": null,
+          "sort_order": 203,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SM",
+          "statutory_code": "SM",
+          "labels": {
+            "es": "San Marino",
+            "en": "San Marino",
+            "pt": "San Marino"
+          },
+          "parent_code": null,
+          "sort_order": 204,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SN",
+          "statutory_code": "SN",
+          "labels": {
+            "es": "Senegal",
+            "en": "Senegal",
+            "pt": "Senegal"
+          },
+          "parent_code": null,
+          "sort_order": 205,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SO",
+          "statutory_code": "SO",
+          "labels": {
+            "es": "Somalia",
+            "en": "Somalia",
+            "pt": "Somália"
+          },
+          "parent_code": null,
+          "sort_order": 206,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SR",
+          "statutory_code": "SR",
+          "labels": {
+            "es": "Surinam",
+            "en": "Suriname",
+            "pt": "Suriname"
+          },
+          "parent_code": null,
+          "sort_order": 207,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SS",
+          "statutory_code": "SS",
+          "labels": {
+            "es": "Sudán del Sur",
+            "en": "South Sudan",
+            "pt": "Sudão do Sul"
+          },
+          "parent_code": null,
+          "sort_order": 208,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ST",
+          "statutory_code": "ST",
+          "labels": {
+            "es": "Santo Tomé y Príncipe",
+            "en": "São Tomé & Príncipe",
+            "pt": "São Tomé e Príncipe"
+          },
+          "parent_code": null,
+          "sort_order": 209,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SV",
+          "statutory_code": "SV",
+          "labels": {
+            "es": "El Salvador",
+            "en": "El Salvador",
+            "pt": "El Salvador"
+          },
+          "parent_code": null,
+          "sort_order": 210,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SX",
+          "statutory_code": "SX",
+          "labels": {
+            "es": "Sint Maarten",
+            "en": "Sint Maarten",
+            "pt": "Sint Maarten"
+          },
+          "parent_code": null,
+          "sort_order": 211,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SY",
+          "statutory_code": "SY",
+          "labels": {
+            "es": "Siria",
+            "en": "Syria",
+            "pt": "Síria"
+          },
+          "parent_code": null,
+          "sort_order": 212,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "SZ",
+          "statutory_code": "SZ",
+          "labels": {
+            "es": "Esuatini",
+            "en": "Eswatini",
+            "pt": "Essuatíni"
+          },
+          "parent_code": null,
+          "sort_order": 213,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TC",
+          "statutory_code": "TC",
+          "labels": {
+            "es": "Islas Turcas y Caicos",
+            "en": "Turks & Caicos Islands",
+            "pt": "Ilhas Turcas e Caicos"
+          },
+          "parent_code": null,
+          "sort_order": 214,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TD",
+          "statutory_code": "TD",
+          "labels": {
+            "es": "Chad",
+            "en": "Chad",
+            "pt": "Chade"
+          },
+          "parent_code": null,
+          "sort_order": 215,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TF",
+          "statutory_code": "TF",
+          "labels": {
+            "es": "Territorios Australes Franceses",
+            "en": "French Southern Territories",
+            "pt": "Territórios Franceses do Sul"
+          },
+          "parent_code": null,
+          "sort_order": 216,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TG",
+          "statutory_code": "TG",
+          "labels": {
+            "es": "Togo",
+            "en": "Togo",
+            "pt": "Togo"
+          },
+          "parent_code": null,
+          "sort_order": 217,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TH",
+          "statutory_code": "TH",
+          "labels": {
+            "es": "Tailandia",
+            "en": "Thailand",
+            "pt": "Tailândia"
+          },
+          "parent_code": null,
+          "sort_order": 218,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TJ",
+          "statutory_code": "TJ",
+          "labels": {
+            "es": "Tayikistán",
+            "en": "Tajikistan",
+            "pt": "Tadjiquistão"
+          },
+          "parent_code": null,
+          "sort_order": 219,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TK",
+          "statutory_code": "TK",
+          "labels": {
+            "es": "Tokelau",
+            "en": "Tokelau",
+            "pt": "Tokelau"
+          },
+          "parent_code": null,
+          "sort_order": 220,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TL",
+          "statutory_code": "TL",
+          "labels": {
+            "es": "Timor-Leste",
+            "en": "Timor-Leste",
+            "pt": "Timor-Leste"
+          },
+          "parent_code": null,
+          "sort_order": 221,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TM",
+          "statutory_code": "TM",
+          "labels": {
+            "es": "Turkmenistán",
+            "en": "Turkmenistan",
+            "pt": "Turcomenistão"
+          },
+          "parent_code": null,
+          "sort_order": 222,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TN",
+          "statutory_code": "TN",
+          "labels": {
+            "es": "Túnez",
+            "en": "Tunisia",
+            "pt": "Tunísia"
+          },
+          "parent_code": null,
+          "sort_order": 223,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TO",
+          "statutory_code": "TO",
+          "labels": {
+            "es": "Tonga",
+            "en": "Tonga",
+            "pt": "Tonga"
+          },
+          "parent_code": null,
+          "sort_order": 224,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TR",
+          "statutory_code": "TR",
+          "labels": {
+            "es": "Turquía",
+            "en": "Türkiye",
+            "pt": "Turquia"
+          },
+          "parent_code": null,
+          "sort_order": 225,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TT",
+          "statutory_code": "TT",
+          "labels": {
+            "es": "Trinidad y Tobago",
+            "en": "Trinidad & Tobago",
+            "pt": "Trinidad e Tobago"
+          },
+          "parent_code": null,
+          "sort_order": 226,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TV",
+          "statutory_code": "TV",
+          "labels": {
+            "es": "Tuvalu",
+            "en": "Tuvalu",
+            "pt": "Tuvalu"
+          },
+          "parent_code": null,
+          "sort_order": 227,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TW",
+          "statutory_code": "TW",
+          "labels": {
+            "es": "Taiwán",
+            "en": "Taiwan",
+            "pt": "Taiwan"
+          },
+          "parent_code": null,
+          "sort_order": 228,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "TZ",
+          "statutory_code": "TZ",
+          "labels": {
+            "es": "Tanzania",
+            "en": "Tanzania",
+            "pt": "Tanzânia"
+          },
+          "parent_code": null,
+          "sort_order": 229,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "UA",
+          "statutory_code": "UA",
+          "labels": {
+            "es": "Ucrania",
+            "en": "Ukraine",
+            "pt": "Ucrânia"
+          },
+          "parent_code": null,
+          "sort_order": 230,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "UG",
+          "statutory_code": "UG",
+          "labels": {
+            "es": "Uganda",
+            "en": "Uganda",
+            "pt": "Uganda"
+          },
+          "parent_code": null,
+          "sort_order": 231,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "UM",
+          "statutory_code": "UM",
+          "labels": {
+            "es": "Islas menores alejadas de EE. UU.",
+            "en": "U.S. Outlying Islands",
+            "pt": "Ilhas Menores Distantes dos EUA"
+          },
+          "parent_code": null,
+          "sort_order": 232,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "US",
+          "statutory_code": "US",
+          "labels": {
+            "es": "Estados Unidos",
+            "en": "United States",
+            "pt": "Estados Unidos"
+          },
+          "parent_code": null,
+          "sort_order": 233,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "UY",
+          "statutory_code": "UY",
+          "labels": {
+            "es": "Uruguay",
+            "en": "Uruguay",
+            "pt": "Uruguai"
+          },
+          "parent_code": null,
+          "sort_order": 234,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "UZ",
+          "statutory_code": "UZ",
+          "labels": {
+            "es": "Uzbekistán",
+            "en": "Uzbekistan",
+            "pt": "Uzbequistão"
+          },
+          "parent_code": null,
+          "sort_order": 235,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VA",
+          "statutory_code": "VA",
+          "labels": {
+            "es": "Ciudad del Vaticano",
+            "en": "Vatican City",
+            "pt": "Cidade do Vaticano"
+          },
+          "parent_code": null,
+          "sort_order": 236,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VC",
+          "statutory_code": "VC",
+          "labels": {
+            "es": "San Vicente y las Granadinas",
+            "en": "St. Vincent & Grenadines",
+            "pt": "São Vicente e Granadinas"
+          },
+          "parent_code": null,
+          "sort_order": 237,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VE",
+          "statutory_code": "VE",
+          "labels": {
+            "es": "Venezuela",
+            "en": "Venezuela",
+            "pt": "Venezuela"
+          },
+          "parent_code": null,
+          "sort_order": 238,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VG",
+          "statutory_code": "VG",
+          "labels": {
+            "es": "Islas Vírgenes Británicas",
+            "en": "British Virgin Islands",
+            "pt": "Ilhas Virgens Britânicas"
+          },
+          "parent_code": null,
+          "sort_order": 239,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VI",
+          "statutory_code": "VI",
+          "labels": {
+            "es": "Islas Vírgenes de EE. UU.",
+            "en": "U.S. Virgin Islands",
+            "pt": "Ilhas Virgens Americanas"
+          },
+          "parent_code": null,
+          "sort_order": 240,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VN",
+          "statutory_code": "VN",
+          "labels": {
+            "es": "Vietnam",
+            "en": "Vietnam",
+            "pt": "Vietnã"
+          },
+          "parent_code": null,
+          "sort_order": 241,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "VU",
+          "statutory_code": "VU",
+          "labels": {
+            "es": "Vanuatu",
+            "en": "Vanuatu",
+            "pt": "Vanuatu"
+          },
+          "parent_code": null,
+          "sort_order": 242,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "WF",
+          "statutory_code": "WF",
+          "labels": {
+            "es": "Wallis y Futuna",
+            "en": "Wallis & Futuna",
+            "pt": "Wallis e Futuna"
+          },
+          "parent_code": null,
+          "sort_order": 243,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "WS",
+          "statutory_code": "WS",
+          "labels": {
+            "es": "Samoa",
+            "en": "Samoa",
+            "pt": "Samoa"
+          },
+          "parent_code": null,
+          "sort_order": 244,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "YE",
+          "statutory_code": "YE",
+          "labels": {
+            "es": "Yemen",
+            "en": "Yemen",
+            "pt": "Iêmen"
+          },
+          "parent_code": null,
+          "sort_order": 245,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "YT",
+          "statutory_code": "YT",
+          "labels": {
+            "es": "Mayotte",
+            "en": "Mayotte",
+            "pt": "Mayotte"
+          },
+          "parent_code": null,
+          "sort_order": 246,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ZA",
+          "statutory_code": "ZA",
+          "labels": {
+            "es": "Sudáfrica",
+            "en": "South Africa",
+            "pt": "África do Sul"
+          },
+          "parent_code": null,
+          "sort_order": 247,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ZM",
+          "statutory_code": "ZM",
+          "labels": {
+            "es": "Zambia",
+            "en": "Zambia",
+            "pt": "Zâmbia"
+          },
+          "parent_code": null,
+          "sort_order": 248,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ZW",
+          "statutory_code": "ZW",
+          "labels": {
+            "es": "Zimbabue",
+            "en": "Zimbabwe",
+            "pt": "Zimbábue"
+          },
+          "parent_code": null,
+          "sort_order": 249,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        }
+      ]
+    },
+    {
+      "code": "ubigeo_pe",
+      "name": "Ubigeo del Perú",
+      "description": "Departamentos (código de dos dígitos). Provincias y distritos se cargan con catalogs:import desde el archivo oficial del INEI (parent_code = departamento o provincia).",
+      "is_extensible": false,
+      "country_code": "PE",
+      "source": "INEI · por validar",
+      "items": [
+        {
+          "code": "01",
+          "statutory_code": "01",
+          "labels": {
+            "es": "Amazonas",
+            "en": "Amazonas",
+            "pt": "Amazonas"
+          },
+          "parent_code": null,
+          "sort_order": 1,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "02",
+          "statutory_code": "02",
+          "labels": {
+            "es": "Áncash",
+            "en": "Áncash",
+            "pt": "Áncash"
+          },
+          "parent_code": null,
+          "sort_order": 2,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "03",
+          "statutory_code": "03",
+          "labels": {
+            "es": "Apurímac",
+            "en": "Apurímac",
+            "pt": "Apurímac"
+          },
+          "parent_code": null,
+          "sort_order": 3,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "04",
+          "statutory_code": "04",
+          "labels": {
+            "es": "Arequipa",
+            "en": "Arequipa",
+            "pt": "Arequipa"
+          },
+          "parent_code": null,
+          "sort_order": 4,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "05",
+          "statutory_code": "05",
+          "labels": {
+            "es": "Ayacucho",
+            "en": "Ayacucho",
+            "pt": "Ayacucho"
+          },
+          "parent_code": null,
+          "sort_order": 5,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "06",
+          "statutory_code": "06",
+          "labels": {
+            "es": "Cajamarca",
+            "en": "Cajamarca",
+            "pt": "Cajamarca"
+          },
+          "parent_code": null,
+          "sort_order": 6,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "07",
+          "statutory_code": "07",
+          "labels": {
+            "es": "Callao",
+            "en": "Callao",
+            "pt": "Callao"
+          },
+          "parent_code": null,
+          "sort_order": 7,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "08",
+          "statutory_code": "08",
+          "labels": {
+            "es": "Cusco",
+            "en": "Cusco",
+            "pt": "Cusco"
+          },
+          "parent_code": null,
+          "sort_order": 8,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "09",
+          "statutory_code": "09",
+          "labels": {
+            "es": "Huancavelica",
+            "en": "Huancavelica",
+            "pt": "Huancavelica"
+          },
+          "parent_code": null,
+          "sort_order": 9,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "10",
+          "statutory_code": "10",
+          "labels": {
+            "es": "Huánuco",
+            "en": "Huánuco",
+            "pt": "Huánuco"
+          },
+          "parent_code": null,
+          "sort_order": 10,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "11",
+          "statutory_code": "11",
+          "labels": {
+            "es": "Ica",
+            "en": "Ica",
+            "pt": "Ica"
+          },
+          "parent_code": null,
+          "sort_order": 11,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "12",
+          "statutory_code": "12",
+          "labels": {
+            "es": "Junín",
+            "en": "Junín",
+            "pt": "Junín"
+          },
+          "parent_code": null,
+          "sort_order": 12,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "13",
+          "statutory_code": "13",
+          "labels": {
+            "es": "La Libertad",
+            "en": "La Libertad",
+            "pt": "La Libertad"
+          },
+          "parent_code": null,
+          "sort_order": 13,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "14",
+          "statutory_code": "14",
+          "labels": {
+            "es": "Lambayeque",
+            "en": "Lambayeque",
+            "pt": "Lambayeque"
+          },
+          "parent_code": null,
+          "sort_order": 14,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "15",
+          "statutory_code": "15",
+          "labels": {
+            "es": "Lima",
+            "en": "Lima",
+            "pt": "Lima"
+          },
+          "parent_code": null,
+          "sort_order": 15,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "16",
+          "statutory_code": "16",
+          "labels": {
+            "es": "Loreto",
+            "en": "Loreto",
+            "pt": "Loreto"
+          },
+          "parent_code": null,
+          "sort_order": 16,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "17",
+          "statutory_code": "17",
+          "labels": {
+            "es": "Madre de Dios",
+            "en": "Madre de Dios",
+            "pt": "Madre de Dios"
+          },
+          "parent_code": null,
+          "sort_order": 17,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "18",
+          "statutory_code": "18",
+          "labels": {
+            "es": "Moquegua",
+            "en": "Moquegua",
+            "pt": "Moquegua"
+          },
+          "parent_code": null,
+          "sort_order": 18,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "19",
+          "statutory_code": "19",
+          "labels": {
+            "es": "Pasco",
+            "en": "Pasco",
+            "pt": "Pasco"
+          },
+          "parent_code": null,
+          "sort_order": 19,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "20",
+          "statutory_code": "20",
+          "labels": {
+            "es": "Piura",
+            "en": "Piura",
+            "pt": "Piura"
+          },
+          "parent_code": null,
+          "sort_order": 20,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "21",
+          "statutory_code": "21",
+          "labels": {
+            "es": "Puno",
+            "en": "Puno",
+            "pt": "Puno"
+          },
+          "parent_code": null,
+          "sort_order": 21,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "22",
+          "statutory_code": "22",
+          "labels": {
+            "es": "San Martín",
+            "en": "San Martín",
+            "pt": "San Martín"
+          },
+          "parent_code": null,
+          "sort_order": 22,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "23",
+          "statutory_code": "23",
+          "labels": {
+            "es": "Tacna",
+            "en": "Tacna",
+            "pt": "Tacna"
+          },
+          "parent_code": null,
+          "sort_order": 23,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "24",
+          "statutory_code": "24",
+          "labels": {
+            "es": "Tumbes",
+            "en": "Tumbes",
+            "pt": "Tumbes"
+          },
+          "parent_code": null,
+          "sort_order": 24,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "25",
+          "statutory_code": "25",
+          "labels": {
+            "es": "Ucayali",
+            "en": "Ucayali",
+            "pt": "Ucayali"
+          },
+          "parent_code": null,
+          "sort_order": 25,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        }
+      ]
+    },
+    {
+      "code": "banks_pe",
+      "name": "Bancos",
+      "description": "Entidades bancarias para el abono de remuneraciones. El código oficial (tabla 36 / CCI) está por validar; la organización puede agregar cooperativas o cajas.",
+      "is_extensible": true,
+      "country_code": "PE",
+      "source": "SBS · por validar",
+      "items": [
+        {
+          "code": "bcp",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco de Crédito del Perú",
+            "en": "Banco de Crédito del Perú",
+            "pt": "Banco de Crédito del Perú"
+          },
+          "parent_code": null,
+          "sort_order": 1,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "bbva",
+          "statutory_code": null,
+          "labels": {
+            "es": "BBVA Perú",
+            "en": "BBVA Perú",
+            "pt": "BBVA Perú"
+          },
+          "parent_code": null,
+          "sort_order": 2,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "interbank",
+          "statutory_code": null,
+          "labels": {
+            "es": "Interbank",
+            "en": "Interbank",
+            "pt": "Interbank"
+          },
+          "parent_code": null,
+          "sort_order": 3,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "scotiabank",
+          "statutory_code": null,
+          "labels": {
+            "es": "Scotiabank Perú",
+            "en": "Scotiabank Perú",
+            "pt": "Scotiabank Perú"
+          },
+          "parent_code": null,
+          "sort_order": 4,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "banbif",
+          "statutory_code": null,
+          "labels": {
+            "es": "BanBif",
+            "en": "BanBif",
+            "pt": "BanBif"
+          },
+          "parent_code": null,
+          "sort_order": 5,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "pichincha",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco Pichincha",
+            "en": "Banco Pichincha",
+            "pt": "Banco Pichincha"
+          },
+          "parent_code": null,
+          "sort_order": 6,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "nacion",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco de la Nación",
+            "en": "Banco de la Nación",
+            "pt": "Banco de la Nación"
+          },
+          "parent_code": null,
+          "sort_order": 7,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "gnb",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco GNB Perú",
+            "en": "Banco GNB Perú",
+            "pt": "Banco GNB Perú"
+          },
+          "parent_code": null,
+          "sort_order": 8,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "falabella",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco Falabella",
+            "en": "Banco Falabella",
+            "pt": "Banco Falabella"
+          },
+          "parent_code": null,
+          "sort_order": 9,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "ripley",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco Ripley",
+            "en": "Banco Ripley",
+            "pt": "Banco Ripley"
+          },
+          "parent_code": null,
+          "sort_order": 10,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "mibanco",
+          "statutory_code": null,
+          "labels": {
+            "es": "Mibanco",
+            "en": "Mibanco",
+            "pt": "Mibanco"
+          },
+          "parent_code": null,
+          "sort_order": 11,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "santander",
+          "statutory_code": null,
+          "labels": {
+            "es": "Banco Santander Perú",
+            "en": "Banco Santander Perú",
+            "pt": "Banco Santander Perú"
+          },
+          "parent_code": null,
+          "sort_order": 12,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "citibank",
+          "statutory_code": null,
+          "labels": {
+            "es": "Citibank del Perú",
+            "en": "Citibank del Perú",
+            "pt": "Citibank del Perú"
+          },
+          "parent_code": null,
+          "sort_order": 13,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "alfin",
+          "statutory_code": null,
+          "labels": {
+            "es": "Alfin Banco",
+            "en": "Alfin Banco",
+            "pt": "Alfin Banco"
+          },
+          "parent_code": null,
+          "sort_order": 14,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "bank_of_china",
+          "statutory_code": null,
+          "labels": {
+            "es": "Bank of China (Perú)",
+            "en": "Bank of China (Perú)",
+            "pt": "Bank of China (Perú)"
+          },
+          "parent_code": null,
+          "sort_order": 15,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "icbc",
+          "statutory_code": null,
+          "labels": {
+            "es": "ICBC Perú Bank",
+            "en": "ICBC Perú Bank",
+            "pt": "ICBC Perú Bank"
+          },
+          "parent_code": null,
+          "sort_order": 16,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        }
+      ]
+    },
+    {
+      "code": "termination_reasons_pe",
+      "name": "Motivos de fin del periodo",
+      "description": "Tabla 17 de la Planilla Electrónica. Los motivos propios de cada organización (termination_reasons) se enlazan por statutory_code.",
+      "is_extensible": false,
+      "country_code": "PE",
+      "source": "docs/18 · Tabla 17 (ayuda SUNAT)",
+      "items": [
+        {
+          "code": "resignation",
+          "statutory_code": "01",
+          "labels": {
+            "es": "Renuncia",
+            "en": "Resignation",
+            "pt": "Pedido de demissão"
+          },
+          "parent_code": null,
+          "sort_order": 1,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "resignation_incentives",
+          "statutory_code": "02",
+          "labels": {
+            "es": "Renuncia con incentivos",
+            "en": "Resignation with incentives",
+            "pt": "Pedido de demissão com incentivos"
+          },
+          "parent_code": null,
+          "sort_order": 2,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "dismissal",
+          "statutory_code": "03",
+          "labels": {
+            "es": "Despido o destitución",
+            "en": "Dismissal",
+            "pt": "Demissão pelo empregador"
+          },
+          "parent_code": null,
+          "sort_order": 3,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "collective_termination",
+          "statutory_code": "04",
+          "labels": {
+            "es": "Cese colectivo",
+            "en": "Collective termination",
+            "pt": "Desligamento coletivo"
+          },
+          "parent_code": null,
+          "sort_order": 4,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "retirement",
+          "statutory_code": "05",
+          "labels": {
+            "es": "Jubilación",
+            "en": "Retirement",
+            "pt": "Aposentadoria"
+          },
+          "parent_code": null,
+          "sort_order": 5,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "permanent_disability",
+          "statutory_code": "06",
+          "labels": {
+            "es": "Invalidez absoluta permanente",
+            "en": "Permanent total disability",
+            "pt": "Invalidez absoluta permanente"
+          },
+          "parent_code": null,
+          "sort_order": 6,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "contract_end",
+          "statutory_code": "07",
+          "labels": {
+            "es": "Terminación de la obra o servicio, cumplimiento de condición resolutoria o vencimiento del plazo",
+            "en": "End of work or service, resolutory condition or end of term",
+            "pt": "Término da obra ou serviço, condição resolutiva ou fim do prazo"
+          },
+          "parent_code": null,
+          "sort_order": 7,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "mutual_agreement",
+          "statutory_code": "08",
+          "labels": {
+            "es": "Mutuo disenso",
+            "en": "Mutual agreement",
+            "pt": "Distrato"
+          },
+          "parent_code": null,
+          "sort_order": 8,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "death",
+          "statutory_code": "09",
+          "labels": {
+            "es": "Fallecimiento",
+            "en": "Death",
+            "pt": "Falecimento"
+          },
+          "parent_code": null,
+          "sort_order": 9,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "employer_succession",
+          "statutory_code": "14",
+          "labels": {
+            "es": "Baja por sucesión en posición del empleador",
+            "en": "Employer succession",
+            "pt": "Sucessão do empregador"
+          },
+          "parent_code": null,
+          "sort_order": 10,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "employer_extinction",
+          "statutory_code": "15",
+          "labels": {
+            "es": "Extinción o liquidación del empleador",
+            "en": "Employer dissolution or liquidation",
+            "pt": "Extinção ou liquidação do empregador"
+          },
+          "parent_code": null,
+          "sort_order": 11,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "not_started",
+          "statutory_code": "17",
+          "labels": {
+            "es": "No se inició la relación laboral o la prestación efectiva de servicios",
+            "en": "Employment or services never started",
+            "pt": "A relação de trabalho ou a prestação de serviços não se iniciou"
+          },
+          "parent_code": null,
+          "sort_order": 12,
+          "is_verified": true,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "age_limit",
+          "statutory_code": "18",
+          "labels": {
+            "es": "Límite de edad 70 años",
+            "en": "Age limit of 70",
+            "pt": "Limite de idade de 70 anos"
+          },
+          "parent_code": null,
+          "sort_order": 13,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        },
+        {
+          "code": "no_link_plame",
+          "statutory_code": "99",
+          "labels": {
+            "es": "Sin vínculo laboral, habilitado para PLAME",
+            "en": "No employment link, enabled for PLAME",
+            "pt": "Sem vínculo de trabalho, habilitado para o PLAME"
+          },
+          "parent_code": null,
+          "sort_order": 14,
+          "is_verified": false,
+          "valid_from": "2000-01-01"
+        }
+      ]
+    }
+  ]
+}

@@ -347,4 +347,10 @@
 .doc-campos { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 12px; }
 .separador-o { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--tx3); font-size: var(--fs-xs); }
 .separador-o::before, .separador-o::after { content: ''; flex: 1; border-top: 1px solid var(--bd); }
-.codigo-grande { font-family: var(--fuente-mono); font-size: 32px; font-weight: 700; letter-spacing: .12em; margin: 16px 0 8px; color: var(--tx); }
+/* CFG-10 · Catálogos: lista a la izquierda y elementos a la derecha. */
+.cat-grid { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 3fr); gap: 24px; align-items: start; }
+.cat-grid .lista b { font-size: var(--fs-s); }
+.cat-cab { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 16px; }
+.cat-cab h2 { font-size: var(--fs-h2); font-weight: 700; margin: 0; }
+@media (max-width: 1000px) { .cat-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
+.codigo-grande {font-family: var(--fuente-mono); font-size: 32px; font-weight: 700; letter-spacing: .12em; margin: 16px 0 8px; color: var(--tx); }

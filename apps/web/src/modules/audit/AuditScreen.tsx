@@ -113,7 +113,7 @@ export function AuditScreen() {
             </select>
             <label className="small text-secondary">{t('audit.from')} <input className="form-control" style={{ display: 'inline-block', width: 'auto' }} type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
             <label className="small text-secondary">{t('audit.to')} <input className="form-control" style={{ display: 'inline-block', width: 'auto' }} type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
-            {entityId && <button type="button" className="tag in" style={{ border: 0, cursor: 'pointer' }} onClick={() => setEntityId('')}>ID {entityId.slice(0, 8)}… ×</button>}
+            {entityId && <button type="button" className="tag in" style={{ border: 0, cursor: 'pointer' }} onClick={() => setEntityId('')}>{t('audit.entity_filter', { id: entityId.slice(0, 8) })}</button>}
           </div>
           <div className="tabla-wrap">
             <table className="table">
@@ -125,7 +125,7 @@ export function AuditScreen() {
                   <tr key={r.id} onClick={() => setDetail(r)} style={{ cursor: 'pointer' }}>
                     <td className="nowrap">{fmt(r.occurred_at)}</td>
                     <td>{r.actor_name ?? <span className="sub2">{t('audit.system')}</span>}</td>
-                    <td><code>{r.action}</code> {r.sensitive && <span className="tag wa" title={t('audit.sensitive')}>S</span>}</td>
+                    <td><code>{r.action}</code> {r.sensitive && <span className="tag wa" title={t('audit.sensitive')}>{t('audit.sensitive_short')}</span>}</td>
                     <td>{entityLabel(r.entity)}<span className="sub2">{r.entity_id.slice(0, 8)}</span></td>
                     <td className="small" style={{ maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={r.changed_fields.join(', ')}>{r.changed_fields.join(', ') || '—'}</td>
                   </tr>

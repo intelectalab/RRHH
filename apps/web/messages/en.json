@@ -124,7 +124,11 @@
     "collapse_menu": "Collapse menu",
     "close_menu": "Close menu",
     "open_menu": "Open menu",
-    "menu_section": "Menu"
+    "menu_section": "Menu",
+    "language": "Language",
+    "lang_es": "Español",
+    "lang_en": "English",
+    "lang_pt": "Português"
   },
   "home": {
     "title": "Hello, {name}",
@@ -336,7 +340,9 @@
     "cat_bank_account": "Bank account",
     "cat_identity_document": "Identity document",
     "cat_union": "Union membership",
-    "cat_other": "Other"
+    "cat_other": "Other",
+    "entity_filter": "ID {id}… ×",
+    "sensitive_short": "S"
   },
   "palette": {
     "open": "Search",
@@ -419,7 +425,8 @@
     "bulk_done": "{ok} approved",
     "bulk_partial": "{ok} approved · {fail} could not be approved",
     "not_yours": "This request is not waiting for your decision.",
-    "by": "{name}"
+    "by": "{name}",
+    "quoted": "“{text}”"
   },
   "tasks": {
     "title": "Tasks",
@@ -690,7 +697,9 @@
     "card_automations": "Automations",
     "card_automations_help": "Rules that create tasks, notify or request approval when something happens.",
     "card_contract_types": "Contract types",
-    "card_contract_types_help": "Country pack modalities and your own types, with terms from legal parameters."
+    "card_contract_types_help": "Country pack modalities and your own types, with terms from legal parameters.",
+    "card_catalogs": "Catalogs",
+    "card_catalogs_help": "Document types, countries, ubigeo, banks, reasons and your own lists"
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -1093,5 +1102,49 @@
     "unit_months": "{n} months",
     "unit_days": "{n} days",
     "unit_other": "{n}"
+  },
+  "catalogs": {
+    "title": "Catalogs",
+    "sub": "Shared lists with stable codes for forms, integrations and filings",
+    "help": "Master catalogs are maintained by the platform with the official code and are updated without downtime. You can add items to extensible catalogs and to your own; an item in use is never deleted: it is archived and no longer offered.",
+    "list": "Catalogs",
+    "new_catalog": "New catalog",
+    "new_item": "Add item",
+    "edit_item": "Edit item",
+    "source_master": "Master",
+    "source_system": "System",
+    "source_organization": "Organization’s own",
+    "extensible": "Accepts custom items",
+    "locked": "Only the platform changes it",
+    "search": "Search by name or code",
+    "show_archived": "Show archived",
+    "col_label": "Name",
+    "col_code": "Code",
+    "col_statutory": "Official code",
+    "col_state": "Status",
+    "empty_title": "No items",
+    "empty_text": "This catalog has no items yet.",
+    "empty_search": "No item matches your search.",
+    "parent": "Belongs to {code}",
+    "no_statutory": "No official code",
+    "own": "Own",
+    "archived_tag": "Archived",
+    "unverified": "To be validated",
+    "unverified_help": "Not yet checked against the official source.",
+    "archive": "Archive",
+    "reactivate": "Reactivate",
+    "archived": "Item archived.",
+    "reactivated": "Item reactivated.",
+    "catalog_created": "Catalog created.",
+    "item_created": "Item added.",
+    "item_saved": "Changes saved.",
+    "name": "Name",
+    "code": "Code",
+    "code_help": "Lowercase letters, numbers and underscores; it cannot change later (integrations and imports use it).",
+    "item_code_help": "Stable item code: lowercase letters, numbers and underscores. It cannot be changed.",
+    "label_es": "Name in Spanish",
+    "label_en": "Name in English (optional)",
+    "label_pt": "Name in Portuguese (optional)",
+    "sort_order": "Order"
   }
 }

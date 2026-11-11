@@ -340,6 +340,14 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | PUT | `/settings/{group}` | `settings.parameters.update` | 0 |
 | GET | `/custom-fields/form` | sesión | 0 |
 | GET | `/exchange-rates/convert` | `settings.exchange_rates.view` | 0 |
+| GET | `/catalogs` | sesión | 0 |
+| POST | `/catalogs` | `settings.catalogs.update` | 0 |
+| GET | `/catalogs/{code}/items` | sesión | 0 |
+| POST | `/catalogs/{code}/items` | `settings.catalogs.update` | 0 |
+| PATCH | `/catalog-items/{id}` | `settings.catalogs.update` | 0 |
+| POST | `/catalog-items/{id}/archive` | `settings.catalogs.update` | 0 |
+| POST | `/catalog-items/{id}/reactivate` | `settings.catalogs.update` | 0 |
+| PATCH | `/me/preferences` | sesión | 0 |
 
 **PLT · Plataforma técnica**
 

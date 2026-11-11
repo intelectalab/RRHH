@@ -124,7 +124,11 @@
     "collapse_menu": "Recolher o menu",
     "close_menu": "Fechar o menu",
     "open_menu": "Abrir o menu",
-    "menu_section": "Menu"
+    "menu_section": "Menu",
+    "language": "Idioma",
+    "lang_es": "Español",
+    "lang_en": "English",
+    "lang_pt": "Português"
   },
   "home": {
     "title": "Olá, {name}",
@@ -336,7 +340,9 @@
     "cat_bank_account": "Conta bancária",
     "cat_identity_document": "Documento de identidade",
     "cat_union": "Filiação sindical",
-    "cat_other": "Outro"
+    "cat_other": "Outro",
+    "entity_filter": "ID {id}… ×",
+    "sensitive_short": "S"
   },
   "palette": {
     "open": "Buscar",
@@ -419,7 +425,8 @@
     "bulk_done": "{ok} aprovadas",
     "bulk_partial": "{ok} aprovadas · {fail} não puderam ser aprovadas",
     "not_yours": "Esta solicitação não aguarda sua decisão.",
-    "by": "{name}"
+    "by": "{name}",
+    "quoted": "“{text}”"
   },
   "tasks": {
     "title": "Tarefas",
@@ -690,7 +697,9 @@
     "card_automations": "Automações",
     "card_automations_help": "Regras que criam tarefas, avisam ou pedem aprovação quando algo acontece.",
     "card_contract_types": "Tipos de contrato",
-    "card_contract_types_help": "Modalidades do pacote do país e tipos próprios, com prazos segundo parâmetros legais."
+    "card_contract_types_help": "Modalidades do pacote do país e tipos próprios, com prazos segundo parâmetros legais.",
+    "card_catalogs": "Catálogos",
+    "card_catalogs_help": "Tipos de documento, países, ubigeo, bancos, motivos e listas próprias"
   },
   "cfgroup": {
     "analitica": "Análise",
@@ -1093,5 +1102,49 @@
     "unit_months": "{n} meses",
     "unit_days": "{n} dias",
     "unit_other": "{n}"
+  },
+  "catalogs": {
+    "title": "Catálogos",
+    "sub": "Listas comuns com código estável para formulários, integrações e declarações",
+    "help": "Os catálogos mestres são mantidos pela plataforma com o código oficial e atualizados sem interromper o serviço. Nos extensíveis e nos próprios você pode adicionar itens; um item em uso não é excluído: é arquivado e deixa de ser oferecido.",
+    "list": "Catálogos",
+    "new_catalog": "Novo catálogo",
+    "new_item": "Adicionar item",
+    "edit_item": "Editar item",
+    "source_master": "Mestre",
+    "source_system": "Do sistema",
+    "source_organization": "Próprio da organização",
+    "extensible": "Aceita itens próprios",
+    "locked": "Só a plataforma altera",
+    "search": "Buscar por nome ou código",
+    "show_archived": "Ver arquivados",
+    "col_label": "Nome",
+    "col_code": "Código",
+    "col_statutory": "Código oficial",
+    "col_state": "Situação",
+    "empty_title": "Sem itens",
+    "empty_text": "Este catálogo ainda não tem itens.",
+    "empty_search": "Nenhum item corresponde à busca.",
+    "parent": "Pertence a {code}",
+    "no_statutory": "Sem código oficial",
+    "own": "Próprio",
+    "archived_tag": "Arquivado",
+    "unverified": "A validar",
+    "unverified_help": "Ainda não conferido com a fonte oficial.",
+    "archive": "Arquivar",
+    "reactivate": "Reativar",
+    "archived": "Item arquivado.",
+    "reactivated": "Item reativado.",
+    "catalog_created": "Catálogo criado.",
+    "item_created": "Item adicionado.",
+    "item_saved": "Alterações salvas.",
+    "name": "Nome",
+    "code": "Código",
+    "code_help": "Minúsculas, números e sublinhado; não muda depois (usado por integrações e importações).",
+    "item_code_help": "Código estável do item: minúsculas, números e sublinhado. Não pode ser alterado.",
+    "label_es": "Nome em espanhol",
+    "label_en": "Nome em inglês (opcional)",
+    "label_pt": "Nome em português (opcional)",
+    "sort_order": "Ordem"
   }
 }

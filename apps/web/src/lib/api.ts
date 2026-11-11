@@ -1,4 +1,5 @@
 import type { paths, components } from '@contracts'
+import { getLocale } from './locale'
 
 export type { paths, components }
 export type Schema<T extends keyof components['schemas']> = components['schemas'][T]
@@ -63,6 +64,8 @@ export class ApiClient {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json, application/problem+json',
+      // CFG-6: sin sesión (ingreso, recuperar clave) la API responde en el idioma de la interfaz.
+      ...(typeof window !== 'undefined' ? { 'Accept-Language': getLocale() } : {}),
       ...(init.headers as Record<string, string> | undefined),
     }
 

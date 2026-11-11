@@ -292,6 +292,14 @@ EXTRA = [
     ("CFG", 0, "put", "/settings/{group}", "settings.parameters.update", "Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa empresa y value null vuelve a heredar", False),
     ("CFG", 0, "get", "/custom-fields/form", "-", "Campos personalizados del formulario de una entidad (?entity=) para quien puede verla; los sensibles solo con su permiso por campo", False),
     ("CFG", 0, "get", "/exchange-rates/convert", "settings.exchange_rates.view", "Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha (indica el tipo aplicado)", False),
+    ("CFG", 0, "get", "/catalogs", "-", "Catálogos maestros y de la organización (CFG-10): código, nombre, si la organización puede extenderlo y cantidad de elementos", False),
+    ("CFG", 0, "post", "/catalogs", "settings.catalogs.update", "Crear un catálogo propio de la organización (tipos, motivos, categorías)", False),
+    ("CFG", 0, "get", "/catalogs/{code}/items", "-", "Elementos de un catálogo con código estable y código oficial, etiqueta en el idioma del usuario y vigencia; ?as_of= y ?include_archived=1. Une los del catálogo maestro con los propios de la organización", False),
+    ("CFG", 0, "post", "/catalogs/{code}/items", "settings.catalogs.update", "Agregar un elemento propio a un catálogo de la organización o a un catálogo maestro extensible (etiquetas por idioma)", False),
+    ("CFG", 0, "patch", "/catalog-items/{id}", "settings.catalogs.update", "Cambiar etiquetas u orden de un elemento propio (el código no cambia)", False),
+    ("CFG", 0, "post", "/catalog-items/{id}/archive", "settings.catalogs.update", "Archivar un elemento propio: deja de ofrecerse para registros nuevos y no se elimina (RN-CFG-09)", False),
+    ("CFG", 0, "post", "/catalog-items/{id}/reactivate", "settings.catalogs.update", "Volver a ofrecer un elemento archivado", False),
+    ("CFG", 0, "patch", "/me/preferences", "-", "Preferencias propias (CFG-6): idioma de la interfaz y de las notificaciones (es, en, pt); null vuelve al idioma de la organización", False),
     ("PLT", 0, "get", "/search", "-", "Búsqueda global filtrada por permisos y alcance", False),
     ("PLT", 0, "post", "/files", "-", "Crear un archivo y obtener URL de subida firmada", False),
     ("PLT", 0, "get", "/files/{id}/download-url", "-", "URL de descarga firmada de corta vida (se valida el permiso del recurso dueño)", False),
@@ -370,6 +378,9 @@ TYPES = {
     "a": {"type": "array", "items": {"type": "string"}},
     "ao": {"type": "array", "items": {"type": "object", "additionalProperties": True}},
 }
+# Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
+CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
+
 READONLY = {"status", "version", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
@@ -536,7 +547,7 @@ def build():
 
     for epic, phase, method, path, perm, summary, public in EXTRA:
         op = {"summary": summary}
-        res = {"200": ok(ref("schemas/GenericEnvelope"))}
+        res = {"201": ok(ref("schemas/GenericEnvelope"), "Creado")} if (method, path) in CREATED else {"200": ok(ref("schemas/GenericEnvelope"))}
         if method in ("post", "put", "patch"):
             op["requestBody"] = body(ref("schemas/GenericInput"))
             if method == "post":
