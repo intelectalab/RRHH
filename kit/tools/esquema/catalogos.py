@@ -338,6 +338,10 @@ LEGAL_PE = [
  lp('host_descargos_dias', 'Hostigamiento: plazo interno de descargos', 'days', None, False, 'DS 014-2019-MIMP art. 29.5', 'Lo fija el comité dentro de sus 15 días; por confirmar.'),
  lp('host_alegatos_dias', 'Hostigamiento: plazo interno de alegatos', 'days', None, False, 'DS 014-2019-MIMP art. 29.6', 'Dentro de los 10 días de la decisión; por confirmar.'),
  lp('vida_ley_registro_poliza_dias', 'Plazo para registrar la póliza de vida', 'days', 30, True, 'DS 009-2020-TR'),
+ # AUS-1 · Duración de licencias de ley que proponen los tipos de ausencia (RN-AUS-04). Sin valor hasta validarlas.
+ lp('licencia_maternidad_dias', 'Licencia por maternidad (días naturales, prenatal y postnatal)', 'days', None, False, 'Ley 26644', 'Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad).'),
+ lp('licencia_paternidad_dias', 'Licencia por paternidad (días naturales consecutivos)', 'days', None, False, 'Ley 29409 y Ley 30807', 'Por confirmar la duración vigente y los supuestos con más días.'),
+ lp('licencia_fallecimiento_familiar_dias', 'Licencia por fallecimiento de un familiar directo (días)', 'days', None, False, 'Por confirmar', 'Por confirmar si existe licencia general en el régimen privado o solo por convenio.'),
  lp('teletrabajo_respuesta_dias_habiles', 'Plazo de respuesta a solicitudes de teletrabajo (días hábiles)', 'days', 10, True, 'Ley 31572'),
  lp('teletrabajo_desconexion_horas', 'Desconexión digital mínima continua', 'hours', 12, True, 'Ley 31572'),
  lp('privacidad_notificacion_incidente_horas', 'Plazo para notificar un incidente de datos personales', 'hours', 48, True, 'DS 016-2024-JUS', vfrom='2025-03-30', vfrom_ok=True),

@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 166,
+    "parametros": 169,
     "verificados": 126,
-    "sin_verificar": 40
+    "sin_verificar": 43
   },
   "parametros": [
     {
@@ -1233,6 +1233,51 @@
       "verificado": true,
       "base_legal": "DS 009-2020-TR",
       "nota": ""
+    },
+    {
+      "codigo": "licencia_maternidad_dias",
+      "nombre": "Licencia por maternidad (días naturales, prenatal y postnatal)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 26644",
+      "nota": "Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad)."
+    },
+    {
+      "codigo": "licencia_paternidad_dias",
+      "nombre": "Licencia por paternidad (días naturales consecutivos)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 29409 y Ley 30807",
+      "nota": "Por confirmar la duración vigente y los supuestos con más días."
+    },
+    {
+      "codigo": "licencia_fallecimiento_familiar_dias",
+      "nombre": "Licencia por fallecimiento de un familiar directo (días)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Por confirmar",
+      "nota": "Por confirmar si existe licencia general en el régimen privado o solo por convenio."
     },
     {
       "codigo": "teletrabajo_respuesta_dias_habiles",

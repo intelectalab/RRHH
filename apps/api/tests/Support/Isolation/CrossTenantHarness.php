@@ -2,6 +2,7 @@
 
 namespace Tests\Support\Isolation;
 
+use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -54,6 +55,8 @@ final class CrossTenantHarness
         '/catalog-items/{id}' => CatalogItem::class,
         '/catalog-items/{id}/archive' => CatalogItem::class,
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
+        // AUS-1: historia de reglas de un tipo de ausencia de A.
+        '/absence-types/{id}/rules' => AbsenceType::class,
     ];
 
     /**

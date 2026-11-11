@@ -16,7 +16,8 @@ trait HasValidity
      */
     public function scopeAsOf(Builder $query, CarbonInterface|string $date): Builder
     {
-        EffectiveDated::applyAsOf($query, $date, $query->qualifyColumn('valid_from'), $query->qualifyColumn('valid_to'));
+        // Sobre el constructor base: el filtro es el mismo y el tipo no depende del modelo concreto.
+        EffectiveDated::applyAsOf($query->getQuery(), $date, $query->qualifyColumn('valid_from'), $query->qualifyColumn('valid_to'));
 
         return $query;
     }
