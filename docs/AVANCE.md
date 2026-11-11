@@ -6,8 +6,8 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 57 | 9 | 23,7 % |
-| Backlog completo | 512 | 57 | 9 | 11,1 % |
+| Primer corte comercial (MVP) | 241 | 58 | 9 | 24,1 % |
+| Backlog completo | 512 | 58 | 9 | 11,3 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -64,7 +64,7 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 | AUD-5 | Integridad y retención de la auditoría | AUD | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Cadena de hash por organización; audit:verify-integrity diario detecta filas alteradas, faltantes, duplicadas o sin sellar y archivos fríos alterados; GET /audit-integrity-checks y pantalla Integridad y retención; audit:archive escribe archivos mensuales, suelta la partición cuando todas las organizaciones archivaron y borra al vencer la retención. Pendiente: aviso cuando falla la verificación y vista en la consola. |
 | UI-1 | Fundamentos visuales y temas claro y oscuro | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | Tokens semánticos de componentes (primario, controles, barra, velo, avisos, avatar) definidos para claro y oscuro; ningún estilo ni componente usa colores literales (prueba que recorre src/ui y src/modules); contraste AA verificado por prueba en 18 pares de uso real en ambos temas; tema claro/oscuro/del sistema en el menú de la cuenta, aplicado antes de pintar; identidad propia (petróleo/ocre, Nunito Sans). Kit v1.13: tokens de docs/10 (azul de marca #0A3A73 y amarillo #F4B400, IBM Plex servida localmente, radios 7/10/12 px), ambos temas con valores propios. |
 | UI-2 | Armazón de navegación | UI | Fase 0 · Cimientos | Story | sí | en_curso | 2026-11-10 | Armazón del kit v1.13 (docs/10 §3.12): barra lateral de 252 px con usuario, menú filtrado por módulo contratado y permiso, contadores y sección Cuenta; se contrae a 68 px (preferencia recordada), de 768 a 1023 px queda en iconos y se abre superpuesta, en celular es cajón con fondo oscurecido (Escape y tocar fuera la cierran); cabecera de 60 px en una línea con miga «Organización · Rol» y el título que publica cada pantalla. Falta la ayuda de pantalla (AYU) y el botón «Crear» cuando existan esas historias. |
-| UI-3 | Biblioteca de componentes | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
+| UI-3 | Biblioteca de componentes | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Biblioteca base con variantes y estados (normal, foco, deshabilitado, error, cargando): botón, tarjeta, pestañas, panel lateral y modal, línea de tiempo, estados y etiquetas, avisos, ayudas emergentes, menús, selector de persona (busca con permisos y alcance de quien pregunta), cargador de archivos y esqueletos; todo operable con teclado. Catálogo en /componentes (en producción solo con NEXT_PUBLIC_UI_CATALOG=1). Pendiente: ruta POST /files real, adopción en pantallas existentes, e2e. |
 | UI-4 | Tablas profesionales | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
 | UI-5 | Formularios y validación en interfaz | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | formErrors coloca cada error del backend junto a su campo (también campos anidados) y deja un mensaje general para lo que no es de un campo; sin red, el cliente devuelve network_error y el formulario conserva lo escrito; mensajes del servidor en lenguaje claro y en el idioma del usuario. Aplicado en Empresas y Usuarios; prueba unitaria. |
 | UI-6 | Estados vacíos, carga y error | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | Componentes EmptyState (explicación + acción si el usuario tiene permiso) y ErrorState (reintentar); esqueletos de carga en las tablas; aplicados a Usuarios, Empresas, Roles y Auditoría (ninguna pantalla muestra solo «No hay registros»). |
