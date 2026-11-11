@@ -12513,7 +12513,7 @@ paths:
         '429': *id004
       tags:
       - RPT
-      x-phase: 8
+      x-phase: 0
       x-permission: reports.exports.view
       operationId: getExports
     post:
@@ -12546,7 +12546,7 @@ paths:
         '429': *id004
       tags:
       - RPT
-      x-phase: 8
+      x-phase: 0
       x-permission: reports.exports.create
       operationId: postExports
   /exports/{id}:
@@ -12577,9 +12577,34 @@ paths:
         '404': *id005
       tags:
       - RPT
-      x-phase: 8
+      x-phase: 0
       x-permission: reports.exports.view
       operationId: getExportsId
+  /exports/{id}/download:
+    get:
+      summary: Descargar el archivo de una exportación propia (CSV); cuenta la descarga y la registra
+      responses:
+        '200':
+          description: Archivo
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '409': *id006
+      tags:
+      - RPT
+      x-phase: 0
+      x-permission: reports.exports.view
+      operationId: getExportsIdDownload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /external-income-declarations:
     get:
       summary: Listar ExternalIncomeDeclaration
@@ -36957,7 +36982,7 @@ components:
           nullable: true
         tasks:
           type: array
-          items: &id359
+          items: &id366
             type: object
             additionalProperties: true
           nullable: true
@@ -39252,24 +39277,47 @@ components:
         filters: &id297
           type: object
           additionalProperties: true
-        file_id: &id298
+        row_count: &id298
+          type: integer
+          nullable: true
+        contains_sensitive: &id299
+          type: boolean
+          nullable: true
+        requested_by_user_id: &id300
           type: string
           description: Identificador opaco
           nullable: true
-        expires_at: &id299
+        requested_by_name: &id301
+          type: string
+          nullable: true
+        file_id: &id302
+          type: string
+          description: Identificador opaco
+          nullable: true
+        download_url: &id303
+          type: string
+          nullable: true
+        download_count: &id304
+          type: integer
+          nullable: true
+        expires_at: &id305
           type: string
           format: date-time
           nullable: true
+        error: &id306
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
         status:
           type: string
           enum:
           - queued
           - running
-          - ready
+          - completed
           - failed
-        created_at:
-          type: string
-          format: date-time
+          - expired
         updated_at:
           type: string
           format: date-time
@@ -39279,8 +39327,19 @@ components:
         resource: *id295
         format: *id296
         filters: *id297
-        file_id: *id298
-        expires_at: *id299
+        row_count: *id298
+        contains_sensitive: *id299
+        requested_by_user_id: *id300
+        requested_by_name: *id301
+        file_id: *id302
+        download_url: *id303
+        download_count: *id304
+        expires_at: *id305
+        error: *id306
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
     ExternalIncomeDeclaration:
       type: object
       required:
@@ -39293,48 +39352,48 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id300
+        employment_id: &id307
           type: string
           description: Identificador opaco
-        fiscal_year: &id301
+        fiscal_year: &id308
           type: integer
-        kind: &id302
+        kind: &id309
           type: string
           enum:
           - previous_employer
           - concurrent_employer
-        employer_tax_id: &id303
+        employer_tax_id: &id310
           type: string
           nullable: true
-        employer_name: &id304
+        employer_name: &id311
           type: string
           nullable: true
-        period_from: &id305
-          type: string
-          format: date
-          nullable: true
-        period_to: &id306
+        period_from: &id312
           type: string
           format: date
           nullable: true
-        gross_income: &id307
+        period_to: &id313
+          type: string
+          format: date
+          nullable: true
+        gross_income: &id314
           $ref: '#/components/schemas/Money'
-        exempt_income: &id308
+        exempt_income: &id315
           $ref: '#/components/schemas/Money'
-        tax_withheld: &id309
+        tax_withheld: &id316
           $ref: '#/components/schemas/Money'
-        monthly_detail: &id310
+        monthly_detail: &id317
           type: object
           additionalProperties: true
           nullable: true
-        this_employer_withholds: &id311
+        this_employer_withholds: &id318
           type: boolean
           nullable: true
-        document_id: &id312
+        document_id: &id319
           type: string
           description: Identificador opaco
           nullable: true
-        received_on: &id313
+        received_on: &id320
           type: string
           format: date
           nullable: true
@@ -39361,20 +39420,20 @@ components:
     ExternalIncomeDeclarationInput:
       type: object
       properties:
-        employment_id: *id300
-        fiscal_year: *id301
-        kind: *id302
-        employer_tax_id: *id303
-        employer_name: *id304
-        period_from: *id305
-        period_to: *id306
-        gross_income: *id307
-        exempt_income: *id308
-        tax_withheld: *id309
-        monthly_detail: *id310
-        this_employer_withholds: *id311
-        document_id: *id312
-        received_on: *id313
+        employment_id: *id307
+        fiscal_year: *id308
+        kind: *id309
+        employer_tax_id: *id310
+        employer_name: *id311
+        period_from: *id312
+        period_to: *id313
+        gross_income: *id314
+        exempt_income: *id315
+        tax_withheld: *id316
+        monthly_detail: *id317
+        this_employer_withholds: *id318
+        document_id: *id319
+        received_on: *id320
     FeatureFlag:
       type: object
       required:
@@ -39387,13 +39446,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        key: &id314
+        key: &id321
           type: string
-        description: &id315
+        description: &id322
           type: string
-        default_on: &id316
+        default_on: &id323
           type: boolean
-        rules: &id317
+        rules: &id324
           type: object
           additionalProperties: true
         created_at:
@@ -39405,10 +39464,10 @@ components:
     FeatureFlagInput:
       type: object
       properties:
-        key: *id314
-        description: *id315
-        default_on: *id316
-        rules: *id317
+        key: *id321
+        description: *id322
+        default_on: *id323
+        rules: *id324
     Feedback:
       type: object
       required:
@@ -39422,21 +39481,21 @@ components:
         id:
           type: string
           description: Identificador opaco
-        from_employment_id: &id318
+        from_employment_id: &id325
           type: string
           description: Identificador opaco
-        to_employment_id: &id319
+        to_employment_id: &id326
           type: string
           description: Identificador opaco
-        kind: &id320
+        kind: &id327
           type: string
           enum:
           - requested
           - given
           - praise
-        body: &id321
+        body: &id328
           type: string
-        visibility: &id322
+        visibility: &id329
           type: string
           enum:
           - private
@@ -39451,11 +39510,11 @@ components:
     FeedbackInput:
       type: object
       properties:
-        from_employment_id: *id318
-        to_employment_id: *id319
-        kind: *id320
-        body: *id321
-        visibility: *id322
+        from_employment_id: *id325
+        to_employment_id: *id326
+        kind: *id327
+        body: *id328
+        visibility: *id329
     FifthCategoryLedgerEntry:
       type: object
       required:
@@ -39549,29 +39608,29 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id323
+        employment_id: &id330
           type: string
           description: Identificador opaco
-        fiscal_year: &id324
+        fiscal_year: &id331
           type: integer
-        origin: &id325
+        origin: &id332
           type: string
           enum:
           - termination
           - december_adjustment
           - worker_declaration
-        amount: &id326
+        amount: &id333
           $ref: '#/components/schemas/Money'
-        refunded_on: &id327
+        refunded_on: &id334
           type: string
           format: date
           nullable: true
-        compensated_amount: &id328
+        compensated_amount: &id335
           $ref: '#/components/schemas/Money'
-        compensation_period: &id329
+        compensation_period: &id336
           type: string
           nullable: true
-        authority_refund_reference: &id330
+        authority_refund_reference: &id337
           type: string
           nullable: true
         status:
@@ -39594,14 +39653,14 @@ components:
     FifthCategoryRefundInput:
       type: object
       properties:
-        employment_id: *id323
-        fiscal_year: *id324
-        origin: *id325
-        amount: *id326
-        refunded_on: *id327
-        compensated_amount: *id328
-        compensation_period: *id329
-        authority_refund_reference: *id330
+        employment_id: *id330
+        fiscal_year: *id331
+        origin: *id332
+        amount: *id333
+        refunded_on: *id334
+        compensated_amount: *id335
+        compensation_period: *id336
+        authority_refund_reference: *id337
     Geofence:
       type: object
       required:
@@ -39615,15 +39674,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        site_id: &id331
+        site_id: &id338
           type: string
           description: Identificador opaco
-        name: &id332
+        name: &id339
           type: string
-        center: &id333
+        center: &id340
           type: object
           additionalProperties: true
-        radius_m: &id334
+        radius_m: &id341
           type: integer
         status:
           type: string
@@ -39639,10 +39698,10 @@ components:
     GeofenceInput:
       type: object
       properties:
-        site_id: *id331
-        name: *id332
-        center: *id333
-        radius_m: *id334
+        site_id: *id338
+        name: *id339
+        center: *id340
+        radius_m: *id341
     Grievance:
       type: object
       required:
@@ -39714,25 +39773,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id335
+        legal_entity_id: &id342
           type: string
           description: Identificador opaco
-        site_id: &id336
+        site_id: &id343
           type: string
           description: Identificador opaco
           nullable: true
-        kind: &id337
+        kind: &id344
           type: string
           enum:
           - committee
           - delegate
-        members: &id338
+        members: &id345
           type: object
           additionalProperties: true
-        term_start: &id339
+        term_start: &id346
           type: string
           format: date
-        term_end: &id340
+        term_end: &id347
           type: string
           format: date
           nullable: true
@@ -39750,12 +39809,12 @@ components:
     HarassmentCommitteeInput:
       type: object
       properties:
-        legal_entity_id: *id335
-        site_id: *id336
-        kind: *id337
-        members: *id338
-        term_start: *id339
-        term_end: *id340
+        legal_entity_id: *id342
+        site_id: *id343
+        kind: *id344
+        members: *id345
+        term_start: *id346
+        term_end: *id347
     HeadcountPlan:
       type: object
       required:
@@ -39769,16 +39828,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id341
+        name: &id348
           type: string
-        scenario: &id342
+        scenario: &id349
           type: string
           enum:
           - current
           - conservative
           - growth
           - custom
-        year: &id343
+        year: &id350
           type: integer
         status:
           type: string
@@ -39787,7 +39846,7 @@ components:
           - submitted
           - approved
           - closed
-        totals: &id344
+        totals: &id351
           type: object
           additionalProperties: true
         created_at:
@@ -39799,10 +39858,10 @@ components:
     HeadcountPlanInput:
       type: object
       properties:
-        name: *id341
-        scenario: *id342
-        year: *id343
-        totals: *id344
+        name: *id348
+        scenario: *id349
+        year: *id350
+        totals: *id351
     HelpArticle:
       type: object
       required:
@@ -39820,23 +39879,23 @@ components:
         id:
           type: string
           description: Identificador opaco
-        slug: &id345
+        slug: &id352
           type: string
-        locale: &id346
+        locale: &id353
           type: string
-        title: &id347
+        title: &id354
           type: string
-        body: &id348
+        body: &id355
           type: string
-        module_code: &id349
+        module_code: &id356
           type: string
-        roles: &id350
+        roles: &id357
           type: array
           items: *id034
-        screen_keys: &id351
+        screen_keys: &id358
           type: array
           items: *id034
-        product_version: &id352
+        product_version: &id359
           type: string
         status:
           type: string
@@ -39853,14 +39912,14 @@ components:
     HelpArticleInput:
       type: object
       properties:
-        slug: *id345
-        locale: *id346
-        title: *id347
-        body: *id348
-        module_code: *id349
-        roles: *id350
-        screen_keys: *id351
-        product_version: *id352
+        slug: *id352
+        locale: *id353
+        title: *id354
+        body: *id355
+        module_code: *id356
+        roles: *id357
+        screen_keys: *id358
+        product_version: *id359
     HelpOrgArticle:
       type: object
       required:
@@ -39875,21 +39934,21 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id353
+        title: &id360
           type: string
-        category_id: &id354
+        category_id: &id361
           type: string
           description: Identificador opaco
           nullable: true
-        body: &id355
+        body: &id362
           type: string
-        audience: &id356
+        audience: &id363
           type: object
           additionalProperties: true
-        owner_user_id: &id357
+        owner_user_id: &id364
           type: string
           description: Identificador opaco
-        review_on: &id358
+        review_on: &id365
           type: string
           format: date
           nullable: true
@@ -39911,12 +39970,12 @@ components:
     HelpOrgArticleInput:
       type: object
       properties:
-        title: *id353
-        category_id: *id354
-        body: *id355
-        audience: *id356
-        owner_user_id: *id357
-        review_on: *id358
+        title: *id360
+        category_id: *id361
+        body: *id362
+        audience: *id363
+        owner_user_id: *id364
+        review_on: *id365
     HolidayCalendar:
       type: object
       required:
@@ -39929,20 +39988,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id360
+        code: &id367
           type: string
           nullable: true
-        name: &id361
+        name: &id368
           type: string
-        country: &id362
+        country: &id369
           type: string
-        scope: &id363
+        scope: &id370
           type: object
           additionalProperties: true
-        holidays: &id364
+        holidays: &id371
           type: array
-          items: *id359
-        is_default: &id365
+          items: *id366
+        is_default: &id372
           type: boolean
           nullable: true
         created_at:
@@ -39954,12 +40013,12 @@ components:
     HolidayCalendarInput:
       type: object
       properties:
-        code: *id360
-        name: *id361
-        country: *id362
-        scope: *id363
-        holidays: *id364
-        is_default: *id365
+        code: *id367
+        name: *id368
+        country: *id369
+        scope: *id370
+        holidays: *id371
+        is_default: *id372
     ImportJob:
       type: object
       required:
@@ -39972,7 +40031,7 @@ components:
         id:
           type: string
           description: Identificador opaco
-        kind: &id366
+        kind: &id373
           type: string
           enum:
           - employees
@@ -39982,10 +40041,10 @@ components:
           - attendance
           - concepts
           - history
-        file_id: &id367
+        file_id: &id374
           type: string
           description: Identificador opaco
-        mapping: &id368
+        mapping: &id375
           type: object
           additionalProperties: true
         status:
@@ -39998,7 +40057,7 @@ components:
           - completed
           - failed
           - cancelled
-        summary: &id369
+        summary: &id376
           type: object
           additionalProperties: true
           nullable: true
@@ -40011,10 +40070,10 @@ components:
     ImportJobInput:
       type: object
       properties:
-        kind: *id366
-        file_id: *id367
-        mapping: *id368
-        summary: *id369
+        kind: *id373
+        file_id: *id374
+        mapping: *id375
+        summary: *id376
     InspectionFile:
       type: object
       required:
@@ -40029,20 +40088,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id370
+        legal_entity_id: &id377
           type: string
           description: Identificador opaco
-        employment_ids: &id371
+        employment_ids: &id378
           type: array
           items: *id034
-        period_from: &id372
+        period_from: &id379
           type: string
-        period_to: &id373
+        period_to: &id380
           type: string
-        sections: &id374
+        sections: &id381
           type: array
           items: *id034
-        file_id: &id375
+        file_id: &id382
           type: string
           description: Identificador opaco
           nullable: true
@@ -40062,12 +40121,12 @@ components:
     InspectionFileInput:
       type: object
       properties:
-        legal_entity_id: *id370
-        employment_ids: *id371
-        period_from: *id372
-        period_to: *id373
-        sections: *id374
-        file_id: *id375
+        legal_entity_id: *id377
+        employment_ids: *id378
+        period_from: *id379
+        period_to: *id380
+        sections: *id381
+        file_id: *id382
     IntegrationConnection:
       type: object
       required:
@@ -40081,14 +40140,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        port: &id376
+        port: &id383
           type: string
-        driver: &id377
+        driver: &id384
           type: string
-        config: &id378
+        config: &id385
           type: object
           additionalProperties: true
-        health: &id379
+        health: &id386
           type: string
           enum:
           - ok
@@ -40114,10 +40173,10 @@ components:
     IntegrationConnectionInput:
       type: object
       properties:
-        port: *id376
-        driver: *id377
-        config: *id378
-        health: *id379
+        port: *id383
+        driver: *id384
+        config: *id385
+        health: *id386
     Interview:
       type: object
       required:
@@ -40132,24 +40191,24 @@ components:
         id:
           type: string
           description: Identificador opaco
-        application_id: &id380
+        application_id: &id387
           type: string
           description: Identificador opaco
-        starts_at: &id381
+        starts_at: &id388
           type: string
           format: date-time
-        ends_at: &id382
+        ends_at: &id389
           type: string
           format: date-time
-        kind: &id383
+        kind: &id390
           type: string
-        location: &id384
+        location: &id391
           type: string
           nullable: true
-        interviewer_ids: &id385
+        interviewer_ids: &id392
           type: array
           items: *id034
-        guide: &id386
+        guide: &id393
           type: string
           nullable: true
         status:
@@ -40168,13 +40227,13 @@ components:
     InterviewInput:
       type: object
       properties:
-        application_id: *id380
-        starts_at: *id381
-        ends_at: *id382
-        kind: *id383
-        location: *id384
-        interviewer_ids: *id385
-        guide: *id386
+        application_id: *id387
+        starts_at: *id388
+        ends_at: *id389
+        kind: *id390
+        location: *id391
+        interviewer_ids: *id392
+        guide: *id393
     JobProfile:
       type: object
       required:
@@ -40186,20 +40245,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id387
+        code: &id394
           type: string
-        name: &id388
+        name: &id395
           type: string
-        level: &id389
-          type: string
-          nullable: true
-        category: &id390
+        level: &id396
           type: string
           nullable: true
-        family: &id391
+        category: &id397
           type: string
           nullable: true
-        description: &id392
+        family: &id398
+          type: string
+          nullable: true
+        description: &id399
           type: string
           nullable: true
         status:
@@ -40216,12 +40275,12 @@ components:
     JobProfileInput:
       type: object
       properties:
-        code: *id387
-        name: *id388
-        level: *id389
-        category: *id390
-        family: *id391
-        description: *id392
+        code: *id394
+        name: *id395
+        level: *id396
+        category: *id397
+        family: *id398
+        description: *id399
     JobRequisition:
       type: object
       required:
@@ -40237,27 +40296,27 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id393
+        title: &id400
           type: string
-        position_id: &id394
+        position_id: &id401
           type: string
           description: Identificador opaco
           nullable: true
-        job_profile_id: &id395
+        job_profile_id: &id402
           type: string
           description: Identificador opaco
-        org_unit_id: &id396
+        org_unit_id: &id403
           type: string
           description: Identificador opaco
-        description: &id397
+        description: &id404
           type: string
-        salary_range: &id398
+        salary_range: &id405
           type: object
           additionalProperties: true
           nullable: true
-        internal: &id399
+        internal: &id406
           type: boolean
-        pipeline: &id400
+        pipeline: &id407
           type: object
           additionalProperties: true
         status:
@@ -40281,14 +40340,14 @@ components:
     JobRequisitionInput:
       type: object
       properties:
-        title: *id393
-        position_id: *id394
-        job_profile_id: *id395
-        org_unit_id: *id396
-        description: *id397
-        salary_range: *id398
-        internal: *id399
-        pipeline: *id400
+        title: *id400
+        position_id: *id401
+        job_profile_id: *id402
+        org_unit_id: *id403
+        description: *id404
+        salary_range: *id405
+        internal: *id406
+        pipeline: *id407
     LegalEntity:
       type: object
       required:
@@ -40304,24 +40363,24 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id408
+        name: &id415
           type: string
-        tax_id: &id409
+        tax_id: &id416
           type: string
-        country: &id410
+        country: &id417
           type: string
-        currency: &id411
+        currency: &id418
           type: string
-        timezone: &id412
+        timezone: &id419
           type: string
-        payroll_regime: &id413
+        payroll_regime: &id420
           type: string
         status:
           type: string
           enum:
           - active
           - archived
-        custom_fields: &id414
+        custom_fields: &id421
           type: object
           additionalProperties: true
           nullable: true
@@ -40344,21 +40403,21 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id401
+        legal_entity_id: &id408
           type: string
           description: Identificador opaco
-        fiscal_year: &id402
+        fiscal_year: &id409
           type: integer
-        net_sales: &id403
+        net_sales: &id410
           $ref: '#/components/schemas/Money'
-        uit_value: &id404
+        uit_value: &id411
           $ref: '#/components/schemas/Money'
-        sales_in_uit: &id405
+        sales_in_uit: &id412
           type: number
-        average_headcount: &id406
+        average_headcount: &id413
           type: number
           nullable: true
-        source_document_id: &id407
+        source_document_id: &id414
           type: string
           description: Identificador opaco
           nullable: true
@@ -40371,23 +40430,23 @@ components:
     LegalEntityAnnualFigureInput:
       type: object
       properties:
-        legal_entity_id: *id401
-        fiscal_year: *id402
-        net_sales: *id403
-        uit_value: *id404
-        sales_in_uit: *id405
-        average_headcount: *id406
-        source_document_id: *id407
+        legal_entity_id: *id408
+        fiscal_year: *id409
+        net_sales: *id410
+        uit_value: *id411
+        sales_in_uit: *id412
+        average_headcount: *id413
+        source_document_id: *id414
     LegalEntityInput:
       type: object
       properties:
-        name: *id408
-        tax_id: *id409
-        country: *id410
-        currency: *id411
-        timezone: *id412
-        payroll_regime: *id413
-        custom_fields: *id414
+        name: *id415
+        tax_id: *id416
+        country: *id417
+        currency: *id418
+        timezone: *id419
+        payroll_regime: *id420
+        custom_fields: *id421
     LegalParameter:
       type: object
       required:
@@ -40401,26 +40460,26 @@ components:
         id:
           type: string
           description: Identificador opaco
-        key: &id415
+        key: &id422
           type: string
-        country: &id416
+        country: &id423
           type: string
-        regime: &id417
+        regime: &id424
           type: string
           nullable: true
-        description: &id418
+        description: &id425
           type: string
-        unit: &id419
+        unit: &id426
           type: string
           enum:
           - amount
           - percent
           - days
           - count
-        values: &id420
+        values: &id427
           type: object
           additionalProperties: true
-        source_reference: &id421
+        source_reference: &id428
           type: string
           nullable: true
         created_at:
@@ -40432,13 +40491,13 @@ components:
     LegalParameterInput:
       type: object
       properties:
-        key: *id415
-        country: *id416
-        regime: *id417
-        description: *id418
-        unit: *id419
-        values: *id420
-        source_reference: *id421
+        key: *id422
+        country: *id423
+        regime: *id424
+        description: *id425
+        unit: *id426
+        values: *id427
+        source_reference: *id428
     Loan:
       type: object
       required:
@@ -40450,17 +40509,17 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id422
+        employment_id: &id429
           type: string
           description: Identificador opaco
-        principal: &id423
+        principal: &id430
           $ref: '#/components/schemas/Money'
-        installments: &id424
+        installments: &id431
           type: integer
-        schedule: &id425
+        schedule: &id432
           type: object
           additionalProperties: true
-        balance: &id426
+        balance: &id433
           $ref: '#/components/schemas/Money'
         status:
           type: string
@@ -40485,11 +40544,11 @@ components:
     LoanInput:
       type: object
       properties:
-        employment_id: *id422
-        principal: *id423
-        installments: *id424
-        schedule: *id425
-        balance: *id426
+        employment_id: *id429
+        principal: *id430
+        installments: *id431
+        schedule: *id432
+        balance: *id433
     MedicalExam:
       type: object
       required:
@@ -40501,32 +40560,32 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id427
+        employment_id: &id434
           type: string
           description: Identificador opaco
-        kind: &id428
+        kind: &id435
           type: string
           enum:
           - pre_employment
           - periodic
           - exit
-        date: &id429
+        date: &id436
           type: string
           format: date
-        expires_on: &id430
+        expires_on: &id437
           type: string
           format: date
           nullable: true
-        fitness: &id431
+        fitness: &id438
           type: string
           enum:
           - fit
           - fit_with_restrictions
           - unfit
-        restrictions: &id432
+        restrictions: &id439
           type: string
           nullable: true
-        file_id: &id433
+        file_id: &id440
           type: string
           description: Identificador opaco
           nullable: true
@@ -40544,13 +40603,13 @@ components:
     MedicalExamInput:
       type: object
       properties:
-        employment_id: *id427
-        kind: *id428
-        date: *id429
-        expires_on: *id430
-        fitness: *id431
-        restrictions: *id432
-        file_id: *id433
+        employment_id: *id434
+        kind: *id435
+        date: *id436
+        expires_on: *id437
+        fitness: *id438
+        restrictions: *id439
+        file_id: *id440
     NotificationTemplate:
       type: object
       required:
@@ -40563,9 +40622,9 @@ components:
         id:
           type: string
           description: Identificador opaco
-        key: &id434
+        key: &id441
           type: string
-        channel: &id435
+        channel: &id442
           type: string
           enum:
           - in_app
@@ -40573,27 +40632,27 @@ components:
           - push
           - whatsapp
           - sms
-        locale: &id436
+        locale: &id443
           type: string
-        subject: &id437
+        subject: &id444
           type: string
           nullable: true
-        body: &id438
+        body: &id445
           type: string
-        variables: &id439
+        variables: &id446
           type: array
           items: *id034
           nullable: true
-        mandatory: &id440
+        mandatory: &id447
           type: boolean
           nullable: true
-        customized: &id441
+        customized: &id448
           type: boolean
           nullable: true
-        default_subject: &id442
+        default_subject: &id449
           type: string
           nullable: true
-        default_body: &id443
+        default_body: &id450
           type: string
           nullable: true
         created_at:
@@ -40605,16 +40664,16 @@ components:
     NotificationTemplateInput:
       type: object
       properties:
-        key: *id434
-        channel: *id435
-        locale: *id436
-        subject: *id437
-        body: *id438
-        variables: *id439
-        mandatory: *id440
-        customized: *id441
-        default_subject: *id442
-        default_body: *id443
+        key: *id441
+        channel: *id442
+        locale: *id443
+        subject: *id444
+        body: *id445
+        variables: *id446
+        mandatory: *id447
+        customized: *id448
+        default_subject: *id449
+        default_body: *id450
     Objective:
       type: object
       required:
@@ -40629,32 +40688,32 @@ components:
         id:
           type: string
           description: Identificador opaco
-        level: &id444
+        level: &id451
           type: string
           enum:
           - company
           - unit
           - individual
-        owner_employment_id: &id445
+        owner_employment_id: &id452
           type: string
           description: Identificador opaco
           nullable: true
-        org_unit_id: &id446
+        org_unit_id: &id453
           type: string
           description: Identificador opaco
           nullable: true
-        parent_id: &id447
+        parent_id: &id454
           type: string
           description: Identificador opaco
           nullable: true
-        title: &id448
+        title: &id455
           type: string
-        key_results: &id449
+        key_results: &id456
           type: object
           additionalProperties: true
-        progress: &id450
+        progress: &id457
           type: number
-        period: &id451
+        period: &id458
           type: string
         status:
           type: string
@@ -40672,14 +40731,14 @@ components:
     ObjectiveInput:
       type: object
       properties:
-        level: *id444
-        owner_employment_id: *id445
-        org_unit_id: *id446
-        parent_id: *id447
-        title: *id448
-        key_results: *id449
-        progress: *id450
-        period: *id451
+        level: *id451
+        owner_employment_id: *id452
+        org_unit_id: *id453
+        parent_id: *id454
+        title: *id455
+        key_results: *id456
+        progress: *id457
+        period: *id458
     OffboardingProcess:
       type: object
       required:
@@ -40693,18 +40752,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id452
+        employment_id: &id459
           type: string
           description: Identificador opaco
-        reason: &id453
+        reason: &id460
           type: string
-        last_day: &id454
+        last_day: &id461
           type: string
           format: date
-        tasks: &id455
+        tasks: &id462
           type: object
           additionalProperties: true
-        exit_interview: &id456
+        exit_interview: &id463
           type: object
           additionalProperties: true
           nullable: true
@@ -40724,11 +40783,11 @@ components:
     OffboardingProcessInput:
       type: object
       properties:
-        employment_id: *id452
-        reason: *id453
-        last_day: *id454
-        tasks: *id455
-        exit_interview: *id456
+        employment_id: *id459
+        reason: *id460
+        last_day: *id461
+        tasks: *id462
+        exit_interview: *id463
     Offer:
       type: object
       required:
@@ -40741,15 +40800,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        application_id: &id457
+        application_id: &id464
           type: string
           description: Identificador opaco
-        template_id: &id458
+        template_id: &id465
           type: string
           description: Identificador opaco
-        salary: &id459
+        salary: &id466
           $ref: '#/components/schemas/Money'
-        start_date: &id460
+        start_date: &id467
           type: string
           format: date
         status:
@@ -40775,10 +40834,10 @@ components:
     OfferInput:
       type: object
       properties:
-        application_id: *id457
-        template_id: *id458
-        salary: *id459
-        start_date: *id460
+        application_id: *id464
+        template_id: *id465
+        salary: *id466
+        start_date: *id467
     OnboardingProcess:
       type: object
       required:
@@ -40792,15 +40851,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id461
+        employment_id: &id468
           type: string
           description: Identificador opaco
-        template_id: &id462
+        template_id: &id469
           type: string
           description: Identificador opaco
-        progress: &id463
+        progress: &id470
           type: integer
-        tasks: &id464
+        tasks: &id471
           type: object
           additionalProperties: true
         status:
@@ -40819,10 +40878,10 @@ components:
     OnboardingProcessInput:
       type: object
       properties:
-        employment_id: *id461
-        template_id: *id462
-        progress: *id463
-        tasks: *id464
+        employment_id: *id468
+        template_id: *id469
+        progress: *id470
+        tasks: *id471
     OneOnOne:
       type: object
       required:
@@ -40837,25 +40896,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        manager_employment_id: &id465
+        manager_employment_id: &id472
           type: string
           description: Identificador opaco
-        employment_id: &id466
+        employment_id: &id473
           type: string
           description: Identificador opaco
-        scheduled_at: &id467
+        scheduled_at: &id474
           type: string
           format: date-time
-        agenda: &id468
+        agenda: &id475
           type: object
           additionalProperties: true
-        notes: &id469
+        notes: &id476
           type: string
           nullable: true
-        private_notes: &id470
+        private_notes: &id477
           type: string
           nullable: true
-        commitments: &id471
+        commitments: &id478
           type: object
           additionalProperties: true
         status:
@@ -40873,13 +40932,13 @@ components:
     OneOnOneInput:
       type: object
       properties:
-        manager_employment_id: *id465
-        employment_id: *id466
-        scheduled_at: *id467
-        agenda: *id468
-        notes: *id469
-        private_notes: *id470
-        commitments: *id471
+        manager_employment_id: *id472
+        employment_id: *id473
+        scheduled_at: *id474
+        agenda: *id475
+        notes: *id476
+        private_notes: *id477
+        commitments: *id478
     OrgUnit:
       type: object
       required:
@@ -40892,22 +40951,22 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id472
+        name: &id479
           type: string
-        type: &id473
+        type: &id480
           type: string
-        parent_id: &id474
-          type: string
-          description: Identificador opaco
-          nullable: true
-        manager_position_id: &id475
+        parent_id: &id481
           type: string
           description: Identificador opaco
           nullable: true
-        valid_from: &id476
+        manager_position_id: &id482
+          type: string
+          description: Identificador opaco
+          nullable: true
+        valid_from: &id483
           type: string
           format: date
-        valid_to: &id477
+        valid_to: &id484
           type: string
           format: date
           nullable: true
@@ -40925,12 +40984,12 @@ components:
     OrgUnitInput:
       type: object
       properties:
-        name: *id472
-        type: *id473
-        parent_id: *id474
-        manager_position_id: *id475
-        valid_from: *id476
-        valid_to: *id477
+        name: *id479
+        type: *id480
+        parent_id: *id481
+        manager_position_id: *id482
+        valid_from: *id483
+        valid_to: *id484
     OvertimeRequest:
       type: object
       required:
@@ -40945,20 +41004,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id478
+        employment_id: &id485
           type: string
           description: Identificador opaco
-        date: &id479
+        date: &id486
           type: string
           format: date
-        minutes: &id480
+        minutes: &id487
           type: integer
-        compensation: &id481
+        compensation: &id488
           type: string
           enum:
           - pay
           - time_bank
-        reason: &id482
+        reason: &id489
           type: string
         status:
           type: string
@@ -40976,11 +41035,11 @@ components:
     OvertimeRequestInput:
       type: object
       properties:
-        employment_id: *id478
-        date: *id479
-        minutes: *id480
-        compensation: *id481
-        reason: *id482
+        employment_id: *id485
+        date: *id486
+        minutes: *id487
+        compensation: *id488
+        reason: *id489
     ParametricTable:
       type: object
       required:
@@ -41021,16 +41080,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        tenant_id: &id483
+        tenant_id: &id490
           type: string
           description: Identificador opaco
-        name: &id484
+        name: &id491
           type: string
-        tax_id: &id485
+        tax_id: &id492
           type: string
-        headcount: &id486
+        headcount: &id493
           type: integer
-        next_deadline: &id487
+        next_deadline: &id494
           type: string
           format: date
           nullable: true
@@ -41048,11 +41107,11 @@ components:
     PartnerClientInput:
       type: object
       properties:
-        tenant_id: *id483
-        name: *id484
-        tax_id: *id485
-        headcount: *id486
-        next_deadline: *id487
+        tenant_id: *id490
+        name: *id491
+        tax_id: *id492
+        headcount: *id493
+        next_deadline: *id494
     PayEquityCategory:
       type: object
       required:
@@ -41067,18 +41126,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id488
+        name: &id495
           type: string
-        job_profile_ids: &id489
+        job_profile_ids: &id496
           type: array
           items: *id034
-        functions: &id490
+        functions: &id497
           type: string
-        responsibility: &id491
+        responsibility: &id498
           type: string
-        requirements: &id492
+        requirements: &id499
           type: string
-        valid_from: &id493
+        valid_from: &id500
           type: string
           format: date
         created_at:
@@ -41090,12 +41149,12 @@ components:
     PayEquityCategoryInput:
       type: object
       properties:
-        name: *id488
-        job_profile_ids: *id489
-        functions: *id490
-        responsibility: *id491
-        requirements: *id492
-        valid_from: *id493
+        name: *id495
+        job_profile_ids: *id496
+        functions: *id497
+        responsibility: *id498
+        requirements: *id499
+        valid_from: *id500
     PayrollConcept:
       type: object
       required:
@@ -41112,11 +41171,11 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id494
+        code: &id501
           type: string
-        name: &id495
+        name: &id502
           type: string
-        kind: &id496
+        kind: &id503
           type: string
           enum:
           - earning
@@ -41125,26 +41184,26 @@ components:
           - tax
           - provision
           - informative
-        formula: &id497
+        formula: &id504
           type: string
-        conditions: &id498
+        conditions: &id505
           type: object
           additionalProperties: true
           nullable: true
-        affects: &id499
+        affects: &id506
           type: object
           additionalProperties: true
-        accounting: &id500
+        accounting: &id507
           type: object
           additionalProperties: true
           nullable: true
-        official_code: &id501
+        official_code: &id508
           type: string
           nullable: true
-        valid_from: &id502
+        valid_from: &id509
           type: string
           format: date
-        valid_to: &id503
+        valid_to: &id510
           type: string
           format: date
           nullable: true
@@ -41165,16 +41224,16 @@ components:
     PayrollConceptInput:
       type: object
       properties:
-        code: *id494
-        name: *id495
-        kind: *id496
-        formula: *id497
-        conditions: *id498
-        affects: *id499
-        accounting: *id500
-        official_code: *id501
-        valid_from: *id502
-        valid_to: *id503
+        code: *id501
+        name: *id502
+        kind: *id503
+        formula: *id504
+        conditions: *id505
+        affects: *id506
+        accounting: *id507
+        official_code: *id508
+        valid_from: *id509
+        valid_to: *id510
     PayrollIncident:
       type: object
       required:
@@ -41187,20 +41246,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        period_id: &id504
+        period_id: &id511
           type: string
           description: Identificador opaco
-        employment_id: &id505
+        employment_id: &id512
           type: string
           description: Identificador opaco
-        concept_code: &id506
+        concept_code: &id513
           type: string
-        quantity: &id507
+        quantity: &id514
           type: number
           nullable: true
-        amount: &id508
+        amount: &id515
           $ref: '#/components/schemas/Money'
-        source: &id509
+        source: &id516
           type: string
           enum:
           - manual
@@ -41209,7 +41268,7 @@ components:
           - loan
           - import
           - retroactive
-        note: &id510
+        note: &id517
           type: string
           nullable: true
         created_at:
@@ -41221,13 +41280,13 @@ components:
     PayrollIncidentInput:
       type: object
       properties:
-        period_id: *id504
-        employment_id: *id505
-        concept_code: *id506
-        quantity: *id507
-        amount: *id508
-        source: *id509
-        note: *id510
+        period_id: *id511
+        employment_id: *id512
+        concept_code: *id513
+        quantity: *id514
+        amount: *id515
+        source: *id516
+        note: *id517
     PayrollPeriod:
       type: object
       required:
@@ -41241,12 +41300,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id511
+        legal_entity_id: &id518
           type: string
           description: Identificador opaco
-        period: &id512
+        period: &id519
           type: string
-        kind: &id513
+        kind: &id520
           type: string
           enum:
           - regular
@@ -41255,7 +41314,7 @@ components:
           - profit_sharing
           - settlement
           - off_cycle
-        pay_date: &id514
+        pay_date: &id521
           type: string
           format: date
         status:
@@ -41267,11 +41326,11 @@ components:
           - approved
           - closed
           - paid
-        totals: &id515
+        totals: &id522
           type: object
           additionalProperties: true
           nullable: true
-        engine_version: &id516
+        engine_version: &id523
           type: string
           nullable: true
         created_at:
@@ -41286,12 +41345,12 @@ components:
     PayrollPeriodInput:
       type: object
       properties:
-        legal_entity_id: *id511
-        period: *id512
-        kind: *id513
-        pay_date: *id514
-        totals: *id515
-        engine_version: *id516
+        legal_entity_id: *id518
+        period: *id519
+        kind: *id520
+        pay_date: *id521
+        totals: *id522
+        engine_version: *id523
     PayrollRegime:
       type: object
       required:
@@ -41429,28 +41488,28 @@ components:
         id:
           type: string
           description: Identificador opaco
-        first_name: &id517
+        first_name: &id524
           type: string
-        last_name: &id518
+        last_name: &id525
           type: string
-        document_type: &id519
+        document_type: &id526
           type: string
-        document_number: &id520
+        document_number: &id527
           type: string
-        birth_date: &id521
+        birth_date: &id528
           type: string
           format: date
           nullable: true
-        nationality: &id522
+        nationality: &id529
           type: string
           nullable: true
-        email: &id523
+        email: &id530
           type: string
           nullable: true
-        phone: &id524
+        phone: &id531
           type: string
           nullable: true
-        address: &id525
+        address: &id532
           type: object
           additionalProperties: true
           nullable: true
@@ -41463,15 +41522,15 @@ components:
     PersonInput:
       type: object
       properties:
-        first_name: *id517
-        last_name: *id518
-        document_type: *id519
-        document_number: *id520
-        birth_date: *id521
-        nationality: *id522
-        email: *id523
-        phone: *id524
-        address: *id525
+        first_name: *id524
+        last_name: *id525
+        document_type: *id526
+        document_number: *id527
+        birth_date: *id528
+        nationality: *id529
+        email: *id530
+        phone: *id531
+        address: *id532
     Plan:
       type: object
       required:
@@ -41487,21 +41546,21 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id526
+        code: &id533
           type: string
-        name: &id527
+        name: &id534
           type: string
-        billing_cycle: &id528
+        billing_cycle: &id535
           type: string
           enum:
           - monthly
           - yearly
-        currency: &id529
+        currency: &id536
           type: string
-        limits: &id530
+        limits: &id537
           type: object
           additionalProperties: true
-        modules: &id531
+        modules: &id538
           type: array
           items: *id034
         status:
@@ -41519,12 +41578,12 @@ components:
     PlanInput:
       type: object
       properties:
-        code: *id526
-        name: *id527
-        billing_cycle: *id528
-        currency: *id529
-        limits: *id530
-        modules: *id531
+        code: *id533
+        name: *id534
+        billing_cycle: *id535
+        currency: *id536
+        limits: *id537
+        modules: *id538
     Position:
       type: object
       required:
@@ -41538,20 +41597,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        job_profile_id: &id532
+        job_profile_id: &id539
           type: string
           description: Identificador opaco
-        org_unit_id: &id533
+        org_unit_id: &id540
           type: string
           description: Identificador opaco
-        site_id: &id534
+        site_id: &id541
           type: string
           description: Identificador opaco
-        cost_center_id: &id535
+        cost_center_id: &id542
           type: string
           description: Identificador opaco
           nullable: true
-        reports_to_position_id: &id536
+        reports_to_position_id: &id543
           type: string
           description: Identificador opaco
           nullable: true
@@ -41564,9 +41623,9 @@ components:
           - filled
           - frozen
           - closed
-        budget: &id537
+        budget: &id544
           $ref: '#/components/schemas/Money'
-        valid_from: &id538
+        valid_from: &id545
           type: string
           format: date
         created_at:
@@ -41581,13 +41640,13 @@ components:
     PositionInput:
       type: object
       properties:
-        job_profile_id: *id532
-        org_unit_id: *id533
-        site_id: *id534
-        cost_center_id: *id535
-        reports_to_position_id: *id536
-        budget: *id537
-        valid_from: *id538
+        job_profile_id: *id539
+        org_unit_id: *id540
+        site_id: *id541
+        cost_center_id: *id542
+        reports_to_position_id: *id543
+        budget: *id544
+        valid_from: *id545
     PpeDelivery:
       type: object
       required:
@@ -41600,20 +41659,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id539
+        employment_id: &id546
           type: string
           description: Identificador opaco
-        items: &id540
+        items: &id547
           type: object
           additionalProperties: true
-        delivered_on: &id541
+        delivered_on: &id548
           type: string
           format: date
-        expires_on: &id542
+        expires_on: &id549
           type: string
           format: date
           nullable: true
-        signature_request_id: &id543
+        signature_request_id: &id550
           type: string
           description: Identificador opaco
           nullable: true
@@ -41632,11 +41691,11 @@ components:
     PpeDeliveryInput:
       type: object
       properties:
-        employment_id: *id539
-        items: *id540
-        delivered_on: *id541
-        expires_on: *id542
-        signature_request_id: *id543
+        employment_id: *id546
+        items: *id547
+        delivered_on: *id548
+        expires_on: *id549
+        signature_request_id: *id550
     PrivacyIncident:
       type: object
       required:
@@ -41650,18 +41709,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        detected_at: &id544
+        detected_at: &id551
           type: string
           format: date-time
-        description: &id545
+        description: &id552
           type: string
-        affected: &id546
+        affected: &id553
           type: object
           additionalProperties: true
-        notify_before: &id547
+        notify_before: &id554
           type: string
           format: date-time
-        notified_at: &id548
+        notified_at: &id555
           type: string
           format: date-time
           nullable: true
@@ -41681,11 +41740,11 @@ components:
     PrivacyIncidentInput:
       type: object
       properties:
-        detected_at: *id544
-        description: *id545
-        affected: *id546
-        notify_before: *id547
-        notified_at: *id548
+        detected_at: *id551
+        description: *id552
+        affected: *id553
+        notify_before: *id554
+        notified_at: *id555
     ProcessTemplate:
       type: object
       required:
@@ -41699,18 +41758,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        kind: &id549
+        kind: &id556
           type: string
           enum:
           - pre_onboarding
           - onboarding
           - offboarding
-        name: &id550
+        name: &id557
           type: string
-        applies_to: &id551
+        applies_to: &id558
           type: object
           additionalProperties: true
-        tasks: &id552
+        tasks: &id559
           type: object
           additionalProperties: true
         status:
@@ -41728,10 +41787,10 @@ components:
     ProcessTemplateInput:
       type: object
       properties:
-        kind: *id549
-        name: *id550
-        applies_to: *id551
-        tasks: *id552
+        kind: *id556
+        name: *id557
+        applies_to: *id558
+        tasks: *id559
     ProfileChangeRequest:
       type: object
       required:
@@ -41744,13 +41803,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id553
+        employment_id: &id560
           type: string
           description: Identificador opaco
-        changes: &id554
+        changes: &id561
           type: object
           additionalProperties: true
-        attachments: &id555
+        attachments: &id562
           type: array
           items: *id034
         status:
@@ -41769,9 +41828,9 @@ components:
     ProfileChangeRequestInput:
       type: object
       properties:
-        employment_id: *id553
-        changes: *id554
-        attachments: *id555
+        employment_id: *id560
+        changes: *id561
+        attachments: *id562
     Project:
       type: object
       required:
@@ -41784,15 +41843,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id556
+        code: &id563
           type: string
-        name: &id557
+        name: &id564
           type: string
-        cost_center_id: &id558
+        cost_center_id: &id565
           type: string
           description: Identificador opaco
           nullable: true
-        billable: &id559
+        billable: &id566
           type: boolean
         status:
           type: string
@@ -41808,10 +41867,10 @@ components:
     ProjectInput:
       type: object
       properties:
-        code: *id556
-        name: *id557
-        cost_center_id: *id558
-        billable: *id559
+        code: *id563
+        name: *id564
+        cost_center_id: *id565
+        billable: *id566
     Provision:
       type: object
       required:
@@ -41861,18 +41920,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id560
+        name: &id567
           type: string
-        kind: &id561
+        kind: &id568
           type: string
           enum:
           - kiosk
           - biometric
           - tablet
-        site_id: &id562
+        site_id: &id569
           type: string
           description: Identificador opaco
-        connector: &id563
+        connector: &id570
           type: string
           nullable: true
         last_seen_at:
@@ -41893,10 +41952,10 @@ components:
     PunchDeviceInput:
       type: object
       properties:
-        name: *id560
-        kind: *id561
-        site_id: *id562
-        connector: *id563
+        name: *id567
+        kind: *id568
+        site_id: *id569
+        connector: *id570
     Recognition:
       type: object
       required:
@@ -41909,21 +41968,21 @@ components:
         id:
           type: string
           description: Identificador opaco
-        from_employment_id: &id564
+        from_employment_id: &id571
           type: string
           description: Identificador opaco
-        to_employment_ids: &id565
+        to_employment_ids: &id572
           type: array
           items: *id034
-        value: &id566
+        value: &id573
           type: string
           nullable: true
-        badge: &id567
+        badge: &id574
           type: string
           nullable: true
-        message: &id568
+        message: &id575
           type: string
-        public: &id569
+        public: &id576
           type: boolean
         created_at:
           type: string
@@ -41934,12 +41993,12 @@ components:
     RecognitionInput:
       type: object
       properties:
-        from_employment_id: *id564
-        to_employment_ids: *id565
-        value: *id566
-        badge: *id567
-        message: *id568
-        public: *id569
+        from_employment_id: *id571
+        to_employment_ids: *id572
+        value: *id573
+        badge: *id574
+        message: *id575
+        public: *id576
     RegistryProfile:
       type: object
       required:
@@ -41968,76 +42027,76 @@ components:
         id:
           type: string
           description: Identificador opaco
-        worker_type_code: &id570
+        worker_type_code: &id577
           type: string
-        labor_regime_code: &id571
+        labor_regime_code: &id578
           type: string
-        occupational_category_code: &id572
+        occupational_category_code: &id579
           type: string
           nullable: true
-        occupation_code: &id573
+        occupation_code: &id580
           type: string
-        education_status_code: &id574
+        education_status_code: &id581
           type: string
-        contract_type_code: &id575
+        contract_type_code: &id582
           type: string
-        has_disability: &id576
+        has_disability: &id583
           type: boolean
-        is_unionized: &id577
+        is_unionized: &id584
           type: boolean
-        alternative_working_regime: &id578
+        alternative_working_regime: &id585
           type: boolean
-        subject_to_max_working_time: &id579
+        subject_to_max_working_time: &id586
           type: boolean
-        subject_to_night_shift: &id580
+        subject_to_night_shift: &id587
           type: boolean
-        special_situation_code: &id581
+        special_situation_code: &id588
           type: string
-        payment_type_code: &id582
+        payment_type_code: &id589
           type: string
-        pay_periodicity_code: &id583
+        pay_periodicity_code: &id590
           type: string
-        initial_basic_remuneration: &id584
+        initial_basic_remuneration: &id591
           $ref: '#/components/schemas/Money'
-        worker_situation_code: &id585
+        worker_situation_code: &id592
           type: string
-        fifth_category_exempt: &id586
+        fifth_category_exempt: &id593
           type: boolean
-        tax_treaty_code: &id587
+        tax_treaty_code: &id594
           type: string
-        is_tax_resident: &id588
+        is_tax_resident: &id595
           type: boolean
-        sctr_health: &id589
+        sctr_health: &id596
           type: string
           enum:
           - none
           - essalud
           - eps
-        sctr_pension: &id590
+        sctr_pension: &id597
           type: string
           enum:
           - none
           - onp
           - insurer
-        agrarian_benefit_payment: &id591
+        agrarian_benefit_payment: &id598
           type: string
           enum:
           - prorated_daily
           - semiannual
           nullable: true
-        completeness: &id592
+        completeness: &id599
           type: string
           enum:
           - draft
           - ready
           - blocked
-        missing_fields: &id593
+        missing_fields: &id600
           type: array
           items: *id034
-        valid_from: &id594
+        valid_from: &id601
           type: string
           format: date
-        valid_to: &id595
+        valid_to: &id602
           type: string
           format: date
           nullable: true
@@ -42056,32 +42115,32 @@ components:
     RegistryProfileInput:
       type: object
       properties:
-        worker_type_code: *id570
-        labor_regime_code: *id571
-        occupational_category_code: *id572
-        occupation_code: *id573
-        education_status_code: *id574
-        contract_type_code: *id575
-        has_disability: *id576
-        is_unionized: *id577
-        alternative_working_regime: *id578
-        subject_to_max_working_time: *id579
-        subject_to_night_shift: *id580
-        special_situation_code: *id581
-        payment_type_code: *id582
-        pay_periodicity_code: *id583
-        initial_basic_remuneration: *id584
-        worker_situation_code: *id585
-        fifth_category_exempt: *id586
-        tax_treaty_code: *id587
-        is_tax_resident: *id588
-        sctr_health: *id589
-        sctr_pension: *id590
-        agrarian_benefit_payment: *id591
-        completeness: *id592
-        missing_fields: *id593
-        valid_from: *id594
-        valid_to: *id595
+        worker_type_code: *id577
+        labor_regime_code: *id578
+        occupational_category_code: *id579
+        occupation_code: *id580
+        education_status_code: *id581
+        contract_type_code: *id582
+        has_disability: *id583
+        is_unionized: *id584
+        alternative_working_regime: *id585
+        subject_to_max_working_time: *id586
+        subject_to_night_shift: *id587
+        special_situation_code: *id588
+        payment_type_code: *id589
+        pay_periodicity_code: *id590
+        initial_basic_remuneration: *id591
+        worker_situation_code: *id592
+        fifth_category_exempt: *id593
+        tax_treaty_code: *id594
+        is_tax_resident: *id595
+        sctr_health: *id596
+        sctr_pension: *id597
+        agrarian_benefit_payment: *id598
+        completeness: *id599
+        missing_fields: *id600
+        valid_from: *id601
+        valid_to: *id602
     Report:
       type: object
       required:
@@ -42098,29 +42157,29 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id596
+        name: &id603
           type: string
-        source: &id597
+        source: &id604
           type: string
-        fields: &id598
+        fields: &id605
           type: array
           items: *id034
-        filters: &id599
+        filters: &id606
           type: object
           additionalProperties: true
-        group_by: &id600
+        group_by: &id607
           type: array
           items: *id034
-        metrics: &id601
+        metrics: &id608
           type: object
           additionalProperties: true
-        visualization: &id602
+        visualization: &id609
           type: string
-        schedule: &id603
+        schedule: &id610
           type: object
           additionalProperties: true
           nullable: true
-        shared: &id604
+        shared: &id611
           type: boolean
         created_at:
           type: string
@@ -42131,15 +42190,15 @@ components:
     ReportInput:
       type: object
       properties:
-        name: *id596
-        source: *id597
-        fields: *id598
-        filters: *id599
-        group_by: *id600
-        metrics: *id601
-        visualization: *id602
-        schedule: *id603
-        shared: *id604
+        name: *id603
+        source: *id604
+        fields: *id605
+        filters: *id606
+        group_by: *id607
+        metrics: *id608
+        visualization: *id609
+        schedule: *id610
+        shared: *id611
     RetentionPolicy:
       type: object
       required:
@@ -42154,19 +42213,19 @@ components:
         id:
           type: string
           description: Identificador opaco
-        entity: &id605
+        entity: &id612
           type: string
-        country: &id606
+        country: &id613
           type: string
-        keep_years: &id607
+        keep_years: &id614
           type: number
-        action: &id608
+        action: &id615
           type: string
           enum:
           - anonymize
           - delete
           - archive
-        legal_basis: &id609
+        legal_basis: &id616
           type: string
         status:
           type: string
@@ -42182,11 +42241,11 @@ components:
     RetentionPolicyInput:
       type: object
       properties:
-        entity: *id605
-        country: *id606
-        keep_years: *id607
-        action: *id608
-        legal_basis: *id609
+        entity: *id612
+        country: *id613
+        keep_years: *id614
+        action: *id615
+        legal_basis: *id616
     Review:
       type: object
       required:
@@ -42201,16 +42260,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        cycle_id: &id616
+        cycle_id: &id623
           type: string
           description: Identificador opaco
-        employment_id: &id617
+        employment_id: &id624
           type: string
           description: Identificador opaco
-        reviewer_id: &id618
+        reviewer_id: &id625
           type: string
           description: Identificador opaco
-        relation: &id619
+        relation: &id626
           type: string
           enum:
           - self
@@ -42218,10 +42277,10 @@ components:
           - peer
           - report
           - other
-        answers: &id620
+        answers: &id627
           type: object
           additionalProperties: true
-        score: &id621
+        score: &id628
           type: number
           nullable: true
         status:
@@ -42252,25 +42311,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id610
+        name: &id617
           type: string
-        kind: &id611
+        kind: &id618
           type: string
           enum:
           - '90'
           - '180'
           - '270'
           - '360'
-        starts_on: &id612
+        starts_on: &id619
           type: string
           format: date
-        ends_on: &id613
+        ends_on: &id620
           type: string
           format: date
-        participants: &id614
+        participants: &id621
           type: object
           additionalProperties: true
-        form: &id615
+        form: &id622
           type: object
           additionalProperties: true
         status:
@@ -42289,21 +42348,21 @@ components:
     ReviewCycleInput:
       type: object
       properties:
-        name: *id610
-        kind: *id611
-        starts_on: *id612
-        ends_on: *id613
-        participants: *id614
-        form: *id615
+        name: *id617
+        kind: *id618
+        starts_on: *id619
+        ends_on: *id620
+        participants: *id621
+        form: *id622
     ReviewInput:
       type: object
       properties:
-        cycle_id: *id616
-        employment_id: *id617
-        reviewer_id: *id618
-        relation: *id619
-        answers: *id620
-        score: *id621
+        cycle_id: *id623
+        employment_id: *id624
+        reviewer_id: *id625
+        relation: *id626
+        answers: *id627
+        score: *id628
     Role:
       type: object
       required:
@@ -42317,20 +42376,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id622
+        name: &id629
           type: string
-        system: &id623
+        system: &id630
           type: boolean
         mfa_required:
           type: boolean
           nullable: true
-        permissions: &id624
+        permissions: &id631
           type: array
           items: *id034
-        field_permissions: &id625
+        field_permissions: &id632
           type: array
           items: *id034
-        scope: &id626
+        scope: &id633
           type: string
           enum:
           - organization
@@ -42348,11 +42407,11 @@ components:
     RoleInput:
       type: object
       properties:
-        name: *id622
-        system: *id623
-        permissions: *id624
-        field_permissions: *id625
-        scope: *id626
+        name: *id629
+        system: *id630
+        permissions: *id631
+        field_permissions: *id632
+        scope: *id633
     SalaryAdvance:
       type: object
       required:
@@ -42364,14 +42423,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id627
+        employment_id: &id634
           type: string
           description: Identificador opaco
-        amount: &id628
+        amount: &id635
           $ref: '#/components/schemas/Money'
-        accrued_basis: &id629
+        accrued_basis: &id636
           $ref: '#/components/schemas/Money'
-        channel: &id630
+        channel: &id637
           type: string
           enum:
           - bank
@@ -42398,10 +42457,10 @@ components:
     SalaryAdvanceInput:
       type: object
       properties:
-        employment_id: *id627
-        amount: *id628
-        accrued_basis: *id629
-        channel: *id630
+        employment_id: *id634
+        amount: *id635
+        accrued_basis: *id636
+        channel: *id637
     SalaryBand:
       type: object
       required:
@@ -42412,25 +42471,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        job_profile_id: &id631
+        job_profile_id: &id638
           type: string
           description: Identificador opaco
           nullable: true
-        category: &id632
+        category: &id639
           type: string
           nullable: true
-        currency: &id633
+        currency: &id640
           type: string
-        min: &id634
+        min: &id641
           type: number
-        mid: &id635
+        mid: &id642
           type: number
-        max: &id636
+        max: &id643
           type: number
-        valid_from: &id637
+        valid_from: &id644
           type: string
           format: date
-        valid_to: &id638
+        valid_to: &id645
           type: string
           format: date
           nullable: true
@@ -42448,14 +42507,14 @@ components:
     SalaryBandInput:
       type: object
       properties:
-        job_profile_id: *id631
-        category: *id632
-        currency: *id633
-        min: *id634
-        mid: *id635
-        max: *id636
-        valid_from: *id637
-        valid_to: *id638
+        job_profile_id: *id638
+        category: *id639
+        currency: *id640
+        min: *id641
+        mid: *id642
+        max: *id643
+        valid_from: *id644
+        valid_to: *id645
     SavedView:
       type: object
       required:
@@ -42470,19 +42529,19 @@ components:
         id:
           type: string
           description: Identificador opaco
-        resource: &id639
+        resource: &id646
           type: string
-        name: &id640
+        name: &id647
           type: string
-        filters: &id641
+        filters: &id648
           type: object
           additionalProperties: true
-        columns: &id642
+        columns: &id649
           type: array
           items: *id034
-        sort: &id643
+        sort: &id650
           type: string
-        shared: &id644
+        shared: &id651
           type: boolean
         created_at:
           type: string
@@ -42493,12 +42552,12 @@ components:
     SavedViewInput:
       type: object
       properties:
-        resource: *id639
-        name: *id640
-        filters: *id641
-        columns: *id642
-        sort: *id643
-        shared: *id644
+        resource: *id646
+        name: *id647
+        filters: *id648
+        columns: *id649
+        sort: *id650
+        shared: *id651
     Scorecard:
       type: object
       required:
@@ -42511,23 +42570,23 @@ components:
         id:
           type: string
           description: Identificador opaco
-        interview_id: &id645
+        interview_id: &id652
           type: string
           description: Identificador opaco
-        interviewer_id: &id646
+        interviewer_id: &id653
           type: string
           description: Identificador opaco
-        ratings: &id647
+        ratings: &id654
           type: object
           additionalProperties: true
-        recommendation: &id648
+        recommendation: &id655
           type: string
           enum:
           - strong_yes
           - 'yes'
           - 'no'
           - strong_no
-        notes: &id649
+        notes: &id656
           type: string
           nullable: true
         created_at:
@@ -42539,11 +42598,11 @@ components:
     ScorecardInput:
       type: object
       properties:
-        interview_id: *id645
-        interviewer_id: *id646
-        ratings: *id647
-        recommendation: *id648
-        notes: *id649
+        interview_id: *id652
+        interviewer_id: *id653
+        ratings: *id654
+        recommendation: *id655
+        notes: *id656
     SensitiveAccessLog:
       type: object
       required:
@@ -42592,20 +42651,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id650
+        employment_id: &id657
           type: string
           description: Identificador opaco
-        termination_date: &id651
+        termination_date: &id658
           type: string
           format: date
-        reason: &id652
+        reason: &id659
           type: string
-        lines: &id653
+        lines: &id660
           type: object
           additionalProperties: true
-        total: &id654
+        total: &id661
           $ref: '#/components/schemas/Money'
-        documents: &id655
+        documents: &id662
           type: array
           items: *id034
         status:
@@ -42629,12 +42688,12 @@ components:
     SettlementInput:
       type: object
       properties:
-        employment_id: *id650
-        termination_date: *id651
-        reason: *id652
-        lines: *id653
-        total: *id654
-        documents: *id655
+        employment_id: *id657
+        termination_date: *id658
+        reason: *id659
+        lines: *id660
+        total: *id661
+        documents: *id662
     Shift:
       type: object
       required:
@@ -42648,15 +42707,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id659
+        name: &id666
           type: string
-        starts_at: &id660
+        starts_at: &id667
           type: string
-        ends_at: &id661
+        ends_at: &id668
           type: string
-        crosses_midnight: &id662
+        crosses_midnight: &id669
           type: boolean
-        color: &id663
+        color: &id670
           type: string
           nullable: true
         status:
@@ -42682,13 +42741,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id656
+        employment_id: &id663
           type: string
           description: Identificador opaco
-        shift_id: &id657
+        shift_id: &id664
           type: string
           description: Identificador opaco
-        date: &id658
+        date: &id665
           type: string
           format: date
         status:
@@ -42707,17 +42766,17 @@ components:
     ShiftAssignmentInput:
       type: object
       properties:
-        employment_id: *id656
-        shift_id: *id657
-        date: *id658
+        employment_id: *id663
+        shift_id: *id664
+        date: *id665
     ShiftInput:
       type: object
       properties:
-        name: *id659
-        starts_at: *id660
-        ends_at: *id661
-        crosses_midnight: *id662
-        color: *id663
+        name: *id666
+        starts_at: *id667
+        ends_at: *id668
+        crosses_midnight: *id669
+        color: *id670
     SignatureRequest:
       type: object
       required:
@@ -42731,15 +42790,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        document_id: &id664
+        document_id: &id671
           type: string
           description: Identificador opaco
-        signers: &id665
+        signers: &id672
           type: object
           additionalProperties: true
-        ordered: &id666
+        ordered: &id673
           type: boolean
-        provider: &id667
+        provider: &id674
           type: string
         status:
           type: string
@@ -42752,7 +42811,7 @@ components:
           - declined
           - cancelled
           - expired
-        evidence: &id668
+        evidence: &id675
           type: object
           additionalProperties: true
           nullable: true
@@ -42765,11 +42824,11 @@ components:
     SignatureRequestInput:
       type: object
       properties:
-        document_id: *id664
-        signers: *id665
-        ordered: *id666
-        provider: *id667
-        evidence: *id668
+        document_id: *id671
+        signers: *id672
+        ordered: *id673
+        provider: *id674
+        evidence: *id675
     Site:
       type: object
       required:
@@ -42784,16 +42843,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id669
+        legal_entity_id: &id676
           type: string
           description: Identificador opaco
-        name: &id670
+        name: &id677
           type: string
-        address: &id671
+        address: &id678
           type: string
-        timezone: &id672
+        timezone: &id679
           type: string
-        risk_site: &id673
+        risk_site: &id680
           type: boolean
         status:
           type: string
@@ -42809,11 +42868,11 @@ components:
     SiteInput:
       type: object
       properties:
-        legal_entity_id: *id669
-        name: *id670
-        address: *id671
-        timezone: *id672
-        risk_site: *id673
+        legal_entity_id: *id676
+        name: *id677
+        address: *id678
+        timezone: *id679
+        risk_site: *id680
     Skill:
       type: object
       required:
@@ -42824,9 +42883,9 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id674
+        name: &id681
           type: string
-        category: &id675
+        category: &id682
           type: string
           nullable: true
         status:
@@ -42843,8 +42902,8 @@ components:
     SkillInput:
       type: object
       properties:
-        name: *id674
-        category: *id675
+        name: *id681
+        category: *id682
     SstCommittee:
       type: object
       required:
@@ -42859,24 +42918,24 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id676
+        legal_entity_id: &id683
           type: string
           description: Identificador opaco
-        kind: &id677
+        kind: &id684
           type: string
           enum:
           - committee
           - supervisor
-        members: &id678
+        members: &id685
           type: object
           additionalProperties: true
-        term_start: &id679
+        term_start: &id686
           type: string
           format: date
-        term_end: &id680
+        term_end: &id687
           type: string
           format: date
-        minutes: &id681
+        minutes: &id688
           type: object
           additionalProperties: true
         created_at:
@@ -42888,12 +42947,12 @@ components:
     SstCommitteeInput:
       type: object
       properties:
-        legal_entity_id: *id676
-        kind: *id677
-        members: *id678
-        term_start: *id679
-        term_end: *id680
-        minutes: *id681
+        legal_entity_id: *id683
+        kind: *id684
+        members: *id685
+        term_start: *id686
+        term_end: *id687
+        minutes: *id688
     SstCommitteeMeeting:
       type: object
       required:
@@ -42907,34 +42966,34 @@ components:
         id:
           type: string
           description: Identificador opaco
-        sst_committee_id: &id682
+        sst_committee_id: &id689
           type: string
           description: Identificador opaco
-        held_on: &id683
+        held_on: &id690
           type: string
           format: date
-        kind: &id684
+        kind: &id691
           type: string
           enum:
           - ordinary
           - extraordinary
-        agenda: &id685
+        agenda: &id692
           type: string
           nullable: true
-        attendees: &id686
+        attendees: &id693
           type: object
           additionalProperties: true
-        quorum_required: &id687
+        quorum_required: &id694
           type: integer
           nullable: true
-        quorum_present: &id688
+        quorum_present: &id695
           type: integer
           nullable: true
-        agreements: &id689
+        agreements: &id696
           type: object
           additionalProperties: true
           nullable: true
-        minutes_document_id: &id690
+        minutes_document_id: &id697
           type: string
           description: Identificador opaco
           nullable: true
@@ -42957,15 +43016,15 @@ components:
     SstCommitteeMeetingInput:
       type: object
       properties:
-        sst_committee_id: *id682
-        held_on: *id683
-        kind: *id684
-        agenda: *id685
-        attendees: *id686
-        quorum_required: *id687
-        quorum_present: *id688
-        agreements: *id689
-        minutes_document_id: *id690
+        sst_committee_id: *id689
+        held_on: *id690
+        kind: *id691
+        agenda: *id692
+        attendees: *id693
+        quorum_required: *id694
+        quorum_present: *id695
+        agreements: *id696
+        minutes_document_id: *id697
     SstElection:
       type: object
       required:
@@ -42983,44 +43042,44 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id691
+        legal_entity_id: &id698
           type: string
           description: Identificador opaco
-        site_id: &id692
+        site_id: &id699
           type: string
           description: Identificador opaco
           nullable: true
-        body_kind: &id693
+        body_kind: &id700
           type: string
           enum:
           - committee
           - subcommittee
           - supervisor
-        headcount_at_start: &id694
+        headcount_at_start: &id701
           type: integer
-        total_members: &id695
+        total_members: &id702
           type: integer
-        worker_seats: &id696
+        worker_seats: &id703
           type: integer
-        convened_by: &id697
+        convened_by: &id704
           type: string
           enum:
           - majority_union
           - employer
           nullable: true
-        voting_mode: &id698
+        voting_mode: &id705
           type: string
           enum:
           - in_person
           - electronic
           nullable: true
-        schedule: &id699
+        schedule: &id706
           type: object
           additionalProperties: true
-        board: &id700
+        board: &id707
           type: object
           additionalProperties: true
-        candidates: &id701
+        candidates: &id708
           type: object
           additionalProperties: true
         status:
@@ -43046,17 +43105,17 @@ components:
     SstElectionInput:
       type: object
       properties:
-        legal_entity_id: *id691
-        site_id: *id692
-        body_kind: *id693
-        headcount_at_start: *id694
-        total_members: *id695
-        worker_seats: *id696
-        convened_by: *id697
-        voting_mode: *id698
-        schedule: *id699
-        board: *id700
-        candidates: *id701
+        legal_entity_id: *id698
+        site_id: *id699
+        body_kind: *id700
+        headcount_at_start: *id701
+        total_members: *id702
+        worker_seats: *id703
+        convened_by: *id704
+        voting_mode: *id705
+        schedule: *id706
+        board: *id707
+        candidates: *id708
     SstIncident:
       type: object
       required:
@@ -43071,28 +43130,28 @@ components:
         id:
           type: string
           description: Identificador opaco
-        occurred_at: &id702
+        occurred_at: &id709
           type: string
           format: date-time
-        kind: &id703
+        kind: &id710
           type: string
           enum:
           - accident
           - incident
           - dangerous_incident
           - occupational_disease
-        severity: &id704
+        severity: &id711
           type: string
-        site_id: &id705
+        site_id: &id712
           type: string
           description: Identificador opaco
-        employment_id: &id706
+        employment_id: &id713
           type: string
           description: Identificador opaco
           nullable: true
-        description: &id707
+        description: &id714
           type: string
-        medical_details: &id708
+        medical_details: &id715
           type: string
           nullable: true
         status:
@@ -43113,13 +43172,13 @@ components:
     SstIncidentInput:
       type: object
       properties:
-        occurred_at: *id702
-        kind: *id703
-        severity: *id704
-        site_id: *id705
-        employment_id: *id706
-        description: *id707
-        medical_details: *id708
+        occurred_at: *id709
+        kind: *id710
+        severity: *id711
+        site_id: *id712
+        employment_id: *id713
+        description: *id714
+        medical_details: *id715
     SstInspection:
       type: object
       required:
@@ -43133,16 +43192,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        site_id: &id709
+        site_id: &id716
           type: string
           description: Identificador opaco
-        date: &id710
+        date: &id717
           type: string
           format: date
-        inspector_id: &id711
+        inspector_id: &id718
           type: string
           description: Identificador opaco
-        findings: &id712
+        findings: &id719
           type: object
           additionalProperties: true
         status:
@@ -43160,10 +43219,10 @@ components:
     SstInspectionInput:
       type: object
       properties:
-        site_id: *id709
-        date: *id710
-        inspector_id: *id711
-        findings: *id712
+        site_id: *id716
+        date: *id717
+        inspector_id: *id718
+        findings: *id719
     SstRisk:
       type: object
       required:
@@ -43179,22 +43238,22 @@ components:
         id:
           type: string
           description: Identificador opaco
-        site_id: &id713
+        site_id: &id720
           type: string
           description: Identificador opaco
-        job_profile_id: &id714
+        job_profile_id: &id721
           type: string
           description: Identificador opaco
           nullable: true
-        hazard: &id715
+        hazard: &id722
           type: string
-        risk: &id716
+        risk: &id723
           type: string
-        probability: &id717
+        probability: &id724
           type: integer
-        severity: &id718
+        severity: &id725
           type: integer
-        controls: &id719
+        controls: &id726
           type: object
           additionalProperties: true
         status:
@@ -43211,13 +43270,13 @@ components:
     SstRiskInput:
       type: object
       properties:
-        site_id: *id713
-        job_profile_id: *id714
-        hazard: *id715
-        risk: *id716
-        probability: *id717
-        severity: *id718
-        controls: *id719
+        site_id: *id720
+        job_profile_id: *id721
+        hazard: *id722
+        risk: *id723
+        probability: *id724
+        severity: *id725
+        controls: *id726
     StatutoryFileLayout:
       type: object
       required:
@@ -43292,10 +43351,10 @@ components:
         id:
           type: string
           description: Identificador opaco
-        person_id: &id720
+        person_id: &id727
           type: string
           description: Identificador opaco
-        right: &id721
+        right: &id728
           type: string
           enum:
           - access
@@ -43303,10 +43362,10 @@ components:
           - cancellation
           - opposition
           - portability
-        due_on: &id722
+        due_on: &id729
           type: string
           format: date
-        resolution: &id723
+        resolution: &id730
           type: string
           nullable: true
         status:
@@ -43325,10 +43384,10 @@ components:
     SubjectRequestInput:
       type: object
       properties:
-        person_id: *id720
-        right: *id721
-        due_on: *id722
-        resolution: *id723
+        person_id: *id727
+        right: *id728
+        due_on: *id729
+        resolution: *id730
     Subscription:
       type: object
       required:
@@ -43342,10 +43401,10 @@ components:
         id:
           type: string
           description: Identificador opaco
-        tenant_id: &id724
+        tenant_id: &id731
           type: string
           description: Identificador opaco
-        plan_id: &id725
+        plan_id: &id732
           type: string
           description: Identificador opaco
         status:
@@ -43356,13 +43415,13 @@ components:
           - past_due
           - suspended
           - cancelled
-        addons: &id726
+        addons: &id733
           type: array
           items: *id034
-        starts_on: &id727
+        starts_on: &id734
           type: string
           format: date
-        ends_on: &id728
+        ends_on: &id735
           type: string
           format: date
           nullable: true
@@ -43375,11 +43434,11 @@ components:
     SubscriptionInput:
       type: object
       properties:
-        tenant_id: *id724
-        plan_id: *id725
-        addons: *id726
-        starts_on: *id727
-        ends_on: *id728
+        tenant_id: *id731
+        plan_id: *id732
+        addons: *id733
+        starts_on: *id734
+        ends_on: *id735
     SuccessionPlan:
       type: object
       required:
@@ -43391,12 +43450,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        position_id: &id729
+        position_id: &id736
           type: string
           description: Identificador opaco
-        critical: &id730
+        critical: &id737
           type: boolean
-        successors: &id731
+        successors: &id738
           type: object
           additionalProperties: true
         status:
@@ -43416,9 +43475,9 @@ components:
     SuccessionPlanInput:
       type: object
       properties:
-        position_id: *id729
-        critical: *id730
-        successors: *id731
+        position_id: *id736
+        critical: *id737
+        successors: *id738
     SunafilNotice:
       type: object
       required:
@@ -43433,22 +43492,22 @@ components:
         id:
           type: string
           description: Identificador opaco
-        legal_entity_id: &id732
+        legal_entity_id: &id739
           type: string
           description: Identificador opaco
-        reference: &id733
+        reference: &id740
           type: string
-        received_on: &id734
-          type: string
-          format: date
-        due_on: &id735
+        received_on: &id741
           type: string
           format: date
-        owner_id: &id736
+        due_on: &id742
+          type: string
+          format: date
+        owner_id: &id743
           type: string
           description: Identificador opaco
           nullable: true
-        summary: &id737
+        summary: &id744
           type: string
         status:
           type: string
@@ -43466,12 +43525,12 @@ components:
     SunafilNoticeInput:
       type: object
       properties:
-        legal_entity_id: *id732
-        reference: *id733
-        received_on: *id734
-        due_on: *id735
-        owner_id: *id736
-        summary: *id737
+        legal_entity_id: *id739
+        reference: *id740
+        received_on: *id741
+        due_on: *id742
+        owner_id: *id743
+        summary: *id744
     SupportSession:
       type: object
       required:
@@ -43484,10 +43543,10 @@ components:
         id:
           type: string
           description: Identificador opaco
-        tenant_id: &id738
+        tenant_id: &id745
           type: string
           description: Identificador opaco
-        reason: &id739
+        reason: &id746
           type: string
         status:
           type: string
@@ -43496,7 +43555,7 @@ components:
           - granted
           - ended
           - denied
-        expires_at: &id740
+        expires_at: &id747
           type: string
           format: date-time
         created_at:
@@ -43508,9 +43567,9 @@ components:
     SupportSessionInput:
       type: object
       properties:
-        tenant_id: *id738
-        reason: *id739
-        expires_at: *id740
+        tenant_id: *id745
+        reason: *id746
+        expires_at: *id747
     Survey:
       type: object
       required:
@@ -43525,9 +43584,9 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id741
+        title: &id748
           type: string
-        kind: &id742
+        kind: &id749
           type: string
           enum:
           - climate
@@ -43537,15 +43596,15 @@ components:
           - pulse
           - enps
           - custom
-        anonymous: &id743
+        anonymous: &id750
           type: boolean
-        min_segment_size: &id744
+        min_segment_size: &id751
           type: integer
           nullable: true
-        audience: &id745
+        audience: &id752
           type: object
           additionalProperties: true
-        questions: &id746
+        questions: &id753
           type: object
           additionalProperties: true
         status:
@@ -43563,12 +43622,12 @@ components:
     SurveyInput:
       type: object
       properties:
-        title: *id741
-        kind: *id742
-        anonymous: *id743
-        min_segment_size: *id744
-        audience: *id745
-        questions: *id746
+        title: *id748
+        kind: *id749
+        anonymous: *id750
+        min_segment_size: *id751
+        audience: *id752
+        questions: *id753
     TalentPool:
       type: object
       required:
@@ -43579,12 +43638,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id747
+        name: &id754
           type: string
-        description: &id748
+        description: &id755
           type: string
           nullable: true
-        candidate_ids: &id749
+        candidate_ids: &id756
           type: array
           items: *id034
         created_at:
@@ -43596,9 +43655,9 @@ components:
     TalentPoolInput:
       type: object
       properties:
-        name: *id747
-        description: *id748
-        candidate_ids: *id749
+        name: *id754
+        description: *id755
+        candidate_ids: *id756
     TalentReview:
       type: object
       required:
@@ -43609,13 +43668,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id750
+        name: &id757
           type: string
-        cycle_id: &id751
+        cycle_id: &id758
           type: string
           description: Identificador opaco
           nullable: true
-        placements: &id752
+        placements: &id759
           type: object
           additionalProperties: true
         status:
@@ -43636,9 +43695,9 @@ components:
     TalentReviewInput:
       type: object
       properties:
-        name: *id750
-        cycle_id: *id751
-        placements: *id752
+        name: *id757
+        cycle_id: *id758
+        placements: *id759
     Task:
       type: object
       required:
@@ -43650,30 +43709,30 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id753
+        title: &id760
           type: string
-        description: &id754
+        description: &id761
           type: string
           nullable: true
-        assignee_user_id: &id755
+        assignee_user_id: &id762
           type: string
           description: Identificador opaco
           nullable: true
-        assignee_role_id: &id756
+        assignee_role_id: &id763
           type: string
           description: Identificador opaco
           nullable: true
-        assignee_name: &id757
+        assignee_name: &id764
           type: string
           nullable: true
-        created_by_name: &id758
+        created_by_name: &id765
           type: string
           nullable: true
-        due_on: &id759
+        due_on: &id766
           type: string
           format: date
           nullable: true
-        priority: &id760
+        priority: &id767
           type: string
           enum:
           - low
@@ -43687,25 +43746,25 @@ components:
           - in_progress
           - done
           - cancelled
-        overdue: &id761
+        overdue: &id768
           type: boolean
           nullable: true
-        related_type: &id762
+        related_type: &id769
           type: string
           nullable: true
-        related_id: &id763
+        related_id: &id770
           type: string
           description: Identificador opaco
           nullable: true
-        completed_at: &id764
+        completed_at: &id771
           type: string
           format: date-time
           nullable: true
-        allowed_actions: &id765
+        allowed_actions: &id772
           type: array
           items: *id034
           nullable: true
-        custom_fields: &id766
+        custom_fields: &id773
           type: object
           additionalProperties: true
           nullable: true
@@ -43718,20 +43777,20 @@ components:
     TaskInput:
       type: object
       properties:
-        title: *id753
-        description: *id754
-        assignee_user_id: *id755
-        assignee_role_id: *id756
-        assignee_name: *id757
-        created_by_name: *id758
-        due_on: *id759
-        priority: *id760
-        overdue: *id761
-        related_type: *id762
-        related_id: *id763
-        completed_at: *id764
-        allowed_actions: *id765
-        custom_fields: *id766
+        title: *id760
+        description: *id761
+        assignee_user_id: *id762
+        assignee_role_id: *id763
+        assignee_name: *id764
+        created_by_name: *id765
+        due_on: *id766
+        priority: *id767
+        overdue: *id768
+        related_type: *id769
+        related_id: *id770
+        completed_at: *id771
+        allowed_actions: *id772
+        custom_fields: *id773
     Tenant:
       type: object
       required:
@@ -43745,11 +43804,11 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id767
+        name: &id774
           type: string
-        slug: &id768
+        slug: &id775
           type: string
-        country: &id769
+        country: &id776
           type: string
         status:
           type: string
@@ -43758,10 +43817,10 @@ components:
           - active
           - suspended
           - cancelled
-        plan_id: &id770
+        plan_id: &id777
           type: string
           description: Identificador opaco
-        trial_ends_on: &id771
+        trial_ends_on: &id778
           type: string
           format: date
           nullable: true
@@ -43774,11 +43833,11 @@ components:
     TenantInput:
       type: object
       properties:
-        name: *id767
-        slug: *id768
-        country: *id769
-        plan_id: *id770
-        trial_ends_on: *id771
+        name: *id774
+        slug: *id775
+        country: *id776
+        plan_id: *id777
+        trial_ends_on: *id778
     Ticket:
       type: object
       required:
@@ -43792,20 +43851,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id772
+        employment_id: &id779
           type: string
           description: Identificador opaco
-        category: &id773
+        category: &id780
           type: string
-        subject: &id774
+        subject: &id781
           type: string
-        body: &id775
+        body: &id782
           type: string
-        assignee_id: &id776
+        assignee_id: &id783
           type: string
           description: Identificador opaco
           nullable: true
-        sla_due_at: &id777
+        sla_due_at: &id784
           type: string
           format: date-time
           nullable: true
@@ -43826,12 +43885,12 @@ components:
     TicketInput:
       type: object
       properties:
-        employment_id: *id772
-        category: *id773
-        subject: *id774
-        body: *id775
-        assignee_id: *id776
-        sla_due_at: *id777
+        employment_id: *id779
+        category: *id780
+        subject: *id781
+        body: *id782
+        assignee_id: *id783
+        sla_due_at: *id784
     TimeBankMovement:
       type: object
       required:
@@ -43844,25 +43903,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id778
+        employment_id: &id785
           type: string
           description: Identificador opaco
-        date: &id779
+        date: &id786
           type: string
           format: date
-        minutes: &id780
+        minutes: &id787
           type: integer
-        kind: &id781
+        kind: &id788
           type: string
           enum:
           - credit
           - debit
           - expiry
           - adjustment
-        source_type: &id782
+        source_type: &id789
           type: string
           nullable: true
-        source_id: &id783
+        source_id: &id790
           type: string
           description: Identificador opaco
           nullable: true
@@ -43875,12 +43934,12 @@ components:
     TimeBankMovementInput:
       type: object
       properties:
-        employment_id: *id778
-        date: *id779
-        minutes: *id780
-        kind: *id781
-        source_type: *id782
-        source_id: *id783
+        employment_id: *id785
+        date: *id786
+        minutes: *id787
+        kind: *id788
+        source_type: *id789
+        source_id: *id790
     TimePunch:
       type: object
       required:
@@ -43894,20 +43953,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id784
+        employment_id: &id791
           type: string
           description: Identificador opaco
-        punched_at: &id785
+        punched_at: &id792
           type: string
           format: date-time
-        kind: &id786
+        kind: &id793
           type: string
           enum:
           - in
           - out
           - break_start
           - break_end
-        method: &id787
+        method: &id794
           type: string
           enum:
           - web
@@ -43918,25 +43977,25 @@ components:
           - crew
           - biometric
           - whatsapp
-        site_id: &id788
+        site_id: &id795
           type: string
           description: Identificador opaco
           nullable: true
-        geo: &id789
+        geo: &id796
           type: object
           additionalProperties: true
           nullable: true
-        device_id: &id790
+        device_id: &id797
           type: string
           description: Identificador opaco
           nullable: true
-        offline: &id791
+        offline: &id798
           type: boolean
-        corrects_id: &id792
+        corrects_id: &id799
           type: string
           description: Identificador opaco
           nullable: true
-        reason: &id793
+        reason: &id800
           type: string
           nullable: true
         created_at:
@@ -43948,16 +44007,16 @@ components:
     TimePunchInput:
       type: object
       properties:
-        employment_id: *id784
-        punched_at: *id785
-        kind: *id786
-        method: *id787
-        site_id: *id788
-        geo: *id789
-        device_id: *id790
-        offline: *id791
-        corrects_id: *id792
-        reason: *id793
+        employment_id: *id791
+        punched_at: *id792
+        kind: *id793
+        method: *id794
+        site_id: *id795
+        geo: *id796
+        device_id: *id797
+        offline: *id798
+        corrects_id: *id799
+        reason: *id800
     Timesheet:
       type: object
       required:
@@ -43971,16 +44030,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id794
+        employment_id: &id801
           type: string
           description: Identificador opaco
-        week_start: &id795
+        week_start: &id802
           type: string
           format: date
-        entries: &id796
+        entries: &id803
           type: object
           additionalProperties: true
-        total_minutes: &id797
+        total_minutes: &id804
           type: integer
         status:
           type: string
@@ -43998,10 +44057,10 @@ components:
     TimesheetInput:
       type: object
       properties:
-        employment_id: *id794
-        week_start: *id795
-        entries: *id796
-        total_minutes: *id797
+        employment_id: *id801
+        week_start: *id802
+        entries: *id803
+        total_minutes: *id804
     TrainingPlan:
       type: object
       required:
@@ -44013,13 +44072,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        year: &id798
+        year: &id805
           type: integer
-        legal_entity_id: &id799
+        legal_entity_id: &id806
           type: string
           description: Identificador opaco
           nullable: true
-        items: &id800
+        items: &id807
           type: object
           additionalProperties: true
         status:
@@ -44037,9 +44096,9 @@ components:
     TrainingPlanInput:
       type: object
       properties:
-        year: *id798
-        legal_entity_id: *id799
-        items: *id800
+        year: *id805
+        legal_entity_id: *id806
+        items: *id807
     TravelAdvance:
       type: object
       required:
@@ -44053,14 +44112,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id801
+        employment_id: &id808
           type: string
           description: Identificador opaco
-        amount: &id802
+        amount: &id809
           $ref: '#/components/schemas/Money'
-        purpose: &id803
+        purpose: &id810
           type: string
-        due_on: &id804
+        due_on: &id811
           type: string
           format: date
         status:
@@ -44080,10 +44139,10 @@ components:
     TravelAdvanceInput:
       type: object
       properties:
-        employment_id: *id801
-        amount: *id802
-        purpose: *id803
-        due_on: *id804
+        employment_id: *id808
+        amount: *id809
+        purpose: *id810
+        due_on: *id811
     Union:
       type: object
       required:
@@ -44095,15 +44154,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id805
+        name: &id812
           type: string
-        legal_entity_id: &id806
+        legal_entity_id: &id813
           type: string
           description: Identificador opaco
-        registration: &id807
+        registration: &id814
           type: string
           nullable: true
-        dues_concept_code: &id808
+        dues_concept_code: &id815
           type: string
           nullable: true
         status:
@@ -44120,10 +44179,10 @@ components:
     UnionInput:
       type: object
       properties:
-        name: *id805
-        legal_entity_id: *id806
-        registration: *id807
-        dues_concept_code: *id808
+        name: *id812
+        legal_entity_id: *id813
+        registration: *id814
+        dues_concept_code: *id815
     UnionMembership:
       type: object
       required:
@@ -44133,20 +44192,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        union_id: &id809
+        union_id: &id816
           type: string
           description: Identificador opaco
-        employment_id: &id810
+        employment_id: &id817
           type: string
           description: Identificador opaco
-        valid_from: &id811
+        valid_from: &id818
           type: string
           format: date
-        valid_to: &id812
+        valid_to: &id819
           type: string
           format: date
           nullable: true
-        role: &id813
+        role: &id820
           type: string
           nullable: true
         created_at:
@@ -44162,11 +44221,11 @@ components:
     UnionMembershipInput:
       type: object
       properties:
-        union_id: *id809
-        employment_id: *id810
-        valid_from: *id811
-        valid_to: *id812
-        role: *id813
+        union_id: *id816
+        employment_id: *id817
+        valid_from: *id818
+        valid_to: *id819
+        role: *id820
     User:
       type: object
       required:
@@ -44179,19 +44238,19 @@ components:
         id:
           type: string
           description: Identificador opaco
-        person_id: &id814
+        person_id: &id821
           type: string
           description: Identificador opaco
           nullable: true
-        login: &id815
+        login: &id822
           type: string
           nullable: true
-        display_name: &id816
+        display_name: &id823
           type: string
-        email: &id817
+        email: &id824
           type: string
           nullable: true
-        document_type: &id818
+        document_type: &id825
           type: string
           enum:
           - dni
@@ -44201,10 +44260,10 @@ components:
           - cpp
           - other
           nullable: true
-        document_number: &id819
+        document_number: &id826
           type: string
           nullable: true
-        phone: &id820
+        phone: &id827
           type: string
           nullable: true
         document_number_masked:
@@ -44221,14 +44280,14 @@ components:
           - locked
           - alumni
           - disabled
-        mfa_enabled: &id821
+        mfa_enabled: &id828
           type: boolean
-        role_ids: &id822
+        role_ids: &id829
           type: array
           items: *id034
-        role_assignments: &id823
+        role_assignments: &id830
           type: array
-          items: *id359
+          items: *id366
           nullable: true
         last_login_at:
           type: string
@@ -44243,16 +44302,16 @@ components:
     UserInput:
       type: object
       properties:
-        person_id: *id814
-        login: *id815
-        display_name: *id816
-        email: *id817
-        document_type: *id818
-        document_number: *id819
-        phone: *id820
-        mfa_enabled: *id821
-        role_ids: *id822
-        role_assignments: *id823
+        person_id: *id821
+        login: *id822
+        display_name: *id823
+        email: *id824
+        document_type: *id825
+        document_number: *id826
+        phone: *id827
+        mfa_enabled: *id828
+        role_ids: *id829
+        role_assignments: *id830
     VacationBalance:
       type: object
       required:
@@ -44309,18 +44368,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id824
+        employment_id: &id831
           type: string
           description: Identificador opaco
-        starts_on: &id825
+        starts_on: &id832
           type: string
           format: date
-        ends_on: &id826
+        ends_on: &id833
           type: string
           format: date
-        days: &id827
+        days: &id834
           type: number
-        advance: &id828
+        advance: &id835
           type: boolean
         status:
           type: string
@@ -44331,7 +44390,7 @@ components:
           - rejected
           - cancelled
           - taken
-        approval_request_id: &id829
+        approval_request_id: &id836
           type: string
           description: Identificador opaco
           nullable: true
@@ -44344,12 +44403,12 @@ components:
     VacationRequestInput:
       type: object
       properties:
-        employment_id: *id824
-        starts_on: *id825
-        ends_on: *id826
-        days: *id827
-        advance: *id828
-        approval_request_id: *id829
+        employment_id: *id831
+        starts_on: *id832
+        ends_on: *id833
+        days: *id834
+        advance: *id835
+        approval_request_id: *id836
     WageTable:
       type: object
       required:
@@ -44365,25 +44424,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        country: &id830
+        country: &id837
           type: string
-        regime: &id831
+        regime: &id838
           type: string
-        name: &id832
+        name: &id839
           type: string
-        legal_source: &id833
+        legal_source: &id840
           type: string
-        valid_from: &id834
+        valid_from: &id841
           type: string
           format: date
-        valid_to: &id835
+        valid_to: &id842
           type: string
           format: date
           nullable: true
-        values: &id836
+        values: &id843
           type: object
           additionalProperties: true
-        verified: &id837
+        verified: &id844
           type: boolean
         created_at:
           type: string
@@ -44394,14 +44453,14 @@ components:
     WageTableInput:
       type: object
       properties:
-        country: *id830
-        regime: *id831
-        name: *id832
-        legal_source: *id833
-        valid_from: *id834
-        valid_to: *id835
-        values: *id836
-        verified: *id837
+        country: *id837
+        regime: *id838
+        name: *id839
+        legal_source: *id840
+        valid_from: *id841
+        valid_to: *id842
+        values: *id843
+        verified: *id844
     WebComplaint:
       type: object
       required:
@@ -44465,25 +44524,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        web_lead_id: &id838
+        web_lead_id: &id845
           type: string
           description: Identificador opaco
-        starts_at: &id839
+        starts_at: &id846
           type: string
           format: date-time
-        ends_at: &id840
+        ends_at: &id847
           type: string
           format: date-time
-        channel: &id841
+        channel: &id848
           type: string
           enum:
           - video
           - phone
-        host_platform_user_id: &id842
+        host_platform_user_id: &id849
           type: string
           description: Identificador opaco
           nullable: true
-        meeting_url: &id843
+        meeting_url: &id850
           type: string
           nullable: true
         status:
@@ -44503,12 +44562,12 @@ components:
     WebDemoBookingInput:
       type: object
       properties:
-        web_lead_id: *id838
-        starts_at: *id839
-        ends_at: *id840
-        channel: *id841
-        host_platform_user_id: *id842
-        meeting_url: *id843
+        web_lead_id: *id845
+        starts_at: *id846
+        ends_at: *id847
+        channel: *id848
+        host_platform_user_id: *id849
+        meeting_url: *id850
     WebLead:
       type: object
       required:
@@ -44520,7 +44579,7 @@ components:
         id:
           type: string
           description: Identificador opaco
-        kind: &id844
+        kind: &id851
           type: string
           enum:
           - demo
@@ -44530,30 +44589,30 @@ components:
           - newsletter
           - calculator
           - signup
-        full_name: &id845
+        full_name: &id852
           type: string
           nullable: true
-        email: &id846
+        email: &id853
           type: string
-        phone: &id847
-          type: string
-          nullable: true
-        company_name: &id848
+        phone: &id854
           type: string
           nullable: true
-        ruc: &id849
+        company_name: &id855
           type: string
           nullable: true
-        product_code: &id850
+        ruc: &id856
           type: string
           nullable: true
-        module_code: &id851
+        product_code: &id857
           type: string
           nullable: true
-        source_page: &id852
+        module_code: &id858
           type: string
           nullable: true
-        utm: &id853
+        source_page: &id859
+          type: string
+          nullable: true
+        utm: &id860
           type: object
           additionalProperties: true
           nullable: true
@@ -44565,11 +44624,11 @@ components:
           - qualified
           - converted
           - discarded
-        assigned_platform_user_id: &id854
+        assigned_platform_user_id: &id861
           type: string
           description: Identificador opaco
           nullable: true
-        notified_at: &id855
+        notified_at: &id862
           type: string
           format: date-time
           nullable: true
@@ -44582,18 +44641,18 @@ components:
     WebLeadInput:
       type: object
       properties:
-        kind: *id844
-        full_name: *id845
-        email: *id846
-        phone: *id847
-        company_name: *id848
-        ruc: *id849
-        product_code: *id850
-        module_code: *id851
-        source_page: *id852
-        utm: *id853
-        assigned_platform_user_id: *id854
-        notified_at: *id855
+        kind: *id851
+        full_name: *id852
+        email: *id853
+        phone: *id854
+        company_name: *id855
+        ruc: *id856
+        product_code: *id857
+        module_code: *id858
+        source_page: *id859
+        utm: *id860
+        assigned_platform_user_id: *id861
+        notified_at: *id862
     WebProduct:
       type: object
       required:
@@ -44610,23 +44669,23 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id856
+        code: &id863
           type: string
-        name: &id857
+        name: &id864
           type: string
-        acronym: &id858
+        acronym: &id865
           type: string
-        slug: &id859
+        slug: &id866
           type: string
-        tagline: &id860
+        tagline: &id867
           type: string
           nullable: true
-        module_codes: &id861
+        module_codes: &id868
           type: array
           items: *id034
-        is_suite: &id862
+        is_suite: &id869
           type: boolean
-        sort_order: &id863
+        sort_order: &id870
           type: integer
         status:
           type: string
@@ -44643,14 +44702,14 @@ components:
     WebProductInput:
       type: object
       properties:
-        code: *id856
-        name: *id857
-        acronym: *id858
-        slug: *id859
-        tagline: *id860
-        module_codes: *id861
-        is_suite: *id862
-        sort_order: *id863
+        code: *id863
+        name: *id864
+        acronym: *id865
+        slug: *id866
+        tagline: *id867
+        module_codes: *id868
+        is_suite: *id869
+        sort_order: *id870
     WebhookDelivery:
       type: object
       required:
@@ -44706,12 +44765,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        url: &id864
+        url: &id871
           type: string
-        events: &id865
+        events: &id872
           type: array
           items: *id034
-        secret_hint: &id866
+        secret_hint: &id873
           type: string
         status:
           type: string
@@ -44728,9 +44787,9 @@ components:
     WebhookEndpointInput:
       type: object
       properties:
-        url: *id864
-        events: *id865
-        secret_hint: *id866
+        url: *id871
+        events: *id872
+        secret_hint: *id873
     WorkSchedule:
       type: object
       required:
@@ -44745,16 +44804,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id867
+        name: &id874
           type: string
-        weekly_hours: &id868
+        weekly_hours: &id875
           type: number
-        days: &id869
+        days: &id876
           type: object
           additionalProperties: true
-        tolerance_minutes: &id870
+        tolerance_minutes: &id877
           type: integer
-        break_minutes: &id871
+        break_minutes: &id878
           type: integer
         status:
           type: string
@@ -44770,11 +44829,11 @@ components:
     WorkScheduleInput:
       type: object
       properties:
-        name: *id867
-        weekly_hours: *id868
-        days: *id869
-        tolerance_minutes: *id870
-        break_minutes: *id871
+        name: *id874
+        weekly_hours: *id875
+        days: *id876
+        tolerance_minutes: *id877
+        break_minutes: *id878
     Workflow:
       type: object
       required:
@@ -44790,16 +44849,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id872
+        name: &id879
           type: string
-        trigger_event: &id873
+        trigger_event: &id880
           type: string
-        conditions: &id874
+        conditions: &id881
           type: object
           additionalProperties: true
-        actions: &id875
+        actions: &id882
           type: array
-          items: *id359
+          items: *id366
         status:
           type: string
           enum:
@@ -44807,10 +44866,10 @@ components:
           - active
           - paused
           - retired
-        allowed_actions: &id876
+        allowed_actions: &id883
           type: array
           items: *id034
-        last_run_at: &id877
+        last_run_at: &id884
           type: string
           format: date-time
           nullable: true
@@ -44825,12 +44884,12 @@ components:
     WorkflowInput:
       type: object
       properties:
-        name: *id872
-        trigger_event: *id873
-        conditions: *id874
-        actions: *id875
-        allowed_actions: *id876
-        last_run_at: *id877
+        name: *id879
+        trigger_event: *id880
+        conditions: *id881
+        actions: *id882
+        allowed_actions: *id883
+        last_run_at: *id884
     WorkflowRun:
       type: object
       required:
@@ -44876,7 +44935,7 @@ components:
           nullable: true
         actions:
           type: array
-          items: *id359
+          items: *id366
         allowed_actions:
           type: array
           items: *id034

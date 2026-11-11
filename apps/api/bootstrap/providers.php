@@ -5,6 +5,7 @@ use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
+use App\Modules\Reports\ReportsServiceProvider;
 use App\Modules\Settings\SettingsServiceProvider;
 use App\Modules\Workflow\WorkflowServiceProvider;
 use App\Providers\AppServiceProvider;
@@ -18,4 +19,5 @@ return [
     NotificationsServiceProvider::class,
     SettingsServiceProvider::class,
     ContractsServiceProvider::class,
+    ReportsServiceProvider::class,
 ];

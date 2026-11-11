@@ -150,6 +150,26 @@ class FileService implements FileStorageService
     }
 
     /**
+     * SEG-12 · Contenido del archivo para entregarlo a través de la API (cuando el recurso dueño
+     * ya validó el permiso). Registra la descarga igual que la URL firmada (RN-PLT-07).
+     *
+     * @return array{name: string, mime: string, contents: string}
+     */
+    public function contentsForDownload(string $fileId, ?string $tenantId = null, ?string $userId = null): array
+    {
+        $file = $this->findOwnedFile($fileId, $tenantId);
+        /** @var string $diskName */
+        $diskName = config('files.disk', 's3');
+        $contents = Storage::disk($diskName)->get($file->storage_key);
+        if ($contents === null) {
+            throw new BusinessRuleViolatedException('RN-PLT-07', 'El archivo no está disponible en el almacenamiento.');
+        }
+        $this->logDownload($file, $userId);
+
+        return ['name' => (string) $file->original_name, 'mime' => (string) $file->mime_type, 'contents' => $contents];
+    }
+
+    /**
      * Elimina lógicamente el archivo de la base de datos y físicamente del almacenamiento.
      */
     public function delete(string $fileId, ?string $tenantId = null): void

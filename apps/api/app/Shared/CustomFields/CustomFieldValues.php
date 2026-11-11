@@ -30,10 +30,11 @@ final class CustomFieldValues
 
     /**
      * Valores visibles para quien consulta: {key: valor}. Los sensibles sin permiso no viajan.
+     * $channel es el canal del registro de accesos (api, export…).
      *
      * @return array<string, mixed>
      */
-    public function read(string $entity, string $entityId, ?EffectivePermissions $permissions): array
+    public function read(string $entity, string $entityId, ?EffectivePermissions $permissions, string $channel = 'api'): array
     {
         $defs = $this->definitions($entity)->keyBy('id');
         if ($defs->isEmpty()) {
@@ -54,7 +55,7 @@ final class CustomFieldValues
         }
         if ($sensitiveRead !== []) {
             DB::table('data_access_logs')->insert([
-                'tenant_id' => TenancyScope::requireTenant(), 'user_id' => request()->user()?->getAuthIdentifier(), 'access_kind' => 'api', 'data_category' => 'other',
+                'tenant_id' => TenancyScope::requireTenant(), 'user_id' => request()->user()?->getAuthIdentifier(), 'access_kind' => $channel, 'data_category' => 'other',
                 'entity_type' => $entity, 'entity_id' => $entityId, 'fields' => '{'.implode(',', array_map(fn ($k) => 'custom.'.$k, $sensitiveRead)).'}', 'ip' => request()->ip(),
                 'occurred_at' => now()->format('Y-m-d H:i:s.uP'),
             ]);

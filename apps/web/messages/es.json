@@ -1147,5 +1147,10 @@
     "label_en": "Nombre en inglés (opcional)",
     "label_pt": "Nombre en portugués (opcional)",
     "sort_order": "Orden"
+  },
+  "exports": {
+    "csv": "Exportar CSV",
+    "working": "Exportando…",
+    "error": "No se pudo exportar el listado."
   }
 }

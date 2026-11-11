@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Shared\Cache\TenantCache;
+use App\Shared\Exports\ExportRegistry;
 use App\Shared\Files\Contracts\FileStorageService;
 use App\Shared\Files\FileService;
 use App\Shared\Inbox\InboxRegistry;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(DataScope::class);
         $this->app->singleton(SearchRegistry::class);
         $this->app->singleton(InboxRegistry::class);
+        $this->app->singleton(ExportRegistry::class);
         $this->app->singleton(TrashRegistry::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);

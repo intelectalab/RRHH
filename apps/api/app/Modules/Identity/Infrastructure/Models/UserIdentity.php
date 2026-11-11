@@ -3,11 +3,11 @@
 namespace App\Modules\Identity\Infrastructure\Models;
 
 use App\Shared\Security\BlindIndex;
+use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\BelongsToTenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Crypt;
 
 /**
  * Identificador de ingreso (correo, documento, teléfono). Se busca por índice ciego
@@ -53,12 +53,12 @@ class UserIdentity extends Model
         return [
             'kind' => $kind,
             'identifier_hash' => BlindIndex::for($kind, $identifier),
-            'identifier_enc' => Crypt::encryptString(BlindIndex::normalize($kind, $identifier)),
+            'identifier_enc' => FieldCipher::encrypt(BlindIndex::normalize($kind, $identifier)),
         ];
     }
 
     public function identifier(): string
     {
-        return Crypt::decryptString($this->identifier_enc);
+        return FieldCipher::decrypt($this->identifier_enc);
     }
 }

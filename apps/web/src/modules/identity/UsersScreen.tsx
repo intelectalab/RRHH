@@ -13,6 +13,7 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
 import { useCompany } from '@/modules/session/CompanyProvider'
+import { ExportButton } from '@/modules/exports/ExportButton'
 import { settingsTabs } from './settingsTabs'
 
 type Assignment = { role_id: string; scope: string | null; legal_entity_ids: string[]; site_ids: string[]; org_unit_ids: string[] }
@@ -86,10 +87,15 @@ export function UsersScreen() {
         title={t('settings.title')}
         sub={users ? t('users.sub', { active, total: users.length }) : undefined}
         tabs={settingsTabs(t, can, 'users')}
-        actions={can('identity.users.create') && (
-          <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-            <Icon name="plus" /> {t('users.new')}
-          </button>
+        actions={(
+          <>
+            <ExportButton resource="users" filters={{ q: q.trim() }} onError={(m) => toast(m, 'error')} />
+            {can('identity.users.create') && (
+              <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
+                <Icon name="plus" /> {t('users.new')}
+              </button>
+            )}
+          </>
         )}
       />
       <main className="main" id="contenido" tabIndex={-1}>

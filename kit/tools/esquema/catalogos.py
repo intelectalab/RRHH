@@ -175,6 +175,7 @@ PARAMS = [
  ('seguridad.otp_minutos', 'base', 'Vigencia del código por mensaje (minutos)', 'integer', 5, [O], 'Minutos que dura el código de ingreso o de activación enviado por SMS o WhatsApp.', {'min': 2, 'max': 15}),
  ('seguridad.otp_intentos', 'base', 'Intentos por código', 'integer', 5, [O], 'Intentos fallidos que admite un código antes de anularse.', {'min': 3, 'max': 10}),
  ('seguridad.otp_reenvio_segundos', 'base', 'Espera para pedir otro código (segundos)', 'integer', 60, [O], 'Tiempo mínimo entre dos envíos de código al mismo usuario.', {'min': 30, 'max': 600}),
+ ('seguridad.marca_agua_descargas', 'base', 'Marca de agua en exportaciones', 'boolean', False, [O], 'Agrega a cada archivo exportado el nombre de quien lo descargó y la fecha.', None),
  ('seguridad.registrar_acceso_sensible', 'base', 'Registrar accesos a datos sensibles', 'boolean', True, [O], 'Deja constancia de cada consulta de sueldo, salud, denuncias, sanciones o biometría.', None),
  ('papelera.dias_restauracion', 'base', 'Días en papelera', 'integer', 30, [O], 'Días durante los que un registro eliminado puede restaurarse desde la papelera.', None),
  ('aprobaciones.recordatorio_horas', 'base', 'Recordatorio de aprobación', 'integer', 24, [O], 'Horas tras las que se recuerda una aprobación pendiente.', None),

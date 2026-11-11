@@ -58,6 +58,28 @@ export class ApiClient {
     return this.send<T>(endpoint, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined })
   }
 
+  /** Descarga un archivo (no JSON): devuelve el contenido y el nombre que sugiere la API. */
+  async download(endpoint: string): Promise<{ blob: Blob; filename: string }> {
+    const url = endpoint.startsWith('http') || endpoint.startsWith('/api/') ? endpoint : `${this.baseUrl}${endpoint}`
+    let response: Response
+    try {
+      response = await this.fetcher(url, { method: 'GET', headers: { Accept: 'text/csv, application/json' }, credentials: 'same-origin' })
+    } catch {
+      throw new ApiRequestError(0, 'network_error', 'network_error')
+    }
+    if (!response.ok) {
+      let body: ApiError | undefined
+      try {
+        body = (await response.json()) as ApiError
+      } catch {
+        // cuerpo no JSON
+      }
+      throw new ApiRequestError(response.status, body?.error?.code ?? 'internal_error', body?.error?.message ?? `HTTP ${response.status}`)
+    }
+    const match = /filename="?([^";]+)"?/.exec(response.headers.get('Content-Disposition') ?? '')
+    return { blob: await response.blob(), filename: match?.[1] ?? 'export.csv' }
+  }
+
   private async send<T>(endpoint: string, init: RequestInit): Promise<T> {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`
     const method = (init.method ?? 'GET').toUpperCase()

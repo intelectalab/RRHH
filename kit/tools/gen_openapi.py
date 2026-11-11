@@ -219,7 +219,7 @@ RES = [
     # ---------- Fase 8 ----------
     ("ANA", 8, "analytics.dashboards", "/dashboards", "Dashboard", "name:s role_ids:a widgets:j shared:b", "LCRUD", ""),
     ("RPT", 8, "reports.reports", "/reports", "Report", "name:s source:s fields:a filters:j group_by:a metrics:j visualization:s schedule?:j shared:b", "LCRUD", "run"),
-    ("RPT", 8, "reports.exports", "/exports", "ExportJob", "resource:s format:e(csv|xlsx|pdf) filters:j file_id?:id expires_at?:dt status:e(queued|running|ready|failed)", "LCR", ""),
+    ("RPT", 0, "reports.exports", "/exports", "ExportJob", "resource:s format:e(csv|xlsx|pdf) filters:j row_count?:i contains_sensitive?:b requested_by_user_id?:id requested_by_name?:s file_id?:id download_url?:s download_count?:i expires_at?:dt error?:s created_at?:dt status:e(queued|running|completed|failed|expired)", "LCR", ""),
     ("ALE", 8, "alerts.rules", "/alert-rules", "AlertRule", "key:s name:s params:j audience:j status:e(active|paused)", "LCRU", "pause resume"),
     ("ALE", 8, "alerts.alerts", "/alerts", "Alert", "rule_key:s title:s explanation:s factors:j subject_type?:s subject_id?:id severity:e(info|warning|critical) status:e(open|snoozed|dismissed|resolved)", "LR", "snooze dismiss resolve"),
     ("IAR", 8, "ai.conversations", "/ai/conversations", "AiConversation", "title?:s user_id:id messages:j", "LCR", "send-message"),
@@ -303,6 +303,7 @@ EXTRA = [
     ("PLT", 0, "get", "/search", "-", "Búsqueda global filtrada por permisos y alcance", False),
     ("PLT", 0, "post", "/files", "-", "Crear un archivo y obtener URL de subida firmada", False),
     ("PLT", 0, "get", "/files/{id}/download-url", "-", "URL de descarga firmada de corta vida (se valida el permiso del recurso dueño)", False),
+    ("RPT", 0, "get", "/exports/{id}/download", "reports.exports.view", "Descargar el archivo de una exportación propia (CSV); cuenta la descarga y la registra", False),
     ("AUD", 0, "get", "/trash", "audit.trash.view", "Papelera: registros eliminados que se pueden restaurar", False),
     ("AUD", 0, "post", "/trash/{id}/restore", "audit.trash.restore", "Restaurar un registro de la papelera", False),
     ("ORG", 1, "get", "/org-chart", "org.units.view", "Organigrama por posiciones en una fecha (as_of)", False),
@@ -548,6 +549,10 @@ def build():
     for epic, phase, method, path, perm, summary, public in EXTRA:
         op = {"summary": summary}
         res = {"201": ok(ref("schemas/GenericEnvelope"), "Creado")} if (method, path) in CREATED else {"200": ok(ref("schemas/GenericEnvelope"))}
+        if path.endswith("/download"):
+            # Descarga directa del archivo (no es JSON).
+            res["200"] = {"description": "Archivo", "content": {"text/csv": {"schema": {"type": "string"}}}}
+            res.update(errs("409"))
         if method in ("post", "put", "patch"):
             op["requestBody"] = body(ref("schemas/GenericInput"))
             if method == "post":

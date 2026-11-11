@@ -5,9 +5,9 @@ namespace App\Modules\Notifications\Http\Controllers;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
+use App\Shared\Security\FieldCipher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -59,7 +59,7 @@ final class DeliveryController
         if ($enc === null) {
             return null;
         }
-        $address = Crypt::decryptString($enc);
+        $address = FieldCipher::decrypt($enc);
         [$local, $domain] = array_pad(explode('@', $address, 2), 2, '');
 
         return mb_substr($local, 0, 2).str_repeat('•', max(1, mb_strlen($local) - 2)).($domain !== '' ? '@'.$domain : '');
