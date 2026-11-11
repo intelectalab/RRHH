@@ -3381,6 +3381,33 @@ paths:
       x-phase: 0
       x-permission: audit.logs.view
       operationId: getAuditLogsId
+  /auth/activation/code:
+    post:
+      summary: 'Activar la cuenta sin correo: documento, código de activación y clave nueva'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: public
+      operationId: postAuthActivationCode
+      security: []
   /auth/invitation/accept:
     post:
       summary: Activar la cuenta con el enlace de invitación y definir la clave
@@ -3491,9 +3518,9 @@ paths:
       x-phase: 0
       x-permission: authenticated
       operationId: postAuthMfaVerify
-  /auth/otp:
+  /auth/otp/request:
     post:
-      summary: Solicitar o verificar un código de un solo uso
+      summary: Pedir un código de ingreso por SMS/WhatsApp con el documento (responde igual exista o no)
       requestBody:
         required: true
         content:
@@ -3516,7 +3543,34 @@ paths:
       - SEG
       x-phase: 0
       x-permission: public
-      operationId: postAuthOtp
+      operationId: postAuthOtpRequest
+      security: []
+  /auth/otp/verify:
+    post:
+      summary: Ingresar con documento y código de un solo uso (caduca, un uso, tope de intentos)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: public
+      operationId: postAuthOtpVerify
       security: []
   /auth/password/forgot:
     post:
@@ -31999,6 +32053,40 @@ paths:
       x-phase: 0
       x-permission: identity.users.update
       operationId: patchUsersId
+  /users/{id}/activation-code:
+    post:
+      summary: Emitir el código de activación de un usuario sin correo (se muestra una vez o se envía por SMS/WhatsApp)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - SEG
+      x-phase: 0
+      x-permission: identity.users.invite
+      operationId: postUsersIdActivationCode
   /users/{id}/invite:
     post:
       summary: Acción «invite» sobre User
@@ -41683,7 +41771,6 @@ components:
       type: object
       required:
       - id
-      - login
       - display_name
       - status
       - mfa_enabled
@@ -41698,9 +41785,32 @@ components:
           nullable: true
         login: &id786
           type: string
+          nullable: true
         display_name: &id787
           type: string
         email: &id788
+          type: string
+          nullable: true
+        document_type: &id789
+          type: string
+          enum:
+          - dni
+          - ce
+          - passport
+          - ptp
+          - cpp
+          - other
+          nullable: true
+        document_number: &id790
+          type: string
+          nullable: true
+        phone: &id791
+          type: string
+          nullable: true
+        document_number_masked:
+          type: string
+          nullable: true
+        phone_masked:
           type: string
           nullable: true
         status:
@@ -41711,12 +41821,12 @@ components:
           - locked
           - alumni
           - disabled
-        mfa_enabled: &id789
+        mfa_enabled: &id792
           type: boolean
-        role_ids: &id790
+        role_ids: &id793
           type: array
           items: *id034
-        role_assignments: &id791
+        role_assignments: &id794
           type: array
           items: *id326
           nullable: true
@@ -41737,9 +41847,12 @@ components:
         login: *id786
         display_name: *id787
         email: *id788
-        mfa_enabled: *id789
-        role_ids: *id790
-        role_assignments: *id791
+        document_type: *id789
+        document_number: *id790
+        phone: *id791
+        mfa_enabled: *id792
+        role_ids: *id793
+        role_assignments: *id794
     VacationBalance:
       type: object
       required:
@@ -41796,18 +41909,18 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id792
+        employment_id: &id795
           type: string
           description: Identificador opaco
-        starts_on: &id793
+        starts_on: &id796
           type: string
           format: date
-        ends_on: &id794
+        ends_on: &id797
           type: string
           format: date
-        days: &id795
+        days: &id798
           type: number
-        advance: &id796
+        advance: &id799
           type: boolean
         status:
           type: string
@@ -41818,7 +41931,7 @@ components:
           - rejected
           - cancelled
           - taken
-        approval_request_id: &id797
+        approval_request_id: &id800
           type: string
           description: Identificador opaco
           nullable: true
@@ -41831,12 +41944,12 @@ components:
     VacationRequestInput:
       type: object
       properties:
-        employment_id: *id792
-        starts_on: *id793
-        ends_on: *id794
-        days: *id795
-        advance: *id796
-        approval_request_id: *id797
+        employment_id: *id795
+        starts_on: *id796
+        ends_on: *id797
+        days: *id798
+        advance: *id799
+        approval_request_id: *id800
     WageTable:
       type: object
       required:
@@ -41852,25 +41965,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        country: &id798
+        country: &id801
           type: string
-        regime: &id799
+        regime: &id802
           type: string
-        name: &id800
+        name: &id803
           type: string
-        legal_source: &id801
+        legal_source: &id804
           type: string
-        valid_from: &id802
+        valid_from: &id805
           type: string
           format: date
-        valid_to: &id803
+        valid_to: &id806
           type: string
           format: date
           nullable: true
-        values: &id804
+        values: &id807
           type: object
           additionalProperties: true
-        verified: &id805
+        verified: &id808
           type: boolean
         created_at:
           type: string
@@ -41881,14 +41994,14 @@ components:
     WageTableInput:
       type: object
       properties:
-        country: *id798
-        regime: *id799
-        name: *id800
-        legal_source: *id801
-        valid_from: *id802
-        valid_to: *id803
-        values: *id804
-        verified: *id805
+        country: *id801
+        regime: *id802
+        name: *id803
+        legal_source: *id804
+        valid_from: *id805
+        valid_to: *id806
+        values: *id807
+        verified: *id808
     WebhookDelivery:
       type: object
       required:
@@ -41944,12 +42057,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        url: &id806
+        url: &id809
           type: string
-        events: &id807
+        events: &id810
           type: array
           items: *id034
-        secret_hint: &id808
+        secret_hint: &id811
           type: string
         status:
           type: string
@@ -41966,9 +42079,9 @@ components:
     WebhookEndpointInput:
       type: object
       properties:
-        url: *id806
-        events: *id807
-        secret_hint: *id808
+        url: *id809
+        events: *id810
+        secret_hint: *id811
     WorkSchedule:
       type: object
       required:
@@ -41983,16 +42096,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id809
+        name: &id812
           type: string
-        weekly_hours: &id810
+        weekly_hours: &id813
           type: number
-        days: &id811
+        days: &id814
           type: object
           additionalProperties: true
-        tolerance_minutes: &id812
+        tolerance_minutes: &id815
           type: integer
-        break_minutes: &id813
+        break_minutes: &id816
           type: integer
         status:
           type: string
@@ -42008,11 +42121,11 @@ components:
     WorkScheduleInput:
       type: object
       properties:
-        name: *id809
-        weekly_hours: *id810
-        days: *id811
-        tolerance_minutes: *id812
-        break_minutes: *id813
+        name: *id812
+        weekly_hours: *id813
+        days: *id814
+        tolerance_minutes: *id815
+        break_minutes: *id816
     Workflow:
       type: object
       required:
@@ -42026,11 +42139,11 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id814
+        name: &id817
           type: string
-        trigger_event: &id815
+        trigger_event: &id818
           type: string
-        graph: &id816
+        graph: &id819
           type: object
           additionalProperties: true
         status:
@@ -42051,9 +42164,9 @@ components:
     WorkflowInput:
       type: object
       properties:
-        name: *id814
-        trigger_event: *id815
-        graph: *id816
+        name: *id817
+        trigger_event: *id818
+        graph: *id819
     WorkflowRun:
       type: object
       required:

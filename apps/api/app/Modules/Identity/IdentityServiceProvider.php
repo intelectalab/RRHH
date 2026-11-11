@@ -6,6 +6,7 @@ use App\Modules\Identity\Application\SessionManager;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
+use App\Modules\Identity\Infrastructure\Subscribers\SendMessageCode;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
 use App\Modules\Identity\Infrastructure\Trash\RoleTrashSource;
 use App\Shared\Outbox\OutboxService;
@@ -61,6 +62,7 @@ final class IdentityServiceProvider extends ServiceProvider
 
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(SendPasswordResetLink::class));
+        $outbox->subscribe($this->app->make(SendMessageCode::class));
         $outbox->subscribe($this->app->make(SendInvitation::class));
 
         $this->app->make(TrashRegistry::class)->register($this->app->make(RoleTrashSource::class));

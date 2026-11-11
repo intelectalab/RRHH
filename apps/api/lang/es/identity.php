@@ -44,4 +44,12 @@ return [
         'enabled_event' => 'Se activó la verificación en dos pasos en tu cuenta.',
         'disabled_event' => 'Se desactivó la verificación en dos pasos en tu cuenta.',
     ],
+    'codes' => [
+        'login_message' => 'Ayni HR: tu código de ingreso es :code. Vence en :minutes minutos. No lo compartas con nadie.',
+        'activation_message' => 'Ayni HR: tu código para activar tu cuenta es :code. Vence en :hours horas. Ingresa con tu documento y este código.',
+        'email_subject' => 'Tu código de Ayni HR',
+        'invalid' => 'El documento o el código no son válidos, o el código ya venció.',
+        'activation_not_pending' => 'La cuenta ya está activa: no necesita código de activación.',
+        'no_phone' => 'El usuario no tiene celular registrado para enviarle el código.',
+    ],
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Identity\Http\Controllers;
 
+use App\Modules\Identity\Application\CodeSignIn;
 use App\Modules\Identity\Application\UserService;
 use App\Modules\Identity\Http\Requests\UserRequest;
 use App\Modules\Identity\Infrastructure\Models\User;
@@ -52,7 +53,7 @@ final class UserController
 
     public function store(UserRequest $request): JsonResponse
     {
-        /** @var array{login: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>} $input */
+        /** @var array{login?: string|null, display_name?: string, email?: string|null, document_type?: string|null, document_number?: string|null, phone?: string|null, person_id?: string|null, role_ids?: array<int, string>} $input */
         $input = $request->validated();
 
         return $this->respond($this->users->create($input, $this->actor($request), $request->getSchemeAndHttpHost()), 201);
@@ -63,7 +64,7 @@ final class UserController
         $user = $this->find($id);
         $ifMatch = trim((string) $request->header('If-Match', ''), ' "W/');
 
-        /** @var array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>} $input */
+        /** @var array{login?: string|null, display_name?: string, email?: string|null, document_type?: string|null, document_number?: string|null, phone?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>} $input */
         $input = $request->validated();
 
         return $this->respond($this->users->update($user, $input, $this->actor($request), $ifMatch === '' ? null : (int) $ifMatch));
@@ -108,6 +109,15 @@ final class UserController
         $data = $request->validate(['reason' => ['sometimes', 'nullable', 'string', 'max:500']]);
 
         return $this->respond($this->users->resetPassword($user, $request->getSchemeAndHttpHost(), isset($data['reason']) ? (string) $data['reason'] : null));
+    }
+
+    /** SEG-2: código de activación para quien no tiene correo (se muestra una vez o se envía por mensaje). */
+    public function activationCode(Request $request, string $id, CodeSignIn $codes): JsonResponse
+    {
+        $user = $this->find($id);
+        $data = $request->validate(['channel' => ['required', 'string', 'in:in_app,sms,whatsapp']]);
+
+        return response()->json(['data' => $codes->issueActivationCode($user, (string) $data['channel'])]);
     }
 
     public function resetMfa(Request $request, string $id): JsonResponse

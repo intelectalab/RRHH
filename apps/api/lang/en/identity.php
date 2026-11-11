@@ -44,4 +44,12 @@ return [
         'enabled_event' => 'Two-step verification was turned on for your account.',
         'disabled_event' => 'Two-step verification was turned off for your account.',
     ],
+    'codes' => [
+        'login_message' => 'Ayni HR: your sign-in code is :code. It expires in :minutes minutes. Do not share it.',
+        'activation_message' => 'Ayni HR: your account activation code is :code. It expires in :hours hours. Sign in with your ID document and this code.',
+        'email_subject' => 'Your Ayni HR code',
+        'invalid' => 'The document or the code is not valid, or the code has expired.',
+        'activation_not_pending' => 'The account is already active: it does not need an activation code.',
+        'no_phone' => 'The user has no mobile number to send the code to.',
+    ],
 ];

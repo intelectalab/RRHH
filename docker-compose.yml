@@ -119,6 +119,8 @@ services:
       MAIL_HOST: mailpit
       MAIL_PORT: 1025
       MAIL_ENCRYPTION: null
+      # Desarrollo: correos y SMS/WhatsApp simulados llegan a Mailpit (http://localhost:8025).
+      INTEGRATIONS_DEV_INBOX: mailpit
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
       AWS_DEFAULT_REGION: us-east-1
@@ -186,6 +188,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: null
+      INTEGRATIONS_DEV_INBOX: mailpit
     volumes:
       - ./apps/api:/var/www/html
       - ./database:/var/www/database
@@ -220,6 +227,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-secret}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: null
+      INTEGRATIONS_DEV_INBOX: mailpit
     volumes:
       - ./apps/api:/var/www/html
       - ./database:/var/www/database

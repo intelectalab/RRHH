@@ -1332,6 +1332,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/activation/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activar la cuenta sin correo: documento, código de activación y clave nueva */
+        post: operations["postAuthActivationCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/invitation/accept": {
         parameters: {
             query?: never;
@@ -1400,7 +1417,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/otp": {
+    "/auth/otp/request": {
         parameters: {
             query?: never;
             header?: never;
@@ -1409,8 +1426,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Solicitar o verificar un código de un solo uso */
-        post: operations["postAuthOtp"];
+        /** Pedir un código de ingreso por SMS/WhatsApp con el documento (responde igual exista o no) */
+        post: operations["postAuthOtpRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/otp/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ingresar con documento y código de un solo uso (caduca, un uso, tope de intentos) */
+        post: operations["postAuthOtpVerify"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12469,6 +12503,23 @@ export interface paths {
         patch: operations["patchUsersId"];
         trace?: never;
     };
+    "/users/{id}/activation-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Emitir el código de activación de un usuario sin correo (se muestra una vez o se envía por SMS/WhatsApp) */
+        post: operations["postUsersIdActivationCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{id}/invite": {
         parameters: {
             query?: never;
@@ -17721,9 +17772,15 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             person_id?: string | null;
-            login: string;
+            login?: string | null;
             display_name: string;
             email?: string | null;
+            /** @enum {string|null} */
+            document_type?: "dni" | "ce" | "passport" | "ptp" | "cpp" | "other" | null;
+            document_number?: string | null;
+            phone?: string | null;
+            document_number_masked?: string | null;
+            phone_masked?: string | null;
             /** @enum {string} */
             status: "invited" | "active" | "locked" | "alumni" | "disabled";
             mfa_enabled: boolean;
@@ -17741,9 +17798,13 @@ export interface components {
         UserInput: {
             /** @description Identificador opaco */
             person_id?: string | null;
-            login?: string;
+            login?: string | null;
             display_name?: string;
             email?: string | null;
+            /** @enum {string|null} */
+            document_type?: "dni" | "ce" | "passport" | "ptp" | "cpp" | "other" | null;
+            document_number?: string | null;
+            phone?: string | null;
             mfa_enabled?: boolean;
             role_ids?: string[];
             role_assignments?: {
@@ -21265,6 +21326,36 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    postAuthActivationCode: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postAuthInvitationAccept: {
         parameters: {
             query?: never;
@@ -21389,7 +21480,37 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
-    postAuthOtp: {
+    postAuthOtpRequest: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAuthOtpVerify: {
         parameters: {
             query?: never;
             header?: {
@@ -50197,6 +50318,41 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postUsersIdActivationCode: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postUsersIdInvite: {

@@ -17089,7 +17089,10 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('seguridad.bloqueo_minutos', 'base', 'Duración del bloqueo (minutos)', 'Tiempo que la cuenta queda bloqueada tras superar los intentos.', 'integer', '15'::jsonb, ARRAY['organization'], '{"min": 5, "max": 1440}'::jsonb),
   ('seguridad.sesion_duracion_minutos', 'base', 'Duración máxima de la sesión (minutos)', 'Tiempo tras el cual hay que volver a ingresar aunque se esté usando.', 'integer', '480'::jsonb, ARRAY['organization'], '{"min": 30, "max": 1440}'::jsonb),
   ('seguridad.inactividad_minutos', 'base', 'Cierre por inactividad (minutos)', 'Minutos sin uso tras los cuales la sesión se cierra.', 'integer', '30'::jsonb, ARRAY['organization'], '{"min": 5, "max": 240}'::jsonb),
-  ('seguridad.mfa_todos', 'base', 'Verificación en dos pasos para todos', 'Exige el segundo factor a todos los usuarios, además de los roles que ya lo exigen.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL);
+  ('seguridad.mfa_todos', 'base', 'Verificación en dos pasos para todos', 'Exige el segundo factor a todos los usuarios, además de los roles que ya lo exigen.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL),
+  ('seguridad.otp_minutos', 'base', 'Vigencia del código por mensaje (minutos)', 'Minutos que dura el código de ingreso o de activación enviado por SMS o WhatsApp.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 2, "max": 15}'::jsonb),
+  ('seguridad.otp_intentos', 'base', 'Intentos por código', 'Intentos fallidos que admite un código antes de anularse.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
+  ('seguridad.otp_reenvio_segundos', 'base', 'Espera para pedir otro código (segundos)', 'Tiempo mínimo entre dos envíos de código al mismo usuario.', 'integer', '60'::jsonb, ARRAY['organization'], '{"min": 30, "max": 600}'::jsonb);
 
 -- NOT-1 · NOT-6: horario de silencio, avisos obligatorios y retención del centro de notificaciones.
 INSERT INTO parameter_definitions (code, module_code, name, description, data_type, default_value, allowed_scopes, options) VALUES

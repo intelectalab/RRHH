@@ -236,7 +236,9 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/auth/password/forgot` | público | 0 |
 | POST | `/auth/password/reset` | público | 0 |
 | POST | `/auth/invitation/accept` | público | 0 |
-| POST | `/auth/otp` | público | 0 |
+| POST | `/auth/otp/request` | público | 0 |
+| POST | `/auth/otp/verify` | público | 0 |
+| POST | `/auth/activation/code` | público | 0 |
 | POST | `/auth/logout` | sesión | 0 |
 | GET | `/me` | sesión | 0 |
 | GET | `/me/sessions` | sesión | 0 |
@@ -249,6 +251,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/me/mfa/totp/confirm` | sesión | 0 |
 | POST | `/me/mfa/recovery-codes` | sesión | 0 |
 | POST | `/me/mfa/disable` | sesión | 0 |
+| POST | `/users/{id}/activation-code` | `identity.users.invite` | 0 |
 | POST | `/roles/{id}/mfa-requirement` | `identity.security_policies.update` | 0 |
 | GET | `/permissions` | `identity.roles.view` | 0 |
 

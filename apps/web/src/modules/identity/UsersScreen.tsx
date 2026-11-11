@@ -7,6 +7,8 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
+import { ActivationCodePanel } from './ActivationCodePanel'
+import { identityPayload, LoginIdentityFields, type LoginIdentity } from './LoginIdentityFields'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
@@ -30,6 +32,7 @@ export function UsersScreen() {
   const [suspending, setSuspending] = useState<User | null>(null)
   const [revoking, setRevoking] = useState<User | null>(null)
   const [resettingMfa, setResettingMfa] = useState<User | null>(null)
+  const [codeFor, setCodeFor] = useState<User | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
   // Enlace desde la búsqueda global: /configuracion/usuarios?q=…
@@ -120,7 +123,7 @@ export function UsersScreen() {
                         <div className="who">
                           <div className="min-w-0">
                             <b>{u.display_name}</b> {self && <span className="tag in">{t('users.you')}</span>} {u.mfa_enabled && <span className="tag ok" title={t('users.mfa_on_title')}>{t('users.mfa_on')}</span>}
-                            <span className="sub2">{u.login}{u.email && u.email !== u.login ? ` · ${u.email}` : ''}</span>
+                            <span className="sub2">{[u.login, u.email && u.email !== u.login ? u.email : null, u.document_number_masked ? `${t(`auth.doc_${u.document_type ?? 'other'}`)} ${u.document_number_masked}` : null].filter(Boolean).join(' · ')}</span>
                           </div>
                         </div>
                       </td>
@@ -130,6 +133,9 @@ export function UsersScreen() {
                       <td className="text-end nowrap">
                         {can('identity.users.update') && u.status !== 'disabled' && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditingUser(u)}>{t('users.edit')}</button>
+                        )}
+                        {u.status === 'invited' && u.document_number_masked && can('identity.users.invite') && (
+                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setCodeFor(u)}>{t('users.action_activation_code')}</button>
                         )}
                         {actions.includes('invite') && u.email && can('identity.users.invite') && (
                           <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'invite', 'users.done_invited')}>{t('users.action_resend')}</button>
@@ -192,6 +198,13 @@ export function UsersScreen() {
           }}
         />
       )}
+      {codeFor && (
+        <ActivationCodePanel
+          user={codeFor}
+          onClose={() => setCodeFor(null)}
+          onSent={(msg) => { setCodeFor(null); toast(msg) }}
+        />
+      )}
       {resettingMfa && (
         <SuspendPanel
           mode="reset-mfa"
@@ -225,6 +238,7 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
   const [login, setLogin] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
+  const [identity, setIdentity] = useState<LoginIdentity>({ docType: 'dni', docNumber: '', phone: '' })
   const [roleIds, setRoleIds] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -234,7 +248,7 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
     setBusy(true)
     setError(null)
     try {
-      await api.post('/users', { login, display_name: displayName || undefined, email: email || null, role_ids: roleIds })
+      await api.post('/users', { login: login || undefined, display_name: displayName || undefined, email: email || null, ...identityPayload(identity), role_ids: roleIds })
       await onCreated()
     } catch (err) {
       setError(Object.values(formErrors(err, t).fields)[0] ?? formErrors(err, t).general)
@@ -254,14 +268,15 @@ function NewUserPanel({ roles, onClose, onCreated }: { roles: Role[]; onClose: (
       </>}
     >
       <form id="nuevo-usuario" onSubmit={submit} noValidate>
-        <label className="form-label" htmlFor="u-login">{t('users.login')}</label>
-        <input id="u-login" className="form-control mb-2" required value={login} onChange={(e) => setLogin(e.target.value)} autoComplete="off" />
+        <label className="form-label" htmlFor="u-login">{t('users.login_optional')}</label>
+        <input id="u-login" className="form-control mb-2" value={login} onChange={(e) => setLogin(e.target.value)} autoComplete="off" />
         <p className="small text-secondary mb-3">{t('users.login_help')}</p>
         <label className="form-label" htmlFor="u-name">{t('users.display_name')}</label>
         <input id="u-name" className="form-control mb-3" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
         <label className="form-label" htmlFor="u-email">{t('users.email')} <span className="text-secondary">{t('users.email_optional')}</span></label>
         <input id="u-email" className="form-control mb-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <p className="small text-secondary mb-3">{t('users.email_help')}</p>
+        <LoginIdentityFields idPrefix="u" value={identity} onChange={setIdentity} />
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
           <legend className="form-label">{t('users.roles')}</legend>
           {roles.map((r) => (
@@ -324,6 +339,7 @@ function EditUserPanel({ user, roles, onClose, onSaved }: { user: User; roles: R
   const { companies } = useCompany()
   const [displayName, setDisplayName] = useState(user.display_name)
   const [email, setEmail] = useState(user.email ?? '')
+  const [identity, setIdentity] = useState<LoginIdentity>({ docType: (user.document_type ?? 'dni') as LoginIdentity['docType'], docNumber: '', phone: '' })
   const [assignments, setAssignments] = useState<Assignment[]>(
     user.role_assignments ?? user.role_ids.map((id) => ({ role_id: id, scope: null, legal_entity_ids: [], site_ids: [], org_unit_ids: [] })),
   )
@@ -340,7 +356,7 @@ function EditUserPanel({ user, roles, onClose, onSaved }: { user: User; roles: R
     setBusy(true)
     setError(null)
     try {
-      await api.request(`/users/${user.id}`, 'PATCH', { display_name: displayName, email: email || null, role_assignments: assignments },
+      await api.request(`/users/${user.id}`, 'PATCH', { display_name: displayName, email: email || null, ...identityPayload(identity), role_assignments: assignments },
         user.version !== undefined ? { 'If-Match': `"${user.version}"` } : undefined)
       await onSaved()
     } catch (err) {
@@ -365,6 +381,7 @@ function EditUserPanel({ user, roles, onClose, onSaved }: { user: User; roles: R
         <input id="e-name" className="form-control mb-3" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
         <label className="form-label" htmlFor="e-email">{t('users.email')} <span className="text-secondary">{t('users.email_optional')}</span></label>
         <input id="e-email" className="form-control mb-3" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <LoginIdentityFields idPrefix="e" value={identity} onChange={setIdentity} maskedDocument={user.document_number_masked} maskedPhone={user.phone_masked} />
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
           <legend className="form-label">{t('users.roles')}</legend>
           <p className="small text-secondary mb-2">{t('users.scope_note')}</p>

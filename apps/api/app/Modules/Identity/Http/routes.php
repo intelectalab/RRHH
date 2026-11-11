@@ -2,6 +2,7 @@
 
 use App\Modules\Identity\Http\Controllers\AccountSecurityController;
 use App\Modules\Identity\Http\Controllers\AuthController;
+use App\Modules\Identity\Http\Controllers\CodeSignInController;
 use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\MfaController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
@@ -22,6 +23,9 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::post('/auth/password/forgot', [AuthController::class, 'forgotPassword'])->middleware('throttle:ayni-login');
     Route::post('/auth/password/reset', [AuthController::class, 'resetPassword'])->middleware('throttle:ayni-login');
     Route::post('/auth/invitation/accept', [AuthController::class, 'acceptInvitation'])->middleware('throttle:ayni-login');
+    Route::post('/auth/otp/request', [CodeSignInController::class, 'request'])->middleware('throttle:ayni-login');
+    Route::post('/auth/otp/verify', [CodeSignInController::class, 'verify'])->middleware('throttle:ayni-login');
+    Route::post('/auth/activation/code', [CodeSignInController::class, 'activate'])->middleware('throttle:ayni-login');
 
     Route::middleware('auth:ayni')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -49,6 +53,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::get('/users/{id}', [UserController::class, 'show'])->middleware('permission:identity.users.view');
         Route::patch('/users/{id}', [UserController::class, 'update'])->middleware('permission:identity.users.update');
         Route::post('/users/{id}/invite', [UserController::class, 'invite'])->middleware('permission:identity.users.invite');
+        Route::post('/users/{id}/activation-code', [UserController::class, 'activationCode'])->middleware('permission:identity.users.invite');
         Route::post('/users/{id}/suspend', [UserController::class, 'suspend'])->middleware('permission:identity.users.suspend');
         Route::post('/users/{id}/reactivate', [UserController::class, 'reactivate'])->middleware('permission:identity.users.reactivate');
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->middleware('permission:identity.users.reset_password');

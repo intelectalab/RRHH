@@ -2,6 +2,7 @@
 
 namespace App\Modules\Identity\Http\Requests;
 
+use App\Modules\Identity\Domain\LoginDocument;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class UserRequest extends FormRequest
@@ -19,7 +20,12 @@ final class UserRequest extends FormRequest
         $creating = $this->isMethod('post');
 
         return [
-            'login' => [$creating ? 'required' : 'sometimes', 'string', 'min:3', 'max:80', 'regex:/^[A-Za-z0-9._@-]+$/'],
+            // SEG-2: quien no tiene correo puede tener solo documento; el usuario (login) es opcional si hay documento.
+            'login' => [$creating ? 'required_without:document_number' : 'sometimes', 'nullable', 'string', 'min:3', 'max:80', 'regex:/^[A-Za-z0-9._@-]+$/'],
+            'document_type' => ['required_with:document_number', 'nullable', 'string', 'in:'.implode(',', LoginDocument::TYPES)],
+            'document_number' => ['sometimes', 'nullable', 'string', 'min:4', 'max:20', 'regex:/^[A-Za-z0-9-]+$/'],
+            // Celular para recibir códigos por SMS o WhatsApp, con código de país.
+            'phone' => ['sometimes', 'nullable', 'string', 'regex:/^\+?[0-9 ()-]{8,20}$/'],
             'display_name' => ['sometimes', 'string', 'min:2', 'max:150'],
             // RN-SEG-09: el correo nunca es obligatorio.
             'email' => ['sometimes', 'nullable', 'string', 'email:rfc', 'max:254'],

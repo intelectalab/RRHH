@@ -32,9 +32,13 @@ class DispatchOutboxCommand extends Command
      * Lógica central de despacho, extraída para ser llamable desde tests y desde el comando Artisan.
      * Implementada como método estático para no depender de la consola inicializada.
      */
-    public static function processOutbox(OutboxService $outboxService, int $limit = 50, int $maxAttempts = 3): int
+    /**
+     * @param  list<string>|null  $onlyIds  entrega inmediata de eventos concretos (OutboxService::deliverSoon)
+     */
+    public static function processOutbox(OutboxService $outboxService, int $limit = 50, int $maxAttempts = 3, ?array $onlyIds = null): int
     {
         $events = OutboxEvent::whereIn('status', [OutboxEvent::STATUS_PENDING, OutboxEvent::STATUS_FAILED])
+            ->when($onlyIds !== null, fn ($q) => $q->whereIn('id', $onlyIds))
             ->where(function ($query) {
                 $query->whereNull('next_attempt_at')
                     ->orWhere('next_attempt_at', '<=', now());

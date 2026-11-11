@@ -52,6 +52,9 @@ final class DomainEventTypes
 
     public const USER_INVITED = 'user.invited.v1';
 
+    /** SEG-2: código de ingreso o de activación por SMS/WhatsApp (cifrado, nunca en claro). */
+    public const USER_MESSAGE_CODE_ISSUED = 'user.message_code_issued.v1';
+
     // Aprobaciones (WFL)
     public const APPROVAL_REQUESTED = 'approval.requested.v1';
 
@@ -245,6 +248,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['user_id', 'user_token_id', 'token_enc', 'expires_at'],
             'description' => 'Invitación emitida o reenviada (token cifrado, nunca en claro)',
+        ],
+        self::USER_MESSAGE_CODE_ISSUED => [
+            'version' => 1,
+            'required_fields' => ['user_id', 'purpose', 'channel', 'code_enc', 'minutes'],
+            'description' => 'Código de un solo uso para ingresar o activar la cuenta sin correo (cifrado, nunca en claro)',
         ],
         self::USER_ACTIVATED => [
             'version' => 1,

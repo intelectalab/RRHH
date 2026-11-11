@@ -2,6 +2,8 @@
 
 namespace App\Shared\Integrations;
 
+use App\Shared\Integrations\DevInbox\DevInboxEmailAdapter;
+use App\Shared\Integrations\DevInbox\DevInboxMessagingAdapter;
 use App\Shared\Integrations\Fake\FakeAiAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
 use App\Shared\Integrations\Fake\FakeBiometricAdapter;
@@ -42,7 +44,7 @@ final class IntegrationManager
         }
 
         if (! app()->isProduction()) {
-            $this->emailAdapter = new FakeEmailAdapter($this->recorder);
+            $this->emailAdapter = $this->devInbox() ? new DevInboxEmailAdapter($this->recorder) : new FakeEmailAdapter($this->recorder);
 
             return $this->emailAdapter;
         }
@@ -72,7 +74,7 @@ final class IntegrationManager
         }
 
         if (! app()->isProduction()) {
-            $this->messagingAdapter = new FakeMessagingAdapter($this->recorder);
+            $this->messagingAdapter = $this->devInbox() ? new DevInboxMessagingAdapter($this->recorder) : new FakeMessagingAdapter($this->recorder);
 
             return $this->messagingAdapter;
         }
@@ -123,6 +125,12 @@ final class IntegrationManager
         }
 
         throw new RuntimeException('No live AI provider configured for production.');
+    }
+
+    /** Desarrollo local: correo y mensajes al buzón de pruebas (config integrations.dev_inbox). */
+    private function devInbox(): bool
+    {
+        return config('integrations.dev_inbox') === 'mailpit' && ! app()->runningUnitTests();
     }
 
     public function setEmailAdapter(EmailPort $adapter): void

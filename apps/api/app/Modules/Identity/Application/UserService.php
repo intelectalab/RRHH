@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Application;
 
 use App\Modules\Identity\Application\Actions\RequestPasswordReset;
+use App\Modules\Identity\Domain\LoginDocument;
 use App\Modules\Identity\Domain\UserAccountStateMachine;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
@@ -47,6 +48,9 @@ final class UserService
         $identities = $user->identities()->get();
         $login = $identities->firstWhere('kind', 'username') ?? $identities->firstWhere('kind', 'email');
         $email = $identities->firstWhere('kind', 'email');
+        $document = $identities->firstWhere('kind', 'national_id');
+        $documentParts = $document === null ? null : LoginDocument::parse($document->identifier());
+        $phone = $identities->firstWhere('kind', 'phone');
 
         return [
             'id' => $user->id,
@@ -54,6 +58,10 @@ final class UserService
             'login' => $login?->identifier() ?? '',
             'display_name' => $user->display_name,
             'email' => $email?->identifier(),
+            // SEG-2: documento y celular viajan enmascarados; se reemplazan, no se leen.
+            'document_type' => $documentParts['type'] ?? null,
+            'document_number_masked' => $documentParts === null ? null : LoginDocument::mask($documentParts['number']),
+            'phone_masked' => $phone === null ? null : '+'.LoginDocument::mask($phone->identifier(), 3),
             'status' => $user->status,
             'mfa_enabled' => DB::table('user_mfa_factors')->where('user_id', $user->id)->whereNotNull('confirmed_at')->whereNull('disabled_at')->exists(),
             'role_ids' => $user->roleAssignments()->orderBy('created_at')->pluck('role_id')->map(fn ($id) => (string) $id)->all(),
@@ -67,26 +75,44 @@ final class UserService
     }
 
     /**
-     * @param  array{login: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>}  $input
+     * @param  array{login?: string|null, display_name?: string, email?: string|null, document_type?: string|null, document_number?: string|null, phone?: string|null, person_id?: string|null, role_ids?: array<int, string>}  $input
      */
     public function create(array $input, EffectivePermissions $actor, string $origin): User
     {
         $roleIds = $this->validatedRoles($input['role_ids'] ?? [], $actor);
-        $this->guardUnique('username', $input['login']);
+        if (! empty($input['login'])) {
+            $this->guardUnique('username', $input['login']);
+        }
         if (! empty($input['email'])) {
             $this->guardUnique('email', $input['email']);
+        }
+        $document = $this->documentOf($input);
+        if ($document !== null) {
+            $this->guardUnique('national_id', $document);
+        }
+        if (! empty($input['phone'])) {
+            $this->guardUnique('phone', $input['phone']);
         }
 
         return DB::transaction(function () use ($input, $roleIds, $origin): User {
             $user = User::create([
-                'display_name' => $input['display_name'] ?? $input['login'],
+                'display_name' => $input['display_name'] ?? $input['login'] ?? (string) ($input['document_number'] ?? ''),
                 'person_id' => $input['person_id'] ?? null,
                 'status' => User::STATUS_INVITED,
                 'locale' => null,
             ]);
-            $user->identities()->create(UserIdentity::attributesFor('username', $input['login']) + ['is_primary' => empty($input['email'])]);
+            if (! empty($input['login'])) {
+                $user->identities()->create(UserIdentity::attributesFor('username', $input['login']) + ['is_primary' => empty($input['email'])]);
+            }
             if (! empty($input['email'])) {
                 $user->identities()->create(UserIdentity::attributesFor('email', $input['email']) + ['is_primary' => true]);
+            }
+            $document = $this->documentOf($input);
+            if ($document !== null) {
+                $user->identities()->create(UserIdentity::attributesFor('national_id', $document) + ['is_primary' => empty($input['email']) && empty($input['login'])]);
+            }
+            if (! empty($input['phone'])) {
+                $user->identities()->create(UserIdentity::attributesFor('phone', $input['phone']));
             }
             foreach ($roleIds as $roleId) {
                 $user->roleAssignments()->create(['role_id' => $roleId, 'granted_by_user_id' => $this->actorId()]);
@@ -103,7 +129,7 @@ final class UserService
     }
 
     /**
-     * @param  array{login?: string, display_name?: string, email?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>}  $input
+     * @param  array{login?: string|null, display_name?: string, email?: string|null, document_type?: string|null, document_number?: string|null, phone?: string|null, person_id?: string|null, role_ids?: array<int, string>, role_assignments?: array<int, mixed>}  $input
      */
     public function update(User $user, array $input, EffectivePermissions $actor, ?int $expectedVersion): User
     {
@@ -134,6 +160,22 @@ final class UserService
                 if (! empty($input['email'])) {
                     $this->guardUnique('email', $input['email'], $user->id);
                     $user->identities()->create(UserIdentity::attributesFor('email', $input['email']) + ['is_primary' => true]);
+                }
+            }
+
+            if (array_key_exists('document_number', $input)) {
+                $user->identities()->where('kind', 'national_id')->delete();
+                $document = $this->documentOf($input);
+                if ($document !== null) {
+                    $this->guardUnique('national_id', $document, $user->id);
+                    $user->identities()->create(UserIdentity::attributesFor('national_id', $document));
+                }
+            }
+            if (array_key_exists('phone', $input)) {
+                $user->identities()->where('kind', 'phone')->delete();
+                if (! empty($input['phone'])) {
+                    $this->guardUnique('phone', (string) $input['phone'], $user->id);
+                    $user->identities()->create(UserIdentity::attributesFor('phone', (string) $input['phone']));
                 }
             }
 
@@ -274,24 +316,32 @@ final class UserService
                 return null;
             }
 
-            $this->passwordPolicy->assertAcceptable($user, $password);
-            $hash = Hash::make($password);
-            $this->passwordPolicy->remember($user, $hash);
-            $user->forceFill([
-                'status' => User::STATUS_ACTIVE,
-                'password_hash' => $hash,
-                'password_changed_at' => now(),
-                'must_change_password' => false,
-            ])->save();
-
-            $this->outbox->record(DomainEventTypes::USER_ACTIVATED, 'user', $user->id, ['user_id' => $user->id]);
-            DB::table('activity_events')->insert([
-                'tenant_id' => $user->tenant_id, 'user_id' => $user->id, 'activity' => 'auth.account_activated',
-                'subject_type' => 'user', 'subject_id' => $user->id, 'occurred_at' => now(),
-            ]);
+            $this->activate($user, $password);
 
             return $user;
         });
+    }
+
+    /**
+     * Fija la primera clave y deja la cuenta activa. Debe llamarse dentro de una transacción.
+     */
+    public function activate(User $user, string $password): void
+    {
+        $this->passwordPolicy->assertAcceptable($user, $password);
+        $hash = Hash::make($password);
+        $this->passwordPolicy->remember($user, $hash);
+        $user->forceFill([
+            'status' => User::STATUS_ACTIVE,
+            'password_hash' => $hash,
+            'password_changed_at' => now(),
+            'must_change_password' => false,
+        ])->save();
+
+        $this->outbox->record(DomainEventTypes::USER_ACTIVATED, 'user', $user->id, ['user_id' => $user->id]);
+        DB::table('activity_events')->insert([
+            'tenant_id' => $user->tenant_id, 'user_id' => $user->id, 'activity' => 'auth.account_activated',
+            'subject_type' => 'user', 'subject_id' => $user->id, 'occurred_at' => now(),
+        ]);
     }
 
     /**
@@ -409,8 +459,24 @@ final class UserService
             ->exists();
 
         if ($exists) {
-            throw new AyniException('duplicate', 409, null, [], ['fields' => [$kind === 'username' ? 'login' : 'email']]);
+            throw new AyniException('duplicate', 409, null, [], ['fields' => [match ($kind) {
+                'username' => 'login',
+                'national_id' => 'document_number',
+                default => $kind,
+            }]]);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     */
+    private function documentOf(array $input): ?string
+    {
+        if (empty($input['document_number']) || empty($input['document_type'])) {
+            return null;
+        }
+
+        return LoginDocument::identifier((string) $input['document_type'], (string) $input['document_number']);
     }
 
     /**

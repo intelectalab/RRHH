@@ -2,11 +2,13 @@
 
 namespace App\Shared\Outbox;
 
+use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use App\Shared\Outbox\Contracts\DomainEventSubscriber;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\Models\OutboxEvent;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use RuntimeException;
@@ -60,6 +62,19 @@ class OutboxService implements OutboxWriter
             'attempts' => 0,
             'correlation_id' => $correlationId,
         ]);
+    }
+
+    public function deliverSoon(OutboxEvent $event): void
+    {
+        $id = $event->id;
+        $tenantId = $event->tenant_id;
+        app()->terminating(function () use ($id, $tenantId): void {
+            try {
+                TenancyScope::runAs($tenantId, fn () => DispatchOutboxCommand::processOutbox($this, 1, 3, [$id]));
+            } catch (\Throwable $e) {
+                Log::warning('outbox: entrega inmediata falló; queda para el despacho periódico.', ['event_id' => $id, 'error' => $e->getMessage()]);
+            }
+        });
     }
 
     public function subscribe(DomainEventSubscriber $subscriber): void

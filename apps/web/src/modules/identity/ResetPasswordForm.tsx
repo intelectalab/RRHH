@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { useT } from '@/lib/useT'
+import { ActivateWithCodeForm } from './ActivateWithCodeForm'
 import { authErrorKey } from './errors'
 
 /**
@@ -46,6 +47,9 @@ export function ResetPasswordForm({ mode = 'reset' }: { mode?: 'reset' | 'activa
       setBusy(false)
     }
   }
+
+  // SEG-2: sin enlace, quien no tiene correo activa con su documento y un código.
+  if (token === '' && activating) return <ActivateWithCodeForm />
 
   if (token === '') {
     return (
