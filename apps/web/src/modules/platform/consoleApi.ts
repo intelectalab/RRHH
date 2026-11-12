@@ -75,7 +75,7 @@ export type ConsoleTenantModule = {
 export type ConsoleTenantDetail = ConsoleTenant & {
   legal_entities: Array<{ id: string; legal_name: string; tax_id: string; country: string; status: string }>
   account: {
-    subscription: { plan: string; status: string; billing_cycle: string; trial_ends_on: string | null } | null
+    subscription: { id: string; plan: string; status: string; billing_cycle: string; trial_ends_on: string | null } | null
     open_balance: Array<{ amount: string; currency: string }>
     open_invoices: number
     overdue_invoices: number
@@ -85,3 +85,74 @@ export type ConsoleTenantDetail = ConsoleTenant & {
 }
 
 export type ConsoleStatusEvent = { id: string; from_status: string | null; to_status: string; reason: string | null; actor: string | null; occurred_at: string }
+
+export type ConsoleMoney = { amount: string; currency: string }
+
+/** SAS-3 · Plan comercial: nombre libre, precio que define el operador y versión (revision). */
+export type ConsolePlan = {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  billing_cycle: 'monthly' | 'annual'
+  price?: ConsoleMoney
+  trial_days: number | null
+  is_public: boolean
+  status: 'draft' | 'active' | 'inactive'
+  revision: number
+  superseded_by_plan_id: string | null
+  duplicated_from_plan_id: string | null
+  modules: string[]
+  limits: Array<{ code: string; value: string | null; unlimited: boolean }>
+  features: string[]
+  subscribers: number
+  allowed_actions: string[]
+}
+
+export type ConsoleModuleInfo = { code: string; name: string; is_core: boolean; depends_on: string[] }
+
+/** SAS-3 · SAS-4 · Complemento contratable sobre un plan. */
+export type ConsoleAddon = {
+  id: string
+  code: string
+  name: string
+  kind: 'module' | 'limit' | 'feature' | 'service'
+  modules: string[]
+  limit_code: string | null
+  limit_increment: string | null
+  price?: ConsoleMoney
+  billing_cycle: 'monthly' | 'annual' | 'one_time'
+  status: 'active' | 'inactive'
+  allowed_actions: string[]
+}
+
+export type ConsoleSubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'suspended' | 'cancelled' | 'expired'
+
+/** SAS-4 · Suscripción de una organización: fuente de sus módulos y límites. */
+export type ConsoleSubscription = {
+  id: string
+  tenant_id: string
+  tenant: { name: string; slug: string; status: ConsoleTenantStatus } | null
+  plan_id: string
+  plan: { code: string; name: string; revision: number; is_current: boolean } | null
+  status: ConsoleSubscriptionStatus
+  billing_cycle: 'monthly' | 'annual'
+  price?: ConsoleMoney
+  starts_on: string
+  ends_on: string | null
+  trial_ends_on: string | null
+  expired_at: string | null
+  cancelled_at: string | null
+  cancel_reason: string | null
+  addons: Array<{ id: string; addon_id: string; code: string; name: string; kind: string; quantity: number; price?: ConsoleMoney; starts_on: string; ends_on: string | null; current: boolean }>
+  allowed_actions: string[]
+}
+
+export type ConsoleSubscriptionEvent = {
+  id: string
+  action: string
+  actor: string | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  occurred_at: string
+}

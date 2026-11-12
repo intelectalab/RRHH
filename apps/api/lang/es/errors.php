@@ -13,6 +13,7 @@ return [
     'tenant_suspended' => 'La organización se encuentra suspendida.',
     'tenant_cancelled' => 'La organización fue dada de baja. Sus datos se conservan durante el periodo de retención; comuníquese con soporte para reactivarla.',
     'module_read_only' => 'El módulo fue retirado: sus datos se pueden consultar pero ya no modificar.',
+    'tenant_read_only' => 'La prueba gratuita terminó: puedes consultar tus datos, pero no modificarlos hasta contratar un plan.',
     'plan_limit_reached' => 'Se ha alcanzado el límite máximo permitido por su plan comercial.',
     'not_found' => 'El recurso solicitado no fue encontrado o no pertenece a su organización.',
     'invalid_transition' => 'La acción solicitada no es válida para el estado actual del recurso.',

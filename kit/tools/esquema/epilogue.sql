@@ -260,7 +260,7 @@ COMMENT ON FUNCTION verify_compliance_chain(uuid, text) IS 'Verifica la integrid
 
 -- La aplicación no lee la tabla tenants: solo ve su propia organización a través de esta vista.
 CREATE VIEW current_tenant AS
-  SELECT id, slug, name, status, country_code, default_currency, default_locale, timezone, is_demo
+  SELECT id, slug, name, status, country_code, default_currency, default_locale, timezone, is_demo, trial_ends_at
     FROM tenants
    WHERE id = NULLIF(current_setting('app.tenant_id', true), '')::uuid AND deleted_at IS NULL;
 COMMENT ON VIEW current_tenant IS 'Organización activa de la sesión. Única vía por la que gestia_app lee datos de tenants.';

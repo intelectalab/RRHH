@@ -133,6 +133,9 @@ final class DomainEventTypes
 
     public const ORG_UNIT_ARCHIVED = 'org_unit.archived.v1';
 
+    // Suscripción de la organización (SAS-4): plan, complementos o estado.
+    public const SUBSCRIPTION_CHANGED = 'subscription.changed.v1';
+
     public const USER_ACTIVATED = 'user.activated.v1';
 
     public const USER_SUSPENDED = 'user.suspended.v1';
@@ -347,6 +350,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['tenant_id', 'module_code', 'status'],
             'description' => 'Un módulo comercial se activó o se retiró en la organización',
+        ],
+        self::SUBSCRIPTION_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['tenant_id', 'subscription_id', 'plan_code', 'status'],
+            'description' => 'La suscripción de la organización cambió de plan, complementos, datos o estado',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

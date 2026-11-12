@@ -13,7 +13,7 @@ import { ErrorState } from '@/ui/components/States'
 import { StatusBadge, Tag } from '@/ui/components/Status'
 import { useConsole, useConsoleTabs } from './ConsoleShell'
 import { tenantTone } from './ConsoleTenants'
-import { consoleApi, type ConsoleStatusEvent, type ConsoleTenantDetail, type ConsoleTenantModule } from './consoleApi'
+import { consoleApi, type ConsolePlan, type ConsoleStatusEvent, type ConsoleTenantDetail, type ConsoleTenantModule } from './consoleApi'
 
 /** Acción de estado → ruta de la API, permiso que la habilita y si exige motivo. */
 const ACTIONS: Record<string, { perm: string; reason: boolean; danger: boolean }> = {
@@ -42,6 +42,7 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
   const [editing, setEditing] = useState(false)
   const [moduleError, setModuleError] = useState<string | null>(null)
   const [busyModule, setBusyModule] = useState<string | null>(null)
+  const [subscribing, setSubscribing] = useState(false)
   const can = (p: string) => me.permissions.includes(p)
 
   const load = useCallback(() => {
@@ -118,7 +119,15 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
               <dt>{t('console.tenant_timezone')}</dt><dd>{tenant.timezone}</dd>
               <dt>{t('console.tenant_locale')}</dt><dd>{t(`console.locale_${tenant.locale}`)}</dd>
               <dt>{t('console.tenant_trial_end')}</dt><dd>{tenant.trial_ends_on ? formatDate(locale, tenant.trial_ends_on) : t('console.none')}</dd>
-              <dt>{t('console.account_plan')}</dt><dd>{tenant.account.subscription ? tenant.account.subscription.plan : t('console.account_no_plan')}</dd>
+              <dt>{t('console.account_plan')}</dt>
+              <dd>
+                {tenant.account.subscription
+                  ? <Link href={`/plataforma/suscripciones?id=${tenant.account.subscription.id}`}>{tenant.account.subscription.plan} · {t(`console.sstatus.${tenant.account.subscription.status}`)}</Link>
+                  : t('console.account_no_plan')}
+                {!tenant.account.subscription && can('platform.subscriptions.create') && tenant.status !== 'cancelled' && (
+                  <> <button type="button" className="btn btn-sec btn-sm" onClick={() => setSubscribing(true)}>{t('console.subs_create')}</button></>
+                )}
+              </dd>
               <dt>{t('console.contact_name')}</dt><dd>{tenant.contact_name ?? t('console.none')}</dd>
               <dt>{t('console.contact_email')}</dt><dd>{tenant.contact_email ?? t('console.none')}</dd>
               <dt>{t('console.contact_phone')}</dt><dd>{tenant.contact_phone ?? t('console.none')}</dd>
@@ -192,6 +201,7 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
       </main>
       {action && <ActionDialog id={id} action={action} onClose={() => setAction(null)} onDone={() => { setAction(null); load() }} />}
       {editing && <EditTenant tenant={tenant} onClose={() => setEditing(false)} onDone={() => { setEditing(false); load() }} />}
+      {subscribing && <NewSubscription tenant={tenant} onClose={() => setSubscribing(false)} onDone={() => { setSubscribing(false); load() }} />}
     </>
   )
 }
@@ -300,5 +310,61 @@ function EditTenant({ tenant, onClose, onDone }: { tenant: ConsoleTenantDetail; 
         {field('contact_phone', t('console.contact_phone'), 'tel')}
       </form>
     </SidePanel>
+  )
+}
+
+/** SAS-4 · Suscribir una organización a un plan a la venta (en prueba solo si la organización está en prueba). */
+function NewSubscription({ tenant, onClose, onDone }: { tenant: ConsoleTenantDetail; onClose: () => void; onDone: () => void }) {
+  const { t } = useT()
+  const [plans, setPlans] = useState<ConsolePlan[]>([])
+  const [planId, setPlanId] = useState('')
+  const [trial, setTrial] = useState(tenant.trial_ends_on ?? '')
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    consoleApi.get<{ data: ConsolePlan[] }>('/plans?filter[status]=active').then((r) => setPlans(r.data)).catch(() => setError(t('console.load_error')))
+  }, [t])
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    try {
+      await consoleApi.post('/subscriptions', { tenant_id: tenant.id, plan_id: planId, ...(tenant.status === 'trial' && trial ? { trial_ends_on: trial } : {}) })
+      onDone()
+    } catch (err) {
+      const r = formErrors(err, t)
+      setError(r.fields.plan_id ?? r.fields.trial_ends_on ?? r.general)
+    }
+  }
+
+  return (
+    <Modal
+      title={t('console.subs_create')}
+      onClose={onClose}
+      footer={(
+        <>
+          <button type="button" className="btn btn-sec" onClick={onClose}>{t('console.cancel')}</button>
+          <button type="submit" form="ns-form" className="btn btn-primary" disabled={!planId}>{t('console.subs_create')}</button>
+        </>
+      )}
+    >
+      <form id="ns-form" onSubmit={submit} noValidate>
+        <p>{t('console.subs_create_help')}</p>
+        <div className="mb-3">
+          <label className="form-label" htmlFor="ns-plan">{t('console.account_plan')}</label>
+          <select id="ns-plan" className="form-select" value={planId} onChange={(e) => setPlanId(e.target.value)}>
+            <option value="">{t('console.subs_choose_plan')}</option>
+            {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+        </div>
+        {tenant.status === 'trial' && (
+          <div className="mb-3">
+            <label className="form-label" htmlFor="ns-trial">{t('console.tenant_trial_end')}</label>
+            <input id="ns-trial" type="date" className="form-control" value={trial} onChange={(e) => setTrial(e.target.value)} />
+          </div>
+        )}
+        {error && <Notice tone="error">{error}</Notice>}
+      </form>
+    </Modal>
   )
 }

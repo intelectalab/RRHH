@@ -9273,6 +9273,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/addons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar Addon */
+        get: operations["getPlatformAddons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/addons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver Addon */
+        get: operations["getPlatformAddonsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar Addon */
+        patch: operations["patchPlatformAddonsId"];
+        trace?: never;
+    };
+    "/platform/addons/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «activate» sobre Addon
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformAddonsIdActivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/addons/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «retire» sobre Addon
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postPlatformAddonsIdRetire"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/audit-events": {
         parameters: {
             query?: never;
@@ -9668,6 +9743,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/plans/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consola SaaS: versiones de un plan (editar un plan con suscriptores crea la siguiente y conserva la anterior para ellos) */
+        get: operations["getPlatformPlansIdVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/subscriptions": {
         parameters: {
             query?: never;
@@ -9704,6 +9796,57 @@ export interface paths {
         patch: operations["patchPlatformSubscriptionsId"];
         trace?: never;
     };
+    "/platform/subscriptions/{id}/addons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: sumar un complemento; su módulo queda activo al instante, sin migrar */
+        post: operations["postPlatformSubscriptionsIdAddons"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/subscriptions/{id}/addons/{addonId}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: quitar un complemento desde hoy; sus módulos pasan a solo lectura (RN-SAS-06) */
+        post: operations["postPlatformSubscriptionsIdAddonsAddonIdRemove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/subscriptions/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: cancelar la suscripción y dar de baja la organización (con motivo; los datos se conservan, RN-SAS-10) */
+        post: operations["postPlatformSubscriptionsIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/subscriptions/{id}/change-plan": {
         parameters: {
             query?: never;
@@ -9718,6 +9861,40 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPlatformSubscriptionsIdChangePlan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/subscriptions/{id}/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: convertir una suscripción en prueba (o vencida) en activa; la organización vuelve a operar (ME-40 convertir o regularizar) */
+        post: operations["postPlatformSubscriptionsIdConvert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/subscriptions/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consola SaaS: historial de la suscripción, cada cambio con su autor */
+        get: operations["getPlatformSubscriptionsIdEvents"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -15487,6 +15664,41 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
+        Addon: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            /** @enum {string} */
+            kind: "module" | "limit" | "feature" | "service";
+            web_product_code?: string | null;
+            modules: string[];
+            limit_code?: string | null;
+            limit_increment?: string | null;
+            price?: components["schemas"]["Money"];
+            /** @enum {string} */
+            billing_cycle: "monthly" | "annual" | "one_time";
+            /** @enum {string} */
+            status: "active" | "inactive";
+            allowed_actions: string[];
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        AddonInput: {
+            code?: string;
+            name?: string;
+            /** @enum {string} */
+            kind?: "module" | "limit" | "feature" | "service";
+            web_product_code?: string | null;
+            modules?: string[];
+            limit_code?: string | null;
+            limit_increment?: string | null;
+            price?: components["schemas"]["Money"];
+            /** @enum {string} */
+            billing_cycle?: "monthly" | "annual" | "one_time";
+        };
         AiConversation: {
             /** @description Identificador opaco */
             id: string;
@@ -18628,15 +18840,26 @@ export interface components {
             id: string;
             code: string;
             name: string;
+            description?: string | null;
             /** @enum {string} */
-            billing_cycle: "monthly" | "yearly";
-            currency: string;
+            billing_cycle: "monthly" | "annual";
+            price?: components["schemas"]["Money"];
+            trial_days?: number | null;
+            is_public: boolean;
+            /** @enum {string} */
+            status: "draft" | "active" | "inactive";
+            revision: number;
+            /** @description Identificador opaco */
+            superseded_by_plan_id?: string | null;
+            /** @description Identificador opaco */
+            duplicated_from_plan_id?: string | null;
+            modules: string[];
             limits: {
                 [key: string]: unknown;
-            };
-            modules: string[];
-            /** @enum {string} */
-            status: "draft" | "active" | "retired";
+            }[];
+            features: string[];
+            subscribers: number;
+            allowed_actions: string[];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -18645,13 +18868,17 @@ export interface components {
         PlanInput: {
             code?: string;
             name?: string;
+            description?: string | null;
             /** @enum {string} */
-            billing_cycle?: "monthly" | "yearly";
-            currency?: string;
+            billing_cycle?: "monthly" | "annual";
+            price?: components["schemas"]["Money"];
+            trial_days?: number | null;
+            is_public?: boolean;
+            modules?: string[];
             limits?: {
                 [key: string]: unknown;
-            };
-            modules?: string[];
+            }[];
+            features?: string[];
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): budget */
         Position: {
@@ -19741,15 +19968,34 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             tenant_id: string;
+            tenant?: {
+                [key: string]: unknown;
+            } | null;
             /** @description Identificador opaco */
             plan_id: string;
+            plan?: {
+                [key: string]: unknown;
+            } | null;
             /** @enum {string} */
-            status: "trial" | "active" | "past_due" | "suspended" | "cancelled";
-            addons: string[];
+            status: "trialing" | "active" | "past_due" | "suspended" | "cancelled" | "expired";
+            /** @enum {string} */
+            billing_cycle: "monthly" | "annual";
+            price?: components["schemas"]["Money"];
             /** Format: date */
             starts_on: string;
             /** Format: date */
             ends_on?: string | null;
+            /** Format: date */
+            trial_ends_on?: string | null;
+            /** Format: date-time */
+            expired_at?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            cancel_reason?: string | null;
+            addons: {
+                [key: string]: unknown;
+            }[];
+            allowed_actions: string[];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -19758,13 +20004,31 @@ export interface components {
         SubscriptionInput: {
             /** @description Identificador opaco */
             tenant_id?: string;
+            tenant?: {
+                [key: string]: unknown;
+            } | null;
             /** @description Identificador opaco */
             plan_id?: string;
-            addons?: string[];
+            plan?: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            billing_cycle?: "monthly" | "annual";
+            price?: components["schemas"]["Money"];
             /** Format: date */
             starts_on?: string;
             /** Format: date */
             ends_on?: string | null;
+            /** Format: date */
+            trial_ends_on?: string | null;
+            /** Format: date-time */
+            expired_at?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            cancel_reason?: string | null;
+            addons?: {
+                [key: string]: unknown;
+            }[];
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): successors */
         SuccessionPlan: {
@@ -20031,6 +20295,8 @@ export interface components {
             tax_id?: string;
             /** @description Alta (SAS-2): módulos que se activan además de los base */
             module_codes?: string[];
+            /** @description Alta (SAS-4): plan de la suscripción; activa sus módulos (en prueba si hay fecha de fin) */
+            plan_id?: string | null;
         };
         Ticket: {
             /** @description Identificador opaco */
@@ -43794,6 +44060,189 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getPlatformAddons: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Addon"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformAddonsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Addon"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformAddonsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddonInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Addon"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformAddonsIdActivate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Addon"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformAddonsIdRetire: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Addon"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     getPlatformAuditEvents: {
         parameters: {
             query?: never;
@@ -44713,6 +45162,31 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getPlatformPlansIdVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     getPlatformSubscriptions: {
         parameters: {
             query?: {
@@ -44859,6 +45333,113 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postPlatformSubscriptionsIdAddons: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformSubscriptionsIdAddonsAddonIdRemove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+                addonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformSubscriptionsIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPlatformSubscriptionsIdChangePlan: {
         parameters: {
             query?: never;
@@ -44893,6 +45474,67 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformSubscriptionsIdConvert: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformSubscriptionsIdEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPlatformSubscriptionsIdReactivate: {

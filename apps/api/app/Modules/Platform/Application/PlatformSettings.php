@@ -43,4 +43,12 @@ final class PlatformSettings
     {
         return max(0, (int) $this->value('modules.read_only_transition_days'));
     }
+
+    /**
+     * Días de gracia, con la organización en solo lectura, tras vencer la prueba sin conversión (RN-SAS-04).
+     */
+    public function trialGraceDays(): int
+    {
+        return max(0, (int) $this->value('subscriptions.trial_grace_days'));
+    }
 }

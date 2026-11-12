@@ -565,6 +565,8 @@
 .consola-cifras .card { padding: 14px 16px; }
 .consola-cifras b { display: block; font-size: 24px; line-height: 30px; }
 .consola-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.consola-acciones-fila { justify-content: flex-end; }
+.consola-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 4px 16px; border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 .ficha { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
 .ficha dt { color: var(--tx2); font-weight: 400; font-size: var(--fs-s); }
 .ficha dd { margin: 0; overflow-wrap: anywhere; }

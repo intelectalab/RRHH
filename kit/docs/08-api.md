@@ -261,6 +261,9 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/platform/plans` | `platform.plans.{view,create}` | 0 |
 | GET, PATCH | `/platform/plans/{id}` | `platform.plans.{view,update}` | 0 |
 | POST | `/platform/plans/{id}/{duplicate,activate,retire}` | `platform.plans.{duplicate,activate,retire}` | 0 |
+| GET | `/platform/addons` | `platform.plans.view` | 0 |
+| GET, PATCH | `/platform/addons/{id}` | `platform.plans.{view,update}` | 0 |
+| POST | `/platform/addons/{id}/{activate,retire}` | `platform.plans.{activate,retire}` | 0 |
 | GET, POST | `/platform/subscriptions` | `platform.subscriptions.{view,create}` | 0 |
 | GET, PATCH | `/platform/subscriptions/{id}` | `platform.subscriptions.{view,update}` | 0 |
 | POST | `/platform/subscriptions/{id}/{change-plan,suspend,reactivate}` | `platform.subscriptions.{change_plan,suspend,reactivate}` | 0 |
@@ -284,6 +287,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/platform/tenants/{id}/modules` | `platform.subscriptions.view` | 0 |
 | POST | `/platform/tenants/{id}/modules/{code}/activate` | `platform.subscriptions.update` | 0 |
 | POST | `/platform/tenants/{id}/modules/{code}/deactivate` | `platform.subscriptions.update` | 0 |
+| GET | `/platform/plans/{id}/versions` | `platform.plans.view` | 0 |
+| GET | `/platform/subscriptions/{id}/events` | `platform.subscriptions.view` | 0 |
+| POST | `/platform/subscriptions/{id}/convert` | `platform.subscriptions.change_plan` | 0 |
+| POST | `/platform/subscriptions/{id}/cancel` | `platform.tenants.cancel` | 0 |
+| POST | `/platform/subscriptions/{id}/addons` | `platform.subscriptions.update` | 0 |
+| POST | `/platform/subscriptions/{id}/addons/{addonId}/remove` | `platform.subscriptions.update` | 0 |
 
 **TEN · Organización (tenant)**
 
