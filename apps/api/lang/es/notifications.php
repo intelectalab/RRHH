@@ -66,6 +66,14 @@ return [
             'in_app' => ['subject' => 'Un correo rebotó', 'body' => 'El correo de {user} rebotó y ya no se usa. Corrígelo en su cuenta o reactívalo desde el registro de entregas.'],
             'email' => ['subject' => 'Un correo de tu organización rebotó', 'body' => "Hola {name}:\n\nEl correo de {user} rebotó en {organization} y dejó de usarse; sus avisos le llegan en la aplicación o por mensaje al celular.\n\nCorrígelo aquí: {link}"],
         ],
+        'limits.warning' => [
+            'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
+            'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],
+        ],
+        'limits.reached' => [
+            'in_app' => ['subject' => 'Llegaste al límite del plan', 'body' => '{metric}: {current} de {limit}. Las nuevas altas o subidas quedan bloqueadas hasta ampliar el plan o liberar espacio.'],
+            'email' => ['subject' => 'Tu organización llegó a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} llegó a {current} de {limit}. Desde ahora no se pueden hacer nuevas altas o subidas de ese tipo; todo lo registrado sigue disponible.\n\nAmplía el plan o suma un complemento aquí: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacaciones',

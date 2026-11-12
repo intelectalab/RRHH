@@ -6,12 +6,13 @@ use App\Modules\Organization\Domain\LegalEntityStateMachine;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
-use App\Shared\Exceptions\PlanLimitReachedException;
 use App\Shared\Exceptions\VersionConflictException;
 use App\Shared\Files\FileService;
 use App\Shared\Files\Models\StoredFile;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
+use App\Shared\Usage\UsageLimits;
+use App\Shared\Usage\UsageMetrics;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +39,7 @@ final class LegalEntityService
         private readonly AuditLogger $audit,
         private readonly OutboxWriter $outbox,
         private readonly FileService $files,
+        private readonly UsageLimits $usage,
     ) {}
 
     /**
@@ -141,6 +143,7 @@ final class LegalEntityService
                 'legal_entity_id' => $entity->id, 'country_code' => $entity->country_code,
             ]);
             $this->audit->record('legal_entity.created', 'legal_entity', $entity->id, null, $this->present($entity->refresh()));
+            $this->usage->record(UsageMetrics::LEGAL_ENTITIES);
 
             return $entity;
         });
@@ -203,6 +206,7 @@ final class LegalEntityService
                 $this->outbox->record(DomainEventTypes::COMPANY_ARCHIVED, 'legal_entity', $entity->id, ['legal_entity_id' => $entity->id]);
             }
             $this->audit->record("legal_entity.{$action}d", 'legal_entity', $entity->id, $before, $this->present($entity->refresh()), $reason);
+            $this->usage->record(UsageMetrics::LEGAL_ENTITIES);
 
             return $entity;
         });
@@ -271,17 +275,10 @@ final class LegalEntityService
         });
     }
 
+    /** SAS-6 · RN-TEN-07: el límite de empresas lo aplica el servicio de consumo (mensaje con cómo ampliarlo). */
     private function guardPlanLimit(): void
     {
-        $limit = DB::table('tenant_limits')->where('limit_code', self::LIMIT_CODE)->first(['limit_value', 'is_unlimited']);
-        if ($limit === null || $limit->is_unlimited || $limit->limit_value === null) {
-            return;
-        }
-
-        $current = LegalEntity::query()->where('status', 'active')->count();
-        if ($current >= (int) $limit->limit_value) {
-            throw new PlanLimitReachedException(self::LIMIT_CODE, $current, (int) $limit->limit_value);
-        }
+        $this->usage->assertCanAdd(UsageMetrics::LEGAL_ENTITIES);
     }
 
     private function validateReferences(string $country, string $currency, ?string $regime, string $taxId): void

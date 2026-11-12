@@ -655,7 +655,9 @@
     "organization_activated": "Organization activated",
     "organization_cancelled": "Organization cancelled",
     "notifications_email_bounced": "Email bounced",
-    "notifications_notice": "Text notice for people without email"
+    "notifications_notice": "Text notice for people without email",
+    "limits_warning": "Close to a plan limit",
+    "limits_reached": "Plan limit reached"
   },
   "nchannel": {
     "in_app": "In the app",
@@ -846,7 +848,9 @@
     "card_absence_types": "Absence types",
     "card_absence_types_help": "Leaves, permissions and sick leave with their rules: pay, caps, proof, who requests and payroll effect.",
     "card_imports": "Import data",
-    "card_imports_help": "Bulk upload from CSV or Excel with validation, preview and undo."
+    "card_imports_help": "Bulk upload from CSV or Excel with validation, preview and undo.",
+    "card_usage": "Plan usage",
+    "card_usage_help": "Employees, administrators, companies and storage against the plan limits."
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -880,7 +884,8 @@
     "vacaciones": "Vacation",
     "whatsapp": "WhatsApp",
     "automatizaciones": "Automations",
-    "importacion": "Import"
+    "importacion": "Import",
+    "limites": "Plan limits"
   },
   "cfgopt": {
     "es": "Spanish",
@@ -1580,7 +1585,92 @@
       "addon_added": "Add-on added",
       "addon_removed": "Add-on removed"
     },
-    "modules_more": "{list} and {n} more"
+    "modules_more": "{list} and {n} more",
+    "tab_flags": "Features",
+    "flags_title": "Features",
+    "flags_sub": "Feature flags: evaluated by organization, plan, beta group and country, in that order. Every change applies at once and is audited.",
+    "flag_new": "New flag",
+    "flag_edit": "Edit flag",
+    "flags_empty_title": "No flags yet",
+    "flags_empty": "Create one to release a feature gradually.",
+    "flag_name": "Feature",
+    "flag_code": "Code",
+    "flag_code_help": "Lowercase letters, numbers, dot, dash or underscore. It cannot change later.",
+    "flag_description": "Description",
+    "flag_default": "Default",
+    "flag_default_help": "On by default (when no rule decides)",
+    "flag_rules": "Rules",
+    "flag_order_help": "Evaluation order: organization override, plan, beta group, country and, last, gradual percentage. The first one that applies decides.",
+    "flag_overrides": "Organizations",
+    "flag_beta": "Beta",
+    "flag_status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "flag_on": "On",
+    "flag_off": "Off",
+    "flag_no_rules": "No rules",
+    "flag_tenants": "Organizations",
+    "flag_action": {
+      "archive": "Archive",
+      "restore": "Restore"
+    },
+    "flag_rule": {
+      "plan": "Plan {value}",
+      "beta_group": "Beta group {value}",
+      "country": "Country {value}",
+      "percentage": "{value}% of organizations"
+    },
+    "flag_target": "Rule type",
+    "flag_target_kind": {
+      "plan": "Plan",
+      "beta_group": "Beta group",
+      "country": "Country",
+      "percentage": "Percentage"
+    },
+    "flag_value": "Value",
+    "flag_value_hint": {
+      "plan": "Plan code (e.g. profesional)",
+      "beta_group": "Group code (e.g. pioneers)",
+      "country": "Country code (e.g. PE)",
+      "percentage": "From 0 to 100"
+    },
+    "flag_result": "Result",
+    "flag_remove_rule": "Remove rule",
+    "flag_add_rule": "Add rule",
+    "flag_tenants_title": "Organizations · {name}",
+    "flag_tenants_help": "An organization override wins over the rules. It can expire: after the date, the organization follows the rules again.",
+    "flag_tenants_empty": "No organization has its own override.",
+    "flag_expired": "Expired",
+    "flag_until": "until {date}",
+    "flag_remove_tenant": "Remove",
+    "flag_set_tenant": "Turn on or off for an organization",
+    "flag_find_tenant": "Find organization",
+    "flag_tenant": "Organization",
+    "flag_choose_tenant": "Choose an organization",
+    "flag_expires": "Expires on (optional)",
+    "flag_source": "Decided by",
+    "flag_source_kind": {
+      "tenant": "The organization",
+      "plan": "The plan",
+      "beta_group": "The beta group",
+      "country": "The country",
+      "percentage": "The gradual percentage",
+      "default": "The default value"
+    },
+    "section_flags": "Features",
+    "flags_manage": "Manage features",
+    "flags_none": "There are no active flags.",
+    "section_usage": "Plan usage",
+    "usage_history": "Daily history ({from} – {to})",
+    "usage_history_empty": "No measurements saved yet.",
+    "usage_day": "Day",
+    "beta_groups": "Beta groups",
+    "beta_groups_help": "Comma-separated codes (e.g. pioneers, north-pilot).",
+    "plan_fit_over_title": "Usage exceeds that plan limits",
+    "plan_fit_over": "The change is allowed, but new additions will be blocked until usage is regularized: {metrics}.",
+    "plan_fit_item": "{metric} {current} of {limit}",
+    "plan_fit_ok": "Current usage fits within that plan limits."
   },
   "ui": {
     "close": "Close",
@@ -2311,5 +2401,38 @@
     "event_freeze": "Frozen",
     "event_unfreeze": "Unfrozen",
     "event_close": "Closed"
+  },
+  "usage": {
+    "title": "Plan usage",
+    "sub": "What your organization uses against its plan limits.",
+    "back": "← Back to Settings",
+    "load_error": "Usage could not be loaded.",
+    "blocked_title": "You reached a plan limit",
+    "blocked_text": "New additions or uploads of {metrics} are blocked; everything recorded is still available. Upgrade the plan or add an add-on with whoever manages your subscription.",
+    "near_title": "You are close to a plan limit",
+    "near_text": "{metrics} are above {percent}% of their limit. Check your usage before reaching the cap.",
+    "section": "Usage against limits",
+    "help": "Administrators are notified when a limit reaches {percent}% and again when it is reached.",
+    "alert_setting": "Change the alert percentage",
+    "col_metric": "Item",
+    "col_used": "In use",
+    "col_limit": "Plan limit",
+    "col_status": "Status",
+    "unlimited": "Unlimited",
+    "no_limit": "Unlimited",
+    "status": {
+      "ok": "Within the limit ({percent}%)",
+      "warning": "Close to the limit ({percent}%)",
+      "reached": "Limit reached",
+      "over": "Above the limit ({percent}%)",
+      "free": "No cap"
+    },
+    "metric": {
+      "employees": "Active employees",
+      "admins": "Administrators",
+      "legal_entities": "Active companies",
+      "storage_mb": "Storage (MB)",
+      "api_calls": "API calls this month"
+    }
   }
 }

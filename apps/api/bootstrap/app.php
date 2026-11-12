@@ -7,6 +7,7 @@ use App\Shared\Commands\GenerateDataDictionaryCommand;
 use App\Shared\Commands\RotateFieldKeysCommand;
 use App\Shared\Commands\VerifyDatabaseConventionsCommand;
 use App\Shared\Exceptions\AyniException;
+use App\Shared\Features\RequireFeature;
 use App\Shared\Http\Middleware\EnsureIdempotency;
 use App\Shared\Http\Middleware\EnsureRequestId;
 use App\Shared\Http\Middleware\ResolveTenantContext;
@@ -15,6 +16,7 @@ use App\Shared\Http\Responses\ProblemDetailsResponse;
 use App\Shared\LegalParameters\SyncLegalParametersCommand;
 use App\Shared\Outbox\Commands\DispatchOutboxCommand;
 use App\Shared\Permissions\RequirePermission;
+use App\Shared\Usage\MeterApiUsage;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -58,11 +60,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             RequirePermission::ALIAS => RequirePermission::class,
+            RequireFeature::ALIAS => RequireFeature::class,
         ]);
         $middleware->api(append: [
             VerifyXsrfToken::class,
             EnsureSecondFactor::class,
             SetRequestLocale::class,
+            MeterApiUsage::class,
             'throttle:ayni-api',
         ]);
     })

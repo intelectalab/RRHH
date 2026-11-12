@@ -13,7 +13,8 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { StatusBadge, Tag, type StatusTone } from '@/ui/components/Status'
 import { useMoney } from './ConsolePlans'
 import { useConsole, useConsoleTabs } from './ConsoleShell'
-import { consoleApi, type ConsoleAddon, type ConsolePlan, type ConsoleSubscription, type ConsoleSubscriptionEvent, type ConsoleSubscriptionStatus } from './consoleApi'
+import { consoleApi, type ConsolePlanFit, type ConsoleAddon, type ConsolePlan, type ConsoleSubscription, type ConsoleSubscriptionEvent, type ConsoleSubscriptionStatus } from './consoleApi'
+import { useMetricLabel } from '@/modules/usage/UsageTable'
 
 const PER_PAGE = 25
 const STATUSES: ConsoleSubscriptionStatus[] = ['trialing', 'active', 'expired', 'past_due', 'suspended', 'cancelled']
@@ -134,10 +135,12 @@ export function SubscriptionPanel({ id, onClose, onChanged }: { id: string; onCl
   const [plans, setPlans] = useState<ConsolePlan[]>([])
   const [addons, setAddons] = useState<ConsoleAddon[]>([])
   const [planId, setPlanId] = useState('')
+  const [fit, setFit] = useState<ConsolePlanFit | null>(null)
   const [addonId, setAddonId] = useState('')
   const [action, setAction] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const can = (p: string) => me.permissions.includes(p)
+  const metricLabel = useMetricLabel()
 
   const load = useCallback(() => {
     Promise.all([
@@ -149,6 +152,13 @@ export function SubscriptionPanel({ id, onClose, onChanged }: { id: string; onCl
       .catch(() => setError(t('console.load_error')))
   }, [id, t])
   useEffect(load, [load])
+
+  // SAS-6 · Antes de cambiar, se compara el consumo actual con los límites del plan elegido.
+  useEffect(() => {
+    setFit(null)
+    if (planId === '') return
+    consoleApi.get<{ data: ConsolePlanFit }>(`/subscriptions/${id}/plan-fit?plan_id=${planId}`).then((r) => setFit(r.data)).catch(() => setFit(null))
+  }, [id, planId])
 
   async function post(path: string, body: Record<string, unknown> = {}) {
     setError(null)
@@ -204,6 +214,12 @@ export function SubscriptionPanel({ id, onClose, onChanged }: { id: string; onCl
                 </select>
                 <button type="submit" className="btn btn-sec" disabled={!planId}>{t('console.subs_change')}</button>
               </div>
+              {fit && fit.some((m) => m.over) && (
+                <Notice tone="warn" title={t('console.plan_fit_over_title')}>
+                  {t('console.plan_fit_over', { metrics: fit.filter((m) => m.over).map((m) => t('console.plan_fit_item', { metric: metricLabel(m.metric), current: m.current, limit: m.limit ?? '' })).join('; ') })}
+                </Notice>
+              )}
+              {fit && !fit.some((m) => m.over) && <p className="small text-secondary mt-2">{t('console.plan_fit_ok')}</p>}
             </form>
           )}
 

@@ -276,6 +276,45 @@ AS $$
 $$;
 COMMENT ON FUNCTION resolve_tenant_id(text) IS 'Devuelve el id de la organización dueña de un dominio. No expone otros datos.';
 
+-- SAS-7 · Banderas de funcionalidad de la organización activa (app.tenant_id). Una sola evaluación para la
+-- API y la web (la web la recibe en /me). Orden (RN-SAS-07): organización, plan, grupo beta, país; después el
+-- porcentaje gradual (cubeta estable por organización) y, al final, el valor por defecto de la bandera.
+-- SECURITY DEFINER: lee el plan y las reglas, que la aplicación no ve, sin exponer más que código y resultado.
+CREATE FUNCTION current_feature_flags() RETURNS TABLE (code text, enabled boolean, source text)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
+AS $$
+  WITH t AS (
+    SELECT id, country_code, COALESCE(beta_groups, '{}'::text[]) AS beta_groups
+      FROM tenants
+     WHERE id = NULLIF(current_setting('app.tenant_id', true), '')::uuid AND deleted_at IS NULL
+  ), pl AS (
+    SELECT p.code FROM subscriptions s JOIN plans p ON p.id = s.plan_id JOIN t ON t.id = s.tenant_id
+     WHERE s.status NOT IN ('cancelled', 'expired')
+  ), ev AS (
+    SELECT f.code, f.default_enabled,
+           (SELECT o.enabled FROM tenant_feature_flags o
+             WHERE o.tenant_id = t.id AND o.feature_flag_code = f.code AND (o.expires_at IS NULL OR o.expires_at > now())) AS by_tenant,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'plan' AND r.target_value IN (SELECT code FROM pl)) AS by_plan,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'beta_group' AND r.target_value = ANY (t.beta_groups)) AS by_beta,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'country' AND r.target_value = t.country_code) AS by_country,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'percentage' AND r.target_value ~ '^[0-9]{1,3}$'
+               AND abs(hashtext(f.code || ':' || t.id::text)::bigint) % 100 < r.target_value::int) AS by_percentage
+      FROM feature_flags f CROSS JOIN t
+     WHERE f.status = 'active'
+  )
+  SELECT code,
+         COALESCE(by_tenant, by_plan, by_beta, by_country, by_percentage, default_enabled),
+         CASE WHEN by_tenant IS NOT NULL THEN 'tenant' WHEN by_plan IS NOT NULL THEN 'plan'
+              WHEN by_beta IS NOT NULL THEN 'beta_group' WHEN by_country IS NOT NULL THEN 'country'
+              WHEN by_percentage IS NOT NULL THEN 'percentage' ELSE 'default' END
+    FROM ev
+$$;
+COMMENT ON FUNCTION current_feature_flags() IS 'SAS-7: banderas de funcionalidad evaluadas para la organización activa (RN-SAS-07).';
+
 -- Crea en una organización los roles de sistema y sus permisos por defecto (idempotente).
 -- También deja la política de seguridad por defecto y activa los módulos base.
 CREATE FUNCTION seed_tenant_defaults(tenant uuid) RETURNS void

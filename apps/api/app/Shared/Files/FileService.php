@@ -8,6 +8,8 @@ use App\Shared\Files\Models\StoredFile;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Usage\UsageLimits;
+use App\Shared\Usage\UsageMetrics;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +69,10 @@ class FileService implements FileStorageService
             );
         }
 
+        // SAS-6 · RN-SAS-03: con el almacenamiento del plan lleno, la subida se rechaza; la lectura sigue.
+        $usage = app(UsageLimits::class);
+        $this->inTenant($resolvedTenantId, fn () => $usage->assertCanStore($sizeBytes));
+
         $fileId = (string) Str::uuid();
         $sha256 = hash('sha256', $contents);
         $cleanName = preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $originalName) ?? 'file';
@@ -112,6 +118,8 @@ class FileService implements FileStorageService
                 tenantId: $resolvedTenantId,
             );
         }
+
+        $this->inTenant($resolvedTenantId, fn () => $usage->record(UsageMetrics::STORAGE_MB));
 
         return $storedFile;
     }
@@ -200,6 +208,8 @@ class FileService implements FileStorageService
         Storage::disk($diskName)->delete($file->storage_key);
 
         $file->delete();
+        // SAS-6 · El consumo de almacenamiento baja con cada borrado.
+        $this->inTenant((string) $file->tenant_id, fn () => app(UsageLimits::class)->record(UsageMetrics::STORAGE_MB));
     }
 
     /**
@@ -257,5 +267,18 @@ class FileService implements FileStorageService
                 'created_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * @param  callable(): mixed  $callback
+     */
+    private function inTenant(string $tenantId, callable $callback): void
+    {
+        if (TenancyScope::current() === $tenantId) {
+            $callback();
+
+            return;
+        }
+        TenancyScope::runAs($tenantId, $callback);
     }
 }

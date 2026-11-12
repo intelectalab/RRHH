@@ -7,12 +7,16 @@ use App\Modules\Settings\Http\Controllers\ExchangeRateController;
 use App\Modules\Settings\Http\Controllers\HolidayCalendarController;
 use App\Modules\Settings\Http\Controllers\SavedViewController;
 use App\Modules\Settings\Http\Controllers\SettingsController;
+use App\Modules\Settings\Http\Controllers\UsageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
     Route::get('/settings', [SettingsController::class, 'groups'])->middleware('permission:settings.parameters.view');
     Route::get('/settings/{group}', [SettingsController::class, 'show'])->middleware('permission:settings.parameters.view');
     Route::put('/settings/{group}', [SettingsController::class, 'update'])->middleware('permission:settings.parameters.update');
+
+    // SAS-6 · Consumo frente a los límites del plan (lo ve quien ve los datos de la organización).
+    Route::get('/usage', [UsageController::class, 'index'])->middleware('permission:settings.organization.view');
 
     Route::get('/holiday-calendars', [HolidayCalendarController::class, 'index'])->middleware('permission:time.holiday_calendars.view');
     Route::post('/holiday-calendars', [HolidayCalendarController::class, 'store'])->middleware('permission:time.holiday_calendars.create');

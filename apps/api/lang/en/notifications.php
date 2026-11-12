@@ -66,6 +66,14 @@ return [
             'in_app' => ['subject' => 'An email bounced', 'body' => '{user}\'s email bounced and is no longer used. Fix it in their account or reactivate it from the delivery log.'],
             'email' => ['subject' => 'An email in your organization bounced', 'body' => "Hi {name},\n\n{user}'s email bounced at {organization} and is no longer used; their notices arrive in the app or by text message.\n\nFix it here: {link}"],
         ],
+        'limits.warning' => [
+            'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
+            'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],
+        ],
+        'limits.reached' => [
+            'in_app' => ['subject' => 'You reached a plan limit', 'body' => '{metric}: {current} of {limit}. New additions or uploads are blocked until you upgrade the plan or free up space.'],
+            'email' => ['subject' => 'Your organization reached a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} reached {current} of {limit}. New additions or uploads of that kind are now blocked; everything already recorded is still available.\n\nUpgrade the plan or add an add-on here: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacation',

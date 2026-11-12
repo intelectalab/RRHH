@@ -5,10 +5,11 @@
   code text! CHECK (char_length(code) = 2) ; name ; default_currency char(3) ; default_locale text ; uniq code
 @currencies P cat | Catálogo de monedas (ISO 4217) admitidas en montos y compensaciones.
   code char(3)! ; name ; symbol text ; decimals smallint=2 ; uniq code
-@tenants P main soft lock | Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id.
+@tenants P main soft lock | Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id. beta_groups: grupos beta a los que pertenece, para las banderas de funcionalidad (SAS-7).
   slug text! ; name ; status enum(trial,active,suspended,blocked,cancelled,grace_period,deleted)=trial ; country_code ~> countries.code
   default_currency char(3)! ; default_locale text=es ; timezone text=America/Lima ; is_demo ; is_partner_managed
-  trial_ends_at ; suspended_at ; suspension_reason ; storage_region ; contact_name ; contact_email ; contact_phone ; cancelled_at ; retention_until date ; uniq slug
+  trial_ends_at ; suspended_at ; suspension_reason ; storage_region ; contact_name ; contact_email ; contact_phone ; cancelled_at ; retention_until date
+  beta_groups text[] ; uniq slug
 @tenant_domains P | Dominios y subdominios por los que se resuelve la organización (incluye dominio propio de marca blanca).
   tenant_id => tenants ; domain text! ; kind enum(subdomain,custom)=subdomain ; verified_at ; is_primary ; uniq domain
 @tenant_status_events P imm | Historial inalterable de cambios de estado de la organización (pruebas, suspensiones, bloqueos, reactivaciones).
@@ -49,13 +50,13 @@
 @tenant_modules main | Módulos activos por organización (resultado de plan, complemento o activación manual). Condiciona menú, API y permisos.
   module_code ~> modules.code ; status enum(active,inactive,trial)=active ; source enum(plan,addon,manual,trial)=plan
   activated_at ; deactivated_at ; read_only_until ts ; uniq module_code
-@tenant_limits | Límites efectivos de la organización (plan + complementos + ajustes).
-  limit_code text! ; limit_value numeric(14,2) ; is_unlimited ; source enum(plan,addon,override)=plan ; uniq limit_code
-@tenant_usage_counters | Consumo medido por organización y periodo (colaboradores, almacenamiento, llamadas de API) para comparar con límites.
+@tenant_limits | Límites efectivos de la organización (plan + complementos + ajustes). warned_at / reached_at marcan el aviso ya enviado al acercarse o llegar al tope (SAS-6, RN-SAS-02); se limpian cuando el consumo baja.
+  limit_code text! ; limit_value numeric(14,2) ; is_unlimited ; source enum(plan,addon,override)=plan ; warned_at ts ; reached_at ts ; uniq limit_code
+@tenant_usage_counters | Consumo medido por organización y periodo para comparar con límites (SAS-6): colaboradores, administradores, empresas y almacenamiento en MB guardan una foto por día (period_start = día); las llamadas de API acumulan por mes (period_start = primer día del mes).
   metric_code text! ; period_start date! ; value numeric(18,2)=0 ; measured_at ts! ; uniq metric_code, period_start
 @feature_flags P cat | Banderas de funcionalidad para liberar funciones de forma gradual.
   code ; name ; description ; default_enabled ; is_beta ; status enum(active,archived)=active ; uniq code
-@feature_flag_rules P | Reglas de activación de una bandera por plan, país, grupo beta o porcentaje.
+@feature_flag_rules P cat | Reglas de activación de una bandera por plan, país, grupo beta o porcentaje. Orden de evaluación (RN-SAS-07): organización, plan, grupo beta, país; después el porcentaje gradual y, al final, el valor por defecto.
   feature_flag_id => feature_flags ; target_kind enum(plan,country,beta_group,percentage)! ; target_value text! ; enabled bool=t
   uniq feature_flag_id, target_kind, target_value
 @tenant_feature_flags | Activación explícita de una bandera para una organización (prevalece sobre las reglas).

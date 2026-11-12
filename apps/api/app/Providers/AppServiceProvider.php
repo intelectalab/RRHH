@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Shared\Cache\TenantCache;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Exports\ExportRegistry;
+use App\Shared\Features\FeatureFlags;
 use App\Shared\Files\Contracts\FileStorageService;
 use App\Shared\Files\FileService;
 use App\Shared\Imports\ImportRegistry;
@@ -21,6 +22,9 @@ use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
 use App\Shared\Trash\TrashRegistry;
+use App\Shared\Usage\Sources\ApiCallsUsageSource;
+use App\Shared\Usage\Sources\StorageUsageSource;
+use App\Shared\Usage\UsageRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Events\RequestHandled;
@@ -53,6 +57,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CalendarRegistry::class);
         $this->app->singleton(ProvisioningRegistry::class);
         $this->app->singleton(ApprovalOutcomeRegistry::class);
+        $this->app->singleton(UsageRegistry::class);
+        $this->app->singleton(FeatureFlags::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);
         $this->app->singleton(IntegrationManager::class);
@@ -67,11 +73,17 @@ class AppServiceProvider extends ServiceProvider
 
         TenantQueueContext::register();
 
+        // SAS-6 · Consumo que mide la plataforma misma: almacenamiento y llamadas a la API.
+        $usage = $this->app->make(UsageRegistry::class);
+        $usage->register(new StorageUsageSource);
+        $usage->register($this->app->make(ApiCallsUsageSource::class));
+
         // Permisos y módulos se memoizan solo dentro de una petición: un cambio de rol aplica de inmediato.
         Event::listen(RequestHandled::class, function (): void {
             $this->app->make(PermissionResolver::class)->forget();
             $this->app->make(ModuleGate::class)->forget();
             $this->app->make(DataScope::class)->forget();
+            $this->app->make(FeatureFlags::class)->forget();
         });
     }
 }

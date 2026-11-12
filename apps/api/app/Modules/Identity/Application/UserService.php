@@ -19,6 +19,8 @@ use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Permissions\EffectivePermissions;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Security\BlindIndex;
+use App\Shared\Usage\UsageLimits;
+use App\Shared\Usage\UsageMetrics;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +40,7 @@ final class UserService
         private readonly PermissionResolver $permissions,
         private readonly RequestPasswordReset $passwordReset,
         private readonly PasswordPolicy $passwordPolicy,
+        private readonly UsageLimits $usage,
     ) {}
 
     /**
@@ -80,6 +83,10 @@ final class UserService
     public function create(array $input, EffectivePermissions $actor, string $origin): User
     {
         $roleIds = $this->validatedRoles($input['role_ids'] ?? [], $actor);
+        if ($this->keepsAdminRole($roleIds)) {
+            // SAS-6 · Límite de administradores del plan.
+            $this->usage->assertCanAdd(UsageMetrics::ADMINS);
+        }
         if (! empty($input['login'])) {
             $this->guardUnique('username', $input['login']);
         }
@@ -123,6 +130,7 @@ final class UserService
             }
 
             $this->audit->record('user.created', 'user', $user->id, null, $this->present($user->refresh()));
+            $this->usage->record(UsageMetrics::ADMINS);
 
             return $user;
         });
@@ -141,6 +149,11 @@ final class UserService
             $input['role_ids'] = array_column($assignments, 'role_id');
         }
         $roleIds = array_key_exists('role_ids', $input) ? $this->validatedRoles($input['role_ids'], $actor) : null;
+        if ($roleIds !== null && $this->keepsAdminRole($roleIds)
+            && ! $this->keepsAdminRole($user->roleAssignments()->pluck('role_id')->map(fn ($id): string => (string) $id)->all())) {
+            // SAS-6 · Dar el rol de administrador a otra persona cuenta contra el límite del plan.
+            $this->usage->assertCanAdd(UsageMetrics::ADMINS);
+        }
 
         return DB::transaction(function () use ($user, $input, $roleIds, $assignments): User {
             $before = $this->present($user);
@@ -198,6 +211,7 @@ final class UserService
             $user->refresh();
             $this->audit->record('user.updated', 'user', $user->id, $before, $this->present($user));
             $this->permissions->forget();
+            $this->usage->record(UsageMetrics::ADMINS);
 
             return $user;
         });

@@ -40,6 +40,20 @@ export function initials(name: string | null | undefined): string {
   return (name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? '').join('')
 }
 
+/**
+ * Cantidad decimal que llega como texto («1250.5») con separadores del idioma, sin pasar por números de
+ * coma flotante (los montos y consumos se calculan en la API).
+ */
+export function formatNumber(locale: string, value: string): string {
+  const m = /^(-?)(\d+)(?:\.(\d+))?$/.exec(value.trim())
+  if (!m) return value
+  const fmt = new Intl.NumberFormat(locale)
+  const int = fmt.format(BigInt(m[2] ?? '0'))
+  if (!m[3]) return `${m[1]}${int}`
+  const sep = fmt.formatToParts(1.5).find((p) => p.type === 'decimal')?.value ?? '.'
+  return `${m[1]}${int}${sep}${m[3]}`
+}
+
 /** Fecha de hoy (AAAA-MM-DD) en la hora local del navegador, no en UTC. */
 export function localToday(now: Date = new Date()): string {
   const p = (n: number) => String(n).padStart(2, '0')

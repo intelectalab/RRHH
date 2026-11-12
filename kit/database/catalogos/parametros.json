@@ -504,6 +504,21 @@
       ]
     },
     {
+      "codigo": "limites.porcentaje_alerta",
+      "modulo": "base",
+      "nombre": "Aviso de consumo del plan (%)",
+      "tipo": "integer",
+      "valor_por_defecto": 80,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Porcentaje de un límite del plan (colaboradores, administradores, empresas, almacenamiento) a partir del cual se avisa a los administradores (RN-SAS-02); al 100 % se bloquean las nuevas altas y subidas.",
+      "opciones": {
+        "min": 50,
+        "max": 99
+      }
+    },
+    {
       "codigo": "notificaciones.retencion_dias",
       "modulo": "base",
       "nombre": "Retención de avisos leídos (días)",

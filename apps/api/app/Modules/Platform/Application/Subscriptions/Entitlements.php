@@ -5,7 +5,9 @@ namespace App\Modules\Platform\Application\Subscriptions;
 use App\Modules\Platform\Application\Tenants\TenantModules;
 use App\Modules\Platform\Infrastructure\Models\PlatformUser;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
+use App\Shared\Features\FeatureFlags;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Usage\UsageLimits;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -18,7 +20,11 @@ use Illuminate\Support\Facades\DB;
  */
 final class Entitlements
 {
-    public function __construct(private readonly TenantModules $modules) {}
+    public function __construct(
+        private readonly TenantModules $modules,
+        private readonly UsageLimits $usage,
+        private readonly FeatureFlags $features,
+    ) {}
 
     /**
      * @return array{activated: list<string>, retired: list<string>, kept: list<string>}
@@ -74,6 +80,11 @@ final class Entitlements
         }
 
         $this->syncLimits($tenantId, (string) $subscription->plan_id, $addons);
+        // SAS-6 · Con los nuevos límites se vuelve a medir: bajar con consumo por encima del tope bloquea las
+        // altas hasta regularizar y avisa a los administradores (una sola vez).
+        TenancyScope::runAs($tenantId, fn () => $this->usage->recordAll());
+        // SAS-7 · Las reglas por plan cambian de resultado: se invalida la evaluación de banderas.
+        $this->features->bumpVersion();
 
         return ['activated' => array_values(array_unique($activated)), 'retired' => $retired, 'kept' => $kept];
     }

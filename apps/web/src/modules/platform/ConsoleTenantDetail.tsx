@@ -13,7 +13,8 @@ import { ErrorState } from '@/ui/components/States'
 import { StatusBadge, Tag } from '@/ui/components/Status'
 import { useConsole, useConsoleTabs } from './ConsoleShell'
 import { tenantTone } from './ConsoleTenants'
-import { consoleApi, type ConsolePlan, type ConsoleStatusEvent, type ConsoleTenantDetail, type ConsoleTenantModule } from './consoleApi'
+import { UsageTable, useMetricLabel } from '@/modules/usage/UsageTable'
+import { consoleApi, type ConsoleFlagEvaluation, type ConsolePlan, type ConsoleStatusEvent, type ConsoleTenantDetail, type ConsoleTenantModule, type ConsoleUsage } from './consoleApi'
 
 /** Acción de estado → ruta de la API, permiso que la habilita y si exige motivo. */
 const ACTIONS: Record<string, { perm: string; reason: boolean; danger: boolean }> = {
@@ -110,6 +111,8 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
           </div>
         </div>
 
+        {can('platform.subscriptions.view') && <TenantUsage id={id} />}
+
         <section className="card mb-3">
           <div className="card-header"><h2>{t('console.section_org')}</h2></div>
           <div className="card-body">
@@ -131,6 +134,8 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
               <dt>{t('console.contact_name')}</dt><dd>{tenant.contact_name ?? t('console.none')}</dd>
               <dt>{t('console.contact_email')}</dt><dd>{tenant.contact_email ?? t('console.none')}</dd>
               <dt>{t('console.contact_phone')}</dt><dd>{tenant.contact_phone ?? t('console.none')}</dd>
+              <dt>{t('console.beta_groups')}</dt>
+              <dd>{tenant.beta_groups.length === 0 ? t('console.none') : tenant.beta_groups.map((g) => <Tag key={g} tone="in">{g}</Tag>)}</dd>
             </dl>
           </div>
         </section>
@@ -179,6 +184,8 @@ export function ConsoleTenantDetail({ id }: { id: string }) {
             </table>
           </div>
         </section>
+
+        {can('platform.feature_flags.view') && <TenantFlags id={id} />}
 
         <section className="card">
           <div className="card-header"><h2>{t('console.section_history')}</h2></div>
@@ -260,13 +267,15 @@ function EditTenant({ tenant, onClose, onDone }: { tenant: ConsoleTenantDetail; 
     name: tenant.name, timezone: tenant.timezone, locale: tenant.locale,
     contact_name: tenant.contact_name ?? '', contact_email: tenant.contact_email ?? '', contact_phone: tenant.contact_phone ?? '',
   })
+  const [beta, setBeta] = useState(tenant.beta_groups.join(', '))
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [general, setGeneral] = useState<string | null>(null)
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     try {
-      await consoleApi.request(`/tenants/${tenant.id}`, 'PATCH', Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === '' ? null : v])))
+      const groups = beta.split(',').map((g) => g.trim().toLowerCase()).filter((g) => g !== '')
+      await consoleApi.request(`/tenants/${tenant.id}`, 'PATCH', { ...Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === '' ? null : v])), beta_groups: groups })
       onDone()
     } catch (err) {
       const r = formErrors(err, t)
@@ -308,6 +317,12 @@ function EditTenant({ tenant, onClose, onDone }: { tenant: ConsoleTenantDetail; 
         {field('contact_name', t('console.contact_name'))}
         {field('contact_email', t('console.contact_email'), 'email')}
         {field('contact_phone', t('console.contact_phone'), 'tel')}
+        <div className="mb-3">
+          <label className="form-label" htmlFor="et-beta">{t('console.beta_groups')}</label>
+          <input id="et-beta" className={`form-control${Object.keys(errors).some((k) => k.startsWith('beta_groups')) ? ' is-invalid' : ''}`} value={beta} onChange={(e) => setBeta(e.target.value)} aria-describedby="et-beta-help" />
+          <div id="et-beta-help" className="form-text">{t('console.beta_groups_help')}</div>
+          {Object.entries(errors).filter(([k]) => k.startsWith('beta_groups')).slice(0, 1).map(([k, v]) => <div key={k} className="invalid-feedback" role="alert">{v}</div>)}
+        </div>
       </form>
     </SidePanel>
   )
@@ -366,5 +381,83 @@ function NewSubscription({ tenant, onClose, onDone }: { tenant: ConsoleTenantDet
         {error && <Notice tone="error">{error}</Notice>}
       </form>
     </Modal>
+  )
+}
+
+/** SAS-6 · Consumo frente a los límites del plan, con la historia diaria de los últimos 90 días (solo cifras, RN-SAS-12). */
+function TenantUsage({ id }: { id: string }) {
+  const { t, locale } = useT()
+  const label = useMetricLabel()
+  const [usage, setUsage] = useState<ConsoleUsage | null>(null)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    consoleApi.get<{ data: ConsoleUsage }>(`/tenants/${id}/usage`).then((r) => setUsage(r.data)).catch(() => setFailed(true))
+  }, [id])
+
+  if (failed) return <Notice tone="error">{t('console.load_error')}</Notice>
+  if (!usage) return <span className="esq mb-3" style={{ width: 320 }} />
+
+  // Historia por día: una fila por fecha (la más reciente arriba) y una columna por métrica medida.
+  const daily = usage.history.filter((h) => h.metric !== 'api_calls')
+  const metrics = Array.from(new Set(daily.map((h) => h.metric)))
+  const dates = Array.from(new Set(daily.map((h) => h.period_start))).sort().reverse().slice(0, 14)
+  const value = (date: string, metric: string) => daily.find((h) => h.period_start === date && h.metric === metric)?.value ?? '—'
+
+  return (
+    <section className="card mb-3">
+      <div className="card-header"><h2>{t('console.section_usage')}</h2></div>
+      <UsageTable rows={usage.metrics} />
+      <div className="card-body">
+        <h3 className="panel-sec">{t('console.usage_history', { from: formatDate(locale, usage.from), to: formatDate(locale, usage.to) })}</h3>
+        {dates.length === 0 && <p className="small text-secondary">{t('console.usage_history_empty')}</p>}
+      </div>
+      {dates.length > 0 && (
+        <div className="tabla-wrap">
+          <table className="table">
+            <thead><tr><th scope="col">{t('console.usage_day')}</th>{metrics.map((m) => <th key={m} scope="col" className="text-end">{label(m)}</th>)}</tr></thead>
+            <tbody>
+              {dates.map((d) => (
+                <tr key={d}><td>{formatDate(locale, d)}</td>{metrics.map((m) => <td key={m} className="text-end">{value(d, m)}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  )
+}
+
+/** SAS-7 · Resultado de cada bandera para la organización y qué regla decidió (misma evaluación que su API). */
+function TenantFlags({ id }: { id: string }) {
+  const { t } = useT()
+  const [flags, setFlags] = useState<ConsoleFlagEvaluation[] | null>(null)
+
+  useEffect(() => {
+    consoleApi.get<{ data: ConsoleFlagEvaluation[] }>(`/tenants/${id}/feature-flags`).then((r) => setFlags(r.data)).catch(() => setFlags([]))
+  }, [id])
+
+  return (
+    <section className="card mb-3">
+      <div className="card-header"><h2>{t('console.section_flags')}</h2> <Link href="/plataforma/funciones" className="small">{t('console.flags_manage')}</Link></div>
+      {flags === null && <div className="card-body"><span className="esq" style={{ width: 240 }} /></div>}
+      {flags && flags.length === 0 && <div className="card-body small text-secondary">{t('console.flags_none')}</div>}
+      {flags && flags.length > 0 && (
+        <div className="tabla-wrap">
+          <table className="table">
+            <thead><tr><th scope="col">{t('console.flag_name')}</th><th scope="col">{t('console.flag_result')}</th><th scope="col">{t('console.flag_source')}</th></tr></thead>
+            <tbody>
+              {flags.map((f) => (
+                <tr key={f.code}>
+                  <td><b>{f.name}</b><span className="sub2">{f.code}</span></td>
+                  <td><StatusBadge tone={f.enabled ? 'ok' : 'gr'}>{t(f.enabled ? 'console.flag_on' : 'console.flag_off')}</StatusBadge></td>
+                  <td className="text-secondary">{t(`console.flag_source_kind.${f.source}`)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   )
 }

@@ -9,6 +9,7 @@ use App\Modules\Notifications\Infrastructure\Subscribers\DeliverMessage;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverNotification;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyEmailBounce;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyOrganizationStatus;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyUsageLimit;
 use App\Modules\Notifications\Infrastructure\Subscribers\SubmitTemplateApproval;
 use App\Modules\Notifications\Infrastructure\Subscribers\VerifyEmailSender;
 use App\Shared\Messaging\MessageSender;
@@ -33,6 +34,7 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(DeliverMessage::class));
         $outbox->subscribe($this->app->make(SubmitTemplateApproval::class));
         $outbox->subscribe($this->app->make(NotifyOrganizationStatus::class));
+        $outbox->subscribe($this->app->make(NotifyUsageLimit::class));
         $outbox->subscribe($this->app->make(VerifyEmailSender::class));
         $outbox->subscribe($this->app->make(NotifyEmailBounce::class));
 

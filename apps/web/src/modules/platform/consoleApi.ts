@@ -55,6 +55,7 @@ export type ConsoleTenant = {
   suspension_reason: string | null
   cancelled_at: string | null
   retention_until: string | null
+  beta_groups: string[]
   created_at: string
   usage: { legal_entities: number; users: number; active_users: number; employees: number }
 }
@@ -156,3 +157,54 @@ export type ConsoleSubscriptionEvent = {
   after: Record<string, unknown> | null
   occurred_at: string
 }
+
+/** SAS-6 · Consumo de una métrica frente a su límite (centésimas ya formateadas por la API). */
+export type UsageMetric = {
+  metric: string
+  label?: string
+  current: string
+  limit: string | null
+  unlimited: boolean
+  has_limit: boolean
+  percent: number | null
+  status: 'ok' | 'warning' | 'reached' | 'over'
+}
+
+export type ConsoleUsage = {
+  metrics: UsageMetric[]
+  alert_percent: number
+  history: Array<{ metric: string; period_start: string; value: string }>
+  from: string
+  to: string
+}
+
+export type ConsolePlanFit = Array<{ metric: string; current: string; limit: string | null; unlimited: boolean; over: boolean }>
+
+/** SAS-7 · Bandera de funcionalidad con sus reglas (orden RN-SAS-07: organización, plan, grupo beta, país). */
+export type FlagTarget = 'plan' | 'beta_group' | 'country' | 'percentage'
+
+export type ConsoleFeatureFlag = {
+  id: string
+  code: string
+  name: string
+  description: string | null
+  default_enabled: boolean
+  is_beta: boolean
+  status: 'active' | 'archived'
+  rules: Array<{ target_kind: FlagTarget; target_value: string; enabled: boolean }>
+  overrides: number
+  allowed_actions: string[]
+}
+
+export type ConsoleFlagOverride = {
+  tenant_id: string
+  tenant_name: string
+  slug: string
+  country: string
+  enabled: boolean
+  reason: string | null
+  expires_at: string | null
+  expired: boolean
+}
+
+export type ConsoleFlagEvaluation = { code: string; name: string; enabled: boolean; source: 'tenant' | FlagTarget | 'default' }

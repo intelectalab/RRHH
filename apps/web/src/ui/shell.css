@@ -642,3 +642,15 @@
   .oc-buscar, .dir-filtros > label, .dir-filtros .dir-buscar { flex: 1 1 100%; max-width: none; }
   .oc-lienzo { max-height: 70vh; }
 }
+/* SAS-6 · Consumo del plan: barra que acompaña al número (el estado se lee en palabras al lado). */
+.uso-barra { display: block; height: 6px; max-width: 160px; margin-top: 6px; border-radius: 999px; background: var(--neutro-50); overflow: hidden; }
+.uso-relleno { display: block; height: 100%; border-radius: 999px; background: var(--ok); }
+.uso-relleno.wa { background: var(--wa); }
+.uso-relleno.er { background: var(--er); }
+
+/* SAS-7 · Regla de una bandera: tipo, valor, resultado y quitar en una fila. */
+.ff-regla { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+@media (max-width: 600px) {
+  .ff-regla { grid-template-columns: minmax(0, 1fr) auto; }
+  .ff-regla > input { grid-column: 1 / -1; grid-row: 2; }
+}

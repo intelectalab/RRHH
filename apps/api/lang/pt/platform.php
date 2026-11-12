@@ -53,4 +53,13 @@ return [
         'tenant_not_in_trial' => 'Somente uma organização em teste pode começar com uma assinatura em teste.',
         'grace_ended' => 'O período de carência do teste gratuito terminou sem contratar um plano.',
     ],
+    'usage' => [
+        'invalid_range' => 'O intervalo de datas não é válido (no máximo dois anos).',
+        'snapshot_done' => 'Consumo medido em :count organizações.',
+    ],
+    'flags' => [
+        'duplicate_code' => 'Já existe uma flag com esse código.',
+        'invalid_rule' => 'Regra inválida: o plano ou o país devem existir, o grupo beta é um código simples e a porcentagem vai de 0 a 100, sem repetir.',
+        'archived' => 'A flag está arquivada: restaure-a para ativá-la em uma organização.',
+    ],
 ];
