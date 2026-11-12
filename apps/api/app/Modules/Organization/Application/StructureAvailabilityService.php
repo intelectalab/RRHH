@@ -5,13 +5,14 @@ namespace App\Modules\Organization\Application;
 use App\Modules\Organization\Infrastructure\Models\CostCenter;
 use App\Modules\Organization\Infrastructure\Models\JobProfile;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\Site;
 use App\Shared\Organization\StructureAvailability;
 use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Validation\ValidationException;
 
 /**
- * ORG-1 · ORG-2 · ORG-4 · ORG-5 · Empresas, sedes, centros de costo y puestos que admiten nuevas asignaciones.
+ * ORG-1 · ORG-2 · ORG-3 · ORG-4 · ORG-5 · Empresas, unidades, sedes, centros de costo y puestos que admiten nuevas asignaciones.
  */
 final class StructureAvailabilityService implements StructureAvailability
 {
@@ -39,6 +40,29 @@ final class StructureAvailabilityService implements StructureAvailability
         if ($problem !== null) {
             throw ValidationException::withMessages([$field => [(string) trans('organization.jobs.'.$problem)]]);
         }
+    }
+
+    public function orgUnitAcceptsPositions(string $orgUnitId): bool
+    {
+        return $this->orgUnitProblem($orgUnitId) === null;
+    }
+
+    public function assertOrgUnitAssignable(string $orgUnitId, string $field = 'org_unit_id'): void
+    {
+        $problem = $this->orgUnitProblem($orgUnitId);
+        if ($problem !== null) {
+            throw ValidationException::withMessages([$field => [(string) trans('organization.units.'.$problem)]]);
+        }
+    }
+
+    private function orgUnitProblem(string $orgUnitId): ?string
+    {
+        $status = OrgUnit::query()->whereKey($orgUnitId)->value('status');
+        if (! is_string($status)) {
+            return 'not_found';
+        }
+
+        return $status === 'active' ? null : 'archived_no_positions';
     }
 
     private function legalEntityProblem(string $legalEntityId): ?string

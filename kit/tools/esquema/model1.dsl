@@ -360,14 +360,19 @@
   changed_by_user_id ?-> users ; uniq job_profile_id, version
 
 #E POS | Posiciones y headcount
-@positions main soft lock | Posición o plaza presupuestada (C-02): una silla concreta. Base del organigrama, vacantes y sucesión.
+@positions main soft lock | Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza.
   code ; title ; job_profile_id -> job_profiles ; org_unit_id -> org_units ; site_id ?-> sites
   legal_entity_id -> legal_entities ; reports_to_position_id ?-> positions ; cost_center_id ?-> cost_centers
+  salary_band_id ?-> salary_bands
   status enum(proposed,approved,open,filled,frozen,closed,recruiting)=proposed ; is_critical ; fte numeric(4,2)=1
+  is_shared ; seats smallint=1 ; valid_from date=today ; valid_to date
   budgeted_from date ; budgeted_to date ; budgeted_cost money #S ; currency cur?
   headcount_plan_line_id ?-> headcount_plan_lines ; uniq code
-@position_status_events imm | Historial inalterable de estados de una posición (aprobada, congelada, eliminada...).
-  position_id -> positions ; from_status ; to_status text! ; reason ; changed_by_user_id ?-> users ; effective_on date!
+  check seats >= 1 AND (is_shared OR seats = 1)
+  check valid_to IS NULL OR valid_to >= valid_from
+  check reports_to_position_id IS NULL OR reports_to_position_id <> id
+@position_status_events imm | Historial inalterable de estados de una posición (aprobada, congelada, cerrada...) con la acción, el motivo y quién la hizo (POS-2).
+  position_id -> positions ; action ; from_status ; to_status text! ; reason ; changed_by_user_id ?-> users ; effective_on date!
 @headcount_plans soft lock | Plan de dotación por ejercicio.
   name ; fiscal_year integer! ; legal_entity_id ?-> legal_entities ; status enum(draft,in_review,approved,closed)=draft
 @headcount_scenarios | Escenarios de un plan: actual, conservador, crecimiento o personalizado.
@@ -425,11 +430,10 @@
   kind enum(hire,promotion,transfer,salary_change,manager_change,schedule_change,contract_change,cost_center_change,regime_change,suspension,reinstatement,termination,data_correction)!
   effective_on date! ; reason ; status enum(draft,pending_approval,approved,applied,rejected,cancelled)=draft
   requested_by_user_id ?-> users ; workflow_instance_id ?-> workflow_instances ; applied_at ; payload j
-@employment_assignments main lock | Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11).
+@employment_assignments main lock | Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).
   employment_id -> employments ; job_profile_id -> job_profiles ; position_id ?-> positions ; org_unit_id -> org_units
   site_id -> sites ; manager_employment_id ?-> employments ; cost_center_id ?-> cost_centers
   work_modality enum(onsite,remote,hybrid)=onsite ; reason ; personnel_action_id ?-> personnel_actions ; vig employment_id
-  raw EXCLUDE USING gist (tenant_id WITH =, position_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (position_id IS NOT NULL) DEFERRABLE INITIALLY IMMEDIATE
 @employment_cost_distributions lock | Distribución con vigencia de una relación laboral entre varios centros de costo (ORG-4 · RN-ORG-06); sus líneas suman siempre 100 %.
   employment_id -> employments ; reason ; vig employment_id
 @employment_cost_distribution_lines | Línea de una distribución: centro de costo y porcentaje (dos decimales).

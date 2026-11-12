@@ -1,10 +1,11 @@
-/** Pestañas de Organización → Estructura (empresas, unidades, sedes, centros de costo y puestos), según permisos. */
-export function orgTabs(t: (k: string) => string, can: (p: string) => boolean, current: 'companies' | 'units' | 'sites' | 'cost_centers' | 'jobs', modules: string[] = []) {
+/** Pestañas de Organización → Estructura (empresas, unidades, sedes, centros de costo, puestos y posiciones), según permisos. */
+export function orgTabs(t: (k: string) => string, can: (p: string) => boolean, current: 'companies' | 'units' | 'sites' | 'cost_centers' | 'jobs' | 'positions', modules: string[] = []) {
   const tabs: Array<{ href: string; label: string; active: boolean }> = []
   if (can('org.legal_entities.view')) tabs.push({ href: '/organizacion/empresas', label: t('org.tab_companies'), active: current === 'companies' })
   if (can('org.units.view') && modules.includes('core')) tabs.push({ href: '/organizacion/unidades', label: t('org.tab_units'), active: current === 'units' })
   if (can('org.sites.view')) tabs.push({ href: '/organizacion/sedes', label: t('org.tab_sites'), active: current === 'sites' })
   if (can('org.cost_centers.view')) tabs.push({ href: '/organizacion/centros-de-costo', label: t('org.tab_cost_centers'), active: current === 'cost_centers' })
   if (can('org.job_profiles.view')) tabs.push({ href: '/organizacion/puestos', label: t('org.tab_jobs'), active: current === 'jobs' })
+  if (can('org.positions.view') && modules.includes('core')) tabs.push({ href: '/organizacion/posiciones', label: t('org.tab_positions'), active: current === 'positions' })
   return tabs
 }

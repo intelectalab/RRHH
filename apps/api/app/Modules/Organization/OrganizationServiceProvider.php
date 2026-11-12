@@ -2,14 +2,17 @@
 
 namespace App\Modules\Organization;
 
+use App\Modules\Organization\Application\PositionOccupancyService;
 use App\Modules\Organization\Application\StructureAvailabilityService;
 use App\Modules\Organization\Console\ApplyStructureChanges;
+use App\Modules\Organization\Console\SyncPositionOccupancy;
 use App\Modules\Organization\Infrastructure\Exports\LegalEntitiesExportSource;
 use App\Modules\Organization\Infrastructure\Imports\LegalEntitiesImporter;
 use App\Modules\Organization\Infrastructure\Provisioning\CreateFirstLegalEntity;
 use App\Modules\Organization\Infrastructure\Search\LegalEntitySearchSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Imports\ImportRegistry;
+use App\Shared\Organization\PositionOccupancy;
 use App\Shared\Organization\StructureAvailability;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
@@ -21,6 +24,7 @@ final class OrganizationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(StructureAvailability::class, StructureAvailabilityService::class);
+        $this->app->bind(PositionOccupancy::class, PositionOccupancyService::class);
     }
 
     public function boot(): void
@@ -34,10 +38,12 @@ final class OrganizationServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ApplyStructureChanges::class]);
+            $this->commands([ApplyStructureChanges::class, SyncPositionOccupancy::class]);
             $this->app->booted(function (): void {
                 // ORG-3 · Cambios de estructura con fecha: rigen desde el inicio del día.
                 $this->app->make(Schedule::class)->command('org:apply-structure-changes')->dailyAt('00:10')->withoutOverlapping();
+                // POS-2 · RN-POS-04 · Ocupada / vacante según las asignaciones que empiezan o terminan hoy.
+                $this->app->make(Schedule::class)->command('positions:sync-occupancy')->dailyAt('00:20')->withoutOverlapping();
             });
         }
     }

@@ -58,6 +58,7 @@ def typetok(name, tok):
         if sqlt == 'boolean': d = {'f': 'false', 't': 'true'}[d]
         elif sqlt == 'jsonb': d = q(d) + '::jsonb'
         elif d == 'now' and sqlt == 'timestamptz': d = 'now()'
+        elif d == 'today' and sqlt == 'date': d = 'current_date'
         elif re.match(r'^-?\d+(\.\d+)?$', d) and sqlt != 'text': pass
         else: d = q(d)
         out += f' NOT NULL DEFAULT {d}'

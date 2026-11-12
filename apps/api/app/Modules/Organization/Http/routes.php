@@ -8,6 +8,7 @@ use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
 use App\Modules\Organization\Http\Controllers\OrganizationCatalogController;
 use App\Modules\Organization\Http\Controllers\OrgUnitController;
+use App\Modules\Organization\Http\Controllers\PositionController;
 use App\Modules\Organization\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -81,4 +82,21 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/org-units/{id}/move', [OrgUnitController::class, 'move'])->middleware('permission:org.units.move');
     Route::post('/org-units/{id}/archive', [OrgUnitController::class, 'archive'])->middleware('permission:org.units.archive');
     Route::post('/org-units/{id}/restore', [OrgUnitController::class, 'restore'])->middleware('permission:org.units.restore');
+
+    // POS-1 · POS-2 · Posiciones como plazas y sus estados (ME-03).
+    Route::get('/position-options', [PositionController::class, 'options'])->middleware('permission:org.positions.view');
+    Route::get('/positions', [PositionController::class, 'index'])->middleware('permission:org.positions.view');
+    Route::post('/positions', [PositionController::class, 'store'])->middleware('permission:org.positions.create');
+    Route::get('/positions/{id}', [PositionController::class, 'show'])->middleware('permission:org.positions.view');
+    Route::patch('/positions/{id}', [PositionController::class, 'update'])->middleware('permission:org.positions.update');
+    Route::get('/positions/{id}/occupants', [PositionController::class, 'occupants'])->middleware('permission:org.positions.view');
+    Route::get('/positions/{id}/status-events', [PositionController::class, 'statusEvents'])->middleware('permission:org.positions.view');
+    Route::get('/positions/{id}/reporting-line', [PositionController::class, 'reportingLine'])->middleware('permission:org.positions.view');
+    Route::post('/positions/{id}/approve', [PositionController::class, 'approve'])->middleware('permission:org.positions.approve');
+    Route::post('/positions/{id}/reject', [PositionController::class, 'reject'])->middleware('permission:org.positions.approve');
+    Route::post('/positions/{id}/open-recruitment', [PositionController::class, 'openRecruitment'])->middleware('permission:org.positions.update');
+    Route::post('/positions/{id}/cancel-recruitment', [PositionController::class, 'cancelRecruitment'])->middleware('permission:org.positions.update');
+    Route::post('/positions/{id}/freeze', [PositionController::class, 'freeze'])->middleware('permission:org.positions.freeze');
+    Route::post('/positions/{id}/unfreeze', [PositionController::class, 'unfreeze'])->middleware('permission:org.positions.unfreeze');
+    Route::post('/positions/{id}/close', [PositionController::class, 'close'])->middleware('permission:org.positions.close');
 });

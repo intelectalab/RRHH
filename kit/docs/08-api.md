@@ -494,6 +494,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/headcount-plans/{id}` | `org.headcount_plans.{view,update}` | 1 |
 | POST | `/headcount-plans/{id}/{submit,approve,close}` | `org.headcount_plans.{submit,approve,close}` | 1 |
 | GET | `/headcount` | `org.positions.view` | 1 |
+| POST | `/positions/{id}/reject` | `org.positions.approve` | 1 |
+| POST | `/positions/{id}/open-recruitment` | `org.positions.update` | 1 |
+| POST | `/positions/{id}/cancel-recruitment` | `org.positions.update` | 1 |
+| GET | `/positions/{id}/occupants` | `org.positions.view` | 1 |
+| GET | `/positions/{id}/status-events` | `org.positions.view` | 1 |
+| GET | `/positions/{id}/reporting-line` | `org.positions.view` | 1 |
+| GET | `/position-options` | `org.positions.view` | 1 |
 
 **COL · Colaboradores**
 

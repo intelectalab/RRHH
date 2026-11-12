@@ -444,3 +444,28 @@ END
 $$;
 CREATE CONSTRAINT TRIGGER trg_cost_distributions_lines AFTER INSERT ON employment_cost_distributions
   DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_has_lines();
+
+-- POS-1 · RN-POS-02 · Una posición admite tantos ocupantes a la vez como cupos tenga (seats; 1 si no es
+-- compartida). Se cuentan las asignaciones de la posición que se traslapan con la nueva (SQLSTATE AY007).
+CREATE FUNCTION check_position_seats() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  cupos integer;
+  usados integer;
+BEGIN
+  IF NEW.position_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+  SELECT seats INTO cupos FROM positions WHERE tenant_id = NEW.tenant_id AND id = NEW.position_id;
+  SELECT count(*) INTO usados FROM employment_assignments a
+   WHERE a.tenant_id = NEW.tenant_id AND a.position_id = NEW.position_id AND a.id <> NEW.id
+     AND daterange(a.valid_from, a.valid_to, '[]') && daterange(NEW.valid_from, NEW.valid_to, '[]');
+  IF usados >= COALESCE(cupos, 1) THEN
+    RAISE EXCEPTION 'La posición % ya tiene % ocupante(s) en esas fechas y solo admite %.', NEW.position_id, usados, COALESCE(cupos, 1) USING ERRCODE = 'AY007';
+  END IF;
+  RETURN NEW;
+END
+$$;
+CREATE TRIGGER trg_employment_assignments_position_seats BEFORE INSERT OR UPDATE OF position_id, valid_from, valid_to ON employment_assignments
+  FOR EACH ROW EXECUTE FUNCTION check_position_seats();
