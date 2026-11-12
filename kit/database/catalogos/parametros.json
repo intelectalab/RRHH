@@ -469,6 +469,22 @@
       ]
     },
     {
+      "codigo": "notificaciones.canal_sin_correo",
+      "modulo": "base",
+      "nombre": "Canal para quien no tiene correo",
+      "tipo": "select",
+      "valor_por_defecto": "sms",
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.",
+      "opciones": [
+        "sms",
+        "whatsapp",
+        "none"
+      ]
+    },
+    {
       "codigo": "notificaciones.retencion_dias",
       "modulo": "base",
       "nombre": "Retención de avisos leídos (días)",

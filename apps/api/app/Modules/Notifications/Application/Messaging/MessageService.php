@@ -28,7 +28,7 @@ final class MessageService implements MessageSender
         private readonly OutboxWriter $outbox,
     ) {}
 
-    public function send(string $channel, string $to, string $templateCode, array $variables, string $locale, string $purpose, string $idempotencyKey): string
+    public function send(string $channel, string $to, string $templateCode, array $variables, string $locale, string $purpose, string $idempotencyKey, ?\DateTimeInterface $notBefore = null): string
     {
         if (! in_array($channel, self::CHANNELS, true)) {
             throw new InvalidArgumentException("Canal de mensajería no admitido: {$channel}");
@@ -61,7 +61,11 @@ final class MessageService implements MessageSender
             'locale' => in_array($locale, NotificationCatalog::LOCALES, true) ? $locale : 'es',
             'variables_enc' => Crypt::encryptString((string) json_encode($variables)),
         ]);
-        $this->outbox->deliverSoon($event);
+        if ($notBefore !== null) {
+            $event->forceFill(['next_attempt_at' => $notBefore])->save(); // RN-NOT-03
+        } else {
+            $this->outbox->deliverSoon($event);
+        }
 
         return $delivery->id;
     }

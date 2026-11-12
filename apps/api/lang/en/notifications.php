@@ -46,6 +46,10 @@ return [
             'in_app' => ['subject' => 'Account security notice', 'body' => '{event}'],
             'email' => ['subject' => 'Account security notice', 'body' => "Hi {name},\n\n{event}\n\nIf this was not you, contact HR right away."],
         ],
+        'notifications.email_bounced' => [
+            'in_app' => ['subject' => 'An email bounced', 'body' => '{user}\'s email bounced and is no longer used. Fix it in their account or reactivate it from the delivery log.'],
+            'email' => ['subject' => 'An email in your organization bounced', 'body' => "Hi {name},\n\n{user}'s email bounced at {organization} and is no longer used; their notices arrive in the app or by text message.\n\nFix it here: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacation',
@@ -72,7 +76,20 @@ return [
             'sms' => 'GestiaHR: your account activation code is {code}. It expires in {hours} hours. Sign in with your ID document and this code.',
             'whatsapp' => 'GestiaHR: your account activation code is {code}. It expires in {hours} hours. Sign in with your ID document and this code.',
         ],
+        'notifications.notice' => [
+            'sms' => '{organization}: {title}. Sign in to see it: {link}',
+            'whatsapp' => '{organization}: {title}. Sign in to see it: {link}',
+        ],
     ],
     'approval_only_whatsapp' => 'Only WhatsApp templates need the provider\'s approval.',
     'approval_reset' => 'The template changed and must be approved again before it is used on WhatsApp.',
+    'sender' => [
+        'invalid_address' => 'Enter a valid sender email.',
+        'nothing_to_verify' => 'The organization uses the platform sender: there is nothing to verify.',
+        'already_verified' => 'The sender is already verified.',
+    ],
+    'bounce' => [
+        'nothing_to_clear' => 'This delivery has no bounced address to reactivate.',
+        'invalid_signature' => 'The provider signature is not valid.',
+    ],
 ];

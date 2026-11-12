@@ -46,6 +46,10 @@ return [
             'in_app' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => '{event}'],
             'email' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => "Hola {name}:\n\n{event}\n\nSi no fuiste tú, avisa a RRHH de inmediato."],
         ],
+        'notifications.email_bounced' => [
+            'in_app' => ['subject' => 'Un correo rebotó', 'body' => 'El correo de {user} rebotó y ya no se usa. Corrígelo en su cuenta o reactívalo desde el registro de entregas.'],
+            'email' => ['subject' => 'Un correo de tu organización rebotó', 'body' => "Hola {name}:\n\nEl correo de {user} rebotó en {organization} y dejó de usarse; sus avisos le llegan en la aplicación o por mensaje al celular.\n\nCorrígelo aquí: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacaciones',
@@ -72,7 +76,20 @@ return [
             'sms' => 'GestiaHR: tu código para activar tu cuenta es {code}. Vence en {hours} horas. Ingresa con tu documento y este código.',
             'whatsapp' => 'GestiaHR: tu código para activar tu cuenta es {code}. Vence en {hours} horas. Ingresa con tu documento y este código.',
         ],
+        'notifications.notice' => [
+            'sms' => '{organization}: {title}. Ingresa para verlo: {link}',
+            'whatsapp' => '{organization}: {title}. Ingresa para verlo: {link}',
+        ],
     ],
     'approval_only_whatsapp' => 'Solo las plantillas de WhatsApp necesitan aprobación del proveedor.',
     'approval_reset' => 'La plantilla cambió y debe aprobarse otra vez antes de usarse en WhatsApp.',
+    'sender' => [
+        'invalid_address' => 'Escribe un correo válido para el remitente.',
+        'nothing_to_verify' => 'La organización usa el remitente de la plataforma: no hay nada que verificar.',
+        'already_verified' => 'El remitente ya está verificado.',
+    ],
+    'bounce' => [
+        'nothing_to_clear' => 'Esta entrega no tiene una dirección rebotada que reactivar.',
+        'invalid_signature' => 'La firma del proveedor no es válida.',
+    ],
 ];

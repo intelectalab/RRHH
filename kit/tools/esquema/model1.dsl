@@ -158,7 +158,7 @@
   last_login_at ; is_service_account ; uniq person_id
 @user_identities | Identificadores con los que un usuario inicia sesión: correo, documento de identidad, teléfono, usuario o SSO (C-09).
   user_id -> users ; kind enum(email,national_id,phone,username,sso)! ; identifier_hash text! ; identifier_enc text!
-  verified_at ; is_primary ; uniq kind, identifier_hash
+  verified_at ; is_primary ; bounced_at ; bounce_reason ; uniq kind, identifier_hash
 @user_mfa_factors | Factores de segundo paso por usuario.
   user_id -> users ; kind enum(totp,sms,email,whatsapp,webauthn)! ; secret_enc ; label ; confirmed_at ; last_used_at ; disabled_at
 @user_mfa_recovery_codes | Códigos de respaldo del segundo factor (SEG-3): de un solo uso, guardados como HMAC.
@@ -283,8 +283,9 @@
   user_id -> users ; category text! ; channel enum(in_app,email,push,whatsapp,sms)! ; enabled bool=t ; uniq user_id, category, channel
 @push_devices | Dispositivos registrados para notificaciones push.
   user_id -> users ; platform enum(ios,android,web)! ; token_enc text! ; token_hash text! ; last_seen_at ; revoked_at ; uniq token_hash
-@message_channels lock | Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas).
+@message_channels lock | Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas). El remitente propio de correo solo se usa verificado (NOT-3); mientras tanto sale el de la plataforma.
   channel enum(email,push,whatsapp,sms)! ; provider text! ; config_enc ; sender_identity ; status enum(active,inactive)=inactive
+  verification_status enum(not_required,pending,verified,failed)=not_required ; verified_at ; verification_error
   uniq channel, provider
 
 #E CFG | Configuración, parámetros, campos personalizados, i18n y multimoneda

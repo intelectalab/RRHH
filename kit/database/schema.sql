@@ -1265,6 +1265,8 @@ CREATE TABLE user_identities (
   identifier_enc text NOT NULL,  -- SENSIBLE (cifrado en la aplicación)
   verified_at timestamptz,
   is_primary boolean NOT NULL DEFAULT false,
+  bounced_at timestamptz,
+  bounce_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_user_identities_tenant_id UNIQUE (tenant_id, id),
@@ -2229,13 +2231,16 @@ CREATE TABLE message_channels (
   config_enc text,  -- SENSIBLE (cifrado en la aplicación)
   sender_identity text,
   status text NOT NULL DEFAULT 'inactive' CHECK (status IN ('active','inactive')),
+  verification_status text NOT NULL DEFAULT 'not_required' CHECK (verification_status IN ('not_required','pending','verified','failed')),
+  verified_at timestamptz,
+  verification_error text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_message_channels_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_message_channels_channel_provider UNIQUE (tenant_id, channel, provider)
 );
-COMMENT ON TABLE message_channels IS 'Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas).';
+COMMENT ON TABLE message_channels IS 'Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas). El remitente propio de correo solo se usa verificado (NOT-3); mientras tanto sale el de la plataforma.';
 ALTER TABLE message_channels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE message_channels FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON message_channels USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -17941,6 +17946,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),
+  ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', 'select', '"sms"'::jsonb, ARRAY['organization'], '["sms", "whatsapp", "none"]'::jsonb),
   ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', 'integer', '180'::jsonb, ARRAY['organization'], NULL),
   ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'Genera el código con el correlativo de la empresa.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),

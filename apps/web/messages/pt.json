@@ -637,7 +637,9 @@
     "automation_notice": "Aviso de uma automação",
     "automation_paused": "Automação pausada",
     "identity_login_code": "Código de acesso",
-    "identity_activation_code": "Código de ativação da conta"
+    "identity_activation_code": "Código de ativação da conta",
+    "notifications_email_bounced": "E-mail devolvido",
+    "notifications_notice": "Aviso por mensagem para quem não tem e-mail"
   },
   "nchannel": {
     "in_app": "No aplicativo",
@@ -731,7 +733,31 @@
     "request_approval": "Pedir aprovação",
     "approval_requested": "Modelo enviado para aprovação do WhatsApp.",
     "approval_edit_note": "Se você mudar o texto, o modelo volta a rascunho e precisa ser aprovado de novo. Enquanto isso, as mensagens saem por SMS.",
-    "d_fallback": "Enviado por SMS: o modelo de {from} não estava aprovado"
+    "d_fallback": "Enviado por SMS: o modelo de {from} não estava aprovado",
+    "view_sender": "Remetente",
+    "d_all_statuses": "Todos os status",
+    "d_reactivate": "Reativar endereço",
+    "d_reactivate_help": "Use quando a pessoa corrigiu o e-mail ou confirmou que voltou a funcionar.",
+    "d_reactivated": "O endereço volta a ser usado",
+    "s_title": "Remetente dos e-mails",
+    "s_help": "Os avisos saem com o remetente da plataforma ou com um próprio da sua organização. O próprio só é usado depois que o provedor de e-mail o verifica.",
+    "s_in_use": "Hoje os e-mails saem como",
+    "s_status_not_required": "Não verificado",
+    "s_status_pending": "Verificação pendente",
+    "s_status_verified": "Verificado",
+    "s_status_failed": "Recusado",
+    "s_failed_note": "O provedor não aceitou o remetente: revise os registros SPF e DKIM do seu domínio e verifique de novo. Enquanto isso é usado o da plataforma.",
+    "s_pending_note": "Enquanto é verificado, os e-mails saem com o remetente da plataforma.",
+    "s_mode": "Remetente",
+    "s_mode_platform": "O da plataforma",
+    "s_mode_own": "Um próprio da organização",
+    "s_address": "E-mail do remetente",
+    "s_address_help": "Por exemplo, rh@suaempresa.com.br. Seu domínio precisa ter os registros que o provedor indicar.",
+    "s_verify": "Verificar de novo",
+    "s_verify_requested": "A verificação foi pedida ao provedor",
+    "s_saved": "Remetente salvo",
+    "s_webhook": "Endereço para os avisos de devolução",
+    "s_webhook_help": "Configure no provedor de e-mail: assim um e-mail que volta deixa de ser usado e o RH recebe um aviso."
   },
   "cfg": {
     "title": "Configurações",
@@ -1172,7 +1198,8 @@
     "company_created": "Empresa criada",
     "company_archived": "Empresa arquivada",
     "user_activated": "Conta ativada",
-    "user_suspended": "Conta bloqueada"
+    "user_suspended": "Conta bloqueada",
+    "user_identity_email_bounced": "Um e-mail voltou"
   },
   "ctype": {
     "title": "Tipos de contrato",

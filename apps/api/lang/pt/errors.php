@@ -31,4 +31,5 @@ return [
     'invalid_credentials' => 'Os dados de acesso estão incorretos.',
     'invalid_token' => 'O link é inválido ou expirou. Solicite um novo.',
     'csrf_mismatch' => 'Não foi possível verificar a sessão. Recarregue a página e tente novamente.',
+    'invalid_signature' => 'A assinatura da chamada não é válida.',
 ];

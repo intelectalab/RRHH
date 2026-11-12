@@ -18,17 +18,21 @@ type Approval = 'not_required' | 'draft' | 'pending' | 'approved' | 'rejected'
 type Delivery = { id: string; channel: string; recipient: string | null; recipient_name: string | null; category: string | null; title: string | null; purpose?: string | null; template_code?: string | null; fallback_from?: string | null; status: string; provider: string | null; attempts: number; error: string | null; sent_at: string | null; created_at: string | null }
 
 const TONE: Record<string, string> = { sent: 'ok', delivered: 'ok', queued: 'wa', failed: 'er', bounced: 'er', suppressed: 'gr' }
+const STATUSES = ['queued', 'sent', 'delivered', 'failed', 'bounced', 'suppressed'] as const
+type View = 'templates' | 'deliveries' | 'sender'
 const APPROVAL_TONE: Record<Approval, string> = { not_required: 'gr', draft: 'gr', pending: 'wa', approved: 'ok', rejected: 'er' }
 /** Canales directos (NOT-5): sin asunto, texto corto. */
 const SHORT = ['sms', 'whatsapp']
 
-/** Configuración → Mensajes (NOT-1, NOT-5): plantillas por tipo, canal e idioma (las de WhatsApp con aprobación del proveedor) y registro de envíos. */
+/** Configuración → Mensajes (NOT-1, NOT-3, NOT-5): plantillas por tipo, canal e idioma (las de WhatsApp con aprobación del proveedor), registro de envíos con los rebotes y remitente de correo. */
 export function MessagesScreen() {
   const { t, locale } = useT()
   const fmtDT = useDateTime()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
-  const [view, setView] = useState<'templates' | 'deliveries'>(can('notifications.templates.view') ? 'templates' : 'deliveries')
+  const views = (['templates', 'deliveries', 'sender'] as const).filter((v) => can(v === 'templates' ? 'notifications.templates.view' : v === 'deliveries' ? 'notifications.deliveries.view' : 'notifications.channels.update'))
+  const [view, setView] = useState<View>(views[0] ?? 'deliveries')
+  const [status, setStatus] = useState('')
   const [channel, setChannel] = useState('')
   const [lang, setLang] = useState<string>(locale)
   const [rows, setRows] = useState<Template[] | null>(null)
@@ -38,20 +42,45 @@ export function MessagesScreen() {
 
   const load = useCallback(async () => {
     try {
+      if (view === 'sender') return
       if (view === 'templates') {
         const q = new URLSearchParams()
         if (channel) q.set('filter[channel]', channel)
         if (lang) q.set('filter[locale]', lang)
         setRows((await api.get<{ data: Template[] }>(`/notification-templates?${q.toString()}`)).data)
       } else {
-        setDeliveries((await api.get<{ data: Delivery[] }>('/notification-deliveries?per_page=50')).data)
+        const q = new URLSearchParams({ per_page: '50' })
+        if (status) q.set('filter[status]', status)
+        setDeliveries((await api.get<{ data: Delivery[] }>(`/notification-deliveries?${q.toString()}`)).data)
       }
       setLoadError(false)
     } catch {
       setLoadError(true)
     }
-  }, [view, channel, lang])
+  }, [view, channel, lang, status])
   useEffect(() => { void load() }, [load])
+
+  // El aviso de rebote a RRHH abre directo los envíos rebotados (?vista=entregas&estado=bounced).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    if (q.get('vista') === 'entregas' && can('notifications.deliveries.view')) setView('deliveries')
+    const st = q.get('estado')
+    if (st && (STATUSES as readonly string[]).includes(st)) setStatus(st)
+  }, [can])
+
+  const [reactivating, setReactivating] = useState<string | null>(null)
+  async function reactivate(d: Delivery) {
+    setReactivating(d.id)
+    try {
+      await api.post(`/notification-deliveries/${d.id}/clear-bounce`, {})
+      toast(t('msgs.d_reactivated'))
+      await load()
+    } catch (err) {
+      toast(formErrors(err, t).general ?? t('common.load_error'))
+    } finally {
+      setReactivating(null)
+    }
+  }
 
   const fake = deliveries?.some((d) => d.provider?.startsWith('fake')) ?? false
   const [requesting, setRequesting] = useState<string | null>(null)
@@ -74,9 +103,9 @@ export function MessagesScreen() {
       <PageHeader title={t('msgs.title')} sub={t('msgs.sub')} tabs={settingsTabs(t, can, 'messages')} />
       <main className="main" id="contenido" tabIndex={-1}>
         <div className="barra-filtros">
-          {can('notifications.templates.view') && can('notifications.deliveries.view') && (
+          {views.length > 1 && (
             <div className="seg" role="group" aria-label={t('msgs.title')}>
-              {(['templates', 'deliveries'] as const).map((v) => (
+              {views.map((v) => (
                 <button key={v} type="button" className={view === v ? 'on' : undefined} aria-pressed={view === v} onClick={() => setView(v)}>{t(`msgs.view_${v}`)}</button>
               ))}
             </div>
@@ -93,8 +122,15 @@ export function MessagesScreen() {
               </select>
             </>
           )}
+          {view === 'deliveries' && (
+            <select className="form-select" style={{ width: 'auto' }} aria-label={t('msgs.d_col_status')} value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="">{t('msgs.d_all_statuses')}</option>
+              {STATUSES.map((st) => <option key={st} value={st}>{t(`msgs.d_status_${st}`)}</option>)}
+            </select>
+          )}
         </div>
         {view === 'deliveries' && fake && <div className="nota">{t('msgs.d_fake')}</div>}
+        {view === 'sender' ? <SenderCard /> : (
         <section className="card">
           <div className="tabla-wrap">
             {view === 'templates' ? (
@@ -127,11 +163,11 @@ export function MessagesScreen() {
               </table>
             ) : (
               <table className="table">
-                <thead><tr><th>{t('msgs.d_col_when')}</th><th>{t('msgs.d_col_to')}</th><th>{t('msgs.d_col_notice')}</th><th>{t('msgs.d_col_status')}</th></tr></thead>
+                <thead><tr><th>{t('msgs.d_col_when')}</th><th>{t('msgs.d_col_to')}</th><th>{t('msgs.d_col_notice')}</th><th>{t('msgs.d_col_status')}</th><th /></tr></thead>
                 <tbody>
-                  {loadError && <tr><td colSpan={4}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
-                  {!loadError && deliveries === null && [1, 2].map((i) => <tr key={i}><td colSpan={4}><span className="esq" style={{ width: `${30 + i * 15}%` }} /></td></tr>)}
-                  {deliveries?.length === 0 && <tr><td colSpan={4}><EmptyState title={t('msgs.d_empty_title')} text={t('msgs.d_empty_text')} /></td></tr>}
+                  {loadError && <tr><td colSpan={5}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
+                  {!loadError && deliveries === null && [1, 2].map((i) => <tr key={i}><td colSpan={5}><span className="esq" style={{ width: `${30 + i * 15}%` }} /></td></tr>)}
+                  {deliveries?.length === 0 && <tr><td colSpan={5}><EmptyState title={t('msgs.d_empty_title')} text={t('msgs.d_empty_text')} /></td></tr>}
                   {deliveries?.map((d) => (
                     <tr key={d.id}>
                       <td className="nowrap">{fmtDT(d.sent_at ?? d.created_at)}</td>
@@ -146,6 +182,13 @@ export function MessagesScreen() {
                         {d.attempts > 1 && <span className="sub2">{t('msgs.d_attempts', { n: d.attempts })}</span>}
                         {d.error && <span className="sub2" style={{ color: 'var(--er)' }}>{d.error}</span>}
                       </td>
+                      <td className="text-end nowrap">
+                        {d.status === 'bounced' && d.channel === 'email' && can('notifications.channels.update') && (
+                          <button type="button" className="btn btn-ter btn-sm" disabled={reactivating === d.id} title={t('msgs.d_reactivate_help')} onClick={() => void reactivate(d)}>
+                            {reactivating === d.id && <span className="spin" aria-hidden="true" />}{t('msgs.d_reactivate')}
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -153,6 +196,7 @@ export function MessagesScreen() {
             )}
           </div>
         </section>
+        )}
       </main>
       {editing && <TemplatePanel template={editing} onClose={() => setEditing(null)} onSaved={async () => { setEditing(null); toast(t('msgs.saved')); await load() }} />}
       {toastNode}
@@ -236,5 +280,109 @@ function TemplatePanel({ template, onClose, onSaved }: { template: Template; onC
         <p>{fill(body)}</p>
       </div>
     </SidePanel>
+  )
+}
+
+type Sender = { mode: 'platform' | 'own'; address: string | null; verification_status: 'not_required' | 'pending' | 'verified' | 'failed'; verified_at: string | null; verification_error: string | null; in_use: string; webhook_url: string }
+const SENDER_TONE: Record<Sender['verification_status'], string> = { not_required: 'gr', pending: 'wa', verified: 'ok', failed: 'er' }
+
+/** NOT-3 · Remitente de los correos: el de la plataforma o uno propio, que solo se usa verificado. */
+function SenderCard() {
+  const { t } = useT()
+  const fmtDT = useDateTime()
+  const { toast, node: toastNode } = useToast()
+  const [sender, setSender] = useState<Sender | null>(null)
+  const [loadError, setLoadError] = useState(false)
+  const [mode, setMode] = useState<Sender['mode']>('platform')
+  const [address, setAddress] = useState('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [busy, setBusy] = useState(false)
+
+  const load = useCallback(async () => {
+    try {
+      const s = (await api.get<{ data: Sender }>('/message-channels/email')).data
+      setSender(s)
+      setMode(s.mode)
+      setAddress(s.address ?? '')
+      setLoadError(false)
+    } catch {
+      setLoadError(true)
+    }
+  }, [])
+  useEffect(() => { void load() }, [load])
+
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setBusy(true)
+    setErrors({})
+    try {
+      setSender((await api.request<{ data: Sender }>('/message-channels/email', 'PUT', mode === 'own' ? { mode, address } : { mode })).data)
+      toast(t('msgs.s_saved'))
+    } catch (err) {
+      const { fields, general } = formErrors(err, t)
+      setErrors(general ? { ...fields, general } : fields)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function verify() {
+    setBusy(true)
+    try {
+      setSender((await api.post<{ data: Sender }>('/message-channels/email/verify', {})).data)
+      toast(t('msgs.s_verify_requested'))
+    } catch (err) {
+      toast(formErrors(err, t).general ?? t('common.load_error'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (loadError) return <section className="card"><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></section>
+  if (sender === null) return <section className="card" style={{ padding: 16 }}><span className="esq" style={{ width: '40%' }} /></section>
+
+  return (
+    <section className="card" style={{ padding: 16 }}>
+      <h2 className="h6" style={{ margin: '0 0 4px' }}>{t('msgs.s_title')}</h2>
+      <p className="small text-secondary" style={{ marginTop: 0 }}>{t('msgs.s_help')}</p>
+      <p className="small">
+        {t('msgs.s_in_use')} <b>{sender.in_use}</b>
+        {sender.mode === 'own' && (
+          <> · <span className={`st ${SENDER_TONE[sender.verification_status]}`}>{t(`msgs.s_status_${sender.verification_status}`)}</span>{sender.verified_at && <span className="text-secondary"> {fmtDT(sender.verified_at)}</span>}</>
+        )}
+      </p>
+      {sender.verification_status === 'failed' && <div className="nota">{t('msgs.s_failed_note')}</div>}
+      {sender.verification_status === 'pending' && <div className="nota">{t('msgs.s_pending_note')}</div>}
+      <form onSubmit={(e) => void save(e)} noValidate style={{ maxWidth: 520 }}>
+        <fieldset className="mb-3">
+          <legend className="form-label">{t('msgs.s_mode')}</legend>
+          {(['platform', 'own'] as const).map((m) => (
+            <label key={m} className="form-check" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input type="radio" name="sender-mode" value={m} checked={mode === m} onChange={() => setMode(m)} />
+              <span>{t(`msgs.s_mode_${m}`)}</span>
+            </label>
+          ))}
+        </fieldset>
+        {mode === 'own' && (
+          <div className="mb-3">
+            <label className="form-label" htmlFor="s-address">{t('msgs.s_address')}</label>
+            <input id="s-address" type="email" className={`form-control${errors.address ? ' is-invalid' : ''}`} value={address} onChange={(e) => setAddress(e.target.value)} autoComplete="off" aria-describedby="s-address-h" aria-invalid={errors.address ? true : undefined} />
+            <p id="s-address-h" className="small text-secondary">{t('msgs.s_address_help')}</p>
+            {errors.address && <div className="invalid-feedback" role="alert" style={{ display: 'block' }}>{errors.address}</div>}
+          </div>
+        )}
+        {errors.general && <div className="invalid-feedback" role="alert" style={{ display: 'block' }}>{errors.general}</div>}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button type="submit" className="btn btn-primary" disabled={busy}>{busy && <span className="spin" aria-hidden="true" />}{t('msgs.save')}</button>
+          {sender.mode === 'own' && sender.verification_status !== 'verified' && (
+            <button type="button" className="btn btn-ter" disabled={busy} onClick={() => void verify()}>{t('msgs.s_verify')}</button>
+          )}
+        </div>
+      </form>
+      <h3 className="small" style={{ fontWeight: 700, margin: '20px 0 4px' }}>{t('msgs.s_webhook')}</h3>
+      <p className="small text-secondary" style={{ margin: 0 }}>{t('msgs.s_webhook_help')}</p>
+      <code style={{ wordBreak: 'break-all' }}>{sender.webhook_url}</code>
+      {toastNode}
+    </section>
   )
 }

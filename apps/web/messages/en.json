@@ -637,7 +637,9 @@
     "automation_notice": "Automation notice",
     "automation_paused": "Automation paused",
     "identity_login_code": "Sign-in code",
-    "identity_activation_code": "Account activation code"
+    "identity_activation_code": "Account activation code",
+    "notifications_email_bounced": "Email bounced",
+    "notifications_notice": "Text notice for people without email"
   },
   "nchannel": {
     "in_app": "In the app",
@@ -731,7 +733,31 @@
     "request_approval": "Request approval",
     "approval_requested": "Template sent to WhatsApp for approval.",
     "approval_edit_note": "If you change the text, the template goes back to draft and must be approved again. Meanwhile, messages go out by SMS.",
-    "d_fallback": "Sent by SMS: the {from} template was not approved"
+    "d_fallback": "Sent by SMS: the {from} template was not approved",
+    "view_sender": "Sender",
+    "d_all_statuses": "All statuses",
+    "d_reactivate": "Reactivate address",
+    "d_reactivate_help": "Use it when the person fixed their email or confirmed it works again.",
+    "d_reactivated": "The address is used again",
+    "s_title": "Email sender",
+    "s_help": "Notices are sent with the platform sender or with your organization's own. Your own sender is used only once the email provider verifies it.",
+    "s_in_use": "Emails are currently sent as",
+    "s_status_not_required": "Not verified",
+    "s_status_pending": "Verification pending",
+    "s_status_verified": "Verified",
+    "s_status_failed": "Rejected",
+    "s_failed_note": "The provider did not accept the sender: check your domain's SPF and DKIM records and verify again. Meanwhile the platform sender is used.",
+    "s_pending_note": "While it is being verified, emails are sent with the platform sender.",
+    "s_mode": "Sender",
+    "s_mode_platform": "The platform's",
+    "s_mode_own": "Your organization's own",
+    "s_address": "Sender email",
+    "s_address_help": "For example, hr@yourcompany.com. Your domain must have the records the provider asks for.",
+    "s_verify": "Verify again",
+    "s_verify_requested": "Verification was requested from the provider",
+    "s_saved": "Sender saved",
+    "s_webhook": "Address for bounce notices",
+    "s_webhook_help": "Set it in your email provider: a bouncing email then stops being used and HR is notified."
   },
   "cfg": {
     "title": "Settings",
@@ -1172,7 +1198,8 @@
     "company_created": "Company created",
     "company_archived": "Company archived",
     "user_activated": "Account activated",
-    "user_suspended": "Account suspended"
+    "user_suspended": "Account suspended",
+    "user_identity_email_bounced": "An email bounced"
   },
   "ctype": {
     "title": "Contract types",

@@ -86,6 +86,12 @@ final class DomainEventTypes
     /** NOT-5: mensaje entrante de un colaborador por SMS/WhatsApp (lo consume M-WHA). */
     public const MESSAGE_RECEIVED = 'message.received.v1';
 
+    /** NOT-3: verificar en el proveedor el remitente de correo propio de la organización. */
+    public const EMAIL_SENDER_VERIFICATION_REQUESTED = 'message_channel.sender_verification_requested.v1';
+
+    /** NOT-3: una dirección de correo rebotó (o se quejó) y quedó marcada como inválida. */
+    public const EMAIL_ADDRESS_BOUNCED = 'user_identity.email_bounced.v1';
+
     public const TASK_OVERDUE = 'task.overdue.v1';
 
     // Auditoría (AUD-5)
@@ -261,6 +267,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['channel', 'from_enc', 'body_enc', 'provider', 'provider_message_id'],
             'description' => 'Mensaje entrante por SMS/WhatsApp (remitente y texto cifrados)',
+        ],
+        self::EMAIL_SENDER_VERIFICATION_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['channel_id'],
+            'description' => 'Verificar en el proveedor el remitente de correo propio de la organización',
+        ],
+        self::EMAIL_ADDRESS_BOUNCED => [
+            'version' => 1,
+            'required_fields' => ['user_id', 'delivery_id', 'kind'],
+            'description' => 'Una dirección de correo rebotó o se quejó: ya no se usa y se avisa a RRHH (la dirección no viaja en el evento)',
         ],
         self::AUDIT_INTEGRITY_FAILED => [
             'version' => 1,

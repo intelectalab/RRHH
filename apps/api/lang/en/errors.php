@@ -31,4 +31,5 @@ return [
     'invalid_credentials' => 'The sign-in details are incorrect.',
     'invalid_token' => 'The link is invalid or has expired. Request a new one.',
     'csrf_mismatch' => 'The session could not be verified. Reload the page and try again.',
+    'invalid_signature' => 'The request signature is not valid.',
 ];

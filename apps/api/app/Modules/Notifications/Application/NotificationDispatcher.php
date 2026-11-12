@@ -4,6 +4,7 @@ namespace App\Modules\Notifications\Application;
 
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Shared\Messaging\MessageSender;
 use App\Shared\Notifications\Notifier;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
@@ -11,20 +12,28 @@ use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\Resolution\TenantDirectory;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
  * NOT-1 · Motor de avisos: destinatarios vigentes, preferencias, plantilla en su idioma, aviso en la
  * aplicación y entregas por canal externo vía outbox (se difieren en el horario de silencio).
+ * RN-NOT-07 · Sin correo válido (no tiene o rebotó), el aviso sale como mensaje corto por el canal de la
+ * organización para quien no tiene correo (SMS o WhatsApp, parámetro notificaciones.canal_sin_correo),
+ * con el título y el enlace, nunca el contenido (RN-NOT-02).
  */
 final class NotificationDispatcher implements Notifier
 {
+    /** Mensaje corto (SMS/WhatsApp) que reemplaza al correo para quien no lo tiene (RN-NOT-07). */
+    public const NOTICE_TEMPLATE = 'notifications.notice';
+
     public function __construct(
         private readonly NotificationCatalog $catalog,
         private readonly PreferenceService $preferences,
         private readonly TemplateRenderer $renderer,
         private readonly OutboxWriter $outbox,
         private readonly TenantDirectory $tenants,
+        private readonly MessageSender $messages,
     ) {}
 
     public function notify(string $category, array $userIds, array $variables, ?string $subjectType = null, ?string $subjectId = null): int
@@ -75,7 +84,11 @@ final class NotificationDispatcher implements Notifier
                     }
                     $address = $this->address((string) $user->id, $channel);
                     if ($address === null) {
-                        continue; // RN-NOT-07: sin correo, el aviso queda en la aplicación.
+                        if ($channel === 'email') {
+                            $this->noticeWithoutEmail($category, (string) $user->id, $locale, $vars, $notificationId, $quietUntil);
+                        }
+
+                        continue;
                     }
                     $delivery = NotificationDelivery::create([
                         'notification_id' => $notificationId,
@@ -112,9 +125,39 @@ final class NotificationDispatcher implements Notifier
         if ($channel !== 'email') {
             return null;
         }
-        $enc = DB::table('user_identities')->where('user_id', $userId)->where('kind', 'email')->orderByDesc('is_primary')->value('identifier_enc');
+        // NOT-3: una dirección que rebotó no se vuelve a usar hasta que RRHH la reactive.
+        $enc = DB::table('user_identities')->where('user_id', $userId)->where('kind', 'email')->whereNull('bounced_at')
+            ->orderByDesc('is_primary')->value('identifier_enc');
 
         return is_string($enc) ? FieldCipher::decrypt($enc) : null;
+    }
+
+    /**
+     * RN-NOT-07 · Aviso corto por SMS/WhatsApp a quien no tiene correo válido: título y enlace, sin datos.
+     *
+     * @param  array<string, string|int|null>  $vars
+     */
+    private function noticeWithoutEmail(string $category, string $userId, string $locale, array $vars, ?string $notificationId, ?\DateTimeInterface $quietUntil): void
+    {
+        $channel = $this->catalog->setting('notificaciones.canal_sin_correo');
+        if (! in_array($channel, ['sms', 'whatsapp'], true)) {
+            return;
+        }
+        $enc = DB::table('user_identities')->where('user_id', $userId)->where('kind', 'phone')->orderByDesc('is_primary')->value('identifier_enc');
+        if (! is_string($enc)) {
+            return; // Sin correo ni celular: el aviso queda en la aplicación.
+        }
+        $title = $this->renderer->render($category, 'in_app', $locale, $vars)['subject'];
+        $this->messages->send(
+            (string) $channel,
+            '+'.FieldCipher::decrypt($enc),
+            self::NOTICE_TEMPLATE,
+            ['title' => mb_substr($title, 0, 120), 'name' => $vars['name'] ?? '', 'organization' => $vars['organization'] ?? '', 'link' => $vars['link'] ?? ''],
+            $locale,
+            'notification:'.$category,
+            'notice:'.($notificationId ?? (string) Str::uuid()).':'.$userId,
+            $quietUntil,
+        );
     }
 
     /**

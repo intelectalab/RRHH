@@ -298,6 +298,11 @@ EXTRA = [
     ("WFL", 0, "post", "/workflows/{id}/test", "workflow.workflows.update", "Probar una regla en seco con datos de ejemplo: si se cumple y qué haría cada acción, sin efectos (WFL-5)", False),
     ("NOT", 0, "get", "/notification-deliveries", "notifications.deliveries.view", "Registro de entregas por canal externo (correo, SMS, WhatsApp) con estado, propósito, canal de respaldo y error", False),
     ("NOT", 0, "post", "/notification-templates/{id}/request-approval", "notifications.templates.update", "Enviar una plantilla de WhatsApp a aprobación del proveedor (NOT-5); 409 si su estado no lo permite", False),
+    ("NOT", 0, "post", "/webhooks/email", None, "Avisos del proveedor de correo (rebotes, quejas, entregas) firmados por el proveedor; un rebote marca la dirección como inválida y avisa a RRHH (NOT-3). 401 sin firma válida", True),
+    ("NOT", 0, "get", "/message-channels/email", "notifications.channels.update", "Remitente de correo de la organización (el de la plataforma o uno propio), su verificación y la dirección para los avisos de rebote (NOT-3)", False),
+    ("NOT", 0, "put", "/message-channels/email", "notifications.channels.update", "Usar el remitente de la plataforma o uno propio; el propio queda pendiente hasta que el proveedor lo verifique (NOT-3)", False),
+    ("NOT", 0, "post", "/message-channels/email/verify", "notifications.channels.update", "Volver a pedir la verificación del remitente propio; 409 si no hay uno pendiente (NOT-3)", False),
+    ("NOT", 0, "post", "/notification-deliveries/{id}/clear-bounce", "notifications.channels.update", "Reactivar la dirección de correo que rebotó en esta entrega (ya corregida); 409 si no hay rebote que reactivar (NOT-3)", False),
     ("CFG", 0, "get", "/settings", "settings.parameters.view", "Secciones de parámetros de los módulos contratados (para el centro de configuración y su buscador)", False),
     ("CFG", 0, "get", "/settings/{group}", "settings.parameters.view", "Parámetros de una sección con valor vigente, origen (empresa, organización o por defecto) e historial; ?legal_entity_id= y ?as_of=", False),
     ("CFG", 0, "put", "/settings/{group}", "settings.parameters.update", "Cambiar parámetros desde una fecha (cierra la vigencia anterior); con legal_entity_id sobrescribe solo esa empresa y value null vuelve a heredar", False),
@@ -401,7 +406,7 @@ TYPES = {
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
-STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
+STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce")}
 CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
@@ -609,6 +614,9 @@ def build():
                     "type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary"}}}}}}
         if not public:
             res.update(errs("401", "403"))
+        elif path.startswith("/webhooks/"):
+            # Webhook de un proveedor: 401 si la firma no es válida.
+            res.update(errs("401"))
         # La consola SaaS responde 404 desde el host de una organización (SAS-1).
         if "{" in path or path.startswith("/platform/"):
             res.update(errs("404"))

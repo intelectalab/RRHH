@@ -14,4 +14,10 @@ return [
      * adaptador; los módulos que envían mensajes no cambian.
      */
     'messaging_providers' => [],
+
+    /*
+     * NOT-3 · Secreto con el que se firman los avisos de rebote del proveedor de correo que llegan a
+     * POST /api/v1/webhooks/email (adaptadores de desarrollo y pruebas; un proveedor real usa su firma).
+     */
+    'email_webhook_secret' => env('EMAIL_WEBHOOK_SECRET', ''),
 ];

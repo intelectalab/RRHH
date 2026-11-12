@@ -17944,6 +17944,79 @@ paths:
       x-phase: 0
       x-permission: authenticated
       operationId: postMeSessionsIdRevoke
+  /message-channels/email:
+    get:
+      summary: Remitente de correo de la organización (el de la plataforma o uno propio), su verificación y la dirección para
+        los avisos de rebote (NOT-3)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - NOT
+      x-phase: 0
+      x-permission: notifications.channels.update
+      operationId: getMessageChannelsEmail
+    put:
+      summary: Usar el remitente de la plataforma o uno propio; el propio queda pendiente hasta que el proveedor lo verifique
+        (NOT-3)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - NOT
+      x-phase: 0
+      x-permission: notifications.channels.update
+      operationId: putMessageChannelsEmail
+  /message-channels/email/verify:
+    post:
+      summary: Volver a pedir la verificación del remitente propio; 409 si no hay uno pendiente (NOT-3)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - NOT
+      x-phase: 0
+      x-permission: notifications.channels.update
+      operationId: postMessageChannelsEmailVerify
   /my-team:
     get:
       summary: Equipo directo e indirecto del manager
@@ -17995,6 +18068,42 @@ paths:
       x-phase: 0
       x-permission: notifications.deliveries.view
       operationId: getNotificationDeliveries
+  /notification-deliveries/{id}/clear-bounce:
+    post:
+      summary: Reactivar la dirección de correo que rebotó en esta entrega (ya corregida); 409 si no hay rebote que reactivar
+        (NOT-3)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - NOT
+      x-phase: 0
+      x-permission: notifications.channels.update
+      operationId: postNotificationDeliveriesIdClearBounce
   /notification-preferences:
     get:
       summary: Preferencias de notificación del usuario
@@ -36125,6 +36234,35 @@ paths:
       x-phase: 9
       x-permission: integrations.webhooks.test
       operationId: postWebhookEndpointsIdTest
+  /webhooks/email:
+    post:
+      summary: Avisos del proveedor de correo (rebotes, quejas, entregas) firmados por el proveedor; un rebote marca la dirección
+        como inválida y avisa a RRHH (NOT-3). 401 sin firma válida
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '422': *id007
+        '429': *id004
+      tags:
+      - NOT
+      x-phase: 0
+      x-permission: public
+      operationId: postWebhooksEmail
+      security: []
   /work-schedules:
     get:
       summary: Listar WorkSchedule
