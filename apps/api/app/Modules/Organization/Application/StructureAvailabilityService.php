@@ -3,16 +3,64 @@
 namespace App\Modules\Organization\Application;
 
 use App\Modules\Organization\Infrastructure\Models\CostCenter;
+use App\Modules\Organization\Infrastructure\Models\JobProfile;
+use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Organization\Infrastructure\Models\Site;
 use App\Shared\Organization\StructureAvailability;
 use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Validation\ValidationException;
 
 /**
- * ORG-2 · ORG-4 · Sedes y centros de costo que admiten nuevas asignaciones.
+ * ORG-1 · ORG-2 · ORG-4 · ORG-5 · Empresas, sedes, centros de costo y puestos que admiten nuevas asignaciones.
  */
 final class StructureAvailabilityService implements StructureAvailability
 {
+    public function legalEntityAcceptsEmployments(string $legalEntityId): bool
+    {
+        return $this->legalEntityProblem($legalEntityId) === null;
+    }
+
+    public function assertLegalEntityAssignable(string $legalEntityId, string $field = 'legal_entity_id'): void
+    {
+        $problem = $this->legalEntityProblem($legalEntityId);
+        if ($problem !== null) {
+            throw ValidationException::withMessages([$field => [(string) trans('organization.'.$problem)]]);
+        }
+    }
+
+    public function jobProfileAcceptsPositions(string $jobProfileId): bool
+    {
+        return $this->jobProfileProblem($jobProfileId) === null;
+    }
+
+    public function assertJobProfileAssignable(string $jobProfileId, string $field = 'job_profile_id'): void
+    {
+        $problem = $this->jobProfileProblem($jobProfileId);
+        if ($problem !== null) {
+            throw ValidationException::withMessages([$field => [(string) trans('organization.jobs.'.$problem)]]);
+        }
+    }
+
+    private function legalEntityProblem(string $legalEntityId): ?string
+    {
+        $status = LegalEntity::query()->whereKey($legalEntityId)->value('status');
+        if (! is_string($status)) {
+            return 'legal_entity_not_found';
+        }
+
+        return $status === 'active' ? null : 'legal_entity_inactive';
+    }
+
+    private function jobProfileProblem(string $jobProfileId): ?string
+    {
+        $status = JobProfile::query()->whereKey($jobProfileId)->value('status');
+        if (! is_string($status)) {
+            return 'not_found';
+        }
+
+        return $status === 'inactive' ? 'archived_no_positions' : null;
+    }
+
     public function siteAcceptsAssignments(string $siteId, ?string $legalEntityId = null): bool
     {
         return $this->siteProblem($siteId, $legalEntityId) === null;

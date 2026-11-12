@@ -75,4 +75,12 @@ return [
         'archived_cannot_move' => 'An archived unit cannot be moved: restore it first.',
         'before_start' => 'The change cannot take effect before the unit exists (:date).',
     ],
+    'legal_entity_not_found' => 'The company does not exist.',
+    'legal_entity_inactive' => 'The company is deactivated and does not accept new employments.',
+    'jobs' => [
+        'duplicate_code' => 'This catalog already has a record with that code.',
+        'not_selectable' => 'Choose an active item from the catalog.',
+        'not_found' => 'The job does not exist.',
+        'archived_no_positions' => 'The job is archived and does not accept new positions.',
+    ],
 ];

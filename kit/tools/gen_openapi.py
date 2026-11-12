@@ -88,7 +88,10 @@ RES = [
     ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id?:id code:s name:s kind:e(headquarters|branch|plant|store|site|remote) address?:s district_code?:s country?:s latitude?:n longitude?:n geofence_radius_m?:i timezone?:s effective_timezone?:s holiday_calendar_id?:id establishment_code?:s risk_site:b status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.units", "/org-units", "OrgUnit", "code:s name:s type_id:id type_name?:s legal_entity_id?:id parent_id?:id parent_name?:s head_position_id?:id head_position_title?:s head_person_name?:s cost_center_id?:id cost_center_name?:s path?:s depth?:i children_count?:i valid_from?:d valid_to?:d effective_from?:d reason?:s scheduled_change?:j as_of?:d status:e(active|archived)", "LCRU", "archive restore move"),
     ("ORG", 1, "org.cost_centers", "/cost-centers", "CostCenter", "code:s name:s legal_entity_id?:id parent_id?:id path?:a accounting_code?:s opened_on?:d closed_on?:d status:e(active|closed|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
-    ("ORG", 1, "org.job_profiles", "/job-profiles", "JobProfile", "code:s name:s level?:s category?:s family?:s description?:s status:e(active|archived)", "LCRU", "archive restore"),
+    ("ORG", 1, "org.job_profiles", "/job-profiles", "JobProfile", "code:s name:s job_family_id?:id job_level_id?:id job_category_id?:id mission?:s functions?:s requirements?:s occupation_code?:s risk_job:b trust_classification:e(none|trust|management) category_pending?:b positions_count?:i current_version?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
+    ("ORG", 1, "org.job_profiles", "/job-families", "JobFamily", "code:s name:s description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
+    ("ORG", 1, "org.job_profiles", "/job-levels", "JobLevel", "code:s name:s rank:i description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
+    ("ORG", 1, "org.job_profiles", "/job-categories", "JobCategory", "code:s name:s rank?:i description?:s functions?:s responsibility_level?:s requirements?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("POS", 1, "org.positions", "/positions", "Position", "job_profile_id:id org_unit_id:id site_id:id cost_center_id?:id reports_to_position_id?:id status:e(requested|approved|open|filled|frozen|closed) budget!?:m valid_from:d", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
     ("COL", 1, "people.people", "/people", "Person", "first_name:s last_name:s document_type:s document_number:s birth_date?:d nationality?:s email?:s phone?:s address?:j", "LCRU", "merge"),
@@ -334,6 +337,8 @@ EXTRA = [
     ("AUD", 0, "get", "/audit-archives/{id}/entries", "audit.logs.view", "Entradas de un mes de auditoría archivado en frío, consultables hasta el fin del plazo de conservación (los campos sensibles se enmascaran sin su permiso)", False),
     ("AUD", 0, "get", "/audit-retention", "audit.logs.view", "Políticas de conservación por separado: auditoría (años y meses en línea), actividad de usuarios (días) y logs técnicos (días)", False),
     ("ORG", 1, "get", "/org-chart", "org.units.view", "Organigrama por posiciones en una fecha (as_of)", False),
+    ("ORG", 1, "get", "/job-profiles/{id}/versions", "org.job_profiles.view", "Versiones de la descripción del puesto (misión, funciones y requisitos), de la más reciente a la más antigua; inalterables (ORG-5)", False),
+    ("ORG", 1, "get", "/legal-entities/{id}/regimes", "org.legal_entities.view", "Historia del régimen laboral de la empresa con su vigencia (valid_from / valid_to), de la más reciente a la más antigua (ORG-1)", False),
     ("POS", 1, "get", "/headcount", "org.positions.view", "Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas", False),
     ("COL", 1, "get", "/directory", "people.directory.view", "Directorio (solo datos no sensibles)", False),
     ("HIS", 1, "get", "/employments/{employment_id}/timeline", "people.employments.view", "Línea de tiempo de la relación laboral", False),
@@ -451,9 +456,10 @@ INPUT_EXTRA = {
         "tax_id": {"type": "string", "description": "Alta (SAS-2): número fiscal de la primera empresa (RUC en Perú)"},
         "module_codes": {"type": "array", "items": {"type": "string"}, "description": "Alta (SAS-2): módulos que se activan además de los base"},
     },
+    "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):

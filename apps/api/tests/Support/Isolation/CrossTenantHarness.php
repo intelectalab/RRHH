@@ -9,6 +9,8 @@ use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
 use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
+use App\Modules\Organization\Infrastructure\Models\JobProfile;
+use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -68,6 +70,9 @@ final class CrossTenantHarness
         '/org-units/{id}/history' => OrgUnit::class,
         '/org-units/{id}/impact' => OrgUnit::class,
         '/org-unit-types/{id}' => OrgUnitType::class,
+        // ORG-1 / ORG-5: historia del régimen de una empresa de A y versiones de un puesto de A.
+        '/legal-entities/{id}/regimes' => LegalEntity::class,
+        '/job-profiles/{id}/versions' => JobProfile::class,
     ];
 
     /**

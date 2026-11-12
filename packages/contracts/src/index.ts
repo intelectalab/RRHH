@@ -6516,6 +6516,234 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/job-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar JobCategory */
+        get: operations["getJobCategories"];
+        put?: never;
+        /** Crear JobCategory */
+        post: operations["postJobCategories"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver JobCategory */
+        get: operations["getJobCategoriesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar JobCategory */
+        patch: operations["patchJobCategoriesId"];
+        trace?: never;
+    };
+    "/job-categories/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «archive» sobre JobCategory
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobCategoriesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-categories/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «restore» sobre JobCategory
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobCategoriesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-families": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar JobFamily */
+        get: operations["getJobFamilies"];
+        put?: never;
+        /** Crear JobFamily */
+        post: operations["postJobFamilies"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-families/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver JobFamily */
+        get: operations["getJobFamiliesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar JobFamily */
+        patch: operations["patchJobFamiliesId"];
+        trace?: never;
+    };
+    "/job-families/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «archive» sobre JobFamily
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobFamiliesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-families/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «restore» sobre JobFamily
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobFamiliesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar JobLevel */
+        get: operations["getJobLevels"];
+        put?: never;
+        /** Crear JobLevel */
+        post: operations["postJobLevels"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-levels/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver JobLevel */
+        get: operations["getJobLevelsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar JobLevel */
+        patch: operations["patchJobLevelsId"];
+        trace?: never;
+    };
+    "/job-levels/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «archive» sobre JobLevel
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobLevelsIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-levels/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «restore» sobre JobLevel
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postJobLevelsIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/job-profiles": {
         parameters: {
             query?: never;
@@ -6586,6 +6814,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postJobProfilesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/job-profiles/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Versiones de la descripción del puesto (misión, funciones y requisitos), de la más reciente a la más antigua; inalterables (ORG-5) */
+        get: operations["getJobProfilesIdVersions"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6798,6 +7043,23 @@ export interface paths {
         post: operations["postLegalEntitiesIdLogo"];
         /** Quitar el logo de la empresa */
         delete: operations["deleteLegalEntitiesIdLogo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-entities/{id}/regimes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia del régimen laboral de la empresa con su vigencia (valid_from / valid_to), de la más reciente a la más antigua (ORG-1) */
+        get: operations["getLegalEntitiesIdRegimes"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -15451,7 +15713,6 @@ export interface components {
                 [key: string]: unknown;
             };
             has_draft?: boolean | null;
-            allowed_actions?: string[] | null;
         };
         ApprovalRequest: {
             /** @description Identificador opaco */
@@ -16377,7 +16638,6 @@ export interface components {
             opened_on?: string | null;
             /** Format: date */
             closed_on?: string | null;
-            allowed_actions?: string[] | null;
         };
         CountryPack: {
             /** @description Identificador opaco */
@@ -17349,7 +17609,6 @@ export interface components {
             started_at?: string | null;
             /** Format: date-time */
             finished_at?: string | null;
-            allowed_actions?: string[] | null;
             /** @description Contenido del archivo CSV o XLSX en base64 (IMP-1) */
             content_base64?: string;
         };
@@ -17441,17 +17700,104 @@ export interface components {
             interviewer_ids?: string[];
             guide?: string | null;
         };
+        JobCategory: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            rank?: number | null;
+            description?: string | null;
+            functions?: string | null;
+            responsibility_level?: string | null;
+            requirements?: string | null;
+            profiles_count?: number | null;
+            /** @enum {string} */
+            status: "active" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        JobCategoryInput: {
+            code?: string;
+            name?: string;
+            rank?: number | null;
+            description?: string | null;
+            functions?: string | null;
+            responsibility_level?: string | null;
+            requirements?: string | null;
+        };
+        JobFamily: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            description?: string | null;
+            profiles_count?: number | null;
+            /** @enum {string} */
+            status: "active" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        JobFamilyInput: {
+            code?: string;
+            name?: string;
+            description?: string | null;
+        };
+        JobLevel: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            rank: number;
+            description?: string | null;
+            profiles_count?: number | null;
+            /** @enum {string} */
+            status: "active" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        JobLevelInput: {
+            code?: string;
+            name?: string;
+            rank?: number;
+            description?: string | null;
+        };
         JobProfile: {
             /** @description Identificador opaco */
             id: string;
             code: string;
             name: string;
-            level?: string | null;
-            category?: string | null;
-            family?: string | null;
-            description?: string | null;
+            /** @description Identificador opaco */
+            job_family_id?: string | null;
+            /** @description Identificador opaco */
+            job_level_id?: string | null;
+            /** @description Identificador opaco */
+            job_category_id?: string | null;
+            mission?: string | null;
+            functions?: string | null;
+            requirements?: string | null;
+            occupation_code?: string | null;
+            risk_job: boolean;
+            /** @enum {string} */
+            trust_classification: "none" | "trust" | "management";
+            category_pending?: boolean | null;
+            positions_count?: number | null;
+            current_version?: number | null;
             /** @enum {string} */
             status: "active" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17460,10 +17806,21 @@ export interface components {
         JobProfileInput: {
             code?: string;
             name?: string;
-            level?: string | null;
-            category?: string | null;
-            family?: string | null;
-            description?: string | null;
+            /** @description Identificador opaco */
+            job_family_id?: string | null;
+            /** @description Identificador opaco */
+            job_level_id?: string | null;
+            /** @description Identificador opaco */
+            job_category_id?: string | null;
+            mission?: string | null;
+            functions?: string | null;
+            requirements?: string | null;
+            occupation_code?: string | null;
+            risk_job?: boolean;
+            /** @enum {string} */
+            trust_classification?: "none" | "trust" | "management";
+            /** @description Motivo del cambio de la descripción (queda en la nueva versión, ORG-5) */
+            change_reason?: string;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): salary_range */
         JobRequisition: {
@@ -19070,7 +19427,6 @@ export interface components {
             holiday_calendar_id?: string | null;
             establishment_code?: string | null;
             risk_site?: boolean;
-            allowed_actions?: string[] | null;
         };
         Skill: {
             /** @description Identificador opaco */
@@ -19615,7 +19971,6 @@ export interface components {
             related_id?: string | null;
             /** Format: date-time */
             completed_at?: string | null;
-            allowed_actions?: string[] | null;
             custom_fields?: {
                 [key: string]: unknown;
             } | null;
@@ -20264,7 +20619,6 @@ export interface components {
             actions?: {
                 [key: string]: unknown;
             }[];
-            allowed_actions?: string[];
             /** Format: date-time */
             last_run_at?: string | null;
         };
@@ -36719,6 +37073,660 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getJobCategories: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postJobCategories: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobCategoryInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getJobCategoriesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchJobCategoriesId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobCategoryInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobCategoriesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobCategoriesIdRestore: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobCategory"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getJobFamilies: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postJobFamilies: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobFamilyInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getJobFamiliesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchJobFamiliesId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobFamilyInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobFamiliesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobFamiliesIdRestore: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobFamily"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getJobLevels: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postJobLevels: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobLevelInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getJobLevelsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchJobLevelsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobLevelInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobLevelsIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postJobLevelsIdRestore: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobLevel"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     getJobProfiles: {
         parameters: {
             query?: {
@@ -36935,6 +37943,31 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getJobProfilesIdVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getJobRequisitions: {
@@ -37511,6 +38544,31 @@ export interface operations {
         };
     };
     deleteLegalEntitiesIdLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getLegalEntitiesIdRegimes: {
         parameters: {
             query?: never;
             header?: never;

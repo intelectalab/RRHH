@@ -113,6 +113,11 @@ final class DomainEventTypes
 
     public const COMPANY_ARCHIVED = 'company.archived.v1';
 
+    // Catálogo de puestos (ORG-5).
+    public const JOB_PROFILE_CREATED = 'job_profile.created.v1';
+
+    public const JOB_PROFILE_UPDATED = 'job_profile.updated.v1';
+
     // Organización (SAS-2): cambios de estado decididos desde la consola.
     public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
 
@@ -371,6 +376,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['org_unit_id', 'effective_on'],
             'description' => 'Unidad archivada: sin posiciones activas ni subunidades (RN-ORG-01)',
+        ],
+        self::JOB_PROFILE_CREATED => [
+            'version' => 1,
+            'required_fields' => ['job_profile_id', 'version'],
+            'description' => 'Puesto de catálogo creado (ORG-5)',
+        ],
+        self::JOB_PROFILE_UPDATED => [
+            'version' => 1,
+            'required_fields' => ['job_profile_id', 'version', 'description_changed'],
+            'description' => 'Puesto de catálogo actualizado; version es la de su descripción vigente (ORG-5)',
         ],
         self::USER_INVITED => [
             'version' => 1,
