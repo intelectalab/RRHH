@@ -3,12 +3,25 @@
 namespace App\Shared\Organization;
 
 /**
- * ORG-2 · ORG-4 · Contrato común para los módulos que asignan personas a la estructura
- * (asignaciones, posiciones, gastos, hojas de tiempo): una sede archivada o un centro de costo
- * cerrado o archivado no admiten nuevas asignaciones. Lo implementa el módulo de Organización.
+ * ORG-1 · ORG-2 · ORG-4 · ORG-5 · Contrato común para los módulos que asignan personas a la estructura
+ * (relaciones laborales, asignaciones, posiciones, gastos, hojas de tiempo): una empresa desactivada,
+ * una sede archivada, un centro de costo cerrado o archivado y un puesto de catálogo archivado no
+ * admiten nuevas asignaciones. Lo implementa el módulo de Organización.
  */
 interface StructureAvailability
 {
+    /** ORG-1: la empresa existe en la organización y está activa (una desactivada no admite nuevas relaciones laborales). */
+    public function legalEntityAcceptsEmployments(string $legalEntityId): bool;
+
+    /** Igual que legalEntityAcceptsEmployments, pero responde 422 explicando el motivo. */
+    public function assertLegalEntityAssignable(string $legalEntityId, string $field = 'legal_entity_id'): void;
+
+    /** ORG-5 · RN-ORG-04: el puesto de catálogo existe y está activo (uno archivado no admite nuevas posiciones). */
+    public function jobProfileAcceptsPositions(string $jobProfileId): bool;
+
+    /** Igual que jobProfileAcceptsPositions, pero responde 422 explicando el motivo. */
+    public function assertJobProfileAssignable(string $jobProfileId, string $field = 'job_profile_id'): void;
+
     /** La sede existe en la organización, está activa y (si se indica) pertenece a esa empresa o es compartida. */
     public function siteAcceptsAssignments(string $siteId, ?string $legalEntityId = null): bool;
 

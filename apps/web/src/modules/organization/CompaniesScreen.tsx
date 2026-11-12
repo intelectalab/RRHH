@@ -11,6 +11,8 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
+import { formatDate } from '@/lib/format'
+import { Timeline } from '@/ui/components/Timeline'
 import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 import { ExportButton } from '@/modules/exports/ExportButton'
 import { DataTable, type BulkAction, type TableColumn, type TableFilter } from '@/ui/components/DataTable'
@@ -151,6 +153,34 @@ export function CompaniesScreen() {
       )}
       {toastNode}
     </>
+  )
+}
+
+type RegimeRow = { labor_regime_code: string; labor_regime_name: string; valid_from: string; valid_to: string | null; current: boolean }
+
+/** ORG-1 · Historia del régimen laboral de la empresa con su vigencia (solo lectura). */
+function RegimeHistory({ companyId }: { companyId: string }) {
+  const { t, locale } = useT()
+  const [rows, setRows] = useState<RegimeRow[] | null>(null)
+
+  useEffect(() => {
+    void api.get<{ data: RegimeRow[] }>(`/legal-entities/${companyId}/regimes`).then((r) => setRows(r.data)).catch(() => setRows([]))
+  }, [companyId])
+
+  if (rows === null || rows.length < 2) return null
+  return (
+    <details className="mb-3">
+      <summary className="small">{t('org.regime_history', { n: rows.length })}</summary>
+      <Timeline
+        label={t('org.regime_history_label')}
+        items={rows.map((r) => ({
+          id: `${r.labor_regime_code}-${r.valid_from}`,
+          tone: r.current ? 'ok' : 'gr',
+          title: r.labor_regime_name,
+          when: r.valid_to ? t('org.regime_range', { from: formatDate(locale, r.valid_from), to: formatDate(locale, r.valid_to) }) : t('org.regime_since', { from: formatDate(locale, r.valid_from) }),
+        }))}
+      />
+    </details>
   )
 }
 
@@ -313,6 +343,7 @@ function CompanyPanel({ company, catalog, onClose, onSaved }: { company: Company
           </select>
         ))}
         {company && <p className="small text-secondary">{t('org.regime_help')}</p>}
+        {company && <RegimeHistory companyId={company.id} />}
 
         <fieldset className="cf-grupo">
           <legend>{t('org.section_profile')}</legend>

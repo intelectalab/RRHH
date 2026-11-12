@@ -2621,17 +2621,19 @@ CREATE TABLE job_families (
   code text NOT NULL,
   name text NOT NULL,
   description text,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_job_families_tenant_id UNIQUE (tenant_id, id)
 );
-COMMENT ON TABLE job_families IS 'Familias de puestos.';
+COMMENT ON TABLE job_families IS 'Familias de puestos (catálogo configurable; se archivan, no se borran).';
 CREATE UNIQUE INDEX uq_job_families_code ON job_families (tenant_id, code) WHERE deleted_at IS NULL;
 ALTER TABLE job_families ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_families FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON job_families USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
-CREATE TRIGGER trg_job_families_touch BEFORE UPDATE ON job_families FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_job_families_touch BEFORE UPDATE ON job_families FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE job_levels (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -2640,17 +2642,19 @@ CREATE TABLE job_levels (
   name text NOT NULL,
   rank smallint NOT NULL,
   description text,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_job_levels_tenant_id UNIQUE (tenant_id, id)
 );
-COMMENT ON TABLE job_levels IS 'Niveles jerárquicos del catálogo de puestos.';
+COMMENT ON TABLE job_levels IS 'Niveles jerárquicos del catálogo de puestos (catálogo configurable; se archivan, no se borran).';
 CREATE UNIQUE INDEX uq_job_levels_code ON job_levels (tenant_id, code) WHERE deleted_at IS NULL;
 ALTER TABLE job_levels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_levels FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON job_levels USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
-CREATE TRIGGER trg_job_levels_touch BEFORE UPDATE ON job_levels FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_job_levels_touch BEFORE UPDATE ON job_levels FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE job_categories (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -2662,6 +2666,7 @@ CREATE TABLE job_categories (
   responsibility_level text,
   requirements text,
   rank smallint,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -2708,6 +2713,31 @@ ALTER TABLE job_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_profiles FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON job_profiles USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_job_profiles_touch BEFORE UPDATE ON job_profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE job_profile_versions (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  job_profile_id uuid NOT NULL,
+  version integer NOT NULL,
+  name text NOT NULL,
+  mission text,
+  functions text,
+  requirements text,
+  change_reason text,
+  changed_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_job_profile_versions_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_job_profile_versions_job_profile_id_version UNIQUE (tenant_id, job_profile_id, version),
+  CONSTRAINT fk_job_profile_versions_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
+  CONSTRAINT fk_job_profile_versions_changed_by_user_id FOREIGN KEY (tenant_id, changed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE job_profile_versions IS 'Versiones inalterables de la descripción de un puesto de catálogo (misión, funciones y requisitos), ORG-5.';
+CREATE INDEX ix_job_profile_versions_changed_by_user_id ON job_profile_versions (tenant_id, changed_by_user_id);
+ALTER TABLE job_profile_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE job_profile_versions FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON job_profile_versions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_job_profile_versions_inmutable BEFORE UPDATE OR DELETE ON job_profile_versions FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_job_profile_versions_no_truncate BEFORE TRUNCATE ON job_profile_versions FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
 
 -- --------------------------------------------------------------------------------------------------
 -- POS · Posiciones y headcount
@@ -18509,7 +18539,7 @@ GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
-REVOKE UPDATE, DELETE ON ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
+REVOKE UPDATE, DELETE ON ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
 -- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
 -- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
 REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;

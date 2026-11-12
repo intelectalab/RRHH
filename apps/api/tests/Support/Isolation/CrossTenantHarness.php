@@ -7,6 +7,8 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
+use App\Modules\Organization\Infrastructure\Models\JobProfile;
+use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -62,6 +64,9 @@ final class CrossTenantHarness
         '/absence-types/{id}/rules' => AbsenceType::class,
         // ORG-4: distribución por centros de costo de una relación laboral de A.
         '/employments/{employment_id}/cost-distributions' => EmploymentCostDistribution::class,
+        // ORG-1 / ORG-5: historia del régimen de una empresa de A y versiones de un puesto de A.
+        '/legal-entities/{id}/regimes' => LegalEntity::class,
+        '/job-profiles/{id}/versions' => JobProfile::class,
     ];
 
     /**

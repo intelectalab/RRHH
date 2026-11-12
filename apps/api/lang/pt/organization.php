@@ -52,4 +52,12 @@ return [
         'total' => 'Os percentuais devem somar 100%.',
         'before_hire' => 'A distribuição não pode começar antes da data de admissão.',
     ],
+    'legal_entity_not_found' => 'A empresa não existe.',
+    'legal_entity_inactive' => 'A empresa está desativada e não aceita novos vínculos de trabalho.',
+    'jobs' => [
+        'duplicate_code' => 'Já existe um registro com esse código neste catálogo.',
+        'not_selectable' => 'Escolha um item ativo do catálogo.',
+        'not_found' => 'O cargo não existe.',
+        'archived_no_positions' => 'O cargo está arquivado e não aceita novas posições.',
+    ],
 ];

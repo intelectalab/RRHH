@@ -5,6 +5,7 @@ namespace App\Modules\Organization\Http\Controllers;
 use App\Modules\Organization\Application\LegalEntityService;
 use App\Modules\Organization\Http\Requests\LegalEntityRequest;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Modules\Organization\Infrastructure\Models\LegalEntityRegime;
 use App\Shared\CustomFields\CustomFieldValues;
 use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
@@ -146,6 +147,23 @@ final class LegalEntityController
     public function removeLogo(Request $request, string $id): JsonResponse
     {
         return $this->respond($this->entities->removeLogo($this->find($request, $id, 'org.legal_entities.update')));
+    }
+
+    /** ORG-1 · Historia del régimen laboral de la empresa con su vigencia (la más reciente primero). */
+    public function regimes(Request $request, string $id): JsonResponse
+    {
+        $entity = $this->find($request, $id, 'org.legal_entities.view');
+        $today = now()->toDateString();
+        $names = DB::table('labor_regimes')->pluck('name', 'code');
+        $rows = $entity->regimes()->orderByDesc('valid_from')->get()->map(fn (LegalEntityRegime $r) => [
+            'labor_regime_code' => $r->labor_regime_code,
+            'labor_regime_name' => $names[$r->labor_regime_code] ?? $r->labor_regime_code,
+            'valid_from' => $r->valid_from->toDateString(),
+            'valid_to' => $r->valid_to?->toDateString(),
+            'current' => $r->valid_from->toDateString() <= $today && ($r->valid_to === null || $r->valid_to->toDateString() >= $today),
+        ]);
+
+        return response()->json(['data' => $rows->values()->all()]);
     }
 
     /**

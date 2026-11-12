@@ -2,6 +2,8 @@
 
 use App\Modules\Organization\Http\Controllers\CostCenterController;
 use App\Modules\Organization\Http\Controllers\CostDistributionController;
+use App\Modules\Organization\Http\Controllers\JobCatalogController;
+use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
 use App\Modules\Organization\Http\Controllers\OrganizationCatalogController;
 use App\Modules\Organization\Http\Controllers\SiteController;
@@ -19,6 +21,25 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/legal-entities/{id}/logo', [LegalEntityController::class, 'logo'])->middleware('permission:org.legal_entities.view');
     Route::post('/legal-entities/{id}/logo', [LegalEntityController::class, 'uploadLogo'])->middleware('permission:org.legal_entities.update');
     Route::delete('/legal-entities/{id}/logo', [LegalEntityController::class, 'removeLogo'])->middleware('permission:org.legal_entities.update');
+    // ORG-1 · Historia del régimen laboral de la empresa con vigencia.
+    Route::get('/legal-entities/{id}/regimes', [LegalEntityController::class, 'regimes'])->middleware('permission:org.legal_entities.view');
+
+    // ORG-5 · Catálogo de puestos y sus catálogos configurables (familias, niveles y categorías).
+    Route::get('/job-profiles', [JobProfileController::class, 'index'])->middleware('permission:org.job_profiles.view');
+    Route::post('/job-profiles', [JobProfileController::class, 'store'])->middleware('permission:org.job_profiles.create');
+    Route::get('/job-profiles/{id}', [JobProfileController::class, 'show'])->middleware('permission:org.job_profiles.view');
+    Route::patch('/job-profiles/{id}', [JobProfileController::class, 'update'])->middleware('permission:org.job_profiles.update');
+    Route::post('/job-profiles/{id}/archive', [JobProfileController::class, 'archive'])->middleware('permission:org.job_profiles.archive');
+    Route::post('/job-profiles/{id}/restore', [JobProfileController::class, 'restore'])->middleware('permission:org.job_profiles.restore');
+    Route::get('/job-profiles/{id}/versions', [JobProfileController::class, 'versions'])->middleware('permission:org.job_profiles.view');
+    foreach (['job-families' => 'family', 'job-levels' => 'level', 'job-categories' => 'category'] as $path => $kind) {
+        Route::get("/{$path}", [JobCatalogController::class, 'index'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.view');
+        Route::post("/{$path}", [JobCatalogController::class, 'store'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.create');
+        Route::get("/{$path}/{id}", [JobCatalogController::class, 'show'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.view');
+        Route::patch("/{$path}/{id}", [JobCatalogController::class, 'update'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.update');
+        Route::post("/{$path}/{id}/archive", [JobCatalogController::class, 'archive'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.archive');
+        Route::post("/{$path}/{id}/restore", [JobCatalogController::class, 'restore'])->defaults('kind', $kind)->middleware('permission:org.job_profiles.restore');
+    }
 
     // ORG-2 · Sedes, sucursales y ubicaciones.
     Route::get('/sites', [SiteController::class, 'index'])->middleware('permission:org.sites.view');

@@ -449,7 +449,18 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/job-profiles` | `org.job_profiles.{view,create}` | 1 |
 | GET, PATCH | `/job-profiles/{id}` | `org.job_profiles.{view,update}` | 1 |
 | POST | `/job-profiles/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
+| GET, POST | `/job-families` | `org.job_profiles.{view,create}` | 1 |
+| GET, PATCH | `/job-families/{id}` | `org.job_profiles.{view,update}` | 1 |
+| POST | `/job-families/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
+| GET, POST | `/job-levels` | `org.job_profiles.{view,create}` | 1 |
+| GET, PATCH | `/job-levels/{id}` | `org.job_profiles.{view,update}` | 1 |
+| POST | `/job-levels/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
+| GET, POST | `/job-categories` | `org.job_profiles.{view,create}` | 1 |
+| GET, PATCH | `/job-categories/{id}` | `org.job_profiles.{view,update}` | 1 |
+| POST | `/job-categories/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
 | GET | `/org-chart` | `org.units.view` | 1 |
+| GET | `/job-profiles/{id}/versions` | `org.job_profiles.view` | 1 |
+| GET | `/legal-entities/{id}/regimes` | `org.legal_entities.view` | 1 |
 | POST | `/cost-centers/{id}/close` | `org.cost_centers.update` | 1 |
 | POST | `/cost-centers/{id}/reopen` | `org.cost_centers.update` | 1 |
 | GET | `/employments/{employment_id}/cost-distributions` | `people.assignments.view` | 1 |

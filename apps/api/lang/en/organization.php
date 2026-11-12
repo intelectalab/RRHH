@@ -52,4 +52,12 @@ return [
         'total' => 'The percentages must add up to 100%.',
         'before_hire' => 'The distribution cannot start before the hire date.',
     ],
+    'legal_entity_not_found' => 'The company does not exist.',
+    'legal_entity_inactive' => 'The company is deactivated and does not accept new employments.',
+    'jobs' => [
+        'duplicate_code' => 'This catalog already has a record with that code.',
+        'not_selectable' => 'Choose an active item from the catalog.',
+        'not_found' => 'The job does not exist.',
+        'archived_no_positions' => 'The job is archived and does not accept new positions.',
+    ],
 ];

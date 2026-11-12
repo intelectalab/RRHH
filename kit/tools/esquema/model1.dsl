@@ -339,16 +339,19 @@
   legal_entity_id ?-> legal_entities ; parent_id ?-> cost_centers ; code ; name ; accounting_code ; opened_on date ; closed_on date
   status enum(active,closed,inactive)=active ; uniq code
   check closed_on IS NULL OR opened_on IS NULL OR closed_on >= opened_on
-@job_families soft | Familias de puestos.
-  code ; name ; description ; uniq code
-@job_levels soft | Niveles jerárquicos del catálogo de puestos.
-  code ; name ; rank smallint! ; description ; uniq code
+@job_families soft lock | Familias de puestos (catálogo configurable; se archivan, no se borran).
+  code ; name ; description ; status enum(active,inactive)=active ; uniq code
+@job_levels soft lock | Niveles jerárquicos del catálogo de puestos (catálogo configurable; se archivan, no se borran).
+  code ; name ; rank smallint! ; description ; status enum(active,inactive)=active ; uniq code
 @job_categories soft lock | Categorías laborales; es el cuadro de categorías y funciones que exige la Ley 30709 (E-05).
-  code ; name ; description ; functions ; responsibility_level ; requirements ; rank smallint ; uniq code
+  code ; name ; description ; functions ; responsibility_level ; requirements ; rank smallint ; status enum(active,inactive)=active ; uniq code
 @job_profiles main soft lock | Puesto de catálogo (C-02), p. ej. «Analista Contable»; no es una plaza.
   code ; name ; job_family_id ?-> job_families ; job_level_id ?-> job_levels ; job_category_id ?-> job_categories
   mission ; functions ; requirements ; occupation_code ; is_risk_job
   trust_classification enum(none,trust,management)=none ; status enum(draft,active,inactive)=active ; uniq code
+@job_profile_versions imm | Versiones inalterables de la descripción de un puesto de catálogo (misión, funciones y requisitos), ORG-5.
+  job_profile_id -> job_profiles ; version integer! ; name text! ; mission ; functions ; requirements ; change_reason
+  changed_by_user_id ?-> users ; uniq job_profile_id, version
 
 #E POS | Posiciones y headcount
 @positions main soft lock | Posición o plaza presupuestada (C-02): una silla concreta. Base del organigrama, vacantes y sucesión.
