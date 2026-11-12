@@ -26,4 +26,6 @@ return [
      */
     'operable_statuses' => ['trial', 'active', 'grace_period'],
     'suspended_statuses' => ['suspended', 'blocked'],
+    // SAS-2: dada de baja; los datos se conservan durante la retención, pero nadie ingresa.
+    'cancelled_statuses' => ['cancelled'],
 ];

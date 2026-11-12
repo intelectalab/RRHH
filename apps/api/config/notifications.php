@@ -24,6 +24,10 @@ return [
         'automation.notice' => ['variables' => ['title', 'message'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'automation.paused' => ['variables' => ['rule'], 'link' => '/configuracion/automatizaciones', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => true],
         'account.security' => ['variables' => ['event'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        'organization.suspended' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        'organization.reactivated' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        'organization.activated' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        'organization.cancelled' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 
     /*

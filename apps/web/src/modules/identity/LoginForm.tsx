@@ -6,7 +6,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { useT } from '@/lib/useT'
 import { DocumentFields, type DocumentType } from './DocumentFields'
-import { authErrorKey } from './errors'
+import { authErrorKey, TENANT_NOTICES } from './errors'
 
 type Mode = 'email' | 'document'
 type MfaStep = 'ok' | 'verify' | 'enroll'
@@ -33,6 +33,12 @@ export function LoginForm() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
+
+  useEffect(() => {
+    // SAS-2: si la organización se suspendió o se dio de baja durante la sesión, se explica aquí.
+    const notice = new URLSearchParams(window.location.search).get('aviso')
+    if (notice && (TENANT_NOTICES as readonly string[]).includes(notice)) setError(t(`auth.${notice}`))
+  }, [t])
 
   useEffect(() => {
     if (wait <= 0) return

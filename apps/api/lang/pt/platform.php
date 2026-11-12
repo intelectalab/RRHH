@@ -13,4 +13,17 @@ return [
         'billing' => 'Financeiro',
         'readonly' => 'Operações (somente leitura)',
     ],
+    'tenants' => [
+        'slug_taken' => 'Esse subdomínio já está em uso ou é reservado.',
+        'reason_required' => 'Informe o motivo: ele fica no histórico e no aviso à organização.',
+        'retention_expired' => 'O período de retenção da organização terminou: ela não pode mais ser reativada.',
+        'unknown_country' => 'O país não existe no catálogo.',
+        'unknown_currency' => 'A moeda não existe no catálogo.',
+        'unknown_timezone' => 'O fuso horário não é válido (por exemplo, America/Lima).',
+        'unknown_regime' => 'O regime trabalhista não corresponde ao país.',
+    ],
+    'modules' => [
+        'core' => 'Os módulos base não podem ser retirados.',
+        'required_by' => 'Outros módulos ativos dependem deste: :modules. Retire-os primeiro.',
+    ],
 ];

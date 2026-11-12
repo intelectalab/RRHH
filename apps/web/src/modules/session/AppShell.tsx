@@ -99,7 +99,9 @@ function Shell({ children }: { children: ReactNode }) {
 
   const active = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href.split('/').slice(0, 2).join('/')))
   const role = session.roles[0]?.name ?? ''
-  const items = MENU.filter((m) => session.modules.includes(m.module) && m.visible(can))
+  // SAS-5: el menú muestra los módulos activos y los retirados que siguen en solo lectura (RN-SAS-06).
+  const visibleModules = [...session.modules, ...(session.modules_read_only ?? [])]
+  const items = MENU.filter((m) => visibleModules.includes(m.module) && m.visible(can))
   const showSettings = session.modules.includes('base') && SETTINGS_PERMS.some((p) => can(p))
 
   const navLink = (href: string, label: string, icon: IconName, count = 0) => (

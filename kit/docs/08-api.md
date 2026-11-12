@@ -278,6 +278,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/platform/auth/mfa/totp/confirm` | `platform` | 0 |
 | POST | `/platform/auth/mfa/verify` | `platform` | 0 |
 | GET | `/platform/audit-events` | `platform.audit.view` | 0 |
+| POST | `/platform/tenants/{id}/activate` | `platform.tenants.reactivate` | 0 |
+| POST | `/platform/tenants/{id}/block` | `platform.tenants.suspend` | 0 |
+| GET | `/platform/tenants/{id}/status-events` | `platform.tenants.view` | 0 |
+| GET | `/platform/tenants/{id}/modules` | `platform.subscriptions.view` | 0 |
+| POST | `/platform/tenants/{id}/modules/{code}/activate` | `platform.subscriptions.update` | 0 |
+| POST | `/platform/tenants/{id}/modules/{code}/deactivate` | `platform.subscriptions.update` | 0 |
 
 **TEN · Organización (tenant)**
 

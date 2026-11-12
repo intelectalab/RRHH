@@ -46,6 +46,22 @@ return [
             'in_app' => ['subject' => 'Aviso de segurança da conta', 'body' => '{event}'],
             'email' => ['subject' => 'Aviso de segurança da conta', 'body' => "Olá {name},\n\n{event}\n\nSe não foi você, avise o RH imediatamente."],
         ],
+        'organization.suspended' => [
+            'in_app' => ['subject' => 'Sua organização foi suspensa', 'body' => 'Sua organização foi suspensa: {reason}. Os dados são mantidos; fale com o suporte para regularizar.'],
+            'email' => ['subject' => 'Sua organização foi suspensa', 'body' => "Olá {name}:\n\nA organização {organization} foi suspensa. Motivo: {reason}.\n\nEnquanto estiver suspensa, seus usuários não podem entrar. Os dados são mantidos. Fale com o suporte do GestiaHR para regularizá-la."],
+        ],
+        'organization.reactivated' => [
+            'in_app' => ['subject' => 'Sua organização voltou a ficar ativa', 'body' => 'A organização está ativa novamente. Todos os dados continuam disponíveis.'],
+            'email' => ['subject' => 'Sua organização voltou a ficar ativa', 'body' => "Olá {name}:\n\nA organização {organization} está ativa novamente e seus usuários já podem entrar. Todos os dados continuam disponíveis.\n\n{link}"],
+        ],
+        'organization.activated' => [
+            'in_app' => ['subject' => 'Sua organização já está ativa', 'body' => 'O teste terminou e a organização ficou ativa.'],
+            'email' => ['subject' => 'Sua organização já está ativa', 'body' => "Olá {name}:\n\nA organização {organization} passou de teste para ativa. Tudo o que foi registrado durante o teste é mantido.\n\n{link}"],
+        ],
+        'organization.cancelled' => [
+            'in_app' => ['subject' => 'Sua organização foi cancelada', 'body' => 'A organização foi cancelada: {reason}. Os dados são mantidos até {retention_until}.'],
+            'email' => ['subject' => 'Sua organização foi cancelada', 'body' => "Olá {name}:\n\nA organização {organization} foi cancelada. Motivo: {reason}.\n\nOs dados são mantidos até {retention_until}. Até essa data você pode pedir ao suporte uma exportação completa ou a reativação."],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'férias',

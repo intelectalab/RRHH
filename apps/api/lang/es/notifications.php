@@ -46,6 +46,22 @@ return [
             'in_app' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => '{event}'],
             'email' => ['subject' => 'Aviso de seguridad de tu cuenta', 'body' => "Hola {name}:\n\n{event}\n\nSi no fuiste tú, avisa a RRHH de inmediato."],
         ],
+        'organization.suspended' => [
+            'in_app' => ['subject' => 'Tu organización fue suspendida', 'body' => 'Tu organización fue suspendida: {reason}. Los datos se conservan; comunícate con soporte para regularizar.'],
+            'email' => ['subject' => 'Tu organización fue suspendida', 'body' => "Hola {name}:\n\nLa organización {organization} fue suspendida. Motivo: {reason}.\n\nMientras siga suspendida, sus usuarios no pueden ingresar. Los datos se conservan. Comunícate con soporte de GestiaHR para regularizarla."],
+        ],
+        'organization.reactivated' => [
+            'in_app' => ['subject' => 'Tu organización volvió a estar activa', 'body' => 'La organización está activa otra vez. Todos sus datos siguen disponibles.'],
+            'email' => ['subject' => 'Tu organización volvió a estar activa', 'body' => "Hola {name}:\n\nLa organización {organization} está activa otra vez y sus usuarios ya pueden ingresar. Todos los datos siguen disponibles.\n\n{link}"],
+        ],
+        'organization.activated' => [
+            'in_app' => ['subject' => 'Tu organización ya está activa', 'body' => 'La prueba terminó y la organización quedó activa.'],
+            'email' => ['subject' => 'Tu organización ya está activa', 'body' => "Hola {name}:\n\nLa organización {organization} pasó de prueba a activa. Todo lo que registraron durante la prueba se conserva.\n\n{link}"],
+        ],
+        'organization.cancelled' => [
+            'in_app' => ['subject' => 'Tu organización fue dada de baja', 'body' => 'La organización fue dada de baja: {reason}. Los datos se conservan hasta el {retention_until}.'],
+            'email' => ['subject' => 'Tu organización fue dada de baja', 'body' => "Hola {name}:\n\nLa organización {organization} fue dada de baja. Motivo: {reason}.\n\nSus datos se conservan hasta el {retention_until}. Hasta esa fecha puedes pedir a soporte una exportación completa o la reactivación."],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacaciones',

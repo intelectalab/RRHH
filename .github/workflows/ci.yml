@@ -54,6 +54,10 @@ jobs:
         working-directory: apps/web
         run: npm run typecheck
 
+      - name: Build web (detecta CSS o rutas que solo fallan al compilar)
+        working-directory: apps/web
+        run: npm run build
+
   contracts-sync:
     name: OpenAPI Contracts & Types Sync
     runs-on: ubuntu-latest

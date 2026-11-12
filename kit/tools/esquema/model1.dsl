@@ -8,7 +8,7 @@
 @tenants P main soft lock | Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id.
   slug text! ; name ; status enum(trial,active,suspended,blocked,cancelled,grace_period,deleted)=trial ; country_code ~> countries.code
   default_currency char(3)! ; default_locale text=es ; timezone text=America/Lima ; is_demo ; is_partner_managed
-  trial_ends_at ; suspended_at ; suspension_reason ; storage_region ; uniq slug
+  trial_ends_at ; suspended_at ; suspension_reason ; storage_region ; contact_name ; contact_email ; contact_phone ; cancelled_at ; retention_until date ; uniq slug
 @tenant_domains P | Dominios y subdominios por los que se resuelve la organización (incluye dominio propio de marca blanca).
   tenant_id => tenants ; domain text! ; kind enum(subdomain,custom)=subdomain ; verified_at ; is_primary ; uniq domain
 @tenant_status_events P imm | Historial inalterable de cambios de estado de la organización (pruebas, suspensiones, bloqueos, reactivaciones).
@@ -47,7 +47,7 @@
   saas_invoice_id => saas_invoices ; description text! ; quantity numeric(14,2)=1 ; unit_price money! ; amount money! ; currency cur
 @tenant_modules main | Módulos activos por organización (resultado de plan, complemento o activación manual). Condiciona menú, API y permisos.
   module_code ~> modules.code ; status enum(active,inactive,trial)=active ; source enum(plan,addon,manual,trial)=plan
-  activated_at ; deactivated_at ; uniq module_code
+  activated_at ; deactivated_at ; read_only_until ts ; uniq module_code
 @tenant_limits | Límites efectivos de la organización (plan + complementos + ajustes).
   limit_code text! ; limit_value numeric(14,2) ; is_unlimited ; source enum(plan,addon,override)=plan ; uniq limit_code
 @tenant_usage_counters | Consumo medido por organización y periodo (colaboradores, almacenamiento, llamadas de API) para comparar con límites.

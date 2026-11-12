@@ -9403,6 +9403,40 @@ export interface paths {
         patch: operations["patchPlatformTenantsId"];
         trace?: never;
     };
+    "/platform/tenants/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: convertir una organización en prueba en activa (ME-40 convertir) */
+        post: operations["postPlatformTenantsIdActivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/tenants/{id}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: bloquear una organización por falta de pago (con motivo; sus usuarios no ingresan) */
+        post: operations["postPlatformTenantsIdBlock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/tenants/{id}/cancel": {
         parameters: {
             query?: never;
@@ -9423,6 +9457,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/tenants/{id}/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consola SaaS: módulos comerciales de la organización (activos, en solo lectura o no contratados) y sus dependencias */
+        get: operations["getPlatformTenantsIdModules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/tenants/{id}/modules/{code}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: activar un módulo en la organización sin migrar datos (activa también sus dependencias) */
+        post: operations["postPlatformTenantsIdModulesCodeActivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/tenants/{id}/modules/{code}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Consola SaaS: retirar un módulo; sus datos se conservan en solo lectura durante la transición (RN-SAS-06) */
+        post: operations["postPlatformTenantsIdModulesCodeDeactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/tenants/{id}/reactivate": {
         parameters: {
             query?: never;
@@ -9437,6 +9522,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPlatformTenantsIdReactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/tenants/{id}/status-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consola SaaS: historial inalterable de estados de la organización */
+        get: operations["getPlatformTenantsIdStatusEvents"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -19230,12 +19332,21 @@ export interface components {
             name: string;
             slug: string;
             country: string;
+            currency: string;
+            timezone: string;
+            locale: string;
             /** @enum {string} */
-            status: "trial" | "active" | "suspended" | "cancelled";
-            /** @description Identificador opaco */
-            plan_id: string;
+            status: "trial" | "active" | "grace_period" | "suspended" | "blocked" | "cancelled" | "deleted";
             /** Format: date */
             trial_ends_on?: string | null;
+            contact_name?: string | null;
+            contact_email?: string | null;
+            contact_phone?: string | null;
+            suspension_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date */
+            retention_until?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -19245,10 +19356,32 @@ export interface components {
             name?: string;
             slug?: string;
             country?: string;
-            /** @description Identificador opaco */
-            plan_id?: string;
+            currency?: string;
+            timezone?: string;
+            locale?: string;
             /** Format: date */
             trial_ends_on?: string | null;
+            contact_name?: string | null;
+            contact_email?: string | null;
+            contact_phone?: string | null;
+            suspension_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date */
+            retention_until?: string | null;
+            /** @description Alta (SAS-2): nombre del primer administrador, que recibe la invitación */
+            admin_name?: string;
+            /**
+             * Format: email
+             * @description Alta (SAS-2): correo del primer administrador
+             */
+            admin_email?: string;
+            /** @description Alta (SAS-2): razón social de la primera empresa */
+            legal_name?: string;
+            /** @description Alta (SAS-2): número fiscal de la primera empresa (RUC en Perú) */
+            tax_id?: string;
+            /** @description Alta (SAS-2): módulos que se activan además de los base */
+            module_codes?: string[];
         };
         Ticket: {
             /** @description Identificador opaco */
@@ -43359,6 +43492,78 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postPlatformTenantsIdActivate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformTenantsIdBlock: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPlatformTenantsIdCancel: {
         parameters: {
             query?: never;
@@ -43395,6 +43600,105 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getPlatformTenantsIdModules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPlatformTenantsIdModulesCodeActivate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformTenantsIdModulesCodeDeactivate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPlatformTenantsIdReactivate: {
         parameters: {
             query?: never;
@@ -43429,6 +43733,31 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPlatformTenantsIdStatusEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPlatformTenantsIdSuspend: {

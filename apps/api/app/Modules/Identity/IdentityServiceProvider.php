@@ -4,6 +4,7 @@ namespace App\Modules\Identity;
 
 use App\Modules\Identity\Application\SessionManager;
 use App\Modules\Identity\Infrastructure\Exports\UsersExportSource;
+use App\Modules\Identity\Infrastructure\Provisioning\InviteFirstAdmin;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
@@ -13,6 +14,7 @@ use App\Modules\Identity\Infrastructure\Trash\RoleTrashSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
+use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\TenancyScope;
 use App\Shared\Trash\TrashRegistry;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -73,6 +75,7 @@ final class IdentityServiceProvider extends ServiceProvider
         $search->register($this->app->make(RoleSearchSource::class));
 
         $this->app->make(ExportRegistry::class)->register($this->app->make(UsersExportSource::class));
+        $this->app->make(ProvisioningRegistry::class)->register($this->app->make(InviteFirstAdmin::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }
 }
