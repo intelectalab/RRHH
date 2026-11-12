@@ -2516,8 +2516,10 @@ CREATE TABLE sites (
   country_code text,
   latitude numeric(9,6),
   longitude numeric(9,6),
+  geofence_radius_m integer,
   timezone text,
   establishment_code text,
+  holiday_calendar_id uuid,
   is_risk_site boolean NOT NULL DEFAULT false,
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -2526,11 +2528,14 @@ CREATE TABLE sites (
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_sites_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_sites_1 CHECK (establishment_code IS NULL OR country_code IS DISTINCT FROM 'PE' OR establishment_code ~ '^[0-9]{4}$'),
+  CONSTRAINT ck_sites_2 CHECK ((latitude IS NULL) = (longitude IS NULL) AND (latitude IS NULL OR latitude BETWEEN -90 AND 90) AND (longitude IS NULL OR longitude BETWEEN -180 AND 180)),
+  CONSTRAINT ck_sites_3 CHECK (geofence_radius_m IS NULL OR (geofence_radius_m > 0 AND latitude IS NOT NULL)),
   CONSTRAINT fk_sites_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id)
 );
 COMMENT ON TABLE sites IS 'Sede, sucursal o ubicación física; base de feriados, geocercas e indicadores por centro de trabajo.';
 CREATE UNIQUE INDEX uq_sites_code ON sites (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_sites_legal_entity_id ON sites (tenant_id, legal_entity_id);
+CREATE INDEX ix_sites_holiday_calendar_id ON sites (tenant_id, holiday_calendar_id);
 ALTER TABLE sites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sites FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON sites USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -2578,16 +2583,19 @@ CREATE TABLE cost_centers (
   code text NOT NULL,
   name text NOT NULL,
   accounting_code text,
-  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
+  opened_on date,
+  closed_on date,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','closed','inactive')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_cost_centers_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_cost_centers_1 CHECK (closed_on IS NULL OR opened_on IS NULL OR closed_on >= opened_on),
   CONSTRAINT fk_cost_centers_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
   CONSTRAINT fk_cost_centers_parent_id FOREIGN KEY (tenant_id, parent_id) REFERENCES cost_centers (tenant_id, id)
 );
-COMMENT ON TABLE cost_centers IS 'Centro de costo para imputar planilla, gastos y horas.';
+COMMENT ON TABLE cost_centers IS 'Centro de costo para imputar planilla, gastos y horas. opened_on / closed_on delimitan su vigencia (closed_on = último día que admite imputaciones); cerrado no admite nuevas asignaciones.';
 CREATE UNIQUE INDEX uq_cost_centers_code ON cost_centers (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_cost_centers_legal_entity_id ON cost_centers (tenant_id, legal_entity_id);
 CREATE INDEX ix_cost_centers_parent_id ON cost_centers (tenant_id, parent_id);
@@ -3243,6 +3251,48 @@ ALTER TABLE employment_assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE employment_assignments FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON employment_assignments USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_employment_assignments_touch BEFORE UPDATE ON employment_assignments FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE employment_cost_distributions (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  employment_id uuid NOT NULL,
+  reason text,
+  valid_from date NOT NULL,
+  valid_to date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_employment_cost_distributions_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_employment_cost_distributions_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ex_employment_cost_distributions_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_employment_cost_distributions_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id)
+);
+COMMENT ON TABLE employment_cost_distributions IS 'Distribución con vigencia de una relación laboral entre varios centros de costo (ORG-4 · RN-ORG-06); sus líneas suman siempre 100 %.';
+ALTER TABLE employment_cost_distributions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE employment_cost_distributions FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON employment_cost_distributions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_employment_cost_distributions_touch BEFORE UPDATE ON employment_cost_distributions FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE employment_cost_distribution_lines (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  employment_cost_distribution_id uuid NOT NULL,
+  cost_center_id uuid NOT NULL,
+  percentage numeric(5,2) NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_employment_cost_distribution_lines_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_employment_cost_distribution_lines_employment_cost__a151fa87 UNIQUE (tenant_id, employment_cost_distribution_id, cost_center_id),
+  CONSTRAINT ck_employment_cost_distribution_lines_1 CHECK (percentage > 0 AND percentage <= 100),
+  CONSTRAINT fk_employment_cost_distribution_lines_employment_cost__cd0fb5f0 FOREIGN KEY (tenant_id, employment_cost_distribution_id) REFERENCES employment_cost_distributions (tenant_id, id),
+  CONSTRAINT fk_employment_cost_distribution_lines_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id)
+);
+COMMENT ON TABLE employment_cost_distribution_lines IS 'Línea de una distribución: centro de costo y porcentaje (dos decimales).';
+CREATE INDEX ix_employment_cost_distribution_lines_cost_center_id ON employment_cost_distribution_lines (tenant_id, cost_center_id);
+ALTER TABLE employment_cost_distribution_lines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE employment_cost_distribution_lines FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON employment_cost_distribution_lines USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_employment_cost_distribution_lines_touch BEFORE UPDATE ON employment_cost_distribution_lines FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE employment_compensations (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -13866,6 +13916,7 @@ ALTER TABLE hr_tasks ADD CONSTRAINT fk_hr_tasks_related_employment_id FOREIGN KE
 ALTER TABLE tenant_settings ADD CONSTRAINT fk_tenant_settings_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id);
 ALTER TABLE tenant_settings ADD CONSTRAINT fk_tenant_settings_site_id FOREIGN KEY (tenant_id, site_id) REFERENCES sites (tenant_id, id);
 ALTER TABLE tenant_settings ADD CONSTRAINT fk_tenant_settings_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id);
+ALTER TABLE sites ADD CONSTRAINT fk_sites_holiday_calendar_id FOREIGN KEY (tenant_id, holiday_calendar_id) REFERENCES holiday_calendars (tenant_id, id);
 ALTER TABLE org_units ADD CONSTRAINT fk_org_units_head_position_id FOREIGN KEY (tenant_id, head_position_id) REFERENCES positions (tenant_id, id);
 ALTER TABLE org_units ADD CONSTRAINT fk_org_units_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN KEY (tenant_id, headcount_plan_line_id) REFERENCES headcount_plan_lines (tenant_id, id);
@@ -18469,4 +18520,42 @@ BEGIN
   END LOOP;
 END
 $$;
+
+-- ORG-4 · RN-ORG-06 · Las líneas de una distribución por centros de costo suman exactamente 100 %.
+-- Se comprueba al confirmar la transacción (diferida) para poder insertar las líneas una a una.
+CREATE FUNCTION check_cost_distribution_total() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  dist uuid := COALESCE(NEW.employment_cost_distribution_id, OLD.employment_cost_distribution_id);
+  total numeric;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distributions WHERE id = dist) THEN
+    RETURN NULL;
+  END IF;
+  SELECT COALESCE(sum(percentage), 0) INTO total FROM employment_cost_distribution_lines WHERE employment_cost_distribution_id = dist;
+  IF total <> 100 THEN
+    RAISE EXCEPTION 'La distribución por centros de costo % suma % %%; debe sumar 100 %%.', dist, total USING ERRCODE = 'AY006';
+  END IF;
+  RETURN NULL;
+END
+$$;
+CREATE CONSTRAINT TRIGGER trg_cost_distribution_lines_total AFTER INSERT OR UPDATE OR DELETE ON employment_cost_distribution_lines
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_total();
+
+CREATE FUNCTION check_cost_distribution_has_lines() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distributions WHERE id = NEW.id) THEN
+    RETURN NULL;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distribution_lines WHERE employment_cost_distribution_id = NEW.id) THEN
+    RAISE EXCEPTION 'La distribución por centros de costo % no tiene líneas; debe sumar 100 %%.', NEW.id USING ERRCODE = 'AY006';
+  END IF;
+  RETURN NULL;
+END
+$$;
+CREATE CONSTRAINT TRIGGER trg_cost_distributions_lines AFTER INSERT ON employment_cost_distributions
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_has_lines();
 

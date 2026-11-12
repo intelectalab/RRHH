@@ -13,6 +13,7 @@ import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
 import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 import { ExportButton } from '@/modules/exports/ExportButton'
+import { orgTabs } from './orgTabs'
 
 type Company = Schema<'LegalEntity'> & { trade_name?: string | null; allowed_actions?: string[]; version?: number }
 type Catalog = {
@@ -67,7 +68,7 @@ export function CompaniesScreen() {
       <PageHeader
         title={t('org.title')}
         sub={rows ? t('org.sub', { active, total: rows.length }) : undefined}
-        tabs={[{ href: '/organizacion/empresas', label: t('org.tab_companies'), active: true }]}
+        tabs={orgTabs(t, can, 'companies')}
         actions={(
           <>
             <ExportButton resource="legal_entities" onError={(m) => toast(m, 'error')} />

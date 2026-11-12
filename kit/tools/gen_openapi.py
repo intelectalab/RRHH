@@ -85,9 +85,9 @@ RES = [
     ("CFG", 0, "settings.saved_views", "/saved-views", "SavedView", "resource:s name:s filters:j columns:a sort:s shared:b", "LCRUD", ""),
     # ---------- Fase 1 ----------
     ("ORG", 1, "org.legal_entities", "/legal-entities", "LegalEntity", "name:s trade_name?:s tax_id:s country:s currency:s timezone:s locale?:s payroll_regime:s tax_regime?:s economic_activity_code?:s address?:s district_code?:s legal_representative_name?:s has_logo?:b status:e(active|archived) custom_fields?:j", "LCRU", "archive restore"),
-    ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id:id name:s address:s timezone:s risk_site:b status:e(active|archived)", "LCRU", "archive restore"),
+    ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id?:id code:s name:s kind:e(headquarters|branch|plant|store|site|remote) address?:s district_code?:s country?:s latitude?:n longitude?:n geofence_radius_m?:i timezone?:s effective_timezone?:s holiday_calendar_id?:id establishment_code?:s risk_site:b status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.units", "/org-units", "OrgUnit", "name:s type:s parent_id?:id manager_position_id?:id valid_from:d valid_to?:d status:e(active|archived)", "LCRU", "archive restore move"),
-    ("ORG", 1, "org.cost_centers", "/cost-centers", "CostCenter", "code:s name:s legal_entity_id:id status:e(active|archived)", "LCRU", "archive restore"),
+    ("ORG", 1, "org.cost_centers", "/cost-centers", "CostCenter", "code:s name:s legal_entity_id?:id parent_id?:id path?:a accounting_code?:s opened_on?:d closed_on?:d status:e(active|closed|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-profiles", "JobProfile", "code:s name:s level?:s category?:s family?:s description?:s status:e(active|archived)", "LCRU", "archive restore"),
     ("POS", 1, "org.positions", "/positions", "Position", "job_profile_id:id org_unit_id:id site_id:id cost_center_id?:id reports_to_position_id?:id status:e(requested|approved|open|filled|frozen|closed) budget!?:m valid_from:d", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
@@ -384,6 +384,10 @@ EXTRA = [
     ("WHA", 9, "put", "/channels/whatsapp/settings", "integrations.whatsapp.update", "Guardar configuración del canal WhatsApp", False),
     ("INT", 9, "get", "/integrations/health", "integrations.connections.view", "Salud de todos los conectores", False),
     ("INT", 9, "post", "/integrations/biometric/{device_id}/punches", "integrations.biometric.push", "Entrada de marcaciones desde un reloj biométrico", False),
+    ("ORG", 1, "post", "/cost-centers/{id}/close", "org.cost_centers.update", "Cerrar un centro de costo desde una fecha (closed_on, último día que admite imputaciones); cerrado no admite nuevas asignaciones ni distribuciones", False),
+    ("ORG", 1, "post", "/cost-centers/{id}/reopen", "org.cost_centers.update", "Reabrir un centro de costo cerrado", False),
+    ("ORG", 1, "get", "/employments/{employment_id}/cost-distributions", "people.assignments.view", "Historia de la distribución de una relación laboral entre centros de costo (de la más reciente a la más antigua); con as_of devuelve solo la vigente a esa fecha", False),
+    ("ORG", 1, "post", "/employments/{employment_id}/cost-distributions", "people.assignments.create", "Registrar una distribución entre centros de costo desde valid_from (cierra la vigente el día anterior); las líneas suman 100 % (RN-ORG-06)", False),
     ("AUS", 2, "get", "/absence-types/{id}/rules", "time.absence_types.view", "Historia de las reglas de un tipo de ausencia (vigencias de la más reciente a la más antigua)", False),
     ("WLB", 9, "get", "/branding", "settings.branding.view", "Marca de la organización", False),
     ("WLB", 9, "put", "/branding", "settings.branding.update", "Guardar marca de la organización", False),
@@ -401,13 +405,16 @@ TYPES = {
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
-STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
-CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
+STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("post", "/cost-centers/{id}/close"), ("post", "/cost-centers/{id}/reopen")}
+CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/employments/{employment_id}/cost-distributions"): [
+        _q("as_of", "Fecha (AAAA-MM-DD): solo la distribución vigente a ese día", False, "date"),
+    ],
     ("get", "/calendar"): [
         _q("from", "Primer día (AAAA-MM-DD)", True, "date"),
         _q("to", "Último día, inclusive; hasta 100 días después de from", True, "date"),
@@ -419,7 +426,7 @@ QUERY = {
 INPUT_EXTRA = {
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "version", "has_logo", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "version", "path", "effective_timezone", "has_logo", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):

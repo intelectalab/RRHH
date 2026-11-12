@@ -406,3 +406,41 @@ BEGIN
   END LOOP;
 END
 $$;
+
+-- ORG-4 · RN-ORG-06 · Las líneas de una distribución por centros de costo suman exactamente 100 %.
+-- Se comprueba al confirmar la transacción (diferida) para poder insertar las líneas una a una.
+CREATE FUNCTION check_cost_distribution_total() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  dist uuid := COALESCE(NEW.employment_cost_distribution_id, OLD.employment_cost_distribution_id);
+  total numeric;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distributions WHERE id = dist) THEN
+    RETURN NULL;
+  END IF;
+  SELECT COALESCE(sum(percentage), 0) INTO total FROM employment_cost_distribution_lines WHERE employment_cost_distribution_id = dist;
+  IF total <> 100 THEN
+    RAISE EXCEPTION 'La distribución por centros de costo % suma % %%; debe sumar 100 %%.', dist, total USING ERRCODE = 'AY006';
+  END IF;
+  RETURN NULL;
+END
+$$;
+CREATE CONSTRAINT TRIGGER trg_cost_distribution_lines_total AFTER INSERT OR UPDATE OR DELETE ON employment_cost_distribution_lines
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_total();
+
+CREATE FUNCTION check_cost_distribution_has_lines() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distributions WHERE id = NEW.id) THEN
+    RETURN NULL;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM employment_cost_distribution_lines WHERE employment_cost_distribution_id = NEW.id) THEN
+    RAISE EXCEPTION 'La distribución por centros de costo % no tiene líneas; debe sumar 100 %%.', NEW.id USING ERRCODE = 'AY006';
+  END IF;
+  RETURN NULL;
+END
+$$;
+CREATE CONSTRAINT TRIGGER trg_cost_distributions_lines AFTER INSERT ON employment_cost_distributions
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_has_lines();

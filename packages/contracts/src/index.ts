@@ -3507,6 +3507,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cost-centers/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cerrar un centro de costo desde una fecha (closed_on, último día que admite imputaciones); cerrado no admite nuevas asignaciones ni distribuciones */
+        post: operations["postCostCentersIdClose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cost-centers/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reabrir un centro de costo cerrado */
+        post: operations["postCostCentersIdReopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/cost-centers/{id}/restore": {
         parameters: {
             query?: never;
@@ -4383,6 +4417,24 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postEmploymentsEmploymentIdCompensationsIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/cost-distributions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia de la distribución de una relación laboral entre centros de costo (de la más reciente a la más antigua); con as_of devuelve solo la vigente a esa fecha */
+        get: operations["getEmploymentsEmploymentIdCostDistributions"];
+        put?: never;
+        /** Registrar una distribución entre centros de costo desde valid_from (cierra la vigente el día anterior); las líneas suman 100 % (RN-ORG-06) */
+        post: operations["postEmploymentsEmploymentIdCostDistributions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -16038,9 +16090,19 @@ export interface components {
             code: string;
             name: string;
             /** @description Identificador opaco */
-            legal_entity_id: string;
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            parent_id?: string | null;
+            path?: string[] | null;
+            accounting_code?: string | null;
+            /** Format: date */
+            opened_on?: string | null;
+            /** Format: date */
+            closed_on?: string | null;
             /** @enum {string} */
-            status: "active" | "archived";
+            status: "active" | "closed" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -16050,7 +16112,15 @@ export interface components {
             code?: string;
             name?: string;
             /** @description Identificador opaco */
-            legal_entity_id?: string;
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            parent_id?: string | null;
+            accounting_code?: string | null;
+            /** Format: date */
+            opened_on?: string | null;
+            /** Format: date */
+            closed_on?: string | null;
+            allowed_actions?: string[] | null;
         };
         CountryPack: {
             /** @description Identificador opaco */
@@ -18655,13 +18725,27 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            legal_entity_id: string;
+            legal_entity_id?: string | null;
+            code: string;
             name: string;
-            address: string;
-            timezone: string;
+            /** @enum {string} */
+            kind: "headquarters" | "branch" | "plant" | "store" | "site" | "remote";
+            address?: string | null;
+            district_code?: string | null;
+            country?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            geofence_radius_m?: number | null;
+            timezone?: string | null;
+            effective_timezone?: string | null;
+            /** @description Identificador opaco */
+            holiday_calendar_id?: string | null;
+            establishment_code?: string | null;
             risk_site: boolean;
             /** @enum {string} */
             status: "active" | "archived";
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -18669,11 +18753,23 @@ export interface components {
         };
         SiteInput: {
             /** @description Identificador opaco */
-            legal_entity_id?: string;
+            legal_entity_id?: string | null;
+            code?: string;
             name?: string;
-            address?: string;
-            timezone?: string;
+            /** @enum {string} */
+            kind?: "headquarters" | "branch" | "plant" | "store" | "site" | "remote";
+            address?: string | null;
+            district_code?: string | null;
+            country?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            geofence_radius_m?: number | null;
+            timezone?: string | null;
+            /** @description Identificador opaco */
+            holiday_calendar_id?: string | null;
+            establishment_code?: string | null;
             risk_site?: boolean;
+            allowed_actions?: string[] | null;
         };
         Skill: {
             /** @description Identificador opaco */
@@ -28784,6 +28880,78 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postCostCentersIdClose: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postCostCentersIdReopen: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postCostCentersIdRestore: {
         parameters: {
             query?: never;
@@ -31174,6 +31342,70 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getEmploymentsEmploymentIdCostDistributions: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD): solo la distribución vigente a ese día */
+                as_of?: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postEmploymentsEmploymentIdCostDistributions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getEmploymentsEmploymentIdDependents: {
