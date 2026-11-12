@@ -190,6 +190,7 @@ PARAMS = [
  ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'time', None, [O], 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', None),
  ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'time', None, [O], 'Hora local en que se entregan los avisos que esperaron por el silencio.', None),
  ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'list', [], [O], 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', ['approval.pending', 'approval.reminder', 'approval.escalated', 'approval.approved', 'approval.rejected', 'task.assigned', 'task.overdue']),
+ ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'select', 'sms', [O], 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', ['sms', 'whatsapp', 'none']),
  ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'integer', 180, [O], 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', None),
  ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'boolean', True, [O, E], 'Genera el código con el correlativo de la empresa.', None),
  ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'boolean', True, [O, E], 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', None),

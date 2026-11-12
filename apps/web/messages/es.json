@@ -644,7 +644,9 @@
     "organization_suspended": "Organización suspendida",
     "organization_reactivated": "Organización reactivada",
     "organization_activated": "Organización activada",
-    "organization_cancelled": "Organización dada de baja"
+    "organization_cancelled": "Organización dada de baja",
+    "notifications_email_bounced": "Correo rebotado",
+    "notifications_notice": "Aviso por mensaje a quien no tiene correo"
   },
   "nchannel": {
     "in_app": "En la aplicación",
@@ -738,7 +740,31 @@
     "request_approval": "Pedir aprobación",
     "approval_requested": "Plantilla enviada a aprobación de WhatsApp.",
     "approval_edit_note": "Si cambias el texto, la plantilla vuelve a borrador y debe aprobarse otra vez. Mientras tanto los mensajes salen por SMS.",
-    "d_fallback": "Enviado por SMS: la plantilla de {from} no estaba aprobada"
+    "d_fallback": "Enviado por SMS: la plantilla de {from} no estaba aprobada",
+    "view_sender": "Remitente",
+    "d_all_statuses": "Todos los estados",
+    "d_reactivate": "Reactivar dirección",
+    "d_reactivate_help": "Úsalo cuando la persona corrigió su correo o confirmó que ya funciona.",
+    "d_reactivated": "La dirección vuelve a usarse",
+    "s_title": "Remitente de los correos",
+    "s_help": "Los avisos salen con el remitente de la plataforma o con uno propio de tu organización. El propio solo se usa cuando el proveedor de correo lo verifica.",
+    "s_in_use": "Los correos salen hoy como",
+    "s_status_not_required": "Sin verificar",
+    "s_status_pending": "Verificación pendiente",
+    "s_status_verified": "Verificado",
+    "s_status_failed": "Rechazado",
+    "s_failed_note": "El proveedor no aceptó el remitente: revisa los registros SPF y DKIM de tu dominio y vuelve a verificar. Mientras tanto se usa el de la plataforma.",
+    "s_pending_note": "Mientras se verifica, los correos salen con el remitente de la plataforma.",
+    "s_mode": "Remitente",
+    "s_mode_platform": "El de la plataforma",
+    "s_mode_own": "Uno propio de la organización",
+    "s_address": "Correo del remitente",
+    "s_address_help": "Por ejemplo, rrhh@tuempresa.pe. Tu dominio debe tener los registros que indique el proveedor.",
+    "s_verify": "Volver a verificar",
+    "s_verify_requested": "Se pidió la verificación al proveedor",
+    "s_saved": "Remitente guardado",
+    "s_webhook": "Dirección para los avisos de rebote",
+    "s_webhook_help": "Configúrala en el proveedor de correo: así un correo que rebota deja de usarse y RRHH recibe un aviso."
   },
   "cfg": {
     "title": "Configuración",
@@ -1179,7 +1205,8 @@
     "company_created": "Empresa creada",
     "company_archived": "Empresa archivada",
     "user_activated": "Cuenta activada",
-    "user_suspended": "Cuenta bloqueada"
+    "user_suspended": "Cuenta bloqueada",
+    "user_identity_email_bounced": "Un correo rebotó"
   },
   "ctype": {
     "title": "Tipos de contrato",

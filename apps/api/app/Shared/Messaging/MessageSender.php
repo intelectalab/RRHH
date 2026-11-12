@@ -17,7 +17,8 @@ interface MessageSender
      * @param  string  $to  número en formato E.164 (+51…)
      * @param  array<string, string|int|null>  $variables  pueden incluir secretos (códigos): viajan cifradas
      * @param  string  $idempotencyKey  la misma clave devuelve la misma entrega sin enviar otra vez
+     * @param  \DateTimeInterface|null  $notBefore  no enviar antes (horario de silencio, RN-NOT-03); null = enseguida
      * @return string id de la entrega (notification_deliveries)
      */
-    public function send(string $channel, string $to, string $templateCode, array $variables, string $locale, string $purpose, string $idempotencyKey): string;
+    public function send(string $channel, string $to, string $templateCode, array $variables, string $locale, string $purpose, string $idempotencyKey, ?\DateTimeInterface $notBefore = null): string;
 }

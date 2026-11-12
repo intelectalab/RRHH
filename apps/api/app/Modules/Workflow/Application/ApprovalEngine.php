@@ -12,6 +12,7 @@ use App\Shared\Exceptions\AyniException;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
+use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -30,6 +31,7 @@ final class ApprovalEngine
         private readonly ApprovalRequestStateMachine $machine,
         private readonly OutboxWriter $outbox,
         private readonly AuditLogger $audit,
+        private readonly ApprovalOutcomeRegistry $outcomes,
     ) {}
 
     /**
@@ -162,6 +164,7 @@ final class ApprovalEngine
             $this->machine->getNextState((string) $request->status, 'cancel');
             $this->cancelPending($request, 'cancelled');
             $request->forceFill(['status' => 'cancelled', 'finished_at' => now()])->save();
+            $this->outcomes->for((string) $request->subject_type)?->cancelled((string) $request->subject_id, $request->id, $reason);
             $this->event(DomainEventTypes::APPROVAL_CANCELLED, $request, ['reason' => $reason]);
             $this->audit->record('approval_request.cancelled', 'approval_request', $request->id, null, ['status' => 'cancelled'], $reason);
 
@@ -346,7 +349,14 @@ final class ApprovalEngine
     private function finish(ApprovalRequest $request, string $status, ?string $comment): void
     {
         $request->forceFill(['status' => $status, 'finished_at' => now()])->save();
-        // El módulo dueño recibe el resultado una sola vez (outbox + registro de eventos procesados).
+        // WFL-4: el módulo dueño aplica el resultado en la misma transacción (actualiza de inmediato su registro).
+        $handler = $this->outcomes->for((string) $request->subject_type);
+        if ($status === 'approved') {
+            $handler?->approved((string) $request->subject_id, $request->id);
+        } else {
+            $handler?->rejected((string) $request->subject_id, $request->id, $comment);
+        }
+        // Además recibe el resultado una sola vez por el outbox (otros consumidores, registro de eventos procesados).
         $this->event($status === 'approved' ? DomainEventTypes::APPROVAL_APPROVED : DomainEventTypes::APPROVAL_REJECTED, $request, ['comment' => $comment]);
     }
 

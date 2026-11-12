@@ -2,6 +2,7 @@
 
 namespace App\Shared\Integrations\Fake;
 
+use App\Shared\Integrations\Email\SignedFeedback;
 use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Integrations\Ports\EmailPort;
 use Throwable;
@@ -9,11 +10,14 @@ use Throwable;
 final class FakeEmailAdapter implements EmailPort
 {
     /**
-     * @var array<int, array{to: string, subject: string, body: string, attachments: array<string, mixed>, id: string}>
+     * @var array<int, array{to: string, subject: string, body: string, attachments: array<string, mixed>, id: string, from: string|null}>
      */
     private array $sent = [];
 
     private ?Throwable $nextException = null;
+
+    /** @var array<string, string> resultado de verificación por remitente (por defecto verified) */
+    private array $senderStatus = [];
 
     public function __construct(
         private readonly ?IntegrationCallRecorder $recorder = null,
@@ -34,7 +38,7 @@ final class FakeEmailAdapter implements EmailPort
         $this->nextException = $e;
     }
 
-    public function send(string $to, string $subject, string $body, array $attachments = []): string
+    public function send(string $to, string $subject, string $body, array $attachments = [], ?string $from = null): string
     {
         $start = hrtime(true);
         $messageId = 'email_'.str()->uuid();
@@ -55,6 +59,7 @@ final class FakeEmailAdapter implements EmailPort
             'subject' => $subject,
             'body' => $body,
             'attachments' => $attachments,
+            'from' => $from,
         ];
 
         $duration = (hrtime(true) - $start) / 1e6;
@@ -63,8 +68,26 @@ final class FakeEmailAdapter implements EmailPort
         return $messageId;
     }
 
+    public function verifySender(string $address): string
+    {
+        $this->recorder?->record('fake_email', 'verify_sender', 0.0, 'success', null, []);
+
+        return $this->senderStatus[mb_strtolower($address)] ?? 'verified';
+    }
+
+    /** Pruebas: resultado de verificación para un remitente (verified, pending o failed). */
+    public function setSenderStatus(string $address, string $status): void
+    {
+        $this->senderStatus[mb_strtolower($address)] = $status;
+    }
+
+    public function parseFeedback(string $payload, array $headers): array
+    {
+        return SignedFeedback::parse($payload, $headers);
+    }
+
     /**
-     * @return array<int, array{to: string, subject: string, body: string, attachments: array<string, mixed>, id: string}>
+     * @return array<int, array{to: string, subject: string, body: string, attachments: array<string, mixed>, id: string, from: string|null}>
      */
     public function getSent(): array
     {
@@ -75,5 +98,6 @@ final class FakeEmailAdapter implements EmailPort
     {
         $this->sent = [];
         $this->nextException = null;
+        $this->senderStatus = [];
     }
 }

@@ -28,6 +28,8 @@ return [
         'organization.reactivated' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'organization.activated' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'organization.cancelled' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // NOT-3: la dirección de correo de una persona rebotó; RRHH la corrige o la reactiva.
+        'notifications.email_bounced' => ['variables' => ['user', 'reason'], 'link' => '/configuracion/mensajes?vista=entregas&estado=bounced', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
     ],
 
     /*
@@ -39,6 +41,8 @@ return [
     'messages' => [
         'identity.login_code' => ['variables' => ['code', 'minutes']],
         'identity.activation_code' => ['variables' => ['code', 'hours']],
+        // RN-NOT-07: aviso corto a quien no tiene correo (título y enlace, sin datos sensibles).
+        'notifications.notice' => ['variables' => ['title']],
     ],
 
     // Variables comunes disponibles en todas las plantillas.

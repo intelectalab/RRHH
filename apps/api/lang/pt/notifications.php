@@ -62,6 +62,10 @@ return [
             'in_app' => ['subject' => 'Sua organização foi cancelada', 'body' => 'A organização foi cancelada: {reason}. Os dados são mantidos até {retention_until}.'],
             'email' => ['subject' => 'Sua organização foi cancelada', 'body' => "Olá {name}:\n\nA organização {organization} foi cancelada. Motivo: {reason}.\n\nOs dados são mantidos até {retention_until}. Até essa data você pode pedir ao suporte uma exportação completa ou a reativação."],
         ],
+        'notifications.email_bounced' => [
+            'in_app' => ['subject' => 'Um e-mail voltou', 'body' => 'O e-mail de {user} voltou e não é mais usado. Corrija na conta da pessoa ou reative pelo registro de envios.'],
+            'email' => ['subject' => 'Um e-mail da sua organização voltou', 'body' => "Olá {name},\n\nO e-mail de {user} voltou em {organization} e deixou de ser usado; os avisos chegam no aplicativo ou por mensagem no celular.\n\nCorrija aqui: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'férias',
@@ -88,7 +92,20 @@ return [
             'sms' => 'GestiaHR: seu código para ativar a conta é {code}. Vence em {hours} horas. Entre com seu documento e este código.',
             'whatsapp' => 'GestiaHR: seu código para ativar a conta é {code}. Vence em {hours} horas. Entre com seu documento e este código.',
         ],
+        'notifications.notice' => [
+            'sms' => '{organization}: {title}. Entre para ver: {link}',
+            'whatsapp' => '{organization}: {title}. Entre para ver: {link}',
+        ],
     ],
     'approval_only_whatsapp' => 'Somente os modelos de WhatsApp precisam da aprovação do provedor.',
     'approval_reset' => 'O modelo mudou e precisa ser aprovado de novo antes de ser usado no WhatsApp.',
+    'sender' => [
+        'invalid_address' => 'Informe um e-mail válido para o remetente.',
+        'nothing_to_verify' => 'A organização usa o remetente da plataforma: não há nada para verificar.',
+        'already_verified' => 'O remetente já está verificado.',
+    ],
+    'bounce' => [
+        'nothing_to_clear' => 'Este envio não tem um endereço devolvido para reativar.',
+        'invalid_signature' => 'A assinatura do provedor não é válida.',
+    ],
 ];

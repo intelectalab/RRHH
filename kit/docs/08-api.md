@@ -345,6 +345,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | PUT | `/notification-preferences` | sesión | 0 |
 | GET | `/notification-deliveries` | `notifications.deliveries.view` | 0 |
 | POST | `/notification-templates/{id}/request-approval` | `notifications.templates.update` | 0 |
+| POST | `/webhooks/email` | público | 0 |
+| GET | `/message-channels/email` | `notifications.channels.update` | 0 |
+| PUT | `/message-channels/email` | `notifications.channels.update` | 0 |
+| POST | `/message-channels/email/verify` | `notifications.channels.update` | 0 |
+| POST | `/notification-deliveries/{id}/clear-bounce` | `notifications.channels.update` | 0 |
 
 **CFG · Configuración y campos personalizados**
 

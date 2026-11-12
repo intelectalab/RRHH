@@ -47,6 +47,8 @@ final class CrossTenantHarness
         'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
+        // NOT-3: reactivar la dirección que rebotó en una entrega de A.
+        '/notification-deliveries/{id}/clear-bounce' => NotificationDelivery::class,
         // WFL-5 · Las reglas y su centro de ejecuciones usan el contrato Workflow / WorkflowRun.
         'Workflow' => AutomationRule::class,
         'WorkflowRun' => AutomationRun::class,

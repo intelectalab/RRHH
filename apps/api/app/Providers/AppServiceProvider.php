@@ -21,6 +21,7 @@ use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
 use App\Shared\Trash\TrashRegistry;
+use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Support\Facades\Event;
@@ -51,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TrashRegistry::class);
         $this->app->singleton(CalendarRegistry::class);
         $this->app->singleton(ProvisioningRegistry::class);
+        $this->app->singleton(ApprovalOutcomeRegistry::class);
 
         $this->app->singleton(IntegrationCallRecorder::class);
         $this->app->singleton(IntegrationManager::class);
