@@ -118,6 +118,21 @@ final class DomainEventTypes
 
     public const JOB_PROFILE_UPDATED = 'job_profile.updated.v1';
 
+    // Posiciones (POS-1 · POS-2 · ME-03).
+    public const POSITION_APPROVED = 'position.approved.v1';
+
+    public const POSITION_OPENED = 'position.opened.v1';
+
+    public const POSITION_FILLED = 'position.filled.v1';
+
+    public const POSITION_VACATED = 'position.vacated.v1';
+
+    public const POSITION_FROZEN = 'position.frozen.v1';
+
+    public const POSITION_UNFROZEN = 'position.unfrozen.v1';
+
+    public const POSITION_CLOSED = 'position.closed.v1';
+
     // Organización (SAS-2): cambios de estado decididos desde la consola.
     public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
 
@@ -385,6 +400,41 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['org_unit_id', 'effective_on'],
             'description' => 'Unidad archivada: sin posiciones activas ni subunidades (RN-ORG-01)',
+        ],
+        self::POSITION_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'effective_on'],
+            'description' => 'Posición aprobada (ME-03)',
+        ],
+        self::POSITION_OPENED => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'effective_on'],
+            'description' => 'Reclutamiento abierto sobre la posición',
+        ],
+        self::POSITION_FILLED => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'occupied_seats', 'effective_on'],
+            'description' => 'La posición quedó ocupada según sus asignaciones vigentes (POS-2)',
+        ],
+        self::POSITION_VACATED => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'occupied_seats', 'effective_on'],
+            'description' => 'La posición quedó vacante: cese, traslado o reclutamiento cancelado (RN-POS-04)',
+        ],
+        self::POSITION_FROZEN => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'reason', 'effective_on'],
+            'description' => 'Posición congelada: no admite vacantes ni ocupantes (RN-POS-03)',
+        ],
+        self::POSITION_UNFROZEN => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'effective_on'],
+            'description' => 'Posición descongelada: vuelve a estar vacante',
+        ],
+        self::POSITION_CLOSED => [
+            'version' => 1,
+            'required_fields' => ['position_id', 'reason', 'effective_on'],
+            'description' => 'Posición rechazada o cerrada; libera presupuesto (RN-POS-06)',
         ],
         self::JOB_PROFILE_CREATED => [
             'version' => 1,

@@ -125,6 +125,8 @@ const VIG_WITHOUT_EXCLUSION = [
     'tenant_settings', 'time_policies', 'user_roles', 'vacation_policies',
     // CFG-10: una sola fila por (master_catalog_id, code) por restricción única; no puede haber solape.
     'master_catalog_items',
+    // POS-1: valid_from / valid_to es la vigencia de la plaza misma (una fila por posición), no una historia por relación.
+    'positions',
 ];
 
 test('toda tabla con vigencia tiene restricción de exclusión o está justificada', function (): void {

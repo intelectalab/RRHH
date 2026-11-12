@@ -11,6 +11,7 @@ use App\Modules\Organization\Infrastructure\Models\JobProfile;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
+use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -73,6 +74,13 @@ final class CrossTenantHarness
         // ORG-1 / ORG-5: historia del régimen de una empresa de A y versiones de un puesto de A.
         '/legal-entities/{id}/regimes' => LegalEntity::class,
         '/job-profiles/{id}/versions' => JobProfile::class,
+        // POS-1 / POS-2: acciones e historias de una posición de A.
+        '/positions/{id}/reject' => Position::class,
+        '/positions/{id}/open-recruitment' => Position::class,
+        '/positions/{id}/cancel-recruitment' => Position::class,
+        '/positions/{id}/occupants' => Position::class,
+        '/positions/{id}/status-events' => Position::class,
+        '/positions/{id}/reporting-line' => Position::class,
     ];
 
     /**

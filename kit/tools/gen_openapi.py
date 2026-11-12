@@ -93,7 +93,7 @@ RES = [
     ("ORG", 1, "org.job_profiles", "/job-families", "JobFamily", "code:s name:s description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-levels", "JobLevel", "code:s name:s rank:i description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-categories", "JobCategory", "code:s name:s rank?:i description?:s functions?:s responsibility_level?:s requirements?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
-    ("POS", 1, "org.positions", "/positions", "Position", "job_profile_id:id org_unit_id:id site_id:id cost_center_id?:id reports_to_position_id?:id status:e(requested|approved|open|filled|frozen|closed) budget!?:m valid_from:d", "LCRU", "approve freeze unfreeze close"),
+    ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
     ("COL", 1, "people.people", "/people", "Person", "first_name:s last_name:s document_type:s document_number:s birth_date?:d nationality?:s email?:s phone?:s address?:j", "LCRU", "merge"),
     ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id legal_entity_id:id code:s hire_date:d termination_date?:d status:e(pre_hire|active|suspended|terminated) worker_type:s payroll_regime:s position_id?:id manager_employment_id?:id base_salary!?:m", "LCRU", "activate suspend terminate cancel-termination"),
@@ -413,6 +413,13 @@ EXTRA = [
     ("ORG", 1, "post", "/employments/{employment_id}/cost-distributions", "people.assignments.create", "Registrar una distribución entre centros de costo desde valid_from (cierra la vigente el día anterior); las líneas suman 100 % (RN-ORG-06)", False),
     ("ORG", 1, "get", "/org-units/{id}/history", "org.units.view", "Historia de la estructura de una unidad (superior, nombre, nivel, responsable y centro de costo por vigencia, incluidos cambios programados)", False),
     ("ORG", 1, "get", "/org-units/{id}/impact", "org.units.view", "Impacto de mover o archivar una unidad: subunidades, posiciones activas y personas de la rama", False),
+    ("POS", 1, "post", "/positions/{id}/reject", "org.positions.approve", "Rechazar una posición propuesta con motivo; pasa a cerrada (ME-03)", False),
+    ("POS", 1, "post", "/positions/{id}/open-recruitment", "org.positions.update", "Abrir reclutamiento sobre una posición aprobada o vacante; no procede si está congelada o cerrada (RN-POS-03)", False),
+    ("POS", 1, "post", "/positions/{id}/cancel-recruitment", "org.positions.update", "Cancelar el reclutamiento sin contratación; la posición vuelve a vacante", False),
+    ("POS", 1, "get", "/positions/{id}/occupants", "org.positions.view", "Historia de ocupantes de la posición (asignaciones con vigencia), del más reciente al más antiguo; con as_of solo los vigentes a ese día", False),
+    ("POS", 1, "get", "/positions/{id}/status-events", "org.positions.view", "Historial inalterable de estados de la posición con acción, motivo, autor y fecha efectiva (POS-2)", False),
+    ("POS", 1, "get", "/positions/{id}/reporting-line", "org.positions.view", "Línea de reporte derivada de la posición jefe (o del responsable de la unidad), de la más cercana a la más alta, con su ocupante", False),
+    ("POS", 1, "get", "/position-options", "org.positions.view", "Opciones para el formulario de posiciones: puestos, empresas, unidades, sedes, centros de costo y posiciones jefe activos", False),
     ("ORG", 1, "get", "/org-unit-options", "org.units.view", "Opciones para el formulario de unidades: niveles, posiciones que pueden ser responsables y centros de costo activos", False),
     ("ORG", 1, "get", "/org-unit-types", "org.units.view", "Niveles de unidad con los nombres de la organización (gerencia, área, departamento…), en orden", False),
     ("ORG", 1, "post", "/org-unit-types", "org.units.update", "Agregar un nivel de unidad propio", False),
@@ -438,13 +445,17 @@ STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("po
                  ("post", "/platform/tenants/{id}/modules/{code}/activate"), ("post", "/platform/tenants/{id}/modules/{code}/deactivate"),
                  ("post", "/cost-centers/{id}/close"), ("post", "/cost-centers/{id}/reopen"),
                  ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce"),
-                 ("post", "/platform/subscriptions/{id}/convert"), ("post", "/platform/subscriptions/{id}/cancel")}
+                 ("post", "/platform/subscriptions/{id}/convert"), ("post", "/platform/subscriptions/{id}/cancel"),
+                 ("post", "/positions/{id}/reject"), ("post", "/positions/{id}/open-recruitment"), ("post", "/positions/{id}/cancel-recruitment")}
 CREATED = {("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/positions/{id}/occupants"): [
+        _q("as_of", "Fecha (AAAA-MM-DD): solo los ocupantes vigentes a ese día", False, "date"),
+    ],
     ("get", "/employments/{employment_id}/cost-distributions"): [
         _q("as_of", "Fecha (AAAA-MM-DD): solo la distribución vigente a ese día", False, "date"),
     ],
@@ -468,7 +479,7 @@ INPUT_EXTRA = {
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):

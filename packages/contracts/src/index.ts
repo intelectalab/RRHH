@@ -10548,6 +10548,23 @@ export interface paths {
         patch: operations["patchPlatformWebSettings"];
         trace?: never;
     };
+    "/position-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opciones para el formulario de posiciones: puestos, empresas, unidades, sedes, centros de costo y posiciones jefe activos */
+        get: operations["getPositionOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/positions": {
         parameters: {
             query?: never;
@@ -10604,6 +10621,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/positions/{id}/cancel-recruitment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancelar el reclutamiento sin contratación; la posición vuelve a vacante */
+        post: operations["postPositionsIdCancelRecruitment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/positions/{id}/close": {
         parameters: {
             query?: never;
@@ -10638,6 +10672,91 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPositionsIdFreeze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/{id}/occupants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia de ocupantes de la posición (asignaciones con vigencia), del más reciente al más antiguo; con as_of solo los vigentes a ese día */
+        get: operations["getPositionsIdOccupants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/{id}/open-recruitment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Abrir reclutamiento sobre una posición aprobada o vacante; no procede si está congelada o cerrada (RN-POS-03) */
+        post: operations["postPositionsIdOpenRecruitment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rechazar una posición propuesta con motivo; pasa a cerrada (ME-03) */
+        post: operations["postPositionsIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/{id}/reporting-line": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Línea de reporte derivada de la posición jefe (o del responsable de la unidad), de la más cercana a la más alta, con su ocupante */
+        get: operations["getPositionsIdReportingLine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/{id}/status-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial inalterable de estados de la posición con acción, motivo, autor y fecha efectiva (POS-2) */
+        get: operations["getPositionsIdStatusEvents"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -18516,7 +18635,6 @@ export interface components {
             head_person_name?: string | null;
             /** @description Identificador opaco */
             cost_center_id?: string | null;
-            cost_center_name?: string | null;
             depth?: number | null;
             children_count?: number | null;
             /** Format: date */
@@ -18884,40 +19002,81 @@ export interface components {
         Position: {
             /** @description Identificador opaco */
             id: string;
+            code: string;
+            title: string;
             /** @description Identificador opaco */
             job_profile_id: string;
+            job_profile_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id: string;
+            legal_entity_name?: string | null;
             /** @description Identificador opaco */
             org_unit_id: string;
+            org_unit_name?: string | null;
             /** @description Identificador opaco */
-            site_id: string;
+            site_id?: string | null;
+            site_name?: string | null;
             /** @description Identificador opaco */
             cost_center_id?: string | null;
+            cost_center_name?: string | null;
             /** @description Identificador opaco */
             reports_to_position_id?: string | null;
-            /** @enum {string} */
-            status: "requested" | "approved" | "open" | "filled" | "frozen" | "closed";
-            budget?: components["schemas"]["Money"];
+            reports_to_title?: string | null;
+            /** @description Identificador opaco */
+            effective_reports_to_position_id?: string | null;
+            /** @description Identificador opaco */
+            salary_band_id?: string | null;
+            is_critical: boolean;
+            fte: number;
+            is_shared: boolean;
+            seats: number;
+            occupied_seats?: number | null;
+            occupants?: {
+                [key: string]: unknown;
+            }[] | null;
+            heads_units?: {
+                [key: string]: unknown;
+            }[] | null;
             /** Format: date */
             valid_from: string;
+            /** Format: date */
+            valid_to?: string | null;
+            /** @enum {string} */
+            status: "proposed" | "approved" | "open" | "recruiting" | "filled" | "frozen" | "closed";
+            budget?: components["schemas"]["Money"];
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
         PositionInput: {
+            code?: string;
+            title?: string;
             /** @description Identificador opaco */
             job_profile_id?: string;
             /** @description Identificador opaco */
+            legal_entity_id?: string;
+            /** @description Identificador opaco */
             org_unit_id?: string;
             /** @description Identificador opaco */
-            site_id?: string;
+            site_id?: string | null;
             /** @description Identificador opaco */
             cost_center_id?: string | null;
             /** @description Identificador opaco */
             reports_to_position_id?: string | null;
-            budget?: components["schemas"]["Money"];
+            /** @description Identificador opaco */
+            salary_band_id?: string | null;
+            is_critical?: boolean;
+            fte?: number;
+            is_shared?: boolean;
+            seats?: number;
             /** Format: date */
             valid_from?: string;
+            /** Format: date */
+            valid_to?: string | null;
+            budget?: components["schemas"]["Money"];
         };
         PpeDelivery: {
             /** @description Identificador opaco */
@@ -47011,6 +47170,28 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getPositionOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getPositions: {
         parameters: {
             query?: {
@@ -47193,6 +47374,42 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postPositionsIdCancelRecruitment: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPositionsIdClose: {
         parameters: {
             query?: never;
@@ -47263,6 +47480,157 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPositionsIdOccupants: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD): solo los ocupantes vigentes a ese día */
+                as_of?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPositionsIdOpenRecruitment: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPositionsIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPositionsIdReportingLine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPositionsIdStatusEvents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPositionsIdUnfreeze: {

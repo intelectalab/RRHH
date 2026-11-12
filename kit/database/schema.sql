@@ -2816,9 +2816,14 @@ CREATE TABLE positions (
   legal_entity_id uuid NOT NULL,
   reports_to_position_id uuid,
   cost_center_id uuid,
+  salary_band_id uuid,
   status text NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed','approved','open','filled','frozen','closed','recruiting')),
   is_critical boolean NOT NULL DEFAULT false,
   fte numeric(4,2) NOT NULL DEFAULT 1,
+  is_shared boolean NOT NULL DEFAULT false,
+  seats smallint NOT NULL DEFAULT 1,
+  valid_from date NOT NULL DEFAULT current_date,
+  valid_to date,
   budgeted_from date,
   budgeted_to date,
   budgeted_cost numeric(14,2),  -- SENSIBLE
@@ -2829,6 +2834,9 @@ CREATE TABLE positions (
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_positions_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_positions_1 CHECK (seats >= 1 AND (is_shared OR seats = 1)),
+  CONSTRAINT ck_positions_2 CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ck_positions_3 CHECK (reports_to_position_id IS NULL OR reports_to_position_id <> id),
   CONSTRAINT fk_positions_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
   CONSTRAINT fk_positions_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id),
   CONSTRAINT fk_positions_site_id FOREIGN KEY (tenant_id, site_id) REFERENCES sites (tenant_id, id),
@@ -2836,7 +2844,7 @@ CREATE TABLE positions (
   CONSTRAINT fk_positions_reports_to_position_id FOREIGN KEY (tenant_id, reports_to_position_id) REFERENCES positions (tenant_id, id),
   CONSTRAINT fk_positions_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id)
 );
-COMMENT ON TABLE positions IS 'Posición o plaza presupuestada (C-02): una silla concreta. Base del organigrama, vacantes y sucesión.';
+COMMENT ON TABLE positions IS 'Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza.';
 CREATE UNIQUE INDEX uq_positions_code ON positions (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_positions_job_profile_id ON positions (tenant_id, job_profile_id);
 CREATE INDEX ix_positions_org_unit_id ON positions (tenant_id, org_unit_id);
@@ -2844,6 +2852,7 @@ CREATE INDEX ix_positions_site_id ON positions (tenant_id, site_id);
 CREATE INDEX ix_positions_legal_entity_id ON positions (tenant_id, legal_entity_id);
 CREATE INDEX ix_positions_reports_to_position_id ON positions (tenant_id, reports_to_position_id);
 CREATE INDEX ix_positions_cost_center_id ON positions (tenant_id, cost_center_id);
+CREATE INDEX ix_positions_salary_band_id ON positions (tenant_id, salary_band_id);
 CREATE INDEX ix_positions_headcount_plan_line_id ON positions (tenant_id, headcount_plan_line_id);
 ALTER TABLE positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE positions FORCE ROW LEVEL SECURITY;
@@ -2854,6 +2863,7 @@ CREATE TABLE position_status_events (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   position_id uuid NOT NULL,
+  action text,
   from_status text,
   to_status text NOT NULL,
   reason text,
@@ -2864,7 +2874,7 @@ CREATE TABLE position_status_events (
   CONSTRAINT fk_position_status_events_position_id FOREIGN KEY (tenant_id, position_id) REFERENCES positions (tenant_id, id),
   CONSTRAINT fk_position_status_events_changed_by_user_id FOREIGN KEY (tenant_id, changed_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE position_status_events IS 'Historial inalterable de estados de una posición (aprobada, congelada, eliminada...).';
+COMMENT ON TABLE position_status_events IS 'Historial inalterable de estados de una posición (aprobada, congelada, cerrada...) con la acción, el motivo y quién la hizo (POS-2).';
 CREATE INDEX ix_position_status_events_position_id ON position_status_events (tenant_id, position_id);
 CREATE INDEX ix_position_status_events_changed_by_user_id ON position_status_events (tenant_id, changed_by_user_id);
 ALTER TABLE position_status_events ENABLE ROW LEVEL SECURITY;
@@ -3332,7 +3342,6 @@ CREATE TABLE employment_assignments (
   CONSTRAINT uq_employment_assignments_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_employment_assignments_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
   CONSTRAINT ex_employment_assignments_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
-  CONSTRAINT ex_employment_assignments_r1 EXCLUDE USING gist (tenant_id WITH =, position_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (position_id IS NOT NULL) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_employment_assignments_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_employment_assignments_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
   CONSTRAINT fk_employment_assignments_position_id FOREIGN KEY (tenant_id, position_id) REFERENCES positions (tenant_id, id),
@@ -3342,7 +3351,7 @@ CREATE TABLE employment_assignments (
   CONSTRAINT fk_employment_assignments_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id),
   CONSTRAINT fk_employment_assignments_personnel_action_id FOREIGN KEY (tenant_id, personnel_action_id) REFERENCES personnel_actions (tenant_id, id)
 );
-COMMENT ON TABLE employment_assignments IS 'Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11).';
+COMMENT ON TABLE employment_assignments IS 'Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).';
 CREATE INDEX ix_employment_assignments_job_profile_id ON employment_assignments (tenant_id, job_profile_id);
 CREATE INDEX ix_employment_assignments_position_id ON employment_assignments (tenant_id, position_id);
 CREATE INDEX ix_employment_assignments_org_unit_id ON employment_assignments (tenant_id, org_unit_id);
@@ -14024,6 +14033,7 @@ ALTER TABLE org_units ADD CONSTRAINT fk_org_units_head_position_id FOREIGN KEY (
 ALTER TABLE org_units ADD CONSTRAINT fk_org_units_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
 ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_head_position_id FOREIGN KEY (tenant_id, head_position_id) REFERENCES positions (tenant_id, id);
 ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
+ALTER TABLE positions ADD CONSTRAINT fk_positions_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN KEY (tenant_id, headcount_plan_line_id) REFERENCES headcount_plan_lines (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_replaces_employment_id FOREIGN KEY (tenant_id, replaces_employment_id) REFERENCES employments (tenant_id, id);
 ALTER TABLE person_sensitive_data ADD CONSTRAINT fk_person_sensitive_data_consent_id FOREIGN KEY (tenant_id, consent_id) REFERENCES consents (tenant_id, id);
@@ -18664,4 +18674,29 @@ END
 $$;
 CREATE CONSTRAINT TRIGGER trg_cost_distributions_lines AFTER INSERT ON employment_cost_distributions
   DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION check_cost_distribution_has_lines();
+
+-- POS-1 · RN-POS-02 · Una posición admite tantos ocupantes a la vez como cupos tenga (seats; 1 si no es
+-- compartida). Se cuentan las asignaciones de la posición que se traslapan con la nueva (SQLSTATE AY007).
+CREATE FUNCTION check_position_seats() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  cupos integer;
+  usados integer;
+BEGIN
+  IF NEW.position_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+  SELECT seats INTO cupos FROM positions WHERE tenant_id = NEW.tenant_id AND id = NEW.position_id;
+  SELECT count(*) INTO usados FROM employment_assignments a
+   WHERE a.tenant_id = NEW.tenant_id AND a.position_id = NEW.position_id AND a.id <> NEW.id
+     AND daterange(a.valid_from, a.valid_to, '[]') && daterange(NEW.valid_from, NEW.valid_to, '[]');
+  IF usados >= COALESCE(cupos, 1) THEN
+    RAISE EXCEPTION 'La posición % ya tiene % ocupante(s) en esas fechas y solo admite %.', NEW.position_id, usados, COALESCE(cupos, 1) USING ERRCODE = 'AY007';
+  END IF;
+  RETURN NEW;
+END
+$$;
+CREATE TRIGGER trg_employment_assignments_position_seats BEFORE INSERT OR UPDATE OF position_id, valid_from, valid_to ON employment_assignments
+  FOR EACH ROW EXECUTE FUNCTION check_position_seats();
 
