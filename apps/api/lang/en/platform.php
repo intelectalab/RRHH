@@ -53,4 +53,13 @@ return [
         'tenant_not_in_trial' => 'Only an organization on trial can start with a trial subscription.',
         'grace_ended' => 'The free trial grace period ended without a plan being purchased.',
     ],
+    'usage' => [
+        'invalid_range' => 'The date range is not valid (two years at most).',
+        'snapshot_done' => 'Usage measured for :count organizations.',
+    ],
+    'flags' => [
+        'duplicate_code' => 'A flag with that code already exists.',
+        'invalid_rule' => 'Invalid rule: the plan or country must exist, the beta group is a simple code and the percentage goes from 0 to 100, without repeats.',
+        'archived' => 'The flag is archived: restore it to enable it for an organization.',
+    ],
 ];

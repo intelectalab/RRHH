@@ -7,6 +7,7 @@ use App\Modules\Identity\Application\RoleScopes;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserSession;
+use App\Shared\Features\FeatureFlags;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class MeController
 {
-    public function __invoke(Request $request, PermissionResolver $resolver, ModuleGate $modules, MfaService $mfa): JsonResponse
+    public function __invoke(Request $request, PermissionResolver $resolver, ModuleGate $modules, MfaService $mfa, FeatureFlags $features): JsonResponse
     {
         /** @var User $user */
         $user = $request->user();
@@ -60,6 +61,8 @@ final class MeController
             'modules' => $pending ? [] : $modules->activeModules(),
             // SAS-5 · RN-SAS-06: módulos retirados que siguen visibles en solo lectura durante la transición.
             'modules_read_only' => $pending ? [] : $modules->readOnlyModules(),
+            // SAS-7: banderas activas para la organización, con la misma evaluación que la API.
+            'features' => $pending ? [] : $features->enabledCodes(),
         ]]);
     }
 }

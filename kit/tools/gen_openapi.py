@@ -57,11 +57,11 @@ EPICS = {
 # (épica, fase, permiso-base, ruta, Esquema, campos, operaciones LCRUD, acciones)
 RES = [
     # ---------- Fase 0 ----------
-    ("SAS", 0, "platform.tenants", "/platform/tenants", "Tenant", "name:s slug:s country:s currency:s timezone:s locale:s status:e(trial|active|grace_period|suspended|blocked|cancelled|deleted) trial_ends_on?:d contact_name?:s contact_email?:s contact_phone?:s suspension_reason?:s cancelled_at?:dt retention_until?:d", "LCRU", "suspend reactivate cancel"),
+    ("SAS", 0, "platform.tenants", "/platform/tenants", "Tenant", "name:s slug:s country:s currency:s timezone:s locale:s status:e(trial|active|grace_period|suspended|blocked|cancelled|deleted) trial_ends_on?:d contact_name?:s contact_email?:s contact_phone?:s suspension_reason?:s cancelled_at?:dt retention_until?:d beta_groups:a", "LCRU", "suspend reactivate cancel"),
     ("SAS", 0, "platform.plans", "/platform/plans", "Plan", "code:s name:s description?:s billing_cycle:e(monthly|annual) price?:m trial_days?:i is_public:b status:e(draft|active|inactive) revision:i superseded_by_plan_id?:id duplicated_from_plan_id?:id modules:a limits:ao features:a subscribers:i allowed_actions:a", "LCRU", "duplicate activate retire"),
     ("SAS", 0, "platform.plans", "/platform/addons", "Addon", "code:s name:s kind:e(module|limit|feature|service) web_product_code?:s modules:a limit_code?:s limit_increment?:s price?:m billing_cycle:e(monthly|annual|one_time) status:e(active|inactive) allowed_actions:a", "LRU", "activate retire"),
     ("SAS", 0, "platform.subscriptions", "/platform/subscriptions", "Subscription", "tenant_id:id tenant?:j plan_id:id plan?:j status:e(trialing|active|past_due|suspended|cancelled|expired) billing_cycle:e(monthly|annual) price?:m starts_on:d ends_on?:d trial_ends_on?:d expired_at?:dt cancelled_at?:dt cancel_reason?:s addons:ao allowed_actions:a", "LCRU", "change-plan suspend reactivate"),
-    ("SAS", 0, "platform.feature_flags", "/platform/feature-flags", "FeatureFlag", "key:s description:s default_on:b rules:j", "LCRU", ""),
+    ("SAS", 0, "platform.feature_flags", "/platform/feature-flags", "FeatureFlag", "code:s name:s description?:s default_enabled:b is_beta:b status:e(active|archived) rules:ao overrides:i allowed_actions:a", "LCRU", ""),
     ("SAS", 0, "platform.support_sessions", "/platform/support-sessions", "SupportSession", "tenant_id:id reason:s status:e(requested|granted|ended|denied) expires_at:dt", "LCR", "end"),
     ("WEB", 0, "platform.web_products", "/platform/web-products", "WebProduct", "code:s name:s acronym:s slug:s tagline?:s module_codes:a is_suite:b sort_order:i status:e(draft|published|hidden)", "LRU", "publish hide"),
     ("WEB", 0, "platform.web_leads", "/platform/web-leads", "WebLead", "kind:e(demo|waitlist|partner|contact|newsletter|calculator|signup) full_name?:s email:s phone?:s company_name?:s ruc?:s product_code?:s module_code?:s source_page?:s utm?:j status:e(new|contacted|qualified|converted|discarded) assigned_platform_user_id?:id notified_at?:dt", "LRU", "assign convert discard"),
@@ -289,6 +289,15 @@ EXTRA = [
     ("SAS", 0, "post", "/platform/subscriptions/{id}/cancel", "platform.tenants.cancel", "Consola SaaS: cancelar la suscripción y dar de baja la organización (con motivo; los datos se conservan, RN-SAS-10)", False),
     ("SAS", 0, "post", "/platform/subscriptions/{id}/addons", "platform.subscriptions.update", "Consola SaaS: sumar un complemento; su módulo queda activo al instante, sin migrar", False),
     ("SAS", 0, "post", "/platform/subscriptions/{id}/addons/{addonId}/remove", "platform.subscriptions.update", "Consola SaaS: quitar un complemento desde hoy; sus módulos pasan a solo lectura (RN-SAS-06)", False),
+    ("SAS", 0, "get", "/platform/tenants/{id}/usage", "platform.subscriptions.view", "Consola SaaS: consumo de la organización frente a los límites de su plan (actual e historia por día; SAS-6, RN-SAS-12: solo cifras)", False),
+    ("SAS", 0, "get", "/platform/subscriptions/{id}/plan-fit", "platform.subscriptions.view", "Consola SaaS: comparar el consumo actual con los límites de otro plan antes de cambiarlo (over = las altas quedarían bloqueadas hasta regularizar)", False),
+    ("SAS", 0, "post", "/platform/feature-flags/{id}/archive", "platform.feature_flags.update", "Consola SaaS: archivar una bandera (deja de evaluarse; reglas y activaciones se conservan)", False),
+    ("SAS", 0, "post", "/platform/feature-flags/{id}/restore", "platform.feature_flags.update", "Consola SaaS: restaurar una bandera archivada", False),
+    ("SAS", 0, "get", "/platform/feature-flags/{id}/tenants", "platform.feature_flags.view", "Consola SaaS: organizaciones con activación explícita de la bandera (prevalece sobre las reglas, RN-SAS-07)", False),
+    ("SAS", 0, "post", "/platform/feature-flags/{id}/tenants", "platform.feature_flags.update", "Consola SaaS: activar o desactivar la bandera para una organización (con motivo y vencimiento opcional; auditado)", False),
+    ("SAS", 0, "post", "/platform/feature-flags/{id}/tenants/{tenantId}/remove", "platform.feature_flags.update", "Consola SaaS: quitar la activación explícita; la organización vuelve a seguir las reglas", False),
+    ("SAS", 0, "get", "/platform/tenants/{id}/feature-flags", "platform.feature_flags.view", "Consola SaaS: resultado de cada bandera para la organización y qué regla decidió (misma evaluación que su API y su web)", False),
+    ("SAS", 0, "get", "/usage", "settings.organization.view", "Consumo de la organización frente a los límites de su plan (colaboradores, administradores, empresas, almacenamiento, llamadas a la API; SAS-6)", False),
     ("WEB", 0, "get", "/public/catalog", None, "Sitio: productos, planes públicos con módulos, límites y complementos, y estado de cada módulo", True),
     ("WEB", 0, "get", "/public/ruc/{ruc}", None, "Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado)", True),
     ("WEB", 0, "get", "/public/subdomains/{slug}", None, "Sitio: disponibilidad de un subdominio", True),
@@ -438,7 +447,8 @@ STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("po
                  ("post", "/platform/tenants/{id}/modules/{code}/activate"), ("post", "/platform/tenants/{id}/modules/{code}/deactivate"),
                  ("post", "/cost-centers/{id}/close"), ("post", "/cost-centers/{id}/reopen"),
                  ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce"),
-                 ("post", "/platform/subscriptions/{id}/convert"), ("post", "/platform/subscriptions/{id}/cancel")}
+                 ("post", "/platform/subscriptions/{id}/convert"), ("post", "/platform/subscriptions/{id}/cancel"),
+                 ("post", "/platform/feature-flags/{id}/archive"), ("post", "/platform/feature-flags/{id}/restore")}
 CREATED = {("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
@@ -447,6 +457,13 @@ _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", 
 QUERY = {
     ("get", "/employments/{employment_id}/cost-distributions"): [
         _q("as_of", "Fecha (AAAA-MM-DD): solo la distribución vigente a ese día", False, "date"),
+    ],
+    ("get", "/platform/tenants/{id}/usage"): [
+        _q("from", "Primer día de la historia (AAAA-MM-DD); por defecto, 90 días antes de to", False, "date"),
+        _q("to", "Último día de la historia (AAAA-MM-DD); por defecto, hoy", False, "date"),
+    ],
+    ("get", "/platform/subscriptions/{id}/plan-fit"): [
+        _q("plan_id", "Plan contra el que se compara el consumo actual", True),
     ],
     ("get", "/calendar"): [
         _q("from", "Primer día (AAAA-MM-DD)", True, "date"),
@@ -468,7 +485,7 @@ INPUT_EXTRA = {
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "overrides", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):

@@ -212,13 +212,14 @@ CREATE TABLE tenants (
   contact_phone text,
   cancelled_at timestamptz,
   retention_until date,
+  beta_groups text[],
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT fk_tenants_country_code FOREIGN KEY (country_code) REFERENCES countries (code)
 );
-COMMENT ON TABLE tenants IS 'Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id.';
+COMMENT ON TABLE tenants IS 'Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id. beta_groups: grupos beta a los que pertenece, para las banderas de funcionalidad (SAS-7).';
 CREATE UNIQUE INDEX uq_tenants_slug ON tenants (slug) WHERE deleted_at IS NULL;
 CREATE INDEX ix_tenants_country_code ON tenants (country_code);
 CREATE TRIGGER trg_tenants_touch BEFORE UPDATE ON tenants FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
@@ -509,12 +510,14 @@ CREATE TABLE tenant_limits (
   limit_value numeric(14,2),
   is_unlimited boolean NOT NULL DEFAULT false,
   source text NOT NULL DEFAULT 'plan' CHECK (source IN ('plan','addon','override')),
+  warned_at timestamptz,
+  reached_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_tenant_limits_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_tenant_limits_limit_code UNIQUE (tenant_id, limit_code)
 );
-COMMENT ON TABLE tenant_limits IS 'Límites efectivos de la organización (plan + complementos + ajustes).';
+COMMENT ON TABLE tenant_limits IS 'Límites efectivos de la organización (plan + complementos + ajustes). warned_at / reached_at marcan el aviso ya enviado al acercarse o llegar al tope (SAS-6, RN-SAS-02); se limpian cuando el consumo baja.';
 ALTER TABLE tenant_limits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenant_limits FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON tenant_limits USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -532,7 +535,7 @@ CREATE TABLE tenant_usage_counters (
   CONSTRAINT uq_tenant_usage_counters_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_tenant_usage_counters_metric_code_period_start UNIQUE (tenant_id, metric_code, period_start)
 );
-COMMENT ON TABLE tenant_usage_counters IS 'Consumo medido por organización y periodo (colaboradores, almacenamiento, llamadas de API) para comparar con límites.';
+COMMENT ON TABLE tenant_usage_counters IS 'Consumo medido por organización y periodo para comparar con límites (SAS-6): colaboradores, administradores, empresas y almacenamiento en MB guardan una foto por día (period_start = día); las llamadas de API acumulan por mes (period_start = primer día del mes).';
 ALTER TABLE tenant_usage_counters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenant_usage_counters FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON tenant_usage_counters USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -564,7 +567,7 @@ CREATE TABLE feature_flag_rules (
   CONSTRAINT uq_feature_flag_rules_feature_flag_id_target_kind_target_value UNIQUE (feature_flag_id, target_kind, target_value),
   CONSTRAINT fk_feature_flag_rules_feature_flag_id FOREIGN KEY (feature_flag_id) REFERENCES feature_flags (id)
 );
-COMMENT ON TABLE feature_flag_rules IS 'Reglas de activación de una bandera por plan, país, grupo beta o porcentaje.';
+COMMENT ON TABLE feature_flag_rules IS 'Reglas de activación de una bandera por plan, país, grupo beta o porcentaje. Orden de evaluación (RN-SAS-07): organización, plan, grupo beta, país; después el porcentaje gradual y, al final, el valor por defecto.';
 CREATE TRIGGER trg_feature_flag_rules_touch BEFORE UPDATE ON feature_flag_rules FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE tenant_feature_flags (
@@ -18098,6 +18101,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),
   ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', 'select', '"sms"'::jsonb, ARRAY['organization'], '["sms", "whatsapp", "none"]'::jsonb),
+  ('limites.porcentaje_alerta', 'base', 'Aviso de consumo del plan (%)', 'Porcentaje de un límite del plan (colaboradores, administradores, empresas, almacenamiento) a partir del cual se avisa a los administradores (RN-SAS-02); al 100 % se bloquean las nuevas altas y subidas.', 'integer', '80'::jsonb, ARRAY['organization'], '{"min": 50, "max": 99}'::jsonb),
   ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', 'integer', '180'::jsonb, ARRAY['organization'], NULL),
   ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'Genera el código con el correlativo de la empresa.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
@@ -18496,6 +18500,45 @@ AS $$
 $$;
 COMMENT ON FUNCTION resolve_tenant_id(text) IS 'Devuelve el id de la organización dueña de un dominio. No expone otros datos.';
 
+-- SAS-7 · Banderas de funcionalidad de la organización activa (app.tenant_id). Una sola evaluación para la
+-- API y la web (la web la recibe en /me). Orden (RN-SAS-07): organización, plan, grupo beta, país; después el
+-- porcentaje gradual (cubeta estable por organización) y, al final, el valor por defecto de la bandera.
+-- SECURITY DEFINER: lee el plan y las reglas, que la aplicación no ve, sin exponer más que código y resultado.
+CREATE FUNCTION current_feature_flags() RETURNS TABLE (code text, enabled boolean, source text)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
+AS $$
+  WITH t AS (
+    SELECT id, country_code, COALESCE(beta_groups, '{}'::text[]) AS beta_groups
+      FROM tenants
+     WHERE id = NULLIF(current_setting('app.tenant_id', true), '')::uuid AND deleted_at IS NULL
+  ), pl AS (
+    SELECT p.code FROM subscriptions s JOIN plans p ON p.id = s.plan_id JOIN t ON t.id = s.tenant_id
+     WHERE s.status NOT IN ('cancelled', 'expired')
+  ), ev AS (
+    SELECT f.code, f.default_enabled,
+           (SELECT o.enabled FROM tenant_feature_flags o
+             WHERE o.tenant_id = t.id AND o.feature_flag_code = f.code AND (o.expires_at IS NULL OR o.expires_at > now())) AS by_tenant,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'plan' AND r.target_value IN (SELECT code FROM pl)) AS by_plan,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'beta_group' AND r.target_value = ANY (t.beta_groups)) AS by_beta,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'country' AND r.target_value = t.country_code) AS by_country,
+           (SELECT bool_or(r.enabled) FROM feature_flag_rules r
+             WHERE r.feature_flag_id = f.id AND r.target_kind = 'percentage' AND r.target_value ~ '^[0-9]{1,3}$'
+               AND abs(hashtext(f.code || ':' || t.id::text)::bigint) % 100 < r.target_value::int) AS by_percentage
+      FROM feature_flags f CROSS JOIN t
+     WHERE f.status = 'active'
+  )
+  SELECT code,
+         COALESCE(by_tenant, by_plan, by_beta, by_country, by_percentage, default_enabled),
+         CASE WHEN by_tenant IS NOT NULL THEN 'tenant' WHEN by_plan IS NOT NULL THEN 'plan'
+              WHEN by_beta IS NOT NULL THEN 'beta_group' WHEN by_country IS NOT NULL THEN 'country'
+              WHEN by_percentage IS NOT NULL THEN 'percentage' ELSE 'default' END
+    FROM ev
+$$;
+COMMENT ON FUNCTION current_feature_flags() IS 'SAS-7: banderas de funcionalidad evaluadas para la organización activa (RN-SAS-07).';
+
 -- Crea en una organización los roles de sistema y sus permisos por defecto (idempotente).
 -- También deja la política de seguridad por defecto y activa los módulos base.
 CREATE FUNCTION seed_tenant_defaults(tenant uuid) RETURNS void
@@ -18596,9 +18639,9 @@ GRANT EXECUTE ON FUNCTION seed_tenant_defaults(uuid) TO gestia_platform;
 -- gestia_app: aplicación de las organizaciones. Todas las tablas de organización, siempre bajo RLS.
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_app;
 -- Catálogos de plataforma: solo lectura para la aplicación.
-REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
+REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, feature_flag_rules, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 

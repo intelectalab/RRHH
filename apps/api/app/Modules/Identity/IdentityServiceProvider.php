@@ -11,12 +11,14 @@ use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendMessageCode;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
 use App\Modules\Identity\Infrastructure\Trash\RoleTrashSource;
+use App\Modules\Identity\Infrastructure\Usage\AdminsUsageSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\TenancyScope;
 use App\Shared\Trash\TrashRegistry;
+use App\Shared\Usage\UsageRegistry;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +78,8 @@ final class IdentityServiceProvider extends ServiceProvider
 
         $this->app->make(ExportRegistry::class)->register($this->app->make(UsersExportSource::class));
         $this->app->make(ProvisioningRegistry::class)->register($this->app->make(InviteFirstAdmin::class));
+        // SAS-6 · Administradores frente al límite del plan.
+        $this->app->make(UsageRegistry::class)->register(new AdminsUsageSource);
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }
 }

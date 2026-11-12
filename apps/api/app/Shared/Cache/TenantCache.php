@@ -88,4 +88,10 @@ final class TenantCache
     {
         return $this->getStore()->forget($this->scopedKey($key));
     }
+
+    /** Suma 1 a un contador de la organización (SAS-6: llamadas a la API). */
+    public function increment(string $key): int
+    {
+        return (int) $this->getStore()->increment($this->scopedKey($key));
+    }
 }

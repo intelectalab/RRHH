@@ -97,6 +97,9 @@ final class TenantController
             'contact_name' => ['sometimes', 'nullable', 'string', 'max:200'],
             'contact_email' => ['sometimes', 'nullable', 'email', 'max:254'],
             'contact_phone' => ['sometimes', 'nullable', 'string', 'max:30'],
+            // SAS-7 · Grupos beta para las banderas de funcionalidad.
+            'beta_groups' => ['sometimes', 'array', 'max:20'],
+            'beta_groups.*' => ['string', 'regex:/^[a-z0-9][a-z0-9_-]{0,39}$/'],
         ]);
 
         return response()->json(['data' => $this->tenants->update($id, $data, $this->actor($request))]);

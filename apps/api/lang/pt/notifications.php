@@ -66,6 +66,14 @@ return [
             'in_app' => ['subject' => 'Um e-mail voltou', 'body' => 'O e-mail de {user} voltou e não é mais usado. Corrija na conta da pessoa ou reative pelo registro de envios.'],
             'email' => ['subject' => 'Um e-mail da sua organização voltou', 'body' => "Olá {name},\n\nO e-mail de {user} voltou em {organization} e deixou de ser usado; os avisos chegam no aplicativo ou por mensagem no celular.\n\nCorrija aqui: {link}"],
         ],
+        'limits.warning' => [
+            'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
+            'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],
+        ],
+        'limits.reached' => [
+            'in_app' => ['subject' => 'Você atingiu um limite do plano', 'body' => '{metric}: {current} de {limit}. Novos cadastros ou envios ficam bloqueados até ampliar o plano ou liberar espaço.'],
+            'email' => ['subject' => 'Sua organização atingiu um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} chegou a {current} de {limit}. A partir de agora não é possível fazer novos cadastros ou envios desse tipo; tudo o que foi registrado continua disponível.\n\nAmplie o plano ou adicione um complemento aqui: {link}"],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'férias',

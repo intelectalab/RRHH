@@ -293,6 +293,15 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/platform/subscriptions/{id}/cancel` | `platform.tenants.cancel` | 0 |
 | POST | `/platform/subscriptions/{id}/addons` | `platform.subscriptions.update` | 0 |
 | POST | `/platform/subscriptions/{id}/addons/{addonId}/remove` | `platform.subscriptions.update` | 0 |
+| GET | `/platform/tenants/{id}/usage` | `platform.subscriptions.view` | 0 |
+| GET | `/platform/subscriptions/{id}/plan-fit` | `platform.subscriptions.view` | 0 |
+| POST | `/platform/feature-flags/{id}/archive` | `platform.feature_flags.update` | 0 |
+| POST | `/platform/feature-flags/{id}/restore` | `platform.feature_flags.update` | 0 |
+| GET | `/platform/feature-flags/{id}/tenants` | `platform.feature_flags.view` | 0 |
+| POST | `/platform/feature-flags/{id}/tenants` | `platform.feature_flags.update` | 0 |
+| POST | `/platform/feature-flags/{id}/tenants/{tenantId}/remove` | `platform.feature_flags.update` | 0 |
+| GET | `/platform/tenants/{id}/feature-flags` | `platform.feature_flags.view` | 0 |
+| GET | `/usage` | `settings.organization.view` | 0 |
 
 **TEN · Organización (tenant)**
 

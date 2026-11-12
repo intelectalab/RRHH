@@ -652,7 +652,9 @@
     "organization_activated": "Organização ativada",
     "organization_cancelled": "Organização cancelada",
     "notifications_email_bounced": "E-mail devolvido",
-    "notifications_notice": "Aviso por mensagem para quem não tem e-mail"
+    "notifications_notice": "Aviso por mensagem para quem não tem e-mail",
+    "limits_warning": "Perto de um limite do plano",
+    "limits_reached": "Limite do plano atingido"
   },
   "nchannel": {
     "in_app": "No aplicativo",
@@ -843,7 +845,9 @@
     "card_absence_types": "Tipos de ausência",
     "card_absence_types_help": "Licenças, permissões e atestados com suas regras: remuneração, limites, comprovante, quem solicita e efeito na folha.",
     "card_imports": "Importar dados",
-    "card_imports_help": "Carga em massa a partir de CSV ou Excel com validação, pré-visualização e opção de desfazer."
+    "card_imports_help": "Carga em massa a partir de CSV ou Excel com validação, pré-visualização e opção de desfazer.",
+    "card_usage": "Consumo do plano",
+    "card_usage_help": "Colaboradores, administradores, empresas e armazenamento em relação aos limites do plano."
   },
   "cfgroup": {
     "analitica": "Análise",
@@ -877,7 +881,8 @@
     "vacaciones": "Férias",
     "whatsapp": "WhatsApp",
     "automatizaciones": "Automações",
-    "importacion": "Importação"
+    "importacion": "Importação",
+    "limites": "Limites do plano"
   },
   "cfgopt": {
     "es": "Espanhol",
@@ -1577,7 +1582,92 @@
       "addon_added": "Complemento adicionado",
       "addon_removed": "Complemento removido"
     },
-    "modules_more": "{list} e mais {n}"
+    "modules_more": "{list} e mais {n}",
+    "tab_flags": "Funcionalidades",
+    "flags_title": "Funcionalidades",
+    "flags_sub": "Flags de funcionalidade: avaliadas por organização, plano, grupo beta e país, nessa ordem. Cada mudança vale na hora e fica auditada.",
+    "flag_new": "Nova flag",
+    "flag_edit": "Editar flag",
+    "flags_empty_title": "Ainda não há flags",
+    "flags_empty": "Crie uma para liberar uma funcionalidade aos poucos.",
+    "flag_name": "Funcionalidade",
+    "flag_code": "Código",
+    "flag_code_help": "Minúsculas, números, ponto, hífen ou sublinhado. Não muda depois.",
+    "flag_description": "Descrição",
+    "flag_default": "Padrão",
+    "flag_default_help": "Ativa por padrão (se nenhuma regra decidir)",
+    "flag_rules": "Regras",
+    "flag_order_help": "Ordem de avaliação: ativação por organização, plano, grupo beta, país e, por último, porcentagem gradual. A primeira que se aplica decide.",
+    "flag_overrides": "Organizações",
+    "flag_beta": "Beta",
+    "flag_status": {
+      "active": "Ativa",
+      "archived": "Arquivada"
+    },
+    "flag_on": "Ativada",
+    "flag_off": "Desativada",
+    "flag_no_rules": "Sem regras",
+    "flag_tenants": "Organizações",
+    "flag_action": {
+      "archive": "Arquivar",
+      "restore": "Restaurar"
+    },
+    "flag_rule": {
+      "plan": "Plano {value}",
+      "beta_group": "Grupo beta {value}",
+      "country": "País {value}",
+      "percentage": "{value} % das organizações"
+    },
+    "flag_target": "Tipo de regra",
+    "flag_target_kind": {
+      "plan": "Plano",
+      "beta_group": "Grupo beta",
+      "country": "País",
+      "percentage": "Porcentagem"
+    },
+    "flag_value": "Valor",
+    "flag_value_hint": {
+      "plan": "Código do plano (ex.: profesional)",
+      "beta_group": "Código do grupo (ex.: pioneiros)",
+      "country": "Código do país (ex.: PE)",
+      "percentage": "De 0 a 100"
+    },
+    "flag_result": "Resultado",
+    "flag_remove_rule": "Remover regra",
+    "flag_add_rule": "Adicionar regra",
+    "flag_tenants_title": "Organizações · {name}",
+    "flag_tenants_help": "A ativação por organização prevalece sobre as regras. Pode ter vencimento: depois da data, a organização volta a seguir as regras.",
+    "flag_tenants_empty": "Nenhuma organização tem ativação própria.",
+    "flag_expired": "Vencida",
+    "flag_until": "até {date}",
+    "flag_remove_tenant": "Remover",
+    "flag_set_tenant": "Ativar ou desativar para uma organização",
+    "flag_find_tenant": "Buscar organização",
+    "flag_tenant": "Organização",
+    "flag_choose_tenant": "Escolha uma organização",
+    "flag_expires": "Vence em (opcional)",
+    "flag_source": "Decidiu",
+    "flag_source_kind": {
+      "tenant": "A organização",
+      "plan": "O plano",
+      "beta_group": "O grupo beta",
+      "country": "O país",
+      "percentage": "A porcentagem gradual",
+      "default": "O valor padrão"
+    },
+    "section_flags": "Funcionalidades",
+    "flags_manage": "Administrar funcionalidades",
+    "flags_none": "Não há flags ativas.",
+    "section_usage": "Consumo do plano",
+    "usage_history": "Histórico diário ({from} – {to})",
+    "usage_history_empty": "Ainda não há medições salvas.",
+    "usage_day": "Dia",
+    "beta_groups": "Grupos beta",
+    "beta_groups_help": "Códigos separados por vírgula (ex.: pioneiros, piloto-norte).",
+    "plan_fit_over_title": "O consumo passa dos limites desse plano",
+    "plan_fit_over": "A mudança é permitida, mas novos cadastros ficarão bloqueados até regularizar: {metrics}.",
+    "plan_fit_item": "{metric} {current} de {limit}",
+    "plan_fit_ok": "O consumo atual cabe nos limites desse plano."
   },
   "ui": {
     "close": "Fechar",
@@ -2162,5 +2252,38 @@
     "risk_job": "Cargo de risco",
     "cancel": "Cancelar",
     "save": "Salvar"
+  },
+  "usage": {
+    "title": "Consumo do plano",
+    "sub": "O que sua organização usa em relação aos limites do plano.",
+    "back": "← Voltar a Configurações",
+    "load_error": "Não foi possível carregar o consumo.",
+    "blocked_title": "Você atingiu um limite do plano",
+    "blocked_text": "Novos cadastros ou envios de {metrics} estão bloqueados; tudo o que foi registrado continua disponível. Amplie o plano ou adicione um complemento com quem administra sua assinatura.",
+    "near_title": "Você está perto de um limite do plano",
+    "near_text": "{metrics} passam de {percent} % do limite. Revise o consumo antes de chegar ao limite.",
+    "section": "Consumo em relação aos limites",
+    "help": "Os administradores são avisados quando um limite chega a {percent} % e de novo ao ser atingido.",
+    "alert_setting": "Mudar a porcentagem de aviso",
+    "col_metric": "Item",
+    "col_used": "Em uso",
+    "col_limit": "Limite do plano",
+    "col_status": "Situação",
+    "unlimited": "Sem limite",
+    "no_limit": "Sem limite",
+    "status": {
+      "ok": "Dentro do limite ({percent} %)",
+      "warning": "Perto do limite ({percent} %)",
+      "reached": "Limite atingido",
+      "over": "Acima do limite ({percent} %)",
+      "free": "Sem teto"
+    },
+    "metric": {
+      "employees": "Colaboradores ativos",
+      "admins": "Administradores",
+      "legal_entities": "Empresas ativas",
+      "storage_mb": "Armazenamento (MB)",
+      "api_calls": "Chamadas à API no mês"
+    }
   }
 }

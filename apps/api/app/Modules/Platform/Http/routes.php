@@ -2,10 +2,12 @@
 
 use App\Modules\Platform\Http\Controllers\ConsoleAuthController;
 use App\Modules\Platform\Http\Controllers\ConsoleController;
+use App\Modules\Platform\Http\Controllers\FeatureFlagController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
 use App\Modules\Platform\Http\Controllers\TenantController;
 use App\Modules\Platform\Http\Controllers\TenantModuleController;
+use App\Modules\Platform\Http\Controllers\UsageController;
 use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
 use App\Modules\Platform\Http\Middleware\EnsureConsoleSecondFactor;
 use Illuminate\Support\Facades\Route;
@@ -76,6 +78,22 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel'])->middleware('platform.permission:platform.tenants.cancel');
             Route::post('/subscriptions/{id}/addons', [SubscriptionController::class, 'addAddon'])->middleware('platform.permission:platform.subscriptions.update');
             Route::post('/subscriptions/{id}/addons/{addonId}/remove', [SubscriptionController::class, 'removeAddon'])->middleware('platform.permission:platform.subscriptions.update');
+
+            // SAS-6 · Consumo frente a límites: actual, historia y comparación con otro plan.
+            Route::get('/tenants/{id}/usage', [UsageController::class, 'show'])->middleware('platform.permission:platform.subscriptions.view');
+            Route::get('/subscriptions/{id}/plan-fit', [UsageController::class, 'planFit'])->middleware('platform.permission:platform.subscriptions.view');
+
+            // SAS-7 · Banderas de funcionalidad (cada cambio, auditado y sin desplegar).
+            Route::get('/feature-flags', [FeatureFlagController::class, 'index'])->middleware('platform.permission:platform.feature_flags.view');
+            Route::post('/feature-flags', [FeatureFlagController::class, 'store'])->middleware('platform.permission:platform.feature_flags.create');
+            Route::get('/feature-flags/{id}', [FeatureFlagController::class, 'show'])->middleware('platform.permission:platform.feature_flags.view');
+            Route::patch('/feature-flags/{id}', [FeatureFlagController::class, 'update'])->middleware('platform.permission:platform.feature_flags.update');
+            Route::post('/feature-flags/{id}/archive', [FeatureFlagController::class, 'archive'])->middleware('platform.permission:platform.feature_flags.update');
+            Route::post('/feature-flags/{id}/restore', [FeatureFlagController::class, 'restore'])->middleware('platform.permission:platform.feature_flags.update');
+            Route::get('/feature-flags/{id}/tenants', [FeatureFlagController::class, 'tenants'])->middleware('platform.permission:platform.feature_flags.view');
+            Route::post('/feature-flags/{id}/tenants', [FeatureFlagController::class, 'setTenant'])->middleware('platform.permission:platform.feature_flags.update');
+            Route::post('/feature-flags/{id}/tenants/{tenantId}/remove', [FeatureFlagController::class, 'removeTenant'])->middleware('platform.permission:platform.feature_flags.update');
+            Route::get('/tenants/{id}/feature-flags', [FeatureFlagController::class, 'forTenant'])->middleware('platform.permission:platform.feature_flags.view');
         });
     });
 });

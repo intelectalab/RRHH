@@ -16,6 +16,8 @@ export type SessionData = {
   modules: string[]
   /** SAS-5: módulos retirados que siguen en solo lectura durante la transición. */
   modules_read_only?: string[]
+  /** SAS-7: banderas activas para la organización (misma evaluación que la API). */
+  features?: string[]
 }
 
 type SessionContextValue = {
@@ -85,4 +87,13 @@ export function useSession(): SessionContextValue {
   const value = useContext(SessionContext)
   if (value === null) throw new Error('useSession fuera de SessionProvider')
   return value
+}
+
+/**
+ * SAS-7 · ¿Está activa la bandera para la organización? Solo decide qué mostrar: la API valida igual
+ * cada ruta detrás de una bandera (regla 10).
+ */
+export function useFeature(code: string): boolean {
+  const ctx = useContext(SessionContext)
+  return ctx?.session.features?.includes(code) ?? false
 }

@@ -7,6 +7,7 @@ use App\Modules\Platform\Application\PlatformSettings;
 use App\Modules\Platform\Domain\TenantStateMachine;
 use App\Modules\Platform\Infrastructure\Models\PlatformUser;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
+use App\Shared\Features\FeatureFlags;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Tenancy\CrossTenantMaintenance;
@@ -40,6 +41,7 @@ final class TenantAdministration
         private readonly ProvisioningRegistry $provisioning,
         private readonly CrossTenantMaintenance $cross,
         private readonly TenantModules $modules,
+        private readonly FeatureFlags $features,
     ) {}
 
     /**
@@ -167,6 +169,12 @@ final class TenantAdministration
                 $changes[$column] = $input[$field];
             }
         }
+        if (array_key_exists('beta_groups', $input)) {
+            // SAS-7 · Grupos beta (códigos validados en el controlador): literal de arreglo de Postgres.
+            $groups = array_values(array_unique(array_map('strval', (array) $input['beta_groups'])));
+            sort($groups);
+            $changes['beta_groups'] = '{'.implode(',', $groups).'}';
+        }
         if (array_key_exists('trial_ends_on', $input) && $row->status === 'trial') {
             $changes['trial_ends_at'] = $input['trial_ends_on'] === null ? null : Carbon::parse((string) $input['trial_ends_on'])->endOfDay();
         }
@@ -175,6 +183,9 @@ final class TenantAdministration
                 DB::table('tenants')->where('id', $row->id)->update($changes);
                 $before = array_intersect_key((array) $row, $changes);
                 $this->audit->record('tenant.updated', $actor, 'tenant', (string) $row->id, $before, $changes, (string) $row->id);
+                if (array_key_exists('beta_groups', $changes)) {
+                    $this->features->bumpVersion();
+                }
             });
         }
 
@@ -293,6 +304,7 @@ final class TenantAdministration
             'suspension_reason' => $row->suspension_reason,
             'cancelled_at' => $row->cancelled_at === null ? null : Carbon::parse((string) $row->cancelled_at)->toIso8601String(),
             'retention_until' => $row->retention_until === null ? null : Carbon::parse((string) $row->retention_until)->toDateString(),
+            'beta_groups' => self::pgArray($row->beta_groups ?? null),
             'version' => (int) $row->lock_version,
             'created_at' => Carbon::parse((string) $row->created_at)->toIso8601String(),
             'updated_at' => Carbon::parse((string) $row->updated_at)->toIso8601String(),
@@ -385,5 +397,20 @@ final class TenantAdministration
         if ($errors !== []) {
             throw ValidationException::withMessages($errors);
         }
+    }
+
+    /**
+     * Arreglo de texto de Postgres («{a,b}») → lista. Los grupos beta son códigos simples, sin comillas.
+     *
+     * @return list<string>
+     */
+    public static function pgArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return array_values(array_map('strval', $value));
+        }
+        $text = trim((string) $value, '{}');
+
+        return $text === '' ? [] : array_map(fn (string $v): string => trim($v, '"'), explode(',', $text));
     }
 }

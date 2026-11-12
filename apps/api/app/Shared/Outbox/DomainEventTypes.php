@@ -136,6 +136,11 @@ final class DomainEventTypes
     // Suscripción de la organización (SAS-4): plan, complementos o estado.
     public const SUBSCRIPTION_CHANGED = 'subscription.changed.v1';
 
+    // Límites y consumo (SAS-6): el consumo se acercó al tope del plan o llegó a él (RN-SAS-02, RN-SAS-03).
+    public const LIMIT_WARNING = 'limit.warning.v1';
+
+    public const LIMIT_REACHED = 'limit.reached.v1';
+
     public const USER_ACTIVATED = 'user.activated.v1';
 
     public const USER_SUSPENDED = 'user.suspended.v1';
@@ -355,6 +360,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['tenant_id', 'subscription_id', 'plan_code', 'status'],
             'description' => 'La suscripción de la organización cambió de plan, complementos, datos o estado',
+        ],
+        self::LIMIT_WARNING => [
+            'version' => 1,
+            'required_fields' => ['metric', 'current', 'limit', 'percent'],
+            'description' => 'El consumo de una métrica del plan llegó al porcentaje de aviso (limites.porcentaje_alerta)',
+        ],
+        self::LIMIT_REACHED => [
+            'version' => 1,
+            'required_fields' => ['metric', 'current', 'limit', 'percent'],
+            'description' => 'El consumo de una métrica llegó al tope del plan: se bloquean nuevas altas o subidas',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

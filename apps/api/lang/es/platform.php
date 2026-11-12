@@ -53,4 +53,13 @@ return [
         'tenant_not_in_trial' => 'Solo una organización en prueba puede empezar con una suscripción en prueba.',
         'grace_ended' => 'Terminó el periodo de gracia de la prueba gratuita sin contratar un plan.',
     ],
+    'usage' => [
+        'invalid_range' => 'El rango de fechas no es válido (máximo dos años).',
+        'snapshot_done' => 'Consumo medido en :count organizaciones.',
+    ],
+    'flags' => [
+        'duplicate_code' => 'Ya existe una bandera con ese código.',
+        'invalid_rule' => 'Regla no válida: el plan o el país deben existir, el grupo beta es un código simple y el porcentaje va de 0 a 100, sin repetir.',
+        'archived' => 'La bandera está archivada: restáurala para activarla en una organización.',
+    ],
 ];
