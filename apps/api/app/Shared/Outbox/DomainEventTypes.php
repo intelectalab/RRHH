@@ -107,6 +107,12 @@ final class DomainEventTypes
 
     public const COMPANY_ARCHIVED = 'company.archived.v1';
 
+    // Organización (SAS-2): cambios de estado decididos desde la consola.
+    public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
+
+    // Módulos de la organización (SAS-5).
+    public const TENANT_MODULE_CHANGED = 'tenant.module_changed.v1';
+
     public const USER_ACTIVATED = 'user.activated.v1';
 
     public const USER_SUSPENDED = 'user.suspended.v1';
@@ -301,6 +307,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['import_job_id', 'entity', 'reverted_rows'],
             'description' => 'Lote importado deshecho',
+        ],
+        self::TENANT_STATUS_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['tenant_id', 'from_status', 'to_status', 'reason'],
+            'description' => 'La organización cambió de estado desde la consola (suspensión, bloqueo, reactivación, baja)',
+        ],
+        self::TENANT_MODULE_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['tenant_id', 'module_code', 'status'],
+            'description' => 'Un módulo comercial se activó o se retiró en la organización',
         ],
         self::COMPANY_CREATED => [
             'version' => 1,

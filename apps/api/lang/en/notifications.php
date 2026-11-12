@@ -46,6 +46,22 @@ return [
             'in_app' => ['subject' => 'Account security notice', 'body' => '{event}'],
             'email' => ['subject' => 'Account security notice', 'body' => "Hi {name},\n\n{event}\n\nIf this was not you, contact HR right away."],
         ],
+        'organization.suspended' => [
+            'in_app' => ['subject' => 'Your organization was suspended', 'body' => 'Your organization was suspended: {reason}. Data is kept; contact support to resolve it.'],
+            'email' => ['subject' => 'Your organization was suspended', 'body' => "Hi {name},\n\nThe organization {organization} was suspended. Reason: {reason}.\n\nWhile it is suspended, its users cannot sign in. Data is kept. Contact GestiaHR support to resolve it."],
+        ],
+        'organization.reactivated' => [
+            'in_app' => ['subject' => 'Your organization is active again', 'body' => 'The organization is active again. All its data is still available.'],
+            'email' => ['subject' => 'Your organization is active again', 'body' => "Hi {name},\n\nThe organization {organization} is active again and its users can sign in. All data is still available.\n\n{link}"],
+        ],
+        'organization.activated' => [
+            'in_app' => ['subject' => 'Your organization is now active', 'body' => 'The trial ended and the organization is now active.'],
+            'email' => ['subject' => 'Your organization is now active', 'body' => "Hi {name},\n\nThe organization {organization} moved from trial to active. Everything recorded during the trial is kept.\n\n{link}"],
+        ],
+        'organization.cancelled' => [
+            'in_app' => ['subject' => 'Your organization was cancelled', 'body' => 'The organization was cancelled: {reason}. Data is kept until {retention_until}.'],
+            'email' => ['subject' => 'Your organization was cancelled', 'body' => "Hi {name},\n\nThe organization {organization} was cancelled. Reason: {reason}.\n\nIts data is kept until {retention_until}. Until then you can ask support for a full export or for reactivation."],
+        ],
     ],
     'subject_types' => [
         'vacation_request' => 'vacation',

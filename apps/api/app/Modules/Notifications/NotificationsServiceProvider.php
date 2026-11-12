@@ -7,6 +7,7 @@ use App\Modules\Notifications\Application\NotificationDispatcher;
 use App\Modules\Notifications\Console\PurgeNotifications;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverMessage;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverNotification;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyOrganizationStatus;
 use App\Modules\Notifications\Infrastructure\Subscribers\SubmitTemplateApproval;
 use App\Shared\Messaging\MessageSender;
 use App\Shared\Notifications\Notifier;
@@ -29,6 +30,7 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(DeliverNotification::class));
         $outbox->subscribe($this->app->make(DeliverMessage::class));
         $outbox->subscribe($this->app->make(SubmitTemplateApproval::class));
+        $outbox->subscribe($this->app->make(NotifyOrganizationStatus::class));
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeNotifications::class]);

@@ -26,7 +26,8 @@ final class AuditLogger
         ?string $reason = null,
     ): void {
         $request = request();
-        $user = $request->user();
+        // Solo el usuario de la organización (guard «ayni»): en la consola, el autor queda en su propia auditoría.
+        $user = $request->user('ayni');
         $actorId = $user instanceof Authenticatable ? (string) $user->getAuthIdentifier() : null;
         $requestId = (string) $request->header('X-Request-Id', '');
 

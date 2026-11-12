@@ -58,6 +58,8 @@ final class MeController
             'field_permissions' => $pending ? [] : array_keys($effective->fields),
             'scopes' => $pending ? [] : array_map(fn (string $s) => RoleScopes::toApi($s), $effective->actions + $effective->fields),
             'modules' => $pending ? [] : $modules->activeModules(),
+            // SAS-5 · RN-SAS-06: módulos retirados que siguen visibles en solo lectura durante la transición.
+            'modules_read_only' => $pending ? [] : $modules->readOnlyModules(),
         ]]);
     }
 }

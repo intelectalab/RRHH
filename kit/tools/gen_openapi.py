@@ -57,7 +57,7 @@ EPICS = {
 # (épica, fase, permiso-base, ruta, Esquema, campos, operaciones LCRUD, acciones)
 RES = [
     # ---------- Fase 0 ----------
-    ("SAS", 0, "platform.tenants", "/platform/tenants", "Tenant", "name:s slug:s country:s status:e(trial|active|suspended|cancelled) plan_id:id trial_ends_on?:d", "LCRU", "suspend reactivate cancel"),
+    ("SAS", 0, "platform.tenants", "/platform/tenants", "Tenant", "name:s slug:s country:s currency:s timezone:s locale:s status:e(trial|active|grace_period|suspended|blocked|cancelled|deleted) trial_ends_on?:d contact_name?:s contact_email?:s contact_phone?:s suspension_reason?:s cancelled_at?:dt retention_until?:d", "LCRU", "suspend reactivate cancel"),
     ("SAS", 0, "platform.plans", "/platform/plans", "Plan", "code:s name:s billing_cycle:e(monthly|yearly) currency:s limits:j modules:a status:e(draft|active|retired)", "LCRU", "duplicate activate retire"),
     ("SAS", 0, "platform.subscriptions", "/platform/subscriptions", "Subscription", "tenant_id:id plan_id:id status:e(trial|active|past_due|suspended|cancelled) addons:a starts_on:d ends_on?:d", "LCRU", "change-plan suspend reactivate"),
     ("SAS", 0, "platform.feature_flags", "/platform/feature-flags", "FeatureFlag", "key:s description:s default_on:b rules:j", "LCRU", ""),
@@ -273,6 +273,12 @@ EXTRA = [
     ("SAS", 0, "post", "/platform/auth/mfa/totp/confirm", "platform", "Consola SaaS: confirmar la aplicación autenticadora con un código; completa el ingreso", False),
     ("SAS", 0, "post", "/platform/auth/mfa/verify", "platform", "Consola SaaS: segundo paso del ingreso con el código de la aplicación autenticadora", False),
     ("SAS", 0, "get", "/platform/audit-events", "platform.audit.view", "Consola SaaS: auditoría propia de la consola (solo inserción)", False),
+    ("SAS", 0, "post", "/platform/tenants/{id}/activate", "platform.tenants.reactivate", "Consola SaaS: convertir una organización en prueba en activa (ME-40 convertir)", False),
+    ("SAS", 0, "post", "/platform/tenants/{id}/block", "platform.tenants.suspend", "Consola SaaS: bloquear una organización por falta de pago (con motivo; sus usuarios no ingresan)", False),
+    ("SAS", 0, "get", "/platform/tenants/{id}/status-events", "platform.tenants.view", "Consola SaaS: historial inalterable de estados de la organización", False),
+    ("SAS", 0, "get", "/platform/tenants/{id}/modules", "platform.subscriptions.view", "Consola SaaS: módulos comerciales de la organización (activos, en solo lectura o no contratados) y sus dependencias", False),
+    ("SAS", 0, "post", "/platform/tenants/{id}/modules/{code}/activate", "platform.subscriptions.update", "Consola SaaS: activar un módulo en la organización sin migrar datos (activa también sus dependencias)", False),
+    ("SAS", 0, "post", "/platform/tenants/{id}/modules/{code}/deactivate", "platform.subscriptions.update", "Consola SaaS: retirar un módulo; sus datos se conservan en solo lectura durante la transición (RN-SAS-06)", False),
     ("WEB", 0, "get", "/public/catalog", None, "Sitio: productos, planes públicos con módulos, límites y complementos, y estado de cada módulo", True),
     ("WEB", 0, "get", "/public/ruc/{ruc}", None, "Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado)", True),
     ("WEB", 0, "get", "/public/subdomains/{slug}", None, "Sitio: disponibilidad de un subdominio", True),
@@ -401,7 +407,8 @@ TYPES = {
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
-STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
+STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("post", "/platform/tenants/{id}/activate"), ("post", "/platform/tenants/{id}/block"),
+                 ("post", "/platform/tenants/{id}/modules/{code}/activate"), ("post", "/platform/tenants/{id}/modules/{code}/deactivate")}
 CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
@@ -417,6 +424,13 @@ QUERY = {
 
 # Campos que se envían al crear pero no vuelven en la respuesta (p. ej. el contenido del archivo).
 INPUT_EXTRA = {
+    "TenantInput": {
+        "admin_name": {"type": "string", "description": "Alta (SAS-2): nombre del primer administrador, que recibe la invitación"},
+        "admin_email": {"type": "string", "format": "email", "description": "Alta (SAS-2): correo del primer administrador"},
+        "legal_name": {"type": "string", "description": "Alta (SAS-2): razón social de la primera empresa"},
+        "tax_id": {"type": "string", "description": "Alta (SAS-2): número fiscal de la primera empresa (RUC en Perú)"},
+        "module_codes": {"type": "array", "items": {"type": "string"}, "description": "Alta (SAS-2): módulos que se activan además de los base"},
+    },
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
 READONLY = {"status", "version", "has_logo", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}

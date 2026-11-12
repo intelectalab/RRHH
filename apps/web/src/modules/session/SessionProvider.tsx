@@ -14,6 +14,8 @@ export type SessionData = {
   field_permissions: string[]
   scopes: Record<string, string>
   modules: string[]
+  /** SAS-5: módulos retirados que siguen en solo lectura durante la transición. */
+  modules_read_only?: string[]
 }
 
 type SessionContextValue = {
@@ -45,6 +47,11 @@ export function SessionProvider({ children, fallback }: { children: ReactNode; f
       if (res.data.user.locale) setLocale(res.data.user.locale)
       setSession(res.data)
     } catch (e) {
+      // SAS-2: organización suspendida o dada de baja → al ingreso, con el aviso claro.
+      if (e instanceof ApiRequestError && e.status === 403 && (e.code === 'tenant_suspended' || e.code === 'tenant_cancelled')) {
+        router.replace(`/ingresar?aviso=${e.code}`)
+        return
+      }
       if (e instanceof ApiRequestError && (e.status === 401 || e.status === 400)) {
         router.replace(e.code === 'mfa_required' ? '/verificacion' : '/ingresar')
         return

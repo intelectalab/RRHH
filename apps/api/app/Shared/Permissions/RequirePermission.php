@@ -39,8 +39,13 @@ final class RequirePermission
             return ProblemDetailsResponse::make(403, 'forbidden', null, null, [], ['permission' => $permission]);
         }
 
-        if (! $this->modules->isEnabled($module)) {
+        $access = $this->modules->accessTo($module);
+        if ($access === ModuleGate::NONE) {
             throw new ModuleNotEnabledException($module);
+        }
+        if ($access === ModuleGate::READ_ONLY && ! $request->isMethodSafe()) {
+            // SAS-5 · RN-SAS-06: módulo retirado en transición; se consulta pero no se modifica.
+            return ProblemDetailsResponse::make(403, 'module_read_only', null, null, [], ['module' => $module]);
         }
 
         $effective = $this->resolver->for((string) $user->getAuthIdentifier());

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ApiClient, readXsrfToken } from '@/lib/api'
 import { translate } from '@/lib/i18n'
 import { actionLabel } from '@/modules/platform/ConsoleAudit'
+import { tenantTone } from '@/modules/platform/ConsoleTenants'
 
 describe('SAS-1 · consola de la plataforma', () => {
   it('lee su propio token XSRF y no el de la organización', () => {
@@ -22,5 +23,26 @@ describe('SAS-1 · consola de la plataforma', () => {
     const t = (k: string) => translate('es', k)
     expect(actionLabel(t, 'console.login')).toBe('Ingresó a la consola')
     expect(actionLabel(t, 'console.otra_cosa')).toBe('console.otra_cosa')
+  })
+})
+
+describe('SAS-2 · SAS-5 · organizaciones y módulos en la consola', () => {
+  it('cada estado de la organización tiene color y texto en los tres idiomas', () => {
+    for (const status of ['trial', 'active', 'grace_period', 'suspended', 'blocked', 'cancelled', 'deleted']) {
+      for (const lang of ['es', 'en', 'pt'] as const) {
+        const key = `console.tstatus.${status}`
+        expect(translate(lang, key)).not.toBe(key)
+      }
+    }
+    expect(tenantTone('active')).toBe('ok')
+    expect(tenantTone('suspended')).toBe('er')
+    expect(tenantTone('blocked')).toBe('er')
+    expect(tenantTone('cancelled')).toBe('gr')
+  })
+
+  it('las acciones de organizaciones y módulos de la auditoría se traducen', () => {
+    const t = (k: string) => translate('es', k)
+    expect(actionLabel(t, 'tenant.suspend')).toBe('Suspendió una organización')
+    expect(actionLabel(t, 'tenant.module_activated')).toBe('Activó un módulo')
   })
 })

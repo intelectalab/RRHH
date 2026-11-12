@@ -11,6 +11,8 @@ return [
     'feature_not_enabled' => 'This feature is not enabled for your organization.',
     'missing_tenant_context' => 'The organization for this request could not be determined. Sign in from your organization\'s address.',
     'tenant_suspended' => 'The organization is currently suspended.',
+    'tenant_cancelled' => 'The organization has been cancelled. Its data is kept during the retention period; contact support to reactivate it.',
+    'module_read_only' => 'The module has been withdrawn: its data can be viewed but no longer changed.',
     'plan_limit_reached' => 'The plan limit for this resource has been reached.',
     'not_found' => 'The requested resource was not found or belongs to another organization.',
     'invalid_transition' => 'The requested action is not valid for the current state.',

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   la cabecera X-Tenant-Id en el entorno de pruebas.
  * - Si hay una credencial autenticada, debe pertenecer a esa organización; si no,
  *   se responde 404 sin revelar que la organización existe.
- * - Organización suspendida o bloqueada → 403 tenant_suspended.
+ * - Organización suspendida o bloqueada → 403 tenant_suspended; dada de baja → 403 tenant_cancelled.
  */
 final class ResolveTenantContext
 {
@@ -56,6 +56,10 @@ final class ResolveTenantContext
 
         if (in_array($resolved->status, (array) config('tenancy.suspended_statuses', []), true)) {
             return ProblemDetailsResponse::make(403, 'tenant_suspended');
+        }
+
+        if (in_array($resolved->status, (array) config('tenancy.cancelled_statuses', []), true)) {
+            return ProblemDetailsResponse::make(403, 'tenant_cancelled');
         }
 
         if (! in_array($resolved->status, (array) config('tenancy.operable_statuses', []), true)) {

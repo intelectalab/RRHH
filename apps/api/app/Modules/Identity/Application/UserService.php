@@ -218,6 +218,27 @@ final class UserService
         });
     }
 
+    /**
+     * SAS-2 · Primer administrador de una organización recién creada desde la consola: queda invitado
+     * con el rol de sistema «admin_empresa» y recibe el enlace de activación en la dirección de su
+     * organización. Corre con el contexto de la organización nueva.
+     */
+    public function createFirstAdmin(string $displayName, string $email, string $origin): User
+    {
+        $this->guardUnique('email', $email);
+        $role = Role::query()->where('system_role_code', 'admin_empresa')->whereNull('deleted_at')->firstOrFail();
+
+        return DB::transaction(function () use ($displayName, $email, $origin, $role): User {
+            $user = User::create(['display_name' => $displayName, 'status' => User::STATUS_INVITED, 'locale' => null]);
+            $user->identities()->create(UserIdentity::attributesFor('email', $email) + ['is_primary' => true]);
+            $user->roleAssignments()->create(['role_id' => $role->id]);
+            $this->issueInvitation($user, $origin);
+            $this->audit->record('user.created', 'user', $user->id, null, $this->present($user->refresh()), 'first_admin');
+
+            return $user;
+        });
+    }
+
     public function suspend(User $user, ?string $reason): User
     {
         $next = $this->machine->getNextState($user->status, UserAccountStateMachine::SUSPEND);
