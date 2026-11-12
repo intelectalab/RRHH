@@ -21,7 +21,7 @@ const KINDS = ['headquarters', 'branch', 'plant', 'store', 'site', 'remote'] as 
 /** ORG-2 · Organización → Sedes: sedes, sucursales y ubicaciones con geocerca, zona horaria, feriados y centro de riesgo. */
 export function SitesScreen() {
   const { t } = useT()
-  const { can } = useSession()
+  const { can, session } = useSession()
   const { toast, node: toastNode } = useToast()
   const [rows, setRows] = useState<Site[] | null>(null)
   const [companies, setCompanies] = useState<Company[]>([])
@@ -64,7 +64,7 @@ export function SitesScreen() {
       <PageHeader
         title={t('org.title')}
         sub={rows ? t('sites.sub', { active, total: rows.length }) : undefined}
-        tabs={orgTabs(t, can, 'sites')}
+        tabs={orgTabs(t, can, 'sites', session.modules)}
         actions={can('org.sites.create') && (
           <button type="button" className="btn btn-primary" onClick={() => setEditing('new')}><Icon name="plus" /> {t('sites.new')}</button>
         )}

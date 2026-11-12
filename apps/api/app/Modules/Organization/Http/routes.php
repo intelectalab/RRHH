@@ -5,6 +5,7 @@ use App\Modules\Organization\Http\Controllers\CostDistributionController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
 use App\Modules\Organization\Http\Controllers\OrganizationCatalogController;
 use App\Modules\Organization\Http\Controllers\SiteController;
+use App\Modules\Organization\Http\Controllers\OrgUnitController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -39,4 +40,18 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/cost-centers/{id}/restore', [CostCenterController::class, 'restore'])->middleware('permission:org.cost_centers.restore');
     Route::get('/employments/{employment_id}/cost-distributions', [CostDistributionController::class, 'index'])->middleware('permission:people.assignments.view');
     Route::post('/employments/{employment_id}/cost-distributions', [CostDistributionController::class, 'store'])->middleware('permission:people.assignments.create');
+    // ORG-3 · Árbol de unidades organizacionales con vigencia.
+    Route::get('/org-unit-types', [OrgUnitController::class, 'types'])->middleware('permission:org.units.view');
+    Route::post('/org-unit-types', [OrgUnitController::class, 'storeType'])->middleware('permission:org.units.update');
+    Route::patch('/org-unit-types/{id}', [OrgUnitController::class, 'updateType'])->middleware('permission:org.units.update');
+    Route::get('/org-unit-options', [OrgUnitController::class, 'options'])->middleware('permission:org.units.view');
+    Route::get('/org-units', [OrgUnitController::class, 'index'])->middleware('permission:org.units.view');
+    Route::post('/org-units', [OrgUnitController::class, 'store'])->middleware('permission:org.units.create');
+    Route::get('/org-units/{id}', [OrgUnitController::class, 'show'])->middleware('permission:org.units.view');
+    Route::patch('/org-units/{id}', [OrgUnitController::class, 'update'])->middleware('permission:org.units.update');
+    Route::get('/org-units/{id}/history', [OrgUnitController::class, 'history'])->middleware('permission:org.units.view');
+    Route::get('/org-units/{id}/impact', [OrgUnitController::class, 'impact'])->middleware('permission:org.units.view');
+    Route::post('/org-units/{id}/move', [OrgUnitController::class, 'move'])->middleware('permission:org.units.move');
+    Route::post('/org-units/{id}/archive', [OrgUnitController::class, 'archive'])->middleware('permission:org.units.archive');
+    Route::post('/org-units/{id}/restore', [OrgUnitController::class, 'restore'])->middleware('permission:org.units.restore');
 });

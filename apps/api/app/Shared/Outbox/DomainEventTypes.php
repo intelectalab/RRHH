@@ -118,6 +118,14 @@ final class DomainEventTypes
 
     // Módulos de la organización (SAS-5).
     public const TENANT_MODULE_CHANGED = 'tenant.module_changed.v1';
+    // Unidades organizativas (ORG-3)
+    public const ORG_UNIT_CREATED = 'org_unit.created.v1';
+
+    public const ORG_UNIT_MOVED = 'org_unit.moved.v1';
+
+    public const ORG_UNIT_MANAGER_CHANGED = 'org_unit.manager_changed.v1';
+
+    public const ORG_UNIT_ARCHIVED = 'org_unit.archived.v1';
 
     public const USER_ACTIVATED = 'user.activated.v1';
 
@@ -343,6 +351,26 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['legal_entity_id'],
             'description' => 'Empresa archivada: deja de aceptar altas',
+        ],
+        self::ORG_UNIT_CREATED => [
+            'version' => 1,
+            'required_fields' => ['org_unit_id', 'parent_id', 'effective_on'],
+            'description' => 'Unidad organizativa creada (rige desde effective_on)',
+        ],
+        self::ORG_UNIT_MOVED => [
+            'version' => 1,
+            'required_fields' => ['org_unit_id', 'from_parent_id', 'to_parent_id', 'effective_on'],
+            'description' => 'Unidad movida a otra superior desde una fecha; organigrama y alcances se recalculan ese día',
+        ],
+        self::ORG_UNIT_MANAGER_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['org_unit_id', 'from_position_id', 'to_position_id', 'effective_on'],
+            'description' => 'Cambió el responsable de la unidad desde una fecha (RN-ORG-03)',
+        ],
+        self::ORG_UNIT_ARCHIVED => [
+            'version' => 1,
+            'required_fields' => ['org_unit_id', 'effective_on'],
+            'description' => 'Unidad archivada: sin posiciones activas ni subunidades (RN-ORG-01)',
         ],
         self::USER_INVITED => [
             'version' => 1,

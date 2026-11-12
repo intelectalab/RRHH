@@ -395,8 +395,10 @@ $$;
 -- 8.1 Vigencias: no se admiten dos asignaciones solapadas para la misma relación laboral.
 INSERT INTO sites (id, tenant_id, code, name) VALUES
   ('aaaaaaaa-0000-4000-8000-000000000a01', 'aaaaaaaa-0000-4000-8000-000000000001', 'LIM', 'Lima');
-INSERT INTO org_units (id, tenant_id, code, name, kind) VALUES
-  ('aaaaaaaa-0000-4000-8000-000000000a02', 'aaaaaaaa-0000-4000-8000-000000000001', 'CONTA', 'Contabilidad', 'area');
+INSERT INTO org_unit_types (id, tenant_id, code, name, rank) VALUES
+  ('aaaaaaaa-0000-4000-8000-000000000a04', 'aaaaaaaa-0000-4000-8000-000000000001', 'area', 'Área', 2);
+INSERT INTO org_units (id, tenant_id, code, name, org_unit_type_id) VALUES
+  ('aaaaaaaa-0000-4000-8000-000000000a02', 'aaaaaaaa-0000-4000-8000-000000000001', 'CONTA', 'Contabilidad', 'aaaaaaaa-0000-4000-8000-000000000a04');
 INSERT INTO job_profiles (id, tenant_id, code, name) VALUES
   ('aaaaaaaa-0000-4000-8000-000000000a03', 'aaaaaaaa-0000-4000-8000-000000000001', 'ANA-CONT', 'Analista Contable');
 INSERT INTO employment_assignments (tenant_id, employment_id, job_profile_id, org_unit_id, site_id, valid_from, valid_to) VALUES

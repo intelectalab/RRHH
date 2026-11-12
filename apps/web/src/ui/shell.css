@@ -569,3 +569,23 @@
 .ficha dt { color: var(--tx2); font-weight: 400; font-size: var(--fs-s); }
 .ficha dd { margin: 0; overflow-wrap: anywhere; }
 @media (max-width: 600px) { .ficha { grid-template-columns: minmax(0, 1fr); gap: 2px; } .ficha dd { margin-bottom: 8px; } }
+/* ORG-3 · Árbol de unidades */
+.ou-filtros { display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; align-items: flex-end; }
+.ou-filtros > div { min-width: 180px; }
+.ou-buscar { flex: 1 1 240px; max-width: 360px; }
+.ou-arbol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--bd); }
+.ou-arbol li { border-bottom: 1px solid var(--bd); }
+.ou-arbol li.arch .ou-nombre b { color: var(--tx2); }
+.ou-fila { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(0, 1fr) 180px 40px; gap: 12px; align-items: center; padding: 10px 12px; }
+.ou-cab { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ou-pliegue { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; }
+.ou-nombre, .ou-dato { display: flex; flex-direction: column; min-width: 0; }
+.ou-nombre b, .ou-dato > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ou-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.ou-nivel { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .ou-fila { grid-template-columns: minmax(0, 1fr) 40px; gap: 6px 12px; }
+  .ou-dato, .ou-tags { grid-column: 1 / 2; padding-inline-start: 32px; }
+  .ou-tags { justify-content: flex-start; }
+  .ou-fila > .menu { grid-row: 1; grid-column: 2; }
+}

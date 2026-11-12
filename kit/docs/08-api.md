@@ -454,6 +454,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/cost-centers/{id}/reopen` | `org.cost_centers.update` | 1 |
 | GET | `/employments/{employment_id}/cost-distributions` | `people.assignments.view` | 1 |
 | POST | `/employments/{employment_id}/cost-distributions` | `people.assignments.create` | 1 |
+| GET | `/org-units/{id}/history` | `org.units.view` | 1 |
+| GET | `/org-units/{id}/impact` | `org.units.view` | 1 |
+| GET | `/org-unit-options` | `org.units.view` | 1 |
+| GET | `/org-unit-types` | `org.units.view` | 1 |
+| POST | `/org-unit-types` | `org.units.update` | 1 |
+| PATCH | `/org-unit-types/{id}` | `org.units.update` | 1 |
 
 **POS · Posiciones y headcount**
 

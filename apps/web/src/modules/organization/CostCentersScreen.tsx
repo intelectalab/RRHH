@@ -21,7 +21,7 @@ const TONE: Record<string, string> = { active: 'ok', closed: 'in', archived: 'gr
 /** ORG-4 · Organización → Centros de costo: código, jerarquía y vigencia; se cierran con fecha y se reabren. */
 export function CostCentersScreen() {
   const { t, locale } = useT()
-  const { can } = useSession()
+  const { can, session } = useSession()
   const { toast, node: toastNode } = useToast()
   const [rows, setRows] = useState<CostCenter[] | null>(null)
   const [companies, setCompanies] = useState<Company[]>([])
@@ -65,7 +65,7 @@ export function CostCentersScreen() {
       <PageHeader
         title={t('org.title')}
         sub={rows ? t('cc.sub', { open, total: rows.length }) : undefined}
-        tabs={orgTabs(t, can, 'cost_centers')}
+        tabs={orgTabs(t, can, 'cost_centers', session.modules)}
         actions={can('org.cost_centers.create') && (
           <button type="button" className="btn btn-primary" onClick={() => setEditing('new')}><Icon name="plus" /> {t('cc.new')}</button>
         )}

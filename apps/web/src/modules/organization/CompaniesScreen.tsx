@@ -28,7 +28,7 @@ type Catalog = {
 /** Organización → Empresas: razones sociales del grupo (TEN-5). */
 export function CompaniesScreen() {
   const { t } = useT()
-  const { can } = useSession()
+  const { can, session } = useSession()
   const company = useCompany()
   const fmtDate = useDateTime()
   const { toast, node: toastNode } = useToast()
@@ -102,7 +102,7 @@ export function CompaniesScreen() {
       <PageHeader
         title={t('org.title')}
         sub={counts ? t('org.sub', counts) : undefined}
-        tabs={orgTabs(t, can, 'companies')}
+        tabs={orgTabs(t, can, 'companies', session.modules)}
         actions={(
           <>
             {can('org.legal_entities.create') && (
