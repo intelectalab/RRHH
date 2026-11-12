@@ -6,8 +6,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 75 | 3 | 31,1 % |
-| Backlog completo | 512 | 75 | 3 | 14,6 % |
+| Primer corte comercial (MVP) | 241 | 77 | 3 | 32,0 % |
+| Backlog completo | 512 | 77 | 3 | 15,0 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -46,8 +46,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 | SEG-12 | Control de descargas y exportaciones | SEG | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Exportaciones con alcance de empresa y permisos por campo; export_jobs con filtros y filas, auditoría y registro de accesos si hay campos sensibles; cada descarga se registra; marca de agua opcional y protección contra fórmulas en CSV; botón Exportar CSV en Usuarios y Empresas. Pendiente: xlsx y pdf, y más listados (cada módulo registra su fuente). |
 | SAS-1 | Consola separada para el superadministrador | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Consola separada (/plataforma) con sesión propia (gestia_console_session), verificación en dos pasos obligatoria, bloqueo tras 5 intentos, roles superadmin/support/billing/readonly, auditoría propia y tablero de cifras agregadas sin datos de colaboradores; comandos platform:create-admin (clave por variable de entorno) y platform:reset-mfa. |
 | SAS-2 | Organizaciones: alta, suspensión y bloqueo | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Alta desde la consola con primera empresa y primer administrador invitado (todo o nada); ficha con metadatos (RN-SAS-12); estados por acción (ME-40): convertir prueba en activa, suspender o bloquear con motivo, reactivar y dar de baja, con historial, auditoría y aviso a administradores; 403 tenant_suspended/tenant_cancelled; la baja fija retention_until sin borrar (RN-SAS-10). Por validar: días de retención y de solo lectura. Pendiente: anonimizar al vencer, boletas en solo lectura con la organización suspendida (RN-SAS-05), idempotencia en la consola. |
-| SAS-3 | Planes comerciales | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
-| SAS-4 | Suscripciones, complementos y pruebas gratuitas | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
+| SAS-3 | Planes comerciales | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Planes con nombre, precio y moneda definidos por el operador (sin precio no se activan), ciclo, días de prueba, visibilidad, módulos con dependencias, límites y funcionalidades; duplicar a borrador; editar con suscriptores crea una versión nueva y conserva las condiciones de los suscriptores (RN-SAS-11); activar y retirar por acción; complementos; pantalla Consola → Planes. Pendiente: publicar el catálogo en el sitio (WEB). |
+| SAS-4 | Suscripciones, complementos y pruebas gratuitas | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Una suscripción por organización es la fuente de sus módulos y límites; subir de plan activa al instante y bajar deja en solo lectura (RN-SAS-06); complementos; convertir, suspender, reactivar y cancelar por acción arrastrando el estado (ME-40); prueba vencida en solo lectura (403 tenant_read_only) durante la gracia y suspendida al terminar (RN-SAS-04, tarea diaria); historial con autor; pantalla Consola → Suscripciones. Por validar: días de gracia. Pendiente: aviso de solo lectura en la app, cobro por ciclo (SAS-11), límites al bajar (SAS-6). |
 | SAS-5 | Módulos por organización | SAS | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-12 | Activar un módulo desde la consola activa sus dependencias sin migrar ni desplegar y conserva los datos; 403 module_not_enabled; /me publica módulos activos y en solo lectura y el menú los filtra; retirar un módulo lo deja en solo lectura (403 module_read_only) durante la transición y luego oculto (RN-SAS-06); no se retira un módulo base ni uno con dependientes. Pendiente: activación por suscripción (SAS-4) y vista de módulos del cliente. |
 | SAS-6 | Límites y consumo | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | SAS-7 | Feature flags | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
