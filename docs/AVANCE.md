@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 64 | 6 | 26,6 % |
-| Backlog completo | 512 | 64 | 6 | 12,5 % |
+| Primer corte comercial (MVP) | 241 | 65 | 6 | 27,0 % |
+| Backlog completo | 512 | 65 | 6 | 12,7 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -65,7 +65,7 @@ Actualizado el **2026-11-11** con `python3 scripts/gen_avance.py` desde `kit/bac
 | UI-1 | Fundamentos visuales y temas claro y oscuro | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | Tokens semánticos de componentes (primario, controles, barra, velo, avisos, avatar) definidos para claro y oscuro; ningún estilo ni componente usa colores literales (prueba que recorre src/ui y src/modules); contraste AA verificado por prueba en 18 pares de uso real en ambos temas; tema claro/oscuro/del sistema en el menú de la cuenta, aplicado antes de pintar; identidad propia (petróleo/ocre, Nunito Sans). Kit v1.13: tokens de docs/10 (azul de marca #0A3A73 y amarillo #F4B400, IBM Plex servida localmente, radios 7/10/12 px), ambos temas con valores propios. |
 | UI-2 | Armazón de navegación | UI | Fase 0 · Cimientos | Story | sí | en_curso | 2026-11-10 | Armazón del kit v1.13 (docs/10 §3.12): barra lateral de 252 px con usuario, menú filtrado por módulo contratado y permiso, contadores y sección Cuenta; se contrae a 68 px (preferencia recordada), de 768 a 1023 px queda en iconos y se abre superpuesta, en celular es cajón con fondo oscurecido (Escape y tocar fuera la cierran); cabecera de 60 px en una línea con miga «Organización · Rol» y el título que publica cada pantalla. Falta la ayuda de pantalla (AYU) y el botón «Crear» cuando existan esas historias. |
 | UI-3 | Biblioteca de componentes | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Biblioteca base con variantes y estados (normal, foco, deshabilitado, error, cargando): botón, tarjeta, pestañas, panel lateral y modal, línea de tiempo, estados y etiquetas, avisos, ayudas emergentes, menús, selector de persona (busca con permisos y alcance de quien pregunta), cargador de archivos y esqueletos; todo operable con teclado. Catálogo en /componentes (en producción solo con NEXT_PUBLIC_UI_CATALOG=1). Pendiente: ruta POST /files real, adopción en pantallas existentes, e2e. |
-| UI-4 | Tablas profesionales | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
+| UI-4 | Tablas profesionales | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-12 | Componente DataTable: búsqueda, filtros, orden y paginación en servidor con total (TableQuery, 400 si el orden no está permitido), columnas visibles y redimensionables, selección con acciones masivas que dicen cuántos registros afectan y piden confirmación, vistas guardadas en /saved-views (compartibles; solo el dueño las cambia) y tarjetas en móvil; usado en Usuarios y Empresas. Pendiente: pasar los demás listados, acciones masivas grandes en segundo plano (RN-UI-08) y vista predeterminada. |
 | UI-5 | Formularios y validación en interfaz | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | formErrors coloca cada error del backend junto a su campo (también campos anidados) y deja un mensaje general para lo que no es de un campo; sin red, el cliente devuelve network_error y el formulario conserva lo escrito; mensajes del servidor en lenguaje claro y en el idioma del usuario. Aplicado en Empresas y Usuarios; prueba unitaria. |
 | UI-6 | Estados vacíos, carga y error | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | Componentes EmptyState (explicación + acción si el usuario tiene permiso) y ErrorState (reintentar); esqueletos de carga en las tablas; aplicados a Usuarios, Empresas, Roles y Auditoría (ninguna pantalla muestra solo «No hay registros»). |
 | UI-7 | Paleta de comandos y búsqueda global | UI | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-10 | GET /search con registro de fuentes por módulo (usuarios, roles, empresas) que aplican permiso, módulo contratado y alcance en la consulta; cubierto por la batería de aislamiento; paleta de comandos con Ctrl/⌘+K y botón Buscar en la barra superior: resultados del servidor + accesos a pantallas permitidas, navegación con flechas, Enter y Esc. Las demás fuentes (personas, documentos, vacantes…) se registran al construir sus módulos. |
