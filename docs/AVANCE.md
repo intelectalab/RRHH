@@ -6,8 +6,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 65 | 6 | 27,0 % |
-| Backlog completo | 512 | 65 | 6 | 12,7 % |
+| Primer corte comercial (MVP) | 241 | 67 | 6 | 27,8 % |
+| Backlog completo | 512 | 67 | 6 | 13,1 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -45,10 +45,10 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 | SEG-11 | Cifrado de datos sensibles y registro de acceso | SEG | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Campos sensibles cifrados con AES-256-GCM y claves fuera de la base (user_identities, user_mfa_factors, notification_deliveries); rotación con security:rotate-field-keys documentada en docs/seguridad-cifrado-de-campos.md; leer un sueldo deja fila en /sensitive-access-logs. Pendiente: auditoría e índice ciego siguen con APP_KEY; producción debe configurar FIELD_ENCRYPTION_KEYS. |
 | SEG-12 | Control de descargas y exportaciones | SEG | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Exportaciones con alcance de empresa y permisos por campo; export_jobs con filtros y filas, auditoría y registro de accesos si hay campos sensibles; cada descarga se registra; marca de agua opcional y protección contra fórmulas en CSV; botón Exportar CSV en Usuarios y Empresas. Pendiente: xlsx y pdf, y más listados (cada módulo registra su fuente). |
 | SAS-1 | Consola separada para el superadministrador | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Consola separada (/plataforma) con sesión propia (gestia_console_session), verificación en dos pasos obligatoria, bloqueo tras 5 intentos, roles superadmin/support/billing/readonly, auditoría propia y tablero de cifras agregadas sin datos de colaboradores; comandos platform:create-admin (clave por variable de entorno) y platform:reset-mfa. |
-| SAS-2 | Organizaciones: alta, suspensión y bloqueo | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
+| SAS-2 | Organizaciones: alta, suspensión y bloqueo | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Alta desde la consola con primera empresa y primer administrador invitado (todo o nada); ficha con metadatos (RN-SAS-12); estados por acción (ME-40): convertir prueba en activa, suspender o bloquear con motivo, reactivar y dar de baja, con historial, auditoría y aviso a administradores; 403 tenant_suspended/tenant_cancelled; la baja fija retention_until sin borrar (RN-SAS-10). Por validar: días de retención y de solo lectura. Pendiente: anonimizar al vencer, boletas en solo lectura con la organización suspendida (RN-SAS-05), idempotencia en la consola. |
 | SAS-3 | Planes comerciales | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | SAS-4 | Suscripciones, complementos y pruebas gratuitas | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
-| SAS-5 | Módulos por organización | SAS | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
+| SAS-5 | Módulos por organización | SAS | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-12 | Activar un módulo desde la consola activa sus dependencias sin migrar ni desplegar y conserva los datos; 403 module_not_enabled; /me publica módulos activos y en solo lectura y el menú los filtra; retirar un módulo lo deja en solo lectura (403 module_read_only) durante la transición y luego oculto (RN-SAS-06); no se retira un módulo base ni uno con dependientes. Pendiente: activación por suscripción (SAS-4) y vista de módulos del cliente. |
 | SAS-6 | Límites y consumo | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | SAS-7 | Feature flags | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | SAS-8 | Acceso de soporte auditado | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
