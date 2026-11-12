@@ -3,7 +3,7 @@
 Motor de notificaciones con plantillas y canales (en la aplicación, correo, push y mensajería) y preferencias por usuario.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** Plataforma base.
-- **Actividades:** 6 (2 historias y 4 tareas); 6 del MVP. **Operaciones de API:** 10.
+- **Actividades:** 6 (2 historias y 4 tareas); 6 del MVP. **Operaciones de API:** 15.
 - **Especificación:** `kit/docs/modulos/M-NOT.md`.
 
 ## Prompt para una sesión nueva de Claude Code
