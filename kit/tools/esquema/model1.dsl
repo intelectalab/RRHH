@@ -21,7 +21,8 @@
   module_code ~> modules.code ; depends_on_code ~> modules.code ; is_required bool=t ; uniq module_code, depends_on_code
 @plans P main soft lock | Planes comerciales definidos por el superadministrador (nombres libres, duplicables).
   code ; name ; description ; status enum(draft,active,inactive)=draft ; billing_cycle enum(monthly,annual)=monthly
-  price money ; currency cur? ; trial_days integer ; is_public bool=t ; duplicated_from_plan_id ?=> plans ; uniq code
+  price money ; currency cur? ; trial_days integer ; is_public bool=t ; duplicated_from_plan_id ?=> plans
+  version smallint=1 ; superseded_by_plan_id ?=> plans ; uniq code, version
 @plan_modules P | Módulos incluidos en cada plan.
   plan_id => plans ; module_code ~> modules.code ; uniq plan_id, module_code
 @plan_limits P | Límites por plan (colaboradores, administradores, almacenamiento, razones sociales, llamadas de API).
@@ -36,7 +37,7 @@
 @subscriptions P main lock | Suscripción de una organización a un plan, con su ciclo, estado y periodo de prueba.
   tenant_id => tenants ; plan_id => plans ; status enum(trialing,active,past_due,suspended,cancelled,expired)=trialing
   billing_cycle enum(monthly,annual)=monthly ; price money ; currency cur? ; starts_on date! ; ends_on ; trial_ends_on
-  cancelled_at ; cancel_reason ; license_key
+  cancelled_at ; cancel_reason ; license_key ; expired_at ts ; uniq tenant_id
 @subscription_addons P | Complementos contratados dentro de una suscripción.
   subscription_id => subscriptions ; addon_id => addons ; quantity integer=1 ; price money ; currency cur? ; starts_on date! ; ends_on
 @saas_invoices P lock | Facturación del SaaS a la organización cliente (no es la nómina del cliente).

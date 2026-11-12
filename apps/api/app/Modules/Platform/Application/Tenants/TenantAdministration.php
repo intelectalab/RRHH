@@ -187,7 +187,7 @@ final class TenantAdministration
      *
      * @return array<string, mixed>
      */
-    public function transition(string $id, string $action, ?string $reason, PlatformUser $actor): array
+    public function transition(string $id, string $action, ?string $reason, ?PlatformUser $actor): array
     {
         $row = $this->find($id);
         $from = (string) $row->status;
@@ -201,7 +201,8 @@ final class TenantAdministration
         $changes = match ($to) {
             'suspended', 'blocked' => ['suspended_at' => now(), 'suspension_reason' => $reason],
             'cancelled' => ['cancelled_at' => now(), 'retention_until' => $retentionUntil],
-            'active' => ['suspended_at' => null, 'suspension_reason' => null, 'cancelled_at' => null, 'retention_until' => null],
+            // La fecha de fin de prueba solo vale en prueba; activa, la organización ya no está en solo lectura (SAS-4).
+            'active' => ['suspended_at' => null, 'suspension_reason' => null, 'cancelled_at' => null, 'retention_until' => null, 'trial_ends_at' => null],
             default => [],
         };
         if ($from === 'cancelled' && $to === 'active' && $row->retention_until !== null && Carbon::parse((string) $row->retention_until)->isPast()) {
@@ -213,7 +214,7 @@ final class TenantAdministration
             DB::table('tenants')->where('id', $row->id)->update(['status' => $to] + $changes);
             DB::table('tenant_status_events')->insert([
                 'tenant_id' => $row->id, 'from_status' => $from, 'to_status' => $to,
-                'reason' => $reason ?? $action, 'platform_user_id' => $actor->id,
+                'reason' => $reason ?? $action, 'platform_user_id' => $actor?->id,
             ]);
             TenancyScope::runAs((string) $row->id, function () use ($row, $from, $to, $reason, $retentionUntil): void {
                 $event = $this->outbox->record(DomainEventTypes::TENANT_STATUS_CHANGED, 'tenant', (string) $row->id, [
@@ -226,6 +227,18 @@ final class TenantAdministration
         });
 
         return $this->show($id);
+    }
+
+    /**
+     * SAS-4 · La suscripción arrastra el estado de la organización (ME-40) solo si la transición procede
+     * desde el estado actual: si la consola ya la dejó ahí, no hace nada.
+     */
+    public function transitionIfAllowed(string $id, string $action, ?string $reason, ?PlatformUser $actor): void
+    {
+        $row = $this->find($id);
+        if ($this->machine->can((string) $row->status, $action)) {
+            $this->transition($id, $action, $reason, $actor);
+        }
     }
 
     /**
@@ -336,13 +349,13 @@ final class TenantAdministration
     private function account(string $tenantId): array
     {
         $subscription = DB::table('subscriptions AS s')->join('plans AS p', 'p.id', '=', 's.plan_id')
-            ->where('s.tenant_id', $tenantId)->orderByDesc('s.starts_on')->first(['s.status', 's.billing_cycle', 's.trial_ends_on', 'p.name']);
+            ->where('s.tenant_id', $tenantId)->orderByDesc('s.starts_on')->first(['s.id', 's.status', 's.billing_cycle', 's.trial_ends_on', 'p.name']);
         $open = DB::table('saas_invoices')->where('tenant_id', $tenantId)->whereIn('status', ['issued', 'overdue'])
             ->groupBy('currency')->selectRaw('currency, sum(total)::text AS amount, count(*) AS n, sum(CASE WHEN status = \'overdue\' THEN 1 ELSE 0 END) AS overdue')->get();
 
         return [
             'subscription' => $subscription === null ? null : [
-                'plan' => (string) $subscription->name, 'status' => (string) $subscription->status,
+                'id' => (string) $subscription->id, 'plan' => (string) $subscription->name, 'status' => (string) $subscription->status,
                 'billing_cycle' => (string) $subscription->billing_cycle, 'trial_ends_on' => $subscription->trial_ends_on,
             ],
             'open_balance' => $open->map(fn ($r): array => ['amount' => (string) $r->amount, 'currency' => (string) $r->currency])->values()->all(),

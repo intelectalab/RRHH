@@ -302,15 +302,19 @@ CREATE TABLE plans (
   trial_days integer,
   is_public boolean NOT NULL DEFAULT true,
   duplicated_from_plan_id uuid,
+  version smallint NOT NULL DEFAULT 1,
+  superseded_by_plan_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
-  CONSTRAINT fk_plans_duplicated_from_plan_id FOREIGN KEY (duplicated_from_plan_id) REFERENCES plans (id)
+  CONSTRAINT fk_plans_duplicated_from_plan_id FOREIGN KEY (duplicated_from_plan_id) REFERENCES plans (id),
+  CONSTRAINT fk_plans_superseded_by_plan_id FOREIGN KEY (superseded_by_plan_id) REFERENCES plans (id)
 );
 COMMENT ON TABLE plans IS 'Planes comerciales definidos por el superadministrador (nombres libres, duplicables).';
-CREATE UNIQUE INDEX uq_plans_code ON plans (code) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX uq_plans_code_version ON plans (code, version) WHERE deleted_at IS NULL;
 CREATE INDEX ix_plans_duplicated_from_plan_id ON plans (duplicated_from_plan_id);
+CREATE INDEX ix_plans_superseded_by_plan_id ON plans (superseded_by_plan_id);
 CREATE TRIGGER trg_plans_touch BEFORE UPDATE ON plans FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE plan_modules (
@@ -402,14 +406,15 @@ CREATE TABLE subscriptions (
   cancelled_at timestamptz,
   cancel_reason text,
   license_key text,
+  expired_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_subscriptions_tenant_id UNIQUE (tenant_id),
   CONSTRAINT fk_subscriptions_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
   CONSTRAINT fk_subscriptions_plan_id FOREIGN KEY (plan_id) REFERENCES plans (id)
 );
 COMMENT ON TABLE subscriptions IS 'Suscripción de una organización a un plan, con su ciclo, estado y periodo de prueba.';
-CREATE INDEX ix_subscriptions_tenant_id ON subscriptions (tenant_id);
 CREATE INDEX ix_subscriptions_plan_id ON subscriptions (plan_id);
 CREATE TRIGGER trg_subscriptions_touch BEFORE UPDATE ON subscriptions FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
@@ -18386,7 +18391,7 @@ INSERT INTO master_catalog_items (master_catalog_id, code, label, labels, statut
 
 -- La aplicación no lee la tabla tenants: solo ve su propia organización a través de esta vista.
 CREATE VIEW current_tenant AS
-  SELECT id, slug, name, status, country_code, default_currency, default_locale, timezone, is_demo
+  SELECT id, slug, name, status, country_code, default_currency, default_locale, timezone, is_demo, trial_ends_at
     FROM tenants
    WHERE id = NULLIF(current_setting('app.tenant_id', true), '')::uuid AND deleted_at IS NULL;
 COMMENT ON VIEW current_tenant IS 'Organización activa de la sesión. Única vía por la que gestia_app lee datos de tenants.';

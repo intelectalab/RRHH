@@ -5,12 +5,14 @@ namespace App\Modules\Platform;
 use App\Modules\Platform\Application\Console\ConsoleSessions;
 use App\Modules\Platform\Console\CreatePlatformAdminCommand;
 use App\Modules\Platform\Console\ResetPlatformMfaCommand;
+use App\Modules\Platform\Console\RunTrialLifecycleCommand;
 use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
 use App\Modules\Platform\Http\Middleware\EnsureConsoleSecondFactor;
 use App\Modules\Platform\Http\Middleware\RequirePlatformPermission;
 use App\Modules\Platform\Infrastructure\Models\PlatformSession;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +60,9 @@ final class PlatformServiceProvider extends ServiceProvider
         $router->aliasMiddleware(RequirePlatformPermission::ALIAS, RequirePlatformPermission::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class]);
+            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class]);
+            // SAS-4 · RN-SAS-04: vencimiento de pruebas y fin de la gracia, una vez al día.
+            $this->app->booted(fn () => $this->app->make(Schedule::class)->command('platform:subscriptions:trials')->dailyAt('01:15')->withoutOverlapping());
         }
 
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');

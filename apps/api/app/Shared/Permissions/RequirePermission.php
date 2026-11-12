@@ -48,6 +48,11 @@ final class RequirePermission
             return ProblemDetailsResponse::make(403, 'module_read_only', null, null, [], ['module' => $module]);
         }
 
+        if (! $request->isMethodSafe() && $this->modules->tenantReadOnly()) {
+            // SAS-4 · RN-SAS-04: prueba vencida sin conversión; la organización solo consulta.
+            return ProblemDetailsResponse::make(403, 'tenant_read_only');
+        }
+
         $effective = $this->resolver->for((string) $user->getAuthIdentifier());
         if (! $effective->has($permission)) {
             return ProblemDetailsResponse::make(403, 'forbidden', null, null, [], ['permission' => $permission]);

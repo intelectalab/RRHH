@@ -2,11 +2,13 @@
 
 namespace App\Modules\Platform\Http\Controllers;
 
+use App\Modules\Platform\Application\Subscriptions\SubscriptionService;
 use App\Modules\Platform\Application\Tenants\TenantAdministration;
 use App\Modules\Platform\Domain\TenantStateMachine;
 use App\Modules\Platform\Infrastructure\Models\PlatformUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -16,7 +18,10 @@ final class TenantController
 {
     private const SLUG = '/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/';
 
-    public function __construct(private readonly TenantAdministration $tenants) {}
+    public function __construct(
+        private readonly TenantAdministration $tenants,
+        private readonly SubscriptionService $subscriptions,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -56,9 +61,23 @@ final class TenantController
             'payroll_regime' => ['required', 'string', 'max:40'],
             'module_codes' => ['sometimes', 'array', 'max:40'],
             'module_codes.*' => ['string', 'max:40', 'exists:modules,code'],
+            // SAS-4: con plan, el alta crea la suscripción (en prueba si hay fecha de fin) y activa sus módulos.
+            'plan_id' => ['sometimes', 'nullable', 'uuid'],
         ]);
+        $actor = $this->actor($request);
 
-        return response()->json(['data' => $this->tenants->create($data, $this->actor($request))], 201);
+        $tenant = DB::transaction(function () use ($data, $actor): array {
+            $tenant = $this->tenants->create($data, $actor);
+            if (! empty($data['plan_id'])) {
+                $this->subscriptions->create(['tenant_id' => $tenant['id'], 'plan_id' => $data['plan_id']], $actor);
+
+                return $this->tenants->show((string) $tenant['id']);
+            }
+
+            return $tenant;
+        });
+
+        return response()->json(['data' => $tenant], 201);
     }
 
     public function show(string $id): JsonResponse

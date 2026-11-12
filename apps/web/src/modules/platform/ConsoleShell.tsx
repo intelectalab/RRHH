@@ -26,6 +26,8 @@ export function useConsoleTabs(): Tab[] {
   const tabs: Array<Tab & { perm: string }> = [
     { href: '/plataforma', label: t('console.tab_dashboard'), active: pathname === '/plataforma', perm: 'platform.metrics.view' },
     { href: '/plataforma/organizaciones', label: t('console.tab_tenants'), active: pathname.startsWith('/plataforma/organizaciones'), perm: 'platform.tenants.view' },
+    { href: '/plataforma/planes', label: t('console.tab_plans'), active: pathname.startsWith('/plataforma/planes'), perm: 'platform.plans.view' },
+    { href: '/plataforma/suscripciones', label: t('console.tab_subscriptions'), active: pathname.startsWith('/plataforma/suscripciones'), perm: 'platform.subscriptions.view' },
     { href: '/plataforma/auditoria', label: t('console.tab_audit'), active: pathname.startsWith('/plataforma/auditoria'), perm: 'platform.audit.view' },
   ]
   return tabs.filter((tab) => me.permissions.includes(tab.perm)).map(({ perm: _perm, ...tab }) => tab)

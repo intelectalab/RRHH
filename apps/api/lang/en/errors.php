@@ -13,6 +13,7 @@ return [
     'tenant_suspended' => 'The organization is currently suspended.',
     'tenant_cancelled' => 'The organization has been cancelled. Its data is kept during the retention period; contact support to reactivate it.',
     'module_read_only' => 'The module has been withdrawn: its data can be viewed but no longer changed.',
+    'tenant_read_only' => 'The free trial has ended: you can view your data but not change it until a plan is purchased.',
     'plan_limit_reached' => 'The plan limit for this resource has been reached.',
     'not_found' => 'The requested resource was not found or belongs to another organization.',
     'invalid_transition' => 'The requested action is not valid for the current state.',

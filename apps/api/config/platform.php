@@ -27,13 +27,15 @@ return [
      */
     /*
      * SAS-2 · SAS-5 · Valores por defecto de la configuración global (tabla platform_settings; la fila,
-     * si existe, manda). Ambos son «por validar» con el área legal y comercial.
+     * si existe, manda). Todos son «por validar» con el área legal y comercial.
      */
     'settings' => [
         // RN-SAS-10: días que se conservan los datos tras la baja, por país («default» para el resto).
         'tenants.retention_days_after_cancel' => ['default' => 90],
         // RN-SAS-06: días que un módulo retirado queda en solo lectura antes de ocultarse.
         'modules.read_only_transition_days' => 30,
+        // SAS-4 · RN-SAS-04: días de gracia (organización en solo lectura) tras vencer la prueba sin conversión.
+        'subscriptions.trial_grace_days' => 7,
     ],
 
     'roles' => [

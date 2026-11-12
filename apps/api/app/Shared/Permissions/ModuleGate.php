@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
  * SAS-5 · Un módulo retirado no borra datos: durante el periodo de transición (RN-SAS-06) queda en
  * solo lectura hasta read_only_until (la consola lo fija con el parámetro de plataforma
  * modules.read_only_transition_days) y después se oculta.
+ *
+ * SAS-4 · Con la prueba vencida sin conversión, toda la organización queda en solo lectura (tenantReadOnly).
  */
 final class ModuleGate
 {
@@ -23,6 +25,9 @@ final class ModuleGate
 
     /** @var array<string, array<string, string>> */
     private array $memo = [];
+
+    /** @var array<string, bool> */
+    private array $readOnlyMemo = [];
 
     /**
      * Módulos con acceso completo (activos o en prueba).
@@ -61,9 +66,26 @@ final class ModuleGate
         return $module === null ? null : (string) $module;
     }
 
+    /**
+     * SAS-4 · RN-SAS-04: la prueba venció sin conversión y la organización está en el periodo de gracia:
+     * se consulta todo, pero nada se modifica hasta que se convierta (o se suspenda al terminar la gracia).
+     * Una gracia por pago vencido (sin fecha de prueba) opera con normalidad (ME-40).
+     */
+    public function tenantReadOnly(): bool
+    {
+        $tenant = TenancyScope::requireTenant();
+        if (! isset($this->readOnlyMemo[$tenant])) {
+            $row = DB::table('current_tenant')->first(['status', 'trial_ends_at']);
+            $this->readOnlyMemo[$tenant] = $row !== null && $row->status === 'grace_period' && $row->trial_ends_at !== null;
+        }
+
+        return $this->readOnlyMemo[$tenant];
+    }
+
     public function forget(): void
     {
         $this->memo = [];
+        $this->readOnlyMemo = [];
     }
 
     /**

@@ -67,7 +67,7 @@ final class TenantModules
      *
      * @return list<string> módulos que se activaron en esta llamada
      */
-    public function activate(string $tenantId, string $code, PlatformUser $actor, string $source = 'manual'): array
+    public function activate(string $tenantId, string $code, ?PlatformUser $actor, string $source = 'manual'): array
     {
         $this->module($code);
         $chain = $this->withDependencies($code);
@@ -105,7 +105,7 @@ final class TenantModules
     /**
      * Retira un módulo: sus datos quedan en solo lectura durante la transición y luego se ocultan.
      */
-    public function deactivate(string $tenantId, string $code, PlatformUser $actor): void
+    public function deactivate(string $tenantId, string $code, ?PlatformUser $actor): void
     {
         $module = $this->module($code);
         if ((bool) $module->is_core) {
@@ -186,7 +186,7 @@ final class TenantModules
         return $order;
     }
 
-    private function audited(string $tenantId, string $module, string $status, ?string $before, PlatformUser $actor): void
+    private function audited(string $tenantId, string $module, string $status, ?string $before, ?PlatformUser $actor): void
     {
         $this->audit->record($status === 'active' ? 'tenant.module_activated' : 'tenant.module_deactivated', $actor, 'tenant_module', null,
             ['module' => $module, 'status' => $before], ['module' => $module, 'status' => $status], $tenantId);
