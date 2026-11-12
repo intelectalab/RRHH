@@ -3,7 +3,7 @@
 Empresas, sedes, unidades, centros de costo, catálogo de puestos y organigrama dinámico.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 7 (7 historias y 0 tareas); 7 del MVP. **Operaciones de API:** 32.
+- **Actividades:** 7 (7 historias y 0 tareas); 7 del MVP. **Operaciones de API:** 36.
 - **Especificación:** `kit/docs/modulos/M-ORG.md`.
 
 ## Prompt para una sesión nueva de Claude Code

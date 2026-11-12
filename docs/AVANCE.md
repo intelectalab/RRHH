@@ -6,8 +6,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 67 | 6 | 27,8 % |
-| Backlog completo | 512 | 67 | 6 | 13,1 % |
+| Primer corte comercial (MVP) | 241 | 69 | 6 | 28,6 % |
+| Backlog completo | 512 | 69 | 6 | 13,5 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -113,9 +113,9 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 | WEB-12 | Páginas legales y libro de reclamaciones virtual | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
 | WEB-13 | Sección «Sitio web» de la consola | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
 | ORG-1 | Empresas y razones sociales | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| ORG-2 | Sedes, sucursales y ubicaciones | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| ORG-2 | Sedes, sucursales y ubicaciones | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | Sedes por empresa o compartidas: código, tipo, dirección, ubigeo, coordenadas y radio de geocerca, zona horaria efectiva (sede → empresa → organización), calendario de feriados, código de establecimiento y marca SCTR; /sites con archive/restore, alcance por empresa y auditoría; RN-ORG-05; pantalla Organización → Sedes. Pendiente: que asignaciones y marcación usen StructureAvailability y la geocerca. |
 | ORG-3 | Árbol de unidades organizacionales | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| ORG-4 | Centros de costo | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| ORG-4 | Centros de costo | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | Centros de costo con cuenta contable, jerarquía sin ciclos y vigencia (abrir, cerrar, reabrir, archivar por acción); no se cierran con subcentros abiertos ni asignaciones vigentes; distribución por relación laboral con vigencia (/employments/{id}/cost-distributions) que suma siempre 100 % (RN-ORG-06, API y disparador en base); pantalla Organización → Centros de costo. Pendiente: distribución en la ficha (COL-3), corregir el mismo día y contabilización de planilla. |
 | ORG-5 | Catálogo de puestos, cargos, niveles y categorías | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | ORG-6 | Organigrama visual dinámico | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | ORG-7 | Directorio de personas | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
