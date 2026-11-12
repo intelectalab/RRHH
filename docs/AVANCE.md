@@ -6,8 +6,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 77 | 3 | 32,0 % |
-| Backlog completo | 512 | 77 | 3 | 15,0 % |
+| Primer corte comercial (MVP) | 241 | 79 | 3 | 32,8 % |
+| Backlog completo | 512 | 79 | 3 | 15,4 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -117,8 +117,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 | ORG-3 | Árbol de unidades organizacionales | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | Árbol de unidades con vigencia: niveles propios por organización (seis precargados), versiones con fecha en org_unit_versions (superior, nombre, nivel, responsable, centro de costo); reorganizar con fecha futura sin alterar el pasado, ?as_of= y org:apply-structure-changes diario que actualiza estructura y alcance; sin ciclos (RN-ORG-02); archivar exige no tener subunidades ni posiciones activas (RN-ORG-01); historia, impacto y eventos por outbox; pantalla Organización → Unidades. Pendiente: responsables con posiciones (POS-1), reasignar aprobaciones (RN-ORG-03), organigrama (ORG-6). |
 | ORG-4 | Centros de costo | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | Centros de costo con cuenta contable, jerarquía sin ciclos y vigencia (abrir, cerrar, reabrir, archivar por acción); no se cierran con subcentros abiertos ni asignaciones vigentes; distribución por relación laboral con vigencia (/employments/{id}/cost-distributions) que suma siempre 100 % (RN-ORG-06, API y disparador en base); pantalla Organización → Centros de costo. Pendiente: distribución en la ficha (COL-3), corregir el mismo día y contabilización de planilla. |
 | ORG-5 | Catálogo de puestos, cargos, niveles y categorías | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | Puestos de catálogo con familia, nivel, categoría, misión, funciones, requisitos, clasificación (ordinario, confianza, dirección), ocupación y riesgo; descripción versionada e inmutable con motivo y autor (/job-profiles/{id}/versions); archivar por acción (RN-ORG-04); sin categoría queda marcado (RN-ORG-07); niveles, familias y categorías configurables; pantalla Organización → Puestos. Pendiente: validación en POS, competencias y banda salarial. |
-| ORG-6 | Organigrama visual dinámico | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| ORG-7 | Directorio de personas | ORG | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| ORG-6 | Organigrama visual dinámico | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | GET /org-chart?view=units/people&as_of= en Personas → Organigrama: árbol de unidades a una fecha con responsable y personas, o línea de reporte vigente (corta ciclos); se calcula al vuelo, así una fecha pasada muestra la estructura de entonces; búsqueda, plegado, zoom y exportación a PNG y PDF. Pendiente: vista por posiciones, filtro por empresa en pantalla, enlace a la ficha (COL). |
+| ORG-7 | Directorio de personas | ORG | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | GET /directory con búsqueda, filtros por unidad (con subunidades), sede y puesto, y paginación; /directory/{employment_id} con jefe, compañeros y reportes; RN-ORG-08: solo nombre, puesto, unidad, sede, empresa y el contacto laboral que elige la organización (directorio.campos_contacto); todos los roles consultan toda la organización, como dice M-ORG; pantalla Personas → Directorio. Pendiente: contacto laboral y foto desde COL; la demo no tiene colaboradores. |
 | POS-1 | Posiciones como plazas | POS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | POS-2 | Estados de la posición | POS | Fase 1 · Core HR | Task | sí | pendiente | — |  |
 | POS-3 | Solicitud y aprobación de nuevas posiciones | POS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
