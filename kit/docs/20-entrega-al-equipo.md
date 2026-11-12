@@ -60,7 +60,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [PLT](../prompts/PLT.md) · Plataforma técnica | Plataforma base | 0 | 14 | 14 | 4 | Sí | A-13, D-22 |
 | 0 | [TEN](../prompts/TEN.md) · Multiempresa y aislamiento | Plataforma base | 1 | 5 | 6 | 3 | Sí | — |
 | 0 | [SEG](../prompts/SEG.md) · Identidad, roles, permisos por campo y alcance | Plataforma base | 9 | 3 | 12 | 41 | Sí | D-23, D-24 |
-| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 55 | Sí | D-19 |
+| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 64 | Sí | D-19 |
 | 0 | [AUD](../prompts/AUD.md) · Auditoría | Plataforma base | 1 | 4 | 5 | 11 | Sí | — |
 | 0 | [UI](../prompts/UI.md) · Sistema de diseño y armazón | Plataforma base | 3 | 9 | 12 | 0 | Sí | — |
 | 0 | [WFL](../prompts/WFL.md) · Motor de aprobaciones y workflows | Plataforma base | 5 | 4 | 9 | 32 | — | — |
@@ -68,7 +68,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [CFG](../prompts/CFG.md) · Configuración, campos personalizados, i18n y multimoneda | Plataforma base | 5 | 5 | 10 | 29 | — | — |
 | 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 35 | Sí | D-39, D-40, D-41 |
 | 1 | [ORG](../prompts/ORG.md) · Estructura organizacional | Core HR | 7 | 0 | 7 | 64 | — | — |
-| 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 16 | — | D-05 |
+| 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 23 | — | D-05 |
 | 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 18 | — | A-05, A-10, D-14, D-17, D-30, D-35 |
 | 1 | [HIS](../prompts/HIS.md) · Historia con vigencia | Core HR | 3 | 3 | 6 | 9 | — | — |
 | 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 16 | — | D-10 |
