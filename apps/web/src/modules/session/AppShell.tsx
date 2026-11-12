@@ -21,12 +21,14 @@ import { ShellTitleProvider, useShellTitle } from './ShellTitle'
 type IconName = Parameters<typeof Icon>[0]['name']
 
 /** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
-type NavLink = { href: string; key: string; icon: IconName; module: string; visible: (can: (p: string) => boolean) => boolean; count?: 'approval' | 'task' }
+type NavLink = { href: string; key: string; icon: IconName; module: string; visible: (can: (p: string) => boolean) => boolean; count?: 'approval' | 'task'; exact?: boolean }
 
 /** Menú principal (docs/10 §3.12 y §4). Se agregan entradas a medida que existen pantallas (sin botones sin función). */
 const MENU: NavLink[] = [
   { href: '/', key: 'shell.modules_home', icon: 'home', module: 'base', visible: () => true },
   { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
+  { href: '/personas/directorio', key: 'shell.modules_directory', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
+  { href: '/personas/organigrama', key: 'shell.modules_org_chart', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
   { href: '/aprobaciones', key: 'shell.modules_approvals', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
   { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
   { href: '/calendario', key: 'shell.modules_calendar', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
@@ -97,15 +99,15 @@ function Shell({ children }: { children: ReactNode }) {
     })
   }
 
-  const active = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href.split('/').slice(0, 2).join('/')))
+  const active = (href: string, exact = false) => (href === '/' ? pathname === '/' : exact ? pathname === href || pathname.startsWith(`${href}/`) : pathname.startsWith(href.split('/').slice(0, 2).join('/')))
   const role = session.roles[0]?.name ?? ''
   // SAS-5: el menú muestra los módulos activos y los retirados que siguen en solo lectura (RN-SAS-06).
   const visibleModules = [...session.modules, ...(session.modules_read_only ?? [])]
   const items = MENU.filter((m) => visibleModules.includes(m.module) && m.visible(can))
   const showSettings = session.modules.includes('base') && SETTINGS_PERMS.some((p) => can(p))
 
-  const navLink = (href: string, label: string, icon: IconName, count = 0) => (
-    <Link key={href} href={href} className={`nav${active(href) ? ' on' : ''}`} aria-current={active(href) ? 'page' : undefined} title={min ? label : undefined}>
+  const navLink = (href: string, label: string, icon: IconName, count = 0, exact = false) => (
+    <Link key={href} href={href} className={`nav${active(href, exact) ? ' on' : ''}`} aria-current={active(href, exact) ? 'page' : undefined} title={min ? label : undefined}>
       <Icon name={icon} size={20} />
       <span className="l">{label}</span>
       {count > 0 && <span className="badge-n" aria-label={t('shell.inbox_aria', { n: count })}>{count}</span>}
@@ -137,7 +139,7 @@ function Shell({ children }: { children: ReactNode }) {
         </div>
         <nav className="side-nav">
           <div className="side-sec">{t('shell.menu_section')}</div>
-          {items.map((m) => navLink(m.href, t(m.key), m.icon, m.count ? (inbox?.[m.count] ?? 0) : 0))}
+          {items.map((m) => navLink(m.href, t(m.key), m.icon, m.count ? (inbox?.[m.count] ?? 0) : 0, m.exact))}
         </nav>
         <div className="side-foot">
           <div className="side-sec">{t('shell.account_section')}</div>

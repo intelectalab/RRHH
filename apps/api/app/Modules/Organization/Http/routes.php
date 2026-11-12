@@ -2,6 +2,7 @@
 
 use App\Modules\Organization\Http\Controllers\CostCenterController;
 use App\Modules\Organization\Http\Controllers\CostDistributionController;
+use App\Modules\Organization\Http\Controllers\DirectoryController;
 use App\Modules\Organization\Http\Controllers\JobCatalogController;
 use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
@@ -11,6 +12,11 @@ use App\Modules\Organization\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
+    // ORG-6 · ORG-7 · Organigrama a una fecha y directorio de personas (RN-ORG-08).
+    Route::get('/org-chart', [DirectoryController::class, 'orgChart'])->middleware('permission:people.directory.view');
+    Route::get('/directory', [DirectoryController::class, 'index'])->middleware('permission:people.directory.view');
+    Route::get('/directory/{employment_id}', [DirectoryController::class, 'show'])->middleware('permission:people.directory.view');
+
     Route::get('/catalogs/organization', OrganizationCatalogController::class)->middleware('permission:org.legal_entities.view');
     Route::get('/legal-entities', [LegalEntityController::class, 'index'])->middleware('permission:org.legal_entities.view');
     Route::post('/legal-entities', [LegalEntityController::class, 'store'])->middleware('permission:org.legal_entities.create');

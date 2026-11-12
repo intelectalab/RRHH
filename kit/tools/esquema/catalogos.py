@@ -120,6 +120,9 @@ ROLES = [(code, name, realm, desc, None, None) for col, code, name, realm, scope
 # SEG-3 · RN-SEG-08 · ADR 0011: roles con acceso a datos sensibles que traen el segundo factor obligatorio.
 MFA_REQUIRED_ROLES = {'superadmin_saas', 'admin_empresa', 'payroll', 'investigador_denuncias'}
 
+# Permisos que valen para toda la organización aunque el rol tenga otro alcance por defecto.
+ORG_WIDE_PERMS = {'people.directory.view'}
+
 def _parse_perm_doc():
     perms, grants, seen = [], {c[1]: {} for c in ROLE_COLS}, {}
     epic = None
@@ -144,6 +147,9 @@ def _parse_perm_doc():
             if rrealm == 'tenant' and seen[code]['ambito'] == 'plataforma': continue
             # «○» = solo lo propio o lo asignado: «own» en Empleado y Manager, «assigned» en los demás roles.
             scope = rscope if cell == '✓' else ('own' if rcode in ('empleado', 'manager') else 'assigned')
+            # ORG-7 · RN-ORG-08: el directorio y el organigrama son de toda la organización para quien los ve;
+            # lo que se limita son los campos (contacto laboral publicado), no las personas.
+            if code in ORG_WIDE_PERMS and cell == '✓': scope = 'organization'
             grants[rcode][code] = scope
     assert len(perms) > 300, len(perms)
     return perms, grants
@@ -191,6 +197,7 @@ PARAMS = [
  ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'time', None, [O], 'Hora local en que se entregan los avisos que esperaron por el silencio.', None),
  ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'list', [], [O], 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', ['approval.pending', 'approval.reminder', 'approval.escalated', 'approval.approved', 'approval.rejected', 'task.assigned', 'task.overdue']),
  ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'select', 'sms', [O], 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', ['sms', 'whatsapp', 'none']),
+ ('directorio.campos_contacto', 'core', 'Contacto visible en el directorio', 'list', ['work_email', 'work_phone'], [O], 'Datos de contacto laboral que todos ven en el directorio y el organigrama (RN-ORG-08). Nunca incluye correo ni celular personal ni datos sensibles.', ['work_email', 'work_phone', 'work_phone_ext']),
  ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'integer', 180, [O], 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', None),
  ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'boolean', True, [O, E], 'Genera el código con el correlativo de la empresa.', None),
  ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'boolean', True, [O, E], 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', None),

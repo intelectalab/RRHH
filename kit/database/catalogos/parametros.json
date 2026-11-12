@@ -485,6 +485,25 @@
       ]
     },
     {
+      "codigo": "directorio.campos_contacto",
+      "modulo": "core",
+      "nombre": "Contacto visible en el directorio",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "work_email",
+        "work_phone"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Datos de contacto laboral que todos ven en el directorio y el organigrama (RN-ORG-08). Nunca incluye correo ni celular personal ni datos sensibles.",
+      "opciones": [
+        "work_email",
+        "work_phone",
+        "work_phone_ext"
+      ]
+    },
+    {
       "codigo": "notificaciones.retencion_dias",
       "modulo": "base",
       "nombre": "Retención de avisos leídos (días)",

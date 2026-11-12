@@ -3977,8 +3977,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Directorio (solo datos no sensibles) */
+        /** Directorio de personas (ORG-7): búsqueda por nombre, puesto, unidad y sede; solo nombre, puesto, unidad, sede y el contacto laboral publicado por la organización (RN-ORG-08), nunca datos personales ni sensibles */
         get: operations["getDirectory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/directory/{employment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tarjeta de contacto (ORG-7) con su equipo: jefe directo, compañeros con el mismo jefe y reportes directos */
+        get: operations["getDirectoryEmploymentId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8264,7 +8281,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Organigrama por posiciones en una fecha (as_of) */
+        /** Organigrama a una fecha (ORG-6): view=units dibuja el árbol de unidades con su responsable y dotación; view=people, la línea de reporte (jefe directo por asignación o por posición jefe). Solo nombre, puesto, unidad, sede y el contacto laboral que la organización publica */
         get: operations["getOrgChart"];
         put?: never;
         post?: never;
@@ -31099,7 +31116,20 @@ export interface operations {
     };
     getDirectory: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Nombre, código de colaborador o puesto */
+                q?: string;
+                /** @description Solo la unidad y sus subunidades */
+                org_unit_id?: string;
+                /** @description Solo esa sede */
+                site_id?: string;
+                /** @description Solo ese puesto */
+                job_profile_id?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -31115,8 +31145,34 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    getDirectoryEmploymentId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getDisciplinaryCases: {
@@ -41644,7 +41700,12 @@ export interface operations {
     };
     getOrgChart: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Fecha (AAAA-MM-DD) de la estructura; por defecto hoy */
+                as_of?: string;
+                /** @description units (por unidades, por defecto) o people (por línea de reporte) */
+                view?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -41660,6 +41721,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };

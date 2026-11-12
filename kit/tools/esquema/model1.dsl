@@ -409,11 +409,12 @@
   person_id -> people ; full_name text! #S ; relationship enum(spouse,partner,pregnant_partner,child,disabled_adult_child,parent,other)! ; doc_type ; number_enc
   number_hash ; birth_date date #S ; is_student ; disability_enc ; registered_on ; deregistered_on ; deregistration_reason
   registry_status enum(pending,registered,deregistered)=pending ; entitles_family_allowance ; proof_file_id ?-> stored_files
-@employments main soft lock | Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí.
+@employments main soft lock | Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí. work_email, work_phone y work_phone_ext son el contacto laboral que el directorio puede publicar (ORG-7 · RN-ORG-08); nunca el correo o celular personal.
   person_id -> people ; legal_entity_id -> legal_entities ; employee_code text! ; kind enum(employee,intern,apprentice)=employee
   worker_category enum(executive,employee,worker)=employee ; hire_date date! ; seniority_date date ; termination_date date
   status enum(pending,active,suspended,terminated,terminating,cancelled)=pending ; rehire_of_employment_id ?-> employments
   source_application_id ?-> applications ; probation_ends_on ; uniq legal_entity_id, employee_code
+  work_email ; work_phone ; work_phone_ext
   check termination_date IS NULL OR termination_date >= hire_date
 @employment_status_events imm | Historial inalterable de estados de la relación laboral.
   employment_id -> employments ; from_status ; to_status text! ; reason_code ; effective_on date! ; changed_by_user_id ?-> users ; notes

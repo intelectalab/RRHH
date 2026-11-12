@@ -10084,7 +10084,63 @@ paths:
       operationId: postDevelopmentPlansIdComplete
   /directory:
     get:
-      summary: Directorio (solo datos no sensibles)
+      summary: 'Directorio de personas (ORG-7): búsqueda por nombre, puesto, unidad y sede; solo nombre, puesto, unidad, sede
+        y el contacto laboral publicado por la organización (RN-ORG-08), nunca datos personales ni sensibles'
+      parameters:
+      - name: q
+        in: query
+        required: false
+        description: Nombre, código de colaborador o puesto
+        schema:
+          type: string
+      - name: org_unit_id
+        in: query
+        required: false
+        description: Solo la unidad y sus subunidades
+        schema:
+          type: string
+      - name: site_id
+        in: query
+        required: false
+        description: Solo esa sede
+        schema:
+          type: string
+      - name: job_profile_id
+        in: query
+        required: false
+        description: Solo ese puesto
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página (desde 1)
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (hasta 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - ORG
+      x-phase: 1
+      x-permission: people.directory.view
+      operationId: getDirectory
+  /directory/{employment_id}:
+    get:
+      summary: 'Tarjeta de contacto (ORG-7) con su equipo: jefe directo, compañeros con el mismo jefe y reportes directos'
       responses:
         '200':
           description: Correcto
@@ -10094,11 +10150,18 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
-      - COL
+      - ORG
       x-phase: 1
       x-permission: people.directory.view
-      operationId: getDirectory
+      operationId: getDirectoryEmploymentId
+      parameters:
+      - name: employment_id
+        in: path
+        required: true
+        schema:
+          type: string
   /disciplinary-cases:
     get:
       summary: Listar DisciplinaryCase
@@ -20535,7 +20598,23 @@ paths:
       operationId: postOneOnOnesIdComplete
   /org-chart:
     get:
-      summary: Organigrama por posiciones en una fecha (as_of)
+      summary: 'Organigrama a una fecha (ORG-6): view=units dibuja el árbol de unidades con su responsable y dotación; view=people,
+        la línea de reporte (jefe directo por asignación o por posición jefe). Solo nombre, puesto, unidad, sede y el contacto
+        laboral que la organización publica'
+      parameters:
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha (AAAA-MM-DD) de la estructura; por defecto hoy
+        schema:
+          type: string
+          format: date
+      - name: view
+        in: query
+        required: false
+        description: units (por unidades, por defecto) o people (por línea de reporte)
+        schema:
+          type: string
       responses:
         '200':
           description: Correcto
@@ -20543,12 +20622,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
         '401': *id002
         '403': *id003
       tags:
       - ORG
       x-phase: 1
-      x-permission: org.units.view
+      x-permission: people.directory.view
       operationId: getOrgChart
   /org-unit-options:
     get:

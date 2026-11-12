@@ -343,11 +343,12 @@ EXTRA = [
     ("AUD", 0, "post", "/trash/{id}/restore", "audit.trash.restore", "Restaurar un registro de la papelera", False),
     ("AUD", 0, "get", "/audit-archives/{id}/entries", "audit.logs.view", "Entradas de un mes de auditoría archivado en frío, consultables hasta el fin del plazo de conservación (los campos sensibles se enmascaran sin su permiso)", False),
     ("AUD", 0, "get", "/audit-retention", "audit.logs.view", "Políticas de conservación por separado: auditoría (años y meses en línea), actividad de usuarios (días) y logs técnicos (días)", False),
-    ("ORG", 1, "get", "/org-chart", "org.units.view", "Organigrama por posiciones en una fecha (as_of)", False),
+    ("ORG", 1, "get", "/org-chart", "people.directory.view", "Organigrama a una fecha (ORG-6): view=units dibuja el árbol de unidades con su responsable y dotación; view=people, la línea de reporte (jefe directo por asignación o por posición jefe). Solo nombre, puesto, unidad, sede y el contacto laboral que la organización publica", False),
     ("ORG", 1, "get", "/job-profiles/{id}/versions", "org.job_profiles.view", "Versiones de la descripción del puesto (misión, funciones y requisitos), de la más reciente a la más antigua; inalterables (ORG-5)", False),
     ("ORG", 1, "get", "/legal-entities/{id}/regimes", "org.legal_entities.view", "Historia del régimen laboral de la empresa con su vigencia (valid_from / valid_to), de la más reciente a la más antigua (ORG-1)", False),
     ("POS", 1, "get", "/headcount", "org.positions.view", "Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas", False),
-    ("COL", 1, "get", "/directory", "people.directory.view", "Directorio (solo datos no sensibles)", False),
+    ("ORG", 1, "get", "/directory", "people.directory.view", "Directorio de personas (ORG-7): búsqueda por nombre, puesto, unidad y sede; solo nombre, puesto, unidad, sede y el contacto laboral publicado por la organización (RN-ORG-08), nunca datos personales ni sensibles", False),
+    ("ORG", 1, "get", "/directory/{employment_id}", "people.directory.view", "Tarjeta de contacto (ORG-7) con su equipo: jefe directo, compañeros con el mismo jefe y reportes directos", False),
     ("HIS", 1, "get", "/employments/{employment_id}/timeline", "people.employments.view", "Línea de tiempo de la relación laboral", False),
     ("ESS", 1, "get", "/me/employment", "-", "Ficha propia del colaborador", False),
     ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador: saldos, próximo pago, pendientes", False),
@@ -447,6 +448,18 @@ _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", 
 QUERY = {
     ("get", "/employments/{employment_id}/cost-distributions"): [
         _q("as_of", "Fecha (AAAA-MM-DD): solo la distribución vigente a ese día", False, "date"),
+    ],
+    ("get", "/org-chart"): [
+        _q("as_of", "Fecha (AAAA-MM-DD) de la estructura; por defecto hoy", False, "date"),
+        _q("view", "units (por unidades, por defecto) o people (por línea de reporte)"),
+    ],
+    ("get", "/directory"): [
+        _q("q", "Nombre, código de colaborador o puesto"),
+        _q("org_unit_id", "Solo la unidad y sus subunidades"),
+        _q("site_id", "Solo esa sede"),
+        _q("job_profile_id", "Solo ese puesto"),
+        _q("page", "Página (desde 1)"),
+        _q("per_page", "Tamaño de página (hasta 100)"),
     ],
     ("get", "/calendar"): [
         _q("from", "Primer día (AAAA-MM-DD)", True, "date"),

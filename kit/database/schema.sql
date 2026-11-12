@@ -3233,6 +3233,9 @@ CREATE TABLE employments (
   rehire_of_employment_id uuid,
   source_application_id uuid,
   probation_ends_on date,
+  work_email text,
+  work_phone text,
+  work_phone_ext text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -3243,7 +3246,7 @@ CREATE TABLE employments (
   CONSTRAINT fk_employments_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
   CONSTRAINT fk_employments_rehire_of_employment_id FOREIGN KEY (tenant_id, rehire_of_employment_id) REFERENCES employments (tenant_id, id)
 );
-COMMENT ON TABLE employments IS 'Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí.';
+COMMENT ON TABLE employments IS 'Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí. work_email, work_phone y work_phone_ext son el contacto laboral que el directorio puede publicar (ORG-7 · RN-ORG-08); nunca el correo o celular personal.';
 CREATE UNIQUE INDEX uq_employments_legal_entity_id_employee_code ON employments (tenant_id, legal_entity_id, employee_code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_employments_person_id ON employments (tenant_id, person_id);
 CREATE INDEX ix_employments_rehire_of_employment_id ON employments (tenant_id, rehire_of_employment_id);
@@ -17273,7 +17276,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'org.sites.view', 'team'),
   ('manager', 'org.cost_centers.view', 'team'),
   ('manager', 'org.job_profiles.view', 'team'),
-  ('manager', 'people.directory.view', 'team'),
+  ('manager', 'people.directory.view', 'organization'),
   ('manager', 'org.positions.view', 'team'),
   ('manager', 'org.position_requests.create', 'team'),
   ('manager', 'people.employments.view', 'team'),
@@ -17483,7 +17486,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('empleado', 'workflow.tasks.complete', 'own'),
   ('empleado', 'time.calendar.view', 'own'),
   ('empleado', 'time.holiday_calendars.view', 'own'),
-  ('empleado', 'people.directory.view', 'own'),
+  ('empleado', 'people.directory.view', 'organization'),
   ('empleado', 'people.employments.view', 'own'),
   ('empleado', 'people.people.view', 'own'),
   ('empleado', 'people.dependents.view', 'own'),
@@ -18098,6 +18101,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),
   ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', 'select', '"sms"'::jsonb, ARRAY['organization'], '["sms", "whatsapp", "none"]'::jsonb),
+  ('directorio.campos_contacto', 'core', 'Contacto visible en el directorio', 'Datos de contacto laboral que todos ven en el directorio y el organigrama (RN-ORG-08). Nunca incluye correo ni celular personal ni datos sensibles.', 'list', '["work_email", "work_phone"]'::jsonb, ARRAY['organization'], '["work_email", "work_phone", "work_phone_ext"]'::jsonb),
   ('notificaciones.retencion_dias', 'base', 'Retención de avisos leídos (días)', 'Días que un aviso leído se muestra en el centro de notificaciones antes de archivarse.', 'integer', '180'::jsonb, ARRAY['organization'], NULL),
   ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'Genera el código con el correlativo de la empresa.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),

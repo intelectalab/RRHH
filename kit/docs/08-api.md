@@ -467,9 +467,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/job-categories` | `org.job_profiles.{view,create}` | 1 |
 | GET, PATCH | `/job-categories/{id}` | `org.job_profiles.{view,update}` | 1 |
 | POST | `/job-categories/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
-| GET | `/org-chart` | `org.units.view` | 1 |
+| GET | `/org-chart` | `people.directory.view` | 1 |
 | GET | `/job-profiles/{id}/versions` | `org.job_profiles.view` | 1 |
 | GET | `/legal-entities/{id}/regimes` | `org.legal_entities.view` | 1 |
+| GET | `/directory` | `people.directory.view` | 1 |
+| GET | `/directory/{employment_id}` | `people.directory.view` | 1 |
 | POST | `/cost-centers/{id}/close` | `org.cost_centers.update` | 1 |
 | POST | `/cost-centers/{id}/reopen` | `org.cost_centers.update` | 1 |
 | GET | `/employments/{employment_id}/cost-distributions` | `people.assignments.view` | 1 |
@@ -505,7 +507,6 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/employments/{id}/{activate,suspend,terminate,cancel-termination}` | `people.employments.{activate,suspend,terminate,cancel_termination}` | 1 |
 | GET, POST | `/employments/{employment_id}/dependents` | `people.dependents.{view,create}` | 1 |
 | GET, PATCH, DELETE | `/employments/{employment_id}/dependents/{id}` | `people.dependents.{view,update,delete}` | 1 |
-| GET | `/directory` | `people.directory.view` | 1 |
 
 **HIS · Historia con vigencia**
 

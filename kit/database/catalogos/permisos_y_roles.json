@@ -18417,7 +18417,7 @@
         },
         {
           "codigo": "people.directory.view",
-          "alcance": "team"
+          "alcance": "organization"
         },
         {
           "codigo": "org.positions.view",
@@ -19262,7 +19262,7 @@
         },
         {
           "codigo": "people.directory.view",
-          "alcance": "own"
+          "alcance": "organization"
         },
         {
           "codigo": "people.employments.view",

@@ -2,9 +2,11 @@
  * tokens.css — Sistema de tokens de diseño de GestiaHR.
  * Valores de kit/docs/10-pantallas-y-ux.md §1 y del prototipo del kit v1.13 (azul de marca, ADR 0014).
  * Ambos temas tienen valores propios (no se invierten colores).
+ * .tema-claro fuerza los valores claros en un elemento (p. ej. para exportar el organigrama a imagen o PDF).
  */
 
-:root {
+:root,
+.tema-claro {
   /* Código QR: siempre oscuro sobre claro para que la cámara lo lea, también en modo oscuro (SEG-3). */
   --qr-claro: #FFFFFF;
   --qr-oscuro: #000000;

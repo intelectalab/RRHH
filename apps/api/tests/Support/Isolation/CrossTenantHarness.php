@@ -6,6 +6,7 @@ use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Organization\Infrastructure\Models\DirectoryEmployment;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
 use App\Modules\Organization\Infrastructure\Models\JobProfile;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
@@ -73,6 +74,10 @@ final class CrossTenantHarness
         // ORG-1 / ORG-5: historia del régimen de una empresa de A y versiones de un puesto de A.
         '/legal-entities/{id}/regimes' => LegalEntity::class,
         '/job-profiles/{id}/versions' => JobProfile::class,
+        // ORG-6 / ORG-7: directorio, tarjeta y organigrama por personas con una relación laboral de A.
+        '/directory' => DirectoryEmployment::class,
+        '/directory/{employment_id}' => DirectoryEmployment::class,
+        '/org-chart' => DirectoryEmployment::class,
     ];
 
     /**
@@ -81,7 +86,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
