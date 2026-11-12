@@ -86,7 +86,7 @@ function sccEmployment(string $legalEntityId, string $siteId, ?string $costCente
         $employment = EmploymentCostDistributionFactory::employment($legalEntityId);
         $unit = (string) Str::uuid();
         $profile = (string) Str::uuid();
-        DB::table('org_units')->insert(['id' => $unit, 'tenant_id' => SCC_TENANT, 'code' => 'U'.Str::random(6), 'name' => 'Unidad', 'kind' => 'area']);
+        DB::table('org_units')->insert(['id' => $unit, 'tenant_id' => SCC_TENANT, 'code' => 'U'.Str::random(6), 'name' => 'Unidad']);
         DB::table('job_profiles')->insert(['id' => $profile, 'tenant_id' => SCC_TENANT, 'code' => 'P'.Str::random(6), 'name' => 'Puesto']);
         DB::table('employment_assignments')->insert([
             'tenant_id' => SCC_TENANT, 'employment_id' => $employment, 'job_profile_id' => $profile, 'org_unit_id' => $unit,

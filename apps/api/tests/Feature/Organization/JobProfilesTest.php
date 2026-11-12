@@ -78,7 +78,7 @@ function jobPosition(string $profileId, string $status = 'open'): void
     TenancyScope::runAs(JOB_TENANT, function () use ($profileId, $status): void {
         $entity = LegalEntity::factory()->create()->id;
         $unit = (string) Str::uuid();
-        DB::table('org_units')->insert(['id' => $unit, 'tenant_id' => JOB_TENANT, 'code' => 'U'.Str::random(6), 'name' => 'Unidad', 'kind' => 'area']);
+        DB::table('org_units')->insert(['id' => $unit, 'tenant_id' => JOB_TENANT, 'code' => 'U'.Str::random(6), 'name' => 'Unidad']);
         DB::table('positions')->insert([
             'tenant_id' => JOB_TENANT, 'code' => 'POS'.Str::random(6), 'title' => 'Plaza', 'job_profile_id' => $profileId,
             'org_unit_id' => $unit, 'legal_entity_id' => $entity, 'status' => $status,
