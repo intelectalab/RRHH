@@ -7908,6 +7908,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/org-unit-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opciones para el formulario de unidades: niveles, posiciones que pueden ser responsables y centros de costo activos */
+        get: operations["getOrgUnitOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org-unit-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Niveles de unidad con los nombres de la organización (gerencia, área, departamento…), en orden */
+        get: operations["getOrgUnitTypes"];
+        put?: never;
+        /** Agregar un nivel de unidad propio */
+        post: operations["postOrgUnitTypes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org-unit-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Renombrar o reordenar un nivel de unidad */
+        patch: operations["patchOrgUnitTypesId"];
+        trace?: never;
+    };
     "/org-units": {
         parameters: {
             query?: never;
@@ -7958,6 +8010,40 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postOrgUnitsIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org-units/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia de la estructura de una unidad (superior, nombre, nivel, responsable y centro de costo por vigencia, incluidos cambios programados) */
+        get: operations["getOrgUnitsIdHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org-units/{id}/impact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Impacto de mover o archivar una unidad: subunidades, posiciones activas y personas de la rama */
+        get: operations["getOrgUnitsIdImpact"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -17564,16 +17650,38 @@ export interface components {
         OrgUnit: {
             /** @description Identificador opaco */
             id: string;
+            code: string;
             name: string;
-            type: string;
+            /** @description Identificador opaco */
+            type_id: string;
+            type_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** @description Identificador opaco */
             parent_id?: string | null;
+            parent_name?: string | null;
             /** @description Identificador opaco */
-            manager_position_id?: string | null;
+            head_position_id?: string | null;
+            head_position_title?: string | null;
+            head_person_name?: string | null;
+            /** @description Identificador opaco */
+            cost_center_id?: string | null;
+            cost_center_name?: string | null;
+            path?: string | null;
+            depth?: number | null;
+            children_count?: number | null;
             /** Format: date */
-            valid_from: string;
+            valid_from?: string | null;
             /** Format: date */
             valid_to?: string | null;
+            /** Format: date */
+            effective_from?: string | null;
+            reason?: string | null;
+            scheduled_change?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date */
+            as_of?: string | null;
             /** @enum {string} */
             status: "active" | "archived";
             /** Format: date-time */
@@ -17582,16 +17690,38 @@ export interface components {
             updated_at?: string;
         };
         OrgUnitInput: {
+            code?: string;
             name?: string;
-            type?: string;
+            /** @description Identificador opaco */
+            type_id?: string;
+            type_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** @description Identificador opaco */
             parent_id?: string | null;
+            parent_name?: string | null;
             /** @description Identificador opaco */
-            manager_position_id?: string | null;
+            head_position_id?: string | null;
+            head_position_title?: string | null;
+            head_person_name?: string | null;
+            /** @description Identificador opaco */
+            cost_center_id?: string | null;
+            cost_center_name?: string | null;
+            path?: string | null;
+            depth?: number | null;
+            children_count?: number | null;
             /** Format: date */
-            valid_from?: string;
+            valid_from?: string | null;
             /** Format: date */
             valid_to?: string | null;
+            /** Format: date */
+            effective_from?: string | null;
+            reason?: string | null;
+            scheduled_change?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date */
+            as_of?: string | null;
         };
         OvertimeRequest: {
             /** @description Identificador opaco */
@@ -39656,6 +39786,114 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getOrgUnitOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getOrgUnitTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postOrgUnitTypes: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchOrgUnitTypesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getOrgUnits: {
         parameters: {
             query?: {
@@ -39836,6 +40074,56 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getOrgUnitsIdHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getOrgUnitsIdImpact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postOrgUnitsIdMove: {

@@ -25,7 +25,7 @@ type Catalog = {
 /** Organización → Empresas: razones sociales del grupo (TEN-5). */
 export function CompaniesScreen() {
   const { t } = useT()
-  const { can } = useSession()
+  const { can, session } = useSession()
   const company = useCompany()
   const { toast, node: toastNode } = useToast()
   const [rows, setRows] = useState<Company[] | null>(null)
@@ -67,7 +67,10 @@ export function CompaniesScreen() {
       <PageHeader
         title={t('org.title')}
         sub={rows ? t('org.sub', { active, total: rows.length }) : undefined}
-        tabs={[{ href: '/organizacion/empresas', label: t('org.tab_companies'), active: true }]}
+        tabs={[
+          { href: '/organizacion/empresas', label: t('org.tab_companies'), active: true },
+          ...(can('org.units.view') && session.modules.includes('core') ? [{ href: '/organizacion/unidades', label: t('org.tab_units'), active: false }] : []),
+        ]}
         actions={(
           <>
             <ExportButton resource="legal_entities" onError={(m) => toast(m, 'error')} />

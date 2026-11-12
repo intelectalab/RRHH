@@ -439,6 +439,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/job-profiles/{id}` | `org.job_profiles.{view,update}` | 1 |
 | POST | `/job-profiles/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
 | GET | `/org-chart` | `org.units.view` | 1 |
+| GET | `/org-units/{id}/history` | `org.units.view` | 1 |
+| GET | `/org-units/{id}/impact` | `org.units.view` | 1 |
+| GET | `/org-unit-options` | `org.units.view` | 1 |
+| GET | `/org-unit-types` | `org.units.view` | 1 |
+| POST | `/org-unit-types` | `org.units.update` | 1 |
+| PATCH | `/org-unit-types/{id}` | `org.units.update` | 1 |
 
 **POS · Posiciones y headcount**
 

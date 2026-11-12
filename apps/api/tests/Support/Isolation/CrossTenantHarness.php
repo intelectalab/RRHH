@@ -6,6 +6,8 @@ use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Organization\Infrastructure\Models\OrgUnit;
+use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -57,6 +59,10 @@ final class CrossTenantHarness
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
         // AUS-1: historia de reglas de un tipo de ausencia de A.
         '/absence-types/{id}/rules' => AbsenceType::class,
+        // ORG-3: historia e impacto de una unidad de A; niveles de unidad de A.
+        '/org-units/{id}/history' => OrgUnit::class,
+        '/org-units/{id}/impact' => OrgUnit::class,
+        '/org-unit-types/{id}' => OrgUnitType::class,
     ];
 
     /**

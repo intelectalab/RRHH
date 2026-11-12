@@ -57,8 +57,8 @@ beforeEach(function (): void {
         $g = $id();
         $v = $id();
         DB::table('org_units')->insert([
-            ['id' => $g, 'tenant_id' => SCO_TENANT, 'parent_id' => null, 'code' => 'G', 'name' => 'Gerencia', 'kind' => 'management'],
-            ['id' => $v, 'tenant_id' => SCO_TENANT, 'parent_id' => $g, 'code' => 'V', 'name' => 'Ventas', 'kind' => 'area'],
+            ['id' => $g, 'tenant_id' => SCO_TENANT, 'parent_id' => null, 'code' => 'G', 'name' => 'Gerencia'],
+            ['id' => $v, 'tenant_id' => SCO_TENANT, 'parent_id' => $g, 'code' => 'V', 'name' => 'Ventas'],
         ]);
         $jp = $id();
         DB::table('job_profiles')->insert(['id' => $jp, 'tenant_id' => SCO_TENANT, 'code' => 'GEN', 'name' => 'Genérico']);

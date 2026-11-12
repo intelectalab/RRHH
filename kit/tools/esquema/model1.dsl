@@ -328,10 +328,15 @@
   district_code ; country_code ; latitude numeric(9,6) ; longitude numeric(9,6) ; timezone ; establishment_code
   is_risk_site ; status ; uniq code
   check establishment_code IS NULL OR country_code IS DISTINCT FROM 'PE' OR establishment_code ~ '^[0-9]{4}$'
-@org_units main soft lock | Unidad organizativa jerárquica (gerencia, área, departamento, subdepartamento, unidad, equipo).
+@org_unit_types soft lock | Tipos o niveles de unidad con los nombres que usa cada organización (gerencia, área, departamento, equipo…); rank ordena del nivel más alto al más bajo (ORG-3).
+  code ; name ; rank smallint=0 ; status enum(active,archived)=active ; uniq code
+@org_units main soft lock | Unidad organizativa jerárquica. Las columnas de estructura (superior, nombre, tipo, responsable, centro de costo, ruta) reflejan la versión vigente hoy; la historia y los cambios programados viven en org_unit_versions (ORG-3). valid_from / valid_to marcan la vida de la unidad.
   legal_entity_id ?-> legal_entities ; parent_id ?-> org_units ; code ; name
-  kind enum(management,area,department,subdepartment,unit,team)! ; head_position_id ?-> positions
-  cost_center_id ?-> cost_centers ; path ; depth smallint ; valid_from date ; valid_to date ; status ; uniq code
+  org_unit_type_id ?-> org_unit_types ; head_position_id ?-> positions
+  cost_center_id ?-> cost_centers ; path ; depth smallint ; valid_from date ; valid_to date ; status enum(active,archived)=active ; uniq code
+@org_unit_versions lock | Estructura de una unidad con vigencia (ORG-3): superior, nombre, tipo, responsable y centro de costo desde una fecha. Mover o renombrar cierra la versión vigente e inserta otra; los reportes de periodos anteriores leen la versión de su fecha.
+  org_unit_id -> org_units ; parent_id ?-> org_units ; name text! ; org_unit_type_id ?-> org_unit_types
+  head_position_id ?-> positions ; cost_center_id ?-> cost_centers ; reason ; changed_by_user_id ?-> users ; vig org_unit_id
 @cost_centers soft lock | Centro de costo para imputar planilla, gastos y horas.
   legal_entity_id ?-> legal_entities ; parent_id ?-> cost_centers ; code ; name ; accounting_code ; status ; uniq code
 @job_families soft | Familias de puestos.

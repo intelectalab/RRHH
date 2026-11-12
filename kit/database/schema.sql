@@ -2536,6 +2536,26 @@ ALTER TABLE sites FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON sites USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_sites_touch BEFORE UPDATE ON sites FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
+CREATE TABLE org_unit_types (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  code text NOT NULL,
+  name text NOT NULL,
+  rank smallint NOT NULL DEFAULT 0,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_org_unit_types_tenant_id UNIQUE (tenant_id, id)
+);
+COMMENT ON TABLE org_unit_types IS 'Tipos o niveles de unidad con los nombres que usa cada organización (gerencia, área, departamento, equipo…); rank ordena del nivel más alto al más bajo (ORG-3).';
+CREATE UNIQUE INDEX uq_org_unit_types_code ON org_unit_types (tenant_id, code) WHERE deleted_at IS NULL;
+ALTER TABLE org_unit_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE org_unit_types FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON org_unit_types USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_org_unit_types_touch BEFORE UPDATE ON org_unit_types FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
 CREATE TABLE org_units (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
@@ -2543,32 +2563,69 @@ CREATE TABLE org_units (
   parent_id uuid,
   code text NOT NULL,
   name text NOT NULL,
-  kind text NOT NULL CHECK (kind IN ('management','area','department','subdepartment','unit','team')),
+  org_unit_type_id uuid,
   head_position_id uuid,
   cost_center_id uuid,
   path text,
   depth smallint,
   valid_from date,
   valid_to date,
-  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_org_units_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_org_units_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
-  CONSTRAINT fk_org_units_parent_id FOREIGN KEY (tenant_id, parent_id) REFERENCES org_units (tenant_id, id)
+  CONSTRAINT fk_org_units_parent_id FOREIGN KEY (tenant_id, parent_id) REFERENCES org_units (tenant_id, id),
+  CONSTRAINT fk_org_units_org_unit_type_id FOREIGN KEY (tenant_id, org_unit_type_id) REFERENCES org_unit_types (tenant_id, id)
 );
-COMMENT ON TABLE org_units IS 'Unidad organizativa jerárquica (gerencia, área, departamento, subdepartamento, unidad, equipo).';
+COMMENT ON TABLE org_units IS 'Unidad organizativa jerárquica. Las columnas de estructura (superior, nombre, tipo, responsable, centro de costo, ruta) reflejan la versión vigente hoy; la historia y los cambios programados viven en org_unit_versions (ORG-3). valid_from / valid_to marcan la vida de la unidad.';
 CREATE UNIQUE INDEX uq_org_units_code ON org_units (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_org_units_legal_entity_id ON org_units (tenant_id, legal_entity_id);
 CREATE INDEX ix_org_units_parent_id ON org_units (tenant_id, parent_id);
+CREATE INDEX ix_org_units_org_unit_type_id ON org_units (tenant_id, org_unit_type_id);
 CREATE INDEX ix_org_units_head_position_id ON org_units (tenant_id, head_position_id);
 CREATE INDEX ix_org_units_cost_center_id ON org_units (tenant_id, cost_center_id);
 ALTER TABLE org_units ENABLE ROW LEVEL SECURITY;
 ALTER TABLE org_units FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON org_units USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_org_units_touch BEFORE UPDATE ON org_units FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE org_unit_versions (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  org_unit_id uuid NOT NULL,
+  parent_id uuid,
+  name text NOT NULL,
+  org_unit_type_id uuid,
+  head_position_id uuid,
+  cost_center_id uuid,
+  reason text,
+  changed_by_user_id uuid,
+  valid_from date NOT NULL,
+  valid_to date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_org_unit_versions_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_org_unit_versions_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ex_org_unit_versions_vigencia EXCLUDE USING gist (tenant_id WITH =, org_unit_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_org_unit_versions_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id),
+  CONSTRAINT fk_org_unit_versions_parent_id FOREIGN KEY (tenant_id, parent_id) REFERENCES org_units (tenant_id, id),
+  CONSTRAINT fk_org_unit_versions_org_unit_type_id FOREIGN KEY (tenant_id, org_unit_type_id) REFERENCES org_unit_types (tenant_id, id),
+  CONSTRAINT fk_org_unit_versions_changed_by_user_id FOREIGN KEY (tenant_id, changed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE org_unit_versions IS 'Estructura de una unidad con vigencia (ORG-3): superior, nombre, tipo, responsable y centro de costo desde una fecha. Mover o renombrar cierra la versión vigente e inserta otra; los reportes de periodos anteriores leen la versión de su fecha.';
+CREATE INDEX ix_org_unit_versions_parent_id ON org_unit_versions (tenant_id, parent_id);
+CREATE INDEX ix_org_unit_versions_org_unit_type_id ON org_unit_versions (tenant_id, org_unit_type_id);
+CREATE INDEX ix_org_unit_versions_head_position_id ON org_unit_versions (tenant_id, head_position_id);
+CREATE INDEX ix_org_unit_versions_cost_center_id ON org_unit_versions (tenant_id, cost_center_id);
+CREATE INDEX ix_org_unit_versions_changed_by_user_id ON org_unit_versions (tenant_id, changed_by_user_id);
+ALTER TABLE org_unit_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE org_unit_versions FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON org_unit_versions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_org_unit_versions_touch BEFORE UPDATE ON org_unit_versions FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE cost_centers (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -13868,6 +13925,8 @@ ALTER TABLE tenant_settings ADD CONSTRAINT fk_tenant_settings_site_id FOREIGN KE
 ALTER TABLE tenant_settings ADD CONSTRAINT fk_tenant_settings_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id);
 ALTER TABLE org_units ADD CONSTRAINT fk_org_units_head_position_id FOREIGN KEY (tenant_id, head_position_id) REFERENCES positions (tenant_id, id);
 ALTER TABLE org_units ADD CONSTRAINT fk_org_units_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
+ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_head_position_id FOREIGN KEY (tenant_id, head_position_id) REFERENCES positions (tenant_id, id);
+ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN KEY (tenant_id, headcount_plan_line_id) REFERENCES headcount_plan_lines (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_replaces_employment_id FOREIGN KEY (tenant_id, replaces_employment_id) REFERENCES employments (tenant_id, id);
 ALTER TABLE person_sensitive_data ADD CONSTRAINT fk_person_sensitive_data_consent_id FOREIGN KEY (tenant_id, consent_id) REFERENCES consents (tenant_id, id);

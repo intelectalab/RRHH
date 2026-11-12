@@ -451,6 +451,7 @@
   .cat-indice { position: static; } .cat-indice ul { display: flex; flex-wrap: wrap; gap: 4px; border-left: 0; }
   .cat-indice a { border: 1px solid var(--bd); border-radius: 99px; padding: 3px 10px; }
   .cat-estado { grid-template-columns: minmax(0, 1fr); gap: 8px; } .cat-estado-t { padding-top: 0; }
+}
 /* Solo para lectores de pantalla. */
 .vh { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
@@ -513,3 +514,24 @@
 .imp-acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; margin-top: 16px; }
 .imp-paginas { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; font-size: var(--fs-s); }
 .imp-confirmo { display: flex; gap: 8px; align-items: center; margin-top: 16px; font-size: var(--fs-s); }
+
+/* ORG-3 · Árbol de unidades */
+.ou-filtros { display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; align-items: flex-end; }
+.ou-filtros > div { min-width: 180px; }
+.ou-buscar { flex: 1 1 240px; max-width: 360px; }
+.ou-arbol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--bd); }
+.ou-arbol li { border-bottom: 1px solid var(--bd); }
+.ou-arbol li.arch .ou-nombre b { color: var(--tx2); }
+.ou-fila { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr) minmax(0, 1fr) 180px 40px; gap: 12px; align-items: center; padding: 10px 12px; }
+.ou-cab { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ou-pliegue { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; }
+.ou-nombre, .ou-dato { display: flex; flex-direction: column; min-width: 0; }
+.ou-nombre b, .ou-dato > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ou-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.ou-nivel { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .ou-fila { grid-template-columns: minmax(0, 1fr) 40px; gap: 6px 12px; }
+  .ou-dato, .ou-tags { grid-column: 1 / 2; padding-inline-start: 32px; }
+  .ou-tags { justify-content: flex-start; }
+  .ou-fila > .menu { grid-row: 1; grid-column: 2; }
+}

@@ -86,7 +86,7 @@ RES = [
     # ---------- Fase 1 ----------
     ("ORG", 1, "org.legal_entities", "/legal-entities", "LegalEntity", "name:s trade_name?:s tax_id:s country:s currency:s timezone:s locale?:s payroll_regime:s tax_regime?:s economic_activity_code?:s address?:s district_code?:s legal_representative_name?:s has_logo?:b status:e(active|archived) custom_fields?:j", "LCRU", "archive restore"),
     ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id:id name:s address:s timezone:s risk_site:b status:e(active|archived)", "LCRU", "archive restore"),
-    ("ORG", 1, "org.units", "/org-units", "OrgUnit", "name:s type:s parent_id?:id manager_position_id?:id valid_from:d valid_to?:d status:e(active|archived)", "LCRU", "archive restore move"),
+    ("ORG", 1, "org.units", "/org-units", "OrgUnit", "code:s name:s type_id:id type_name?:s legal_entity_id?:id parent_id?:id parent_name?:s head_position_id?:id head_position_title?:s head_person_name?:s cost_center_id?:id cost_center_name?:s path?:s depth?:i children_count?:i valid_from?:d valid_to?:d effective_from?:d reason?:s scheduled_change?:j as_of?:d status:e(active|archived)", "LCRU", "archive restore move"),
     ("ORG", 1, "org.cost_centers", "/cost-centers", "CostCenter", "code:s name:s legal_entity_id:id status:e(active|archived)", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-profiles", "JobProfile", "code:s name:s level?:s category?:s family?:s description?:s status:e(active|archived)", "LCRU", "archive restore"),
     ("POS", 1, "org.positions", "/positions", "Position", "job_profile_id:id org_unit_id:id site_id:id cost_center_id?:id reports_to_position_id?:id status:e(requested|approved|open|filled|frozen|closed) budget!?:m valid_from:d", "LCRU", "approve freeze unfreeze close"),
@@ -384,6 +384,12 @@ EXTRA = [
     ("WHA", 9, "put", "/channels/whatsapp/settings", "integrations.whatsapp.update", "Guardar configuración del canal WhatsApp", False),
     ("INT", 9, "get", "/integrations/health", "integrations.connections.view", "Salud de todos los conectores", False),
     ("INT", 9, "post", "/integrations/biometric/{device_id}/punches", "integrations.biometric.push", "Entrada de marcaciones desde un reloj biométrico", False),
+    ("ORG", 1, "get", "/org-units/{id}/history", "org.units.view", "Historia de la estructura de una unidad (superior, nombre, nivel, responsable y centro de costo por vigencia, incluidos cambios programados)", False),
+    ("ORG", 1, "get", "/org-units/{id}/impact", "org.units.view", "Impacto de mover o archivar una unidad: subunidades, posiciones activas y personas de la rama", False),
+    ("ORG", 1, "get", "/org-unit-options", "org.units.view", "Opciones para el formulario de unidades: niveles, posiciones que pueden ser responsables y centros de costo activos", False),
+    ("ORG", 1, "get", "/org-unit-types", "org.units.view", "Niveles de unidad con los nombres de la organización (gerencia, área, departamento…), en orden", False),
+    ("ORG", 1, "post", "/org-unit-types", "org.units.update", "Agregar un nivel de unidad propio", False),
+    ("ORG", 1, "patch", "/org-unit-types/{id}", "org.units.update", "Renombrar o reordenar un nivel de unidad", False),
     ("AUS", 2, "get", "/absence-types/{id}/rules", "time.absence_types.view", "Historia de las reglas de un tipo de ausencia (vigencias de la más reciente a la más antigua)", False),
     ("WLB", 9, "get", "/branding", "settings.branding.view", "Marca de la organización", False),
     ("WLB", 9, "put", "/branding", "settings.branding.update", "Guardar marca de la organización", False),
@@ -402,7 +408,7 @@ TYPES = {
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
 STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval")}
-CREATED = {("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
+CREATED = {("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
