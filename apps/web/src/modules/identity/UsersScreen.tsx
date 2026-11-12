@@ -9,11 +9,12 @@ import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
 import { ActivationCodePanel } from './ActivationCodePanel'
 import { identityPayload, LoginIdentityFields, type LoginIdentity } from './LoginIdentityFields'
-import { EmptyState, ErrorState } from '@/ui/components/States'
+import { EmptyState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
 import { useCompany } from '@/modules/session/CompanyProvider'
 import { ExportButton } from '@/modules/exports/ExportButton'
+import { DataTable, type BulkAction, type TableColumn, type TableFilter } from '@/ui/components/DataTable'
 import { settingsTabs } from './settingsTabs'
 import { useDateTime } from '@/modules/session/useDateTime'
 
@@ -28,47 +29,33 @@ export function UsersScreen() {
   const fmtDT = useDateTime()
   const { session, can } = useSession()
   const { toast, node: toastNode } = useToast()
-  const [users, setUsers] = useState<User[] | null>(null)
   const [roles, setRoles] = useState<Role[]>([])
-  const [q, setQ] = useState('')
   const [creating, setCreating] = useState(false)
   const [suspending, setSuspending] = useState<User | null>(null)
   const [revoking, setRevoking] = useState<User | null>(null)
   const [resettingMfa, setResettingMfa] = useState<User | null>(null)
   const [codeFor, setCodeFor] = useState<User | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
+  const [counts, setCounts] = useState<{ active: number; total: number } | null>(null)
 
-  // Enlace desde la búsqueda global: /configuracion/usuarios?q=…
-  useEffect(() => {
-    const initial = new URLSearchParams(window.location.search).get('q')
-    if (initial) setQ(initial)
+  // UI-4: la tabla pide sus páginas al servidor; recargar es volver a pedir la página y los conteos.
+  const load = useCallback(async () => {
+    setReloadKey((k) => k + 1)
   }, [])
 
-  const [loadError, setLoadError] = useState(false)
-
-  const load = useCallback(async () => {
-    const params = new URLSearchParams({ per_page: '100' })
-    if (q.trim() !== '') params.set('q', q.trim())
-    try {
-      const res = await api.get<{ data: User[] }>(`/users?${params.toString()}`)
-      setUsers(res.data)
-      setLoadError(false)
-    } catch {
-      setLoadError(true)
-    }
-  }, [q])
-
   useEffect(() => {
-    const id = window.setTimeout(() => void load(), 250)
-    return () => window.clearTimeout(id)
-  }, [load])
+    void Promise.all([
+      api.get<{ meta?: { total?: number | null } }>('/users?per_page=1'),
+      api.get<{ meta?: { total?: number | null } }>('/users?per_page=1&filter[status]=active'),
+    ]).then(([all, act]) => setCounts({ total: all.meta?.total ?? 0, active: act.meta?.total ?? 0 })).catch(() => setCounts(null))
+  }, [reloadKey])
 
   useEffect(() => {
     if (can('identity.roles.view')) void api.get<{ data: Role[] }>('/roles?per_page=100').then((r) => setRoles(r.data))
   }, [can])
 
   const roleName = useMemo(() => new Map(roles.map((r) => [r.id, r.name])), [roles])
-  const active = users?.filter((u) => u.status === 'active').length ?? 0
 
   async function act(user: User, action: 'invite' | 'reactivate' | 'reset-password', doneKey: string) {
     try {
@@ -83,15 +70,52 @@ export function UsersScreen() {
   const fmt = (iso: string | null | undefined) =>
     iso ? fmtDT(iso) : null
 
+  const columns: Array<TableColumn<User>> = [
+    {
+      key: 'user', label: t('users.col_user'), sort: 'display_name', hideable: false, width: 320,
+      render: (u) => (
+        <div className="who">
+          <div className="min-w-0">
+            <b>{u.display_name}</b> {u.id === session.user.id && <span className="tag in">{t('users.you')}</span>} {u.mfa_enabled && <span className="tag ok" title={t('users.mfa_on_title')}>{t('users.mfa_on')}</span>}
+            <span className="sub2">{[u.login, u.email && u.email !== u.login ? u.email : null, u.document_number_masked ? `${t(`auth.doc_${u.document_type ?? 'other'}`)} ${u.document_number_masked}` : null].filter(Boolean).join(' · ')}</span>
+          </div>
+        </div>
+      ),
+    },
+    { key: 'roles', label: t('users.col_roles'), render: (u) => u.role_ids.map((id) => roleName.get(id)).filter(Boolean).join(', ') || '—' },
+    { key: 'last_login_at', label: t('users.col_last'), sort: 'last_login_at', render: (u) => fmt(u.last_login_at) ?? <span className="sub2">{t('users.never')}</span> },
+    { key: 'status', label: t('users.col_status'), sort: 'status', render: (u) => <span className={`st ${STATUS_CLASS[u.status] ?? 'gr'}`}>{t(`users.status_${u.status}`)}</span> },
+    { key: 'created_at', label: t('users.col_created'), sort: 'created_at', hiddenByDefault: true, render: (u) => fmt(u.created_at) ?? '—' },
+  ]
+
+  const tableFilters: TableFilter[] = [
+    { key: 'status', label: t('users.filter_status'), options: ['invited', 'active', 'locked', 'alumni', 'disabled'].map((s) => ({ value: s, label: t(`users.status_${s}`) })) },
+    ...(roles.length > 0 ? [{ key: 'role_id', label: t('users.filter_role'), options: roles.map((r) => ({ value: r.id, label: r.name })) }] : []),
+  ]
+
+  // Acción masiva con operación real detrás (RN-UI-01): reenviar la invitación a los invitados con correo.
+  const bulkActions: Array<BulkAction<User>> = can('identity.users.invite') ? [{
+    key: 'resend',
+    label: t('users.bulk_resend'),
+    applies: (u) => (u.allowed_actions ?? []).includes('invite') && Boolean(u.email),
+    run: async (rows) => {
+      let done = 0
+      for (const u of rows) {
+        try { await api.post(`/users/${u.id}/invite`, {}); done++ } catch { /* se informa en el total */ }
+      }
+      await load()
+      return done
+    },
+  }] : []
+
   return (
     <>
       <PageHeader
         title={t('settings.title')}
-        sub={users ? t('users.sub', { active, total: users.length }) : undefined}
+        sub={counts ? t('users.sub', counts) : undefined}
         tabs={settingsTabs(t, can, 'users')}
         actions={(
           <>
-            <ExportButton resource="users" filters={{ q: q.trim() }} onError={(m) => toast(m, 'error')} />
             {can('identity.users.create') && (
               <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
                 <Icon name="plus" /> {t('users.new')}
@@ -101,76 +125,56 @@ export function UsersScreen() {
         )}
       />
       <main className="main" id="contenido" tabIndex={-1}>
-        <section className="card">
-          <div className="filtros">
-            <input className="form-control" type="search" placeholder={t('users.search')} aria-label={t('users.search')} value={q} onChange={(e) => setQ(e.target.value)} />
-          </div>
-          <div className="tabla-wrap">
-            <table className="table">
-              <thead>
-                <tr><th>{t('users.col_user')}</th><th>{t('users.col_roles')}</th><th>{t('users.col_last')}</th><th>{t('users.col_status')}</th><th /></tr>
-              </thead>
-              <tbody>
-                {loadError && <tr><td colSpan={5}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
-                {!loadError && users === null && [1, 2, 3].map((i) => (
-                  <tr key={i}><td colSpan={5}><span className="esq" style={{ width: `${40 + i * 12}%` }} /></td></tr>
-                ))}
-                {users?.length === 0 && (
-                  <tr><td colSpan={5}>
-                    <EmptyState title={t('users.empty_title')} text={t('users.empty_text')} action={can('identity.users.create') && (
-                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setCreating(true)}><Icon name="plus" /> {t('users.new')}</button>
-                    )} />
-                  </td></tr>
+        <DataTable<User>
+          resource="users"
+          endpoint="/users"
+          urlSearch
+          defaultSort="display_name"
+          searchLabel={t('users.search')}
+          reloadKey={reloadKey}
+          rowKey={(u) => u.id}
+          columns={columns}
+          filters={tableFilters}
+          bulkActions={bulkActions}
+          toolbar={(state) => <ExportButton resource="users" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} />}
+          empty={(
+            <EmptyState title={t('users.empty_title')} text={t('users.empty_text')} action={can('identity.users.create') && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => setCreating(true)}><Icon name="plus" /> {t('users.new')}</button>
+            )} />
+          )}
+          rowActions={(u) => {
+            const actions = u.allowed_actions ?? []
+            const self = u.id === session.user.id
+            return (
+              <>
+                {can('identity.users.update') && u.status !== 'disabled' && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditingUser(u)}>{t('users.edit')}</button>
                 )}
-                {users?.map((u) => {
-                  const actions = u.allowed_actions ?? []
-                  const self = u.id === session.user.id
-                  return (
-                    <tr key={u.id}>
-                      <td>
-                        <div className="who">
-                          <div className="min-w-0">
-                            <b>{u.display_name}</b> {self && <span className="tag in">{t('users.you')}</span>} {u.mfa_enabled && <span className="tag ok" title={t('users.mfa_on_title')}>{t('users.mfa_on')}</span>}
-                            <span className="sub2">{[u.login, u.email && u.email !== u.login ? u.email : null, u.document_number_masked ? `${t(`auth.doc_${u.document_type ?? 'other'}`)} ${u.document_number_masked}` : null].filter(Boolean).join(' · ')}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{u.role_ids.map((id) => roleName.get(id)).filter(Boolean).join(', ') || '—'}</td>
-                      <td>{fmt(u.last_login_at) ?? <span className="sub2">{t('users.never')}</span>}</td>
-                      <td><span className={`st ${STATUS_CLASS[u.status] ?? 'gr'}`}>{t(`users.status_${u.status}`)}</span></td>
-                      <td className="text-end nowrap">
-                        {can('identity.users.update') && u.status !== 'disabled' && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditingUser(u)}>{t('users.edit')}</button>
-                        )}
-                        {u.status === 'invited' && u.document_number_masked && can('identity.users.invite') && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setCodeFor(u)}>{t('users.action_activation_code')}</button>
-                        )}
-                        {actions.includes('invite') && u.email && can('identity.users.invite') && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'invite', 'users.done_invited')}>{t('users.action_resend')}</button>
-                        )}
-                        {u.status === 'active' && u.email && can('identity.users.reset_password') && !self && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'reset-password', 'users.done_reset')}>{t('users.action_reset_password')}</button>
-                        )}
-                        {u.status === 'active' && can('identity.users.suspend') && !self && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setRevoking(u)}>{t('users.action_revoke_sessions')}</button>
-                        )}
-                        {u.mfa_enabled && (u.status === 'active' || u.status === 'locked') && can('identity.users.reset_mfa') && !self && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setResettingMfa(u)}>{t('users.action_reset_mfa')}</button>
-                        )}
-                        {actions.includes('suspend') && can('identity.users.suspend') && !self && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => setSuspending(u)}>{t('users.action_suspend')}</button>
-                        )}
-                        {actions.includes('reactivate') && can('identity.users.reactivate') && (
-                          <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'reactivate', 'users.done_reactivated')}>{t('users.action_reactivate')}</button>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                {u.status === 'invited' && u.document_number_masked && can('identity.users.invite') && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => setCodeFor(u)}>{t('users.action_activation_code')}</button>
+                )}
+                {actions.includes('invite') && u.email && can('identity.users.invite') && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'invite', 'users.done_invited')}>{t('users.action_resend')}</button>
+                )}
+                {u.status === 'active' && u.email && can('identity.users.reset_password') && !self && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'reset-password', 'users.done_reset')}>{t('users.action_reset_password')}</button>
+                )}
+                {u.status === 'active' && can('identity.users.suspend') && !self && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => setRevoking(u)}>{t('users.action_revoke_sessions')}</button>
+                )}
+                {u.mfa_enabled && (u.status === 'active' || u.status === 'locked') && can('identity.users.reset_mfa') && !self && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => setResettingMfa(u)}>{t('users.action_reset_mfa')}</button>
+                )}
+                {actions.includes('suspend') && can('identity.users.suspend') && !self && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => setSuspending(u)}>{t('users.action_suspend')}</button>
+                )}
+                {actions.includes('reactivate') && can('identity.users.reactivate') && (
+                  <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(u, 'reactivate', 'users.done_reactivated')}>{t('users.action_reactivate')}</button>
+                )}
+              </>
+            )
+          }}
+        />
       </main>
       {creating && (
         <NewUserPanel

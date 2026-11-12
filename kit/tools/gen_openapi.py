@@ -82,7 +82,7 @@ RES = [
     ("NOT", 0, "notifications.templates", "/notification-templates", "NotificationTemplate", "key:s channel:e(in_app|email|push|whatsapp|sms) locale:s subject?:s body:s variables?:a mandatory?:b customized?:b default_subject?:s default_body?:s approval_status?:e(not_required|draft|pending|approved|rejected) rejection_reason?:s approval_decided_at?:dt", "LCRU", ""),
     ("CFG", 0, "settings.custom_fields", "/custom-fields", "CustomField", "entity:s key:s label:s type:e(text|number|date|select|multiselect|checkbox|user|file|url|currency|percent) options?:a required:b sensitive:b permission?:s section?:s sort_order?:i values_count?:i", "LCRUD", ""),
     ("CFG", 0, "settings.exchange_rates", "/exchange-rates", "ExchangeRate", "from_currency:s to_currency:s rate:s valid_on:d source:s", "LC", ""),
-    ("CFG", 0, "settings.saved_views", "/saved-views", "SavedView", "resource:s name:s filters:j columns:a sort:s shared:b", "LCRUD", ""),
+    ("CFG", 0, "settings.saved_views", "/saved-views", "SavedView", "resource:s name:s filters:j columns:a sort:s shared:b mine:b", "LCRUD", ""),
     # ---------- Fase 1 ----------
     ("ORG", 1, "org.legal_entities", "/legal-entities", "LegalEntity", "name:s trade_name?:s tax_id:s country:s currency:s timezone:s locale?:s payroll_regime:s tax_regime?:s economic_activity_code?:s address?:s district_code?:s legal_representative_name?:s has_logo?:b status:e(active|archived) custom_fields?:j", "LCRU", "archive restore"),
     ("ORG", 1, "org.sites", "/sites", "Site", "legal_entity_id:id name:s address:s timezone:s risk_site:b status:e(active|archived)", "LCRU", "archive restore"),
@@ -419,7 +419,7 @@ QUERY = {
 INPUT_EXTRA = {
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "version", "has_logo", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "version", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):

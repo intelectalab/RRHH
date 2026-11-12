@@ -513,3 +513,44 @@
 .imp-acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end; margin-top: 16px; }
 .imp-paginas { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; font-size: var(--fs-s); }
 .imp-confirmo { display: flex; gap: 8px; align-items: center; margin-top: 16px; font-size: var(--fs-s); }
+
+/* UI-4 · Tabla profesional (DataTable) */
+.dt-barra { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--bd); }
+.dt-barra .form-control, .dt-barra .form-select { height: 36px; padding-top: 6px; padding-bottom: 6px; font-size: var(--fs-s); }
+.dt-buscar { flex: 1 1 220px; max-width: 320px; }
+.dt-filtro, .dt-vista { width: auto; flex: 0 1 180px; }
+.dt-herr { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-left: auto; }
+.dt-columnas { padding: 8px 12px; display: grid; gap: 6px; min-width: 220px; }
+.dt .form-check { display: flex; gap: 8px; align-items: center; font-size: var(--fs-s); cursor: pointer; }
+.dt .form-check-input, .dt-sel input { width: 16px; height: 16px; accent-color: var(--pe-500); }
+.dt-masiva { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 16px; background: var(--pe-50); border-bottom: 1px solid var(--bd); font-size: var(--fs-s); }
+.dt-aviso { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 16px; font-size: var(--fs-s); border-bottom: 1px solid var(--bd); background: var(--sup2); }
+.dt-tabla { table-layout: auto; }
+.dt-tabla th { position: relative; }
+.dt-tabla td { overflow-wrap: anywhere; }
+.dt-tabla tr.sel td { background: var(--pe-50); }
+.dt-sel { width: 44px; }
+.dt-orden { display: inline-flex; gap: 6px; align-items: center; border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.dt-orden:hover { color: var(--tx); }
+.dt-flecha { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; opacity: .35; border-top: 5px solid currentColor; }
+.dt-flecha.ascending { border-top: 0; border-bottom: 5px solid currentColor; opacity: 1; }
+.dt-flecha.descending { opacity: 1; }
+.dt-ancho { position: absolute; top: 0; right: 0; width: 8px; height: 100%; cursor: col-resize; touch-action: none; }
+.dt-ancho:hover, .dt-ancho:focus-visible { background: var(--pe-500); opacity: .4; outline: none; }
+.dt-pie { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid var(--bd); font-size: var(--fs-s); }
+.dt-por-pagina { display: inline-flex; gap: 6px; align-items: center; }
+.dt-por-pagina .form-select { width: auto; padding: 4px 8px; }
+.dt-paginas { display: inline-flex; gap: 6px; align-items: center; }
+/* RN-UI-06: en pantallas angostas cada fila es una tarjeta; nunca se desborda la página. */
+@media (max-width: 640px) {
+  .dt-buscar, .dt-filtro, .dt-vista { flex: 1 1 100%; max-width: none; }
+  .dt-herr { margin-left: 0; }
+  .dt-tabla thead { display: none; }
+  .dt-tabla, .dt-tabla tbody, .dt-tabla tr, .dt-tabla td { display: block; width: 100%; }
+  .dt-tabla colgroup { display: none; }
+  .dt-tabla tr { border-bottom: 1px solid var(--bd); padding: 8px 0; position: relative; }
+  .dt-tabla td { border: 0; padding: 4px 16px; }
+  .dt-tabla td[data-label]::before { content: attr(data-label); display: block; font-size: 11.5px; font-weight: 700; color: var(--tx2); }
+  .dt-tabla td.dt-sel { position: absolute; right: 8px; top: 8px; width: auto; padding: 4px; }
+  .dt-tabla td.dt-acciones { text-align: left; white-space: normal; }
+}

@@ -6,10 +6,9 @@ use App\Modules\Organization\Application\LegalEntityService;
 use App\Modules\Organization\Http\Requests\LegalEntityRequest;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Shared\CustomFields\CustomFieldValues;
-use App\Shared\Pagination\CursorPaginator;
-use App\Shared\Pagination\PaginationParams;
 use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
+use App\Shared\Query\TableQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,21 +29,28 @@ final class LegalEntityController
 
     public function index(Request $request): JsonResponse
     {
-        $params = PaginationParams::fromRequest($request);
         $query = LegalEntity::query();
         $this->scope->applyLegalEntity($query, $request, 'org.legal_entities.view', 'id');
 
-        $status = $request->query('status');
+        $status = TableQuery::filter($request, 'status');
         if ($status === 'active' || $status === 'archived') {
             $query->where('status', $status === 'active' ? 'active' : 'inactive');
+        }
+        // UI-4: filtro por país de la tabla de empresas.
+        $country = TableQuery::filter($request, 'country');
+        if ($country !== null) {
+            $query->where('country_code', strtoupper($country));
         }
         $q = trim((string) $request->query('q', ''));
         if ($q !== '') {
             $query->where(fn ($w) => $w->where('legal_name', 'ilike', '%'.addcslashes($q, '%_\\').'%')->orWhere('tax_id', 'like', addcslashes($q, '%_\\').'%'));
         }
 
-        $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'legal_name');
-        $ids = array_column($page['data'], 'id');
+        $page = (new TableQuery(
+            ['name' => 'legal_name', 'tax_id' => 'tax_id', 'country' => 'country_code', 'status' => 'status', 'created_at' => 'created_at'],
+            ['status', 'country'],
+        ))->page($query, $request, 'name');
+        $ids = $page['ids'];
         $models = LegalEntity::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         return response()->json([
@@ -52,7 +58,7 @@ final class LegalEntityController
                 fn (LegalEntity $e) => $this->entities->present($e),
                 array_filter(array_map(fn ($id) => $models->get($id), $ids), fn ($e) => $e instanceof LegalEntity),
             )),
-            'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
+            'meta' => $page['meta'],
         ]);
     }
 

@@ -21,4 +21,8 @@ return [
         'invalid_range' => 'Indica un rango válido: from y to en formato AAAA-MM-DD, to no anterior a from y de hasta 100 días.',
         'unknown_source' => 'La fuente «:source» no existe en el calendario.',
     ],
+    'saved_view_filter' => 'Solo se puede filtrar por resource.',
+    'saved_view_limit' => 'Llegaste al máximo de :max vistas guardadas en esta tabla. Borra alguna para guardar otra.',
+    'saved_view_not_owner' => 'Solo quien creó la vista puede cambiarla o borrarla.',
+    'saved_view_name_taken' => 'Ya tienes una vista con ese nombre en esta tabla.',
 ];

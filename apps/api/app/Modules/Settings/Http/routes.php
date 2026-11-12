@@ -5,6 +5,7 @@ use App\Modules\Settings\Http\Controllers\CatalogController;
 use App\Modules\Settings\Http\Controllers\CustomFieldController;
 use App\Modules\Settings\Http\Controllers\ExchangeRateController;
 use App\Modules\Settings\Http\Controllers\HolidayCalendarController;
+use App\Modules\Settings\Http\Controllers\SavedViewController;
 use App\Modules\Settings\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,13 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::patch('/catalog-items/{id}', [CatalogController::class, 'updateItem'])->middleware('permission:settings.catalogs.update');
     Route::post('/catalog-items/{id}/archive', [CatalogController::class, 'archive'])->middleware('permission:settings.catalogs.update');
     Route::post('/catalog-items/{id}/reactivate', [CatalogController::class, 'reactivate'])->middleware('permission:settings.catalogs.update');
+
+    // UI-4 · Vistas guardadas de las tablas: cada usuario sobre las suyas; las compartidas solo se leen.
+    Route::get('/saved-views', [SavedViewController::class, 'index'])->middleware('permission:settings.saved_views.view');
+    Route::post('/saved-views', [SavedViewController::class, 'store'])->middleware('permission:settings.saved_views.create');
+    Route::get('/saved-views/{id}', [SavedViewController::class, 'show'])->middleware('permission:settings.saved_views.view');
+    Route::patch('/saved-views/{id}', [SavedViewController::class, 'update'])->middleware('permission:settings.saved_views.update');
+    Route::delete('/saved-views/{id}', [SavedViewController::class, 'destroy'])->middleware('permission:settings.saved_views.delete');
 
     Route::get('/custom-fields', [CustomFieldController::class, 'index'])->middleware('permission:settings.custom_fields.view');
     Route::post('/custom-fields', [CustomFieldController::class, 'store'])->middleware('permission:settings.custom_fields.create');

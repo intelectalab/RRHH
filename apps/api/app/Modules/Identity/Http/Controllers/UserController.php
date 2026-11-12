@@ -7,9 +7,8 @@ use App\Modules\Identity\Application\UserService;
 use App\Modules\Identity\Http\Requests\UserRequest;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Shared\Audit\ActivityLogger;
-use App\Shared\Pagination\CursorPaginator;
-use App\Shared\Pagination\PaginationParams;
 use App\Shared\Permissions\EffectivePermissions;
+use App\Shared\Query\TableQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,20 +21,27 @@ final class UserController
 
     public function index(Request $request): JsonResponse
     {
-        $params = PaginationParams::fromRequest($request);
         $query = User::query();
 
         $q = trim((string) $request->query('q', ''));
         if ($q !== '') {
             $query->where('display_name', 'ilike', '%'.addcslashes($q, '%_\\').'%');
         }
-        $status = $request->query('status');
-        if (is_string($status) && $status !== '') {
+        $status = TableQuery::filter($request, 'status');
+        if ($status !== null) {
             $query->whereIn('status', explode(',', $status));
         }
+        // UI-4: filtro por rol de la tabla de usuarios.
+        $role = TableQuery::filter($request, 'role_id');
+        if ($role !== null) {
+            $query->whereHas('roleAssignments', fn ($w) => $w->where('role_id', $role));
+        }
 
-        $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor);
-        $ids = array_column($page['data'], 'id');
+        $page = (new TableQuery(
+            ['display_name' => 'display_name', 'last_login_at' => 'last_login_at', 'status' => 'status', 'created_at' => 'created_at'],
+            ['status', 'role_id'],
+        ))->page($query, $request, 'display_name');
+        $ids = $page['ids'];
         $models = User::query()->whereIn('id', $ids)->get()->keyBy('id');
 
         return response()->json([
@@ -43,7 +49,7 @@ final class UserController
                 fn (User $u) => $this->users->present($u),
                 array_filter(array_map(fn ($id) => $models->get($id), $ids), fn ($u) => $u instanceof User),
             )),
-            'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
+            'meta' => $page['meta'],
         ]);
     }
 

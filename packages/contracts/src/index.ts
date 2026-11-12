@@ -18479,6 +18479,7 @@ export interface components {
             columns: string[];
             sort: string;
             shared: boolean;
+            mine: boolean;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */

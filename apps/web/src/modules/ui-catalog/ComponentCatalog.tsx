@@ -6,6 +6,7 @@ import { searchActiveUsers } from '@/modules/identity/peopleSearch'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { DataTable } from '@/ui/components/DataTable'
 import { FileUploader } from '@/ui/components/FileUploader'
 import { Icon } from '@/ui/components/Icon'
 import { MenuButton } from '@/ui/components/MenuButton'
@@ -22,7 +23,8 @@ import { Timeline } from '@/ui/components/Timeline'
 import { useToast } from '@/ui/components/Toast'
 import { Tooltip } from '@/ui/components/Tooltip'
 
-const SECTIONS = ['buttons', 'cards', 'tabs', 'overlays', 'timeline', 'status', 'notices', 'tooltips', 'menus', 'people', 'files', 'skeletons', 'states'] as const
+const SECTIONS = ['buttons', 'cards', 'tabs', 'overlays', 'timeline', 'status', 'notices', 'tooltips', 'menus', 'people', 'files', 'skeletons', 'states', 'tables'] as const
+type CatalogUser = { id: string; display_name: string; status: string; last_login_at?: string | null }
 type Section = (typeof SECTIONS)[number]
 
 /** Bloque de un estado del componente con su nombre (normal, foco, deshabilitado, error, cargando). */
@@ -289,6 +291,24 @@ export function ComponentCatalog() {
                 <Card flush><ErrorState text={s('error_text')} retryLabel={s('retry')} onRetry={() => did(s('retry'))} /></Card>
               </div>
             ))}
+
+            {section('tables', canSearchPeople ? (
+              <DataTable<CatalogUser>
+                resource="ui_catalog_users"
+                endpoint="/users"
+                defaultSort="display_name"
+                searchLabel={t('users.search')}
+                rowKey={(u) => u.id}
+                columns={[
+                  { key: 'name', label: t('users.col_user'), sort: 'display_name', hideable: false, render: (u) => <b>{u.display_name}</b> },
+                  { key: 'status', label: t('users.col_status'), sort: 'status', render: (u) => t(`users.status_${u.status}`) },
+                  { key: 'last_login_at', label: t('users.col_last'), sort: 'last_login_at', render: (u) => u.last_login_at ?? '—' },
+                ]}
+                filters={[{ key: 'status', label: t('users.filter_status'), options: ['invited', 'active', 'locked'].map((v) => ({ value: v, label: t(`users.status_${v}`) })) }]}
+                bulkActions={[{ key: 'demo', label: s('btn_save'), applies: () => true, run: async (rows) => { did(s('btn_save')); return rows.length } }]}
+                empty={<EmptyState title={s('empty_title')} text={s('empty_text')} />}
+              />
+            ) : <Notice tone="info">{s('tables_no_access')}</Notice>)}
           </div>
         </div>
       </main>

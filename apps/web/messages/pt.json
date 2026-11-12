@@ -225,7 +225,11 @@
     "code_shown": "Entregue este código ao colaborador. Ele não será mostrado novamente.",
     "code_expires": "Vence em {date}",
     "code_sent": "Código enviado ao celular cadastrado",
-    "no_doc": "Sem documento"
+    "no_doc": "Sem documento",
+    "filter_status": "Status",
+    "filter_role": "Perfil",
+    "bulk_resend": "Reenviar convite",
+    "col_created": "Criado"
   },
   "roles": {
     "sub": "{count} papéis",
@@ -322,7 +326,12 @@
     "logo_remove": "Remover",
     "logo_help": "PNG, JPEG ou WebP de até 1 MB. Usado em documentos e no seletor de empresa.",
     "logo_saved": "Logo atualizado",
-    "logo_removed": "Logo removido"
+    "logo_removed": "Logo removido",
+    "filter_status": "Status",
+    "filter_country": "País",
+    "bulk_archive": "Arquivar empresas",
+    "col_created": "Criada",
+    "search": "Buscar por razão social ou número fiscal"
   },
   "audit": {
     "sub": "Quem alterou o quê, quando e de onde. Somente leitura.",
@@ -1453,7 +1462,10 @@
     "sk_block": "Bloco",
     "empty_title": "Ainda não há registros",
     "empty_text": "Quando você adicionar o primeiro, ele aparecerá aqui.",
-    "error_text": "Não foi possível carregar a lista."
+    "error_text": "Não foi possível carregar a lista.",
+    "sec_tables": "Tabela profissional",
+    "sec_tables_help": "Busca, filtros, ordenação e paginação no servidor, colunas que se escolhem e redimensionam, seleção com ações em massa e visões salvas. Abaixo, a tabela real de usuários.",
+    "tables_no_access": "Para ver o exemplo com dados reais você precisa de permissão para ver usuários."
   },
   "atype": {
     "title": "Tipos de ausência",
@@ -1623,5 +1635,40 @@
     "revert_yes": "Sim, desfazer",
     "reverted": "Importação desfeita",
     "cancelled": "Importação descartada"
+  },
+  "table": {
+    "views": "Visão salva",
+    "view_default": "Visão padrão",
+    "view_shared_name": "{name} (compartilhada)",
+    "view_update": "Atualizar visão",
+    "view_delete": "Apagar visão",
+    "view_delete_confirm": "Apagar a visão «{name}»?",
+    "view_deleted": "Visão apagada.",
+    "view_updated": "Visão «{name}» atualizada.",
+    "view_save": "Salvar visão",
+    "view_saved": "Visão «{name}» salva.",
+    "view_save_title": "Salvar visão",
+    "view_name": "Nome da visão",
+    "view_name_required": "Digite um nome para a visão.",
+    "view_contents": "Salva {columns} colunas visíveis com os filtros, a busca e a ordem atuais.",
+    "view_share": "Compartilhar com a organização (outros a veem, mas não a alteram)",
+    "view_error": "Não foi possível salvar a visão.",
+    "columns": "Colunas",
+    "bulk_region": "Ações sobre a seleção",
+    "selected": "{n} selecionados",
+    "clear_selection": "Limpar seleção",
+    "select_page": "Selecionar todos desta página",
+    "select_row": "Selecionar linha",
+    "resize": "Largura da coluna {column} (setas esquerda e direita)",
+    "actions": "Ações",
+    "range": "{from}–{to} de {total}",
+    "per_page": "Por página",
+    "prev": "Página anterior",
+    "next": "Próxima página",
+    "page": "Página {page} de {pages}",
+    "bulk_confirm": "Aplicar a {n}",
+    "bulk_summary": "«{action}» afetará {n} registros. Deseja continuar?",
+    "bulk_skipped": "{n} dos selecionados não admitem esta ação e serão ignorados.",
+    "bulk_done": "Pronto: {done} de {total} processados."
   }
 }

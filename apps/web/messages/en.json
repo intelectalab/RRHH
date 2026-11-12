@@ -225,7 +225,11 @@
     "code_shown": "Give this code to the employee. It will not be shown again.",
     "code_expires": "Expires on {date}",
     "code_sent": "Code sent to the registered mobile",
-    "no_doc": "No document"
+    "no_doc": "No document",
+    "filter_status": "Status",
+    "filter_role": "Role",
+    "bulk_resend": "Resend invitation",
+    "col_created": "Created"
   },
   "roles": {
     "sub": "{count} roles",
@@ -322,7 +326,12 @@
     "logo_remove": "Remove",
     "logo_help": "PNG, JPEG or WebP up to 1 MB. Used on documents and in the company selector.",
     "logo_saved": "Logo updated",
-    "logo_removed": "Logo removed"
+    "logo_removed": "Logo removed",
+    "filter_status": "Status",
+    "filter_country": "Country",
+    "bulk_archive": "Archive companies",
+    "col_created": "Created",
+    "search": "Search by legal name or tax ID"
   },
   "audit": {
     "sub": "Who changed what, when and from where. Read only.",
@@ -1453,7 +1462,10 @@
     "sk_block": "Block",
     "empty_title": "No records yet",
     "empty_text": "When you add the first one it will appear here.",
-    "error_text": "The list could not be loaded."
+    "error_text": "The list could not be loaded.",
+    "sec_tables": "Professional table",
+    "sec_tables_help": "Server-side search, filters, sort and pagination, columns you can choose and resize, selection with bulk actions and saved views. Below, the real users table.",
+    "tables_no_access": "To see the example with real data you need permission to view users."
   },
   "atype": {
     "title": "Absence types",
@@ -1623,5 +1635,40 @@
     "revert_yes": "Yes, undo",
     "reverted": "Import undone",
     "cancelled": "Import discarded"
+  },
+  "table": {
+    "views": "Saved view",
+    "view_default": "Default view",
+    "view_shared_name": "{name} (shared)",
+    "view_update": "Update view",
+    "view_delete": "Delete view",
+    "view_delete_confirm": "Delete the view “{name}”?",
+    "view_deleted": "View deleted.",
+    "view_updated": "View “{name}” updated.",
+    "view_save": "Save view",
+    "view_saved": "View “{name}” saved.",
+    "view_save_title": "Save view",
+    "view_name": "View name",
+    "view_name_required": "Enter a name for the view.",
+    "view_contents": "Saves {columns} visible columns with the current filters, search and sort.",
+    "view_share": "Share with the organization (others see it but cannot change it)",
+    "view_error": "The view could not be saved.",
+    "columns": "Columns",
+    "bulk_region": "Actions on the selection",
+    "selected": "{n} selected",
+    "clear_selection": "Clear selection",
+    "select_page": "Select all on this page",
+    "select_row": "Select row",
+    "resize": "Width of column {column} (left and right arrows)",
+    "actions": "Actions",
+    "range": "{from}–{to} of {total}",
+    "per_page": "Per page",
+    "prev": "Previous page",
+    "next": "Next page",
+    "page": "Page {page} of {pages}",
+    "bulk_confirm": "Apply to {n}",
+    "bulk_summary": "“{action}” will affect {n} records. Do you want to continue?",
+    "bulk_skipped": "{n} of the selected records do not allow this action and will be skipped.",
+    "bulk_done": "Done: {done} of {total} processed."
   }
 }

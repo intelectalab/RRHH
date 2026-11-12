@@ -43466,6 +43466,7 @@ components:
       - columns
       - sort
       - shared
+      - mine
       properties:
         id:
           type: string
@@ -43483,6 +43484,8 @@ components:
         sort: &id677
           type: string
         shared: &id678
+          type: boolean
+        mine:
           type: boolean
         created_at:
           type: string

@@ -184,7 +184,9 @@ test('el Auditor consulta todo y no puede modificar nada en el sistema', functio
 
     // SEG-12: exportar un listado es una lectura (genera un archivo, no cambia datos del sistema);
     // el catálogo (kit/docs/07) le da reports.exports.create al Auditor.
-    $readOnlyPosts = ['api/v1/exports'];
+    // UI-4: las vistas guardadas son preferencias propias de la tabla (no datos del sistema); el
+    // catálogo da settings.saved_views.* a todos los roles, solo sobre lo propio.
+    $readOnlyPosts = ['api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}'];
 
     $writes = [];
     foreach (Route::getRoutes()->getRoutes() as $route) {

@@ -21,4 +21,8 @@ return [
         'invalid_range' => 'Enter a valid range: from and to as YYYY-MM-DD, to not before from and up to 100 days.',
         'unknown_source' => 'The calendar has no source «:source».',
     ],
+    'saved_view_filter' => 'You can only filter by resource.',
+    'saved_view_limit' => 'You reached the maximum of :max saved views for this table. Delete one to save another.',
+    'saved_view_not_owner' => 'Only the person who created the view can change or delete it.',
+    'saved_view_name_taken' => 'You already have a view with that name for this table.',
 ];

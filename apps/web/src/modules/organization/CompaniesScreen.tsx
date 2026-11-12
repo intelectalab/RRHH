@@ -8,11 +8,13 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
-import { EmptyState, ErrorState } from '@/ui/components/States'
+import { EmptyState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { formErrors } from '@/lib/errors'
 import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 import { ExportButton } from '@/modules/exports/ExportButton'
+import { DataTable, type BulkAction, type TableColumn, type TableFilter } from '@/ui/components/DataTable'
+import { useDateTime } from '@/modules/session/useDateTime'
 
 type Company = Schema<'LegalEntity'> & { trade_name?: string | null; allowed_actions?: string[]; version?: number }
 type Catalog = {
@@ -27,29 +29,61 @@ export function CompaniesScreen() {
   const { t } = useT()
   const { can } = useSession()
   const company = useCompany()
+  const fmtDate = useDateTime()
   const { toast, node: toastNode } = useToast()
-  const [rows, setRows] = useState<Company[] | null>(null)
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [editing, setEditing] = useState<Company | 'new' | null>(null)
-  const [loadError, setLoadError] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
+  const [counts, setCounts] = useState<{ active: number; total: number } | null>(null)
 
+  // UI-4: la tabla pide sus páginas al servidor; recargar es volver a pedir la página y los conteos.
   const load = useCallback(async () => {
-    try {
-      const res = await api.get<{ data: Company[] }>('/legal-entities?per_page=100')
-      setRows(res.data)
-      setLoadError(false)
-    } catch {
-      setLoadError(true)
-    }
+    setReloadKey((k) => k + 1)
   }, [])
 
   useEffect(() => {
-    void load()
+    void Promise.all([
+      api.get<{ meta?: { total?: number | null } }>('/legal-entities?per_page=1'),
+      api.get<{ meta?: { total?: number | null } }>('/legal-entities?per_page=1&filter[status]=active'),
+    ]).then(([all, act]) => setCounts({ total: all.meta?.total ?? 0, active: act.meta?.total ?? 0 })).catch(() => setCounts(null))
+  }, [reloadKey])
+
+  useEffect(() => {
     void api.get<{ data: Catalog }>('/catalogs/organization').then((r) => setCatalog(r.data))
-  }, [load])
+  }, [])
 
   const regimeName = (code: string) => catalog?.labor_regimes.find((r) => r.code === code)?.name ?? code
-  const active = rows?.filter((r) => r.status === 'active').length ?? 0
+
+  const columns: Array<TableColumn<Company>> = [
+    { key: 'name', label: t('org.col_name'), sort: 'name', hideable: false, width: 280, render: (r) => <><b>{r.name}</b>{r.trade_name && <span className="sub2">{r.trade_name}</span>}</> },
+    { key: 'tax_id', label: t('org.col_tax'), sort: 'tax_id', render: (r) => r.tax_id },
+    { key: 'country', label: t('org.col_country'), sort: 'country', render: (r) => catalog?.countries.find((c) => c.code === r.country)?.name ?? r.country },
+    { key: 'currency', label: t('org.col_currency'), render: (r) => r.currency },
+    { key: 'regime', label: t('org.col_regime'), render: (r) => regimeName(r.payroll_regime) },
+    { key: 'status', label: t('org.col_status'), sort: 'status', render: (r) => <span className={`st ${r.status === 'active' ? 'ok' : 'gr'}`}>{t(r.status === 'active' ? 'org.status_active' : 'org.status_archived')}</span> },
+    { key: 'created_at', label: t('org.col_created'), sort: 'created_at', hiddenByDefault: true, render: (r) => (r.created_at ? fmtDate(r.created_at) : '—') },
+  ]
+
+  const tableFilters: TableFilter[] = [
+    { key: 'status', label: t('org.filter_status'), options: [{ value: 'active', label: t('org.status_active') }, { value: 'archived', label: t('org.status_archived') }] },
+    ...(catalog ? [{ key: 'country', label: t('org.filter_country'), options: catalog.countries.map((c) => ({ value: c.code, label: c.name })) }] : []),
+  ]
+
+  // Acción masiva con operación real detrás (RN-UI-01): archivar las empresas elegidas que lo admiten.
+  const bulkActions: Array<BulkAction<Company>> = can('org.legal_entities.archive') ? [{
+    key: 'archive',
+    label: t('org.bulk_archive'),
+    danger: true,
+    applies: (r) => Boolean(r.allowed_actions?.includes('archive')),
+    run: async (rows) => {
+      let done = 0
+      for (const r of rows) {
+        try { await api.post(`/legal-entities/${r.id}/archive`, {}); done++ } catch { /* se informa en el total */ }
+      }
+      await Promise.all([load(), company.reload()])
+      return done
+    },
+  }] : []
 
   async function transition(row: Company, action: 'archive' | 'restore') {
     if (action === 'archive' && !window.confirm(t('org.confirm_archive', { name: row.name }))) return
@@ -66,11 +100,10 @@ export function CompaniesScreen() {
     <>
       <PageHeader
         title={t('org.title')}
-        sub={rows ? t('org.sub', { active, total: rows.length }) : undefined}
+        sub={counts ? t('org.sub', counts) : undefined}
         tabs={[{ href: '/organizacion/empresas', label: t('org.tab_companies'), active: true }]}
         actions={(
           <>
-            <ExportButton resource="legal_entities" onError={(m) => toast(m, 'error')} />
             {can('org.legal_entities.create') && (
               <button type="button" className="btn btn-primary" onClick={() => setEditing('new')}><Icon name="plus" /> {t('org.new')}</button>
             )}
@@ -78,41 +111,30 @@ export function CompaniesScreen() {
         )}
       />
       <main className="main" id="contenido" tabIndex={-1}>
-        <section className="card">
-          <div className="tabla-wrap">
-            <table className="table">
-              <thead>
-                <tr><th>{t('org.col_name')}</th><th>{t('org.col_tax')}</th><th>{t('org.col_country')}</th><th>{t('org.col_currency')}</th><th>{t('org.col_regime')}</th><th>{t('org.col_status')}</th><th /></tr>
-              </thead>
-              <tbody>
-                {loadError && <tr><td colSpan={7}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
-                {!loadError && rows === null && [1, 2].map((i) => <tr key={i}><td colSpan={7}><span className="esq" style={{ width: `${30 + i * 20}%` }} /></td></tr>)}
-                {rows?.length === 0 && (
-                  <tr><td colSpan={7}>
-                    <EmptyState title={t('org.empty_title')} text={t('org.empty_text')} action={can('org.legal_entities.create') && (
-                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('org.new')}</button>
-                    )} />
-                  </td></tr>
-                )}
-                {rows?.map((r) => (
-                  <tr key={r.id}>
-                    <td><b>{r.name}</b>{r.trade_name && <span className="sub2">{r.trade_name}</span>}</td>
-                    <td>{r.tax_id}</td>
-                    <td>{catalog?.countries.find((c) => c.code === r.country)?.name ?? r.country}</td>
-                    <td>{r.currency}</td>
-                    <td>{regimeName(r.payroll_regime)}</td>
-                    <td><span className={`st ${r.status === 'active' ? 'ok' : 'gr'}`}>{t(r.status === 'active' ? 'org.status_active' : 'org.status_archived')}</span></td>
-                    <td className="text-end nowrap">
-                      {r.status === 'active' && can('org.legal_entities.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('org.edit')}</button>}
-                      {r.allowed_actions?.includes('archive') && can('org.legal_entities.archive') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void transition(r, 'archive')}>{t('org.archive')}</button>}
-                      {r.allowed_actions?.includes('restore') && can('org.legal_entities.restore') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void transition(r, 'restore')}>{t('org.restore')}</button>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <DataTable<Company>
+          resource="legal_entities"
+          endpoint="/legal-entities"
+          defaultSort="name"
+          searchLabel={t('org.search')}
+          reloadKey={reloadKey}
+          rowKey={(r) => r.id}
+          columns={columns}
+          filters={tableFilters}
+          bulkActions={bulkActions}
+          toolbar={(state) => <ExportButton resource="legal_entities" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} />}
+          empty={(
+            <EmptyState title={t('org.empty_title')} text={t('org.empty_text')} action={can('org.legal_entities.create') && (
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('org.new')}</button>
+            )} />
+          )}
+          rowActions={(r) => (
+            <>
+              {r.status === 'active' && can('org.legal_entities.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('org.edit')}</button>}
+              {r.allowed_actions?.includes('archive') && can('org.legal_entities.archive') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void transition(r, 'archive')}>{t('org.archive')}</button>}
+              {r.allowed_actions?.includes('restore') && can('org.legal_entities.restore') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void transition(r, 'restore')}>{t('org.restore')}</button>}
+            </>
+          )}
+        />
       </main>
       {editing !== null && catalog && (
         <CompanyPanel
