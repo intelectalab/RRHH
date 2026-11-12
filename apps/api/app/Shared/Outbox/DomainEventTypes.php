@@ -123,6 +123,7 @@ final class DomainEventTypes
 
     // Módulos de la organización (SAS-5).
     public const TENANT_MODULE_CHANGED = 'tenant.module_changed.v1';
+
     // Unidades organizativas (ORG-3)
     public const ORG_UNIT_CREATED = 'org_unit.created.v1';
 

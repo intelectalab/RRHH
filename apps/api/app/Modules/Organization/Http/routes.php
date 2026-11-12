@@ -6,8 +6,8 @@ use App\Modules\Organization\Http\Controllers\JobCatalogController;
 use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
 use App\Modules\Organization\Http\Controllers\OrganizationCatalogController;
-use App\Modules\Organization\Http\Controllers\SiteController;
 use App\Modules\Organization\Http\Controllers\OrgUnitController;
+use App\Modules\Organization\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
