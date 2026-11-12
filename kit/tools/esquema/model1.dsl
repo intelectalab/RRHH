@@ -325,15 +325,19 @@
   legal_representative_name ; legal_representative_document_enc ; started_operations_on ; status ; uniq country_code, tax_id
 @sites main soft lock | Sede, sucursal o ubicación física; base de feriados, geocercas e indicadores por centro de trabajo.
   legal_entity_id ?-> legal_entities ; code ; name ; kind enum(headquarters,branch,plant,store,site,remote)=branch ; address
-  district_code ; country_code ; latitude numeric(9,6) ; longitude numeric(9,6) ; timezone ; establishment_code
-  is_risk_site ; status ; uniq code
+  district_code ; country_code ; latitude numeric(9,6) ; longitude numeric(9,6) ; geofence_radius_m integer ; timezone ; establishment_code
+  holiday_calendar_id ?-> holiday_calendars ; is_risk_site ; status ; uniq code
   check establishment_code IS NULL OR country_code IS DISTINCT FROM 'PE' OR establishment_code ~ '^[0-9]{4}$'
+  check (latitude IS NULL) = (longitude IS NULL) AND (latitude IS NULL OR latitude BETWEEN -90 AND 90) AND (longitude IS NULL OR longitude BETWEEN -180 AND 180)
+  check geofence_radius_m IS NULL OR (geofence_radius_m > 0 AND latitude IS NOT NULL)
 @org_units main soft lock | Unidad organizativa jerárquica (gerencia, área, departamento, subdepartamento, unidad, equipo).
   legal_entity_id ?-> legal_entities ; parent_id ?-> org_units ; code ; name
   kind enum(management,area,department,subdepartment,unit,team)! ; head_position_id ?-> positions
   cost_center_id ?-> cost_centers ; path ; depth smallint ; valid_from date ; valid_to date ; status ; uniq code
-@cost_centers soft lock | Centro de costo para imputar planilla, gastos y horas.
-  legal_entity_id ?-> legal_entities ; parent_id ?-> cost_centers ; code ; name ; accounting_code ; status ; uniq code
+@cost_centers soft lock | Centro de costo para imputar planilla, gastos y horas. opened_on / closed_on delimitan su vigencia (closed_on = último día que admite imputaciones); cerrado no admite nuevas asignaciones.
+  legal_entity_id ?-> legal_entities ; parent_id ?-> cost_centers ; code ; name ; accounting_code ; opened_on date ; closed_on date
+  status enum(active,closed,inactive)=active ; uniq code
+  check closed_on IS NULL OR opened_on IS NULL OR closed_on >= opened_on
 @job_families soft | Familias de puestos.
   code ; name ; description ; uniq code
 @job_levels soft | Niveles jerárquicos del catálogo de puestos.
@@ -415,6 +419,12 @@
   site_id -> sites ; manager_employment_id ?-> employments ; cost_center_id ?-> cost_centers
   work_modality enum(onsite,remote,hybrid)=onsite ; reason ; personnel_action_id ?-> personnel_actions ; vig employment_id
   raw EXCLUDE USING gist (tenant_id WITH =, position_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (position_id IS NOT NULL) DEFERRABLE INITIALLY IMMEDIATE
+@employment_cost_distributions lock | Distribución con vigencia de una relación laboral entre varios centros de costo (ORG-4 · RN-ORG-06); sus líneas suman siempre 100 %.
+  employment_id -> employments ; reason ; vig employment_id
+@employment_cost_distribution_lines | Línea de una distribución: centro de costo y porcentaje (dos decimales).
+  employment_cost_distribution_id -> employment_cost_distributions ; cost_center_id -> cost_centers ; percentage numeric(5,2)!
+  uniq employment_cost_distribution_id, cost_center_id
+  check percentage > 0 AND percentage <= 100
 @employment_compensations main lock sens | Compensación con vigencia (C-03): sueldo base y periodicidad. Fuente única del sueldo (C-11).
   employment_id -> employments ; base_salary money! #S ; currency cur ; pay_frequency enum(monthly,biweekly,weekly,daily,hourly)=monthly
   salary_basis enum(monthly,daily,hourly)=monthly ; is_integral_salary

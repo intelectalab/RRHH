@@ -445,6 +445,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/job-profiles/{id}` | `org.job_profiles.{view,update}` | 1 |
 | POST | `/job-profiles/{id}/{archive,restore}` | `org.job_profiles.{archive,restore}` | 1 |
 | GET | `/org-chart` | `org.units.view` | 1 |
+| POST | `/cost-centers/{id}/close` | `org.cost_centers.update` | 1 |
+| POST | `/cost-centers/{id}/reopen` | `org.cost_centers.update` | 1 |
+| GET | `/employments/{employment_id}/cost-distributions` | `people.assignments.view` | 1 |
+| POST | `/employments/{employment_id}/cost-distributions` | `people.assignments.create` | 1 |
 
 **POS · Posiciones y headcount**
 

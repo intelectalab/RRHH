@@ -6,6 +6,7 @@ use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -57,6 +58,8 @@ final class CrossTenantHarness
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
         // AUS-1: historia de reglas de un tipo de ausencia de A.
         '/absence-types/{id}/rules' => AbsenceType::class,
+        // ORG-4: distribución por centros de costo de una relación laboral de A.
+        '/employments/{employment_id}/cost-distributions' => EmploymentCostDistribution::class,
     ];
 
     /**

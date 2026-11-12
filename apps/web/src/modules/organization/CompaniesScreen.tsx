@@ -15,6 +15,7 @@ import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/module
 import { ExportButton } from '@/modules/exports/ExportButton'
 import { DataTable, type BulkAction, type TableColumn, type TableFilter } from '@/ui/components/DataTable'
 import { useDateTime } from '@/modules/session/useDateTime'
+import { orgTabs } from './orgTabs'
 
 type Company = Schema<'LegalEntity'> & { trade_name?: string | null; allowed_actions?: string[]; version?: number }
 type Catalog = {
@@ -101,7 +102,7 @@ export function CompaniesScreen() {
       <PageHeader
         title={t('org.title')}
         sub={counts ? t('org.sub', counts) : undefined}
-        tabs={[{ href: '/organizacion/empresas', label: t('org.tab_companies'), active: true }]}
+        tabs={orgTabs(t, can, 'companies')}
         actions={(
           <>
             {can('org.legal_entities.create') && (
