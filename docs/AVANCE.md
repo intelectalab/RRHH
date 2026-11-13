@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 88 | 3 | 36,5 % |
-| Backlog completo | 512 | 88 | 3 | 17,2 % |
+| Primer corte comercial (MVP) | 241 | 90 | 3 | 37,3 % |
+| Backlog completo | 512 | 90 | 3 | 17,6 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -135,8 +135,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 | COL-7 | Régimen pensionario, salud y seguros del trabajador | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | COL-8 | Cuentas bancarias y datos de pago | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | COL-9 | Listado de colaboradores | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | /employments con alcance en la consulta, filtros por empresa, sede, unidad, puesto, posición, jefe, estado y tipo, búsqueda por nombre, código o documento (por huella), orden en servidor, vistas Activos / Por ingresar / Cesados, exportación CSV sin datos personales, sueldo solo con permiso; Personas → Colaboradores; demo con 18 colaboradores ficticios. Pendiente: acciones masivas y ficha 360 (COL-3). |
-| COL-10 | Reingreso y relaciones simultáneas | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| COL-11 | Registro del cese de la relación laboral | COL | Fase 1 · Core HR | Task | sí | pendiente | — |  |
+| COL-10 | Reingreso y relaciones simultáneas | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Reingreso reutiliza la persona y crea una relación nueva enlazada (rehire_of_employment_id, employee.rehired) sin tocar la anterior; relaciones simultáneas en otras empresas del grupo (colaboradores.relaciones_simultaneas, 409 si no se permiten), nunca en la misma (RN-COL-02); la ficha lista las demás relaciones dentro del alcance. Pendiente: antigüedad para beneficios según el paquete de país y aviso si el cese anterior no era apto para reingreso. |
+| COL-11 | Registro del cese de la relación laboral | COL | Fase 1 · Core HR | Task | sí | hecha | 2026-11-13 | Registrar cese pasa la relación a «En proceso de cese» con fecha, último día, aviso, motivo de la Tabla 17, quién decide, apto para reingreso y detalle sensible; RN-COL-09 (422 closed_period) y RN-COL-10 (advierte o bloquea pendientes); el día del cese cierra con vigencia todo lo abierto, cierra el contrato, libera la posición y emite employee.terminated; revertir con motivo antes de la fecha; nada se borra. Por validar: renuncia_preaviso_dias. Pendiente: tareas de offboarding (OFF), cuenta de ex-colaborador, reasignar subordinados, suspender y reanudar. |
 | COL-12 | Inicio de RRHH | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | HIS-1 | Patrón de vigencia reutilizable | HIS | Fase 1 · Core HR | Task | sí | hecha | 2026-11-11 | Patrón compartido en app/Shared/Vigencia: cerrar la fila vigente e insertar otra, as_of y 409 ante solape (EXCLUDE). Pruebas con fecha pasada, presente y futura y prueba de esquema: toda tabla con valid_from/valid_to tiene restricción de exclusión o está en una lista justificada. Pendiente: que asignación, compensación y horario lo adopten en sus historias. |
 | HIS-2 | Movimientos de personal | HIS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
