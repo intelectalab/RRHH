@@ -3152,6 +3152,7 @@ CREATE TABLE person_bank_accounts (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   person_id uuid NOT NULL,
+  employment_id uuid NOT NULL,
   purpose text NOT NULL CHECK (purpose IN ('salary','cts','other')),
   bank_code text NOT NULL,
   account_type text NOT NULL CHECK (account_type IN ('savings','checking','wallet')),
@@ -3160,15 +3161,28 @@ CREATE TABLE person_bank_accounts (
   currency char(3) NOT NULL,
   is_active boolean NOT NULL DEFAULT true,
   verified_at timestamptz,
+  status text NOT NULL DEFAULT 'pending_approval' CHECK (status IN ('pending_approval','active','rejected','cancelled')),
+  requested_by_user_id uuid,
+  decided_by_user_id uuid,
+  decided_at timestamptz,
+  decision_reason text,
+  valid_from date NOT NULL,
+  valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_person_bank_accounts_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_person_bank_accounts_person_id FOREIGN KEY (tenant_id, person_id) REFERENCES people (tenant_id, id)
+  CONSTRAINT ck_person_bank_accounts_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ex_person_bank_accounts_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, purpose WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL AND status = 'active') DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_person_bank_accounts_person_id FOREIGN KEY (tenant_id, person_id) REFERENCES people (tenant_id, id),
+  CONSTRAINT fk_person_bank_accounts_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_person_bank_accounts_decided_by_user_id FOREIGN KEY (tenant_id, decided_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE person_bank_accounts IS 'Cuentas de la persona para pago de haberes y depósito de CTS. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+COMMENT ON TABLE person_bank_accounts IS 'Cuentas de pago de haberes y depósito de CTS por relación laboral y finalidad, con vigencia (COL-8). Un cambio queda pendiente hasta que otra persona lo aprueba (RN-COL-11); la exclusión solo rige entre cuentas activas. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_person_bank_accounts_person_id ON person_bank_accounts (tenant_id, person_id);
+CREATE INDEX ix_person_bank_accounts_requested_by_user_id ON person_bank_accounts (tenant_id, requested_by_user_id);
+CREATE INDEX ix_person_bank_accounts_decided_by_user_id ON person_bank_accounts (tenant_id, decided_by_user_id);
 ALTER TABLE person_bank_accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE person_bank_accounts FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON person_bank_accounts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -3263,6 +3277,7 @@ CREATE TABLE dependents (
   registry_status text NOT NULL DEFAULT 'pending' CHECK (registry_status IN ('pending','registered','deregistered')),
   entitles_family_allowance boolean NOT NULL DEFAULT false,
   proof_file_id uuid,
+  majority_alerted_on date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -3526,6 +3541,7 @@ CREATE TABLE employment_labor_regimes (
   labor_regime_code text NOT NULL,
   health_scheme text NOT NULL DEFAULT 'essalud' CHECK (health_scheme IN ('essalud','eps','sis','other')),
   health_provider_id uuid,
+  health_plan_code text,
   has_risk_insurance boolean NOT NULL DEFAULT false,
   has_family_allowance boolean NOT NULL DEFAULT false,
   personnel_action_id uuid,
@@ -6419,18 +6435,25 @@ CREATE TABLE insurance_beneficiaries (
   percentage numeric(5,2),
   declared_on date,
   declaration_document_id uuid,
+  declaration_id uuid NOT NULL,
+  declaration_file_id uuid,
+  signed_on date,
+  status text NOT NULL DEFAULT 'current' CHECK (status IN ('current','superseded')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   CONSTRAINT uq_insurance_beneficiaries_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_insurance_beneficiaries_1 CHECK (percentage IS NULL OR (percentage > 0 AND percentage <= 100)),
   CONSTRAINT fk_insurance_beneficiaries_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_insurance_beneficiaries_insurance_policy_member_id FOREIGN KEY (tenant_id, insurance_policy_member_id) REFERENCES insurance_policy_members (tenant_id, id),
-  CONSTRAINT fk_insurance_beneficiaries_declaration_document_id FOREIGN KEY (tenant_id, declaration_document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_insurance_beneficiaries_declaration_document_id FOREIGN KEY (tenant_id, declaration_document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_insurance_beneficiaries_declaration_file_id FOREIGN KEY (tenant_id, declaration_file_id) REFERENCES stored_files (tenant_id, id)
 );
-COMMENT ON TABLE insurance_beneficiaries IS 'Beneficiarios declarados por el trabajador para el seguro de vida. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+COMMENT ON TABLE insurance_beneficiaries IS 'Beneficiarios declarados por el trabajador para el seguro de vida (COL-7). Cada declaración (declaration_id) agrupa sus beneficiarios con el archivo firmado; una declaración nueva deja la anterior como superseded. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_insurance_beneficiaries_employment_id ON insurance_beneficiaries (tenant_id, employment_id);
 CREATE INDEX ix_insurance_beneficiaries_insurance_policy_member_id ON insurance_beneficiaries (tenant_id, insurance_policy_member_id);
 CREATE INDEX ix_insurance_beneficiaries_declaration_document_id ON insurance_beneficiaries (tenant_id, declaration_document_id);
+CREATE INDEX ix_insurance_beneficiaries_declaration_file_id ON insurance_beneficiaries (tenant_id, declaration_file_id);
 ALTER TABLE insurance_beneficiaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE insurance_beneficiaries FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON insurance_beneficiaries USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -14092,6 +14115,7 @@ ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN
 ALTER TABLE positions ADD CONSTRAINT fk_positions_position_request_id FOREIGN KEY (tenant_id, position_request_id) REFERENCES position_requests (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_replaces_employment_id FOREIGN KEY (tenant_id, replaces_employment_id) REFERENCES employments (tenant_id, id);
+ALTER TABLE person_bank_accounts ADD CONSTRAINT fk_person_bank_accounts_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id);
 ALTER TABLE person_sensitive_data ADD CONSTRAINT fk_person_sensitive_data_consent_id FOREIGN KEY (tenant_id, consent_id) REFERENCES consents (tenant_id, id);
 ALTER TABLE employments ADD CONSTRAINT fk_employments_source_application_id FOREIGN KEY (tenant_id, source_application_id) REFERENCES applications (tenant_id, id);
 ALTER TABLE employment_compensations ADD CONSTRAINT fk_employment_compensations_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
@@ -14562,6 +14586,12 @@ INSERT INTO labor_regimes (code, country_code, name, kind) VALUES
   ('pe_construccion', 'PE', 'Construcción civil', 'construction'),
   ('pe_agrario', 'PE', 'Agrario', 'agrarian'),
   ('pe_formativo', 'PE', 'Modalidades formativas', 'training');
+INSERT INTO pension_funds (code, country_code, name, kind, status) VALUES
+  ('pe_onp', 'PE', 'Oficina de Normalización Previsional (ONP)', 'public', 'active'),
+  ('pe_afp_habitat', 'PE', 'AFP Habitat', 'private', 'active'),
+  ('pe_afp_integra', 'PE', 'AFP Integra', 'private', 'active'),
+  ('pe_afp_prima', 'PE', 'Prima AFP', 'private', 'active'),
+  ('pe_afp_profuturo', 'PE', 'Profuturo AFP', 'private', 'active');
 INSERT INTO system_roles (code, name, description, realm, mfa_required_default) VALUES
   ('superadmin_saas', 'Superadmin SaaS', 'Propietario del SaaS. Opera en una consola aparte; no es un rol de organización y no ve datos de RRHH salvo acceso de soporte autorizado.', 'platform', true),
   ('admin_empresa', 'Administrador empresa', 'Administra la organización completa. Por defecto no accede a denuncias ni a datos médicos: esos permisos se asignan aparte.', 'tenant', true),
@@ -18176,6 +18206,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'Genera el código con el correlativo de la empresa.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.cambios_perfil_requieren_aprobacion', 'core', 'Cambios de perfil con aprobación', 'Los cambios que pide el colaborador pasan por RRHH antes de aplicarse.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
+  ('colaboradores.cuenta_bancaria_requiere_aprobacion', 'core', 'Cambio de cuenta de pago con aprobación', 'COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),
   ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'Días de anticipación con que se avisa el vencimiento.', 'list', '[60, 30, 15]'::jsonb, ARRAY['organization','legal_entity'], NULL),

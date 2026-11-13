@@ -66,6 +66,18 @@ return [
             'in_app' => ['subject' => 'Um e-mail voltou', 'body' => 'O e-mail de {user} voltou e não é mais usado. Corrija na conta da pessoa ou reative pelo registro de envios.'],
             'email' => ['subject' => 'Um e-mail da sua organização voltou', 'body' => "Olá {name},\n\nO e-mail de {user} voltou em {organization} e deixou de ser usado; os avisos chegam no aplicativo ou por mensagem no celular.\n\nCorrija aqui: {link}"],
         ],
+        'people.dependent_majority' => [
+            'in_app' => ['subject' => 'Um filho dependente atingiu a maioridade', 'body' => 'Verifique se o filho de {employee} continua como dependente (estudos, incapacidade) ou dê baixa.'],
+            'email' => ['subject' => 'Revise um dependente', 'body' => "Olá {name}:\n\nUm filho dependente de {employee} atingiu a maioridade em {organization}. Verifique se continua como dependente ou dê baixa.\n\nRevise aqui: {link}"],
+        ],
+        'people.bank_account_requested' => [
+            'in_app' => ['subject' => 'Uma conta de pagamento foi cadastrada em seu nome', 'body' => 'A conta terminada em {last4} foi cadastrada para seus pagamentos. Se não foi você, avise o RH imediatamente.'],
+            'email' => ['subject' => 'Uma conta de pagamento foi cadastrada em seu nome', 'body' => "Olá {name}:\n\nEm {organization}, a conta terminada em {last4} foi cadastrada para seus pagamentos e aguarda aprovação.\n\nSe não foi você, avise o RH imediatamente."],
+        ],
+        'people.bank_account_changed' => [
+            'in_app' => ['subject' => 'Sua conta de pagamento mudou', 'body' => 'Seus pagamentos irão para a conta terminada em {last4}. Se não foi você, avise o RH imediatamente.'],
+            'email' => ['subject' => 'Sua conta de pagamento mudou', 'body' => "Olá {name}:\n\nEm {organization}, seus pagamentos irão a partir de agora para a conta terminada em {last4}.\n\nSe não foi você, avise o RH imediatamente."],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],
@@ -92,6 +104,14 @@ return [
     'unsupported_channel' => 'Esse canal ainda não está disponível.',
     // NOT-5 · Mensajes directos por SMS y WhatsApp (variables entre llaves).
     'messages' => [
+        'people.bank_account_requested' => [
+            'sms' => '{organization}: a conta terminada em {last4} foi cadastrada para seus pagamentos. Se não foi você, avise o RH.',
+            'whatsapp' => '{organization}: a conta terminada em {last4} foi cadastrada para seus pagamentos. Se não foi você, avise o RH.',
+        ],
+        'people.bank_account_changed' => [
+            'sms' => '{organization}: seus pagamentos irão para a conta terminada em {last4}. Se não foi você, avise o RH.',
+            'whatsapp' => '{organization}: seus pagamentos irão para a conta terminada em {last4}. Se não foi você, avise o RH.',
+        ],
         'identity.login_code' => [
             'sms' => 'GestiaHR: seu código de acesso é {code}. Vence em {minutes} minutos. Não o compartilhe.',
             'whatsapp' => 'GestiaHR: seu código de acesso é {code}. Vence em {minutes} minutos. Não o compartilhe.',

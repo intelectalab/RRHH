@@ -66,6 +66,18 @@ return [
             'in_app' => ['subject' => 'An email bounced', 'body' => '{user}\'s email bounced and is no longer used. Fix it in their account or reactivate it from the delivery log.'],
             'email' => ['subject' => 'An email in your organization bounced', 'body' => "Hi {name},\n\n{user}'s email bounced at {organization} and is no longer used; their notices arrive in the app or by text message.\n\nFix it here: {link}"],
         ],
+        'people.dependent_majority' => [
+            'in_app' => ['subject' => 'A dependent child reached legal age', 'body' => 'Check whether the child of {employee} remains a dependent (studies, disability) or deregister them.'],
+            'email' => ['subject' => 'Review a dependent', 'body' => "Hello {name}:\n\nA dependent child of {employee} reached legal age at {organization}. Check whether they remain a dependent or deregister them.\n\nReview it here: {link}"],
+        ],
+        'people.bank_account_requested' => [
+            'in_app' => ['subject' => 'A payment account was registered in your name', 'body' => 'The account ending in {last4} was registered for your payments. If you did not request it, tell HR right away.'],
+            'email' => ['subject' => 'A payment account was registered in your name', 'body' => "Hello {name}:\n\nAt {organization}, the account ending in {last4} was registered for your payments and awaits approval.\n\nIf you did not request it, tell HR right away."],
+        ],
+        'people.bank_account_changed' => [
+            'in_app' => ['subject' => 'Your payment account changed', 'body' => 'Your payments will go to the account ending in {last4}. If you did not request it, tell HR right away.'],
+            'email' => ['subject' => 'Your payment account changed', 'body' => "Hello {name}:\n\nAt {organization}, your payments will now go to the account ending in {last4}.\n\nIf you did not request it, tell HR right away."],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],
@@ -92,6 +104,14 @@ return [
     'unsupported_channel' => 'That channel is not available yet.',
     // NOT-5 · Mensajes directos por SMS y WhatsApp (variables entre llaves).
     'messages' => [
+        'people.bank_account_requested' => [
+            'sms' => '{organization}: the account ending in {last4} was registered for your payments. If you did not request it, tell HR.',
+            'whatsapp' => '{organization}: the account ending in {last4} was registered for your payments. If you did not request it, tell HR.',
+        ],
+        'people.bank_account_changed' => [
+            'sms' => '{organization}: your payments will go to the account ending in {last4}. If you did not request it, tell HR.',
+            'whatsapp' => '{organization}: your payments will go to the account ending in {last4}. If you did not request it, tell HR.',
+        ],
         'identity.login_code' => [
             'sms' => 'GestiaHR: your sign-in code is {code}. It expires in {minutes} minutes. Do not share it.',
             'whatsapp' => 'GestiaHR: your sign-in code is {code}. It expires in {minutes} minutes. Do not share it.',

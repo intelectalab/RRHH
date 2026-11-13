@@ -36,8 +36,8 @@
     }
   ],
   "totales": {
-    "parametros": 169,
-    "verificados": 126,
+    "parametros": 170,
+    "verificados": 127,
     "sin_verificar": 43
   },
   "parametros": [
@@ -175,6 +175,21 @@
       "verificado": true,
       "base_legal": "Fuentes secundarias 2026",
       "nota": "Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
+    },
+    {
+      "codigo": "mayoria_edad_anios",
+      "nombre": "Edad en que un hijo derechohabiente pasa a revisión",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "count",
+      "valor": 18,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": true,
+      "base_legal": "Código Civil, art. 42",
+      "nota": "COL-6: al cumplirla, RRHH revisa si el hijo sigue como derechohabiente (estudios o incapacidad) y su efecto en la asignación familiar."
     },
     {
       "codigo": "afp_aporte_obligatorio_pct",

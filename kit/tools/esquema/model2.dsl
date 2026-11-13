@@ -292,9 +292,11 @@
 @insurance_policy_members | Trabajadores cubiertos por una póliza y periodo de cobertura.
   insurance_policy_id -> insurance_policies ; employment_id -> employments ; covered_from date! ; covered_to date ; plan_code
   employee_contribution money ; currency cur?
-@insurance_beneficiaries soft sens | Beneficiarios declarados por el trabajador para el seguro de vida.
+@insurance_beneficiaries soft sens | Beneficiarios declarados por el trabajador para el seguro de vida (COL-7). Cada declaración (declaration_id) agrupa sus beneficiarios con el archivo firmado; una declaración nueva deja la anterior como superseded.
   employment_id -> employments ; insurance_policy_member_id ?-> insurance_policy_members ; full_name_enc text!
   document_number_enc ; relationship ; percentage numeric(5,2) ; declared_on ; declaration_document_id ?-> documents
+  declaration_id uuid! ; declaration_file_id ?-> stored_files ; signed_on date ; status enum(current,superseded)=current
+  check percentage IS NULL OR (percentage > 0 AND percentage <= 100)
 
 #E PRE | Préstamos, adelantos y adelanto de sueldo
 @loans main soft lock sens | Préstamo al trabajador con cronograma y descuento automático en planilla.

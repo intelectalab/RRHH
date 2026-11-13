@@ -3,6 +3,14 @@
 namespace Tests\Support\Isolation;
 
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
+use App\Modules\CoreHR\Infrastructure\Models\BankAccount;
+use App\Modules\CoreHR\Infrastructure\Models\Dependent;
+use App\Modules\CoreHR\Infrastructure\Models\HealthProvider;
+use App\Modules\CoreHR\Infrastructure\Models\HealthRegime;
+use App\Modules\CoreHR\Infrastructure\Models\InsuranceCoverage;
+use App\Modules\CoreHR\Infrastructure\Models\InsurancePolicy;
+use App\Modules\CoreHR\Infrastructure\Models\LifeInsuranceBeneficiary;
+use App\Modules\CoreHR\Infrastructure\Models\PensionAffiliation;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -81,6 +89,26 @@ final class CrossTenantHarness
         '/directory' => DirectoryEmployment::class,
         '/directory/{employment_id}' => DirectoryEmployment::class,
         '/org-chart' => DirectoryEmployment::class,
+        // COL-6: derechohabientes de la persona de una relación laboral de A (baja y sustento).
+        '/employments/{employment_id}/dependents' => Dependent::class,
+        '/employments/{employment_id}/dependents/{id}' => Dependent::class,
+        '/employments/{employment_id}/dependents/{id}/deregister' => Dependent::class,
+        '/employments/{employment_id}/dependents/{id}/proof' => Dependent::class,
+        // COL-7: previsión, salud, coberturas y declaraciones de Vida Ley de una relación de A; pólizas y entidades de A.
+        '/employments/{employment_id}/pension-affiliations' => PensionAffiliation::class,
+        '/employments/{employment_id}/health-regimes' => HealthRegime::class,
+        '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,
+        '/employments/{employment_id}/insurance-coverages/{id}/end' => InsuranceCoverage::class,
+        '/employments/{employment_id}/life-insurance-declarations' => LifeInsuranceBeneficiary::class,
+        '/employments/{employment_id}/life-insurance-declarations/{id}/file' => LifeInsuranceBeneficiary::class,
+        '/insurance-policies' => InsurancePolicy::class,
+        '/insurance-policies/{id}' => InsurancePolicy::class,
+        '/health-providers' => HealthProvider::class,
+        // COL-8: cuentas de pago de una relación de A y sus acciones.
+        '/employments/{employment_id}/bank-accounts' => BankAccount::class,
+        '/employments/{employment_id}/bank-accounts/{id}/approve' => BankAccount::class,
+        '/employments/{employment_id}/bank-accounts/{id}/reject' => BankAccount::class,
+        '/employments/{employment_id}/bank-accounts/{id}/cancel' => BankAccount::class,
         // POS-1 / POS-2: acciones e historias de una posición de A.
         // POS-3 · POS-4: solicitudes de posición y presupuestos de dotación de A.
         '/position-requests/{id}' => PositionRequest::class,
@@ -101,7 +129,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

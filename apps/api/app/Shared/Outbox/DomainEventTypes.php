@@ -20,6 +20,17 @@ final class DomainEventTypes
 
     public const EMPLOYEE_HIRE_CANCELLED = 'employee.hire_cancelled.v1';
 
+    // COL-6 · COL-7 · COL-8: derechohabientes, previsión y salud, cuentas de pago.
+    public const DEPENDENT_REACHED_MAJORITY = 'dependent.reached_majority.v1';
+
+    public const PENSION_AFFILIATION_CHANGED = 'employment.pension_changed.v1';
+
+    public const HEALTH_REGIME_CHANGED = 'employment.health_changed.v1';
+
+    public const BANK_ACCOUNT_CHANGE_REQUESTED = 'bank_account.change_requested.v1';
+
+    public const BANK_ACCOUNT_CHANGED = 'bank_account.changed.v1';
+
     // Asistencia / Vacaciones
     public const LEAVE_REQUESTED = 'leave.requested.v1';
 
@@ -199,6 +210,31 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['employment_id', 'person_id', 'legal_entity_id', 'hire_date'],
             'description' => 'Relación laboral activa: empieza a marcar, a generar saldos y a entrar en planilla (ME-01)',
+        ],
+        self::DEPENDENT_REACHED_MAJORITY => [
+            'version' => 1,
+            'required_fields' => ['dependent_id', 'person_id', 'reached_on'],
+            'description' => 'Un hijo derechohabiente cumplió la mayoría de edad: RRHH revisa si sigue como derechohabiente (COL-6)',
+        ],
+        self::PENSION_AFFILIATION_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'pension_system', 'effective_from'],
+            'description' => 'Cambio de sistema, administradora o tipo de comisión con fecha efectiva; fuente de los aportes (COL-7)',
+        ],
+        self::HEALTH_REGIME_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'health_scheme', 'effective_from'],
+            'description' => 'Cambio del régimen de salud (EsSalud, EPS con plan) con fecha efectiva (COL-7)',
+        ],
+        self::BANK_ACCOUNT_CHANGE_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['bank_account_id', 'employment_id', 'person_id', 'purpose'],
+            'description' => 'Se registró una cuenta de pago nueva o cambiada que espera aprobación; se avisa al titular (RN-COL-11)',
+        ],
+        self::BANK_ACCOUNT_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['bank_account_id', 'employment_id', 'person_id', 'purpose', 'effective_from'],
+            'description' => 'La cuenta de pago cambió y rige desde la fecha; se avisa al titular por un canal distinto (RN-COL-11)',
         ],
         self::EMPLOYEE_HIRE_CANCELLED => [
             'version' => 1,

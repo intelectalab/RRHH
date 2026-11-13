@@ -66,6 +66,11 @@ export class ApiClient {
     return this.send<T>(endpoint, { method: 'POST', body: form, headers: { 'Content-Type': '' } })
   }
 
+  /** Envía un formulario multipart con campos y archivos (p. ej. una declaración firmada con sus datos). */
+  async postForm<T>(endpoint: string, form: FormData): Promise<T> {
+    return this.send<T>(endpoint, { method: 'POST', body: form, headers: { 'Content-Type': '' } })
+  }
+
   /** Descarga un archivo (no JSON): devuelve el contenido y el nombre que sugiere la API. */
   async download(endpoint: string): Promise<{ blob: Blob; filename: string }> {
     const url = endpoint.startsWith('http') || endpoint.startsWith('/api/') ? endpoint : `${this.baseUrl}${endpoint}`

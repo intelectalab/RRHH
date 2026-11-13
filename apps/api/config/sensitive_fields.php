@@ -80,6 +80,20 @@ return [
         'trace' => ['payroll.results.trace.view', 'salary'],
     ],
     'Payslip' => ['net' => ['payroll.results.view', 'salary']],
+    // COL-6 · Derechohabientes: datos de terceros (el recurso exige people.dependents.view).
+    'Dependent' => [
+        'document_number' => ['people.people.personal_data.view', 'identity_document'],
+        'birth_date' => ['people.people.personal_data.view', 'other'],
+        'has_disability' => ['people.people.health_data.view', 'health'],
+    ],
+    // COL-7 · Código de afiliado (CUSPP) y beneficiarios de Vida Ley (esquema genérico en el contrato).
+    'PensionAffiliation' => ['affiliate_code' => ['people.people.personal_data.view', 'identity_document']],
+    'LifeInsuranceDeclaration' => ['beneficiaries' => ['people.people.personal_data.view', 'other']],
+    // COL-8 · RN-COL-11: número y código interbancario; sin el permiso viajan solo los últimos dígitos.
+    'BankAccount' => [
+        'account_number' => ['people.people.bank_account.view', 'bank_account'],
+        'interbank_code' => ['people.people.bank_account.view', 'bank_account'],
+    ],
     'Person' => [
         'document_number' => ['people.people.personal_data.view', 'identity_document'],
         'birth_date' => ['people.people.personal_data.view', 'other'],

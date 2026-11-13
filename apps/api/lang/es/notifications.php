@@ -66,6 +66,18 @@ return [
             'in_app' => ['subject' => 'Un correo rebotó', 'body' => 'El correo de {user} rebotó y ya no se usa. Corrígelo en su cuenta o reactívalo desde el registro de entregas.'],
             'email' => ['subject' => 'Un correo de tu organización rebotó', 'body' => "Hola {name}:\n\nEl correo de {user} rebotó en {organization} y dejó de usarse; sus avisos le llegan en la aplicación o por mensaje al celular.\n\nCorrígelo aquí: {link}"],
         ],
+        'people.dependent_majority' => [
+            'in_app' => ['subject' => 'Un hijo derechohabiente cumplió la mayoría de edad', 'body' => 'Revisa si el hijo de {employee} sigue como derechohabiente (estudios, incapacidad) o dalo de baja.'],
+            'email' => ['subject' => 'Revisa un derechohabiente', 'body' => "Hola {name}:\n\nUn hijo derechohabiente de {employee} cumplió la mayoría de edad en {organization}. Revisa si sigue como derechohabiente o dalo de baja.\n\nRevísalo aquí: {link}"],
+        ],
+        'people.bank_account_requested' => [
+            'in_app' => ['subject' => 'Se registró una cuenta de pago a tu nombre', 'body' => 'Se registró la cuenta terminada en {last4} para tus pagos. Si no lo pediste, avisa a RRHH de inmediato.'],
+            'email' => ['subject' => 'Se registró una cuenta de pago a tu nombre', 'body' => "Hola {name}:\n\nEn {organization} se registró la cuenta terminada en {last4} para tus pagos; queda pendiente de aprobación.\n\nSi no lo pediste, avisa a RRHH de inmediato."],
+        ],
+        'people.bank_account_changed' => [
+            'in_app' => ['subject' => 'Tu cuenta de pago cambió', 'body' => 'Tus pagos se abonarán en la cuenta terminada en {last4}. Si no lo pediste, avisa a RRHH de inmediato.'],
+            'email' => ['subject' => 'Tu cuenta de pago cambió', 'body' => "Hola {name}:\n\nEn {organization}, tus pagos se abonarán desde ahora en la cuenta terminada en {last4}.\n\nSi no lo pediste, avisa a RRHH de inmediato."],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],
@@ -92,6 +104,14 @@ return [
     'unsupported_channel' => 'Ese canal aún no está disponible.',
     // NOT-5 · Mensajes directos por SMS y WhatsApp (variables entre llaves).
     'messages' => [
+        'people.bank_account_requested' => [
+            'sms' => '{organization}: se registró la cuenta terminada en {last4} para tus pagos. Si no lo pediste, avisa a RRHH.',
+            'whatsapp' => '{organization}: se registró la cuenta terminada en {last4} para tus pagos. Si no lo pediste, avisa a RRHH.',
+        ],
+        'people.bank_account_changed' => [
+            'sms' => '{organization}: tus pagos irán a la cuenta terminada en {last4}. Si no lo pediste, avisa a RRHH.',
+            'whatsapp' => '{organization}: tus pagos irán a la cuenta terminada en {last4}. Si no lo pediste, avisa a RRHH.',
+        ],
         'identity.login_code' => [
             'sms' => 'GestiaHR: tu código de ingreso es {code}. Vence en {minutes} minutos. No lo compartas con nadie.',
             'whatsapp' => 'GestiaHR: tu código de ingreso es {code}. Vence en {minutes} minutos. No lo compartas con nadie.',
