@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import es from '../../messages/es.json'
 import { peopleTabs } from '@/modules/people/peopleTabs'
+import { ADDENDUM_KINDS, CONTRACT_STATUSES, contractButtons } from '@/modules/people/profile/ContractsTab'
 import { PROFILE_TABS, visibleTabs } from '@/modules/people/profile/profileTabs'
 import { seniorityText } from '@/modules/people/profile/seniority'
 import { CHANGE_FIELDS, MOVEMENT_KINDS, WORK_FIELDS } from '@/modules/people/profile/types'
@@ -14,14 +15,33 @@ const t = (k: string, v: Record<string, string | number> = {}) => {
 describe('ficha 360 (COL-3)', () => {
   it('las pestañas aparecen solo con el módulo contratado y el permiso', () => {
     const all = () => true
-    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'compensation', 'dependents', 'social_security', 'payment'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'contracts', 'compensation', 'dependents', 'social_security', 'payment'])
     expect(visibleTabs(PROFILE_TABS, [], all)).toEqual([])
     // Sin permiso de ver la historia de asignaciones, esa pestaña no aparece.
-    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'compensation', 'dependents', 'social_security', 'payment'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'contracts', 'compensation', 'dependents', 'social_security', 'payment'])
     // HIS-3: sin el permiso de campo de sueldo, la pestaña de compensación no aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.employments.salary.view').map((x) => x.id)).not.toContain('compensation')
+    // CON-2: sin permiso de ver contratos, esa pestaña no aparece.
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'contracts.contracts.view').map((x) => x.id)).not.toContain('contracts')
     // COL-6: sin permiso de derechohabientes, esa pestaña tampoco aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.dependents.view').map((x) => x.id)).not.toContain('dependents')
+  })
+
+  it('CON-2 · la pestaña Contratos ofrece solo las acciones permitidas por el estado y el permiso', () => {
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'contracts.contracts.view').map((x) => x.id)).not.toContain('contracts')
+    const draft = { status: 'draft' as const, allowed_actions: ['submit', 'register-signature', 'void'] }
+    expect(contractButtons(draft, () => true)).toEqual(['edit', 'submit', 'register-signature', 'void'])
+    expect(contractButtons(draft, (p) => p === 'contracts.contracts.issue')).toEqual(['register-signature'])
+    // Las acciones de sistema (inicio, vencimiento) no son botones.
+    expect(contractButtons({ status: 'signed', allowed_actions: ['start', 'void'] }, () => true)).toEqual(['void'])
+  })
+
+  it('cada estado, acción y tipo de adenda del contrato tiene su texto', () => {
+    const ctr = (es as unknown as { ctr: Record<string, string> }).ctr
+    for (const s of CONTRACT_STATUSES) expect(ctr[`status_${s}`], s).toBeTruthy()
+    for (const k of [...ADDENDUM_KINDS, 'position']) expect(ctr[`kind_${k}`], k).toBeTruthy()
+    for (const a of ['edit', 'submit', 'approve', 'return', 'register-signature', 'decline-signature', 'void', 'terminate', 'renew']) expect(ctr[`act_${a}`], a).toBeTruthy()
+    expect(ficha.tab_contracts).toBeTruthy()
   })
 
   it('la antigüedad que calcula el servidor se lee en palabras, omitiendo las partes en cero', () => {

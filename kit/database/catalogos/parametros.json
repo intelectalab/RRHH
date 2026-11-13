@@ -640,6 +640,35 @@
       ]
     },
     {
+      "codigo": "contratos.requiere_aprobacion",
+      "modulo": "core",
+      "nombre": "Contratos con aprobación antes de la firma",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "CON-2 · ME-11: con «sí», el contrato y la renovación pasan por aprobación (Borrador → En aprobación → En firma); con «no», al enviarlos se genera el documento y quedan listos para firmar.",
+      "opciones": null
+    },
+    {
+      "codigo": "contratos.aviso_fin_prueba_dias",
+      "modulo": "core",
+      "nombre": "Aviso del fin del periodo de prueba (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 7,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "CON-2: días antes del fin del periodo de prueba en que se avisa al jefe y a RRHH. 0: el mismo día.",
+      "opciones": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
       "codigo": "colaboradores.cuenta_bancaria_requiere_aprobacion",
       "modulo": "core",
       "nombre": "Cambio de cuenta de pago con aprobación",

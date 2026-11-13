@@ -3153,11 +3153,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «cancel» sobre ContractAddendum
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** Cancelar la adenda antes de firmarse (reason) */
         post: operations["postContractAddendaIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contract-addenda/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el documento vigente de la adenda */
+        get: operations["getContractAddendaIdDocument"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3173,11 +3187,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «issue» sobre ContractAddendum
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** Emitir la adenda: genera su documento y la deja en firma */
         post: operations["postContractAddendaIdIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contract-addenda/{id}/register-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registrar la adenda firmada (multipart: file, signed_on, origin); aplica sus cambios con vigencia (RN-CON-08) */
+        post: operations["postContractAddendaIdRegisterSignature"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3408,7 +3436,7 @@ export interface paths {
         patch: operations["patchContractsId"];
         trace?: never;
     };
-    "/contracts/{id}/issue": {
+    "/contracts/{id}/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -3417,11 +3445,59 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «issue» sobre Contract
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postContractsIdIssue"];
+        /** Aprobar el contrato: genera el documento desde la plantilla y lo deja listo para firmar */
+        post: operations["postContractsIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/decline-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** La firma no se completó: el contrato vuelve a borrador (reason) */
+        post: operations["postContractsIdDeclineSignature"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el documento vigente del contrato (generado o firmado) */
+        get: operations["getContractsIdDocument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/register-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registrar el ejemplar firmado por ambas partes (multipart: file, signed_on, origin); desde borrador solo el contrato físico escaneado (RN-CON-06). Si la fecha de inicio llegó, rige */
+        post: operations["postContractsIdRegisterSignature"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3437,11 +3513,42 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «renew» sobre Contract
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación */
         post: operations["postContractsIdRenew"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Devolver el contrato a borrador con observaciones (reason) */
+        post: operations["postContractsIdReturn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enviar el borrador: valida tipo, fechas, causa objetiva, periodo de prueba y topes (RN-CON-01/02/03/07); queda en aprobación o, si la organización no la exige, en firma con su documento */
+        post: operations["postContractsIdSubmit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3457,11 +3564,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «terminate» sobre Contract
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** Terminar el contrato vigente o vencido (reason, effective_on) */
         post: operations["postContractsIdTerminate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contracts/{id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anular el contrato antes de que empiece a regir (reason) */
+        post: operations["postContractsIdVoid"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4548,6 +4669,23 @@ export interface paths {
         };
         /** Ver Compensation */
         get: operations["getEmploymentsEmploymentIdCompensationsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cadena de contratos de la relación en orden: contrato inicial, renovaciones y sus adendas (CON-3) */
+        get: operations["getEmploymentsEmploymentIdContracts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -17684,35 +17822,87 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             employment_id: string;
-            type: string;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            legal_entity_name?: string | null;
+            /** @description Identificador opaco */
+            contract_type_id: string;
+            contract_type_name?: string | null;
+            contract_type_category?: string | null;
+            number?: string | null;
             /** Format: date */
             starts_on: string;
             /** Format: date */
             ends_on?: string | null;
             /** Format: date */
-            probation_ends_on?: string | null;
-            workday: string;
-            cause?: string | null;
+            trial_period_ends_on?: string | null;
+            weekly_hours?: number | null;
             /** @enum {string} */
-            status: "draft" | "issued" | "signed" | "active" | "expired" | "terminated";
+            work_modality: "onsite" | "remote" | "hybrid";
+            objective_cause?: string | null;
+            /** @enum {string} */
+            status: "draft" | "pending_approval" | "pending_signature" | "signed" | "active" | "expired" | "terminated" | "superseded" | "cancelled";
+            /** @description Identificador opaco */
+            renewal_of_contract_id?: string | null;
+            /** @description Identificador opaco */
+            renewed_by_contract_id?: string | null;
+            has_document?: boolean | null;
+            document_version?: number | null;
+            /** @enum {string|null} */
+            signature_origin?: "physical_scan" | "electronic" | null;
+            /** Format: date-time */
+            signed_at?: string | null;
+            /** Format: date-time */
+            approved_at?: string | null;
+            accumulated_days?: number | null;
+            termination_reason?: string | null;
+            accumulation?: {
+                [key: string]: unknown;
+            } | null;
+            warnings?: {
+                [key: string]: unknown;
+            }[] | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): salary_change */
         ContractAddendum: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
             contract_id: string;
-            kind: string;
+            /** @description Identificador opaco */
+            employment_id?: string | null;
+            number?: string | null;
+            /** @enum {string} */
+            kind: "salary" | "position" | "schedule" | "extension" | "modality" | "other";
             /** Format: date */
             effective_on: string;
-            changes: {
+            description: string;
+            changes?: {
                 [key: string]: unknown;
-            };
+            } | null;
+            salary_change?: components["schemas"]["Money"];
             /** @enum {string} */
-            status: "draft" | "issued" | "signed" | "cancelled";
+            status: "draft" | "pending_signature" | "active" | "cancelled";
+            has_document?: boolean | null;
+            document_version?: number | null;
+            /** Format: date-time */
+            signed_at?: string | null;
+            /** @enum {string|null} */
+            signature_origin?: "physical_scan" | "electronic" | null;
+            applied_refs?: {
+                [key: string]: unknown;
+            } | null;
+            cancellation_reason?: string | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17721,25 +17911,38 @@ export interface components {
         ContractAddendumInput: {
             /** @description Identificador opaco */
             contract_id?: string;
-            kind?: string;
+            /** @description Identificador opaco */
+            employment_id?: string | null;
+            number?: string | null;
+            /** @enum {string} */
+            kind?: "salary" | "position" | "schedule" | "extension" | "modality" | "other";
             /** Format: date */
             effective_on?: string;
+            description?: string;
             changes?: {
                 [key: string]: unknown;
-            };
+            } | null;
         };
         ContractInput: {
             /** @description Identificador opaco */
             employment_id?: string;
-            type?: string;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            contract_type_id?: string;
+            number?: string | null;
             /** Format: date */
             starts_on?: string;
             /** Format: date */
             ends_on?: string | null;
             /** Format: date */
-            probation_ends_on?: string | null;
-            workday?: string;
-            cause?: string | null;
+            trial_period_ends_on?: string | null;
+            weekly_hours?: number | null;
+            /** @enum {string} */
+            work_modality?: "onsite" | "remote" | "hybrid";
+            objective_cause?: string | null;
+            /** @description Identificador opaco */
+            renewal_of_contract_id?: string | null;
         };
         ContractType: {
             /** @description Identificador opaco */
@@ -18281,7 +18484,6 @@ export interface components {
             person_id?: string;
             /** @description Identificador opaco */
             legal_entity_id?: string;
-            employee_code?: string;
             /** @enum {string} */
             kind?: "employee" | "intern" | "apprentice";
             /** @enum {string} */
@@ -30016,7 +30218,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -30026,16 +30228,43 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["ContractAddendum"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getContractAddendaIdDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postContractAddendaIdIssue: {
@@ -30052,7 +30281,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -30062,16 +30291,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["ContractAddendum"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractAddendaIdRegisterSignature: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: date */
+                    signed_on: string;
+                    /** @enum {string} */
+                    origin?: "physical_scan" | "electronic";
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getContractTypes: {
@@ -30802,7 +31074,7 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postContractsIdIssue: {
+    postContractsIdApprove: {
         parameters: {
             query?: never;
             header?: {
@@ -30816,7 +31088,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -30826,16 +31098,122 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Contract"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractsIdDeclineSignature: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getContractsIdDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postContractsIdRegisterSignature: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: date */
+                    signed_on: string;
+                    /** @enum {string} */
+                    origin?: "physical_scan" | "electronic";
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postContractsIdRenew: {
@@ -30852,7 +31230,43 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractsIdReturn: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -30862,16 +31276,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Contract"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractsIdSubmit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postContractsIdTerminate: {
@@ -30888,7 +31338,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -30898,16 +31348,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Contract"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postContractsIdVoid: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getCostCenters: {
@@ -33789,6 +34275,31 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["Compensation"];
                     };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getEmploymentsEmploymentIdContracts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
             401: components["responses"]["Unauthorized"];

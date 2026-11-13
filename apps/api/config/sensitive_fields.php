@@ -31,6 +31,8 @@ return [
         'current' => ['compensation.proposals.view', 'salary'],
         'proposed' => ['compensation.proposals.view', 'salary'],
     ],
+    // CON-3: sueldo pactado en una adenda de remuneración.
+    'ContractAddendum' => ['salary_change' => ['people.employments.salary.view', 'salary']],
     'ComplianceLedgerEntry' => ['payload' => ['compliance.ledger.view', 'other']],
     'Contractor' => ['fee' => ['payroll.contractors.fees.view', 'salary']],
     'ContractorInvoice' => [

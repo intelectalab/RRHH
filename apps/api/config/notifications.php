@@ -37,6 +37,8 @@ return [
         // COL-8 · RN-COL-11: se registró o cambió la cuenta de pago del titular (solo los últimos dígitos).
         'people.bank_account_requested' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'people.bank_account_changed' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // CON-2: el periodo de prueba de un colaborador termina pronto; el jefe y RRHH lo revisan en la ficha.
+        'contracts.probation_ending' => ['variables' => ['employee', 'ends_on'], 'link' => '/personas/colaboradores/{employment_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 

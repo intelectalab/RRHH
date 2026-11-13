@@ -20,6 +20,28 @@ final class DomainEventTypes
 
     public const EMPLOYEE_HIRE_CANCELLED = 'employee.hire_cancelled.v1';
 
+    // CON-2 · CON-3 · ME-11: ciclo del contrato (envío, emisión con documento, firma, inicio, renovación,
+    // adenda, vencimiento sin regularizar, término, anulación) y aviso del fin del periodo de prueba.
+    public const CONTRACT_CREATED = 'contract.created.v1';
+
+    public const CONTRACT_ISSUED = 'contract.issued.v1';
+
+    public const CONTRACT_SIGNED = 'contract.signed.v1';
+
+    public const CONTRACT_STARTED = 'contract.started.v1';
+
+    public const CONTRACT_RENEWED = 'contract.renewed.v1';
+
+    public const CONTRACT_AMENDED = 'contract.amended.v1';
+
+    public const CONTRACT_EXPIRED = 'contract.expired.v1';
+
+    public const CONTRACT_TERMINATED = 'contract.terminated.v1';
+
+    public const CONTRACT_VOIDED = 'contract.voided.v1';
+
+    public const CONTRACT_PROBATION_ENDING = 'contract.probation_ending.v1';
+
     // COL-10 · COL-11 · ME-01: reingreso y cese (registro, reversión) de la relación laboral.
     public const EMPLOYEE_REHIRED = 'employee.rehired.v1';
 
@@ -279,6 +301,16 @@ final class DomainEventTypes
             'required_fields' => ['employment_id', 'person_id', 'legal_entity_id', 'hire_date', 'rehire_of_employment_id'],
             'description' => 'Reingreso: relación nueva de una persona con una relación anterior cesada, que queda intacta (COL-10)',
         ],
+        self::CONTRACT_CREATED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id'], 'description' => 'Contrato enviado a aprobación o a firma (ME-11)'],
+        self::CONTRACT_ISSUED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'document_id'], 'description' => 'Contrato aprobado: documento generado y listo para firmar (ME-11)'],
+        self::CONTRACT_SIGNED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'signature_origin'], 'description' => 'Contrato firmado por ambas partes (RN-CON-06)'],
+        self::CONTRACT_STARTED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'starts_on'], 'description' => 'Contrato vigente desde su fecha de inicio (ME-11)'],
+        self::CONTRACT_RENEWED => ['version' => 1, 'required_fields' => ['contract_id', 'renewal_of_contract_id', 'employment_id'], 'description' => 'Renovación firmada que sucede al contrato anterior (CON-3)'],
+        self::CONTRACT_AMENDED => ['version' => 1, 'required_fields' => ['contract_id', 'addendum_id', 'kind', 'effective_on'], 'description' => 'Adenda firmada; aplica sus cambios con vigencia (RN-CON-08)'],
+        self::CONTRACT_EXPIRED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'ends_on'], 'description' => 'Contrato a plazo vencido sin renovación ni cese: riesgo de desnaturalización (RN-CON-05)'],
+        self::CONTRACT_TERMINATED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'reason'], 'description' => 'Contrato terminado (cese, renovación o término registrado)'],
+        self::CONTRACT_VOIDED => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id'], 'description' => 'Contrato anulado antes de empezar a regir'],
+        self::CONTRACT_PROBATION_ENDING => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'trial_period_ends_on'], 'description' => 'El periodo de prueba termina pronto: aviso al jefe y a RRHH (CON-2)'],
         self::OFFBOARDING_STARTED => [
             'version' => 1,
             'required_fields' => ['employment_id', 'termination_id', 'termination_date', 'reason'],

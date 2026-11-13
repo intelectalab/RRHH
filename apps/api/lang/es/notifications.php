@@ -78,6 +78,10 @@ return [
             'in_app' => ['subject' => 'Tu cuenta de pago cambió', 'body' => 'Tus pagos se abonarán en la cuenta terminada en {last4}. Si no lo pediste, avisa a RRHH de inmediato.'],
             'email' => ['subject' => 'Tu cuenta de pago cambió', 'body' => "Hola {name}:\n\nEn {organization}, tus pagos se abonarán desde ahora en la cuenta terminada en {last4}.\n\nSi no lo pediste, avisa a RRHH de inmediato."],
         ],
+        'contracts.probation_ending' => [
+            'in_app' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => 'El periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño antes de esa fecha.'],
+            'email' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => "Hola {name}:\n\nEn {organization}, el periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño y decide antes de esa fecha.\n\nRevísalo aquí: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],

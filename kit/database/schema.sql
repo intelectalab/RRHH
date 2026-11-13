@@ -3654,6 +3654,12 @@ CREATE TABLE contracts (
   document_id uuid,
   signature_request_id uuid,
   accumulated_days integer,
+  signed_at timestamptz,
+  signature_origin text CHECK (signature_origin IN ('physical_scan','electronic')),
+  approved_by_user_id uuid,
+  approved_at timestamptz,
+  termination_reason text,
+  probation_alerted_on date,
   valid_from date NOT NULL,
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -3665,13 +3671,15 @@ CREATE TABLE contracts (
   CONSTRAINT ex_contracts_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL AND status NOT IN ('draft','pending_approval','superseded','cancelled')) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_contracts_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_contracts_contract_type_id FOREIGN KEY (tenant_id, contract_type_id) REFERENCES contract_types (tenant_id, id),
-  CONSTRAINT fk_contracts_renewal_of_contract_id FOREIGN KEY (tenant_id, renewal_of_contract_id) REFERENCES contracts (tenant_id, id)
+  CONSTRAINT fk_contracts_renewal_of_contract_id FOREIGN KEY (tenant_id, renewal_of_contract_id) REFERENCES contracts (tenant_id, id),
+  CONSTRAINT fk_contracts_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE contracts IS 'Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08).';
 CREATE INDEX ix_contracts_contract_type_id ON contracts (tenant_id, contract_type_id);
 CREATE INDEX ix_contracts_renewal_of_contract_id ON contracts (tenant_id, renewal_of_contract_id);
 CREATE INDEX ix_contracts_document_id ON contracts (tenant_id, document_id);
 CREATE INDEX ix_contracts_signature_request_id ON contracts (tenant_id, signature_request_id);
+CREATE INDEX ix_contracts_approved_by_user_id ON contracts (tenant_id, approved_by_user_id);
 ALTER TABLE contracts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contracts FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON contracts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -3688,6 +3696,11 @@ CREATE TABLE contract_amendments (
   document_id uuid,
   signature_request_id uuid,
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','pending_signature','active','cancelled')),
+  changes jsonb,
+  applied_refs jsonb,
+  signed_at timestamptz,
+  signature_origin text CHECK (signature_origin IN ('physical_scan','electronic')),
+  cancellation_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -18227,6 +18240,8 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('colaboradores.cese_bloquea_pendientes', 'core', 'Bloquear el cese con pendientes', 'Si el cese se registra con activos sin devolver, préstamos o adelantos con saldo o vacaciones aprobadas posteriores a la fecha de cese, se rechaza en lugar de solo advertir (RN-COL-10).', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.relaciones_simultaneas', 'core', 'Relaciones simultáneas en empresas del grupo', 'Permite que una persona tenga a la vez relaciones laborales abiertas con distintas empresas de la organización (COL-10). Con la misma empresa nunca se permite (RN-COL-02).', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('colaboradores.campos_requieren_aprobacion', 'core', 'Datos que el colaborador cambia con aprobación', 'RN-COL-06 · Datos personales que, propuestos por el propio colaborador, esperan a RRHH; los demás (nombre preferido, correo y celular personales) se aplican en el acto.', 'list', '["first_names", "paternal_surname", "maternal_surname", "birth_date", "sex", "marital_status", "nationality_code", "address"]'::jsonb, ARRAY['organization'], '["first_names", "paternal_surname", "maternal_surname", "preferred_name", "birth_date", "sex", "marital_status", "nationality_code", "personal_email", "mobile_phone", "address"]'::jsonb),
+  ('contratos.requiere_aprobacion', 'core', 'Contratos con aprobación antes de la firma', 'CON-2 · ME-11: con «sí», el contrato y la renovación pasan por aprobación (Borrador → En aprobación → En firma); con «no», al enviarlos se genera el documento y quedan listos para firmar.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('contratos.aviso_fin_prueba_dias', 'core', 'Aviso del fin del periodo de prueba (días)', 'CON-2: días antes del fin del periodo de prueba en que se avisa al jefe y a RRHH. 0: el mismo día.', 'integer', '7'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 60}'::jsonb),
   ('colaboradores.cuenta_bancaria_requiere_aprobacion', 'core', 'Cambio de cuenta de pago con aprobación', 'COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('movimientos.tipos_con_aprobacion', 'core', 'Movimientos que pasan por aprobación', 'HIS-2: tipos de movimiento de personal que, aunque los registre RRHH, esperan el flujo de aprobación publicado para «personnel_action» antes de aplicarse. Lo que propone un jefe siempre pasa por aprobación.', 'list', '["promotion"]'::jsonb, ARRAY['organization','legal_entity'], '["promotion", "transfer", "manager_change", "cost_center_change", "data_correction"]'::jsonb),
   ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),

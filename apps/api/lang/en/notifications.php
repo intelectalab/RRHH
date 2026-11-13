@@ -78,6 +78,10 @@ return [
             'in_app' => ['subject' => 'Your payment account changed', 'body' => 'Your payments will go to the account ending in {last4}. If you did not request it, tell HR right away.'],
             'email' => ['subject' => 'Your payment account changed', 'body' => "Hello {name}:\n\nAt {organization}, your payments will now go to the account ending in {last4}.\n\nIf you did not request it, tell HR right away."],
         ],
+        'contracts.probation_ending' => [
+            'in_app' => ['subject' => '{employee}\'s probation ends soon', 'body' => '{employee}\'s probation period ends on {ends_on}. Review their performance before that date.'],
+            'email' => ['subject' => '{employee}\'s probation ends soon', 'body' => "Hello {name}:\n\nIn {organization}, {employee}'s probation period ends on {ends_on}. Review their performance and decide before that date.\n\nReview it here: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],
