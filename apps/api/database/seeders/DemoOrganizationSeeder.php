@@ -111,6 +111,13 @@ class DemoOrganizationSeeder extends Seeder
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
+            // POS-3: sin flujo publicado no se puede enviar una solicitud de posición (RN-WFL-01).
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'position_request')->exists()) {
+                $flow = $flows->create(['name' => 'Nuevas posiciones · aprobación estándar', 'subject_type' => 'position_request', 'steps' => ['levels' => [
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 48, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
 
             $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
             if ($admin === null || Task::query()->exists()) {
