@@ -6,8 +6,8 @@ Actualizado el **2026-11-12** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 83 | 3 | 34,4 % |
-| Backlog completo | 512 | 83 | 3 | 16,2 % |
+| Primer corte comercial (MVP) | 241 | 85 | 3 | 35,3 % |
+| Backlog completo | 512 | 85 | 3 | 16,6 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
