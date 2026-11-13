@@ -12,6 +12,7 @@ return [
         'user' => 'User',
         'role' => 'Role',
         'legal_entity' => 'LegalEntity',
+        'person' => 'Person',
         'employment' => 'Employment',
         'compensation' => 'Compensation',
         'position' => 'Position',
@@ -26,7 +27,7 @@ return [
     ],
 
     // Atributos que nunca se copian a la auditoría.
-    'ignored_attributes' => ['created_at', 'updated_at', 'lock_version', 'password_hash', 'session_hash', 'token_hash', 'identifier_hash', 'identifier_enc', 'remember_token'],
+    'ignored_attributes' => ['created_at', 'updated_at', 'lock_version', 'password_hash', 'session_hash', 'token_hash', 'identifier_hash', 'identifier_enc', 'number_enc', 'number_hash', 'remember_token'],
 
     'mask' => '••••',
 

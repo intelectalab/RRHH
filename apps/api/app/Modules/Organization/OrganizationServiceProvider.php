@@ -10,7 +10,6 @@ use App\Modules\Organization\Infrastructure\Exports\LegalEntitiesExportSource;
 use App\Modules\Organization\Infrastructure\Imports\LegalEntitiesImporter;
 use App\Modules\Organization\Infrastructure\Provisioning\CreateFirstLegalEntity;
 use App\Modules\Organization\Infrastructure\Search\LegalEntitySearchSource;
-use App\Modules\Organization\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\Organization\Infrastructure\Usage\LegalEntitiesUsageSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Imports\ImportRegistry;
@@ -40,7 +39,6 @@ final class OrganizationServiceProvider extends ServiceProvider
         $this->app->make(ProvisioningRegistry::class)->register($this->app->make(CreateFirstLegalEntity::class));
         // SAS-6 · Consumo frente a los límites del plan.
         $this->app->make(UsageRegistry::class)->register(new LegalEntitiesUsageSource);
-        $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {

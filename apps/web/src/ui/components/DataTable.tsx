@@ -30,6 +30,9 @@ export type BulkAction<T> = { key: string; label: string; applies: (row: T) => b
 
 export type TableState = { q: string; filters: Record<string, string>; sort: string }
 
+/** Vista predefinida del listado (p. ej. «Activos», «Por ingresar»): filtros fijos, sin guardarse en el servidor. */
+export type TablePreset = { key: string; label: string; filters: Record<string, string> }
+
 type SavedView = { id: string; name: string; filters: Record<string, unknown>; columns: string[]; sort: string; shared: boolean; mine: boolean }
 
 const PER_PAGE = [25, 50, 100]
@@ -72,7 +75,7 @@ export function nextSort(current: string, field: string, fallback: string): stri
  * recibe la tabla: una vista que las nombre simplemente no las muestra. En pantallas angostas cada
  * fila se ve como tarjeta (RN-UI-06).
  */
-export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, filters = [], bulkActions = [], defaultSort, searchLabel, empty, toolbar, reloadKey = 0, onTotal, urlSearch = false }: {
+export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, filters = [], bulkActions = [], defaultSort, searchLabel, empty, toolbar, reloadKey = 0, onTotal, urlSearch = false, presets = [] }: {
   resource: string
   endpoint: string
   columns: Array<TableColumn<T>>
@@ -88,6 +91,8 @@ export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, 
   onTotal?: (total: number) => void
   /** Toma la búsqueda inicial de ?q= en la dirección. */
   urlSearch?: boolean
+  /** Vistas predefinidas que aparecen antes de las guardadas. */
+  presets?: TablePreset[]
 }) {
   const { t } = useT()
   const { can } = useSession()
@@ -171,8 +176,11 @@ export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, 
 
   function applyView(id: string) {
     setViewId(id)
+    const preset = id.startsWith('preset:') ? presets.find((p) => `preset:${p.key}` === id) : undefined
     const v = views.find((x) => x.id === id)
-    if (!v) {
+    if (preset) {
+      setState({ q: '', filters: preset.filters, sort: defaultSort })
+    } else if (!v) {
       setState({ q: '', filters: {}, sort: defaultSort })
       setHidden(new Set(columns.filter((c) => c.hiddenByDefault).map((c) => c.key)))
     } else {
@@ -305,9 +313,10 @@ export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, 
           </select>
         ))}
         <div className="dt-herr">
-          {can('settings.saved_views.view') && (
+          {(can('settings.saved_views.view') || presets.length > 0) && (
             <select className="form-select dt-vista" aria-label={t('table.views')} value={viewId} onChange={(e) => applyView(e.target.value)}>
               <option value="">{t('table.view_default')}</option>
+              {presets.map((p) => <option key={p.key} value={`preset:${p.key}`}>{p.label}</option>)}
               {views.map((v) => <option key={v.id} value={v.id}>{v.mine ? v.name : t('table.view_shared_name', { name: v.name })}</option>)}
             </select>
           )}

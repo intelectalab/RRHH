@@ -80,6 +80,14 @@ return [
         'trace' => ['payroll.results.trace.view', 'salary'],
     ],
     'Payslip' => ['net' => ['payroll.results.view', 'salary']],
+    'Person' => [
+        'document_number' => ['people.people.personal_data.view', 'identity_document'],
+        'birth_date' => ['people.people.personal_data.view', 'other'],
+        'sex' => ['people.people.personal_data.view', 'other'],
+        'marital_status' => ['people.people.personal_data.view', 'other'],
+        'personal_email' => ['people.people.personal_data.view', 'other'],
+        'mobile_phone' => ['people.people.personal_data.view', 'other'],
+    ],
     'Position' => ['budget' => ['org.positions.budget.view', 'salary']],
     'Provision' => ['amount' => ['payroll.provisions.view', 'salary']],
     'RegistryProfile' => [

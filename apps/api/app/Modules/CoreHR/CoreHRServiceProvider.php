@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Modules\CoreHR;
+
+use App\Modules\CoreHR\Console\ActivateDueEmployments;
+use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
+use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
+use App\Shared\Exports\ExportRegistry;
+use App\Shared\Usage\UsageRegistry;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\ServiceProvider;
+
+/**
+ * Módulo COL · Colaboradores y ficha 360 (kit/docs/modulos/M-COL.md): personas, relaciones laborales,
+ * ingreso y listado. Se comunica con Organización por los contratos de app/Shared/Organization.
+ */
+final class CoreHRServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        // SAS-6 · RN-COL-13 · Colaboradores activos frente al límite del plan.
+        $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
+        $this->app->make(ExportRegistry::class)->register($this->app->make(EmploymentsExportSource::class));
+        $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([ActivateDueEmployments::class]);
+            $this->app->booted(function (): void {
+                // RN-COL-04 · Los ingresos de hoy se activan al empezar el día, después de los cambios de estructura.
+                $this->app->make(Schedule::class)->command('employments:activate-due')->dailyAt('00:15')->withoutOverlapping();
+            });
+        }
+    }
+}

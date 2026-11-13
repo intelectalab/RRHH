@@ -1,0 +1,37 @@
+<?php
+
+// COL-1 · COL-2 · COL-9 · Personas y colaboradores.
+return [
+    'document_types' => [
+        'dni' => 'DNI', 'ce' => 'Carné de extranjería', 'passport' => 'Pasaporte', 'ptp' => 'PTP',
+        'cpp' => 'Carné de permiso temporal de permanencia', 'other' => 'Otro documento',
+    ],
+    'document_type_invalid' => 'Elige un tipo de documento válido.',
+    'document_number_invalid' => 'El número no tiene el formato de :type (por ejemplo, :example).',
+    'document_not_editable' => 'El documento no se cambia desde aquí: se registra un documento nuevo y se conserva el anterior.',
+    'person_exists' => 'Ya hay una persona registrada con ese documento. Usa su ficha para registrar un reingreso o una relación adicional.',
+    'person_not_found' => 'La persona no existe.',
+    'version_conflict' => 'Otra persona cambió este registro. Vuelve a cargarlo y repite el cambio.',
+    'sex_disabled' => 'La organización no registra el sexo.',
+    'personal_data_forbidden' => 'No tienes permiso para registrar datos personales.',
+    'salary_forbidden' => 'No tienes permiso para registrar el sueldo.',
+    'field_required' => 'Completa este dato.',
+    'position_required' => 'La organización solo contrata contra una posición aprobada y libre.',
+    'position_not_found' => 'La posición no existe.',
+    'position_other_entity' => 'La posición es de otra empresa.',
+    'manager_invalid' => 'El jefe debe ser un colaborador vigente.',
+    'employment_overlap' => 'Esta persona ya tiene una relación vigente o por ingresar con la empresa (código :code).',
+    'rehire_before_termination' => 'El reingreso debe ser posterior al cese anterior (:date).',
+    'regime_required' => 'Indica el régimen laboral: la empresa no tiene uno vigente en la fecha de ingreso.',
+    'contract_type_invalid' => 'Elige un tipo de contrato.',
+    'contract_end_required' => 'Este tipo de contrato exige fecha de fin.',
+    'contract_end_before_hire' => 'El contrato no puede terminar antes del ingreso.',
+    'contract_cause_required' => 'Este tipo de contrato exige la causa objetiva.',
+    'code_exists' => 'El código :code ya existe en la empresa.',
+    'hire_date_not_reached' => 'El ingreso es el :date: se activa ese día.',
+    'reason_required' => 'Indica el motivo.',
+    'status_by_action' => 'El estado cambia con sus acciones (activar, anular), no editándolo.',
+    'out_of_scope' => 'Esa empresa está fuera de tu alcance.',
+    'activate_due' => 'Ingresos activados: :count.',
+    'activate_blocked' => 'No se pudo activar :item',
+];

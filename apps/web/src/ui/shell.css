@@ -654,3 +654,16 @@
   .ff-regla { grid-template-columns: minmax(0, 1fr) auto; }
   .ff-regla > input { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* COL-2 · Registrar ingreso por pasos y resumen de la relación laboral. */
+.pasos { display: flex; flex-wrap: wrap; gap: 8px 16px; list-style: none; counter-reset: paso; margin: 0 0 16px; padding: 0; }
+.pasos li { counter-increment: paso; display: flex; align-items: center; gap: 8px; color: var(--tx2); font-size: var(--fs-s); }
+.pasos li::before { content: counter(paso); display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; border: 1px solid var(--bd2); font-weight: 700; }
+.pasos li.on { color: var(--tx); font-weight: 700; }
+.pasos li.on::before { background: var(--primario); border-color: var(--primario); color: var(--sobre-marca); }
+.pasos li.hecho::before { background: var(--ok-50); border-color: var(--ok); color: var(--tx); }
+.lista-simple { margin: 8px 0 12px; padding-left: 20px; }
+.emp-resumen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; margin-top: 16px; }
+@media (max-width: 900px) {
+  .emp-resumen { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+}

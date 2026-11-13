@@ -4312,6 +4312,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employment-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Opciones del formulario de ingreso: empresas, puestos, posiciones libres, unidades, sedes, centros de costo, tipos de contrato, regímenes y jefes */
+        get: operations["getEmploymentOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments": {
         parameters: {
             query?: never;
@@ -4634,6 +4651,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postEmploymentsIdActivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anular un ingreso que aún no empezó (ME-01: Por ingresar → Anulada); libera la posición */
+        post: operations["postEmploymentsIdCancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9229,6 +9263,23 @@ export interface paths {
         put?: never;
         /** Crear Person */
         post: operations["postPeople"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/document-match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Buscar una persona por su documento (RN-COL-01): si ya existe, devuelve su identificación y sus relaciones para ofrecer reingreso o relación adicional */
+        get: operations["getPeopleDocumentMatch"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -17400,22 +17451,59 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             person_id: string;
+            person_name?: string | null;
+            document_number_masked?: string | null;
             /** @description Identificador opaco */
             legal_entity_id: string;
-            code: string;
+            legal_entity_name?: string | null;
+            employee_code: string;
+            /** @enum {string} */
+            kind: "employee" | "intern" | "apprentice";
+            /** @enum {string} */
+            worker_category: "executive" | "employee" | "worker";
             /** Format: date */
             hire_date: string;
             /** Format: date */
+            seniority_date?: string | null;
+            /** Format: date */
+            probation_ends_on?: string | null;
+            /** Format: date */
             termination_date?: string | null;
             /** @enum {string} */
-            status: "pre_hire" | "active" | "suspended" | "terminated";
-            worker_type: string;
-            payroll_regime: string;
+            status: "pending" | "active" | "suspended" | "terminating" | "terminated" | "cancelled";
+            /** @description Identificador opaco */
+            rehire_of_employment_id?: string | null;
+            work_email?: string | null;
+            work_phone?: string | null;
+            work_phone_ext?: string | null;
+            /** @description Identificador opaco */
+            job_profile_id?: string | null;
+            job_profile_name?: string | null;
             /** @description Identificador opaco */
             position_id?: string | null;
+            position_title?: string | null;
+            /** @description Identificador opaco */
+            org_unit_id?: string | null;
+            org_unit_name?: string | null;
+            /** @description Identificador opaco */
+            site_id?: string | null;
+            site_name?: string | null;
+            /** @description Identificador opaco */
+            cost_center_id?: string | null;
+            cost_center_name?: string | null;
             /** @description Identificador opaco */
             manager_employment_id?: string | null;
+            manager_name?: string | null;
+            /** @enum {string|null} */
+            work_modality?: "onsite" | "remote" | "hybrid" | null;
+            labor_regime_code?: string | null;
+            /** @description Identificador opaco */
+            contract_type_id?: string | null;
+            /** Format: date */
+            contract_end_date?: string | null;
             base_salary?: components["schemas"]["Money"];
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -17426,18 +17514,56 @@ export interface components {
             person_id?: string;
             /** @description Identificador opaco */
             legal_entity_id?: string;
-            code?: string;
+            employee_code?: string;
+            /** @enum {string} */
+            kind?: "employee" | "intern" | "apprentice";
+            /** @enum {string} */
+            worker_category?: "executive" | "employee" | "worker";
             /** Format: date */
             hire_date?: string;
             /** Format: date */
+            seniority_date?: string | null;
+            /** Format: date */
+            probation_ends_on?: string | null;
+            /** Format: date */
             termination_date?: string | null;
-            worker_type?: string;
-            payroll_regime?: string;
+            /** @description Identificador opaco */
+            rehire_of_employment_id?: string | null;
+            work_email?: string | null;
+            work_phone?: string | null;
+            work_phone_ext?: string | null;
+            /** @description Identificador opaco */
+            job_profile_id?: string | null;
             /** @description Identificador opaco */
             position_id?: string | null;
             /** @description Identificador opaco */
+            org_unit_id?: string | null;
+            /** @description Identificador opaco */
+            site_id?: string | null;
+            /** @description Identificador opaco */
+            cost_center_id?: string | null;
+            /** @description Identificador opaco */
             manager_employment_id?: string | null;
+            /** @enum {string|null} */
+            work_modality?: "onsite" | "remote" | "hybrid" | null;
+            labor_regime_code?: string | null;
+            /** @description Identificador opaco */
+            contract_type_id?: string | null;
+            /** Format: date */
+            contract_end_date?: string | null;
             base_salary?: components["schemas"]["Money"];
+            /** @description Ingreso (COL-2) de una persona nueva: nombres, apellidos y documento (document_type, document_number, document_country); si el documento ya existe responde 409 person_exists con la persona */
+            person?: Record<string, never>;
+            /**
+             * @description Régimen de salud inicial (por defecto essalud)
+             * @enum {string}
+             */
+            health_scheme?: "essalud" | "eps" | "sis" | "other";
+            /**
+             * @description Periodicidad del sueldo inicial (exige people.employments.salary.edit junto con base_salary)
+             * @enum {string}
+             */
+            pay_frequency?: "monthly" | "biweekly" | "weekly" | "daily" | "hourly";
         };
         Enrollment: {
             /** @description Identificador opaco */
@@ -19081,39 +19207,56 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): document_number, birth_date, sex, marital_status, personal_email, mobile_phone */
         Person: {
             /** @description Identificador opaco */
             id: string;
-            first_name: string;
-            last_name: string;
-            document_type: string;
-            document_number: string;
+            first_names: string;
+            paternal_surname: string;
+            maternal_surname?: string | null;
+            preferred_name?: string | null;
+            full_name?: string | null;
+            /** @enum {string} */
+            document_type: "dni" | "ce" | "passport" | "ptp" | "cpp" | "other";
+            document_country?: string | null;
+            document_number?: string | null;
+            document_number_masked?: string | null;
             /** Format: date */
             birth_date?: string | null;
-            nationality?: string | null;
-            email?: string | null;
-            phone?: string | null;
-            address?: {
+            /** @enum {string|null} */
+            sex?: "female" | "male" | "unspecified" | null;
+            nationality_code?: string | null;
+            /** @enum {string|null} */
+            marital_status?: "single" | "married" | "cohabiting" | "divorced" | "widowed" | null;
+            personal_email?: string | null;
+            mobile_phone?: string | null;
+            employments?: {
                 [key: string]: unknown;
-            } | null;
+            }[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
         PersonInput: {
-            first_name?: string;
-            last_name?: string;
-            document_type?: string;
-            document_number?: string;
+            first_names?: string;
+            paternal_surname?: string;
+            maternal_surname?: string | null;
+            preferred_name?: string | null;
+            /** @enum {string} */
+            document_type?: "dni" | "ce" | "passport" | "ptp" | "cpp" | "other";
+            document_country?: string | null;
+            document_number?: string | null;
             /** Format: date */
             birth_date?: string | null;
-            nationality?: string | null;
-            email?: string | null;
-            phone?: string | null;
-            address?: {
-                [key: string]: unknown;
-            } | null;
+            /** @enum {string|null} */
+            sex?: "female" | "male" | "unspecified" | null;
+            nationality_code?: string | null;
+            /** @enum {string|null} */
+            marital_status?: "single" | "married" | "cohabiting" | "divorced" | "widowed" | null;
+            personal_email?: string | null;
+            mobile_phone?: string | null;
         };
         Plan: {
             /** @description Identificador opaco */
@@ -21070,7 +21213,6 @@ export interface components {
         WebLeadInput: {
             /** @enum {string} */
             kind?: "demo" | "waitlist" | "partner" | "contact" | "newsletter" | "calculator" | "signup";
-            full_name?: string | null;
             email?: string;
             phone?: string | null;
             company_name?: string | null;
@@ -32279,6 +32421,28 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getEmploymentOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getEmployments: {
         parameters: {
             query?: {
@@ -33270,6 +33434,42 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postEmploymentsIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postEmploymentsIdCancelTermination: {
@@ -44299,6 +44499,36 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPeopleDocumentMatch: {
+        parameters: {
+            query: {
+                /** @description Tipo de documento (dni, ce, passport, ptp, cpp, other) */
+                document_type: string;
+                /** @description Número del documento */
+                document_number: string;
+                /** @description País emisor (ISO 3166-1 alfa-2); por defecto PE */
+                document_country?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getPeopleId: {

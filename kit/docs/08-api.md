@@ -523,6 +523,9 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/employments/{id}/{activate,suspend,terminate,cancel-termination}` | `people.employments.{activate,suspend,terminate,cancel_termination}` | 1 |
 | GET, POST | `/employments/{employment_id}/dependents` | `people.dependents.{view,create}` | 1 |
 | GET, PATCH, DELETE | `/employments/{employment_id}/dependents/{id}` | `people.dependents.{view,update,delete}` | 1 |
+| GET | `/people/document-match` | `people.people.view` | 1 |
+| GET | `/employment-options` | `people.employments.create` | 1 |
+| POST | `/employments/{id}/cancel` | `people.employments.update` | 1 |
 
 **HIS · Historia con vigencia**
 

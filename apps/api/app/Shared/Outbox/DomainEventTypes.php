@@ -15,6 +15,11 @@ final class DomainEventTypes
 
     public const EMPLOYEE_COMPENSATION_CHANGED = 'employment.compensation_changed.v1';
 
+    // COL-2 · ME-01: activación del ingreso (manual o por la fecha) y anulación de un ingreso que no empezó.
+    public const EMPLOYMENT_ACTIVATED = 'employment.activated.v1';
+
+    public const EMPLOYEE_HIRE_CANCELLED = 'employee.hire_cancelled.v1';
+
     // Asistencia / Vacaciones
     public const LEAVE_REQUESTED = 'leave.requested.v1';
 
@@ -180,6 +185,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['employee_id', 'termination_date', 'reason'],
             'description' => 'Cese registrado de colaborador',
+        ],
+        self::EMPLOYMENT_ACTIVATED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'person_id', 'legal_entity_id', 'hire_date'],
+            'description' => 'Relación laboral activa: empieza a marcar, a generar saldos y a entrar en planilla (ME-01)',
+        ],
+        self::EMPLOYEE_HIRE_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'person_id', 'legal_entity_id'],
+            'description' => 'Ingreso anulado antes de empezar: libera la posición y cancela el onboarding (ME-01)',
         ],
         self::EMPLOYEE_COMPENSATION_CHANGED => [
             'version' => 1,

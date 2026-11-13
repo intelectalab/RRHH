@@ -95,8 +95,8 @@ RES = [
     ("ORG", 1, "org.job_profiles", "/job-categories", "JobCategory", "code:s name:s rank?:i description?:s functions?:s responsibility_level?:s requirements?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
-    ("COL", 1, "people.people", "/people", "Person", "first_name:s last_name:s document_type:s document_number:s birth_date?:d nationality?:s email?:s phone?:s address?:j", "LCRU", "merge"),
-    ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id legal_entity_id:id code:s hire_date:d termination_date?:d status:e(pre_hire|active|suspended|terminated) worker_type:s payroll_regime:s position_id?:id manager_employment_id?:id base_salary!?:m", "LCRU", "activate suspend terminate cancel-termination"),
+    ("COL", 1, "people.people", "/people", "Person", "first_names:s paternal_surname:s maternal_surname?:s preferred_name?:s full_name?:s document_type:e(dni|ce|passport|ptp|cpp|other) document_country?:s document_number!?:s document_number_masked?:s birth_date!?:d sex!?:e(female|male|unspecified) nationality_code?:s marital_status!?:e(single|married|cohabiting|divorced|widowed) personal_email!?:s mobile_phone!?:s employments?:ao version?:i", "LCRU", "merge"),
+    ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id person_name?:s document_number_masked?:s legal_entity_id:id legal_entity_name?:s employee_code:s kind:e(employee|intern|apprentice) worker_category:e(executive|employee|worker) hire_date:d seniority_date?:d probation_ends_on?:d termination_date?:d status:e(pending|active|suspended|terminating|terminated|cancelled) rehire_of_employment_id?:id work_email?:s work_phone?:s work_phone_ext?:s job_profile_id?:id job_profile_name?:s position_id?:id position_title?:s org_unit_id?:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality?:e(onsite|remote|hybrid) labor_regime_code?:s contract_type_id?:id contract_end_date?:d base_salary!?:m allowed_actions?:a version?:i", "LCRU", "activate suspend terminate cancel-termination"),
     ("COL", 1, "people.dependents", "/employments/{employment_id}/dependents", "Dependent", "first_name:s last_name:s relationship:s document_number?:s birth_date?:d valid_from:d valid_to?:d", "LCRUD", ""),
     ("HIS", 1, "people.assignments", "/employments/{employment_id}/assignments", "Assignment", "position_id?:id org_unit_id:id site_id:id cost_center_id?:id manager_employment_id?:id valid_from:d valid_to?:d reason:s", "LCR", "cancel"),
     ("HIS", 1, "people.compensations", "/employments/{employment_id}/compensations", "Compensation", "base_salary!:m pay_frequency:e(monthly|biweekly|weekly) components!?:j valid_from:d valid_to?:d reason:s", "LCR", "cancel"),
@@ -242,6 +242,9 @@ RES = [
 
 # Operaciones que no son CRUD: (épica, fase, método, ruta, permiso|None, resumen, público)
 EXTRA = [
+    ("COL", 1, "get", "/people/document-match", "people.people.view", "Buscar una persona por su documento (RN-COL-01): si ya existe, devuelve su identificación y sus relaciones para ofrecer reingreso o relación adicional", False),
+    ("COL", 1, "get", "/employment-options", "people.employments.create", "Opciones del formulario de ingreso: empresas, puestos, posiciones libres, unidades, sedes, centros de costo, tipos de contrato, regímenes y jefes", False),
+    ("COL", 1, "post", "/employments/{id}/cancel", "people.employments.update", "Anular un ingreso que aún no empezó (ME-01: Por ingresar → Anulada); libera la posición", False),
     ("SEG", 0, "post", "/auth/login", None, "Iniciar sesión (correo o documento de identidad + clave)", True),
     ("SEG", 0, "post", "/auth/password/forgot", None, "Solicitar el enlace de recuperación de clave (misma respuesta exista o no el correo)", True),
     ("SEG", 0, "post", "/auth/password/reset", None, "Restablecer la clave con el enlace de un solo uso", True),
@@ -451,7 +454,7 @@ TYPES = {
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
-STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("post", "/platform/tenants/{id}/activate"), ("post", "/platform/tenants/{id}/block"),
+STATE_ACTIONS = {("post", "/employments/{id}/cancel"), ("post", "/notification-templates/{id}/request-approval"), ("post", "/platform/tenants/{id}/activate"), ("post", "/platform/tenants/{id}/block"),
                  ("post", "/platform/tenants/{id}/modules/{code}/activate"), ("post", "/platform/tenants/{id}/modules/{code}/deactivate"),
                  ("post", "/cost-centers/{id}/close"), ("post", "/cost-centers/{id}/reopen"),
                  ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce"),
@@ -464,6 +467,11 @@ CREATED = {("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalo
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/people/document-match"): [
+        _q("document_type", "Tipo de documento (dni, ce, passport, ptp, cpp, other)", True),
+        _q("document_number", "Número del documento", True),
+        _q("document_country", "País emisor (ISO 3166-1 alfa-2); por defecto PE"),
+    ],
     ("get", "/positions/{id}/occupants"): [
         _q("as_of", "Fecha (AAAA-MM-DD): solo los ocupantes vigentes a ese día", False, "date"),
     ],
@@ -506,10 +514,15 @@ INPUT_EXTRA = {
         "module_codes": {"type": "array", "items": {"type": "string"}, "description": "Alta (SAS-2): módulos que se activan además de los base"},
         "plan_id": {"type": "string", "nullable": True, "description": "Alta (SAS-4): plan de la suscripción; activa sus módulos (en prueba si hay fecha de fin)"},
     },
+    "EmploymentInput": {
+        "person": {"type": "object", "description": "Ingreso (COL-2) de una persona nueva: nombres, apellidos y documento (document_type, document_number, document_country); si el documento ya existe responde 409 person_exists con la persona"},
+        "health_scheme": {"type": "string", "enum": ["essalud", "eps", "sis", "other"], "description": "Régimen de salud inicial (por defecto essalud)"},
+        "pay_frequency": {"type": "string", "enum": ["monthly", "biweekly", "weekly", "daily", "hourly"], "description": "Periodicidad del sueldo inicial (exige people.employments.salary.edit junto con base_salary)"},
+    },
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "full_name", "employments", "person_name", "position_title", "manager_name", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):
