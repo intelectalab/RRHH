@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { api } from '@/lib/api'
 import { useT } from '@/lib/useT'
 import { formatDate, localToday } from '@/lib/format'
+import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { EmptyState, ErrorState } from '@/ui/components/States'
@@ -24,6 +25,7 @@ const OPEN_DEPTH = 2
 /** ORG-6 · Personas → Organigrama: por unidades o por línea de reporte, a una fecha, con búsqueda, zoom, plegado y exportación. */
 export function OrgChartScreen() {
   const { t, locale } = useT()
+  const { can } = useSession()
   const { toast, node: toastNode } = useToast()
   const today = useMemo(() => localToday(), [])
   const [view, setView] = useState<View>('units')
@@ -102,7 +104,7 @@ export function OrgChartScreen() {
       <PageHeader
         title={t('people.title')}
         sub={nodes ? t(view === 'units' ? 'people.chart_sub_units' : 'people.chart_sub_people', { n: nodes.length }) : undefined}
-        tabs={peopleTabs(t, 'chart')}
+        tabs={peopleTabs(t, 'chart', can)}
         actions={(
           <>
             <button type="button" className="btn btn-sec btn-sm" disabled={!layout || busy || layout.nodes.length === 0} onClick={() => void download('png')}><Icon name="download" /> {t('people.export_png')}</button>

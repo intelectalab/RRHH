@@ -3,6 +3,15 @@
 // SEG-12 · Exportação de listas.
 return [
     'columns' => [
+        'employee_code' => 'Código',
+        'person_name' => 'Colaborador',
+        'legal_entity_name' => 'Empresa',
+        'job_profile_name' => 'Cargo',
+        'position_title' => 'Posição',
+        'org_unit_name' => 'Unidade',
+        'site_name' => 'Local',
+        'manager_name' => 'Gestor',
+        'hire_date' => 'Data de admissão',
         'display_name' => 'Nome',
         'email' => 'E-mail',
         'status' => 'Status',

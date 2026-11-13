@@ -1,0 +1,37 @@
+<?php
+
+// COL-1 · COL-2 · COL-9 · Pessoas e colaboradores.
+return [
+    'document_types' => [
+        'dni' => 'DNI', 'ce' => 'Carteira de estrangeiro', 'passport' => 'Passaporte', 'ptp' => 'PTP',
+        'cpp' => 'Carteira de permissão temporária de permanência', 'other' => 'Outro documento',
+    ],
+    'document_type_invalid' => 'Escolha um tipo de documento válido.',
+    'document_number_invalid' => 'O número não tem o formato de :type (por exemplo, :example).',
+    'document_not_editable' => 'O documento não é alterado aqui: registre um novo documento e o anterior é mantido.',
+    'person_exists' => 'Já existe uma pessoa registrada com esse documento. Use a ficha dela para registrar uma readmissão ou um vínculo adicional.',
+    'person_not_found' => 'A pessoa não existe.',
+    'version_conflict' => 'Outra pessoa alterou este registro. Recarregue e repita a alteração.',
+    'sex_disabled' => 'A organização não registra o sexo.',
+    'personal_data_forbidden' => 'Você não tem permissão para registrar dados pessoais.',
+    'salary_forbidden' => 'Você não tem permissão para registrar o salário.',
+    'field_required' => 'Preencha este dado.',
+    'position_required' => 'A organização só contrata para uma posição aprovada e livre.',
+    'position_not_found' => 'A posição não existe.',
+    'position_other_entity' => 'A posição é de outra empresa.',
+    'manager_invalid' => 'O gestor deve ser um colaborador vigente.',
+    'employment_overlap' => 'Esta pessoa já tem um vínculo vigente ou a iniciar com a empresa (código :code).',
+    'rehire_before_termination' => 'A readmissão deve ser posterior ao desligamento anterior (:date).',
+    'regime_required' => 'Informe o regime trabalhista: a empresa não tem um vigente na data de admissão.',
+    'contract_type_invalid' => 'Escolha um tipo de contrato.',
+    'contract_end_required' => 'Este tipo de contrato exige data de término.',
+    'contract_end_before_hire' => 'O contrato não pode terminar antes da admissão.',
+    'contract_cause_required' => 'Este tipo de contrato exige a causa objetiva.',
+    'code_exists' => 'O código :code já existe na empresa.',
+    'hire_date_not_reached' => 'A admissão é em :date: é ativada nesse dia.',
+    'reason_required' => 'Informe o motivo.',
+    'status_by_action' => 'O status muda por suas ações (ativar, anular), não editando.',
+    'out_of_scope' => 'Essa empresa está fora do seu escopo.',
+    'activate_due' => 'Admissões ativadas: :count.',
+    'activate_blocked' => 'Não foi possível ativar :item',
+];

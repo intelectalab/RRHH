@@ -13,7 +13,7 @@ type ExportJob = Schema<'ExportJob'>
  * vuelve a validar el permiso, el alcance y los campos sensibles, y registra la exportación.
  */
 export function ExportButton({ resource, filters = {}, onError }: {
-  resource: 'users' | 'legal_entities'
+  resource: 'users' | 'legal_entities' | 'employments'
   filters?: Record<string, string>
   onError?: (message: string) => void
 }) {

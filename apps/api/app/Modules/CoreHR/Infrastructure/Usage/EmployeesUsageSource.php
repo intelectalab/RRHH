@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Modules\Organization\Infrastructure\Usage;
+namespace App\Modules\CoreHR\Infrastructure\Usage;
 
 use App\Shared\Usage\UsageMetrics;
 use App\Shared\Usage\UsageSource;
 use Illuminate\Support\Facades\DB;
 
 /**
- * SAS-6 · RN-SAS-02 · Colaboradores con relación laboral activa. Organización ya resuelve la
- * disponibilidad de las relaciones laborales (StructureAvailability); cuando exista el módulo de
- * colaboradores (COL), esta fuente pasa a él.
+ * SAS-6 · RN-SAS-02 · RN-COL-13 · Colaboradores con relación laboral activa. Vive en Core HR, dueño
+ * de las relaciones laborales (se movió desde Organización al crearse el módulo COL).
  */
 final class EmployeesUsageSource implements UsageSource
 {

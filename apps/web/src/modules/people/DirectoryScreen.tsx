@@ -71,7 +71,7 @@ export function DirectoryScreen() {
 
   return (
     <>
-      <PageHeader title={t('people.title')} sub={result ? t('people.dir_sub', { n: total }) : undefined} tabs={peopleTabs(t, 'directory')} />
+      <PageHeader title={t('people.title')} sub={result ? t('people.dir_sub', { n: total }) : undefined} tabs={peopleTabs(t, 'directory', can)} />
       <main className="main" id="contenido" tabIndex={-1}>
         <section className="card">
           <div className="dir-filtros">

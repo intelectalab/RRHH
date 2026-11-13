@@ -3,6 +3,7 @@
 namespace App\Modules\Contracts\Application;
 
 use App\Modules\Contracts\Infrastructure\Models\ContractType;
+use App\Shared\Labor\ContractTypeSource;
 use App\Shared\LegalParameters\LegalParameters;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
  * CON-1 · Catálogo de tipos de contrato: los del paquete de país se siembran en cada organización
  * (de solo lectura) y sus plazos se resuelven desde los parámetros legales con vigencia.
  */
-final class ContractTypeCatalog
+final class ContractTypeCatalog implements ContractTypeSource
 {
     public function __construct(private readonly LegalParameters $legal) {}
 

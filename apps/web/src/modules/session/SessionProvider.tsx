@@ -77,7 +77,7 @@ export function SessionProvider({ children, fallback }: { children: ReactNode; f
   if (session === null) return <>{fallback}</>
 
   return (
-    <SessionContext.Provider value={{ session, can: (p) => session.permissions.includes(p), reload: load, logout }}>
+    <SessionContext.Provider value={{ session, can: (p) => session.permissions.includes(p) || (session.field_permissions ?? []).includes(p), reload: load, logout }}>
       {children}
     </SessionContext.Provider>
   )

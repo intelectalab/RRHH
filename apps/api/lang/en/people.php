@@ -1,0 +1,37 @@
+<?php
+
+// COL-1 · COL-2 · COL-9 · People and employees.
+return [
+    'document_types' => [
+        'dni' => 'National ID (DNI)', 'ce' => 'Foreigner ID card', 'passport' => 'Passport', 'ptp' => 'PTP',
+        'cpp' => 'Temporary stay permit card', 'other' => 'Other document',
+    ],
+    'document_type_invalid' => 'Choose a valid document type.',
+    'document_number_invalid' => 'The number does not match the :type format (for example, :example).',
+    'document_not_editable' => 'The document is not changed here: register a new document and the previous one is kept.',
+    'person_exists' => 'A person with that document is already registered. Use their record to register a rehire or an additional employment.',
+    'person_not_found' => 'The person does not exist.',
+    'version_conflict' => 'Someone else changed this record. Reload it and repeat the change.',
+    'sex_disabled' => 'The organization does not record sex.',
+    'personal_data_forbidden' => 'You are not allowed to record personal data.',
+    'salary_forbidden' => 'You are not allowed to record the salary.',
+    'field_required' => 'Fill in this field.',
+    'position_required' => 'The organization only hires against an approved, free position.',
+    'position_not_found' => 'The position does not exist.',
+    'position_other_entity' => 'The position belongs to another company.',
+    'manager_invalid' => 'The manager must be a current employee.',
+    'employment_overlap' => 'This person already has a current or upcoming employment with the company (code :code).',
+    'rehire_before_termination' => 'The rehire must be after the previous termination (:date).',
+    'regime_required' => 'Enter the labor regime: the company has none in force on the hire date.',
+    'contract_type_invalid' => 'Choose a contract type.',
+    'contract_end_required' => 'This contract type requires an end date.',
+    'contract_end_before_hire' => 'The contract cannot end before the hire date.',
+    'contract_cause_required' => 'This contract type requires the objective cause.',
+    'code_exists' => 'Code :code already exists in the company.',
+    'hire_date_not_reached' => 'The hire date is :date: it is activated on that day.',
+    'reason_required' => 'Enter the reason.',
+    'status_by_action' => 'The status changes through its actions (activate, cancel), not by editing it.',
+    'out_of_scope' => 'That company is outside your scope.',
+    'activate_due' => 'Hires activated: :count.',
+    'activate_blocked' => 'Could not activate :item',
+];

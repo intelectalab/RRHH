@@ -16,5 +16,7 @@ class DatabaseSeeder extends Seeder
         // Parámetros legales del paquete de país (regla 4): antes de la organización demo.
         app(LegalParameters::class)->sync('PE');
         $this->call(DemoOrganizationSeeder::class);
+        // COL-2 · Estructura y colaboradores demo (directorio, organigrama, posiciones y listado con datos).
+        $this->call(DemoPeopleSeeder::class);
     }
 }

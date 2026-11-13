@@ -3,6 +3,7 @@
 use App\Modules\Absences\AbsencesServiceProvider;
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
+use App\Modules\CoreHR\CoreHRServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Imports\ImportsServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
@@ -26,4 +27,5 @@ return [
     PlatformServiceProvider::class,
     AbsencesServiceProvider::class,
     ImportsServiceProvider::class,
+    CoreHRServiceProvider::class,
 ];
