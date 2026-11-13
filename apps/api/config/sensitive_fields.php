@@ -88,6 +88,20 @@ return [
         'personal_email' => ['people.people.personal_data.view', 'other'],
         'mobile_phone' => ['people.people.personal_data.view', 'other'],
     ],
+    // COL-4 · Datos personales de la persona (respuestas de /people/{id}/addresses, /emergency-contacts y
+    // /sensitive-data, esquema genérico en el contrato): cada lectura queda en el registro de accesos.
+    'PersonAddress' => [
+        'address' => ['people.people.personal_data.view', 'other'],
+        'district_code' => ['people.people.personal_data.view', 'other'],
+    ],
+    'EmergencyContact' => [
+        'full_name' => ['people.people.personal_data.view', 'other'],
+        'phone' => ['people.people.personal_data.view', 'other'],
+    ],
+    'PersonSensitiveData' => [
+        'disability' => ['people.people.health_data.view', 'health'],
+        'blood_type' => ['people.people.health_data.view', 'health'],
+    ],
     'Position' => ['budget' => ['org.positions.budget.view', 'salary']],
     // POS-3 · POS-4 (respuestas de /position-requests y /headcount*, esquema genérico en el contrato).
     'PositionRequest' => ['estimated_cost' => ['org.positions.budget.view', 'salary']],

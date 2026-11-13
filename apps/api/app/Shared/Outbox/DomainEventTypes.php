@@ -27,6 +27,11 @@ final class DomainEventTypes
 
     public const OFFBOARDING_CANCELLED = 'offboarding.cancelled.v1';
 
+    // COL-4 · RN-COL-06: cambio de datos personales propuesto por el colaborador y su aprobación.
+    public const PERSON_DATA_CHANGE_REQUESTED = 'person.data_change_requested.v1';
+
+    public const PERSON_DATA_CHANGE_APPROVED = 'person.data_change_approved.v1';
+
     // Asistencia / Vacaciones
     public const LEAVE_REQUESTED = 'leave.requested.v1';
 
@@ -201,6 +206,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['employee_id', 'termination_date', 'reason'],
             'description' => 'Cese registrado de colaborador',
+        ],
+        self::PERSON_DATA_CHANGE_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['request_id', 'person_id', 'fields'],
+            'description' => 'El colaborador propuso cambios de datos personales que esperan a RRHH',
+        ],
+        self::PERSON_DATA_CHANGE_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['request_id', 'person_id', 'fields'],
+            'description' => 'RRHH aprobó y aplicó cambios de datos personales propuestos por el colaborador',
         ],
         self::EMPLOYMENT_ACTIVATED => [
             'version' => 1,

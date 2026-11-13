@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $marital_status
  * @property string|null $personal_email
  * @property string|null $mobile_phone
+ * @property string|null $photo_file_id
  * @property CarbonInterface|null $anonymized_at
  * @property int $lock_version
  * @property CarbonInterface $created_at

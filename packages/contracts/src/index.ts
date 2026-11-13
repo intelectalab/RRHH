@@ -4694,6 +4694,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{id}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cabecera de la ficha 360: nombre, foto, puesto, unidad, estado, antigüedad calculada por el servidor y las otras relaciones laborales de la persona (dentro del alcance) para cambiar de ficha */
+        get: operations["getEmploymentsIdProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{id}/suspend": {
         parameters: {
             query?: never;
@@ -4728,6 +4745,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postEmploymentsIdTerminate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{id}/work-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Datos laborales vigentes a una fecha (código, empresa, sede, unidad, puesto, posición, jefe, centro de costo, modalidad, régimen, contrato, estado): cada uno con su valor, desde cuándo rige y la historia a la que enlaza; antigüedad calculada */
+        get: operations["getEmploymentsIdWorkData"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9357,6 +9391,78 @@ export interface paths {
         patch: operations["patchPeopleId"];
         trace?: never;
     };
+    "/people/{id}/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Direcciones vigentes de la persona (con history=true también las anteriores); exige people.people.personal_data.view y cada lectura queda registrada */
+        get: operations["getPeopleIdAddresses"];
+        put?: never;
+        /** Registrar una dirección: la anterior del mismo tipo queda como histórica (exige people.people.personal_data.edit) */
+        post: operations["postPeopleIdAddresses"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/addresses/{address_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Eliminar una dirección (pasa a la papelera; exige people.people.personal_data.edit) */
+        delete: operations["deletePeopleIdAddressesAddressId"];
+        options?: never;
+        head?: never;
+        /** Corregir una dirección (exige people.people.personal_data.edit; queda auditado) */
+        patch: operations["patchPeopleIdAddressesAddressId"];
+        trace?: never;
+    };
+    "/people/{id}/emergency-contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contactos de emergencia de la persona; exige people.people.personal_data.view y cada lectura queda registrada */
+        get: operations["getPeopleIdEmergencyContacts"];
+        put?: never;
+        /** Agregar un contacto de emergencia (exige people.people.personal_data.edit) */
+        post: operations["postPeopleIdEmergencyContacts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/emergency-contacts/{contact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Eliminar un contacto de emergencia (exige people.people.personal_data.edit) */
+        delete: operations["deletePeopleIdEmergencyContactsContactId"];
+        options?: never;
+        head?: never;
+        /** Editar un contacto de emergencia (exige people.people.personal_data.edit) */
+        patch: operations["patchPeopleIdEmergencyContactsContactId"];
+        trace?: never;
+    };
     "/people/{id}/merge": {
         parameters: {
             query?: never;
@@ -9371,6 +9477,43 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPeopleIdMerge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Foto de la persona (404 si no tiene) */
+        get: operations["getPeopleIdPhoto"];
+        put?: never;
+        /** Subir o reemplazar la foto (PNG, JPEG o WebP hasta 1 MB) */
+        post: operations["postPeopleIdPhoto"];
+        /** Quitar la foto */
+        delete: operations["deletePeopleIdPhoto"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/people/{id}/sensitive-data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Condición de discapacidad y grupo sanguíneo con su consentimiento (exige people.people.health_data.view; cada lectura queda registrada) */
+        get: operations["getPeopleIdSensitiveData"];
+        /** Registrar la condición de discapacidad o el grupo sanguíneo; la discapacidad exige consentimiento expreso (RN-COL-08) y los permisos health_data.view y personal_data.edit */
+        put: operations["putPeopleIdSensitiveData"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -16450,26 +16593,42 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
+            job_profile_id: string;
+            job_profile_name?: string | null;
+            /** @description Identificador opaco */
             position_id?: string | null;
+            position_title?: string | null;
             /** @description Identificador opaco */
             org_unit_id: string;
+            org_unit_name?: string | null;
             /** @description Identificador opaco */
             site_id: string;
+            site_name?: string | null;
             /** @description Identificador opaco */
             cost_center_id?: string | null;
+            cost_center_name?: string | null;
             /** @description Identificador opaco */
             manager_employment_id?: string | null;
+            manager_name?: string | null;
+            /** @enum {string} */
+            work_modality: "onsite" | "remote" | "hybrid";
             /** Format: date */
             valid_from: string;
             /** Format: date */
             valid_to?: string | null;
-            reason: string;
+            reason?: string | null;
+            /** @enum {string|null} */
+            kind?: "hire" | "promotion" | "transfer" | "manager_change" | "cost_center_change" | "data_correction" | null;
+            /** @description Identificador opaco */
+            personnel_action_id?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
         AssignmentInput: {
+            /** @description Identificador opaco */
+            job_profile_id?: string;
             /** @description Identificador opaco */
             position_id?: string | null;
             /** @description Identificador opaco */
@@ -16480,11 +16639,15 @@ export interface components {
             cost_center_id?: string | null;
             /** @description Identificador opaco */
             manager_employment_id?: string | null;
+            /** @enum {string} */
+            work_modality?: "onsite" | "remote" | "hybrid";
             /** Format: date */
             valid_from?: string;
             /** Format: date */
             valid_to?: string | null;
-            reason?: string;
+            reason?: string | null;
+            /** @enum {string|null} */
+            kind?: "hire" | "promotion" | "transfer" | "manager_change" | "cost_center_change" | "data_correction" | null;
         };
         AttendanceDay: {
             /** @description Identificador opaco */
@@ -17904,9 +18067,6 @@ export interface components {
             };
             row_count?: number | null;
             contains_sensitive?: boolean | null;
-            /** @description Identificador opaco */
-            requested_by_user_id?: string | null;
-            requested_by_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
             download_url?: string | null;
@@ -19631,13 +19791,22 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            employment_id: string;
+            person_id?: string | null;
+            person_name?: string | null;
             changes: {
                 [key: string]: unknown;
             };
-            attachments: string[];
+            applied_fields?: string[] | null;
+            pending_fields?: string[] | null;
             /** @enum {string} */
             status: "pending" | "approved" | "rejected" | "cancelled";
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            rejection_reason?: string | null;
+            allowed_actions?: string[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -19645,11 +19814,11 @@ export interface components {
         };
         ProfileChangeRequestInput: {
             /** @description Identificador opaco */
-            employment_id?: string;
+            person_id?: string | null;
             changes?: {
                 [key: string]: unknown;
             };
-            attachments?: string[];
+            rejection_reason?: string | null;
         };
         Project: {
             /** @description Identificador opaco */
@@ -33656,6 +33825,31 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getEmploymentsIdProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     postEmploymentsIdSuspend: {
         parameters: {
             query?: never;
@@ -33726,6 +33920,35 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getEmploymentsIdWorkData: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD) de los datos; por defecto hoy (o el ingreso si aún no empezó) */
+                as_of?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getEnrollments: {
@@ -44905,6 +45128,248 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getPeopleIdAddresses: {
+        parameters: {
+            query?: {
+                /** @description true: incluye las direcciones anteriores */
+                history?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPeopleIdAddresses: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    deletePeopleIdAddressesAddressId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPeopleIdAddressesAddressId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPeopleIdEmergencyContacts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPeopleIdEmergencyContacts: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    deletePeopleIdEmergencyContactsContactId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPeopleIdEmergencyContactsContactId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                contact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPeopleIdMerge: {
         parameters: {
             query?: never;
@@ -44939,6 +45404,153 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPeopleIdPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Imagen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/webp": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPeopleIdPhoto: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    deletePeopleIdPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPeopleIdSensitiveData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    putPeopleIdSensitiveData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPermissions: {

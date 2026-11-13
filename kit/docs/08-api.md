@@ -538,6 +538,21 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/employment-options` | `people.employments.create` | 1 |
 | POST | `/employments/{id}/cancel` | `people.employments.update` | 1 |
 | GET | `/termination-reasons` | `people.employments.terminate` | 1 |
+| GET | `/employments/{id}/profile` | `people.employments.view` | 1 |
+| GET | `/employments/{id}/work-data` | `people.employments.view` | 1 |
+| GET | `/people/{id}/photo` | `people.people.view` | 1 |
+| POST | `/people/{id}/photo` | `people.people.update` | 1 |
+| DELETE | `/people/{id}/photo` | `people.people.update` | 1 |
+| GET | `/people/{id}/addresses` | `people.people.view` | 1 |
+| POST | `/people/{id}/addresses` | `people.people.update` | 1 |
+| PATCH | `/people/{id}/addresses/{address_id}` | `people.people.update` | 1 |
+| DELETE | `/people/{id}/addresses/{address_id}` | `people.people.update` | 1 |
+| GET | `/people/{id}/emergency-contacts` | `people.people.view` | 1 |
+| POST | `/people/{id}/emergency-contacts` | `people.people.update` | 1 |
+| PATCH | `/people/{id}/emergency-contacts/{contact_id}` | `people.people.update` | 1 |
+| DELETE | `/people/{id}/emergency-contacts/{contact_id}` | `people.people.update` | 1 |
+| GET | `/people/{id}/sensitive-data` | `people.people.view` | 1 |
+| PUT | `/people/{id}/sensitive-data` | `people.people.update` | 1 |
 
 **HIS · Historia con vigencia**
 

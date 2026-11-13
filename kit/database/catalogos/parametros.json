@@ -594,6 +594,39 @@
       "opciones": null
     },
     {
+      "codigo": "colaboradores.campos_requieren_aprobacion",
+      "modulo": "core",
+      "nombre": "Datos que el colaborador cambia con aprobación",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "first_names",
+        "paternal_surname",
+        "maternal_surname",
+        "birth_date",
+        "sex",
+        "marital_status",
+        "nationality_code",
+        "address"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "RN-COL-06 · Datos personales que, propuestos por el propio colaborador, esperan a RRHH; los demás (nombre preferido, correo y celular personales) se aplican en el acto.",
+      "opciones": [
+        "first_names",
+        "paternal_surname",
+        "maternal_surname",
+        "preferred_name",
+        "birth_date",
+        "sex",
+        "marital_status",
+        "nationality_code",
+        "personal_email",
+        "mobile_phone",
+        "address"
+      ]
+    },
+    {
       "codigo": "posiciones.factor_carga_pct",
       "modulo": "core",
       "nombre": "Cargas del empleador para el costo proyectado (%)",

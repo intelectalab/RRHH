@@ -243,6 +243,19 @@ final class EmploymentService
      */
     private function assignment(array $input, string $legalEntityId, string $hireDate): array
     {
+        return $this->buildAssignment($input, $legalEntityId, $hireDate);
+    }
+
+    /**
+     * Valida y arma una asignación (ingreso o movimiento, COL-5): lo que falte se toma de la posición; la
+     * estructura y la posición se validan con los contratos de Organización. En un movimiento, la posición
+     * que la relación ya ocupa no se vuelve a validar como plaza libre ($employmentId).
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
+    public function buildAssignment(array $input, string $legalEntityId, string $hireDate, ?string $employmentId = null): array
+    {
         $this->structure->assertLegalEntityAssignable($legalEntityId);
         $positionId = isset($input['position_id']) && is_string($input['position_id']) ? $input['position_id'] : null;
         if ($positionId === null && $this->parameters->value('posiciones.contratar_solo_con_posicion', $legalEntityId) === true) {
@@ -257,7 +270,7 @@ final class EmploymentService
             if ((string) $position->legal_entity_id !== $legalEntityId) {
                 throw ValidationException::withMessages(['position_id' => [(string) trans('people.position_other_entity')]]);
             }
-            $this->occupancy->assertAssignable($positionId, $hireDate);
+            $this->occupancy->assertAssignable($positionId, $hireDate, null, $employmentId);
             $fromPosition = [
                 'job_profile_id' => $position->job_profile_id, 'org_unit_id' => $position->org_unit_id,
                 'site_id' => $position->site_id, 'cost_center_id' => $position->cost_center_id,
@@ -290,8 +303,8 @@ final class EmploymentService
         if ($values['cost_center_id'] !== null) {
             $this->structure->assertCostCenterAssignable((string) $values['cost_center_id'], $hireDate, $legalEntityId);
         }
-        if ($values['manager_employment_id'] !== null && ! Employment::query()->whereKey($values['manager_employment_id'])
-            ->whereIn('status', EmploymentStateMachine::OPEN_STATES)->exists()) {
+        if ($values['manager_employment_id'] !== null && ($values['manager_employment_id'] === $employmentId || ! Employment::query()->whereKey($values['manager_employment_id'])
+            ->whereIn('status', EmploymentStateMachine::OPEN_STATES)->exists())) {
             throw ValidationException::withMessages(['manager_employment_id' => [(string) trans('people.manager_invalid')]]);
         }
 

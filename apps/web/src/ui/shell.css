@@ -684,3 +684,34 @@
 @media (max-width: 640px) {
   .cese-fechas { grid-template-columns: minmax(0, 1fr); }
 }
+/* COL-3 · COL-4 · COL-5 · Ficha 360: cabecera, datos con vigencia, listas de datos personales y solicitudes. */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.ficha-cab { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px 24px; align-items: start; background: var(--sup); border: 1px solid var(--bd); border-radius: var(--r-l); padding: 16px; margin-bottom: 16px; }
+.ficha-foto { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.ficha-foto img, .ficha-ini { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; }
+.ficha-ini { display: grid; place-items: center; background: var(--pe-50); color: var(--pe-700); font-size: 28px; font-weight: 700; }
+.ficha-foto-acc { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; }
+.ficha-cab-datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; margin: 0; }
+.ficha-cab-datos dt { color: var(--tx2); font-weight: 400; font-size: var(--fs-s); }
+.ficha-cab-datos dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.ficha-rel { min-width: 220px; }
+.ficha-vig .ficha-dato { display: contents; }
+.ficha-vig dd > span:first-child { display: block; }
+.ficha-link { border: 0; background: none; padding: 0; font: inherit; color: var(--pe-600); text-decoration: underline; cursor: pointer; }
+.ficha-link:hover { color: var(--pe-700); }
+.ficha-lista { list-style: none; margin: 0; padding: 0; }
+.ficha-lista li { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--bd2); }
+.ficha-lista li:last-child { border-bottom: 0; }
+.ficha-lista li > div:first-child { min-width: 0; overflow-wrap: anywhere; }
+.ficha-acc { display: flex; flex: none; gap: 2px; }
+.ficha-solicitudes { display: grid; gap: 16px; }
+.ptabs-panel .emp-resumen { margin-top: 0; }
+@media (max-width: 900px) {
+  .ficha-cab { grid-template-columns: auto minmax(0, 1fr); }
+  .ficha-rel { grid-column: 1 / -1; min-width: 0; }
+}
+@media (max-width: 600px) {
+  .ficha-cab { grid-template-columns: minmax(0, 1fr); justify-items: stretch; }
+  .ficha-cab-datos { grid-template-columns: minmax(0, 1fr); }
+  .ficha-lista li { flex-direction: column; }
+}
