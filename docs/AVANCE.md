@@ -6,8 +6,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 90 | 3 | 37,3 % |
-| Backlog completo | 512 | 90 | 3 | 17,6 % |
+| Primer corte comercial (MVP) | 241 | 93 | 3 | 38,6 % |
+| Backlog completo | 512 | 93 | 3 | 18,2 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -128,9 +128,9 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | POS-7 | Organigrama por posiciones | POS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | COL-1 | Personas y deduplicación | COL | Fase 1 · Core HR | Task | sí | hecha | 2026-11-12 | Persona única por organización; documento cifrado y con huella; 409 person_exists y /people/document-match que ofrece reingreso o relación adicional; validación por tipo con el paquete Perú (largo de CE, PTP y CPP por validar); datos personales solo con permiso de campo y con registro de acceso; sexo opcional por parámetro. Pendiente: historial de documentos y fusión de personas. |
 | COL-2 | Alta de relación laboral | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-12 | El ingreso crea relación, asignación, régimen, contrato en borrador y compensación (con permiso); employee.hired una sola vez (Idempotency-Key); valida estructura y posición (la deja ocupada); 409 employment_overlap (RN-COL-02); ingreso futuro queda «Por ingresar» y se activa solo (RN-COL-04); 403 plan_limit_reached (RN-COL-13); activar y anular por acción; pantalla Registrar ingreso por pasos. Pendiente: suspender, reanudar y cesar, faltantes del registro laboral, contrato firmado (CON-2). |
-| COL-3 | Ficha 360 del colaborador | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| COL-4 | Datos personales y contactos de emergencia | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| COL-5 | Datos laborales de la ficha | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| COL-3 | Ficha 360 del colaborador | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Ficha 360 sobre la relación: cabecera con foto, nombre, puesto, unidad, jefe, estado y antigüedad calculada por el servidor (/employments/{id}/profile); cambio entre relaciones de la misma persona; pestañas registrables por módulo y permiso (profileTabs.tsx): Resumen, Información, Historial; acciones de cese en la cabecera. Pendiente: pestañas de los demás módulos y de actividad. |
+| COL-4 | Datos personales y contactos de emergencia | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Foto, direcciones cifradas con historia, contactos de emergencia con teléfono cifrado; lecturas en el registro de accesos y 403 sin permiso de campo; RN-COL-08: discapacidad y grupo sanguíneo solo con permiso de salud y consentimiento expreso; RN-COL-06: el colaborador propone cambios, los de colaboradores.campos_requieren_aprobacion esperan a RRHH; pantalla Personas → Cambios de datos. Pendiente: historial de documentos y sustento adjunto. |
+| COL-5 | Datos laborales de la ficha | COL | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Datos laborales vigentes a una fecha (/employments/{id}/work-data) con «desde cuándo» y enlace a su historia; nada se edita en sitio: un movimiento con fecha efectiva cierra la asignación vigente y abre otra (409 el mismo día), sincroniza posiciones y emite employee.updated; pestaña Historial. Pendiente: equipo y horario, aprobación de movimientos y cambios de sueldo, régimen y contrato (HIS-2 a HIS-4). |
 | COL-6 | Derechohabientes | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | COL-7 | Régimen pensionario, salud y seguros del trabajador | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | COL-8 | Cuentas bancarias y datos de pago | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
