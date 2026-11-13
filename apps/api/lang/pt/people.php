@@ -115,4 +115,14 @@ return [
         'same_approver' => 'Quem registra a alteração de conta não pode aprová-la.',
         'replaced' => 'Substituída por uma conta aprovada depois.',
     ],
+    'movements' => [
+        'not_correctable' => 'Essa movimentação não pode ser corrigida: apenas movimentações de alocação já aplicadas.',
+        'later_movements' => 'Há movimentações posteriores: corrija ou cancele primeiro a mais recente.',
+        'pending_movement' => 'O vínculo já tem uma movimentação agendada ou em aprovação: edite-a ou cancele-a antes de registrar outra.',
+        'requester_required' => 'A movimentação que passa por aprovação precisa de um solicitante.',
+        'edit_future_only' => 'Uma movimentação agendada só pode ir para outra data futura; para aplicá-la hoje, cancele-a e registre-a novamente.',
+        'closed_period' => 'A data cai em um período de folha fechado (até :date): só quem pode corrigir movimentações a registra, e a diferença vai para o período aberto.',
+        'apply_blocked' => 'Não foi possível aplicar a movimentação agendada :id; ela continua agendada.',
+        'apply_due' => 'Movimentações agendadas aplicadas: :count.',
+    ],
 ];

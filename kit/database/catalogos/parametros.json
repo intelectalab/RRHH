@@ -640,6 +640,27 @@
       "opciones": null
     },
     {
+      "codigo": "movimientos.tipos_con_aprobacion",
+      "modulo": "core",
+      "nombre": "Movimientos que pasan por aprobación",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "promotion"
+      ],
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "HIS-2: tipos de movimiento de personal que, aunque los registre RRHH, esperan el flujo de aprobación publicado para «personnel_action» antes de aplicarse. Lo que propone un jefe siempre pasa por aprobación.",
+      "opciones": [
+        "promotion",
+        "transfer",
+        "manager_change",
+        "cost_center_change",
+        "data_correction"
+      ]
+    },
+    {
       "codigo": "posiciones.factor_carga_pct",
       "modulo": "core",
       "nombre": "Cargas del empleador para el costo proyectado (%)",

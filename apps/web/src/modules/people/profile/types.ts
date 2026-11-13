@@ -69,6 +69,36 @@ export type Assignment = {
 export const MOVEMENT_KINDS = ['promotion', 'transfer', 'manager_change', 'cost_center_change', 'data_correction'] as const
 export type MovementKind = (typeof MOVEMENT_KINDS)[number]
 
+/** Campos de la asignación que cambia un movimiento de personal. */
+export const MOVEMENT_FIELDS = ['position_id', 'job_profile_id', 'org_unit_id', 'site_id', 'cost_center_id', 'manager_employment_id', 'work_modality'] as const
+export type MovementField = (typeof MOVEMENT_FIELDS)[number]
+
+export const MOVEMENT_STATUSES = ['draft', 'pending_approval', 'approved', 'scheduled', 'applied', 'rejected', 'cancelled', 'replaced'] as const
+export type MovementStatus = (typeof MOVEMENT_STATUSES)[number]
+
+/** HIS-2 · HIS-4 · Movimiento de personal (GET /personnel-actions/{id}); el antes y el después traen su nombre. */
+export type PersonnelAction = {
+  id: string
+  employment_id: string
+  kind: MovementKind
+  effective_on: string
+  reason: string | null
+  status: MovementStatus
+  changes: Partial<Record<MovementField, string | null>>
+  before: Partial<Record<MovementField, { value: string | null; label: string | null }>>
+  after: Partial<Record<MovementField, { value: string | null; label: string | null }>>
+  approval: { status: string; pending_approvers: string[] } | null
+  decision_reason: string | null
+  replaces_personnel_action_id: string | null
+  replaced_by_personnel_action_id: string | null
+  is_retroactive: boolean
+  affected_from: string | null
+  affected_to: string | null
+  allowed_actions: Array<'edit' | 'cancel' | 'correct'>
+  person_name?: string | null
+  employee_code?: string | null
+}
+
 /** COL-4 · Persona (GET /people/{id}); los datos personales faltan sin permiso de campo. */
 export type PersonData = {
   id: string

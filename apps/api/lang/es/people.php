@@ -118,4 +118,14 @@ return [
         'same_approver' => 'Quien registra el cambio de cuenta no puede aprobarlo.',
         'replaced' => 'Reemplazada por una cuenta aprobada después.',
     ],
+    'movements' => [
+        'not_correctable' => 'Ese movimiento no se puede corregir: solo los movimientos de la asignación ya aplicados.',
+        'later_movements' => 'Hay movimientos posteriores: corrige o anula primero el más reciente.',
+        'pending_movement' => 'La relación ya tiene un movimiento programado o en aprobación: edítalo o anúlalo antes de registrar otro.',
+        'requester_required' => 'El movimiento que pasa por aprobación necesita un solicitante.',
+        'edit_future_only' => 'Un movimiento programado solo se mueve a otra fecha futura; para aplicarlo hoy, anúlalo y regístralo de nuevo.',
+        'closed_period' => 'La fecha cae en un periodo de planilla cerrado (hasta el :date): solo quien puede corregir movimientos lo registra y la diferencia va al periodo abierto.',
+        'apply_blocked' => 'No se pudo aplicar el movimiento programado :id; sigue programado.',
+        'apply_due' => 'Movimientos programados aplicados: :count.',
+    ],
 ];

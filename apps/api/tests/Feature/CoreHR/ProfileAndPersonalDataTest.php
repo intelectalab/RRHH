@@ -151,16 +151,22 @@ test('COL-5: cada dato laboral dice desde cuándo rige y a qué historia enlaza'
 });
 
 test('COL-5: un movimiento cierra la asignación vigente y abre otra; el pasado no cambia', function (): void {
-    $move = fichaCall($this->admin, 'post', "/employments/{$this->employment}/assignments", [
-        'valid_from' => '2026-02-01', 'org_unit_id' => $this->unit2, 'job_profile_id' => $this->profile2, 'reason' => 'Promoción a supervisor',
+    // Sin tipos sometidos a aprobación, RRHH aplica la promoción en el acto (HIS-2).
+    TenancyScope::runAs(FICHA_TENANT, fn () => app(ParameterResolver::class)->set('movimientos.tipos_con_aprobacion', [], 'organization', null, null, 'prueba'));
+    $move = fichaCall($this->admin, 'post', "/employments/{$this->employment}/personnel-actions", [
+        'effective_on' => '2026-02-01', 'reason' => 'Promoción a supervisor',
+        'changes' => ['org_unit_id' => $this->unit2, 'job_profile_id' => $this->profile2],
     ]);
     $move->assertCreated();
-    $this->assertMatchesOpenApi($move, 'post', '/employments/{employment_id}/assignments', 201);
-    expect($move->json('data.kind'))->toBe('promotion')->and($move->json('data.valid_from'))->toBe('2026-02-01');
+    $this->assertMatchesOpenApi($move, 'post', '/employments/{employment_id}/personnel-actions', 201);
+    expect($move->json('data.kind'))->toBe('promotion')->and($move->json('data.status'))->toBe('applied')
+        ->and($move->json('data.effective_on'))->toBe('2026-02-01');
 
     $history = fichaCall($this->admin, 'get', "/employments/{$this->employment}/assignments")->assertOk();
     $this->assertMatchesOpenApi($history, 'get', '/employments/{employment_id}/assignments', 200);
     expect($history->json('data'))->toHaveCount(2)
+        ->and($history->json('data.0.kind'))->toBe('promotion')
+        ->and($history->json('data.0.valid_from'))->toBe('2026-02-01')
         ->and($history->json('data.1.valid_to'))->toBe('2026-01-31')
         ->and($history->json('data.1.org_unit_id'))->toBe($this->unit);
 
@@ -168,7 +174,7 @@ test('COL-5: un movimiento cierra la asignación vigente y abre otra; el pasado 
     expect(fichaCall($this->admin, 'get', "/employments/{$this->employment}/work-data?as_of=2026-01-15")->json('data.fields.org_unit.value'))->toBe($this->unit)
         ->and(fichaCall($this->admin, 'get', "/employments/{$this->employment}/work-data?as_of=2026-02-15")->json('data.fields.org_unit.since'))->toBe('2026-02-01');
 
-    $one = fichaCall($this->admin, 'get', "/employments/{$this->employment}/assignments/".$move->json('data.id'))->assertOk();
+    $one = fichaCall($this->admin, 'get', "/employments/{$this->employment}/assignments/".$history->json('data.0.id'))->assertOk();
     $this->assertMatchesOpenApi($one, 'get', '/employments/{employment_id}/assignments/{id}', 200);
 
     TenancyScope::runAs(FICHA_TENANT, function (): void {
@@ -180,14 +186,16 @@ test('COL-5: un movimiento cierra la asignación vigente y abre otra; el pasado 
 });
 
 test('COL-5: el movimiento se rechaza el mismo día, sin cambios, antes del ingreso o sin permiso', function (): void {
-    $path = "/employments/{$this->employment}/assignments";
+    $path = "/employments/{$this->employment}/personnel-actions";
     // Mismo día que la asignación vigente: se corrige con otro registro, no se sobrescribe (409).
-    fichaCall($this->admin, 'post', $path, ['valid_from' => '2025-03-10', 'org_unit_id' => $this->unit2])->assertStatus(409);
-    fichaCall($this->admin, 'post', $path, ['valid_from' => '2026-03-01', 'org_unit_id' => $this->unit])->assertStatus(422);
-    fichaCall($this->admin, 'post', $path, ['valid_from' => '2024-01-01', 'org_unit_id' => $this->unit2])->assertStatus(422);
-    fichaCall($this->admin, 'post', $path, ['org_unit_id' => $this->unit2])->assertStatus(422);
-    $manager = fichaUser(FICHA_TENANT, 'manager');
-    fichaCall($manager, 'post', $path, ['valid_from' => '2026-03-01', 'org_unit_id' => $this->unit2])->assertForbidden();
+    fichaCall($this->admin, 'post', $path, ['effective_on' => '2025-03-10', 'changes' => ['org_unit_id' => $this->unit2]])->assertStatus(409);
+    fichaCall($this->admin, 'post', $path, ['effective_on' => '2026-03-01', 'changes' => ['org_unit_id' => $this->unit]])->assertStatus(422);
+    fichaCall($this->admin, 'post', $path, ['effective_on' => '2024-01-01', 'changes' => ['org_unit_id' => $this->unit2]])->assertStatus(422);
+    fichaCall($this->admin, 'post', $path, ['changes' => ['org_unit_id' => $this->unit2]])->assertStatus(422);
+    // La asignación ya no se escribe directamente: no hay ruta.
+    fichaCall($this->admin, 'post', "/employments/{$this->employment}/assignments", ['valid_from' => '2026-03-01', 'org_unit_id' => $this->unit2])->assertStatus(405);
+    $employee = fichaEmployee($this->person);
+    fichaCall($employee, 'post', $path, ['effective_on' => '2026-03-01', 'changes' => ['org_unit_id' => $this->unit2]])->assertForbidden();
 });
 
 // ── COL-4 · Datos personales ────────────────────────────────────────────────────────────────────────

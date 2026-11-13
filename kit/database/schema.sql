@@ -3367,11 +3367,21 @@ CREATE TABLE personnel_actions (
   kind text NOT NULL CHECK (kind IN ('hire','promotion','transfer','salary_change','manager_change','schedule_change','contract_change','cost_center_change','regime_change','suspension','reinstatement','termination','data_correction')),
   effective_on date NOT NULL,
   reason text,
-  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','pending_approval','approved','applied','rejected','cancelled')),
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','pending_approval','approved','scheduled','applied','rejected','cancelled','replaced')),
   requested_by_user_id uuid,
   workflow_instance_id uuid,
   applied_at timestamptz,
   payload jsonb,
+  changes jsonb,
+  decided_at timestamptz,
+  decision_reason text,
+  cancelled_at timestamptz,
+  cancelled_by_user_id uuid,
+  replaces_personnel_action_id uuid,
+  replaced_by_personnel_action_id uuid,
+  is_retroactive boolean NOT NULL DEFAULT false,
+  affected_from date,
+  affected_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -3379,12 +3389,19 @@ CREATE TABLE personnel_actions (
   CONSTRAINT uq_personnel_actions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_personnel_actions_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_personnel_actions_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
-  CONSTRAINT fk_personnel_actions_workflow_instance_id FOREIGN KEY (tenant_id, workflow_instance_id) REFERENCES workflow_instances (tenant_id, id)
+  CONSTRAINT fk_personnel_actions_workflow_instance_id FOREIGN KEY (tenant_id, workflow_instance_id) REFERENCES workflow_instances (tenant_id, id),
+  CONSTRAINT fk_personnel_actions_cancelled_by_user_id FOREIGN KEY (tenant_id, cancelled_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_personnel_actions_replaces_personnel_action_id FOREIGN KEY (tenant_id, replaces_personnel_action_id) REFERENCES personnel_actions (tenant_id, id),
+  CONSTRAINT fk_personnel_actions_replaced_by_personnel_action_id FOREIGN KEY (tenant_id, replaced_by_personnel_action_id) REFERENCES personnel_actions (tenant_id, id)
 );
-COMMENT ON TABLE personnel_actions IS 'Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera.';
+COMMENT ON TABLE personnel_actions IS 'Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera. HIS-2: queda en aprobación según la configuración; HIS-4: con fecha futura queda «programado» (scheduled) y se aplica solo ese día; una corrección deja el original como «reemplazado» (replaced) y enlazado.';
 CREATE INDEX ix_personnel_actions_employment_id ON personnel_actions (tenant_id, employment_id);
 CREATE INDEX ix_personnel_actions_requested_by_user_id ON personnel_actions (tenant_id, requested_by_user_id);
 CREATE INDEX ix_personnel_actions_workflow_instance_id ON personnel_actions (tenant_id, workflow_instance_id);
+CREATE INDEX ix_personnel_actions_cancelled_by_user_id ON personnel_actions (tenant_id, cancelled_by_user_id);
+CREATE INDEX ix_personnel_actions_replaces_personnel_action_id ON personnel_actions (tenant_id, replaces_personnel_action_id);
+CREATE INDEX ix_personnel_actions_replaced_by_personnel_action_id ON personnel_actions (tenant_id, replaced_by_personnel_action_id);
+CREATE INDEX ix_personnel_actions_status_effective_on ON personnel_actions (tenant_id, status, effective_on);
 ALTER TABLE personnel_actions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE personnel_actions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON personnel_actions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -18210,6 +18227,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('colaboradores.relaciones_simultaneas', 'core', 'Relaciones simultáneas en empresas del grupo', 'Permite que una persona tenga a la vez relaciones laborales abiertas con distintas empresas de la organización (COL-10). Con la misma empresa nunca se permite (RN-COL-02).', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('colaboradores.campos_requieren_aprobacion', 'core', 'Datos que el colaborador cambia con aprobación', 'RN-COL-06 · Datos personales que, propuestos por el propio colaborador, esperan a RRHH; los demás (nombre preferido, correo y celular personales) se aplican en el acto.', 'list', '["first_names", "paternal_surname", "maternal_surname", "birth_date", "sex", "marital_status", "nationality_code", "address"]'::jsonb, ARRAY['organization'], '["first_names", "paternal_surname", "maternal_surname", "preferred_name", "birth_date", "sex", "marital_status", "nationality_code", "personal_email", "mobile_phone", "address"]'::jsonb),
   ('colaboradores.cuenta_bancaria_requiere_aprobacion', 'core', 'Cambio de cuenta de pago con aprobación', 'COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('movimientos.tipos_con_aprobacion', 'core', 'Movimientos que pasan por aprobación', 'HIS-2: tipos de movimiento de personal que, aunque los registre RRHH, esperan el flujo de aprobación publicado para «personnel_action» antes de aplicarse. Lo que propone un jefe siempre pasa por aprobación.', 'list', '["promotion"]'::jsonb, ARRAY['organization','legal_entity'], '["promotion", "transfer", "manager_change", "cost_center_change", "data_correction"]'::jsonb),
   ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),
   ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'Días de anticipación con que se avisa el vencimiento.', 'list', '[60, 30, 15]'::jsonb, ARRAY['organization','legal_entity'], NULL),

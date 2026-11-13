@@ -27,6 +27,17 @@ final class DomainEventTypes
 
     public const OFFBOARDING_CANCELLED = 'offboarding.cancelled.v1';
 
+    // HIS-2 · HIS-4: movimientos de personal (promoción y traslado para la analítica) y su trámite.
+    public const EMPLOYEE_PROMOTED = 'employee.promoted.v1';
+
+    public const EMPLOYEE_TRANSFERRED = 'employee.transferred.v1';
+
+    public const PERSONNEL_ACTION_REQUESTED = 'personnel_action.requested.v1';
+
+    public const PERSONNEL_ACTION_CANCELLED = 'personnel_action.cancelled.v1';
+
+    public const EMPLOYMENT_RETROACTIVE_CHANGE = 'employment.retroactive_change.v1';
+
     // COL-4 · RN-COL-06: cambio de datos personales propuesto por el colaborador y su aprobación.
     public const PERSON_DATA_CHANGE_REQUESTED = 'person.data_change_requested.v1';
 
@@ -277,6 +288,31 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['employment_id', 'termination_id'],
             'description' => 'Cese revertido antes de su fecha: la relación vuelve a «Activa» (ME-01)',
+        ],
+        self::EMPLOYEE_PROMOTED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'personnel_action_id', 'effective_on', 'updated_fields'],
+            'description' => 'Promoción aplicada (cambio de puesto) con su movimiento de personal (HIS-2)',
+        ],
+        self::EMPLOYEE_TRANSFERRED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'personnel_action_id', 'effective_on', 'updated_fields'],
+            'description' => 'Traslado aplicado (unidad, sede o posición) con su movimiento de personal (HIS-2)',
+        ],
+        self::PERSONNEL_ACTION_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['personnel_action_id', 'employment_id', 'kind', 'effective_on', 'status'],
+            'description' => 'Movimiento de personal registrado: aplicado, programado o en aprobación (HIS-2)',
+        ],
+        self::PERSONNEL_ACTION_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['personnel_action_id', 'employment_id'],
+            'description' => 'Movimiento programado o en aprobación anulado antes de aplicarse (HIS-4)',
+        ],
+        self::EMPLOYMENT_RETROACTIVE_CHANGE => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'personnel_action_id', 'affected_from', 'affected_to'],
+            'description' => 'Cambio con fecha pasada: rango de fechas afectado para recalcular planilla y asistencia sin alterar periodos cerrados (HIS-4 · RN-HIS-05)',
         ],
         self::EMPLOYEE_COMPENSATION_CHANGED => [
             'version' => 1,

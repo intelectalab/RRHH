@@ -434,11 +434,14 @@
   employment_id -> employments ; from_status ; to_status text! ; reason_code ; effective_on date! ; changed_by_user_id ?-> users ; notes
 
 #E HIS | Historia con vigencia
-@personnel_actions main soft lock | Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera.
+@personnel_actions main soft lock | Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera. HIS-2: queda en aprobación según la configuración; HIS-4: con fecha futura queda «programado» (scheduled) y se aplica solo ese día; una corrección deja el original como «reemplazado» (replaced) y enlazado.
   employment_id -> employments
   kind enum(hire,promotion,transfer,salary_change,manager_change,schedule_change,contract_change,cost_center_change,regime_change,suspension,reinstatement,termination,data_correction)!
-  effective_on date! ; reason ; status enum(draft,pending_approval,approved,applied,rejected,cancelled)=draft
+  effective_on date! ; reason ; status enum(draft,pending_approval,approved,scheduled,applied,rejected,cancelled,replaced)=draft
   requested_by_user_id ?-> users ; workflow_instance_id ?-> workflow_instances ; applied_at ; payload j
+  changes j ; decided_at ts ; decision_reason ; cancelled_at ts ; cancelled_by_user_id ?-> users
+  replaces_personnel_action_id ?-> personnel_actions ; replaced_by_personnel_action_id ?-> personnel_actions
+  is_retroactive bool=f ; affected_from date ; affected_to date ; idx status, effective_on
 @employment_assignments main lock | Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).
   employment_id -> employments ; job_profile_id -> job_profiles ; position_id ?-> positions ; org_unit_id -> org_units
   site_id -> sites ; manager_employment_id ?-> employments ; cost_center_id ?-> cost_centers
