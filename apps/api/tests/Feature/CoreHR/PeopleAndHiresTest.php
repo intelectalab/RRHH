@@ -176,7 +176,7 @@ test('COL-2 · el ingreso crea asignación, régimen, contrato y compensación c
         ->and($first->json('data.labor_regime_code'))->toBe('pe_general')
         ->and($first->json('data.work_email'))->toBe('rosa.quispe@empresa.test')
         ->and($first->json('data.base_salary'))->toBe(['amount' => '3500.00', 'currency' => 'PEN'])
-        ->and($first->json('data.allowed_actions'))->toBe([]);
+        ->and($first->json('data.allowed_actions'))->toBe(['terminate']);
 
     // Repetir con la misma clave no crea otro ingreso ni otro evento.
     $repeat = colCall($this->admin, 'post', '/employments', $body, ['Idempotency-Key' => $key]);
@@ -265,7 +265,8 @@ test('la matriz de ME-01 rechaza toda acción no declarada', function (): void {
             expect($machine->can($state, $action))->toBe(isset($machine->transitions()[$state][$action]));
         }
     }
-    expect($machine->manualActions('active'))->toBe([])->and($machine->manualActions('pending'))->toBe(['activate', 'cancel']);
+    expect($machine->manualActions('active'))->toBe(['terminate'])->and($machine->manualActions('pending'))->toBe(['activate', 'cancel'])
+        ->and($machine->manualActions('terminating'))->toBe(['cancel-termination'])->and($machine->manualActions('terminated'))->toBe([]);
 });
 
 test('COL-2 · RN-COL-02 sin dos relaciones abiertas con la misma empresa; el reingreso reutiliza a la persona', function (): void {

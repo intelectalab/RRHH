@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 169,
+    "parametros": 170,
     "verificados": 126,
-    "sin_verificar": 43
+    "sin_verificar": 44
   },
   "parametros": [
     {
@@ -963,6 +963,21 @@
       "verificado": false,
       "base_legal": "DS 003-97-TR",
       "nota": "El tope general no consta en la investigación."
+    },
+    {
+      "codigo": "renuncia_preaviso_dias",
+      "nombre": "Preaviso de renuncia (días naturales)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DS 003-97-TR art. 18",
+      "nota": "Se cita un preaviso de 30 días naturales que el empleador puede exonerar; no verificado. El cese solo advierte si el preaviso registrado es menor (COL-11)."
     },
     {
       "codigo": "liquidacion_plazo_pago_horas",

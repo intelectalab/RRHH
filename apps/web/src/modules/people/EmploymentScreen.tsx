@@ -16,6 +16,7 @@ import { StatusBadge } from '@/ui/components/Status'
 import { ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { STATUS_TONE, type Employment } from './employment'
+import { TerminationActions, TerminationAndRelations } from './EmploymentTermination'
 import { peopleTabs } from './peopleTabs'
 
 /**
@@ -97,6 +98,7 @@ export function EmploymentScreen({ id }: { id: string }) {
             {actions.includes('cancel') && can('people.employments.update') && (
               <button type="button" className="btn btn-sec" disabled={busy} onClick={() => { setReason(''); setError(null); setCancelling(true) }}>{t('emp.cancel')}</button>
             )}
+            <TerminationActions employment={employment} onChanged={setEmployment} onToast={toast} />
           </>
         )}
       />
@@ -130,6 +132,7 @@ export function EmploymentScreen({ id }: { id: string }) {
             </dl>
           </Card>
         </div>
+        <TerminationAndRelations employment={employment} />
       </main>
       {cancelling && (
         <Modal

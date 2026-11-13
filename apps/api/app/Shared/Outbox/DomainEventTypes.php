@@ -20,6 +20,13 @@ final class DomainEventTypes
 
     public const EMPLOYEE_HIRE_CANCELLED = 'employee.hire_cancelled.v1';
 
+    // COL-10 · COL-11 · ME-01: reingreso y cese (registro, reversión) de la relación laboral.
+    public const EMPLOYEE_REHIRED = 'employee.rehired.v1';
+
+    public const OFFBOARDING_STARTED = 'offboarding.started.v1';
+
+    public const OFFBOARDING_CANCELLED = 'offboarding.cancelled.v1';
+
     // Asistencia / Vacaciones
     public const LEAVE_REQUESTED = 'leave.requested.v1';
 
@@ -204,6 +211,21 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['employment_id', 'person_id', 'legal_entity_id'],
             'description' => 'Ingreso anulado antes de empezar: libera la posición y cancela el onboarding (ME-01)',
+        ],
+        self::EMPLOYEE_REHIRED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'person_id', 'legal_entity_id', 'hire_date', 'rehire_of_employment_id'],
+            'description' => 'Reingreso: relación nueva de una persona con una relación anterior cesada, que queda intacta (COL-10)',
+        ],
+        self::OFFBOARDING_STARTED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'termination_id', 'termination_date', 'reason'],
+            'description' => 'Cese registrado: la relación pasa a «En proceso de cese»; inicia el offboarding y la liquidación (ME-01)',
+        ],
+        self::OFFBOARDING_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'termination_id'],
+            'description' => 'Cese revertido antes de su fecha: la relación vuelve a «Activa» (ME-01)',
         ],
         self::EMPLOYEE_COMPENSATION_CHANGED => [
             'version' => 1,

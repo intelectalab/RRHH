@@ -5,6 +5,8 @@ namespace App\Modules\CoreHR\Http\Controllers;
 use App\Modules\CoreHR\Application\EmploymentPresenter;
 use App\Modules\CoreHR\Application\EmploymentService;
 use App\Modules\CoreHR\Application\IdentityDocuments;
+use App\Modules\CoreHR\Application\TerminationReasonCatalog;
+use App\Modules\CoreHR\Application\TerminationService;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Shared\Audit\ActivityLogger;
 use App\Shared\Audit\AuditLogger;
@@ -27,6 +29,8 @@ use Illuminate\Validation\ValidationException;
  * COL-2 · COL-9 · Colaboradores (relaciones laborales): listado con alcance aplicado en la consulta,
  * filtros y orden en el servidor; ficha básica; ingreso; activar y anular (ME-01). El sueldo es sensible:
  * sin people.employments.salary.view no viaja ni se filtra, y cada lectura queda registrada.
+ * COL-10 · COL-11 · La ficha muestra las demás relaciones de la persona (reingresos y relaciones simultáneas,
+ * dentro del alcance de quien consulta) y el cese registrado; registrar y revertir el cese son acciones.
  */
 final class EmploymentController
 {
@@ -43,6 +47,7 @@ final class EmploymentController
 
     public function __construct(
         private readonly EmploymentService $employments,
+        private readonly TerminationService $terminations,
         private readonly EmploymentPresenter $presenter,
         private readonly DataScope $scope,
         private readonly SensitiveFields $sensitive,
@@ -132,6 +137,43 @@ final class EmploymentController
         $reason = $data['reason'] ?? $data['comment'] ?? null;
 
         return $this->respond($request, $this->employments->cancel($employment, is_string($reason) ? $reason : null, $this->userId($request)));
+    }
+
+    /** COL-11 · Registrar el cese (Activa o Suspendida → En proceso de cese; Cesada si la fecha ya llegó). */
+    public function terminate(Request $request, string $id): JsonResponse
+    {
+        $employment = $this->find($request, $id, 'people.employments.terminate');
+        $input = $request->validate([
+            'termination_reason_id' => ['required', 'uuid'],
+            'termination_date' => ['required', 'date_format:Y-m-d'],
+            'last_working_day' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'notice_date' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'initiated_by' => ['sometimes', 'nullable', Rule::in(['employee', 'employer', 'mutual'])],
+            'detail' => ['sometimes', 'nullable', 'string', 'max:2000'],
+            'is_rehire_eligible' => ['sometimes', 'nullable', 'boolean'],
+        ]);
+        $result = $this->terminations->register($employment, $input, $this->userId($request));
+        $response = $this->respond($request, $result['employment']);
+        $payload = (array) $response->getData(true);
+        $payload['meta'] = ['warnings' => $result['warnings']];
+
+        return $response->setData($payload);
+    }
+
+    /** COL-11 · Revertir el cese antes de su fecha (En proceso de cese → Activa). */
+    public function cancelTermination(Request $request, string $id): JsonResponse
+    {
+        $employment = $this->find($request, $id, 'people.employments.cancel_termination');
+        $data = $request->validate(['reason' => ['sometimes', 'nullable', 'string', 'max:500'], 'comment' => ['sometimes', 'nullable', 'string', 'max:500']]);
+        $reason = $data['reason'] ?? $data['comment'] ?? null;
+
+        return $this->respond($request, $this->terminations->revert($employment, is_string($reason) ? $reason : null, $this->userId($request)));
+    }
+
+    /** COL-11 · Motivos de cese de la organización (Tabla 17 del paquete de país y los propios). */
+    public function terminationReasons(TerminationReasonCatalog $reasons): JsonResponse
+    {
+        return response()->json(['data' => $reasons->all()]);
     }
 
     /** Opciones del formulario de ingreso, con el alcance de empresa de quien registra. */
@@ -348,6 +390,28 @@ final class EmploymentController
         return $user === null ? null : (string) $user->getAuthIdentifier();
     }
 
+    /**
+     * COL-10 · Las demás relaciones de la persona (reingresos y relaciones simultáneas) que quien consulta puede
+     * ver con su alcance, para pasar de una a otra en la ficha.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function otherEmployments(Request $request, Employment $employment): array
+    {
+        $query = Employment::query()->where('employments.person_id', $employment->person_id)->where('employments.id', '<>', $employment->id)
+            ->join('legal_entities as le', 'le.id', '=', 'employments.legal_entity_id')
+            ->select(['employments.id', 'employments.legal_entity_id', 'le.legal_name', 'employments.employee_code', 'employments.hire_date',
+                'employments.termination_date', 'employments.status', 'employments.rehire_of_employment_id']);
+        $this->scope->applyEmployment($query, $request, 'people.employments.view', 'employments.id');
+
+        return $query->orderByDesc('employments.hire_date')->get()->map(fn (Employment $e): array => [
+            'id' => $e->id, 'legal_entity_id' => $e->legal_entity_id, 'legal_entity_name' => (string) $e->getAttribute('legal_name'),
+            'employee_code' => $e->employee_code, 'hire_date' => $e->hire_date->toDateString(),
+            'termination_date' => $e->termination_date?->toDateString(), 'status' => $e->status,
+            'rehire_of_employment_id' => $e->rehire_of_employment_id,
+        ])->values()->all();
+    }
+
     private function respond(Request $request, Employment $employment, int $status = 200): JsonResponse
     {
         $data = $this->presenter->presentMany([$employment], withSalary: true)[0];
@@ -355,6 +419,8 @@ final class EmploymentController
             // Sin compensación registrada no hay lectura de sueldo que registrar.
             unset($data['base_salary']);
         }
+        $data['termination'] = $this->terminations->current($employment, $this->permissions($request)->has('people.employments.terminate'));
+        $data['other_employments'] = $this->otherEmployments($request, $employment);
         $data = $this->sensitive->present(self::SCHEMA, $data, $this->permissions($request), 'api', $employment->person_id);
 
         return response()->json(['data' => $data], $status)->header('ETag', '"'.$employment->lock_version.'"');

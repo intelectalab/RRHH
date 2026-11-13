@@ -569,6 +569,31 @@
       "opciones": null
     },
     {
+      "codigo": "colaboradores.cese_bloquea_pendientes",
+      "modulo": "core",
+      "nombre": "Bloquear el cese con pendientes",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Si el cese se registra con activos sin devolver, préstamos o adelantos con saldo o vacaciones aprobadas posteriores a la fecha de cese, se rechaza en lugar de solo advertir (RN-COL-10).",
+      "opciones": null
+    },
+    {
+      "codigo": "colaboradores.relaciones_simultaneas",
+      "modulo": "core",
+      "nombre": "Relaciones simultáneas en empresas del grupo",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Permite que una persona tenga a la vez relaciones laborales abiertas con distintas empresas de la organización (COL-10). Con la misma empresa nunca se permite (RN-COL-02).",
+      "opciones": null
+    },
+    {
       "codigo": "posiciones.factor_carga_pct",
       "modulo": "core",
       "nombre": "Cargas del empleador para el costo proyectado (%)",

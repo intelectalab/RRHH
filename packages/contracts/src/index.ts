@@ -14419,6 +14419,23 @@ export interface paths {
         patch: operations["patchTenant"];
         trace?: never;
     };
+    "/termination-reasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Motivos de cese de la organización, enlazados a la Tabla 17 del paquete de país (COL-11) */
+        get: operations["getTerminationReasons"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tickets": {
         parameters: {
             query?: never;
@@ -17625,6 +17642,12 @@ export interface components {
             /** Format: date */
             contract_end_date?: string | null;
             base_salary?: components["schemas"]["Money"];
+            termination?: {
+                [key: string]: unknown;
+            } | null;
+            other_employments?: {
+                [key: string]: unknown;
+            }[] | null;
             allowed_actions?: string[] | null;
             version?: number | null;
             /** Format: date-time */
@@ -57623,6 +57646,28 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getTerminationReasons: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getTickets: {

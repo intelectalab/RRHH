@@ -537,6 +537,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/people/document-match` | `people.people.view` | 1 |
 | GET | `/employment-options` | `people.employments.create` | 1 |
 | POST | `/employments/{id}/cancel` | `people.employments.update` | 1 |
+| GET | `/termination-reasons` | `people.employments.terminate` | 1 |
 
 **HIS · Historia con vigencia**
 

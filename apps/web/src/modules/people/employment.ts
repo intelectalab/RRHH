@@ -37,8 +37,49 @@ export type Employment = {
   contract_type_id: string | null
   contract_end_date: string | null
   base_salary?: { amount: string; currency: string } | null
+  /** COL-11 · Cese registrado (sin los revertidos); el detalle solo llega a quien puede cesar. */
+  termination?: Termination | null
+  /** COL-10 · Otras relaciones de la persona dentro del alcance de quien consulta. */
+  other_employments?: RelatedEmployment[]
   allowed_actions?: string[]
   version?: number
+}
+
+export type Termination = {
+  id: string
+  status: string
+  termination_reason_id: string
+  reason_code: string
+  reason_name: string
+  category: string
+  statutory_code: string | null
+  initiated_by: 'employee' | 'employer' | 'mutual'
+  notice_date: string | null
+  last_working_day: string
+  termination_date: string
+  is_rehire_eligible: boolean | null
+  detail?: string | null
+}
+
+export type RelatedEmployment = {
+  id: string
+  legal_entity_id: string
+  legal_entity_name: string
+  employee_code: string
+  hire_date: string
+  termination_date: string | null
+  status: EmploymentStatus
+  rehire_of_employment_id: string | null
+}
+
+export type TerminationReason = {
+  id: string
+  code: string
+  name: string
+  category: string
+  is_voluntary: boolean
+  statutory_code: string | null
+  initiated_by: 'employee' | 'employer' | 'mutual'
 }
 
 export type EmploymentStatus = 'pending' | 'active' | 'suspended' | 'terminating' | 'terminated' | 'cancelled'

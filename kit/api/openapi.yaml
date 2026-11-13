@@ -35794,6 +35794,23 @@ paths:
       x-phase: 0
       x-permission: settings.organization.update
       operationId: patchTenant
+  /termination-reasons:
+    get:
+      summary: Motivos de cese de la organización, enlazados a la Tabla 17 del paquete de país (COL-11)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+      tags:
+      - COL
+      x-phase: 1
+      x-permission: people.employments.terminate
+      operationId: getTerminationReasons
   /tickets:
     get:
       summary: Listar Ticket
@@ -42729,6 +42746,14 @@ components:
           nullable: true
         base_salary: &id294
           $ref: '#/components/schemas/Money'
+        termination:
+          type: object
+          additionalProperties: true
+          nullable: true
+        other_employments:
+          type: array
+          items: *id089
+          nullable: true
         allowed_actions:
           type: array
           items: *id034

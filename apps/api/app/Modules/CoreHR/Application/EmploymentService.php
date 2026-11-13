@@ -30,6 +30,11 @@ use Illuminate\Validation\ValidationException;
  * Reglas: RN-COL-01 (persona única, PersonService), RN-COL-02 (sin dos relaciones abiertas con la misma
  * empresa), RN-COL-13 (límite del plan) y posiciones.contratar_solo_con_posicion (el alta consume una
  * posición vacante). Estructura y posición se validan con los contratos de Organización.
+ *
+ * COL-10 · Reingreso y relaciones simultáneas: un reingreso reutiliza la persona y crea una relación nueva
+ * (con su asignación, compensación, contrato y saldos) enlazada con rehire_of_employment_id; la anterior no se
+ * reabre ni se toca. Una persona puede tener a la vez relaciones con distintas empresas del grupo, salvo que la
+ * organización lo apague (colaboradores.relaciones_simultaneas).
  */
 final class EmploymentService
 {
@@ -122,6 +127,12 @@ final class EmploymentService
                 'position_id' => $assignment['position_id'],
                 'rehire_of_employment_id' => $previous,
             ]);
+            if ($previous !== null) {
+                $this->outbox->record(DomainEventTypes::EMPLOYEE_REHIRED, 'employment', $employment->id, [
+                    'employment_id' => $employment->id, 'person_id' => $person->id, 'legal_entity_id' => $legalEntityId,
+                    'hire_date' => $hireDate, 'rehire_of_employment_id' => $previous,
+                ]);
+            }
             $this->audit->record('employment.hired', 'employment', $employment->id, null, [
                 'person_id' => $person->id, 'legal_entity_id' => $legalEntityId, 'employee_code' => $employment->employee_code,
                 'hire_date' => $hireDate, 'status' => $status, 'position_id' => $assignment['position_id'],
@@ -288,25 +299,44 @@ final class EmploymentService
     }
 
     /**
-     * RN-COL-02 · Sin otra relación abierta con la misma empresa. Devuelve la relación cesada anterior con
-     * esa empresa (reingreso), que no se reabre.
+     * RN-COL-02 · Sin otra relación abierta con la misma empresa en fechas que se solapen: una relación «En
+     * proceso de cese» cuyo cese es anterior al nuevo ingreso no se solapa. COL-10 · Con otra empresa del
+     * grupo se permite, salvo que la organización lo apague. Devuelve la relación anterior que este ingreso
+     * retoma (reingreso): la última cesada con la misma empresa o, si no hay y la persona no tiene otra relación
+     * vigente, con cualquier empresa del grupo. Esa relación no se reabre.
      */
     private function assertNoOpenRelation(Person $person, string $legalEntityId, string $hireDate): ?string
     {
-        $open = Employment::query()->where('person_id', $person->id)->where('legal_entity_id', $legalEntityId)
-            ->whereIn('status', EmploymentStateMachine::OPEN_STATES)->first();
-        if ($open instanceof Employment) {
-            throw new AyniException('employment_overlap', 409, (string) trans('people.employment_overlap', ['code' => $open->employee_code]), [], [
-                'employment_id' => $open->id,
-            ]);
+        $open = Employment::query()->where('person_id', $person->id)->whereIn('status', EmploymentStateMachine::OPEN_STATES)->get();
+        $activeElsewhere = false;
+        foreach ($open as $relation) {
+            $endsBefore = $relation->status === 'terminating' && $relation->termination_date !== null && $relation->termination_date->toDateString() < $hireDate;
+            if ($relation->legal_entity_id === $legalEntityId && ! $endsBefore) {
+                throw new AyniException('employment_overlap', 409, (string) trans('people.employment_overlap', ['code' => $relation->employee_code]), [], [
+                    'employment_id' => $relation->id,
+                ]);
+            }
+            if ($relation->legal_entity_id !== $legalEntityId && ! $endsBefore) {
+                $activeElsewhere = true;
+            }
+            if ($relation->legal_entity_id !== $legalEntityId && ! $endsBefore && $this->parameters->value('colaboradores.relaciones_simultaneas') === false) {
+                throw new AyniException('simultaneous_not_allowed', 409, (string) trans('people.simultaneous_not_allowed', ['code' => $relation->employee_code]), [], [
+                    'employment_id' => $relation->id,
+                ]);
+            }
         }
-        $last = Employment::query()->where('person_id', $person->id)->where('legal_entity_id', $legalEntityId)
-            ->where('status', 'terminated')->orderByDesc('termination_date')->first();
-        if ($last instanceof Employment && $last->termination_date !== null && $last->termination_date->toDateString() >= $hireDate) {
-            throw ValidationException::withMessages(['hire_date' => [(string) trans('people.rehire_before_termination', ['date' => $last->termination_date->toDateString()])]]);
+        $previous = Employment::query()->where('person_id', $person->id)
+            ->where(fn ($q) => $q->where('status', 'terminated')->orWhere(fn ($t) => $t->where('status', 'terminating')->where('termination_date', '<', $hireDate)))
+            ->orderByRaw('legal_entity_id = ? DESC', [$legalEntityId])->orderByDesc('termination_date')->get();
+        $sameEntity = $previous->first(fn (Employment $e) => $e->legal_entity_id === $legalEntityId);
+        if ($sameEntity instanceof Employment && $sameEntity->termination_date !== null && $sameEntity->termination_date->toDateString() >= $hireDate) {
+            throw ValidationException::withMessages(['hire_date' => [(string) trans('people.rehire_before_termination', ['date' => $sameEntity->termination_date->toDateString()])]]);
         }
+        // Con otra relación vigente en el grupo, el ingreso es una relación simultánea, no un reingreso.
+        $last = $previous->first(fn (Employment $e) => $e->termination_date !== null && $e->termination_date->toDateString() < $hireDate
+            && ($e->legal_entity_id === $legalEntityId || ! $activeElsewhere));
 
-        return $last?->id;
+        return $last instanceof Employment ? $last->id : null;
     }
 
     /**

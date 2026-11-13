@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **43 parámetros sin valor verificado**; **36** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **44 parámetros sin valor verificado**; **37** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -36,6 +36,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `quinta_devuelve_exceso` | El empleador devuelve el exceso de retención de quinta en la regularización o el cese | Todos | count | Reglamento LIR art. 40 y 45 | Sí | Por confirmar el procedimiento y si se devuelve en la boleta o se informa a SUNAT. | |
 | `quinta_fraccionamiento_semanal` | Fraccionamiento de la retención en pagos semanales o quincenales | Todos | text | Reglamento LIR art. 40 | Sí | proporcional o ultimo_pago; por confirmar. | |
 | `quinta_previas_sin_detalle` | Tratamiento de retenciones de empleadores anteriores declaradas sin detalle mensual | Todos | text | Reglamento LIR art. 40 y 41 | Sí | total o prorrateo; criterio por confirmar. | |
+| `renuncia_preaviso_dias` | Preaviso de renuncia (días naturales) | Todos | days | DS 003-97-TR art. 18 | Sí | Se cita un preaviso de 30 días naturales que el empleador puede exonerar; no verificado. El cese solo advierte si el preaviso registrado es menor (COL-11). | |
 | `sobretiempo_tasa_tramo1_pct` | Sobretasa de las dos primeras horas extra | Todos | percent | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `sobretiempo_tasa_tramo2_pct` | Sobretasa de las horas extra siguientes | Todos | percent | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `sst_capacitaciones_anuales_min` | Capacitaciones mínimas al año | Todos | count | Ley 29783 art. 35 | Sí | Por confirmar. | |

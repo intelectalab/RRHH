@@ -674,3 +674,13 @@
 @media (max-width: 900px) {
   .emp-resumen { grid-template-columns: minmax(0, 1fr); gap: 16px; }
 }
+
+/* COL-10 · COL-11 · Cese y relaciones de la persona en la ficha de la relación. */
+.emp-resumen ~ .notice, .emp-resumen ~ .card { margin-top: 16px; }
+.cese-fechas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 16px; }
+.cese-relaciones { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.cese-relaciones li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.cese-relaciones li > span, .cese-relaciones li > small { color: var(--tx2); }
+@media (max-width: 640px) {
+  .cese-fechas { grid-template-columns: minmax(0, 1fr); }
+}

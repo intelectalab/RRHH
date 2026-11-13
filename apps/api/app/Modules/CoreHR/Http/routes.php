@@ -20,4 +20,9 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::patch('/employments/{id}', [EmploymentController::class, 'update'])->middleware('permission:people.employments.update');
     Route::post('/employments/{id}/activate', [EmploymentController::class, 'activate'])->middleware('permission:people.employments.activate');
     Route::post('/employments/{id}/cancel', [EmploymentController::class, 'cancel'])->middleware('permission:people.employments.update');
+
+    // COL-11 · Cese de la relación laboral (ME-01): registrar, revertir y motivos (Tabla 17).
+    Route::get('/termination-reasons', [EmploymentController::class, 'terminationReasons'])->middleware('permission:people.employments.terminate');
+    Route::post('/employments/{id}/terminate', [EmploymentController::class, 'terminate'])->middleware('permission:people.employments.terminate');
+    Route::post('/employments/{id}/cancel-termination', [EmploymentController::class, 'cancelTermination'])->middleware('permission:people.employments.cancel_termination');
 });
