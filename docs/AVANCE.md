@@ -6,8 +6,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 96 | 3 | 39,8 % |
-| Backlog completo | 512 | 96 | 3 | 18,8 % |
+| Primer corte comercial (MVP) | 241 | 97 | 3 | 40,2 % |
+| Backlog completo | 512 | 97 | 3 | 18,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -140,7 +140,7 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | COL-12 | Inicio de RRHH | COL | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | HIS-1 | Patrón de vigencia reutilizable | HIS | Fase 1 · Core HR | Task | sí | hecha | 2026-11-11 | Patrón compartido en app/Shared/Vigencia: cerrar la fila vigente e insertar otra, as_of y 409 ante solape (EXCLUDE). Pruebas con fecha pasada, presente y futura y prueba de esquema: toda tabla con valid_from/valid_to tiene restricción de exclusión o está en una lista justificada. Pendiente: que asignación, compensación y horario lo adopten en sus historias. |
 | HIS-2 | Movimientos de personal | HIS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| HIS-3 | Compensación con vigencia | HIS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| HIS-3 | Compensación con vigencia | HIS | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Sueldo, moneda, periodicidad, base de cálculo y componentes fijos con vigencia: cada cambio cierra el vigente e inserta otro con fecha efectiva y motivo; aprobación por el flujo salary_change (parámetro) enlazada a su origen (RN-HIS-08); valida la RMV vigente (parámetro legal; a tiempo parcial solo advierte); banda de la posición como referencia con aviso; auditoría y employment.compensation_changed; ver y editar son permisos de campo con registro de accesos; pestaña Compensación en la ficha; flujo demo. Pendiente: RMV en el ingreso, proporcional por jornada, conversión de moneda, retroactivos (HIS-4) y política salarial (RN-HIS-07). |
 | HIS-4 | Cambios con fecha futura y correcciones retroactivas | HIS | Fase 1 · Core HR | Task | sí | pendiente | — |  |
 | HIS-5 | Línea de tiempo laboral | HIS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | HIS-6 | Servicio de consulta de datos maestros | HIS | Fase 1 · Core HR | Task | sí | pendiente | — |  |
