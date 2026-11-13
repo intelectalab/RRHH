@@ -14,10 +14,12 @@ const t = (k: string, v: Record<string, string | number> = {}) => {
 describe('ficha 360 (COL-3)', () => {
   it('las pestañas aparecen solo con el módulo contratado y el permiso', () => {
     const all = () => true
-    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'dependents', 'social_security', 'payment'])
     expect(visibleTabs(PROFILE_TABS, [], all)).toEqual([])
     // Sin permiso de ver la historia de asignaciones, esa pestaña no aparece.
-    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'dependents', 'social_security', 'payment'])
+    // COL-6: sin permiso de derechohabientes, esa pestaña tampoco aparece.
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.dependents.view').map((x) => x.id)).not.toContain('dependents')
   })
 
   it('la antigüedad que calcula el servidor se lee en palabras, omitiendo las partes en cero', () => {
