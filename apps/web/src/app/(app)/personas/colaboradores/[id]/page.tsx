@@ -1,6 +1,6 @@
-import { EmploymentScreen } from '@/modules/people/EmploymentScreen'
+import { EmploymentProfileScreen } from '@/modules/people/profile/EmploymentProfileScreen'
 
 export default async function ColaboradorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  return <EmploymentScreen id={id} />
+  return <EmploymentProfileScreen id={id} />
 }

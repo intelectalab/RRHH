@@ -3,6 +3,7 @@
 namespace Tests\Support\Isolation;
 
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
+use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -93,6 +94,9 @@ final class CrossTenantHarness
         '/positions/{id}/occupants' => Position::class,
         '/positions/{id}/status-events' => Position::class,
         '/positions/{id}/reporting-line' => Position::class,
+        // COL-5: historia y movimientos de la asignación de una relación laboral de A.
+        '/employments/{employment_id}/assignments' => Employment::class,
+        '/employments/{employment_id}/assignments/{id}' => Employment::class,
     ];
 
     /**

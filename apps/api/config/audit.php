@@ -13,6 +13,8 @@ return [
         'role' => 'Role',
         'legal_entity' => 'LegalEntity',
         'person' => 'Person',
+        'person_address' => 'PersonAddress',
+        'emergency_contact' => 'EmergencyContact',
         'employment' => 'Employment',
         'compensation' => 'Compensation',
         'position' => 'Position',

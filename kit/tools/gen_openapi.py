@@ -98,7 +98,7 @@ RES = [
     ("COL", 1, "people.people", "/people", "Person", "first_names:s paternal_surname:s maternal_surname?:s preferred_name?:s full_name?:s document_type:e(dni|ce|passport|ptp|cpp|other) document_country?:s document_number!?:s document_number_masked?:s birth_date!?:d sex!?:e(female|male|unspecified) nationality_code?:s marital_status!?:e(single|married|cohabiting|divorced|widowed) personal_email!?:s mobile_phone!?:s employments?:ao version?:i", "LCRU", "merge"),
     ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id person_name?:s document_number_masked?:s legal_entity_id:id legal_entity_name?:s employee_code:s kind:e(employee|intern|apprentice) worker_category:e(executive|employee|worker) hire_date:d seniority_date?:d probation_ends_on?:d termination_date?:d status:e(pending|active|suspended|terminating|terminated|cancelled) rehire_of_employment_id?:id work_email?:s work_phone?:s work_phone_ext?:s job_profile_id?:id job_profile_name?:s position_id?:id position_title?:s org_unit_id?:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality?:e(onsite|remote|hybrid) labor_regime_code?:s contract_type_id?:id contract_end_date?:d base_salary!?:m allowed_actions?:a version?:i", "LCRU", "activate suspend terminate cancel-termination"),
     ("COL", 1, "people.dependents", "/employments/{employment_id}/dependents", "Dependent", "first_name:s last_name:s relationship:s document_number?:s birth_date?:d valid_from:d valid_to?:d", "LCRUD", ""),
-    ("HIS", 1, "people.assignments", "/employments/{employment_id}/assignments", "Assignment", "position_id?:id org_unit_id:id site_id:id cost_center_id?:id manager_employment_id?:id valid_from:d valid_to?:d reason:s", "LCR", "cancel"),
+    ("HIS", 1, "people.assignments", "/employments/{employment_id}/assignments", "Assignment", "job_profile_id:id job_profile_name?:s position_id?:id position_title?:s org_unit_id:id org_unit_name?:s site_id:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality:e(onsite|remote|hybrid) valid_from:d valid_to?:d reason?:s kind?:e(hire|promotion|transfer|manager_change|cost_center_change|data_correction) personnel_action_id?:id", "LCR", "cancel"),
     ("HIS", 1, "people.compensations", "/employments/{employment_id}/compensations", "Compensation", "base_salary!:m pay_frequency:e(monthly|biweekly|weekly) components!?:j valid_from:d valid_to?:d reason:s", "LCR", "cancel"),
     ("CON", 1, "contracts.contract_types", "/contract-types", "ContractType", "code:s name:s country_code?:s category:e(indefinite|fixed_term|part_time|internship|other) modality_code?:s requires_end_date:b requires_objective_cause:b max_duration_parameter_code?:s trial_period_parameter_code?:s document_template_id?:id is_system:b max_duration?:j trial_period?:j", "LCRU", ""),
     ("CON", 1, "contracts.contracts", "/contracts", "Contract", "employment_id:id type:s starts_on:d ends_on?:d probation_ends_on?:d workday:s cause?:s status:e(draft|issued|signed|active|expired|terminated)", "LCRU", "issue renew terminate"),
@@ -106,7 +106,7 @@ RES = [
     ("DOC", 1, "documents.documents", "/documents", "Document", "employment_id?:id folder:s name:s file_id:id version:i confidentiality:e(normal|restricted|sensitive) expires_on?:d status:e(active|archived)", "LCRU", "archive restore new-version"),
     ("DOC", 1, "documents.templates", "/document-templates", "DocumentTemplate", "name:s kind:s locale:s body:s variables:a status:e(draft|published|retired) version:i", "LCRU", "publish retire generate"),
     ("DOC", 1, "documents.signature_requests", "/signature-requests", "SignatureRequest", "document_id:id signers:j ordered:b provider:s status:e(draft|sent|viewed|partially_signed|completed|declined|cancelled|expired) evidence?:j", "LCR", "send sign decline cancel remind"),
-    ("ESS", 1, "people.change_requests", "/profile-change-requests", "ProfileChangeRequest", "employment_id:id changes:j attachments:a status:e(pending|approved|rejected|cancelled)", "LCR", "approve reject cancel"),
+    ("ESS", 1, "people.change_requests", "/profile-change-requests", "ProfileChangeRequest", "person_id?:id person_name?:s changes:j applied_fields?:a pending_fields?:a status:e(pending|approved|rejected|cancelled) requested_by_user_id?:id requested_by_name?:s reviewed_at?:dt rejection_reason?:s allowed_actions?:a", "LCR", "approve reject cancel"),
     ("IMP", 1, "imports.imports", "/imports", "ImportJob", "entity:e(legal_entities|employees|contracts|vacation_balances|salaries|attendance|concepts|history|org_structure|dependents|positions) file_name?:s file_id?:id headers?:a mapping?:j suggested_mapping?:j status:e(uploaded|mapped|validated|with_errors|importing|completed|failed|cancelled|reverted) total_rows?:i valid_rows?:i error_rows?:i imported_rows?:i batch_size?:i summary?:j error_message?:s created_by_user_id?:id created_by_name?:s started_at?:dt finished_at?:dt allowed_actions?:a", "LCR", "map validate execute cancel revert"),
     ("AYU", 1, "platform.help_articles", "/platform/help-articles", "HelpArticle", "slug:s locale:s title:s body:s module_code:s roles:a screen_keys:a product_version:s status:e(draft|published|archived)", "LCRU", "publish archive"),
     ("AYU", 1, "help.org_articles", "/help/org-articles", "HelpOrgArticle", "title:s category_id?:id body:s audience:j owner_user_id:id review_on?:d version:i status:e(draft|published|in_review|archived)", "LCRU", "publish archive"),
@@ -245,6 +245,23 @@ EXTRA = [
     ("COL", 1, "get", "/people/document-match", "people.people.view", "Buscar una persona por su documento (RN-COL-01): si ya existe, devuelve su identificación y sus relaciones para ofrecer reingreso o relación adicional", False),
     ("COL", 1, "get", "/employment-options", "people.employments.create", "Opciones del formulario de ingreso: empresas, puestos, posiciones libres, unidades, sedes, centros de costo, tipos de contrato, regímenes y jefes", False),
     ("COL", 1, "post", "/employments/{id}/cancel", "people.employments.update", "Anular un ingreso que aún no empezó (ME-01: Por ingresar → Anulada); libera la posición", False),
+    # COL-3 · COL-5 · Ficha 360: cabecera y datos laborales vigentes (la asignación cambia con un movimiento).
+    ("COL", 1, "get", "/employments/{id}/profile", "people.employments.view", "Cabecera de la ficha 360: nombre, foto, puesto, unidad, estado, antigüedad calculada por el servidor y las otras relaciones laborales de la persona (dentro del alcance) para cambiar de ficha", False),
+    ("COL", 1, "get", "/employments/{id}/work-data", "people.employments.view", "Datos laborales vigentes a una fecha (código, empresa, sede, unidad, puesto, posición, jefe, centro de costo, modalidad, régimen, contrato, estado): cada uno con su valor, desde cuándo rige y la historia a la que enlaza; antigüedad calculada", False),
+    # COL-4 · Datos personales de la persona (compartidos entre sus relaciones laborales).
+    ("COL", 1, "get", "/people/{id}/photo", "people.people.view", "Foto de la persona (404 si no tiene)", False),
+    ("COL", 1, "post", "/people/{id}/photo", "people.people.update", "Subir o reemplazar la foto (PNG, JPEG o WebP hasta 1 MB)", False),
+    ("COL", 1, "delete", "/people/{id}/photo", "people.people.update", "Quitar la foto", False),
+    ("COL", 1, "get", "/people/{id}/addresses", "people.people.view", "Direcciones vigentes de la persona (con history=true también las anteriores); exige people.people.personal_data.view y cada lectura queda registrada", False),
+    ("COL", 1, "post", "/people/{id}/addresses", "people.people.update", "Registrar una dirección: la anterior del mismo tipo queda como histórica (exige people.people.personal_data.edit)", False),
+    ("COL", 1, "patch", "/people/{id}/addresses/{address_id}", "people.people.update", "Corregir una dirección (exige people.people.personal_data.edit; queda auditado)", False),
+    ("COL", 1, "delete", "/people/{id}/addresses/{address_id}", "people.people.update", "Eliminar una dirección (pasa a la papelera; exige people.people.personal_data.edit)", False),
+    ("COL", 1, "get", "/people/{id}/emergency-contacts", "people.people.view", "Contactos de emergencia de la persona; exige people.people.personal_data.view y cada lectura queda registrada", False),
+    ("COL", 1, "post", "/people/{id}/emergency-contacts", "people.people.update", "Agregar un contacto de emergencia (exige people.people.personal_data.edit)", False),
+    ("COL", 1, "patch", "/people/{id}/emergency-contacts/{contact_id}", "people.people.update", "Editar un contacto de emergencia (exige people.people.personal_data.edit)", False),
+    ("COL", 1, "delete", "/people/{id}/emergency-contacts/{contact_id}", "people.people.update", "Eliminar un contacto de emergencia (exige people.people.personal_data.edit)", False),
+    ("COL", 1, "get", "/people/{id}/sensitive-data", "people.people.view", "Condición de discapacidad y grupo sanguíneo con su consentimiento (exige people.people.health_data.view; cada lectura queda registrada)", False),
+    ("COL", 1, "put", "/people/{id}/sensitive-data", "people.people.update", "Registrar la condición de discapacidad o el grupo sanguíneo; la discapacidad exige consentimiento expreso (RN-COL-08) y los permisos health_data.view y personal_data.edit", False),
     ("SEG", 0, "post", "/auth/login", None, "Iniciar sesión (correo o documento de identidad + clave)", True),
     ("SEG", 0, "post", "/auth/password/forgot", None, "Solicitar el enlace de recuperación de clave (misma respuesta exista o no el correo)", True),
     ("SEG", 0, "post", "/auth/password/reset", None, "Restablecer la clave con el enlace de un solo uso", True),
@@ -477,12 +494,18 @@ STATE_ACTIONS = {("post", "/employments/{id}/cancel"), ("post", "/notification-t
                  ("post", "/position-requests/{id}/submit"), ("post", "/position-requests/{id}/cancel")}
 # Rutas extra que responden 409 por conflicto de vigencia (otro registro ya ocupa ese periodo).
 CONFLICTS = {("post", "/headcount-budgets"), ("patch", "/headcount-budgets/{id}")}
-CREATED = {("post", "/position-requests"), ("post", "/headcount-budgets"), ("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
+CREATED = {("post", "/people/{id}/addresses"), ("post", "/people/{id}/emergency-contacts"), ("post", "/position-requests"), ("post", "/headcount-budgets"), ("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/employments/{id}/work-data"): [
+        _q("as_of", "Fecha (AAAA-MM-DD) de los datos; por defecto hoy (o el ingreso si aún no empezó)", False, "date"),
+    ],
+    ("get", "/people/{id}/addresses"): [
+        _q("history", "true: incluye las direcciones anteriores"),
+    ],
     ("get", "/headcount"): [
         _q("as_of", "Fecha (AAAA-MM-DD) de la dotación; por defecto hoy", False, "date"),
         _q("legal_entity_id", "Solo esa empresa"),
@@ -557,7 +580,7 @@ INPUT_EXTRA = {
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "full_name", "employments", "person_name", "position_title", "manager_name", "position_request_id", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "applied_fields", "pending_fields", "requested_by_name", "requested_by_user_id", "reviewed_at", "personnel_action_id", "full_name", "employments", "person_name", "position_title", "manager_name", "position_request_id", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):
@@ -734,7 +757,7 @@ def build():
             # Descarga directa del archivo (no es JSON).
             res["200"] = {"description": "Archivo", "content": {"text/csv": {"schema": {"type": "string"}}}}
             res.update(errs("409"))
-        if path.endswith("/logo") and method == "get":
+        if (path.endswith("/logo") or path.endswith("/photo")) and method == "get":
             res["200"] = {"description": "Imagen", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("image/png", "image/jpeg", "image/webp")}}
         if (method, path) in QUERY:
             op["parameters"] = QUERY[(method, path)]
@@ -744,7 +767,7 @@ def build():
             if method == "post":
                 op["parameters"] = [ref("parameters/IdempotencyKey")]
             res.update(errs("400", "422", "429"))
-            if path.endswith("/logo"):
+            if path.endswith("/logo") or path.endswith("/photo"):
                 op["requestBody"] = {"required": True, "content": {"multipart/form-data": {"schema": {
                     "type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary"}}}}}}
         if not public:
