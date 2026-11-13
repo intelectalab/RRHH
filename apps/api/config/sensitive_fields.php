@@ -21,6 +21,11 @@ return [
         'base_salary' => ['people.employments.salary.view', 'salary'],
         'components' => ['people.employments.salary.view', 'salary'],
     ],
+    'CompensationChange' => [
+        'base_salary' => ['people.employments.salary.view', 'salary'],
+        'components' => ['people.employments.salary.view', 'salary'],
+        'previous_salary' => ['people.employments.salary.view', 'salary'],
+    ],
     'CompensationCycle' => ['budget' => ['compensation.cycles.view', 'salary']],
     'CompensationProposal' => [
         'current' => ['compensation.proposals.view', 'salary'],

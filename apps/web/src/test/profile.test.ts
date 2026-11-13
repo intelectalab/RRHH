@@ -14,10 +14,12 @@ const t = (k: string, v: Record<string, string | number> = {}) => {
 describe('ficha 360 (COL-3)', () => {
   it('las pestañas aparecen solo con el módulo contratado y el permiso', () => {
     const all = () => true
-    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'dependents', 'social_security', 'payment'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'compensation', 'dependents', 'social_security', 'payment'])
     expect(visibleTabs(PROFILE_TABS, [], all)).toEqual([])
     // Sin permiso de ver la historia de asignaciones, esa pestaña no aparece.
-    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'dependents', 'social_security', 'payment'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'compensation', 'dependents', 'social_security', 'payment'])
+    // HIS-3: sin el permiso de campo de sueldo, la pestaña de compensación no aparece.
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.employments.salary.view').map((x) => x.id)).not.toContain('compensation')
     // COL-6: sin permiso de derechohabientes, esa pestaña tampoco aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.dependents.view').map((x) => x.id)).not.toContain('dependents')
   })

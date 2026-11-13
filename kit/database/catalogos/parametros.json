@@ -569,6 +569,19 @@
       "opciones": null
     },
     {
+      "codigo": "compensacion.cambio_requiere_aprobacion",
+      "modulo": "core",
+      "nombre": "Cambios de sueldo con aprobación",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "HIS-3 · Un cambio de sueldo o de componentes fijos pasa por el flujo de aprobación publicado para salary_change antes de registrarse; con falso se registra en el acto (siempre con motivo y auditoría).",
+      "opciones": null
+    },
+    {
       "codigo": "colaboradores.cese_bloquea_pendientes",
       "modulo": "core",
       "nombre": "Bloquear el cese con pendientes",

@@ -115,4 +115,18 @@ return [
         'same_approver' => 'Whoever records the account change cannot approve it.',
         'replaced' => 'Replaced by an account approved later.',
     ],
+    'compensation' => [
+        'employment_closed' => 'The employment is terminated or cancelled: its compensation no longer changes.',
+        'before_hire' => 'The effective date cannot be before the hire date.',
+        'after_termination' => 'The effective date cannot be after the termination date.',
+        'amount_positive' => 'The amount must be greater than zero.',
+        'invalid_concept' => 'The concept is not an available fixed component or is repeated.',
+        'pending_exists' => 'There is already a salary change awaiting approval for that date: wait for the decision or cancel it.',
+        'out_of_band_below' => 'The salary is below the salary band of the position.',
+        'out_of_band_above' => 'The salary is above the salary band of the position.',
+        'minimum_unverified' => 'There is no verified minimum wage for that date: check the amount before approving it.',
+        'below_minimum' => 'The monthly salary cannot be lower than the minimum wage in force (:amount).',
+        'below_minimum_part_time' => 'The salary is below the minimum wage; it is accepted because the contract is part-time.',
+        'invalid_filter' => 'The filter is not valid.',
+    ],
 ];

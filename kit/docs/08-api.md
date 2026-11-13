@@ -585,9 +585,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/employments/{employment_id}/assignments` | `people.assignments.{view,create}` | 1 |
 | GET | `/employments/{employment_id}/assignments/{id}` | `people.assignments.view` | 1 |
 | POST | `/employments/{employment_id}/assignments/{id}/cancel` | `people.assignments.cancel` | 1 |
-| GET, POST | `/employments/{employment_id}/compensations` | `people.compensations.{view,create}` | 1 |
+| GET | `/employments/{employment_id}/compensations` | `people.compensations.view` | 1 |
 | GET | `/employments/{employment_id}/compensations/{id}` | `people.compensations.view` | 1 |
-| POST | `/employments/{employment_id}/compensations/{id}/cancel` | `people.compensations.cancel` | 1 |
+| GET, POST | `/employments/{employment_id}/compensation-changes` | `people.compensations.{view,create}` | 1 |
+| GET | `/employments/{employment_id}/compensation-changes/{id}` | `people.compensations.view` | 1 |
+| POST | `/employments/{employment_id}/compensation-changes/{id}/cancel` | `people.compensations.cancel` | 1 |
+| GET | `/compensation-concepts` | `people.compensations.view` | 1 |
 | GET | `/employments/{employment_id}/timeline` | `people.employments.view` | 1 |
 
 **CON · Contratos y adendas**

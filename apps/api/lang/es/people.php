@@ -118,4 +118,18 @@ return [
         'same_approver' => 'Quien registra el cambio de cuenta no puede aprobarlo.',
         'replaced' => 'Reemplazada por una cuenta aprobada después.',
     ],
+    'compensation' => [
+        'employment_closed' => 'La relación laboral está cesada o anulada: su compensación ya no cambia.',
+        'before_hire' => 'La fecha efectiva no puede ser anterior a la fecha de ingreso.',
+        'after_termination' => 'La fecha efectiva no puede ser posterior a la fecha de cese.',
+        'amount_positive' => 'El monto debe ser mayor que cero.',
+        'invalid_concept' => 'El concepto no es un componente fijo disponible o está repetido.',
+        'pending_exists' => 'Ya hay un cambio de sueldo pendiente de aprobación con esa fecha: espera la decisión o cancélalo.',
+        'out_of_band_below' => 'El sueldo queda por debajo de la banda salarial de la posición.',
+        'out_of_band_above' => 'El sueldo queda por encima de la banda salarial de la posición.',
+        'minimum_unverified' => 'No hay una remuneración mínima verificada para esa fecha: revisa el monto antes de aprobarlo.',
+        'below_minimum' => 'El sueldo mensual no puede ser menor que la remuneración mínima vigente (:amount).',
+        'below_minimum_part_time' => 'El sueldo está por debajo de la remuneración mínima; se acepta porque el contrato es a tiempo parcial.',
+        'invalid_filter' => 'El filtro no es válido.',
+    ],
 ];

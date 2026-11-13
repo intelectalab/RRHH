@@ -2278,6 +2278,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/compensation-concepts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Conceptos fijos recurrentes del paquete de país que se pueden asignar como componentes de la compensación (HIS-3) */
+        get: operations["getCompensationConcepts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/compensation-cycles": {
         parameters: {
             query?: never;
@@ -4471,6 +4488,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{employment_id}/compensation-changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar CompensationChange */
+        get: operations["getEmploymentsEmploymentIdCompensationChanges"];
+        put?: never;
+        /** Crear CompensationChange */
+        post: operations["postEmploymentsEmploymentIdCompensationChanges"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/compensation-changes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver CompensationChange */
+        get: operations["getEmploymentsEmploymentIdCompensationChangesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/compensation-changes/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acción «cancel» sobre CompensationChange
+         * @description Transición explícita; valida la máquina de estados y deja auditoría.
+         */
+        post: operations["postEmploymentsEmploymentIdCompensationChangesIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{employment_id}/compensations": {
         parameters: {
             query?: never;
@@ -4481,8 +4553,7 @@ export interface paths {
         /** Listar Compensation */
         get: operations["getEmploymentsEmploymentIdCompensations"];
         put?: never;
-        /** Crear Compensation */
-        post: operations["postEmploymentsEmploymentIdCompensations"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4500,26 +4571,6 @@ export interface paths {
         get: operations["getEmploymentsEmploymentIdCompensationsId"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/employments/{employment_id}/compensations/{id}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acción «cancel» sobre Compensation
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postEmploymentsEmploymentIdCompensationsIdCancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -17229,19 +17280,79 @@ export interface components {
             id: string;
             base_salary?: components["schemas"]["Money"];
             /** @enum {string} */
-            pay_frequency: "monthly" | "biweekly" | "weekly";
+            pay_frequency: "monthly" | "biweekly" | "weekly" | "daily" | "hourly";
+            /** @enum {string} */
+            salary_basis: "monthly" | "daily" | "hourly";
+            is_integral_salary: boolean;
+            /** @enum {string|null} */
+            change_reason?: "hire" | "merit" | "promotion" | "adjustment" | "legal" | "review_cycle" | "correction" | null;
             components?: {
                 [key: string]: unknown;
-            } | null;
+            }[] | null;
             /** Format: date */
             valid_from: string;
             /** Format: date */
             valid_to?: string | null;
-            reason: string;
+            /** @description Identificador opaco */
+            personnel_action_id?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
+        };
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): base_salary, components, previous_salary */
+        CompensationChange: {
+            /** @description Identificador opaco */
+            id: string;
+            base_salary?: components["schemas"]["Money"];
+            /** @enum {string} */
+            pay_frequency: "monthly" | "biweekly" | "weekly" | "daily" | "hourly";
+            /** @enum {string|null} */
+            salary_basis?: "monthly" | "daily" | "hourly" | null;
+            is_integral_salary?: boolean | null;
+            components?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Format: date */
+            effective_on: string;
+            /** @enum {string} */
+            reason: "merit" | "promotion" | "adjustment" | "legal" | "review_cycle" | "correction";
+            notes?: string | null;
+            /** @enum {string} */
+            status: "pending_approval" | "applied" | "rejected" | "cancelled";
+            previous_salary?: components["schemas"]["Money"];
+            /** @enum {string|null} */
+            band_position?: "below" | "within" | "above" | "none" | null;
+            /** @description Identificador opaco */
+            compensation_id?: string | null;
+            /** @description Identificador opaco */
+            approval_request_id?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            decision_reason?: string | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        CompensationChangeInput: {
+            base_salary?: components["schemas"]["Money"];
+            /** @enum {string} */
+            pay_frequency?: "monthly" | "biweekly" | "weekly" | "daily" | "hourly";
+            /** @enum {string|null} */
+            salary_basis?: "monthly" | "daily" | "hourly" | null;
+            is_integral_salary?: boolean | null;
+            components?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Format: date */
+            effective_on?: string;
+            /** @enum {string} */
+            reason?: "merit" | "promotion" | "adjustment" | "legal" | "review_cycle" | "correction";
+            notes?: string | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): budget */
         CompensationCycle: {
@@ -17269,19 +17380,6 @@ export interface components {
             scope?: {
                 [key: string]: unknown;
             };
-        };
-        CompensationInput: {
-            base_salary?: components["schemas"]["Money"];
-            /** @enum {string} */
-            pay_frequency?: "monthly" | "biweekly" | "weekly";
-            components?: {
-                [key: string]: unknown;
-            } | null;
-            /** Format: date */
-            valid_from?: string;
-            /** Format: date */
-            valid_to?: string | null;
-            reason?: string;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): current, proposed */
         CompensationProposal: {
@@ -21709,8 +21807,6 @@ export interface components {
             ends_on?: string;
             days?: number;
             advance?: boolean;
-            /** @description Identificador opaco */
-            approval_request_id?: string | null;
         };
         WageTable: {
             /** @description Identificador opaco */
@@ -27590,6 +27686,28 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getCompensationConcepts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getCompensationCycles: {
         parameters: {
             query?: {
@@ -33462,6 +33580,159 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getEmploymentsEmploymentIdCompensationChanges: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompensationChange"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postEmploymentsEmploymentIdCompensationChanges: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompensationChangeInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompensationChange"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getEmploymentsEmploymentIdCompensationChangesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompensationChange"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postEmploymentsEmploymentIdCompensationChangesIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CompensationChange"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     getEmploymentsEmploymentIdCompensations: {
         parameters: {
             query?: {
@@ -33507,44 +33778,6 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
-    postEmploymentsEmploymentIdCompensations: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                employment_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CompensationInput"];
-            };
-        };
-        responses: {
-            /** @description Creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Compensation"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
     getEmploymentsEmploymentIdCompensationsId: {
         parameters: {
             query?: {
@@ -33576,43 +33809,6 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
-        };
-    };
-    postEmploymentsEmploymentIdCompensationsIdCancel: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                employment_id: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Compensation"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
         };
     };
     getEmploymentsEmploymentIdCostDistributions: {

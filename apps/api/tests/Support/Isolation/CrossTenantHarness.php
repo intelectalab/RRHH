@@ -4,6 +4,8 @@ namespace Tests\Support\Isolation;
 
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\CoreHR\Infrastructure\Models\BankAccount;
+use App\Modules\CoreHR\Infrastructure\Models\Compensation;
+use App\Modules\CoreHR\Infrastructure\Models\CompensationChange;
 use App\Modules\CoreHR\Infrastructure\Models\Dependent;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Modules\CoreHR\Infrastructure\Models\HealthProvider;
@@ -106,6 +108,12 @@ final class CrossTenantHarness
         '/insurance-policies/{id}' => InsurancePolicy::class,
         '/health-providers' => HealthProvider::class,
         // COL-8: cuentas de pago de una relación de A y sus acciones.
+        // HIS-3 · Compensación con vigencia y cambios de sueldo de una relación de A.
+        '/employments/{employment_id}/compensations' => Compensation::class,
+        '/employments/{employment_id}/compensations/{id}' => Compensation::class,
+        '/employments/{employment_id}/compensation-changes' => CompensationChange::class,
+        '/employments/{employment_id}/compensation-changes/{id}' => CompensationChange::class,
+        '/employments/{employment_id}/compensation-changes/{id}/cancel' => CompensationChange::class,
         '/employments/{employment_id}/bank-accounts' => BankAccount::class,
         '/employments/{employment_id}/bank-accounts/{id}/approve' => BankAccount::class,
         '/employments/{employment_id}/bank-accounts/{id}/reject' => BankAccount::class,

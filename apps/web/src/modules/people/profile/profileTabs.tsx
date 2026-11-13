@@ -3,6 +3,7 @@ import { BankAccountsSection } from '../BankAccountsSection'
 import { DependentsSection } from '../DependentsSection'
 import { InsuranceSection } from '../InsuranceSection'
 import { PensionHealthSection } from '../PensionHealthSection'
+import { CompensationTab } from './CompensationTab'
 import { HistoryTab } from './HistoryTab'
 import { InfoTab } from './InfoTab'
 import { SummaryTab } from './SummaryTab'
@@ -30,6 +31,8 @@ export const PROFILE_TABS: ProfileTabDef[] = [
   { id: 'summary', label: 'ficha.tab_summary', module: 'core', permission: null, render: (c) => <SummaryTab {...c} onHistory={() => c.goTo('history')} /> },
   { id: 'info', label: 'ficha.tab_info', module: 'core', permission: 'people.people.view', render: (c) => <InfoTab {...c} /> },
   { id: 'history', label: 'ficha.tab_history', module: 'core', permission: 'people.assignments.view', render: (c) => <HistoryTab {...c} /> },
+  // HIS-3: sueldo y componentes con vigencia (solo con el permiso de campo de sueldo).
+  { id: 'compensation', label: 'ficha.tab_compensation', module: 'core', permission: 'people.employments.salary.view', render: (c) => <CompensationTab {...c} /> },
   // COL-6 · COL-7 · COL-8: datos que consume la planilla.
   { id: 'dependents', label: 'ficha.tab_dependents', module: 'core', permission: 'people.dependents.view', render: (c) => <DependentsSection employmentId={c.header.id} personId={c.header.person_id} onToast={c.toast} /> },
   { id: 'social_security', label: 'ficha.tab_social_security', module: 'core', permission: 'people.employments.view', render: (c) => (

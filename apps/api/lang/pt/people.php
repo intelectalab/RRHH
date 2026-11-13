@@ -115,4 +115,18 @@ return [
         'same_approver' => 'Quem registra a alteração de conta não pode aprová-la.',
         'replaced' => 'Substituída por uma conta aprovada depois.',
     ],
+    'compensation' => [
+        'employment_closed' => 'O vínculo empregatício está encerrado ou anulado: sua remuneração não muda mais.',
+        'before_hire' => 'A data efetiva não pode ser anterior à data de admissão.',
+        'after_termination' => 'A data efetiva não pode ser posterior à data de desligamento.',
+        'amount_positive' => 'O valor deve ser maior que zero.',
+        'invalid_concept' => 'O conceito não é um componente fixo disponível ou está repetido.',
+        'pending_exists' => 'Já existe uma alteração salarial aguardando aprovação nessa data: aguarde a decisão ou cancele-a.',
+        'out_of_band_below' => 'O salário fica abaixo da faixa salarial da posição.',
+        'out_of_band_above' => 'O salário fica acima da faixa salarial da posição.',
+        'minimum_unverified' => 'Não há salário mínimo verificado para essa data: confira o valor antes de aprová-lo.',
+        'below_minimum' => 'O salário mensal não pode ser menor que o salário mínimo vigente (:amount).',
+        'below_minimum_part_time' => 'O salário está abaixo do mínimo; é aceito porque o contrato é de meio período.',
+        'invalid_filter' => 'O filtro não é válido.',
+    ],
 ];

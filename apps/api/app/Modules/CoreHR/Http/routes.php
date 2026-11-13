@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\CoreHR\Http\Controllers\BankAccountController;
+use App\Modules\CoreHR\Http\Controllers\CompensationController;
 use App\Modules\CoreHR\Http\Controllers\DependentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentProfileController;
@@ -99,4 +100,13 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post($emp.'/bank-accounts/{id}/approve', [BankAccountController::class, 'approve'])->middleware('permission:people.change_requests.approve');
     Route::post($emp.'/bank-accounts/{id}/reject', [BankAccountController::class, 'reject'])->middleware('permission:people.change_requests.approve');
     Route::post($emp.'/bank-accounts/{id}/cancel', [BankAccountController::class, 'cancel'])->middleware('permission:people.people.bank_account.edit');
+
+    // HIS-3 · Compensación con vigencia: historia (montos con permiso de campo) y cambios con motivo y aprobación.
+    Route::get($emp.'/compensations', [CompensationController::class, 'index'])->middleware('permission:people.compensations.view');
+    Route::get($emp.'/compensations/{id}', [CompensationController::class, 'show'])->middleware('permission:people.compensations.view');
+    Route::get($emp.'/compensation-changes', [CompensationController::class, 'changes'])->middleware('permission:people.compensations.view');
+    Route::post($emp.'/compensation-changes', [CompensationController::class, 'store'])->middleware('permission:people.compensations.create');
+    Route::get($emp.'/compensation-changes/{id}', [CompensationController::class, 'showChange'])->middleware('permission:people.compensations.view');
+    Route::post($emp.'/compensation-changes/{id}/cancel', [CompensationController::class, 'cancel'])->middleware('permission:people.compensations.cancel');
+    Route::get('/compensation-concepts', [CompensationController::class, 'concepts'])->middleware('permission:people.compensations.view');
 });

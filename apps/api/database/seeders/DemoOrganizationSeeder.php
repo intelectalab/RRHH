@@ -118,6 +118,14 @@ class DemoOrganizationSeeder extends Seeder
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
+            // HIS-3: un cambio de sueldo espera la aprobación del administrador de la empresa.
+            $companyAdmin = Role::query()->where('system_role_code', 'admin_empresa')->value('id');
+            if ($companyAdmin !== null && ! ApprovalFlow::query()->where('subject_type', 'salary_change')->exists()) {
+                $flow = $flows->create(['name' => 'Cambios de sueldo · aprobación estándar', 'subject_type' => 'salary_change', 'steps' => ['levels' => [
+                    ['name' => 'Administración de la empresa', 'mode' => 'parallel_any', 'sla_hours' => 48, 'approvers' => [['kind' => 'role', 'role_id' => (string) $companyAdmin]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
 
             $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
             if ($admin === null || Task::query()->exists()) {
