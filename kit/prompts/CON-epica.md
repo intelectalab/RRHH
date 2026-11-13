@@ -3,7 +3,7 @@
 Contratos por modalidad con vigencia, renovaciones, adendas, alertas de vencimiento y de tope acumulado.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 16.
+- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 25.
 - **Especificación:** `kit/docs/modulos/M-CON.md`.
 
 ## Prompt para una sesión nueva de Claude Code
