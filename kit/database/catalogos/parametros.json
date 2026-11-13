@@ -627,6 +627,19 @@
       ]
     },
     {
+      "codigo": "colaboradores.cuenta_bancaria_requiere_aprobacion",
+      "modulo": "core",
+      "nombre": "Cambio de cuenta de pago con aprobación",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.",
+      "opciones": null
+    },
+    {
       "codigo": "posiciones.factor_carga_pct",
       "modulo": "core",
       "nombre": "Cargas del empleador para el costo proyectado (%)",

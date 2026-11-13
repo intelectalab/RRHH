@@ -553,6 +553,30 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | DELETE | `/people/{id}/emergency-contacts/{contact_id}` | `people.people.update` | 1 |
 | GET | `/people/{id}/sensitive-data` | `people.people.view` | 1 |
 | PUT | `/people/{id}/sensitive-data` | `people.people.update` | 1 |
+| POST | `/employments/{employment_id}/dependents/{id}/deregister` | `people.dependents.update` | 1 |
+| GET | `/employments/{employment_id}/dependents/{id}/proof` | `people.dependents.view` | 1 |
+| POST | `/employments/{employment_id}/dependents/{id}/proof` | `people.dependents.update` | 1 |
+| GET | `/employments/{employment_id}/pension-affiliations` | `people.employments.view` | 1 |
+| POST | `/employments/{employment_id}/pension-affiliations` | `people.employments.update` | 1 |
+| GET | `/employments/{employment_id}/health-regimes` | `people.employments.view` | 1 |
+| POST | `/employments/{employment_id}/health-regimes` | `people.employments.update` | 1 |
+| GET | `/employments/{employment_id}/insurance-coverages` | `people.employments.view` | 1 |
+| POST | `/employments/{employment_id}/insurance-coverages` | `people.employments.update` | 1 |
+| POST | `/employments/{employment_id}/insurance-coverages/{id}/end` | `people.employments.update` | 1 |
+| GET | `/employments/{employment_id}/life-insurance-declarations` | `people.employments.view` | 1 |
+| POST | `/employments/{employment_id}/life-insurance-declarations` | `people.employments.update` | 1 |
+| GET | `/employments/{employment_id}/life-insurance-declarations/{id}/file` | `people.employments.view` | 1 |
+| GET | `/pension-funds` | `people.employments.view` | 1 |
+| GET | `/health-providers` | `people.employments.view` | 1 |
+| POST | `/health-providers` | `org.legal_entities.update` | 1 |
+| GET | `/insurance-policies` | `org.legal_entities.view` | 1 |
+| POST | `/insurance-policies` | `org.legal_entities.update` | 1 |
+| PATCH | `/insurance-policies/{id}` | `org.legal_entities.update` | 1 |
+| GET | `/employments/{employment_id}/bank-accounts` | `people.employments.view` | 1 |
+| POST | `/employments/{employment_id}/bank-accounts` | `people.people.bank_account.edit` | 1 |
+| POST | `/employments/{employment_id}/bank-accounts/{id}/approve` | `people.change_requests.approve` | 1 |
+| POST | `/employments/{employment_id}/bank-accounts/{id}/reject` | `people.change_requests.approve` | 1 |
+| POST | `/employments/{employment_id}/bank-accounts/{id}/cancel` | `people.people.bank_account.edit` | 1 |
 
 **HIS · Historia con vigencia**
 

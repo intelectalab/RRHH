@@ -259,6 +259,8 @@ def seeds():
     o.append(',\n'.join(f"  ((SELECT id FROM addons WHERE code = {q(k)}), {q(m)})" for k, n, pr, mods in C.ADDONS for m in mods) + ';')
     o.append('INSERT INTO labor_regimes (code, country_code, name, kind) VALUES')
     o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)})" for c, n, k in C.REGIMES_PE) + ';')
+    o.append('INSERT INTO pension_funds (code, country_code, name, kind, status) VALUES')  # COL-7
+    o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)}, 'active')" for c, n, k in C.PENSION_FUNDS_PE) + ';')
     o.append('INSERT INTO system_roles (code, name, description, realm, mfa_required_default) VALUES')
     o.append(',\n'.join(f"  ({q(c)}, {q(n)}, {q(d)}, {q(r)}, {str(c in C.MFA_REQUIRED_ROLES).lower()})" for c, n, r, d, _, _ in C.ROLES) + ';')
     perms = C.permissions()

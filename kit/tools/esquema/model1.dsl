@@ -405,9 +405,11 @@
   is_current bool=t
 @emergency_contacts soft | Contactos de emergencia.
   person_id -> people ; full_name text! #S ; relationship ; phone_enc text! ; sort_order
-@person_bank_accounts soft lock sens | Cuentas de la persona para pago de haberes y depósito de CTS.
-  person_id -> people ; purpose enum(salary,cts,other)! ; bank_code text! ; account_type enum(savings,checking,wallet)!
+@person_bank_accounts soft lock sens | Cuentas de pago de haberes y depósito de CTS por relación laboral y finalidad, con vigencia (COL-8). Un cambio queda pendiente hasta que otra persona lo aprueba (RN-COL-11); la exclusión solo rige entre cuentas activas.
+  person_id -> people ; employment_id -> employments ; purpose enum(salary,cts,other)! ; bank_code text! ; account_type enum(savings,checking,wallet)!
   account_number_enc text! ; interbank_code_enc ; currency cur ; is_active bool=t ; verified_at
+  status enum(pending_approval,active,rejected,cancelled)=pending_approval ; requested_by_user_id ?-> users ; decided_by_user_id ?-> users
+  decided_at ts ; decision_reason ; vig employment_id, purpose | status = 'active'
 @person_education | Formación académica.
   person_id -> people ; level enum(primary,secondary,technical,university,postgraduate,other)! ; institution ; degree ; field
   started_on ; finished_on ; is_completed ; file_id ?-> stored_files
@@ -420,6 +422,7 @@
   person_id -> people ; full_name text! #S ; relationship enum(spouse,partner,pregnant_partner,child,disabled_adult_child,parent,other)! ; doc_type ; number_enc
   number_hash ; birth_date date #S ; is_student ; disability_enc ; registered_on ; deregistered_on ; deregistration_reason
   registry_status enum(pending,registered,deregistered)=pending ; entitles_family_allowance ; proof_file_id ?-> stored_files
+  majority_alerted_on date
 @employments main soft lock | Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí. work_email, work_phone y work_phone_ext son el contacto laboral que el directorio puede publicar (ORG-7 · RN-ORG-08); nunca el correo o celular personal.
   person_id -> people ; legal_entity_id -> legal_entities ; employee_code text! ; kind enum(employee,intern,apprentice)=employee
   worker_category enum(executive,employee,worker)=employee ; hire_date date! ; seniority_date date ; termination_date date
@@ -456,7 +459,7 @@
   notes ; vig employment_id, payroll_concept_id
 @employment_labor_regimes lock | Régimen laboral y de salud del trabajador con vigencia (C-05).
   employment_id -> employments ; labor_regime_code ~> labor_regimes.code ; health_scheme enum(essalud,eps,sis,other)=essalud
-  health_provider_id ?-> health_providers ; has_risk_insurance ; has_family_allowance
+  health_provider_id ?-> health_providers ; health_plan_code ; has_risk_insurance ; has_family_allowance
   personnel_action_id ?-> personnel_actions ; vig employment_id
 @employment_pension_affiliations lock | Afiliación previsional del trabajador con vigencia (sistema, administradora, tipo de comisión).
   employment_id -> employments ; pension_system enum(afp,onp,none,other)! ; pension_fund_code ?~> pension_funds.code

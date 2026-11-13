@@ -57,7 +57,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 
 ## 2. Con valor, pero con fecha de inicio no verificada
 
-102 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
+103 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
 
 | Código | Parámetro | Régimen | Valor | Vigente desde | Base legal citada |
 |---|---|---|---|---|---|
@@ -114,6 +114,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `indemnizacion_tope_dias` | Indemnización por despido: tope en remuneraciones diarias | Pequeña empresa | 120 | 2025-01-01 | DS 013-2013-PRODUCE; guía MTPE |
 | `indemnizacion_tope_dias` | Indemnización por despido: tope en remuneraciones diarias | Todos | 360 | 2025-01-01 | DS 003-97-TR art. 38 |
 | `indemnizacion_vacacional_aplica` | Corresponde indemnización por vacaciones no gozadas en el año siguiente | Todos | 1 | 2025-01-01 | DL 713 art. 23 |
+| `mayoria_edad_anios` | Edad en que un hijo derechohabiente pasa a revisión | Todos | 18 | 2026-01-01 | Código Civil, art. 42 |
 | `mype_anios_consecutivos_exceso` | Años consecutivos de exceso de ventas que inician la permanencia | Todos | 2 | 2026-01-01 | DS 013-2013-PRODUCE art. 42; guía MTPE |
 | `mype_permanencia_anios` | Permanencia en el régimen tras superar el tope de ventas | Microempresa | 1 | 2026-01-01 | DS 013-2013-PRODUCE art. 42; guía MTPE |
 | `mype_permanencia_anios` | Permanencia en el régimen tras superar el tope de ventas | Pequeña empresa | 3 | 2026-01-01 | DS 013-2013-PRODUCE art. 42; guía MTPE |

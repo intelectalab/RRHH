@@ -4,6 +4,7 @@ namespace App\Modules\CoreHR;
 
 use App\Modules\CoreHR\Console\ActivateDueEmployments;
 use App\Modules\CoreHR\Console\ApplyDueTerminations;
+use App\Modules\CoreHR\Console\ReviewDependentsMajority;
 use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Shared\Exports\ExportRegistry;
@@ -25,12 +26,14 @@ final class CoreHRServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ActivateDueEmployments::class, ApplyDueTerminations::class]);
+            $this->commands([ActivateDueEmployments::class, ApplyDueTerminations::class, ReviewDependentsMajority::class]);
             $this->app->booted(function (): void {
                 // RN-COL-04 · Los ingresos de hoy se activan al empezar el día, después de los cambios de estructura.
                 $this->app->make(Schedule::class)->command('employments:activate-due')->dailyAt('00:15')->withoutOverlapping();
                 // COL-11 · Los ceses de hoy rigen antes de que se recalcule la ocupación de las posiciones (00:20).
                 $this->app->make(Schedule::class)->command('employments:apply-terminations')->dailyAt('00:10')->withoutOverlapping();
+                // COL-6 · Hijos que cumplen la mayoría de edad: aviso de revisión a RRHH.
+                $this->app->make(Schedule::class)->command('dependents:review-majority')->dailyAt('06:10')->withoutOverlapping();
             });
         }
     }

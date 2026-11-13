@@ -32,6 +32,11 @@ return [
         'notifications.email_bounced' => ['variables' => ['user', 'reason'], 'link' => '/configuracion/mensajes?vista=entregas&estado=bounced', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // SAS-6 · RN-SAS-02 · RN-SAS-03: el consumo se acerca al tope del plan o llega a él.
         'limits.warning' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // COL-6: un hijo derechohabiente cumplió la mayoría de edad; RRHH lo revisa en la ficha.
+        'people.dependent_majority' => ['variables' => ['employee'], 'link' => '/personas/colaboradores/{employment_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // COL-8 · RN-COL-11: se registró o cambió la cuenta de pago del titular (solo los últimos dígitos).
+        'people.bank_account_requested' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        'people.bank_account_changed' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 
@@ -46,6 +51,9 @@ return [
         'identity.activation_code' => ['variables' => ['code', 'hours']],
         // RN-NOT-07: aviso corto a quien no tiene correo (título y enlace, sin datos sensibles).
         'notifications.notice' => ['variables' => ['title']],
+        // COL-8 · RN-COL-11: aviso al celular del titular por un canal distinto al de la solicitud.
+        'people.bank_account_requested' => ['variables' => ['last4']],
+        'people.bank_account_changed' => ['variables' => ['last4']],
     ],
 
     // Variables comunes disponibles en todas las plantillas.

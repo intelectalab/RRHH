@@ -72,4 +72,50 @@ return [
     'change_request_open' => 'Ya tienes una solicitud de cambio pendiente: espera la respuesta de RRHH o cancélala.',
     'change_request_own_only' => 'Solo puedes proponer cambios de tus propios datos. RRHH edita los datos desde la ficha.',
     'change_request_self_approval' => 'No puedes revisar una solicitud que hiciste tú.',
+    'before_hire' => 'La fecha no puede ser anterior al ingreso.',
+    // COL-6 · Derechohabientes.
+    'dependents' => [
+        'child_birth_date' => 'Un hijo exige su fecha de nacimiento.',
+        'duplicated' => 'Esta persona ya tiene un derechohabiente con ese documento.',
+        'relationship_locked' => 'El vínculo no se cambia: da de baja al derechohabiente y regístralo otra vez.',
+        'deregistered_locked' => 'El derechohabiente está de baja: ya no se modifica.',
+        'deregistered_before_registered' => 'La baja no puede ser anterior al alta.',
+        'proof_type' => 'Sube el sustento en PDF, JPG o PNG.',
+        'health_forbidden' => 'No tienes permiso para registrar datos de salud.',
+        'majority_reviewed' => 'Hijos que pasan a revisión por mayoría de edad: :count.',
+    ],
+    // COL-7 · Previsión, salud y seguros.
+    'pension' => [
+        'fund_required' => 'Elige una administradora válida para ese sistema.',
+        'scheme_required' => 'Indica el tipo de comisión de la AFP (sobre el flujo o mixta).',
+        'scheme_only_afp' => 'El tipo de comisión solo aplica a una AFP.',
+        'fund_not_applicable' => 'Ese sistema no lleva administradora.',
+        'affiliate_only_afp' => 'El código de afiliado (CUSPP) solo aplica a una AFP.',
+    ],
+    'health' => [
+        'provider_required' => 'Elige la EPS con la que trabaja la organización.',
+        'plan_required' => 'Indica el plan de la EPS.',
+        'provider_only_eps' => 'La entidad y el plan solo aplican a una EPS.',
+        'provider_exists' => 'Ya existe una entidad con ese código.',
+    ],
+    'insurance' => [
+        'policy_other_entity' => 'La póliza es de otra empresa.',
+        'policy_inactive' => 'La póliza no está vigente.',
+        'outside_policy' => 'La fecha está fuera de la vigencia de la póliza.',
+        'already_covered' => 'El trabajador ya está cubierto por esa póliza en esa fecha.',
+        'end_before_start' => 'La cobertura no puede terminar antes de empezar.',
+        'percentages_total' => 'Los porcentajes de los beneficiarios deben sumar 100 %.',
+    ],
+    // COL-8 · Cuentas de pago.
+    'payments' => [
+        'forbidden' => 'No tienes permiso para ver las cuentas de pago.',
+        'invalid_account_number' => 'El número de cuenta no tiene un formato válido (por ejemplo, :example).',
+        'invalid_interbank_code' => 'El código interbancario debe tener 20 dígitos (por ejemplo, :example).',
+        'invalid_affiliate_code' => 'El código de afiliado no tiene un formato válido (por ejemplo, :example).',
+        'interbank_check_digits' => 'Los dígitos de control del código interbancario no cuadran.',
+        'bank_unknown' => 'Elige un banco del catálogo.',
+        'pending_exists' => 'Ya hay un cambio de cuenta pendiente para esa finalidad: apruébalo, recházalo o cancélalo primero.',
+        'same_approver' => 'Quien registra el cambio de cuenta no puede aprobarlo.',
+        'replaced' => 'Reemplazada por una cuenta aprobada después.',
+    ],
 ];

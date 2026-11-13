@@ -97,7 +97,7 @@ RES = [
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
     ("COL", 1, "people.people", "/people", "Person", "first_names:s paternal_surname:s maternal_surname?:s preferred_name?:s full_name?:s document_type:e(dni|ce|passport|ptp|cpp|other) document_country?:s document_number!?:s document_number_masked?:s birth_date!?:d sex!?:e(female|male|unspecified) nationality_code?:s marital_status!?:e(single|married|cohabiting|divorced|widowed) personal_email!?:s mobile_phone!?:s employments?:ao version?:i", "LCRU", "merge"),
     ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id person_name?:s document_number_masked?:s legal_entity_id:id legal_entity_name?:s employee_code:s kind:e(employee|intern|apprentice) worker_category:e(executive|employee|worker) hire_date:d seniority_date?:d probation_ends_on?:d termination_date?:d status:e(pending|active|suspended|terminating|terminated|cancelled) rehire_of_employment_id?:id work_email?:s work_phone?:s work_phone_ext?:s job_profile_id?:id job_profile_name?:s position_id?:id position_title?:s org_unit_id?:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality?:e(onsite|remote|hybrid) labor_regime_code?:s contract_type_id?:id contract_end_date?:d base_salary!?:m termination?:j other_employments?:ao allowed_actions?:a version?:i", "LCRU", "activate suspend terminate cancel-termination"),
-    ("COL", 1, "people.dependents", "/employments/{employment_id}/dependents", "Dependent", "first_name:s last_name:s relationship:s document_number?:s birth_date?:d valid_from:d valid_to?:d", "LCRUD", ""),
+    ("COL", 1, "people.dependents", "/employments/{employment_id}/dependents", "Dependent", "person_id?:id full_name:s relationship:e(spouse|partner|pregnant_partner|child|disabled_adult_child|parent|other) document_type?:e(dni|ce|passport|ptp|cpp|other) document_number!?:s document_number_masked?:s birth_date!?:d is_student?:b has_disability!?:b registered_on?:d deregistered_on?:d deregistration_reason?:s registry_status:e(pending|registered|deregistered) entitles_family_allowance:b has_proof:b missing_proof:b majority_alerted_on?:d version?:i", "LCRUD", ""),
     ("HIS", 1, "people.assignments", "/employments/{employment_id}/assignments", "Assignment", "job_profile_id:id job_profile_name?:s position_id?:id position_title?:s org_unit_id:id org_unit_name?:s site_id:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality:e(onsite|remote|hybrid) valid_from:d valid_to?:d reason?:s kind?:e(hire|promotion|transfer|manager_change|cost_center_change|data_correction) personnel_action_id?:id", "LCR", "cancel"),
     ("HIS", 1, "people.compensations", "/employments/{employment_id}/compensations", "Compensation", "base_salary!:m pay_frequency:e(monthly|biweekly|weekly) components!?:j valid_from:d valid_to?:d reason:s", "LCR", "cancel"),
     ("CON", 1, "contracts.contract_types", "/contract-types", "ContractType", "code:s name:s country_code?:s category:e(indefinite|fixed_term|part_time|internship|other) modality_code?:s requires_end_date:b requires_objective_cause:b max_duration_parameter_code?:s trial_period_parameter_code?:s document_template_id?:id is_system:b max_duration?:j trial_period?:j", "LCRU", ""),
@@ -263,6 +263,33 @@ EXTRA = [
     ("COL", 1, "delete", "/people/{id}/emergency-contacts/{contact_id}", "people.people.update", "Eliminar un contacto de emergencia (exige people.people.personal_data.edit)", False),
     ("COL", 1, "get", "/people/{id}/sensitive-data", "people.people.view", "Condición de discapacidad y grupo sanguíneo con su consentimiento (exige people.people.health_data.view; cada lectura queda registrada)", False),
     ("COL", 1, "put", "/people/{id}/sensitive-data", "people.people.update", "Registrar la condición de discapacidad o el grupo sanguíneo; la discapacidad exige consentimiento expreso (RN-COL-08) y los permisos health_data.view y personal_data.edit", False),
+    # COL-6 · Derechohabientes: baja con fecha y motivo (no se borran) y documento de sustento.
+    ("COL", 1, "post", "/employments/{employment_id}/dependents/{id}/deregister", "people.dependents.update", "Dar de baja a un derechohabiente con fecha y motivo (registro laboral y seguros); queda en la historia", False),
+    ("COL", 1, "get", "/employments/{employment_id}/dependents/{id}/proof", "people.dependents.view", "Descargar el documento de sustento del derechohabiente (se registra la descarga)", False),
+    ("COL", 1, "post", "/employments/{employment_id}/dependents/{id}/proof", "people.dependents.update", "Subir o reemplazar el documento de sustento (multipart, campo file; PDF, JPG o PNG). Con sustento, un hijo cuenta para la asignación familiar (RN-COL-07)", False),
+    # COL-7 · Régimen pensionario, salud y seguros del trabajador (con vigencia).
+    ("COL", 1, "get", "/employments/{employment_id}/pension-affiliations", "people.employments.view", "Historia de la afiliación previsional (sistema, administradora, tipo de comisión) con vigencia; el código de afiliado solo con permiso de datos personales", False),
+    ("COL", 1, "post", "/employments/{employment_id}/pension-affiliations", "people.employments.update", "Registrar un cambio de AFP, de tipo de comisión o de sistema desde una fecha efectiva: cierra la afiliación vigente el día anterior", False),
+    ("COL", 1, "get", "/employments/{employment_id}/health-regimes", "people.employments.view", "Historia del régimen de salud (EsSalud, EPS con plan, SIS) con vigencia", False),
+    ("COL", 1, "post", "/employments/{employment_id}/health-regimes", "people.employments.update", "Registrar un cambio del régimen de salud desde una fecha efectiva (EPS exige entidad y plan)", False),
+    ("COL", 1, "get", "/employments/{employment_id}/insurance-coverages", "people.employments.view", "Coberturas del trabajador en las pólizas del empleador (Vida Ley, SCTR salud y pensión, plan de salud)", False),
+    ("COL", 1, "post", "/employments/{employment_id}/insurance-coverages", "people.employments.update", "Incluir al trabajador en una póliza de su empresa desde una fecha", False),
+    ("COL", 1, "post", "/employments/{employment_id}/insurance-coverages/{id}/end", "people.employments.update", "Terminar la cobertura del trabajador en una póliza (fecha de fin)", False),
+    ("COL", 1, "get", "/employments/{employment_id}/life-insurance-declarations", "people.employments.view", "Declaraciones de beneficiarios de Vida Ley, la vigente primero; los beneficiarios solo con permiso de datos personales", False),
+    ("COL", 1, "post", "/employments/{employment_id}/life-insurance-declarations", "people.employments.update", "Archivar una declaración firmada de beneficiarios de Vida Ley (multipart: beneficiaries en JSON que suman 100 %, signed_on y file); la anterior queda reemplazada", False),
+    ("COL", 1, "get", "/employments/{employment_id}/life-insurance-declarations/{id}/file", "people.employments.view", "Descargar la declaración firmada (exige además permiso de datos personales; se registra la descarga)", False),
+    ("COL", 1, "get", "/pension-funds", "people.employments.view", "Administradoras y sistemas de pensiones del país (?country=PE)", False),
+    ("COL", 1, "get", "/health-providers", "people.employments.view", "Entidades de salud y aseguradoras con las que trabaja la organización", False),
+    ("COL", 1, "post", "/health-providers", "org.legal_entities.update", "Registrar una EPS o aseguradora de la organización", False),
+    ("COL", 1, "get", "/insurance-policies", "org.legal_entities.view", "Pólizas del empleador por empresa (Vida Ley, SCTR, plan de salud), con el alcance de empresa del usuario", False),
+    ("COL", 1, "post", "/insurance-policies", "org.legal_entities.update", "Registrar una póliza del empleador para una empresa", False),
+    ("COL", 1, "patch", "/insurance-policies/{id}", "org.legal_entities.update", "Actualizar una póliza (aseguradora, número, fin, estado)", False),
+    # COL-8 · Cuentas de pago con vigencia y aprobación de cuatro ojos (RN-COL-11).
+    ("COL", 1, "get", "/employments/{employment_id}/bank-accounts", "people.employments.view", "Cuentas de pago (haberes, CTS) con vigencia y estado; el número y el CCI completos solo con people.people.bank_account.view", False),
+    ("COL", 1, "post", "/employments/{employment_id}/bank-accounts", "people.people.bank_account.edit", "Registrar una cuenta nueva o el cambio de la vigente: queda pendiente de aprobación y se avisa al titular por un canal distinto", False),
+    ("COL", 1, "post", "/employments/{employment_id}/bank-accounts/{id}/approve", "people.change_requests.approve", "Aprobar el cambio de cuenta (otra persona que quien lo registró): cierra la cuenta anterior y rige desde su fecha", False),
+    ("COL", 1, "post", "/employments/{employment_id}/bank-accounts/{id}/reject", "people.change_requests.approve", "Rechazar el cambio de cuenta con motivo", False),
+    ("COL", 1, "post", "/employments/{employment_id}/bank-accounts/{id}/cancel", "people.people.bank_account.edit", "Cancelar un cambio de cuenta pendiente con motivo", False),
     ("SEG", 0, "post", "/auth/login", None, "Iniciar sesión (correo o documento de identidad + clave)", True),
     ("SEG", 0, "post", "/auth/password/forgot", None, "Solicitar el enlace de recuperación de clave (misma respuesta exista o no el correo)", True),
     ("SEG", 0, "post", "/auth/password/reset", None, "Restablecer la clave con el enlace de un solo uso", True),
@@ -485,7 +512,7 @@ TYPES = {
 }
 # Operaciones de EXTRA que crean un registro: responden 201 en lugar de 200.
 # Rutas extra que son transiciones de estado (responden 409 invalid_transition).
-STATE_ACTIONS = {("post", "/employments/{id}/cancel"), ("post", "/notification-templates/{id}/request-approval"), ("post", "/platform/tenants/{id}/activate"), ("post", "/platform/tenants/{id}/block"),
+STATE_ACTIONS = {("post", "/employments/{id}/cancel"), ("post", "/employments/{employment_id}/dependents/{id}/deregister"), ("post", "/employments/{employment_id}/insurance-coverages/{id}/end"), ("post", "/employments/{employment_id}/bank-accounts/{id}/approve"), ("post", "/employments/{employment_id}/bank-accounts/{id}/reject"), ("post", "/employments/{employment_id}/bank-accounts/{id}/cancel"), ("post", "/notification-templates/{id}/request-approval"), ("post", "/platform/tenants/{id}/activate"), ("post", "/platform/tenants/{id}/block"),
                  ("post", "/platform/tenants/{id}/modules/{code}/activate"), ("post", "/platform/tenants/{id}/modules/{code}/deactivate"),
                  ("post", "/cost-centers/{id}/close"), ("post", "/cost-centers/{id}/reopen"),
                  ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce"),
@@ -494,8 +521,8 @@ STATE_ACTIONS = {("post", "/employments/{id}/cancel"), ("post", "/notification-t
                  ("post", "/platform/feature-flags/{id}/archive"), ("post", "/platform/feature-flags/{id}/restore"),
                  ("post", "/position-requests/{id}/submit"), ("post", "/position-requests/{id}/cancel")}
 # Rutas extra que responden 409 por conflicto de vigencia (otro registro ya ocupa ese periodo).
-CONFLICTS = {("post", "/headcount-budgets"), ("patch", "/headcount-budgets/{id}")}
-CREATED = {("post", "/people/{id}/addresses"), ("post", "/people/{id}/emergency-contacts"), ("post", "/position-requests"), ("post", "/headcount-budgets"), ("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
+CONFLICTS = {("post", "/headcount-budgets"), ("patch", "/headcount-budgets/{id}"), ("post", "/employments/{employment_id}/pension-affiliations"), ("post", "/employments/{employment_id}/health-regimes"), ("post", "/employments/{employment_id}/insurance-coverages"), ("post", "/employments/{employment_id}/bank-accounts"), ("post", "/health-providers")}
+CREATED = {("post", "/people/{id}/addresses"), ("post", "/people/{id}/emergency-contacts"), ("post", "/position-requests"), ("post", "/headcount-budgets"), ("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions"), ("post", "/employments/{employment_id}/pension-affiliations"), ("post", "/employments/{employment_id}/health-regimes"), ("post", "/employments/{employment_id}/insurance-coverages"), ("post", "/employments/{employment_id}/life-insurance-declarations"), ("post", "/employments/{employment_id}/bank-accounts"), ("post", "/health-providers"), ("post", "/insurance-policies")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
@@ -581,7 +608,7 @@ INPUT_EXTRA = {
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "applied_fields", "pending_fields", "requested_by_name", "requested_by_user_id", "reviewed_at", "personnel_action_id", "termination", "other_employments", "full_name", "employments", "person_name", "position_title", "manager_name", "position_request_id", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "registry_status", "deregistered_on", "deregistration_reason", "entitles_family_allowance", "has_proof", "missing_proof", "majority_alerted_on", "applied_fields", "pending_fields", "requested_by_name", "requested_by_user_id", "reviewed_at", "personnel_action_id", "termination", "other_employments", "full_name", "employments", "person_name", "position_title", "manager_name", "position_request_id", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):
@@ -695,7 +722,7 @@ def build():
                 "parameters": [ref("parameters/Page"), ref("parameters/PerPage"), ref("parameters/Cursor"),
                                ref("parameters/Sort"), ref("parameters/Filter"), ref("parameters/Q"),
                                ref("parameters/AsOf"), ref("parameters/Fields")],
-                "responses": {"200": ok(many(name)), **errs("400", "401", "403", "429")},
+                "responses": {"200": ok(many(name)), **errs("400", "401", "403", "429", *(("404",) if "{" in path else ()))},
             }, epic, phase, perm + ".view")
             crud_c.append("GET")
         if "C" in ops:
@@ -703,7 +730,7 @@ def build():
                 "summary": f"Crear {label}",
                 "parameters": [ref("parameters/IdempotencyKey")],
                 "requestBody": body(ref(f"schemas/{name}Input")),
-                "responses": {"201": ok(one(name), "Creado"), **errs("400", "401", "403", "409", "422", "429")},
+                "responses": {"201": ok(one(name), "Creado"), **errs("400", "401", "403", "409", "422", "429", *(("404",) if "{" in path else ()))},
             }, epic, phase, perm + ".create")
             crud_c.append("POST")
         if "R" in ops:
@@ -758,6 +785,8 @@ def build():
             # Descarga directa del archivo (no es JSON).
             res["200"] = {"description": "Archivo", "content": {"text/csv": {"schema": {"type": "string"}}}}
             res.update(errs("409"))
+        if method == "get" and (path.endswith("/proof") or path.endswith("/file")):
+            res["200"] = {"description": "Archivo", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("application/pdf", "image/png", "image/jpeg")}}
         if (path.endswith("/logo") or path.endswith("/photo")) and method == "get":
             res["200"] = {"description": "Imagen", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("image/png", "image/jpeg", "image/webp")}}
         if (method, path) in QUERY:
@@ -771,6 +800,15 @@ def build():
             if path.endswith("/logo") or path.endswith("/photo"):
                 op["requestBody"] = {"required": True, "content": {"multipart/form-data": {"schema": {
                     "type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary"}}}}}}
+            if path.endswith("/proof"):
+                op["requestBody"] = {"required": True, "content": {"multipart/form-data": {"schema": {
+                    "type": "object", "required": ["file"], "properties": {"file": {"type": "string", "format": "binary"}}}}}}
+            if path.endswith("/life-insurance-declarations"):
+                op["requestBody"] = {"required": True, "content": {"multipart/form-data": {"schema": {
+                    "type": "object", "required": ["beneficiaries", "signed_on", "file"], "properties": {
+                        "beneficiaries": {"type": "string", "description": "JSON: [{full_name, document_number?, relationship, percentage}] que suman 100"},
+                        "signed_on": {"type": "string", "format": "date"},
+                        "file": {"type": "string", "format": "binary"}}}}}}
         if not public:
             res.update(errs("401", "403"))
         elif path.startswith("/webhooks/"):

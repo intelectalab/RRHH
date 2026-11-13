@@ -206,6 +206,7 @@ PARAMS = [
  ('colaboradores.cese_bloquea_pendientes', 'core', 'Bloquear el cese con pendientes', 'boolean', False, [O, E], 'Si el cese se registra con activos sin devolver, préstamos o adelantos con saldo o vacaciones aprobadas posteriores a la fecha de cese, se rechaza en lugar de solo advertir (RN-COL-10).', None),
  ('colaboradores.relaciones_simultaneas', 'core', 'Relaciones simultáneas en empresas del grupo', 'boolean', True, [O], 'Permite que una persona tenga a la vez relaciones laborales abiertas con distintas empresas de la organización (COL-10). Con la misma empresa nunca se permite (RN-COL-02).', None),
  ('colaboradores.campos_requieren_aprobacion', 'core', 'Datos que el colaborador cambia con aprobación', 'list', ['first_names', 'paternal_surname', 'maternal_surname', 'birth_date', 'sex', 'marital_status', 'nationality_code', 'address'], [O], 'RN-COL-06 · Datos personales que, propuestos por el propio colaborador, esperan a RRHH; los demás (nombre preferido, correo y celular personales) se aplican en el acto.', ['first_names', 'paternal_surname', 'maternal_surname', 'preferred_name', 'birth_date', 'sex', 'marital_status', 'nationality_code', 'personal_email', 'mobile_phone', 'address']),
+ ('colaboradores.cuenta_bancaria_requiere_aprobacion', 'core', 'Cambio de cuenta de pago con aprobación', 'boolean', True, [O, E], 'COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.', None),
  ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'decimal', 0, [O, E], 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', {'min': 0, 'max': 200}),
  ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'boolean', False, [O, E], 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', None),
  ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'list', [60, 30, 15], [O, E], 'Días de anticipación con que se avisa el vencimiento.', None),
@@ -287,6 +288,7 @@ LEGAL_PE = [
  lp('asignacion_familiar_aplica', 'Corresponde asignación familiar', 'count', 0, True, 'DS 013-2013-PRODUCE', 'Fuente secundaria; confirmar con el especialista.', regime='pe_pequena'),
  lp('dias_base_mes', 'Días de la base mensual para prorratear y calcular truncos', 'days', 30, True, 'DS 001-97-TR', 'Remuneración diaria = mensual ÷ 30; el mes completo cuenta 30 días. Confirmar con el especialista.'),
  lp('onp_aporte_pct', 'Aporte al sistema nacional de pensiones', 'percent', 13, True, 'Fuentes secundarias 2026'),
+ lp('mayoria_edad_anios', 'Edad en que un hijo derechohabiente pasa a revisión', 'count', 18, True, 'Código Civil, art. 42', 'COL-6: al cumplirla, RRHH revisa si el hijo sigue como derechohabiente (estudios o incapacidad) y su efecto en la asignación familiar.'),
  lp('afp_aporte_obligatorio_pct', 'Aporte obligatorio al fondo (AFP)', 'percent', 10, True, 'Fuentes secundarias 2026'),
  lp('afp_comision_flujo_pct', 'Comisión sobre flujo por AFP', 'percent', None, False, 'SBS', 'Varía por AFP; cargar en pension_fund_rates cada periodo.'),
  lp('afp_comision_mixta_pct', 'Comisión mixta por AFP', 'percent', None, False, 'SBS', 'Varía por AFP; cargar en pension_fund_rates cada periodo.'),
@@ -456,6 +458,14 @@ LEGAL_PE = [
  lp('sunafil_pas_informe_final_dias_habiles', 'Procedimiento sancionador: descargos al informe final', 'business_days', None, False, 'DS 019-2006-TR', 'Por confirmar.'),
  lp('sunafil_pas_apelacion_dias_habiles', 'Procedimiento sancionador: apelación', 'business_days', None, False, 'DS 019-2006-TR', 'Por confirmar.'),
  lp('sunafil_actuaciones_dias_habiles', 'Duración de las actuaciones inspectivas', 'business_days', None, False, 'Ley 28806', 'Por confirmar.'),
+]
+
+# COL-7 · Sistemas y administradoras de pensiones del Perú (pension_funds). Los códigos oficiales
+# (T-Registro, AFPnet) quedan vacíos hasta validarlos con la fuente; las tasas viven en pension_fund_rates.
+PENSION_FUNDS_PE = [
+ ('pe_onp', 'Oficina de Normalización Previsional (ONP)', 'public'),
+ ('pe_afp_habitat', 'AFP Habitat', 'private'), ('pe_afp_integra', 'AFP Integra', 'private'),
+ ('pe_afp_prima', 'Prima AFP', 'private'), ('pe_afp_profuturo', 'Profuturo AFP', 'private'),
 ]
 
 REGIMES_PE = [
