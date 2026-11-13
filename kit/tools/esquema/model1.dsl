@@ -368,7 +368,7 @@
   status enum(proposed,approved,open,filled,frozen,closed,recruiting)=proposed ; is_critical ; fte numeric(4,2)=1
   is_shared ; seats smallint=1 ; valid_from date=today ; valid_to date
   budgeted_from date ; budgeted_to date ; budgeted_cost money #S ; currency cur?
-  headcount_plan_line_id ?-> headcount_plan_lines ; uniq code
+  headcount_plan_line_id ?-> headcount_plan_lines ; position_request_id ?-> position_requests ; uniq code
   check seats >= 1 AND (is_shared OR seats = 1)
   check valid_to IS NULL OR valid_to >= valid_from
   check reports_to_position_id IS NULL OR reports_to_position_id <> id
@@ -381,11 +381,16 @@
 @headcount_plan_lines | Dotación planificada por unidad y puesto dentro de un escenario, con costo proyectado.
   headcount_scenario_id -> headcount_scenarios ; org_unit_id -> org_units ; job_profile_id -> job_profiles
   site_id ?-> sites ; planned_count integer! ; planned_start_on ; projected_cost money #S ; currency cur? ; notes
-@position_requests soft lock | Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar.
-  requested_by_user_id -> users ; org_unit_id -> org_units ; job_profile_id -> job_profiles ; site_id ?-> sites
+@position_requests soft lock | Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar (POS-3, ME-04). Al aprobarse por el motor de aprobaciones crea sus posiciones en «aprobada» (positions.position_request_id). over_budget: al enviarla superaba el presupuesto disponible de la unidad (RN-POS-05).
+  requested_by_user_id -> users ; legal_entity_id ?-> legal_entities ; org_unit_id -> org_units ; job_profile_id -> job_profiles ; site_id ?-> sites
+  title text ; cost_center_id ?-> cost_centers ; reports_to_position_id ?-> positions ; salary_band_id ?-> salary_bands
   quantity integer=1 ; justification text! ; kind enum(new,replacement,temporary)=new ; replaces_employment_id ?-> employments
-  estimated_cost money ; currency cur? ; status enum(draft,submitted,approved,rejected,cancelled,fulfilled)=draft
-  workflow_instance_id ?-> workflow_instances ; needed_by date
+  estimated_cost money #S ; currency cur? ; status enum(draft,submitted,approved,rejected,cancelled,fulfilled)=draft
+  workflow_instance_id ?-> workflow_instances ; needed_by date ; over_budget bool=f ; submitted_at ts ; decided_at ts ; decision_reason
+  check quantity >= 1
+@headcount_budgets soft lock | Presupuesto de dotación por unidad y periodo (POS-4): plazas y costo mensual presupuestados. Un solo presupuesto vigente por unidad a la vez (valid_from / valid_to); el tablero compara contra él las posiciones aprobadas, ocupadas, vacantes y congeladas.
+  legal_entity_id -> legal_entities ; org_unit_id -> org_units ; budgeted_positions integer! ; monthly_cost money #S ; currency cur?
+  notes ; check budgeted_positions >= 0 ; vig org_unit_id
 
 #E COL | Colaboradores y ficha 360
 @people main soft lock | Persona natural (C-01). No se duplica en reingresos ni entre empresas del grupo.

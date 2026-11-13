@@ -65,6 +65,7 @@ final class PositionService
         private readonly StructureAvailability $structure,
         private readonly AuditLogger $audit,
         private readonly OutboxWriter $outbox,
+        private readonly HeadcountService $headcount,
     ) {}
 
     // ------------------------------------------------------------------ Presentación
@@ -136,6 +137,7 @@ final class PositionService
                 'valid_from' => $p->valid_from->toDateString(),
                 'valid_to' => $p->valid_to?->toDateString(),
                 'status' => $p->status,
+                'position_request_id' => $p->position_request_id,
                 'budget' => $p->budgeted_cost === null || $p->currency === null ? null
                     : ['amount' => (string) $p->budgeted_cost, 'currency' => (string) $p->currency],
                 'allowed_actions' => $this->machine->manualActions($p->status),
@@ -339,6 +341,9 @@ final class PositionService
             $this->structure->assertJobProfileAssignable($position->job_profile_id);
             $this->structure->assertOrgUnitAssignable($position->org_unit_id);
         }
+        if ($action === 'approve') {
+            $reason = $this->assertBudget($position, $reason);
+        }
 
         return DB::transaction(function () use ($position, $action, $next, $reason, $day, $userId): Position {
             $locked = Position::query()->whereKey($position->id)->lockForUpdate()->firstOrFail();
@@ -356,6 +361,45 @@ final class PositionService
 
             return $locked;
         });
+    }
+
+    /**
+     * POS-3 · Crea una posición ya aprobada por el flujo de su solicitud (sin pasar por «propuesta»):
+     * la aprobación del flujo es la decisión, incluso si superaba el presupuesto (queda en el motivo).
+     *
+     * @param  array<string, mixed>  $values  columnas
+     */
+    public function createApproved(array $values, string $reason): Position
+    {
+        $position = Position::create($values + ['status' => 'approved', 'is_shared' => false, 'seats' => 1]);
+        $position->refresh();
+        $day = $position->valid_from->toDateString();
+        $this->recordEvent($position, 'approve', null, 'approved', $reason, null, $day);
+        $this->outbox->record(self::EVENTS['approve'], 'position', $position->id, [
+            'position_id' => $position->id, 'from_status' => null, 'to_status' => 'approved', 'reason' => $reason,
+            'occupied_seats' => 0, 'effective_on' => $day, 'position_request_id' => $position->position_request_id,
+        ]);
+        $this->audit->record('position.created', 'position', $position->id, null, $this->auditable($position), $reason);
+
+        return $position;
+    }
+
+    /**
+     * POS-4 · Aprobar una plaza que excede el presupuesto de su unidad exige una excepción con motivo.
+     * Devuelve el motivo a registrar (marcado como excepción de presupuesto).
+     */
+    private function assertBudget(Position $position, ?string $reason): ?string
+    {
+        $day = max($position->valid_from->toDateString(), EffectiveDated::day(now()));
+        $cost = $this->headcount->positionCost($position, $day);
+        if (! $this->headcount->exceeds($position->org_unit_id, $day, $position->seats, $cost, $position->id)) {
+            return $reason;
+        }
+        if ($reason === null || trim($reason) === '') {
+            throw new AyniException('business_rule_violated', 422, (string) trans('organization.positions.over_budget_reason_required'), [], ['rule' => 'over_budget']);
+        }
+
+        return (string) trans('organization.positions.over_budget_exception', ['reason' => trim($reason)]);
     }
 
     public function countOccupants(string $positionId, string $date, ?string $exceptEmploymentId = null, ?string $to = null): int

@@ -133,6 +133,15 @@ final class DomainEventTypes
 
     public const POSITION_CLOSED = 'position.closed.v1';
 
+    // Solicitudes de posición (POS-3 · ME-04).
+    public const POSITION_REQUESTED = 'position.requested.v1';
+
+    public const POSITION_REQUEST_APPROVED = 'position_request.approved.v1';
+
+    public const POSITION_REQUEST_REJECTED = 'position_request.rejected.v1';
+
+    public const POSITION_REQUEST_CANCELLED = 'position_request.cancelled.v1';
+
     // Organización (SAS-2): cambios de estado decididos desde la consola.
     public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
 
@@ -450,6 +459,26 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['position_id', 'reason', 'effective_on'],
             'description' => 'Posición rechazada o cerrada; libera presupuesto (RN-POS-06)',
+        ],
+        self::POSITION_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['position_request_id', 'org_unit_id', 'job_profile_id', 'quantity', 'over_budget', 'approval_request_id'],
+            'description' => 'Solicitud de posición enviada al flujo de aprobación; over_budget si supera el presupuesto de la unidad (RN-POS-05)',
+        ],
+        self::POSITION_REQUEST_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['position_request_id', 'org_unit_id', 'quantity'],
+            'description' => 'Solicitud de posición aprobada: sus posiciones quedaron en «aprobada» (ME-04)',
+        ],
+        self::POSITION_REQUEST_REJECTED => [
+            'version' => 1,
+            'required_fields' => ['position_request_id', 'reason'],
+            'description' => 'Solicitud de posición rechazada con motivo (ME-04)',
+        ],
+        self::POSITION_REQUEST_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['position_request_id'],
+            'description' => 'Solicitud de posición cancelada por el solicitante (ME-04)',
         ],
         self::JOB_PROFILE_CREATED => [
             'version' => 1,

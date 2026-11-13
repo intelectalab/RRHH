@@ -14590,6 +14590,110 @@ paths:
   /headcount:
     get:
       summary: 'Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas'
+      parameters:
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha (AAAA-MM-DD) de la dotación; por defecto hoy
+        schema:
+          type: string
+          format: date
+      - name: legal_entity_id
+        in: query
+        required: false
+        description: Solo esa empresa
+        schema:
+          type: string
+      - name: org_unit_id
+        in: query
+        required: false
+        description: Solo esa unidad y sus subunidades
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.positions.view
+      operationId: getHeadcount
+  /headcount-budgets:
+    get:
+      summary: Presupuestos de dotación por unidad y periodo (plazas y costo mensual; el costo solo con org.positions.budget.view)
+      parameters:
+      - name: org_unit_id
+        in: query
+        required: false
+        description: Solo esa unidad
+        schema:
+          type: string
+      - name: legal_entity_id
+        in: query
+        required: false
+        description: Solo esa empresa
+        schema:
+          type: string
+      - name: as_of
+        in: query
+        required: false
+        description: Vigentes a esa fecha (AAAA-MM-DD)
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.headcount_plans.view
+      operationId: getHeadcountBudgets
+    post:
+      summary: Registrar el presupuesto de una unidad desde una fecha; cierra el presupuesto vigente de la unidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.headcount_plans.create
+      operationId: postHeadcountBudgets
+  /headcount-budgets/{id}:
+    get:
+      summary: Ver un presupuesto de dotación
       responses:
         '200':
           description: Correcto
@@ -14599,11 +14703,51 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id002
         '403': *id003
+        '404': *id005
       tags:
       - POS
       x-phase: 1
-      x-permission: org.positions.view
-      operationId: getHeadcount
+      x-permission: org.headcount_plans.view
+      operationId: getHeadcountBudgetsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      summary: Corregir un presupuesto de dotación (plazas, costo, notas)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.headcount_plans.update
+      operationId: patchHeadcountBudgetsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /headcount-plans:
     get:
       summary: Listar HeadcountPlan
@@ -14861,6 +15005,39 @@ paths:
       x-phase: 1
       x-permission: org.headcount_plans.submit
       operationId: postHeadcountPlansIdSubmit
+  /headcount/positions:
+    get:
+      summary: 'Desviación explicada por posición de una unidad: base del costo (sueldo del ocupante, punto medio de la banda
+        o costo presupuestado), cargas y si entra en el presupuesto; los montos solo con org.positions.budget.view'
+      parameters:
+      - name: org_unit_id
+        in: query
+        required: true
+        description: Unidad cuyas posiciones se explican
+        schema:
+          type: string
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.positions.view
+      operationId: getHeadcountPositions
   /health:
     get:
       summary: 'Salud de la API: disponible sin sesión ni organización'
@@ -26175,6 +26352,199 @@ paths:
       x-phase: 1
       x-permission: org.positions.view
       operationId: getPositionOptions
+  /position-requests:
+    get:
+      summary: 'Solicitudes de posición: las propias; con org.positions.approve, todas las del alcance. El costo estimado
+        (estimated_cost) solo viaja con org.positions.budget.view o al solicitante'
+      parameters:
+      - name: status
+        in: query
+        required: false
+        description: draft, submitted, approved, rejected, cancelled o fulfilled (separados por coma)
+        schema:
+          type: string
+      - name: org_unit_id
+        in: query
+        required: false
+        description: Solo esa unidad
+        schema:
+          type: string
+      - name: mine
+        in: query
+        required: false
+        description: 'true: solo las propias'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.view
+      operationId: getPositionRequests
+    post:
+      summary: Registrar una solicitud de posición en borrador (puesto, unidad, motivo, cantidad, fecha y costo estimado)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.create
+      operationId: postPositionRequests
+  /position-requests/{id}:
+    get:
+      summary: Ver una solicitud de posición con su aprobación, el presupuesto disponible de la unidad y las posiciones que
+        creó
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+        '404': *id005
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.view
+      operationId: getPositionRequestsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      summary: Editar una solicitud en borrador (solo el solicitante)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.create
+      operationId: patchPositionRequestsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /position-requests/{id}/cancel:
+    post:
+      summary: Cancelar una solicitud en borrador o en aprobación (anula los pasos pendientes)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.create
+      operationId: postPositionRequestsIdCancel
+  /position-requests/{id}/submit:
+    post:
+      summary: Enviar la solicitud al flujo de aprobación configurado; si supera el presupuesto disponible de la unidad se
+        marca over_budget y el flujo puede exigir un nivel adicional (RN-POS-05)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '404': *id005
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - POS
+      x-phase: 1
+      x-permission: org.position_requests.create
+      operationId: postPositionRequestsIdSubmit
   /positions:
     get:
       summary: Listar Position
@@ -45318,6 +45688,10 @@ components:
           - filled
           - frozen
           - closed
+        position_request_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
         budget: &id630
           $ref: '#/components/schemas/Money'
         allowed_actions:

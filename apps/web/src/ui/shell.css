@@ -654,3 +654,11 @@
   .ff-regla { grid-template-columns: minmax(0, 1fr) auto; }
   .ff-regla > input { grid-column: 1 / -1; grid-row: 2; }
 }
+
+/* POS-4 · Dotación: indicadores, columnas numéricas y desviación por posición. */
+.hc-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.hc-kpi { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--bd); border-radius: 10px; background: var(--sup); }
+.table .num { text-align: right; white-space: nowrap; }
+.hc-lista { list-style: none; padding: 0; margin: 0; }
+.hc-lista > li { padding-bottom: 12px; border-bottom: 1px solid var(--bd2); }
+.hc-lista > li:last-child { border-bottom: 0; }

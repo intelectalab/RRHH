@@ -102,10 +102,38 @@ return [
         'seats_need_shared' => 'Só uma posição compartilhada admite mais de uma vaga.',
         'seats_below_occupied' => 'A posição tem :count ocupante(s): não pode ter menos vagas.',
         'budget_forbidden' => 'Você não tem permissão para registrar o custo das posições.',
+        'over_budget_reason_required' => 'Esta vaga excede o orçamento de quadro da sua unidade: para aprová-la registre o motivo da exceção.',
+        'over_budget_exception' => 'Exceção de orçamento: :reason',
         'not_assignable_proposed' => 'A posição ainda não foi aprovada: não admite ocupantes.',
         'not_assignable_frozen' => 'A posição está congelada: não admite ocupantes nem vagas (RN-POS-03).',
         'not_assignable_closed' => 'A posição está fechada: não admite ocupantes (RN-POS-03).',
         'expired' => 'A posição não está mais vigente nessa data.',
         'no_free_seat' => 'A posição não tem vagas livres nessas datas (vagas: :seats).',
+    ],
+    // POS-3 · Solicitudes de posición.
+    'position_requests' => [
+        'only_draft' => 'Só se edita uma solicitação em rascunho.',
+        'only_requester' => 'Só quem fez a solicitação (ou quem aprova posições) pode alterá-la.',
+        'justification_required' => 'Indique o motivo da solicitação.',
+        'entity_required' => 'Indique a empresa da posição.',
+        'approved_reason' => 'Aprovada por solicitação de posição.',
+        'approved_over_budget' => 'Aprovada por solicitação de posição fora do orçamento (exceção aprovada no fluxo).',
+    ],
+    // POS-4 · Dotación y presupuesto.
+    'headcount' => [
+        'unknown_unit' => 'A unidade não existe ou está arquivada.',
+        'budget_overlap' => 'A unidade já tem um orçamento que começa nesse dia ou depois: corrija-o em vez de registrar outro.',
+        'explain_status' => [
+            'within' => 'Vaga :seat de :budgeted orçadas: dentro do orçamento.',
+            'over_budget' => 'Vaga :seat de :budgeted orçadas: excede o orçamento de vagas.',
+            'no_budget' => 'A unidade não tem orçamento registrado nesta data.',
+            'not_counted' => 'Não conta no orçamento (proposta, ainda não aprovada).',
+        ],
+        'explain_basis' => [
+            'occupant_salary' => 'Custo: salário vigente do ocupante mais :factor % de encargos.',
+            'band_midpoint' => 'Custo: ponto médio da faixa (vaga) mais :factor % de encargos.',
+            'budgeted_cost' => 'Custo: custo orçado da posição mais :factor % de encargos.',
+            'none' => 'Sem custo: não tem ocupante, faixa nem custo orçado.',
+        ],
     ],
 ];

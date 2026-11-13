@@ -102,10 +102,38 @@ return [
         'seats_need_shared' => 'Only a shared position can have more than one seat.',
         'seats_below_occupied' => 'The position has :count occupant(s): it cannot have fewer seats.',
         'budget_forbidden' => 'You are not allowed to record position costs.',
+        'over_budget_reason_required' => 'This position exceeds its unit\'s headcount budget: to approve it, record the reason for the exception.',
+        'over_budget_exception' => 'Budget exception: :reason',
         'not_assignable_proposed' => 'The position is not approved yet: it cannot have occupants.',
         'not_assignable_frozen' => 'The position is frozen: it accepts no occupants or openings (RN-POS-03).',
         'not_assignable_closed' => 'The position is closed: it accepts no occupants (RN-POS-03).',
         'expired' => 'The position is no longer valid on that date.',
         'no_free_seat' => 'The position has no free seats on those dates (seats: :seats).',
+    ],
+    // POS-3 · Solicitudes de posición.
+    'position_requests' => [
+        'only_draft' => 'Only a draft request can be edited.',
+        'only_requester' => 'Only the requester (or someone who approves positions) can change it.',
+        'justification_required' => 'State the reason for the request.',
+        'entity_required' => 'Indicate the company of the position.',
+        'approved_reason' => 'Approved through a position request.',
+        'approved_over_budget' => 'Approved through an over-budget position request (exception approved in the workflow).',
+    ],
+    // POS-4 · Dotación y presupuesto.
+    'headcount' => [
+        'unknown_unit' => 'The unit does not exist or is archived.',
+        'budget_overlap' => 'The unit already has a budget starting on that day or later: correct it instead of adding another.',
+        'explain_status' => [
+            'within' => 'Position :seat of :budgeted budgeted: within budget.',
+            'over_budget' => 'Position :seat of :budgeted budgeted: exceeds the headcount budget.',
+            'no_budget' => 'The unit has no budget recorded for this date.',
+            'not_counted' => 'Not counted against the budget (proposed, not yet approved).',
+        ],
+        'explain_basis' => [
+            'occupant_salary' => 'Cost: occupant\'s current salary plus :factor % employer charges.',
+            'band_midpoint' => 'Cost: salary band midpoint (vacant) plus :factor % employer charges.',
+            'budgeted_cost' => 'Cost: the position\'s budgeted cost plus :factor % employer charges.',
+            'none' => 'No cost: no occupant, salary band or budgeted cost.',
+        ],
     ],
 ];

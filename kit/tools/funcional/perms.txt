@@ -47,7 +47,7 @@ ORG | org.cost_centers | centros de costo | AD RH PY RC MG AU ST CT | AD RH |
 ORG | org.job_profiles | puestos de catálogo, niveles y categorías | AD RH PY RC MG AU ST CT | AD RH |
 ORG | people.directory | el directorio y el organigrama | AD RH PY RC MG EM AU ST CT |  |
 POS | org.positions | posiciones | AD RH PY RC MG AU CT | AD RH |
-POS | org.position_requests | solicitudes de posición |  |  | +create#Solicitar una nueva posición o un reemplazo:AD RH MG
+POS | org.position_requests | solicitudes de posición |  |  | +create#Solicitar una nueva posición o un reemplazo:AD RH MG; +view#Ver solicitudes de posición (las propias; todas con org.positions.approve):AD RH MG AU CT
 POS | org.headcount_plans | planes y escenarios de plantilla | AD RH AU CT | AD RH | approve:AD
 POS | *org.positions.budget.view | Ver costo presupuestado y proyectado de posiciones | AD RH PY CT
 COL,ESS | people.employments | colaboradores (relaciones laborales) | AD RH PY RC MG AU ST CT EM° | AD RH |

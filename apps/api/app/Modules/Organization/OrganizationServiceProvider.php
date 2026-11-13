@@ -12,6 +12,7 @@ use App\Modules\Organization\Infrastructure\Provisioning\CreateFirstLegalEntity;
 use App\Modules\Organization\Infrastructure\Search\LegalEntitySearchSource;
 use App\Modules\Organization\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\Organization\Infrastructure\Usage\LegalEntitiesUsageSource;
+use App\Modules\Organization\Infrastructure\Workflow\PositionRequestOutcome;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Organization\PositionOccupancy;
@@ -19,6 +20,7 @@ use App\Shared\Organization\StructureAvailability;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Usage\UsageRegistry;
+use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +43,8 @@ final class OrganizationServiceProvider extends ServiceProvider
         // SAS-6 · Consumo frente a los límites del plan.
         $this->app->make(UsageRegistry::class)->register(new LegalEntitiesUsageSource);
         $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
+        // POS-3 · WFL-4 · La decisión del flujo sobre una solicitud de posición se aplica aquí al instante.
+        $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(PositionRequestOutcome::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {

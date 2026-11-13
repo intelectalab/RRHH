@@ -569,6 +569,22 @@
       "opciones": null
     },
     {
+      "codigo": "posiciones.factor_carga_pct",
+      "modulo": "core",
+      "nombre": "Cargas del empleador para el costo proyectado (%)",
+      "tipo": "decimal",
+      "valor_por_defecto": 0,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).",
+      "opciones": {
+        "min": 0,
+        "max": 200
+      }
+    },
+    {
       "codigo": "posiciones.contratar_solo_con_posicion",
       "modulo": "core",
       "nombre": "Contratar solo contra posición aprobada",

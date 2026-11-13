@@ -93,7 +93,7 @@ RES = [
     ("ORG", 1, "org.job_profiles", "/job-families", "JobFamily", "code:s name:s description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-levels", "JobLevel", "code:s name:s rank:i description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-categories", "JobCategory", "code:s name:s rank?:i description?:s functions?:s responsibility_level?:s requirements?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
-    ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
+    ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) position_request_id?:id budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
     ("COL", 1, "people.people", "/people", "Person", "first_name:s last_name:s document_type:s document_number:s birth_date?:d nationality?:s email?:s phone?:s address?:j", "LCRU", "merge"),
     ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id legal_entity_id:id code:s hire_date:d termination_date?:d status:e(pre_hire|active|suspended|terminated) worker_type:s payroll_regime:s position_id?:id manager_employment_id?:id base_salary!?:m", "LCRU", "activate suspend terminate cancel-termination"),
@@ -430,6 +430,19 @@ EXTRA = [
     ("POS", 1, "get", "/positions/{id}/status-events", "org.positions.view", "Historial inalterable de estados de la posición con acción, motivo, autor y fecha efectiva (POS-2)", False),
     ("POS", 1, "get", "/positions/{id}/reporting-line", "org.positions.view", "Línea de reporte derivada de la posición jefe (o del responsable de la unidad), de la más cercana a la más alta, con su ocupante", False),
     ("POS", 1, "get", "/position-options", "org.positions.view", "Opciones para el formulario de posiciones: puestos, empresas, unidades, sedes, centros de costo y posiciones jefe activos", False),
+    # POS-3 · Solicitudes de posición (ME-04): se aprueban o rechazan en el centro de aprobaciones (motor WFL).
+    ("POS", 1, "get", "/position-requests", "org.position_requests.view", "Solicitudes de posición: las propias; con org.positions.approve, todas las del alcance. El costo estimado (estimated_cost) solo viaja con org.positions.budget.view o al solicitante", False),
+    ("POS", 1, "post", "/position-requests", "org.position_requests.create", "Registrar una solicitud de posición en borrador (puesto, unidad, motivo, cantidad, fecha y costo estimado)", False),
+    ("POS", 1, "get", "/position-requests/{id}", "org.position_requests.view", "Ver una solicitud de posición con su aprobación, el presupuesto disponible de la unidad y las posiciones que creó", False),
+    ("POS", 1, "patch", "/position-requests/{id}", "org.position_requests.create", "Editar una solicitud en borrador (solo el solicitante)", False),
+    ("POS", 1, "post", "/position-requests/{id}/submit", "org.position_requests.create", "Enviar la solicitud al flujo de aprobación configurado; si supera el presupuesto disponible de la unidad se marca over_budget y el flujo puede exigir un nivel adicional (RN-POS-05)", False),
+    ("POS", 1, "post", "/position-requests/{id}/cancel", "org.position_requests.create", "Cancelar una solicitud en borrador o en aprobación (anula los pasos pendientes)", False),
+    # POS-4 · Presupuesto de dotación y desviaciones.
+    ("POS", 1, "get", "/headcount-budgets", "org.headcount_plans.view", "Presupuestos de dotación por unidad y periodo (plazas y costo mensual; el costo solo con org.positions.budget.view)", False),
+    ("POS", 1, "post", "/headcount-budgets", "org.headcount_plans.create", "Registrar el presupuesto de una unidad desde una fecha; cierra el presupuesto vigente de la unidad", False),
+    ("POS", 1, "get", "/headcount-budgets/{id}", "org.headcount_plans.view", "Ver un presupuesto de dotación", False),
+    ("POS", 1, "patch", "/headcount-budgets/{id}", "org.headcount_plans.update", "Corregir un presupuesto de dotación (plazas, costo, notas)", False),
+    ("POS", 1, "get", "/headcount/positions", "org.positions.view", "Desviación explicada por posición de una unidad: base del costo (sueldo del ocupante, punto medio de la banda o costo presupuestado), cargas y si entra en el presupuesto; los montos solo con org.positions.budget.view", False),
     ("ORG", 1, "get", "/org-unit-options", "org.units.view", "Opciones para el formulario de unidades: niveles, posiciones que pueden ser responsables y centros de costo activos", False),
     ("ORG", 1, "get", "/org-unit-types", "org.units.view", "Niveles de unidad con los nombres de la organización (gerencia, área, departamento…), en orden", False),
     ("ORG", 1, "post", "/org-unit-types", "org.units.update", "Agregar un nivel de unidad propio", False),
@@ -457,13 +470,35 @@ STATE_ACTIONS = {("post", "/notification-templates/{id}/request-approval"), ("po
                  ("post", "/message-channels/email/verify"), ("post", "/notification-deliveries/{id}/clear-bounce"),
                  ("post", "/platform/subscriptions/{id}/convert"), ("post", "/platform/subscriptions/{id}/cancel"),
                  ("post", "/positions/{id}/reject"), ("post", "/positions/{id}/open-recruitment"), ("post", "/positions/{id}/cancel-recruitment"),
-                 ("post", "/platform/feature-flags/{id}/archive"), ("post", "/platform/feature-flags/{id}/restore")}
-CREATED = {("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
+                 ("post", "/platform/feature-flags/{id}/archive"), ("post", "/platform/feature-flags/{id}/restore"),
+                 ("post", "/position-requests/{id}/submit"), ("post", "/position-requests/{id}/cancel")}
+# Rutas extra que responden 409 por conflicto de vigencia (otro registro ya ocupa ese periodo).
+CONFLICTS = {("post", "/headcount-budgets"), ("patch", "/headcount-budgets/{id}")}
+CREATED = {("post", "/position-requests"), ("post", "/headcount-budgets"), ("post", "/org-unit-types"), ("post", "/catalogs"), ("post", "/catalogs/{code}/items"), ("post", "/employments/{employment_id}/cost-distributions")}
 
 # Parámetros de consulta declarados de algunas operaciones de EXTRA (además responden 400 invalid_filter).
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/headcount"): [
+        _q("as_of", "Fecha (AAAA-MM-DD) de la dotación; por defecto hoy", False, "date"),
+        _q("legal_entity_id", "Solo esa empresa"),
+        _q("org_unit_id", "Solo esa unidad y sus subunidades"),
+    ],
+    ("get", "/headcount/positions"): [
+        _q("org_unit_id", "Unidad cuyas posiciones se explican", True),
+        _q("as_of", "Fecha (AAAA-MM-DD); por defecto hoy", False, "date"),
+    ],
+    ("get", "/position-requests"): [
+        _q("status", "draft, submitted, approved, rejected, cancelled o fulfilled (separados por coma)"),
+        _q("org_unit_id", "Solo esa unidad"),
+        _q("mine", "true: solo las propias"),
+    ],
+    ("get", "/headcount-budgets"): [
+        _q("org_unit_id", "Solo esa unidad"),
+        _q("legal_entity_id", "Solo esa empresa"),
+        _q("as_of", "Vigentes a esa fecha (AAAA-MM-DD)", False, "date"),
+    ],
     ("get", "/positions/{id}/occupants"): [
         _q("as_of", "Fecha (AAAA-MM-DD): solo los ocupantes vigentes a ese día", False, "date"),
     ],
@@ -509,7 +544,7 @@ INPUT_EXTRA = {
     "JobProfileInput": {"change_reason": {"type": "string", "description": "Motivo del cambio de la descripción (queda en la nueva versión, ORG-5)"}},
     "ImportJobInput": {"content_base64": {"type": "string", "description": "Contenido del archivo CSV o XLSX en base64 (IMP-1)"}},
 }
-READONLY = {"status", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
+READONLY = {"status", "position_request_id", "overrides", "job_profile_name", "legal_entity_name", "org_unit_name", "site_name", "cost_center_name", "reports_to_title", "effective_reports_to_position_id", "occupied_seats", "occupants", "heads_units", "revision", "subscribers", "superseded_by_plan_id", "duplicated_from_plan_id", "version", "profiles_count", "allowed_actions", "category_pending", "positions_count", "current_version", "path", "effective_timezone", "has_logo", "mine", "last_login_at", "last_used_at", "last_seen_at", "last_checked_at", "mfa_required", "document_number_masked", "phone_masked"}
 
 
 def parse_fields(spec):
@@ -679,6 +714,8 @@ def build():
         res = {"201": ok(ref("schemas/GenericEnvelope"), "Creado")} if (method, path) in CREATED else {"200": ok(ref("schemas/GenericEnvelope"))}
         if (method, path) in STATE_ACTIONS:
             # Transición de estado: 409 invalid_transition si el estado actual no la admite (regla 3).
+            res.update(errs("409"))
+        if (method, path) in CONFLICTS:
             res.update(errs("409"))
         if path.endswith("/download"):
             # Descarga directa del archivo (no es JSON).

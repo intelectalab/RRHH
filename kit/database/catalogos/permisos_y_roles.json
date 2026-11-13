@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 910,
+    "permisos": 911,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 138,
+    "fuera_del_contrato_api": 139,
     "roles": 11
   },
   "permisos": [
@@ -2004,6 +2004,18 @@
       "en_contrato_api": false,
       "ambito": "organizacion",
       "descripcion": "Solicitar una nueva posición o un reemplazo"
+    },
+    {
+      "codigo": "org.position_requests.view",
+      "epica": "POS",
+      "modulo": "core",
+      "recurso": "position_requests",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "organizacion",
+      "descripcion": "Ver solicitudes de posición (las propias; todas con `org.positions.approve`)"
     },
     {
       "codigo": "org.headcount_plans.view",
@@ -11684,6 +11696,10 @@
           "alcance": "organization"
         },
         {
+          "codigo": "org.position_requests.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "org.headcount_plans.view",
           "alcance": "organization"
         },
@@ -14794,6 +14810,10 @@
         },
         {
           "codigo": "org.position_requests.create",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "org.position_requests.view",
           "alcance": "organization"
         },
         {
@@ -18428,6 +18448,10 @@
           "alcance": "team"
         },
         {
+          "codigo": "org.position_requests.view",
+          "alcance": "team"
+        },
+        {
           "codigo": "people.employments.view",
           "alcance": "team"
         },
@@ -19898,6 +19922,10 @@
           "alcance": "organization"
         },
         {
+          "codigo": "org.position_requests.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "org.headcount_plans.view",
           "alcance": "organization"
         },
@@ -21230,6 +21258,10 @@
         },
         {
           "codigo": "org.positions.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "org.position_requests.view",
           "alcance": "organization"
         },
         {

@@ -203,6 +203,7 @@ PARAMS = [
  ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'boolean', True, [O, E], 'Genera el código con el correlativo de la empresa.', None),
  ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'boolean', True, [O, E], 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', None),
  ('colaboradores.cambios_perfil_requieren_aprobacion', 'core', 'Cambios de perfil con aprobación', 'boolean', True, [O], 'Los cambios que pide el colaborador pasan por RRHH antes de aplicarse.', None),
+ ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'decimal', 0, [O, E], 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', {'min': 0, 'max': 200}),
  ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'boolean', False, [O, E], 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', None),
  ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'list', [60, 30, 15], [O, E], 'Días de anticipación con que se avisa el vencimiento.', None),
  ('contratos.alerta_tope_acumulado_dias', 'core', 'Aviso de tope acumulado', 'integer', 90, [O, E], 'Días de anticipación con que se avisa que un contrato a modalidad se acerca a su plazo máximo.', None),

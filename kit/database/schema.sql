@@ -2832,6 +2832,7 @@ CREATE TABLE positions (
   budgeted_cost numeric(14,2),  -- SENSIBLE
   currency char(3),
   headcount_plan_line_id uuid,
+  position_request_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -2857,6 +2858,7 @@ CREATE INDEX ix_positions_reports_to_position_id ON positions (tenant_id, report
 CREATE INDEX ix_positions_cost_center_id ON positions (tenant_id, cost_center_id);
 CREATE INDEX ix_positions_salary_band_id ON positions (tenant_id, salary_band_id);
 CREATE INDEX ix_positions_headcount_plan_line_id ON positions (tenant_id, headcount_plan_line_id);
+CREATE INDEX ix_positions_position_request_id ON positions (tenant_id, position_request_id);
 ALTER TABLE positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE positions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON positions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -2961,40 +2963,86 @@ CREATE TABLE position_requests (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   requested_by_user_id uuid NOT NULL,
+  legal_entity_id uuid,
   org_unit_id uuid NOT NULL,
   job_profile_id uuid NOT NULL,
   site_id uuid,
+  title text,
+  cost_center_id uuid,
+  reports_to_position_id uuid,
+  salary_band_id uuid,
   quantity integer NOT NULL DEFAULT 1,
   justification text NOT NULL,
   kind text NOT NULL DEFAULT 'new' CHECK (kind IN ('new','replacement','temporary')),
   replaces_employment_id uuid,
-  estimated_cost numeric(14,2),
+  estimated_cost numeric(14,2),  -- SENSIBLE
   currency char(3),
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','submitted','approved','rejected','cancelled','fulfilled')),
   workflow_instance_id uuid,
   needed_by date,
+  over_budget boolean NOT NULL DEFAULT false,
+  submitted_at timestamptz,
+  decided_at timestamptz,
+  decision_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_position_requests_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_position_requests_1 CHECK (quantity >= 1),
   CONSTRAINT fk_position_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_position_requests_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
   CONSTRAINT fk_position_requests_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id),
   CONSTRAINT fk_position_requests_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
   CONSTRAINT fk_position_requests_site_id FOREIGN KEY (tenant_id, site_id) REFERENCES sites (tenant_id, id),
+  CONSTRAINT fk_position_requests_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id),
+  CONSTRAINT fk_position_requests_reports_to_position_id FOREIGN KEY (tenant_id, reports_to_position_id) REFERENCES positions (tenant_id, id),
   CONSTRAINT fk_position_requests_workflow_instance_id FOREIGN KEY (tenant_id, workflow_instance_id) REFERENCES workflow_instances (tenant_id, id)
 );
-COMMENT ON TABLE position_requests IS 'Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar.';
+COMMENT ON TABLE position_requests IS 'Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar (POS-3, ME-04). Al aprobarse por el motor de aprobaciones crea sus posiciones en «aprobada» (positions.position_request_id). over_budget: al enviarla superaba el presupuesto disponible de la unidad (RN-POS-05).';
 CREATE INDEX ix_position_requests_requested_by_user_id ON position_requests (tenant_id, requested_by_user_id);
+CREATE INDEX ix_position_requests_legal_entity_id ON position_requests (tenant_id, legal_entity_id);
 CREATE INDEX ix_position_requests_org_unit_id ON position_requests (tenant_id, org_unit_id);
 CREATE INDEX ix_position_requests_job_profile_id ON position_requests (tenant_id, job_profile_id);
 CREATE INDEX ix_position_requests_site_id ON position_requests (tenant_id, site_id);
+CREATE INDEX ix_position_requests_cost_center_id ON position_requests (tenant_id, cost_center_id);
+CREATE INDEX ix_position_requests_reports_to_position_id ON position_requests (tenant_id, reports_to_position_id);
+CREATE INDEX ix_position_requests_salary_band_id ON position_requests (tenant_id, salary_band_id);
 CREATE INDEX ix_position_requests_replaces_employment_id ON position_requests (tenant_id, replaces_employment_id);
 CREATE INDEX ix_position_requests_workflow_instance_id ON position_requests (tenant_id, workflow_instance_id);
 ALTER TABLE position_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE position_requests FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON position_requests USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_position_requests_touch BEFORE UPDATE ON position_requests FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE headcount_budgets (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  legal_entity_id uuid NOT NULL,
+  org_unit_id uuid NOT NULL,
+  budgeted_positions integer NOT NULL,
+  monthly_cost numeric(14,2),  -- SENSIBLE
+  currency char(3),
+  notes text,
+  valid_from date NOT NULL,
+  valid_to date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_headcount_budgets_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_headcount_budgets_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ck_headcount_budgets_1 CHECK (budgeted_positions >= 0),
+  CONSTRAINT ex_headcount_budgets_vigencia EXCLUDE USING gist (tenant_id WITH =, org_unit_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_headcount_budgets_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_headcount_budgets_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id)
+);
+COMMENT ON TABLE headcount_budgets IS 'Presupuesto de dotación por unidad y periodo (POS-4): plazas y costo mensual presupuestados. Un solo presupuesto vigente por unidad a la vez (valid_from / valid_to); el tablero compara contra él las posiciones aprobadas, ocupadas, vacantes y congeladas.';
+CREATE INDEX ix_headcount_budgets_legal_entity_id ON headcount_budgets (tenant_id, legal_entity_id);
+ALTER TABLE headcount_budgets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE headcount_budgets FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON headcount_budgets USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_headcount_budgets_touch BEFORE UPDATE ON headcount_budgets FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 -- --------------------------------------------------------------------------------------------------
 -- COL · Colaboradores y ficha 360
@@ -14041,6 +14089,8 @@ ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_head_position_
 ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN KEY (tenant_id, headcount_plan_line_id) REFERENCES headcount_plan_lines (tenant_id, id);
+ALTER TABLE positions ADD CONSTRAINT fk_positions_position_request_id FOREIGN KEY (tenant_id, position_request_id) REFERENCES position_requests (tenant_id, id);
+ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_replaces_employment_id FOREIGN KEY (tenant_id, replaces_employment_id) REFERENCES employments (tenant_id, id);
 ALTER TABLE person_sensitive_data ADD CONSTRAINT fk_person_sensitive_data_consent_id FOREIGN KEY (tenant_id, consent_id) REFERENCES consents (tenant_id, id);
 ALTER TABLE employments ADD CONSTRAINT fk_employments_source_application_id FOREIGN KEY (tenant_id, source_application_id) REFERENCES applications (tenant_id, id);
@@ -14688,6 +14738,7 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('org.positions.unfreeze', 'core', 'positions', 'unfreeze', 'action', false, 'Descongelar posiciones'),
   ('org.positions.update', 'core', 'positions', 'update', 'action', false, 'Editar posiciones'),
   ('org.position_requests.create', 'core', 'position_requests', 'create', 'action', false, 'Solicitar una nueva posición o un reemplazo'),
+  ('org.position_requests.view', 'core', 'position_requests', 'view', 'action', false, 'Ver solicitudes de posición (las propias; todas con `org.positions.approve`)'),
   ('org.headcount_plans.view', 'core', 'headcount_plans', 'view', 'action', false, 'Ver planes y escenarios de plantilla'),
   ('org.headcount_plans.approve', 'core', 'headcount_plans', 'approve', 'action', false, 'Aprobar planes y escenarios de plantilla'),
   ('org.headcount_plans.close', 'core', 'headcount_plans', 'close', 'action', false, 'Cerrar planes y escenarios de plantilla'),
@@ -15611,6 +15662,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('admin_empresa', 'org.positions.unfreeze', 'organization'),
   ('admin_empresa', 'org.positions.update', 'organization'),
   ('admin_empresa', 'org.position_requests.create', 'organization'),
+  ('admin_empresa', 'org.position_requests.view', 'organization'),
   ('admin_empresa', 'org.headcount_plans.view', 'organization'),
   ('admin_empresa', 'org.headcount_plans.approve', 'organization'),
   ('admin_empresa', 'org.headcount_plans.close', 'organization'),
@@ -16388,6 +16440,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('rrhh', 'org.positions.unfreeze', 'organization'),
   ('rrhh', 'org.positions.update', 'organization'),
   ('rrhh', 'org.position_requests.create', 'organization'),
+  ('rrhh', 'org.position_requests.view', 'organization'),
   ('rrhh', 'org.headcount_plans.view', 'organization'),
   ('rrhh', 'org.headcount_plans.close', 'organization'),
   ('rrhh', 'org.headcount_plans.create', 'organization'),
@@ -17292,6 +17345,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'people.directory.view', 'organization'),
   ('manager', 'org.positions.view', 'team'),
   ('manager', 'org.position_requests.create', 'team'),
+  ('manager', 'org.position_requests.view', 'team'),
   ('manager', 'people.employments.view', 'team'),
   ('manager', 'people.people.view', 'team'),
   ('manager', 'people.change_requests.view', 'own'),
@@ -17657,6 +17711,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('auditor', 'org.job_profiles.view', 'organization'),
   ('auditor', 'people.directory.view', 'organization'),
   ('auditor', 'org.positions.view', 'organization'),
+  ('auditor', 'org.position_requests.view', 'organization'),
   ('auditor', 'org.headcount_plans.view', 'organization'),
   ('auditor', 'people.employments.view', 'organization'),
   ('auditor', 'people.people.view', 'organization'),
@@ -17987,6 +18042,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('contador', 'org.job_profiles.view', 'organization'),
   ('contador', 'people.directory.view', 'organization'),
   ('contador', 'org.positions.view', 'organization'),
+  ('contador', 'org.position_requests.view', 'organization'),
   ('contador', 'org.headcount_plans.view', 'organization'),
   ('contador', 'org.positions.budget.view', 'organization'),
   ('contador', 'people.employments.view', 'organization'),
@@ -18120,6 +18176,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('colaboradores.codigo_automatico', 'core', 'Código de colaborador automático', 'Genera el código con el correlativo de la empresa.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.registrar_sexo', 'core', 'Registrar sexo', 'Activa el campo cuando la norma lo exige (planilla, igualdad salarial).', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('colaboradores.cambios_perfil_requieren_aprobacion', 'core', 'Cambios de perfil con aprobación', 'Los cambios que pide el colaborador pasan por RRHH antes de aplicarse.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
+  ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),
   ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'Días de anticipación con que se avisa el vencimiento.', 'list', '[60, 30, 15]'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_tope_acumulado_dias', 'core', 'Aviso de tope acumulado', 'Días de anticipación con que se avisa que un contrato a modalidad se acerca a su plazo máximo.', 'integer', '90'::jsonb, ARRAY['organization','legal_entity'], NULL),

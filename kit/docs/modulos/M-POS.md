@@ -42,6 +42,7 @@ Gestionar la plantilla por posiciones (plazas presupuestadas): cuántas hay, cu�
 | `org.positions.unfreeze` | Descongelar posiciones | Administrador empresa, RRHH |
 | `org.positions.update` | Editar posiciones | Administrador empresa, RRHH |
 | `org.position_requests.create` **(+)** | Solicitar una nueva posición o un reemplazo | Administrador empresa, RRHH, Manager |
+| `org.position_requests.view` **(+)** | Ver solicitudes de posición (las propias; todas con `org.positions.approve`) | Administrador empresa, RRHH, Manager, Auditor, Contador |
 | `org.headcount_plans.view` | Ver planes y escenarios de plantilla | Administrador empresa, RRHH, Auditor, Contador |
 | `org.headcount_plans.approve` | Aprobar planes y escenarios de plantilla | Administrador empresa |
 | `org.headcount_plans.close` | Cerrar planes y escenarios de plantilla | Administrador empresa, RRHH |

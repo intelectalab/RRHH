@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonInterface|null $valid_to
  * @property string|null $budgeted_cost
  * @property string|null $currency
+ * @property string|null $position_request_id
  * @property int $lock_version
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at

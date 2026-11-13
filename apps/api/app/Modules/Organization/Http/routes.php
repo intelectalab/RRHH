@@ -3,12 +3,14 @@
 use App\Modules\Organization\Http\Controllers\CostCenterController;
 use App\Modules\Organization\Http\Controllers\CostDistributionController;
 use App\Modules\Organization\Http\Controllers\DirectoryController;
+use App\Modules\Organization\Http\Controllers\HeadcountController;
 use App\Modules\Organization\Http\Controllers\JobCatalogController;
 use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
 use App\Modules\Organization\Http\Controllers\OrganizationCatalogController;
 use App\Modules\Organization\Http\Controllers\OrgUnitController;
 use App\Modules\Organization\Http\Controllers\PositionController;
+use App\Modules\Organization\Http\Controllers\PositionRequestController;
 use App\Modules\Organization\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -99,4 +101,18 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/positions/{id}/freeze', [PositionController::class, 'freeze'])->middleware('permission:org.positions.freeze');
     Route::post('/positions/{id}/unfreeze', [PositionController::class, 'unfreeze'])->middleware('permission:org.positions.unfreeze');
     Route::post('/positions/{id}/close', [PositionController::class, 'close'])->middleware('permission:org.positions.close');
+    // POS-3 · Solicitudes de posición (se aprueban en el centro de aprobaciones).
+    Route::get('/position-requests', [PositionRequestController::class, 'index'])->middleware('permission:org.position_requests.view');
+    Route::post('/position-requests', [PositionRequestController::class, 'store'])->middleware('permission:org.position_requests.create');
+    Route::get('/position-requests/{id}', [PositionRequestController::class, 'show'])->middleware('permission:org.position_requests.view');
+    Route::patch('/position-requests/{id}', [PositionRequestController::class, 'update'])->middleware('permission:org.position_requests.create');
+    Route::post('/position-requests/{id}/submit', [PositionRequestController::class, 'submit'])->middleware('permission:org.position_requests.create');
+    Route::post('/position-requests/{id}/cancel', [PositionRequestController::class, 'cancel'])->middleware('permission:org.position_requests.create');
+    // POS-4 · Tablero de dotación, desviación por posición y presupuestos por unidad.
+    Route::get('/headcount', [HeadcountController::class, 'index'])->middleware('permission:org.positions.view');
+    Route::get('/headcount/positions', [HeadcountController::class, 'positions'])->middleware('permission:org.positions.view');
+    Route::get('/headcount-budgets', [HeadcountController::class, 'budgets'])->middleware('permission:org.headcount_plans.view');
+    Route::post('/headcount-budgets', [HeadcountController::class, 'storeBudget'])->middleware('permission:org.headcount_plans.create');
+    Route::get('/headcount-budgets/{id}', [HeadcountController::class, 'showBudget'])->middleware('permission:org.headcount_plans.view');
+    Route::patch('/headcount-budgets/{id}', [HeadcountController::class, 'updateBudget'])->middleware('permission:org.headcount_plans.update');
 });

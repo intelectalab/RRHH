@@ -144,7 +144,7 @@ Leyenda de columnas: **SA** Superadmin SaaS · **AD** Administrador empresa · *
 
 `✓` concedido con el alcance por defecto del rol (sección 3). `○` concedido solo sobre lo propio o lo asignado a la persona (sus solicitudes, sus casos, sus tareas, lo que debe firmar o evaluar). Vacío = no concedido. **(S)** = permiso de campo o recurso sensible: su uso queda en el registro de accesos. **(+)** = no figura aún en `api/openapi.yaml`; debe añadirse al contrato (permisos de campo y acciones funcionales).
 
-Totales: 910 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 110 acciones funcionales por añadir al contrato · 108 sensibles.
+Totales: 911 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 111 acciones funcionales por añadir al contrato · 108 sensibles.
 
 ### Fase 0 · Cimientos
 
@@ -372,6 +372,7 @@ Totales: 910 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 110
 | `org.positions.unfreeze` | Descongelar posiciones |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `org.positions.update` | Editar posiciones |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `org.position_requests.create` **(+)** | Solicitar una nueva posición o un reemplazo |  | ✓ | ✓ |  |  | ✓ |  |  |  |  |  |
+| `org.position_requests.view` **(+)** | Ver solicitudes de posición (las propias; todas con `org.positions.approve`) |  | ✓ | ✓ |  |  | ✓ |  | ✓ |  |  | ✓ |
 | `org.headcount_plans.view` | Ver planes y escenarios de plantilla |  | ✓ | ✓ |  |  |  |  | ✓ |  |  | ✓ |
 | `org.headcount_plans.approve` | Aprobar planes y escenarios de plantilla |  | ✓ |  |  |  |  |  |  |  |  |  |
 | `org.headcount_plans.close` | Cerrar planes y escenarios de plantilla |  | ✓ | ✓ |  |  |  |  |  |  |  |  |

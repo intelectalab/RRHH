@@ -102,10 +102,38 @@ return [
         'seats_need_shared' => 'Solo una posición compartida admite más de un cupo.',
         'seats_below_occupied' => 'La posición tiene :count ocupante(s): no puede tener menos cupos.',
         'budget_forbidden' => 'No tienes permiso para registrar el costo de las posiciones.',
+        'over_budget_reason_required' => 'Esta plaza excede el presupuesto de dotación de su unidad: para aprobarla registra el motivo de la excepción.',
+        'over_budget_exception' => 'Excepción de presupuesto: :reason',
         'not_assignable_proposed' => 'La posición todavía no está aprobada: no admite ocupantes.',
         'not_assignable_frozen' => 'La posición está congelada: no admite ocupantes ni vacantes (RN-POS-03).',
         'not_assignable_closed' => 'La posición está cerrada: no admite ocupantes (RN-POS-03).',
         'expired' => 'La posición ya no está vigente en esa fecha.',
         'no_free_seat' => 'La posición no tiene cupos libres en esas fechas (cupos: :seats).',
+    ],
+    // POS-3 · Solicitudes de posición.
+    'position_requests' => [
+        'only_draft' => 'Solo se edita una solicitud en borrador.',
+        'only_requester' => 'Solo quien hizo la solicitud (o quien aprueba posiciones) puede cambiarla.',
+        'justification_required' => 'Indica el motivo de la solicitud.',
+        'entity_required' => 'Indica la empresa de la posición.',
+        'approved_reason' => 'Aprobada por solicitud de posición.',
+        'approved_over_budget' => 'Aprobada por solicitud de posición fuera de presupuesto (excepción aprobada en el flujo).',
+    ],
+    // POS-4 · Dotación y presupuesto.
+    'headcount' => [
+        'unknown_unit' => 'La unidad no existe o está archivada.',
+        'budget_overlap' => 'La unidad ya tiene un presupuesto que empieza ese día o después: corrígelo en lugar de registrar otro.',
+        'explain_status' => [
+            'within' => 'Plaza :seat de :budgeted presupuestadas: dentro del presupuesto.',
+            'over_budget' => 'Plaza :seat de :budgeted presupuestadas: excede el presupuesto de plazas.',
+            'no_budget' => 'La unidad no tiene presupuesto registrado a esta fecha.',
+            'not_counted' => 'No cuenta en el presupuesto (propuesta, aún sin aprobar).',
+        ],
+        'explain_basis' => [
+            'occupant_salary' => 'Costo: sueldo vigente del ocupante más :factor % de cargas.',
+            'band_midpoint' => 'Costo: punto medio de la banda (vacante) más :factor % de cargas.',
+            'budgeted_cost' => 'Costo: costo presupuestado de la posición más :factor % de cargas.',
+            'none' => 'Sin costo: no tiene ocupante, banda ni costo presupuestado.',
+        ],
     ],
 ];

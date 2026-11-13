@@ -8,11 +8,13 @@ use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Organization\Infrastructure\Models\DirectoryEmployment;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
+use App\Modules\Organization\Infrastructure\Models\HeadcountBudget;
 use App\Modules\Organization\Infrastructure\Models\JobProfile;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
+use App\Modules\Organization\Infrastructure\Models\PositionRequest;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -80,6 +82,11 @@ final class CrossTenantHarness
         '/directory/{employment_id}' => DirectoryEmployment::class,
         '/org-chart' => DirectoryEmployment::class,
         // POS-1 / POS-2: acciones e historias de una posición de A.
+        // POS-3 · POS-4: solicitudes de posición y presupuestos de dotación de A.
+        '/position-requests/{id}' => PositionRequest::class,
+        '/position-requests/{id}/submit' => PositionRequest::class,
+        '/position-requests/{id}/cancel' => PositionRequest::class,
+        '/headcount-budgets/{id}' => HeadcountBudget::class,
         '/positions/{id}/reject' => Position::class,
         '/positions/{id}/open-recruitment' => Position::class,
         '/positions/{id}/cancel-recruitment' => Position::class,

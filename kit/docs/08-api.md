@@ -510,6 +510,17 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/positions/{id}/status-events` | `org.positions.view` | 1 |
 | GET | `/positions/{id}/reporting-line` | `org.positions.view` | 1 |
 | GET | `/position-options` | `org.positions.view` | 1 |
+| GET | `/position-requests` | `org.position_requests.view` | 1 |
+| POST | `/position-requests` | `org.position_requests.create` | 1 |
+| GET | `/position-requests/{id}` | `org.position_requests.view` | 1 |
+| PATCH | `/position-requests/{id}` | `org.position_requests.create` | 1 |
+| POST | `/position-requests/{id}/submit` | `org.position_requests.create` | 1 |
+| POST | `/position-requests/{id}/cancel` | `org.position_requests.create` | 1 |
+| GET | `/headcount-budgets` | `org.headcount_plans.view` | 1 |
+| POST | `/headcount-budgets` | `org.headcount_plans.create` | 1 |
+| GET | `/headcount-budgets/{id}` | `org.headcount_plans.view` | 1 |
+| PATCH | `/headcount-budgets/{id}` | `org.headcount_plans.update` | 1 |
+| GET | `/headcount/positions` | `org.positions.view` | 1 |
 
 **COL · Colaboradores**
 

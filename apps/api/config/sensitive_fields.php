@@ -81,6 +81,18 @@ return [
     ],
     'Payslip' => ['net' => ['payroll.results.view', 'salary']],
     'Position' => ['budget' => ['org.positions.budget.view', 'salary']],
+    // POS-3 · POS-4 (respuestas de /position-requests y /headcount*, esquema genérico en el contrato).
+    'PositionRequest' => ['estimated_cost' => ['org.positions.budget.view', 'salary']],
+    'HeadcountBudget' => ['monthly_cost' => ['org.positions.budget.view', 'salary']],
+    'HeadcountUnit' => [
+        'projected_cost' => ['org.positions.budget.view', 'salary'],
+        'budgeted_cost' => ['org.positions.budget.view', 'salary'],
+        'deviation_cost' => ['org.positions.budget.view', 'salary'],
+    ],
+    'HeadcountPosition' => [
+        'base_cost' => ['org.positions.budget.view', 'salary'],
+        'projected_cost' => ['org.positions.budget.view', 'salary'],
+    ],
     'Provision' => ['amount' => ['payroll.provisions.view', 'salary']],
     'RegistryProfile' => [
         'has_disability' => ['people.people.health_data.view', 'health'],
