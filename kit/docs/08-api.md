@@ -598,10 +598,22 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/contract-types/{id}` | `contracts.contract_types.{view,update}` | 1 |
 | GET, POST | `/contracts` | `contracts.contracts.{view,create}` | 1 |
 | GET, PATCH | `/contracts/{id}` | `contracts.contracts.{view,update}` | 1 |
-| POST | `/contracts/{id}/{issue,renew,terminate}` | `contracts.contracts.{issue,renew,terminate}` | 1 |
 | GET, POST | `/contract-addenda` | `contracts.addenda.{view,create}` | 1 |
 | GET | `/contract-addenda/{id}` | `contracts.addenda.view` | 1 |
-| POST | `/contract-addenda/{id}/{issue,cancel}` | `contracts.addenda.{issue,cancel}` | 1 |
+| POST | `/contracts/{id}/submit` | `contracts.contracts.create` | 1 |
+| POST | `/contracts/{id}/approve` | `contracts.contracts.approve` | 1 |
+| POST | `/contracts/{id}/return` | `contracts.contracts.approve` | 1 |
+| POST | `/contracts/{id}/register-signature` | `contracts.contracts.issue` | 1 |
+| POST | `/contracts/{id}/decline-signature` | `contracts.contracts.issue` | 1 |
+| POST | `/contracts/{id}/void` | `contracts.contracts.update` | 1 |
+| POST | `/contracts/{id}/terminate` | `contracts.contracts.terminate` | 1 |
+| POST | `/contracts/{id}/renew` | `contracts.contracts.renew` | 1 |
+| GET | `/contracts/{id}/document` | `contracts.contracts.view` | 1 |
+| GET | `/employments/{employment_id}/contracts` | `contracts.contracts.view` | 1 |
+| POST | `/contract-addenda/{id}/issue` | `contracts.addenda.issue` | 1 |
+| POST | `/contract-addenda/{id}/register-signature` | `contracts.addenda.issue` | 1 |
+| POST | `/contract-addenda/{id}/cancel` | `contracts.addenda.cancel` | 1 |
+| GET | `/contract-addenda/{id}/document` | `contracts.addenda.view` | 1 |
 
 **DOC · Documentos y firma**
 

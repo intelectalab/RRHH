@@ -3,6 +3,8 @@
 namespace Tests\Support\Isolation;
 
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
+use App\Modules\Contracts\Infrastructure\Models\Contract;
+use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
 use App\Modules\CoreHR\Infrastructure\Models\BankAccount;
 use App\Modules\CoreHR\Infrastructure\Models\Dependent;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
@@ -122,6 +124,21 @@ final class CrossTenantHarness
         '/positions/{id}/occupants' => Position::class,
         '/positions/{id}/status-events' => Position::class,
         '/positions/{id}/reporting-line' => Position::class,
+        // CON-2 · CON-3: acciones, documento y cadena de contratos de una relación de A; acciones de sus adendas.
+        '/contracts/{id}/submit' => Contract::class,
+        '/contracts/{id}/approve' => Contract::class,
+        '/contracts/{id}/return' => Contract::class,
+        '/contracts/{id}/register-signature' => Contract::class,
+        '/contracts/{id}/decline-signature' => Contract::class,
+        '/contracts/{id}/void' => Contract::class,
+        '/contracts/{id}/terminate' => Contract::class,
+        '/contracts/{id}/renew' => Contract::class,
+        '/contracts/{id}/document' => Contract::class,
+        '/employments/{employment_id}/contracts' => Contract::class,
+        '/contract-addenda/{id}/issue' => ContractAddendum::class,
+        '/contract-addenda/{id}/register-signature' => ContractAddendum::class,
+        '/contract-addenda/{id}/cancel' => ContractAddendum::class,
+        '/contract-addenda/{id}/document' => ContractAddendum::class,
         // COL-5: historia y movimientos de la asignación de una relación laboral de A.
         '/employments/{employment_id}/assignments' => Employment::class,
         '/employments/{employment_id}/assignments/{id}' => Employment::class,

@@ -78,6 +78,10 @@ return [
             'in_app' => ['subject' => 'Sua conta de pagamento mudou', 'body' => 'Seus pagamentos irão para a conta terminada em {last4}. Se não foi você, avise o RH imediatamente.'],
             'email' => ['subject' => 'Sua conta de pagamento mudou', 'body' => "Olá {name}:\n\nEm {organization}, seus pagamentos irão a partir de agora para a conta terminada em {last4}.\n\nSe não foi você, avise o RH imediatamente."],
         ],
+        'contracts.probation_ending' => [
+            'in_app' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => 'O período de experiência de {employee} termina em {ends_on}. Revise o desempenho antes dessa data.'],
+            'email' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => "Olá {name}:\n\nEm {organization}, o período de experiência de {employee} termina em {ends_on}. Revise o desempenho e decida antes dessa data.\n\nRevise aqui: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],

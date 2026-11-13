@@ -475,11 +475,13 @@
   weekly_hours numeric(5,2) ; work_modality enum(onsite,remote,hybrid)=onsite
   status enum(draft,pending_signature,active,expired,terminated,superseded,cancelled,pending_approval,signed)=draft
   renewal_of_contract_id ?-> contracts ; document_id ?-> documents ; signature_request_id ?-> signature_requests
-  accumulated_days integer ; vig employment_id | status NOT IN ('draft','pending_approval','superseded','cancelled')
+  accumulated_days integer ; signed_at ; signature_origin enum(physical_scan,electronic) ; approved_by_user_id ?-> users ; approved_at
+  termination_reason ; probation_alerted_on ; vig employment_id | status NOT IN ('draft','pending_approval','superseded','cancelled')
 @contract_amendments soft lock | Adendas al contrato.
   contract_id -> contracts ; number ; kind enum(salary,position,schedule,extension,modality,other)! ; effective_on date!
   description text! ; document_id ?-> documents ; signature_request_id ?-> signature_requests
-  status enum(draft,pending_signature,active,cancelled)=draft
+  status enum(draft,pending_signature,active,cancelled)=draft ; changes j ; applied_refs j ; signed_at
+  signature_origin enum(physical_scan,electronic) ; cancellation_reason
 @contract_renewal_batches lock | Lote de renovación masiva de contratos con firma (E-08).
   name ; legal_entity_id ?-> legal_entities ; status enum(draft,in_review,approved,sent_to_signature,completed,cancelled)=draft
   new_end_date date ; created_by_user_id -> users

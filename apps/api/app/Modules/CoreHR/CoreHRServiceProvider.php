@@ -6,8 +6,10 @@ use App\Modules\CoreHR\Console\ActivateDueEmployments;
 use App\Modules\CoreHR\Console\ApplyDueTerminations;
 use App\Modules\CoreHR\Console\ReviewDependentsMajority;
 use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
+use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Shared\Exports\ExportRegistry;
+use App\Shared\Labor\AssignmentChanges;
 use App\Shared\Usage\UsageRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -18,6 +20,12 @@ use Illuminate\Support\ServiceProvider;
  */
 final class CoreHRServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // CON-3 · RN-CON-08: las adendas firmadas registran el movimiento de la asignación sin importar Core HR.
+        $this->app->bind(AssignmentChanges::class, AssignmentChangesAdapter::class);
+    }
+
     public function boot(): void
     {
         // SAS-6 · RN-COL-13 · Colaboradores activos frente al límite del plan.
