@@ -4374,8 +4374,7 @@ export interface paths {
         /** Listar Assignment */
         get: operations["getEmploymentsEmploymentIdAssignments"];
         put?: never;
-        /** Crear Assignment */
-        post: operations["postEmploymentsEmploymentIdAssignments"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4393,26 +4392,6 @@ export interface paths {
         get: operations["getEmploymentsEmploymentIdAssignmentsId"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/employments/{employment_id}/assignments/{id}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acción «cancel» sobre Assignment
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postEmploymentsEmploymentIdAssignmentsIdCancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4767,6 +4746,41 @@ export interface paths {
         put?: never;
         /** Registrar un cambio de AFP, de tipo de comisión o de sistema desde una fecha efectiva: cierra la afiliación vigente el día anterior */
         post: operations["postEmploymentsEmploymentIdPensionAffiliations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/personnel-actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Movimientos de personal de una relación laboral (aplicados, programados, en aprobación, rechazados, anulados y reemplazados) con el antes y el después */
+        get: operations["getEmploymentsEmploymentIdPersonnelActions"];
+        put?: never;
+        /** Registrar un movimiento (tipo, fecha efectiva, cambios de la asignación y motivo). Con fecha futura queda programado (RN-HIS-04); los tipos de movimientos.tipos_con_aprobacion pasan por el flujo «personnel_action»; con fecha en un periodo de planilla cerrado exige people.assignments.correct (RN-HIS-05) */
+        post: operations["postEmploymentsEmploymentIdPersonnelActions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/personnel-actions/propose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Un jefe propone un movimiento para su equipo (mismos datos que el registro): siempre pasa por el flujo «personnel_action» antes de aplicarse o programarse */
+        post: operations["postEmploymentsEmploymentIdPersonnelActionsPropose"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9862,6 +9876,75 @@ export interface paths {
         get: operations["getPermissions"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/personnel-actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Movimientos de la organización dentro del alcance; por defecto los programados y en aprobación (Movimientos programados) */
+        get: operations["getPersonnelActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/personnel-actions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver un movimiento de personal con su aprobación y su antes y después */
+        get: operations["getPersonnelActionsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar un movimiento programado antes de su fecha (fecha futura, cambios, motivo) */
+        patch: operations["patchPersonnelActionsId"];
+        trace?: never;
+    };
+    "/personnel-actions/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Anular un movimiento programado o en aprobación antes de aplicarse (motivo obligatorio) */
+        post: operations["postPersonnelActionsIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/personnel-actions/{id}/correct": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corregir un movimiento aplicado con los valores correctos y el motivo: crea el movimiento de corrección y el original queda reemplazado (RN-HIS-06); con fecha pasada emite employment.retroactive_change con el rango afectado */
+        post: operations["postPersonnelActionsIdCorrect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -16956,29 +17039,6 @@ export interface components {
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
-        };
-        AssignmentInput: {
-            /** @description Identificador opaco */
-            job_profile_id?: string;
-            /** @description Identificador opaco */
-            position_id?: string | null;
-            /** @description Identificador opaco */
-            org_unit_id?: string;
-            /** @description Identificador opaco */
-            site_id?: string;
-            /** @description Identificador opaco */
-            cost_center_id?: string | null;
-            /** @description Identificador opaco */
-            manager_employment_id?: string | null;
-            /** @enum {string} */
-            work_modality?: "onsite" | "remote" | "hybrid";
-            /** Format: date */
-            valid_from?: string;
-            /** Format: date */
-            valid_to?: string | null;
-            reason?: string | null;
-            /** @enum {string|null} */
-            kind?: "hire" | "promotion" | "transfer" | "manager_change" | "cost_center_change" | "data_correction" | null;
         };
         AttendanceDay: {
             /** @description Identificador opaco */
@@ -33300,44 +33360,6 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
-    postEmploymentsEmploymentIdAssignments: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                employment_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AssignmentInput"];
-            };
-        };
-        responses: {
-            /** @description Creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Assignment"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
     getEmploymentsEmploymentIdAssignmentsId: {
         parameters: {
             query?: {
@@ -33369,43 +33391,6 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
-        };
-    };
-    postEmploymentsEmploymentIdAssignmentsIdCancel: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                employment_id: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Assignment"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
         };
     };
     getEmploymentsEmploymentIdBankAccounts: {
@@ -34438,6 +34423,103 @@ export interface operations {
         };
     };
     postEmploymentsEmploymentIdPensionAffiliations: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getEmploymentsEmploymentIdPersonnelActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postEmploymentsEmploymentIdPersonnelActions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postEmploymentsEmploymentIdPersonnelActionsPropose: {
         parameters: {
             query?: never;
             header?: {
@@ -46831,6 +46913,174 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    getPersonnelActions: {
+        parameters: {
+            query?: {
+                /** @description Estados separados por coma (draft, pending_approval, approved, scheduled, applied, rejected, cancelled, replaced); por defecto pending_approval, approved y scheduled */
+                "filter[status]"?: string;
+                /** @description Tipo de movimiento (promotion, transfer, manager_change, cost_center_change, data_correction) */
+                "filter[kind]"?: string;
+                /** @description Solo los de esa relación laboral */
+                "filter[employment_id]"?: string;
+                /** @description Desde esa fecha efectiva (AAAA-MM-DD) */
+                "filter[from]"?: string;
+                /** @description Hasta esa fecha efectiva (AAAA-MM-DD) */
+                "filter[to]"?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getPersonnelActionsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPersonnelActionsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPersonnelActionsIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPersonnelActionsIdCorrect: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPlatformAddons: {

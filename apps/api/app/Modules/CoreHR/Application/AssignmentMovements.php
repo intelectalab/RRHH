@@ -20,8 +20,9 @@ use Illuminate\Validation\ValidationException;
  * efectiva (regla 2). El movimiento deja un personnel_action aplicado y cierra la asignación vigente el
  * día anterior para insertar la nueva (EffectiveDated). La historia se lee de employment_assignments.
  *
- * Los movimientos con aprobación, los de sueldo, contrato o régimen y las correcciones retroactivas con
- * planilla cerrada son de M-HIS (HIS-2 a HIS-4); aquí solo los de la asignación.
+ * HIS-2 · HIS-4: la aprobación, la programación a futuro y las correcciones las orquesta PersonnelActions;
+ * aquí vive la mecánica de la asignación (validar, aplicar, corregir). Sueldo, contrato y régimen son de
+ * HIS-3 y M-CON.
  */
 final class AssignmentMovements
 {
@@ -65,79 +66,168 @@ final class AssignmentMovements
     }
 
     /**
-     * Registra un movimiento de la asignación desde $input['valid_from'].
+     * HIS-2 · Valida un movimiento sin escribir nada: la relación admite cambios, la fecha es posterior al
+     * ingreso, no hay tramos desde esa fecha (409) y los valores resultantes son válidos en la estructura.
      *
-     * @param  array<string, mixed>  $input
-     * @return array<string, mixed> la asignación nueva
+     * @param  array<string, mixed>  $changes  subconjunto de FIELDS
+     * @return array{from: string, kind: string, changed: list<string>, before: array<string, mixed>, after: array<string, mixed>, values: array<string, mixed>, current: \stdClass}
      */
-    public function register(Employment $employment, array $input, ?string $userId): array
+    public function preview(Employment $employment, array $changes, string $validFrom, ?string $kind = null): array
     {
         if (! in_array($employment->status, EmploymentStateMachine::OPEN_STATES, true)) {
             throw new AyniException('invalid_transition', 409, (string) trans('people.movement_closed_relation'));
         }
-        $from = EffectiveDated::day((string) $input['valid_from']);
+        $from = EffectiveDated::day($validFrom);
         if ($from < $employment->hire_date->toDateString()) {
             throw ValidationException::withMessages(['valid_from' => [(string) trans('people.movement_before_hire')]]);
         }
+        $current = $this->validity->rowAt('employment_assignments', ['employment_id' => $employment->id], $from);
+        if ($current === null) {
+            throw ValidationException::withMessages(['valid_from' => [(string) trans('people.movement_no_assignment')]]);
+        }
+        // Un tramo que ya empieza ese día o después no se pisa: se corrige (HIS-4) o se anula lo programado.
+        if (DB::table('employment_assignments')->where('employment_id', $employment->id)->where('valid_from', '>=', $from)->exists()) {
+            throw new AyniException('overlap', 409, (string) trans('validity.same_day'), [], ['reason' => 'same_day']);
+        }
 
-        return DB::transaction(function () use ($employment, $input, $from, $userId): array {
+        return $this->compute($employment, $current, $changes, $from, $kind);
+    }
+
+    /**
+     * Aplica el movimiento: deja (o completa) el personnel_action aplicado, cierra la asignación vigente el día
+     * anterior e inserta la nueva, sincroniza las posiciones y emite employee.updated (y employee.promoted /
+     * employee.transferred según el tipo).
+     *
+     * @param  array<string, mixed>  $changes
+     * @return array{action_id: string, kind: string, changed: list<string>, assignment: array<string, mixed>}
+     */
+    public function applyChanges(Employment $employment, array $changes, string $validFrom, ?string $kind, ?string $reason, ?string $userId, ?string $actionId): array
+    {
+        return DB::transaction(function () use ($employment, $changes, $validFrom, $kind, $reason, $userId, $actionId): array {
             Employment::query()->whereKey($employment->id)->lockForUpdate()->first();
-            $current = $this->validity->rowAt('employment_assignments', ['employment_id' => $employment->id], $from, true);
-            if ($current === null) {
-                throw ValidationException::withMessages(['valid_from' => [(string) trans('people.movement_no_assignment')]]);
-            }
-
-            $merged = [];
-            foreach (self::FIELDS as $field) {
-                $merged[$field] = $current->{$field};
-            }
-            $positionChanged = array_key_exists('position_id', $input) && $input['position_id'] !== $current->position_id;
-            if ($positionChanged && is_string($input['position_id'])) {
-                // La posición nueva trae su puesto, unidad, sede y centro, salvo que el movimiento los indique.
-                $position = DB::table('positions')->where('id', $input['position_id'])->whereNull('deleted_at')->first();
-                if ($position !== null) {
-                    foreach (['job_profile_id', 'org_unit_id', 'site_id', 'cost_center_id'] as $field) {
-                        $merged[$field] = $position->{$field};
-                    }
-                }
-            }
-            foreach (self::FIELDS as $field) {
-                if (array_key_exists($field, $input)) {
-                    $merged[$field] = $input[$field];
-                }
-            }
-
-            $values = $this->employments->buildAssignment($merged, $employment->legal_entity_id, $from, $employment->id);
-            $changed = array_values(array_filter(self::FIELDS, fn (string $f) => (string) ($values[$f] ?? '') !== (string) ($current->{$f} ?? '')));
-            if ($changed === []) {
-                throw ValidationException::withMessages(['valid_from' => [(string) trans('people.movement_no_changes')]]);
-            }
-            $kind = isset($input['kind']) && is_string($input['kind']) ? $input['kind'] : $this->kindFor($changed);
+            $p = $this->preview($employment, $changes, $validFrom, $kind);
             $tenant = TenancyScope::requireTenant();
-            $before = array_intersect_key((array) $current, array_flip($changed));
-            $after = array_intersect_key($values, array_flip($changed));
-
-            $actionId = (string) DB::table('personnel_actions')->insertGetId([
-                'tenant_id' => $tenant, 'employment_id' => $employment->id, 'kind' => $kind, 'effective_on' => $from,
-                'reason' => $input['reason'] ?? null, 'status' => 'applied', 'requested_by_user_id' => $userId,
-                'applied_at' => now(), 'payload' => json_encode(['before' => $before, 'after' => $after], JSON_THROW_ON_ERROR),
-            ]);
-            $id = $this->validity->change('employment_assignments', ['tenant_id' => $tenant, 'employment_id' => $employment->id],
-                $values + ['reason' => $input['reason'] ?? $kind, 'personnel_action_id' => $actionId], $from);
-
-            foreach (array_unique(array_filter([$current->position_id, $values['position_id']])) as $positionId) {
-                $this->occupancy->sync((string) $positionId, $userId);
+            $payload = json_encode(['before' => $p['before'], 'after' => $p['after']], JSON_THROW_ON_ERROR);
+            if ($actionId === null) {
+                $actionId = (string) DB::table('personnel_actions')->insertGetId([
+                    'tenant_id' => $tenant, 'employment_id' => $employment->id, 'kind' => $p['kind'], 'effective_on' => $p['from'],
+                    'reason' => $reason, 'status' => 'applied', 'requested_by_user_id' => $userId,
+                    'applied_at' => now(), 'payload' => $payload, 'changes' => json_encode($changes, JSON_THROW_ON_ERROR),
+                ]);
+            } else {
+                DB::table('personnel_actions')->where('id', $actionId)->update([
+                    'kind' => $p['kind'], 'status' => 'applied', 'applied_at' => now(), 'payload' => $payload, 'updated_at' => now(),
+                ]);
             }
-            $this->outbox->record(DomainEventTypes::EMPLOYEE_UPDATED, 'employment', $employment->id, [
-                'employee_id' => $employment->id, 'employment_id' => $employment->id, 'person_id' => $employment->person_id,
-                'updated_fields' => $changed, 'effective_on' => $from, 'personnel_action_id' => $actionId, 'kind' => $kind,
-            ]);
-            $this->audit->record('employment.assignment_changed', 'employment', $employment->id, $before, $after + ['valid_from' => $from, 'kind' => $kind],
-                isset($input['reason']) && is_string($input['reason']) ? $input['reason'] : null);
+            $id = $this->validity->change('employment_assignments', ['tenant_id' => $tenant, 'employment_id' => $employment->id],
+                $p['values'] + ['reason' => $reason ?? $p['kind'], 'personnel_action_id' => $actionId], $p['from']);
 
-            /** @var array<string, mixed> */
-            return $this->find($employment, $id);
+            $this->afterChange($employment, $p['current']->position_id, $p['values']['position_id'] ?? null, $p['changed'], $p['from'], $actionId, $p['kind'], $userId);
+            $this->audit->record('employment.assignment_changed', 'employment', $employment->id, $p['before'], $p['after'] + ['valid_from' => $p['from'], 'kind' => $p['kind']], $reason);
+
+            /** @var array<string, mixed> $assignment */
+            $assignment = $this->find($employment, $id);
+
+            return ['action_id' => $actionId, 'kind' => $p['kind'], 'changed' => $p['changed'], 'assignment' => $assignment];
         });
+    }
+
+    /**
+     * HIS-4 · RN-HIS-06 · Corrige el tramo que abrió un movimiento aplicado: solo el último tramo y abierto
+     * (si hay movimientos posteriores, se corrigen o anulan primero esos). El valor original queda en la
+     * historia del movimiento corregido (payload «after») y en la auditoría; el tramo toma los valores
+     * correctos desde la misma fecha (EffectiveDated SAME_DAY_REPLACE) y queda enlazado al movimiento de
+     * corrección. Debe correr dentro de la transacción de PersonnelActions.
+     *
+     * @param  array<string, mixed>  $changes
+     * @return array{changed: list<string>, before: array<string, mixed>, after: array<string, mixed>, assignment: array<string, mixed>, from: string}
+     */
+    public function correctRow(Employment $employment, string $originalActionId, array $changes, string $correctionActionId, ?string $reason, ?string $userId): array
+    {
+        $row = DB::table('employment_assignments')->where('employment_id', $employment->id)->where('personnel_action_id', $originalActionId)->lockForUpdate()->first();
+        if ($row === null) {
+            throw new AyniException('invalid_transition', 409, (string) trans('people.movements.not_correctable'));
+        }
+        $later = DB::table('employment_assignments')->where('employment_id', $employment->id)->where('valid_from', '>', $row->valid_from)->exists();
+        if ($later || $row->valid_to !== null) {
+            throw new AyniException('later_movements', 409, (string) trans('people.movements.later_movements'));
+        }
+        $from = EffectiveDated::day((string) $row->valid_from);
+        $p = $this->compute($employment, $row, $changes, $from, 'data_correction');
+        $tenant = TenancyScope::requireTenant();
+        $id = $this->validity->change('employment_assignments', ['tenant_id' => $tenant, 'employment_id' => $employment->id],
+            $p['values'] + ['reason' => $reason ?? 'data_correction', 'personnel_action_id' => $correctionActionId, 'updated_at' => now()], $from, EffectiveDated::SAME_DAY_REPLACE);
+        $this->afterChange($employment, $row->position_id, $p['values']['position_id'] ?? null, $p['changed'], $from, $correctionActionId, 'data_correction', $userId);
+        $this->audit->record('employment.assignment_corrected', 'employment', $employment->id, $p['before'], $p['after'] + ['valid_from' => $from, 'corrects' => $originalActionId], $reason);
+
+        /** @var array<string, mixed> $assignment */
+        $assignment = $this->find($employment, $id);
+
+        return ['changed' => $p['changed'], 'before' => $p['before'], 'after' => $p['after'], 'assignment' => $assignment, 'from' => $from];
+    }
+
+    /**
+     * @param  array<string, mixed>  $changes
+     * @return array{from: string, kind: string, changed: list<string>, before: array<string, mixed>, after: array<string, mixed>, values: array<string, mixed>, current: \stdClass}
+     */
+    private function compute(Employment $employment, \stdClass $current, array $changes, string $from, ?string $kind): array
+    {
+        $merged = [];
+        foreach (self::FIELDS as $field) {
+            $merged[$field] = $current->{$field};
+        }
+        $positionChanged = array_key_exists('position_id', $changes) && $changes['position_id'] !== $current->position_id;
+        if ($positionChanged && is_string($changes['position_id'])) {
+            // La posición nueva trae su puesto, unidad, sede y centro, salvo que el movimiento los indique.
+            $position = DB::table('positions')->where('id', $changes['position_id'])->whereNull('deleted_at')->first();
+            if ($position !== null) {
+                foreach (['job_profile_id', 'org_unit_id', 'site_id', 'cost_center_id'] as $field) {
+                    $merged[$field] = $position->{$field};
+                }
+            }
+        }
+        foreach (self::FIELDS as $field) {
+            if (array_key_exists($field, $changes)) {
+                $merged[$field] = $changes[$field];
+            }
+        }
+
+        $values = $this->employments->buildAssignment($merged, $employment->legal_entity_id, $from, $employment->id);
+        $changed = array_values(array_filter(self::FIELDS, fn (string $f) => (string) ($values[$f] ?? '') !== (string) ($current->{$f} ?? '')));
+        if ($changed === []) {
+            throw ValidationException::withMessages(['valid_from' => [(string) trans('people.movement_no_changes')]]);
+        }
+
+        return [
+            'from' => $from,
+            'kind' => $kind ?? $this->kindFor($changed),
+            'changed' => $changed,
+            'before' => array_intersect_key((array) $current, array_flip($changed)),
+            'after' => array_intersect_key($values, array_flip($changed)),
+            'values' => $values,
+            'current' => $current,
+        ];
+    }
+
+    /**
+     * Ocupación de las posiciones y eventos de un cambio de asignación.
+     *
+     * @param  list<string>  $changed
+     */
+    private function afterChange(Employment $employment, mixed $oldPosition, mixed $newPosition, array $changed, string $from, string $actionId, string $kind, ?string $userId): void
+    {
+        foreach (array_unique(array_filter([$oldPosition, $newPosition])) as $positionId) {
+            $this->occupancy->sync((string) $positionId, $userId);
+        }
+        $base = ['employee_id' => $employment->id, 'employment_id' => $employment->id, 'person_id' => $employment->person_id,
+            'effective_on' => $from, 'personnel_action_id' => $actionId, 'kind' => $kind, 'updated_fields' => $changed];
+        $this->outbox->record(DomainEventTypes::EMPLOYEE_UPDATED, 'employment', $employment->id, $base);
+        // HIS-2 · La promoción y el traslado quedan identificados como tales para la analítica.
+        if ($kind === 'promotion') {
+            $this->outbox->record(DomainEventTypes::EMPLOYEE_PROMOTED, 'employment', $employment->id, $base);
+        } elseif ($kind === 'transfer') {
+            $this->outbox->record(DomainEventTypes::EMPLOYEE_TRANSFERRED, 'employment', $employment->id, $base);
+        }
     }
 
     /**

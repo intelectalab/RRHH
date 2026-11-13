@@ -126,6 +126,13 @@ class DemoOrganizationSeeder extends Seeder
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
+            // HIS-2: los movimientos que pasan por aprobación (promociones y lo que propone un jefe) usan este flujo.
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'personnel_action')->exists()) {
+                $flow = $flows->create(['name' => 'Movimientos de personal · aprobación estándar', 'subject_type' => 'personnel_action', 'steps' => ['levels' => [
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 48, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
 
             $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
             if ($admin === null || Task::query()->exists()) {

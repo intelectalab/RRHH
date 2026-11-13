@@ -10,12 +10,11 @@ use App\Shared\Exceptions\InvalidFilterException;
 use App\Shared\Permissions\DataScope;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 /**
  * COL-3 · COL-5 · Ficha 360: cabecera (foto, nombre, puesto, estado, antigüedad calculada y las otras
  * relaciones de la persona para cambiar de ficha), datos laborales vigentes con «desde cuándo» y la historia
- * de la asignación, que solo cambia con un movimiento con fecha efectiva.
+ * de la asignación, que solo cambia con un movimiento de personal (HIS-2, PersonnelActionController).
  */
 final class EmploymentProfileController
 {
@@ -62,27 +61,6 @@ final class EmploymentProfileController
         abort_if($row === null, 404);
 
         return response()->json(['data' => $row]);
-    }
-
-    /** COL-5 · Registra un movimiento de la asignación desde valid_from (cierra la vigente el día anterior). */
-    public function storeAssignment(Request $request, string $employmentId): JsonResponse
-    {
-        $employment = $this->findEmployment($request, $employmentId, 'people.assignments.create');
-        $uuid = ['sometimes', 'nullable', 'uuid'];
-        $input = $request->validate([
-            'valid_from' => ['required', 'date_format:Y-m-d'],
-            'kind' => ['sometimes', Rule::in(AssignmentMovements::KINDS)],
-            'reason' => ['sometimes', 'nullable', 'string', 'max:500'],
-            'job_profile_id' => ['sometimes', 'uuid'],
-            'org_unit_id' => ['sometimes', 'uuid'],
-            'site_id' => ['sometimes', 'uuid'],
-            'position_id' => $uuid,
-            'cost_center_id' => $uuid,
-            'manager_employment_id' => $uuid,
-            'work_modality' => ['sometimes', Rule::in(['onsite', 'remote', 'hybrid'])],
-        ]);
-
-        return response()->json(['data' => $this->movements->register($employment, $input, $this->userId($request))], 201);
     }
 
     private function asOf(Request $request): ?string

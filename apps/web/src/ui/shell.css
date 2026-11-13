@@ -734,3 +734,11 @@
   .ficha-cab-datos { grid-template-columns: minmax(0, 1fr); }
   .ficha-lista li { flex-direction: column; }
 }
+
+/* HIS-2 · HIS-4 · Movimientos de personal: lista con estado, antes → después y acciones. */
+.mov-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.mov-item { border: 1px solid var(--bd); border-radius: 8px; padding: 12px; min-width: 0; }
+.mov-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 4px; }
+.mov-cambios { margin: 4px 0; padding-left: 18px; overflow-wrap: anywhere; }
+.mov-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.mov-acciones:empty { display: none; }

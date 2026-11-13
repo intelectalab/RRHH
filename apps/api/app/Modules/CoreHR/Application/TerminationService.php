@@ -320,6 +320,11 @@ final class TerminationService
             ->whereNotIn('status', ['cancelled', 'superseded'])->where('valid_from', '>', $date)->exists()) {
             $later[] = 'contracts';
         }
+        // HIS-4 · Un movimiento programado o en aprobación para después del cese tampoco se aplica solo.
+        if (DB::table('personnel_actions')->where('employment_id', $employment->id)->whereNull('deleted_at')
+            ->whereIn('status', PersonnelActions::OPEN_STATES)->where('effective_on', '>', $date)->exists()) {
+            $later[] = 'personnel_actions';
+        }
         if ($later !== []) {
             throw new AyniException('future_changes', 409, (string) trans('people.termination.future_changes'), [], ['tables' => $later]);
         }

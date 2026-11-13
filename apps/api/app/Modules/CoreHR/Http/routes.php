@@ -8,6 +8,7 @@ use App\Modules\CoreHR\Http\Controllers\EmploymentProfileController;
 use App\Modules\CoreHR\Http\Controllers\InsuranceCatalogController;
 use App\Modules\CoreHR\Http\Controllers\PersonalDataController;
 use App\Modules\CoreHR\Http\Controllers\PersonController;
+use App\Modules\CoreHR\Http\Controllers\PersonnelActionController;
 use App\Modules\CoreHR\Http\Controllers\ProfileChangeRequestController;
 use App\Modules\CoreHR\Http\Controllers\SocialSecurityController;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,16 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/employments/{id}/profile', [EmploymentProfileController::class, 'profile'])->middleware('permission:people.employments.view');
     Route::get('/employments/{id}/work-data', [EmploymentProfileController::class, 'workData'])->middleware('permission:people.employments.view');
     Route::get('/employments/{employment_id}/assignments', [EmploymentProfileController::class, 'assignments'])->middleware('permission:people.assignments.view');
-    Route::post('/employments/{employment_id}/assignments', [EmploymentProfileController::class, 'storeAssignment'])->middleware('permission:people.assignments.create');
+    // HIS-2 · HIS-4 · Movimientos de personal: única vía para cambiar la asignación (con aprobación,
+    // programados a futuro, corregidos). El jefe propone por /propose (siempre pasa por aprobación).
+    Route::get('/employments/{employment_id}/personnel-actions', [PersonnelActionController::class, 'forEmployment'])->middleware('permission:people.assignments.view');
+    Route::post('/employments/{employment_id}/personnel-actions', [PersonnelActionController::class, 'store'])->middleware('permission:people.assignments.create');
+    Route::post('/employments/{employment_id}/personnel-actions/propose', [PersonnelActionController::class, 'propose'])->middleware('permission:people.assignments.propose');
+    Route::get('/personnel-actions', [PersonnelActionController::class, 'index'])->middleware('permission:people.assignments.view');
+    Route::get('/personnel-actions/{id}', [PersonnelActionController::class, 'show'])->middleware('permission:people.assignments.view');
+    Route::patch('/personnel-actions/{id}', [PersonnelActionController::class, 'update'])->middleware('permission:people.assignments.create');
+    Route::post('/personnel-actions/{id}/cancel', [PersonnelActionController::class, 'cancel'])->middleware('permission:people.assignments.cancel');
+    Route::post('/personnel-actions/{id}/correct', [PersonnelActionController::class, 'correct'])->middleware('permission:people.assignments.correct');
     Route::get('/employments/{employment_id}/assignments/{id}', [EmploymentProfileController::class, 'assignment'])->middleware('permission:people.assignments.view');
 
     // COL-4 · Datos personales de la persona: foto, direcciones, contactos de emergencia y datos sensibles.

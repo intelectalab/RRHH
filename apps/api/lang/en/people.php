@@ -129,4 +129,14 @@ return [
         'below_minimum_part_time' => 'The salary is below the minimum wage; it is accepted because the contract is part-time.',
         'invalid_filter' => 'The filter is not valid.',
     ],
+    'movements' => [
+        'not_correctable' => 'That movement cannot be corrected: only applied assignment movements can.',
+        'later_movements' => 'There are later movements: correct or cancel the most recent one first.',
+        'pending_movement' => 'The employment already has a scheduled or pending movement: edit or cancel it before registering another.',
+        'requester_required' => 'A movement that goes through approval needs a requester.',
+        'edit_future_only' => 'A scheduled movement can only move to another future date; to apply it today, cancel it and register it again.',
+        'closed_period' => 'The date falls in a closed payroll period (until :date): only someone who can correct movements may register it, and the difference goes to the open period.',
+        'apply_blocked' => 'Scheduled movement :id could not be applied; it remains scheduled.',
+        'apply_due' => 'Scheduled movements applied: :count.',
+    ],
 ];

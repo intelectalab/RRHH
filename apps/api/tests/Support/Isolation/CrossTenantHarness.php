@@ -14,6 +14,7 @@ use App\Modules\CoreHR\Infrastructure\Models\InsuranceCoverage;
 use App\Modules\CoreHR\Infrastructure\Models\InsurancePolicy;
 use App\Modules\CoreHR\Infrastructure\Models\LifeInsuranceBeneficiary;
 use App\Modules\CoreHR\Infrastructure\Models\PensionAffiliation;
+use App\Modules\CoreHR\Infrastructure\Models\PersonnelAction;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -133,6 +134,13 @@ final class CrossTenantHarness
         // COL-5: historia y movimientos de la asignación de una relación laboral de A.
         '/employments/{employment_id}/assignments' => Employment::class,
         '/employments/{employment_id}/assignments/{id}' => Employment::class,
+        // HIS-2 · HIS-4: movimientos de personal de una relación de A (programados, en aprobación) y sus acciones.
+        '/employments/{employment_id}/personnel-actions' => PersonnelAction::class,
+        '/employments/{employment_id}/personnel-actions/propose' => PersonnelAction::class,
+        '/personnel-actions' => PersonnelAction::class,
+        '/personnel-actions/{id}' => PersonnelAction::class,
+        '/personnel-actions/{id}/cancel' => PersonnelAction::class,
+        '/personnel-actions/{id}/correct' => PersonnelAction::class,
     ];
 
     /**
@@ -141,7 +149,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
