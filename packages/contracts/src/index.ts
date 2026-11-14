@@ -3446,6 +3446,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/contracts/expiring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contratos que vencen dentro de la ventana (por defecto, la mayor anticipación de aviso de su empresa) y vencidos sin regularizar (RN-CON-05), con días para vencer, acumulado frente al tope (RN-CON-02/03) y acción sugerida (renew, convert_indefinite, continue_renewal, regularize); excluye los regularizados */
+        get: operations["getContractsExpiring"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/contracts/{id}": {
         parameters: {
             query?: never;
@@ -3541,7 +3558,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación */
+        /** Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación, salvo confirmación expresa (confirm_over_limit=true) con motivo (over_limit_reason), que queda auditada (CON-4) */
         post: operations["postContractsIdRenew"];
         delete?: never;
         options?: never;
@@ -5186,6 +5203,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postEmploymentsIdTerminate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Línea de tiempo laboral de la relación: ingreso o reingreso, movimientos con el antes y el después de cada campo, cambios de sueldo (solo con people.employments.salary.view; lectura registrada), contratos y adendas, estados y cese; cada tipo exige además el permiso de su recurso (meta.types) */
+        get: operations["getEmploymentsIdTimeline"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -16019,6 +16053,127 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/vacation-balances/{id}/ledger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Movimientos del libro de vacaciones de la relación (devengo, reservas, goce, ajustes, liquidación), del más reciente al más antiguo; el saldo es su suma */
+        get: operations["getVacationBalancesIdLedger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-legal-limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Límites legales del régimen a una fecha (días por año, plazo de goce, récord, venta, fraccionamiento y adelanto), cada uno con su estado de validación */
+        get: operations["getVacationLegalLimits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar VacationPolicy */
+        get: operations["getVacationPolicies"];
+        put?: never;
+        /** Crear una política de vacaciones (alcance por empresa, régimen y categoría; reglas desde effective_from). Días por año vacíos = los del régimen en los parámetros legales; una regla menor que la ley verificada responde 422 y lo «por validar» vuelve en meta.warnings */
+        post: operations["postVacationPolicies"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-policies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver VacationPolicy */
+        get: operations["getVacationPoliciesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambiar nombre o alcance y registrar reglas nuevas desde effective_from: se cierra la regla vigente y se inserta otra (nunca se sobrescribe la historia) */
+        patch: operations["patchVacationPoliciesId"];
+        trace?: never;
+    };
+    "/vacation-policies/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archivar la política: deja de aplicarse en los cálculos nuevos; los periodos ya ganados no cambian */
+        post: operations["postVacationPoliciesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-policies/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restaurar una política archivada */
+        post: operations["postVacationPoliciesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-policies/{id}/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historia de las reglas de la política (vigencias de la más reciente a la más antigua) */
+        get: operations["getVacationPoliciesIdRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/vacation-requests": {
         parameters: {
             query?: never;
@@ -17468,9 +17623,6 @@ export interface components {
             /** @enum {string} */
             kind?: "cts" | "gratification" | "profit_sharing";
             period?: string;
-            totals?: {
-                [key: string]: unknown;
-            } | null;
         };
         Candidate: {
             /** @description Identificador opaco */
@@ -17938,6 +18090,7 @@ export interface components {
             approved_at?: string | null;
             accumulated_days?: number | null;
             termination_reason?: string | null;
+            over_limit_reason?: string | null;
             accumulation?: {
                 [key: string]: unknown;
             } | null;
@@ -18023,6 +18176,7 @@ export interface components {
             objective_cause?: string | null;
             /** @description Identificador opaco */
             renewal_of_contract_id?: string | null;
+            over_limit_reason?: string | null;
         };
         ContractType: {
             /** @description Identificador opaco */
@@ -19109,9 +19263,6 @@ export interface components {
             /** @enum {string} */
             scenario?: "current" | "conservative" | "growth" | "custom";
             year?: number;
-            totals?: {
-                [key: string]: unknown;
-            };
         };
         HelpArticle: {
             /** @description Identificador opaco */
@@ -20185,9 +20336,6 @@ export interface components {
             kind?: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "off_cycle";
             /** Format: date */
             pay_date?: string;
-            totals?: {
-                [key: string]: unknown;
-            } | null;
             engine_version?: string | null;
         };
         PayrollRegime: {
@@ -22099,16 +22247,58 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             employment_id: string;
+            employee_code?: string | null;
+            person_name?: string | null;
+            legal_entity_name?: string | null;
+            status?: string | null;
             /** Format: date */
-            period_start: string;
+            hire_date?: string | null;
+            available_days?: string | null;
+            accruing_days?: string | null;
+            overdue_periods?: number | null;
             /** Format: date */
-            period_end: string;
-            accrued_days: number;
-            taken_days: number;
-            scheduled_days: number;
-            available_days: number;
-            /** Format: date */
-            expires_on?: string | null;
+            as_of?: string | null;
+            totals?: {
+                [key: string]: unknown;
+            } | null;
+            accruing?: {
+                [key: string]: unknown;
+            } | null;
+            advance_available?: string | null;
+            overdue_days?: string | null;
+            pending_validation?: boolean | null;
+            periods?: {
+                [key: string]: unknown;
+            }[] | null;
+            policy?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        VacationPolicy: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            legal_entity_name?: string | null;
+            labor_regime_code?: string | null;
+            /** @description Identificador opaco */
+            job_category_id?: string | null;
+            job_category_name?: string | null;
+            /** @enum {string} */
+            status: "active" | "archived";
+            allowed_actions: string[];
+            rules?: {
+                [key: string]: unknown;
+            } | null;
+            legal?: {
+                [key: string]: unknown;
+            } | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -27733,6 +27923,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -27815,6 +28006,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -31137,6 +31329,42 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getContractsExpiring: {
+        parameters: {
+            query?: {
+                /** @description Días hacia adelante (1 a 365); por defecto, la mayor anticipación de aviso de la empresa de cada contrato */
+                within?: string;
+                /** @description Solo los contratos de esa empresa */
+                legal_entity_id?: string;
+                /** @description true (por defecto) incluye los vencidos sin regularizar */
+                include_expired?: string;
+                /** @description Nombre o código del colaborador, o número del contrato */
+                q?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getContractsId: {
@@ -34501,6 +34729,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -35010,6 +35239,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -35742,6 +35972,35 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getEmploymentsIdTimeline: {
+        parameters: {
+            query?: {
+                /** @description Tipos separados por coma: hire, movement, compensation, contract, status, termination; vacío = todos los que el usuario puede ver */
+                types?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getEmploymentsIdWorkData: {
@@ -39827,6 +40086,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -44795,6 +45055,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -47173,6 +47434,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -47292,6 +47554,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -51012,6 +51275,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -62615,6 +62879,299 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getVacationBalancesIdLedger: {
+        parameters: {
+            query?: {
+                /** @description Solo los movimientos de ese periodo vacacional */
+                period_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getVacationLegalLimits: {
+        parameters: {
+            query: {
+                /** @description Régimen laboral (pe_general, pe_micro, pe_pequena…) */
+                labor_regime_code: string;
+                /** @description Fecha (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getVacationPolicies: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["VacationPolicy"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postVacationPolicies: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getVacationPoliciesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["VacationPolicy"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchVacationPoliciesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postVacationPoliciesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postVacationPoliciesIdRestore: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getVacationPoliciesIdRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getVacationRequests: {
