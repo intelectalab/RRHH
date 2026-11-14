@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 183,
+    "parametros": 184,
     "verificados": 128,
-    "sin_verificar": 55
+    "sin_verificar": 56
   },
   "parametros": [
     {
@@ -1128,6 +1128,21 @@
       "verificado": false,
       "base_legal": "DL 1310",
       "nota": "Citado de memoria en la investigación; validar con el texto vigente."
+    },
+    {
+      "codigo": "legajo_conservacion_anios",
+      "nombre": "Conservación del legajo después del cese",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "years",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Por definir (normas de conservación de documentos laborales)",
+      "nota": "DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura."
     },
     {
       "codigo": "sst_conservacion_accidentes_anios",

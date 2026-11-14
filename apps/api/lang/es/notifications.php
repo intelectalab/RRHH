@@ -94,6 +94,18 @@ return [
             'in_app' => ['subject' => '{employee} se acerca al tope de contratos a plazo', 'body' => 'Al terminar el contrato que vence el {ends_on}, {employee} queda cerca del tope permitido. {explanation} Renovar podría desnaturalizar el contrato.'],
             'email' => ['subject' => '{employee} se acerca al tope de contratos a plazo', 'body' => "Hola {name}:\n\nEn {organization}, al terminar el contrato que vence el {ends_on}, {employee} queda cerca del tope de contratos a plazo. {explanation}\n\nRenovar podría desnaturalizar el contrato. Revísalo aquí: {link}"],
         ],
+        'documents.expiring' => [
+            'in_app' => ['subject' => '{document} vence en {days_left} días', 'body' => '{document} ({type}) de {employee} vence el {expires_on}. Pide o sube la versión renovada antes de esa fecha.'],
+            'email' => ['subject' => '{document} vence en {days_left} días', 'body' => "Hola {name}:\n\nEn {organization}, {document} ({type}) de {employee} vence el {expires_on} (faltan {days_left} días).\n\nPide o sube la versión renovada antes de esa fecha: {link}"],
+        ],
+        'documents.expired' => [
+            'in_app' => ['subject' => '{document} venció', 'body' => '{document} ({type}) de {employee} venció el {expires_on}. Sube la versión vigente para regularizar el legajo.'],
+            'email' => ['subject' => '{document} venció', 'body' => "Hola {name}:\n\nEn {organization}, {document} ({type}) de {employee} venció el {expires_on}.\n\nSube la versión vigente para regularizar el legajo: {link}"],
+        ],
+        'documents.rejected' => [
+            'in_app' => ['subject' => 'Tu documento {document} fue observado', 'body' => 'Recursos Humanos observó {document} ({type}): {reason} Sube una versión corregida.'],
+            'email' => ['subject' => 'Tu documento {document} fue observado', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos observó {document} ({type}): {reason}\n\nSube una versión corregida: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],

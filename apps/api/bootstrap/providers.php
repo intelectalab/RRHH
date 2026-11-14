@@ -4,6 +4,7 @@ use App\Modules\Absences\AbsencesServiceProvider;
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\CoreHR\CoreHRServiceProvider;
+use App\Modules\Documents\DocumentsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Imports\ImportsServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
@@ -30,4 +31,5 @@ return [
     ImportsServiceProvider::class,
     CoreHRServiceProvider::class,
     VacationsServiceProvider::class,
+    DocumentsServiceProvider::class,
 ];

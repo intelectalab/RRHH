@@ -19,6 +19,8 @@ use App\Modules\CoreHR\Infrastructure\Models\InsurancePolicy;
 use App\Modules\CoreHR\Infrastructure\Models\LifeInsuranceBeneficiary;
 use App\Modules\CoreHR\Infrastructure\Models\PensionAffiliation;
 use App\Modules\CoreHR\Infrastructure\Models\PersonnelAction;
+use App\Modules\Documents\Infrastructure\Models\Document;
+use App\Modules\Documents\Infrastructure\Models\DocumentCategory;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -167,6 +169,13 @@ final class CrossTenantHarness
         '/contract-addenda/{id}/register-signature' => ContractAddendum::class,
         '/contract-addenda/{id}/cancel' => ContractAddendum::class,
         '/contract-addenda/{id}/document' => ContractAddendum::class,
+        // DOC-1 · DOC-2 · Tipos documentales y documentos por vencer (respuesta genérica).
+        '/document-categories/{id}' => DocumentCategory::class,
+        '/document-categories/{id}/archive' => DocumentCategory::class,
+        '/document-categories/{id}/restore' => DocumentCategory::class,
+        '/documents/expiring' => Document::class,
+        '/employments/{employment_id}/documents' => Document::class,
+        '/employments/{employment_id}/linked-documents/{ref}/file' => Document::class,
         // COL-5: historia y movimientos de la asignación de una relación laboral de A.
         '/employments/{employment_id}/assignments' => Employment::class,
         '/employments/{employment_id}/assignments/{id}' => Employment::class,
@@ -185,7 +194,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions', '/absence-subsidies'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions', '/absence-subsidies', '/documents/expiring'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

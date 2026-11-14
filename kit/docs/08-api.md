@@ -631,15 +631,31 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
-| GET, POST | `/documents` | `documents.documents.{view,create}` | 1 |
+| GET | `/documents` | `documents.documents.view` | 1 |
 | GET, PATCH | `/documents/{id}` | `documents.documents.{view,update}` | 1 |
-| POST | `/documents/{id}/{archive,restore,new-version}` | `documents.documents.{archive,restore,new_version}` | 1 |
+| POST | `/documents/{id}/{archive,restore}` | `documents.documents.{archive,restore}` | 1 |
 | GET, POST | `/document-templates` | `documents.templates.{view,create}` | 1 |
 | GET, PATCH | `/document-templates/{id}` | `documents.templates.{view,update}` | 1 |
 | POST | `/document-templates/{id}/{publish,retire,generate}` | `documents.templates.{publish,retire,generate}` | 1 |
 | GET, POST | `/signature-requests` | `documents.signature_requests.{view,create}` | 1 |
 | GET | `/signature-requests/{id}` | `documents.signature_requests.view` | 1 |
 | POST | `/signature-requests/{id}/{send,sign,decline,cancel,remind}` | `documents.signature_requests.{send,sign,decline,cancel,remind}` | 1 |
+| GET | `/document-categories` | `documents.documents.view` | 1 |
+| POST | `/document-categories` | `documents.document_types.update` | 1 |
+| PATCH | `/document-categories/{id}` | `documents.document_types.update` | 1 |
+| POST | `/document-categories/{id}/archive` | `documents.document_types.update` | 1 |
+| POST | `/document-categories/{id}/restore` | `documents.document_types.update` | 1 |
+| POST | `/documents` | `documents.documents.create` | 1 |
+| POST | `/documents/{id}/approve` | `documents.documents.approve` | 1 |
+| POST | `/documents/{id}/reject` | `documents.documents.approve` | 1 |
+| DELETE | `/documents/{id}` | `documents.documents.update` | 1 |
+| GET | `/documents/expiring` | `documents.documents.view` | 1 |
+| GET | `/documents/{id}/versions` | `documents.documents.view` | 1 |
+| POST | `/documents/{id}/versions` | `documents.documents.new_version` | 1 |
+| GET | `/documents/{id}/file` | `documents.documents.view` | 1 |
+| GET | `/documents/{id}/versions/{version}/file` | `documents.documents.view` | 1 |
+| GET | `/employments/{employment_id}/documents` | `documents.documents.view` | 1 |
+| GET | `/employments/{employment_id}/linked-documents/{ref}/file` | `documents.documents.view` | 1 |
 
 **ESS · Portal del colaborador**
 

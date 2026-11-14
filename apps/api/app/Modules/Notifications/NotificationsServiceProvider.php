@@ -9,6 +9,7 @@ use App\Modules\Notifications\Infrastructure\Subscribers\DeliverMessage;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverNotification;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyAbsenceSubsidy;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyContractEvents;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyDocumentEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyEmailBounce;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyOrganizationStatus;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyPeopleChanges;
@@ -43,6 +44,7 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(NotifyPeopleChanges::class));
         $outbox->subscribe($this->app->make(NotifyContractEvents::class));
         $outbox->subscribe($this->app->make(NotifyAbsenceSubsidy::class));
+        $outbox->subscribe($this->app->make(NotifyDocumentEvents::class));
 
         if ($this->app->runningInConsole()) {
             $this->commands([PurgeNotifications::class]);

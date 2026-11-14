@@ -44,6 +44,10 @@ return [
         'contracts.cap_approaching' => ['variables' => ['employee', 'ends_on', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // AUS-3: un descanso pasó a subsidio; quien gestiona subsidios presenta el reembolso (sin datos de salud).
         'absences.subsidy_started' => ['variables' => ['employee', 'days', 'starts_on'], 'link' => '/tiempo/subsidios', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // DOC-2 · RN-DOC-09: un documento vence pronto o venció (al responsable y al titular); ME-12: uno entregado fue rechazado.
+        'documents.expiring' => ['variables' => ['document', 'type', 'employee', 'expires_on', 'days_left'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'documents.expired' => ['variables' => ['document', 'type', 'employee', 'expires_on'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'documents.rejected' => ['variables' => ['document', 'type', 'reason'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 

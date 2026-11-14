@@ -4440,6 +4440,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/document-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Carpetas del legajo (personal, contratos, boletas, certificados, vacaciones, SST, evaluaciones, capacitaciones) con sus tipos documentales: confidencialidad, visibilidad para el colaborador, revisión, vencimiento y anticipación del aviso (RN-DOC-09) */
+        get: operations["getDocumentCategories"];
+        put?: never;
+        /** Crear un tipo documental dentro de una carpeta (o una carpeta propia de la organización) */
+        post: operations["postDocumentCategories"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar nombre, confidencialidad, visibilidad, revisión y vencimiento de un tipo o carpeta; los documentos ya subidos conservan su clasificación */
+        patch: operations["patchDocumentCategoriesId"];
+        trace?: never;
+    };
+    "/document-categories/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archivar un tipo documental: deja de ofrecerse al subir; sus documentos siguen en el legajo */
+        post: operations["postDocumentCategoriesIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-categories/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restaurar un tipo documental archivado */
+        post: operations["postDocumentCategoriesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/document-templates": {
         parameters: {
             query?: never;
@@ -4546,8 +4615,25 @@ export interface paths {
         /** Listar Document */
         get: operations["getDocuments"];
         put?: never;
-        /** Crear Document */
+        /** Subir un documento al legajo (multipart: file, category_id, title, employment_id o legal_entity_id, issued_on, expires_on, classification, visible_to_employee, description). Nace vigente; si lo sube el propio colaborador y su tipo exige revisión, queda en revisión */
         post: operations["postDocuments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/expiring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Documentos por vencer y vencidos con su titular y su responsable (DOC-2 · RN-DOC-09), dentro del alcance del usuario */
+        get: operations["getDocumentsExpiring"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4565,11 +4651,29 @@ export interface paths {
         get: operations["getDocumentsId"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Mover a la papelera un documento subido por error (no los que generan o firman otros módulos); se restaura desde la papelera y solo se depura al vencer la conservación legal */
+        delete: operations["deleteDocumentsId"];
         options?: never;
         head?: never;
         /** Actualizar Document */
         patch: operations["patchDocumentsId"];
+        trace?: never;
+    };
+    "/documents/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aprobar un documento en revisión (ME-12): queda vigente y, si su tipo vence, se agenda el aviso */
+        post: operations["postDocumentsIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/documents/{id}/archive": {
@@ -4592,7 +4696,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/documents/{id}/new-version": {
+    "/documents/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar o previsualizar (inline=true) la versión vigente; si el documento es confidencial la lectura queda en el registro de accesos (RN-DOC-08) */
+        get: operations["getDocumentsIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -4601,11 +4722,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «new-version» sobre Document
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postDocumentsIdNewVersion"];
+        /** Rechazar un documento en revisión con motivo; se avisa al titular */
+        post: operations["postDocumentsIdReject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4626,6 +4744,41 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postDocumentsIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Versiones del documento, de la más reciente a la primera, con su huella, fechas y autor (RN-DOC-01) */
+        get: operations["getDocumentsIdVersions"];
+        put?: never;
+        /** Subir una versión nueva (multipart: file, issued_on, expires_on, notes); la anterior se conserva. No se admite en documentos firmados ni en los que gestiona otro módulo (RN-DOC-02) */
+        post: operations["postDocumentsIdVersions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}/versions/{version}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar o previsualizar una versión anterior */
+        get: operations["getDocumentsIdVersionsVersionFile"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4966,6 +5119,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{employment_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Legajo de la relación laboral por carpeta: documentos propios y los que aportan otros módulos (contratos, sustentos y certificados de ausencias) sin duplicar archivos; cada uno según los permisos de quien consulta */
+        get: operations["getEmploymentsEmploymentIdDocuments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{employment_id}/health-regimes": {
         parameters: {
             query?: never;
@@ -5046,6 +5216,23 @@ export interface paths {
         };
         /** Descargar la declaración firmada (exige además permiso de datos personales; se registra la descarga) */
         get: operations["getEmploymentsEmploymentIdLifeInsuranceDeclarationsIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/linked-documents/{ref}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar o previsualizar un documento que aporta otro módulo al legajo (exige además el permiso de ese módulo) */
+        get: operations["getEmploymentsEmploymentIdLinkedDocumentsRefFile"];
         put?: never;
         post?: never;
         delete?: never;
@@ -18783,18 +18970,47 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            employment_id?: string | null;
-            folder: string;
-            name: string;
+            category_id: string;
+            title: string;
+            description?: string | null;
             /** @description Identificador opaco */
-            file_id: string;
-            version: number;
+            employment_id?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            person_id?: string | null;
+            person_name?: string | null;
+            category_name?: string | null;
+            /** @description Identificador opaco */
+            folder_id?: string | null;
+            folder_code?: string | null;
+            folder_name?: string | null;
             /** @enum {string} */
-            confidentiality: "normal" | "restricted" | "sensitive";
+            classification: "public" | "internal" | "confidential" | "restricted";
+            /** @enum {string} */
+            status: "draft" | "pending_approval" | "active" | "archived" | "expired" | "rejected" | "requested";
+            /** Format: date */
+            issued_on?: string | null;
             /** Format: date */
             expires_on?: string | null;
+            expiring?: boolean | null;
+            days_to_expiry?: number | null;
+            visible_to_employee: boolean;
+            /** @description Identificador opaco */
+            responsible_user_id?: string | null;
+            responsible_name?: string | null;
             /** @enum {string} */
-            status: "active" | "archived";
+            source: "upload" | "generated" | "import" | "signature" | "system";
+            managed_by?: string | null;
+            current_version?: number | null;
+            file_name?: string | null;
+            mime_type?: string | null;
+            size_bytes?: number | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            archive_reason?: string | null;
+            version: number;
+            allowed_actions: string[];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -18802,15 +19018,26 @@ export interface components {
         };
         DocumentInput: {
             /** @description Identificador opaco */
-            employment_id?: string | null;
-            folder?: string;
-            name?: string;
+            category_id?: string;
+            title?: string;
+            description?: string | null;
             /** @description Identificador opaco */
-            file_id?: string;
+            employment_id?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            person_id?: string | null;
             /** @enum {string} */
-            confidentiality?: "normal" | "restricted" | "sensitive";
+            classification?: "public" | "internal" | "confidential" | "restricted";
+            /** Format: date */
+            issued_on?: string | null;
             /** Format: date */
             expires_on?: string | null;
+            visible_to_employee?: boolean;
+            /** @description Identificador opaco */
+            responsible_user_id?: string | null;
+            /** @enum {string} */
+            source?: "upload" | "generated" | "import" | "signature" | "system";
         };
         DocumentTemplate: {
             /** @description Identificador opaco */
@@ -19591,7 +19818,6 @@ export interface components {
         ImportJobInput: {
             /** @enum {string} */
             entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions";
-            file_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
             headers?: string[] | null;
@@ -34092,6 +34318,170 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getDocumentCategories: {
+        parameters: {
+            query?: {
+                /** @description true incluye los tipos archivados */
+                include_archived?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postDocumentCategories: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchDocumentCategoriesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postDocumentCategoriesIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postDocumentCategoriesIdRestore: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getDocumentTemplates: {
         parameters: {
             query?: {
@@ -34400,7 +34790,27 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["DocumentInput"];
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: uuid */
+                    category_id: string;
+                    title: string;
+                    description?: string;
+                    /** Format: uuid */
+                    employment_id?: string;
+                    /** Format: uuid */
+                    legal_entity_id?: string;
+                    /** Format: date */
+                    issued_on?: string;
+                    /** Format: date */
+                    expires_on?: string;
+                    /** @enum {string} */
+                    classification?: "public" | "internal" | "confidential" | "restricted";
+                    visible_to_employee?: boolean;
+                    /** Format: uuid */
+                    responsible_user_id?: string;
+                };
             };
         };
         responses: {
@@ -34410,17 +34820,50 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Document"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDocumentsExpiring: {
+        parameters: {
+            query?: {
+                /** @description Días hacia adelante (1 a 365); por defecto, la anticipación de cada tipo o el parámetro documentos.aviso_vencimiento_dias */
+                within?: string;
+                /** @description true (por defecto) incluye los vencidos */
+                include_expired?: string;
+                /** @description Solo los de ese tipo o carpeta */
+                category_id?: string;
+                /** @description Nombre o código del titular, o título del documento */
+                q?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getDocumentsId: {
@@ -34453,6 +34896,32 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    deleteDocumentsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     patchDocumentsId: {
@@ -34492,6 +34961,42 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postDocumentsIdApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postDocumentsIdArchive: {
         parameters: {
             query?: never;
@@ -34528,7 +35033,38 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postDocumentsIdNewVersion: {
+    getDocumentsIdFile: {
+        parameters: {
+            query?: {
+                /** @description true para previsualizar en el navegador (Content-Disposition inline) */
+                inline?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postDocumentsIdReject: {
         parameters: {
             query?: never;
             header?: {
@@ -34542,7 +35078,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -34552,16 +35088,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Document"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postDocumentsIdRestore: {
@@ -34598,6 +35134,107 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getDocumentsIdVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postDocumentsIdVersions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: date */
+                    issued_on?: string;
+                    /** Format: date */
+                    expires_on?: string;
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDocumentsIdVersionsVersionFile: {
+        parameters: {
+            query?: {
+                /** @description true para previsualizar en el navegador */
+                inline?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+                version: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getEmploymentOptions: {
@@ -35553,6 +36190,37 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getEmploymentsEmploymentIdDocuments: {
+        parameters: {
+            query?: {
+                /** @description true incluye los archivados */
+                include_archived?: string;
+                /** @description Código de la carpeta */
+                folder?: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     getEmploymentsEmploymentIdHealthRegimes: {
         parameters: {
             query?: never;
@@ -35803,6 +36471,38 @@ export interface operations {
                     "image/jpeg": string;
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getEmploymentsEmploymentIdLinkedDocumentsRefFile: {
+        parameters: {
+            query?: {
+                /** @description true para previsualizar en el navegador */
+                inline?: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];

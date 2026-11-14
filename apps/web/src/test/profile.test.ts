@@ -15,7 +15,7 @@ const t = (k: string, v: Record<string, string | number> = {}) => {
 describe('ficha 360 (COL-3)', () => {
   it('las pestañas aparecen solo con el módulo contratado y el permiso', () => {
     const all = () => true
-    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'contracts', 'compensation', 'dependents', 'social_security', 'payment'])
+    expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'contracts', 'compensation', 'dependents', 'social_security', 'payment', 'documents'])
     expect(visibleTabs(PROFILE_TABS, [], all)).toEqual([])
     // HIS-5: el Historial (línea de tiempo) basta con ver la ficha; sin ella, no aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toContain('history')

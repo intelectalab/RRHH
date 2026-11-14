@@ -3819,6 +3819,15 @@ CREATE TABLE document_categories (
   default_classification text NOT NULL DEFAULT 'internal' CHECK (default_classification IN ('public','internal','confidential','restricted')),
   retention_policy_id uuid,
   required_permission_code text,
+  scope text NOT NULL DEFAULT 'employee' CHECK (scope IN ('employee','company')),
+  description text,
+  requires_expiry boolean NOT NULL DEFAULT false,
+  expiry_notice_days smallint,
+  visible_to_employee boolean NOT NULL DEFAULT false,
+  requires_review boolean NOT NULL DEFAULT false,
+  is_system boolean NOT NULL DEFAULT false,
+  sort_order smallint NOT NULL DEFAULT 0,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -3826,7 +3835,7 @@ CREATE TABLE document_categories (
   CONSTRAINT fk_document_categories_parent_id FOREIGN KEY (tenant_id, parent_id) REFERENCES document_categories (tenant_id, id),
   CONSTRAINT fk_document_categories_required_permission_code FOREIGN KEY (required_permission_code) REFERENCES permissions (code)
 );
-COMMENT ON TABLE document_categories IS 'Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención.';
+COMMENT ON TABLE document_categories IS 'Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención. DOC-1: las carpetas no tienen parent_id; los tipos documentales cuelgan de una carpeta y definen confidencialidad, visibilidad para el colaborador, revisión y, con DOC-2, si exigen vencimiento y con qué anticipación se avisa (RN-DOC-09).';
 CREATE UNIQUE INDEX uq_document_categories_code ON document_categories (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_document_categories_parent_id ON document_categories (tenant_id, parent_id);
 CREATE INDEX ix_document_categories_retention_policy_id ON document_categories (tenant_id, retention_policy_id);
@@ -3854,6 +3863,11 @@ CREATE TABLE documents (
   source text NOT NULL DEFAULT 'upload' CHECK (source IN ('upload','generated','import','signature','system')),
   document_template_version_id uuid,
   visible_to_employee boolean NOT NULL DEFAULT false,
+  responsible_user_id uuid,
+  description text,
+  expiry_alerted_on date,
+  archived_at timestamptz,
+  archive_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -3862,7 +3876,8 @@ CREATE TABLE documents (
   CONSTRAINT fk_documents_document_category_id FOREIGN KEY (tenant_id, document_category_id) REFERENCES document_categories (tenant_id, id),
   CONSTRAINT fk_documents_owner_person_id FOREIGN KEY (tenant_id, owner_person_id) REFERENCES people (tenant_id, id),
   CONSTRAINT fk_documents_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
-  CONSTRAINT fk_documents_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id)
+  CONSTRAINT fk_documents_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_documents_responsible_user_id FOREIGN KEY (tenant_id, responsible_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE documents IS 'Documento del repositorio, ligado a una persona, relación laboral, empresa u otro registro.';
 CREATE INDEX ix_documents_document_category_id ON documents (tenant_id, document_category_id);
@@ -3871,7 +3886,9 @@ CREATE INDEX ix_documents_employment_id ON documents (tenant_id, employment_id);
 CREATE INDEX ix_documents_legal_entity_id ON documents (tenant_id, legal_entity_id);
 CREATE INDEX ix_documents_current_version_id ON documents (tenant_id, current_version_id);
 CREATE INDEX ix_documents_document_template_version_id ON documents (tenant_id, document_template_version_id);
+CREATE INDEX ix_documents_responsible_user_id ON documents (tenant_id, responsible_user_id);
 CREATE INDEX ix_documents_subject_type_subject_id ON documents (tenant_id, subject_type, subject_id);
+CREATE INDEX ix_documents_status_expires_on ON documents (tenant_id, status, expires_on);
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON documents USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -3886,6 +3903,8 @@ CREATE TABLE document_versions (
   content_hash text NOT NULL,
   uploaded_by_user_id uuid,
   notes text,
+  issued_on date,
+  expires_on date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_document_versions_tenant_id UNIQUE (tenant_id, id),
@@ -3894,7 +3913,7 @@ CREATE TABLE document_versions (
   CONSTRAINT fk_document_versions_stored_file_id FOREIGN KEY (tenant_id, stored_file_id) REFERENCES stored_files (tenant_id, id),
   CONSTRAINT fk_document_versions_uploaded_by_user_id FOREIGN KEY (tenant_id, uploaded_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE document_versions IS 'Versiones de un documento; cada una apunta a un archivo y guarda su huella.';
+COMMENT ON TABLE document_versions IS 'Versiones de un documento; cada una apunta a un archivo y guarda su huella. DOC-2 · RN-DOC-01: una versión nueva no reemplaza a la anterior, que queda consultable con sus propias fechas de emisión y vencimiento.';
 CREATE INDEX ix_document_versions_stored_file_id ON document_versions (tenant_id, stored_file_id);
 CREATE INDEX ix_document_versions_uploaded_by_user_id ON document_versions (tenant_id, uploaded_by_user_id);
 ALTER TABLE document_versions ENABLE ROW LEVEL SECURITY;
@@ -18368,6 +18387,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('documentos.firma_nivel_defecto', 'core', 'Nivel de firma por defecto', 'Nivel de firma electrónica para documentos laborales.', 'select', '"simple"'::jsonb, ARRAY['organization','legal_entity'], '["simple", "advanced", "digital_certificate"]'::jsonb),
   ('documentos.firma_otp_obligatorio', 'core', 'OTP al firmar', 'Exige clave temporal como parte de la evidencia de firma.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('documentos.tamano_maximo_mb', 'core', 'Tamaño máximo de archivo (MB)', 'Tamaño máximo por archivo subido.', 'integer', '20'::jsonb, ARRAY['organization'], NULL),
+  ('documentos.aviso_vencimiento_dias', 'core', 'Aviso de vencimiento de documentos', 'DOC-2 · RN-DOC-09: días de anticipación con que se avisa al responsable y al titular que un documento vence, cuando su tipo no fija los suyos.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('asistencia.metodos_permitidos', 'attendance', 'Métodos de marcación', 'Métodos de marcación habilitados.', 'list', '["web", "app"]'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], '["web", "app", "qr", "kiosk", "pin", "biometric", "crew", "api"]'::jsonb),
   ('asistencia.tolerancia_minutos', 'attendance', 'Tolerancia de ingreso (min)', 'Minutos de tolerancia antes de contar tardanza.', 'integer', '5'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], NULL),
   ('asistencia.exigir_geocerca', 'attendance', 'Exigir geocerca', 'Solo acepta marcaciones de la app dentro de una geocerca.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], NULL),

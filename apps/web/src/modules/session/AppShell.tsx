@@ -32,6 +32,7 @@ const MENU: NavLink[] = [
   { href: '/personas/organigrama', key: 'shell.modules_org_chart', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
   { href: '/aprobaciones', key: 'shell.modules_approvals', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
   { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
+  { href: '/documentos/vencimientos', key: 'shell.modules_documents', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
   { href: '/calendario', key: 'shell.modules_calendar', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
   { href: '/tiempo/ausencias', key: 'shell.modules_absences', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
   { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
