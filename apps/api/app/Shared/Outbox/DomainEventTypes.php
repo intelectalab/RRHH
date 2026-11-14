@@ -228,6 +228,9 @@ final class DomainEventTypes
 
     public const ABSENCE_ENDED = 'absence.ended.v1';
 
+    // AUS-3: un descanso aprobado pasó a subsidio (expediente de reembolso abierto).
+    public const ABSENCE_SUBSIDY_STARTED = 'absence.subsidy_started.v1';
+
     // Organización (SAS-2): cambios de estado decididos desde la consola.
     public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
 
@@ -707,6 +710,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
             'description' => 'La ausencia terminó (finalizada); cierra su efecto en planilla',
+        ],
+        self::ABSENCE_SUBSIDY_STARTED => [
+            'version' => 1,
+            'required_fields' => ['subsidy_case_id', 'absence_request_id', 'employment_id', 'kind', 'subsidized_days'],
+            'description' => 'Un descanso aprobado tiene días de subsidio: se abre su expediente de reembolso (AUS-3)',
         ],
         self::JOB_PROFILE_CREATED => [
             'version' => 1,

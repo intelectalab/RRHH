@@ -22,6 +22,15 @@ export type Absence = {
   days: string | null
   hours: string | null
   calendar_days: string | null
+  /** AUS-4: primer día laborable después del fin (lo calcula el servidor; lo ve el jefe). */
+  return_on?: string | null
+  /** AUS-4: causales de ampliación de ley elegidas. */
+  legal_extensions?: string[]
+  required_documents?: LegalDocument[]
+  /** AUS-3: reparto empleador / subsidio (solo con permiso de datos de salud o al titular). */
+  employer_paid_days?: string | null
+  subsidized_days?: string | null
+  subsidy_status?: SubsidyStatus | null
   is_paid: boolean | null
   affects_attendance: boolean | null
   /** Motivo de un tipo no confidencial. */
@@ -50,9 +59,37 @@ export type Absence = {
 
 export type Issue = { code: string; status?: number; message: string }
 
+export type LegalDocument = { code: string; label: string }
+
+/** AUS-4 · Plan de una licencia de ley (duración desde parámetros con vigencia). */
+export type LegalLeavePlan = {
+  base_parameter: string | null
+  base_days: string | null
+  extensions: { code: string; label: string; parameter: string; mode: 'add' | 'total'; days: string | null; pending_validation: boolean; selected: boolean }[]
+  total_days: string | null
+  pending_validation: boolean
+  verified: boolean
+  documents: LegalDocument[]
+}
+
+/** AUS-3 · Vista previa del reparto del descanso médico en el año. */
+export type SubsidyPreview = {
+  kind: 'illness' | 'maternity'
+  year: number
+  threshold_days: string | null
+  pending_validation: boolean
+  prior_days: string
+  accumulated_days: string
+  employer_paid_days: string
+  subsidized_days: string
+  reaches_threshold: boolean
+}
+
 /** POST /absences/simulate */
 export type AbsenceSimulation = {
   unit: 'days' | 'hours'
+  ends_on: string
+  return_on: string | null
   days: string | null
   hours: string | null
   calendar_days: number
@@ -61,9 +98,66 @@ export type AbsenceSimulation = {
   is_paid: boolean
   document_required: boolean
   document_grace_days: number | null
+  legal_leave: LegalLeavePlan | null
+  required_documents: LegalDocument[]
+  subsidy: SubsidyPreview | null
   issues: Issue[]
   warnings: Issue[]
   role: 'employee' | 'manager' | 'hr'
+}
+
+export const SUBSIDY_STATUSES = ['pending_filing', 'filed', 'observed', 'approved', 'reimbursed', 'rejected', 'cancelled'] as const
+export type SubsidyStatus = (typeof SUBSIDY_STATUSES)[number]
+
+export const SUBSIDY_TONE: Record<SubsidyStatus, string> = {
+  pending_filing: 'wa', filed: 'in', observed: 'er', approved: 'ok', reimbursed: 'gr', rejected: 'er', cancelled: 'gr',
+}
+
+export type Money = { amount: string; currency: string | null }
+
+/** AUS-3 · Expediente de subsidio (GET /absence-subsidies). */
+export type SubsidyCase = {
+  id: string
+  absence_request_id: string
+  employment_id: string
+  person_name: string | null
+  employee_code: string | null
+  kind: 'illness' | 'maternity'
+  status: SubsidyStatus
+  subsidized_days: string
+  starts_on: string | null
+  ends_on: string | null
+  absence_starts_on: string | null
+  absence_ends_on: string | null
+  year: number | null
+  filing_due_on: string | null
+  is_overdue: boolean
+  filed_on: string | null
+  filing_reference: string | null
+  amount_requested: Money | null
+  amount_approved: Money | null
+  amount_reimbursed: Money | null
+  reimbursed_on: string | null
+  observation: string | null
+  decision_reason: string | null
+  allowed_actions: string[]
+  version: number
+}
+
+/** AUS-3 · Certificado médico (GET /absences/{id}/medical-certificate). */
+export type MedicalCertificate = {
+  id: string | null
+  absence_request_id: string
+  kind: 'citt' | 'private' | null
+  certificate_number?: string | null
+  issuer: string | null
+  diagnosis?: string | null
+  issued_on: string | null
+  days_granted: number | null
+  absence_calendar_days: number | null
+  days_mismatch: boolean
+  is_work_related: boolean
+  validated_at: string | null
 }
 
 export const ABSENCE_TONE: Record<AbsenceStatus, string> = {

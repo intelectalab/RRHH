@@ -3,6 +3,7 @@
 namespace Tests\Support\Isolation;
 
 use App\Modules\Absences\Infrastructure\Models\AbsenceRequest;
+use App\Modules\Absences\Infrastructure\Models\AbsenceSubsidyCase;
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
@@ -90,6 +91,16 @@ final class CrossTenantHarness
         '/absences/{id}/register' => AbsenceRequest::class,
         '/absences/{id}/attachments' => AbsenceRequest::class,
         '/absences/{id}/attachments/{attachment_id}' => AbsenceRequest::class,
+        // AUS-3: certificado médico de una ausencia de A, acumulado de su relación y expedientes de subsidio de A.
+        '/absences/{id}/medical-certificate' => AbsenceRequest::class,
+        '/employments/{employment_id}/medical-leave-summary' => AbsenceRequest::class,
+        '/absence-subsidies/{id}' => AbsenceSubsidyCase::class,
+        '/absence-subsidies/{id}/file' => AbsenceSubsidyCase::class,
+        '/absence-subsidies/{id}/observe' => AbsenceSubsidyCase::class,
+        '/absence-subsidies/{id}/approve' => AbsenceSubsidyCase::class,
+        '/absence-subsidies/{id}/reject' => AbsenceSubsidyCase::class,
+        '/absence-subsidies/{id}/reimburse' => AbsenceSubsidyCase::class,
+        '/absence-subsidies' => AbsenceSubsidyCase::class,
         // ORG-4: distribución por centros de costo de una relación laboral de A.
         '/employments/{employment_id}/cost-distributions' => EmploymentCostDistribution::class,
         // ORG-3: historia e impacto de una unidad de A; niveles de unidad de A.
@@ -174,7 +185,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions'];
+    public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions', '/absence-subsidies'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

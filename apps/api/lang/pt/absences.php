@@ -22,6 +22,7 @@ return [
         'below_legal_duration' => 'A duração legal é de :days dias: não se registra menos.',
         'legal_duration_pending' => 'A duração legal de referência é de :days dias (parâmetro a validar).',
         'legal_duration_unknown' => 'A duração legal deste tipo ainda não foi validada.',
+        'legal_duration_proposed' => 'A duração legal proposta é de :days dias (parâmetro a validar).',
         'closed_period' => 'A ausência cai em um período de folha fechado (até :date): só Recursos Humanos a registra.',
         'closed_period_adjustment' => 'Cai em um período de folha fechado (até :date): seu efeito irá como ajuste no período aberto.',
         'overlap' => 'Já existe outra ausência nessas datas (de :from a :to).',
@@ -54,5 +55,41 @@ return [
             'month' => 'mês',
             'year' => 'ano',
         ],
+    ],
+    // AUS-4 · Licencias de ley: causales de ampliación y documentos.
+    'legal_leave' => [
+        'extensions' => [
+            'multiple_birth' => 'Parto múltiplo',
+            'child_disability' => 'Filho ou filha com deficiência',
+            'premature_or_multiple' => 'Parto prematuro ou múltiplo',
+            'serious_condition' => 'Doença grave ou complicações da mãe ou do recém-nascido',
+        ],
+        'documents' => [
+            'maternity_certificate' => 'Atestado médico de maternidade (CITT)',
+            'birth_certificate' => 'Certidão de nascimento',
+            'death_certificate' => 'Certidão de óbito',
+            'kinship_proof' => 'Documento que comprova o parentesco',
+            'medical_certificate' => 'Atestado médico ou CITT',
+        ],
+        'unknown_extension' => 'Causa de prorrogação desconhecida para este tipo: :code.',
+        'documents_required' => 'Documentos exigidos: :documents.',
+    ],
+    // AUS-3 · Subsidios y certificado médico.
+    'subsidies' => [
+        'threshold_unknown' => 'O limite de dias a cargo do empregador ainda não foi validado: todo o afastamento conta a cargo do empregador até defini-lo.',
+        'threshold_reached' => 'Com este afastamento o acumulado do ano chega a :accumulated dias (limite :threshold): :subsidized dias passam a subsídio.',
+        'invalid_action' => 'Ação inválida para o processo de subsídio.',
+        'invalid_filter' => 'Filtro de status inválido.',
+        'future_date' => 'A data de apresentação não pode ser futura.',
+        'date_required' => 'Informe a data.',
+        'amount_required' => 'Informe o valor.',
+        'amount_invalid' => 'O valor deve ser um número não negativo com até duas casas decimais.',
+        'currency_mismatch' => 'O valor deve estar em :currency.',
+        'reason_required' => 'Informe o motivo.',
+    ],
+    'certificates' => [
+        'not_medical' => 'Somente afastamentos médicos e licenças-maternidade têm atestado médico.',
+        'closed' => 'A ausência está encerrada: o atestado não pode ser registrado.',
+        'forbidden' => 'Registrar o atestado exige permissão para ver dados de saúde.',
     ],
 ];

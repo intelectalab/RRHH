@@ -16,6 +16,15 @@ return [
     'Absence' => [
         'medical_reason' => ['time.absences.medical_certificate.view', 'health'],
         'medical_attachments' => ['time.absences.medical_certificate.view', 'health'],
+        // AUS-3: el reparto empleador / subsidio revela que es un descanso médico.
+        'employer_paid_days' => ['time.absences.medical_certificate.view', 'health'],
+        'subsidized_days' => ['time.absences.medical_certificate.view', 'health'],
+        'subsidy_status' => ['time.absences.medical_certificate.view', 'health'],
+    ],
+    // AUS-3 · Certificado médico (CITT o particular): número y diagnóstico (respuesta de /absences/{id}/medical-certificate).
+    'AbsenceMedicalCertificate' => [
+        'certificate_number' => ['time.absences.medical_certificate.view', 'health'],
+        'diagnosis' => ['time.absences.medical_certificate.view', 'health'],
     ],
     'AccountingEntry' => ['lines' => ['payroll.accounting_entries.view', 'salary']],
     'Application' => ['expected_salary' => ['recruiting.candidates.salary_expectation.view', 'salary']],

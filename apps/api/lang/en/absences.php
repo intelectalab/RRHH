@@ -22,6 +22,7 @@ return [
         'below_legal_duration' => 'The legal duration is :days days: less cannot be recorded.',
         'legal_duration_pending' => 'The reference legal duration is :days days (parameter pending validation).',
         'legal_duration_unknown' => 'The legal duration of this type is not validated yet.',
+        'legal_duration_proposed' => 'The proposed statutory duration is :days days (parameter pending validation).',
         'closed_period' => 'The absence falls in a closed payroll period (until :date): only Human Resources records it.',
         'closed_period_adjustment' => 'It falls in a closed payroll period (until :date): its effect will go as an adjustment to the open period.',
         'overlap' => 'There is already another absence on those dates (from :from to :to).',
@@ -54,5 +55,41 @@ return [
             'month' => 'month',
             'year' => 'year',
         ],
+    ],
+    // AUS-4 · Licencias de ley: causales de ampliación y documentos.
+    'legal_leave' => [
+        'extensions' => [
+            'multiple_birth' => 'Multiple birth',
+            'child_disability' => 'Child with a disability',
+            'premature_or_multiple' => 'Premature or multiple birth',
+            'serious_condition' => 'Serious illness or complications of the mother or newborn',
+        ],
+        'documents' => [
+            'maternity_certificate' => 'Maternity medical certificate (CITT)',
+            'birth_certificate' => 'Birth certificate',
+            'death_certificate' => 'Death certificate',
+            'kinship_proof' => 'Proof of kinship',
+            'medical_certificate' => 'Medical certificate or CITT',
+        ],
+        'unknown_extension' => 'Unknown extension reason for this type: :code.',
+        'documents_required' => 'Required documents: :documents.',
+    ],
+    // AUS-3 · Subsidios y certificado médico.
+    'subsidies' => [
+        'threshold_unknown' => 'The employer-paid days threshold is not validated yet: the whole leave counts as employer-paid until it is set.',
+        'threshold_reached' => 'With this leave the year total reaches :accumulated days (threshold :threshold): :subsidized days become subsidized.',
+        'invalid_action' => 'Invalid action for the subsidy case.',
+        'invalid_filter' => 'Invalid status filter.',
+        'future_date' => 'The filing date cannot be in the future.',
+        'date_required' => 'Enter the date.',
+        'amount_required' => 'Enter the amount.',
+        'amount_invalid' => 'The amount must be a non-negative number with up to two decimals.',
+        'currency_mismatch' => 'The amount must be in :currency.',
+        'reason_required' => 'Enter the reason.',
+    ],
+    'certificates' => [
+        'not_medical' => 'Only medical leaves and maternity leaves have a medical certificate.',
+        'closed' => 'The absence is closed: the certificate cannot be recorded.',
+        'forbidden' => 'Recording the certificate requires permission to view health data.',
     ],
 ];
