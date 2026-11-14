@@ -68,9 +68,9 @@ final class AbsenceDays
         $next = CarbonImmutable::parse($endsOn)->addDay();
         $limit = $next->addDays(27);
         $holidays = $this->holidays($context['site_id'], $next->toDateString(), $limit->toDateString());
-        $rest = $this->restDays($context['legal_entity_id']);
+        $rest = $this->workingDays->restDays($context['legal_entity_id']);
         for ($d = $next; $d->lessThanOrEqualTo($limit); $d = $d->addDay()) {
-            if (! in_array(self::WEEKDAYS[$d->dayOfWeekIso], $rest, true) && ! in_array($d->toDateString(), $holidays, true)) {
+            if (! in_array(WorkingDays::weekday($d), $rest, true) && ! in_array($d->toDateString(), $holidays, true)) {
                 return $d->toDateString();
             }
         }

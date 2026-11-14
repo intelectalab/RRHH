@@ -6,8 +6,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 108 | 3 | 44,8 % |
-| Backlog completo | 512 | 108 | 3 | 21,1 % |
+| Primer corte comercial (MVP) | 241 | 110 | 3 | 45,6 % |
+| Backlog completo | 512 | 110 | 3 | 21,5 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -208,8 +208,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | VAC-7 | Importación de saldos de vacaciones | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
 | AUS-1 | Tipos de ausencia con reglas propias | AUS | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-11 | Paquete Perú con 10 tipos precargados; reglas con vigencia en absence_type_rules (as_of, historia en GET /absence-types/{id}/rules): goce, unidad días u horas, topes, anticipación, sustento con plazo, quién solicita, flujo de aprobación, concepto de planilla validado, efecto en asistencia y beneficios, alcance por empresa o régimen; archivar por acción (409); pantalla Configuración → Tipos de ausencia. Por validar: duración de licencias de maternidad, paternidad y fallecimiento; concepto de descuento sin goce; efecto en beneficios. Pendiente: aplicar las reglas en las solicitudes (AUS-2). |
 | AUS-2 | Solicitud y registro de ausencias | AUS | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-13 | Borrador → enviada (flujo absence_request) → aprobada / en curso / finalizada; RRHH registra directo; sustento con plazo y vencimiento diario; tope con excepción, anticipación, duración de ley, periodo cerrado, solapes 409 con exclusión en base; días hábiles con feriados de la sede y descanso parametrizado; motivo médico confidencial; calendario y puerto ApprovedAbsences; pantalla /tiempo/ausencias y pestaña Ausencias; flujo demo. Pendiente: incidencias para planilla (AUS-6) y que el jefe registre para su equipo. |
-| AUS-3 | Descansos médicos y subsidios | AUS | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
-| AUS-4 | Licencias de maternidad, paternidad y otras de ley | AUS | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
+| AUS-3 | Descansos médicos y subsidios | AUS | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-13 | Certificado CITT o particular con número y diagnóstico cifrados, solo con permiso médico y con registro de acceso; reparto empleador / subsidio por año con umbral descanso_medico_dias_cargo_empleador (por validar), aviso al alcanzarlo y acumulado anual; expediente de reembolso por acciones (presentar, observar, aprobar, rechazar, reembolsar) con plazo por parámetro y aviso; pantalla Tiempo → Subsidios. |
+| AUS-4 | Licencias de maternidad, paternidad y otras de ley | AUS | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-13 | Licencias de ley con duración desde parámetros con vigencia y ampliaciones por causal; documentos requeridos y fin propuesto; fecha de retorno visible para el jefe; duración validada no admite menos (422), por validar solo avisa. Por validar: duraciones y ampliaciones de maternidad, paternidad y fallecimiento. |
 | AUS-5 | Trabajo remoto y desconexión digital | AUS | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
 | AUS-6 | Ausencias como incidencias para planilla | AUS | Fase 2 · Tiempo | Task | sí | pendiente | — |  |
 | BHO-1 | Solicitud y autorización de horas extra | BHO | Fase 2 · Tiempo | Story | — | pendiente | — |  |
