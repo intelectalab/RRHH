@@ -58,6 +58,27 @@ final class AbsenceDays
     }
 
     /**
+     * AUS-4 · Fecha de retorno: el primer día laborable después del último día de la ausencia (sin descanso
+     * semanal ni feriados de la sede). Si en las cuatro semanas siguientes no hay ninguno, el día siguiente.
+     *
+     * @param  array{legal_entity_id: string, site_id: string|null, timezone: string}  $context
+     */
+    public function returnOn(array $context, string $endsOn): string
+    {
+        $next = CarbonImmutable::parse($endsOn)->addDay();
+        $limit = $next->addDays(27);
+        $holidays = $this->holidays($context['site_id'], $next->toDateString(), $limit->toDateString());
+        $rest = $this->restDays($context['legal_entity_id']);
+        for ($d = $next; $d->lessThanOrEqualTo($limit); $d = $d->addDay()) {
+            if (! in_array(self::WEEKDAYS[$d->dayOfWeekIso], $rest, true) && ! in_array($d->toDateString(), $holidays, true)) {
+                return $d->toDateString();
+            }
+        }
+
+        return $next->toDateString();
+    }
+
+    /**
      * Feriados entre dos fechas: los del calendario de la sede y los del calendario por defecto.
      *
      * @return list<string>

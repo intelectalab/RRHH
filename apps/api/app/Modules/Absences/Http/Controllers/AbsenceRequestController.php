@@ -186,6 +186,9 @@ final class AbsenceRequestController
             'end_time' => ['sometimes', 'nullable', 'date_format:H:i'],
             'reason' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'exception_reason' => ['sometimes', 'nullable', 'string', 'max:500'],
+            // AUS-4 · Causales de ampliación de una licencia de ley (códigos del paquete de país).
+            'legal_extensions' => ['sometimes', 'nullable', 'array', 'max:10'],
+            'legal_extensions.*' => ['string', 'max:60'],
         ]);
     }
 

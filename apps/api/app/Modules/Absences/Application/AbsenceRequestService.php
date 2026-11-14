@@ -66,12 +66,14 @@ final class AbsenceRequestService
         private readonly FileService $files,
         private readonly AuditLogger $audit,
         private readonly OutboxWriter $outbox,
+        private readonly LegalLeave $legalLeave,
+        private readonly MedicalLeaveSplit $split,
     ) {}
 
     // ------------------------------------------------------------------ Borrador
 
     /**
-     * @param  array{employment_id: string, absence_type_id: string, starts_on: string, ends_on?: string|null, start_time?: string|null, end_time?: string|null, reason?: string|null, exception_reason?: string|null}  $input
+     * @param  array{employment_id: string, absence_type_id: string, starts_on: string, ends_on?: string|null, start_time?: string|null, end_time?: string|null, reason?: string|null, exception_reason?: string|null, legal_extensions?: list<string>|null}  $input
      */
     public function create(array $input, string $userId): AbsenceRequest
     {
@@ -111,6 +113,7 @@ final class AbsenceRequestService
             'ends_on' => array_key_exists('ends_on', $input) ? $input['ends_on'] : $absence->day('ends_on'),
             'start_time' => array_key_exists('start_time', $input) ? $input['start_time'] : self::time($absence->start_time),
             'end_time' => array_key_exists('end_time', $input) ? $input['end_time'] : self::time($absence->end_time),
+            'legal_extensions' => array_key_exists('legal_extensions', $input) ? $input['legal_extensions'] : $absence->legal_extensions,
         ];
         $values = $this->shape($type, $absence->employment_id, $merged);
 
@@ -136,8 +139,8 @@ final class AbsenceRequestService
      * Mide la ausencia y revisa todas las reglas sin escribir nada. Lo usa la simulación de la pantalla de
      * solicitud y, lanzando el primer problema, el envío y el registro.
      *
-     * @param  array{starts_on: string, ends_on?: string|null, start_time?: string|null, end_time?: string|null, exception_reason?: string|null}  $input
-     * @return array{unit: string, days: string|null, hours: string|null, calendar_days: int, working_days: int, holidays: list<string>, is_paid: bool, affects_attendance: bool, document_required: bool, document_grace_days: int|null, legal_duration: array<string, mixed>|null, issues: list<array{code: string, status: int, message: string}>, warnings: list<array{code: string, message: string}>}
+     * @param  array{starts_on: string, ends_on?: string|null, start_time?: string|null, end_time?: string|null, exception_reason?: string|null, legal_extensions?: list<string>|null}  $input
+     * @return array{unit: string, ends_on: string, return_on: string|null, days: string|null, hours: string|null, calendar_days: int, working_days: int, holidays: list<string>, is_paid: bool, affects_attendance: bool, document_required: bool, document_grace_days: int|null, legal_duration: array<string, mixed>|null, legal_leave: array<string, mixed>|null, required_documents: list<array{code: string, label: string}>, subsidy: array<string, mixed>|null, issues: list<array{code: string, status: int, message: string}>, warnings: list<array{code: string, message: string}>}
      */
     public function evaluate(AbsenceType $type, string $employmentId, array $input, string $role, ?string $ignoreId = null): array
     {
@@ -154,6 +157,8 @@ final class AbsenceRequestService
         $rule = $this->rule($type, $startsOn);
         $domain = AbsenceTypeCatalog::domain($rule);
         $legal = $this->types->present($type, $startsOn)['legal_duration'];
+        /** @var array{base_parameter: string|null, base_days: string|null, extensions: list<array<string, mixed>>, total_days: string|null, pending_validation: bool, verified: bool, documents: list<array{code: string, label: string}>}|null $plan */
+        $plan = $values['legal_leave'];
 
         if ($type->status !== 'active') {
             $issue('type_archived', 422, (string) trans('absences.requests.type_archived'));
@@ -202,18 +207,36 @@ final class AbsenceRequestService
             }
         }
 
-        // RN-AUS-04 · Duración de ley: se propone y no se admite menos; si el parámetro está por validar, solo avisa.
-        if (is_array($legal) && $legal['value'] !== null && $rule->unit === 'days') {
-            $required = (string) $legal['value'];
-            if (BigDecimal::of((string) $values['calendar_days'])->isLessThan($required)) {
-                if (($legal['verified'] ?? false) === true && ($legal['pending_validation'] ?? false) !== true) {
+        // RN-AUS-04 · Duración de ley (base + ampliaciones por causal, AUS-4): se propone y no se admite menos;
+        // si alguna pieza está por validar, solo avisa.
+        if (is_array($plan) && $plan['base_parameter'] !== null && $rule->unit === 'days') {
+            $required = $plan['total_days'];
+            if ($required === null) {
+                $warnings[] = ['code' => 'legal_duration_pending', 'message' => (string) trans('absences.requests.legal_duration_unknown')];
+            } elseif (BigDecimal::of((string) $values['calendar_days'])->isLessThan($required)) {
+                if ($plan['verified']) {
                     $issue('below_legal_duration', 422, (string) trans('absences.requests.below_legal_duration', ['days' => self::number($required)]));
                 } else {
                     $warnings[] = ['code' => 'legal_duration_pending', 'message' => (string) trans('absences.requests.legal_duration_pending', ['days' => self::number($required)])];
                 }
+            } elseif (! $plan['verified']) {
+                $warnings[] = ['code' => 'legal_duration_pending', 'message' => (string) trans('absences.requests.legal_duration_proposed', ['days' => self::number($required)])];
             }
-        } elseif (is_array($legal) && $legal['value'] === null) {
-            $warnings[] = ['code' => 'legal_duration_pending', 'message' => (string) trans('absences.requests.legal_duration_unknown')];
+        }
+        if (is_array($plan) && $plan['documents'] !== []) {
+            $warnings[] = ['code' => 'legal_documents', 'message' => (string) trans('absences.legal_leave.documents_required', ['documents' => implode(', ', array_map(fn (array $d): string => $d['label'], $plan['documents']))])];
+        }
+
+        // AUS-3 · RN-AUS-03 · Descanso médico: acumulado del año y desde qué día pasa a subsidio.
+        $subsidy = $rule->unit === 'days' ? $this->split->preview($type, $employmentId, $startsOn, (string) $values['calendar_days'], $ignoreId) : null;
+        if ($subsidy !== null && $subsidy['kind'] === 'illness') {
+            if ($subsidy['threshold_days'] === null) {
+                $warnings[] = ['code' => 'subsidy_threshold_pending', 'message' => (string) trans('absences.subsidies.threshold_unknown')];
+            } elseif ($subsidy['reaches_threshold']) {
+                $warnings[] = ['code' => 'subsidy_threshold', 'message' => (string) trans('absences.subsidies.threshold_reached', [
+                    'accumulated' => $subsidy['accumulated_days'], 'threshold' => self::number($subsidy['threshold_days']), 'subsidized' => $subsidy['subsidized_days'],
+                ])];
+            }
         }
 
         // RN-AUS-08 · Periodo de planilla cerrado: solo RRHH, y su efecto va como ajuste al periodo abierto.
@@ -247,6 +270,8 @@ final class AbsenceRequestService
 
         return [
             'unit' => $rule->unit,
+            'ends_on' => $endsOn,
+            'return_on' => $values['return_on'],
             'days' => $values['days'],
             'hours' => $values['hours'],
             'calendar_days' => (int) $values['calendar_days'],
@@ -257,6 +282,9 @@ final class AbsenceRequestService
             'document_required' => $rule->requires_document,
             'document_grace_days' => $rule->document_grace_days,
             'legal_duration' => $legal,
+            'legal_leave' => $plan,
+            'required_documents' => $plan['documents'] ?? [],
+            'subsidy' => $subsidy,
             'issues' => $issues,
             'warnings' => $warnings,
         ];
@@ -490,6 +518,8 @@ final class AbsenceRequestService
             ->where('e.id', $a->employment_id)->first(['e.employee_code', 'e.person_id', 'e.legal_entity_id', 'p.first_names', 'p.paternal_surname', 'p.maternal_surname']);
         $confidential = $type instanceof AbsenceType && $type->is_confidential;
         $attachments = $this->attachments($a);
+        $definition = $type instanceof AbsenceType ? LegalLeave::definition($type->country_code ?? $this->types->country(), $type->code) : ['extensions' => [], 'documents' => []];
+        $subsidyKind = $type instanceof AbsenceType ? $this->split->kind($type, $a->day('starts_on')) : null;
 
         $row = [
             'id' => $a->id,
@@ -510,6 +540,9 @@ final class AbsenceRequestService
             'days' => $a->days === null ? null : self::number((string) $a->days),
             'hours' => $a->hours === null ? null : self::number((string) $a->hours),
             'calendar_days' => $a->calendar_days === null ? null : self::number((string) $a->calendar_days),
+            'return_on' => $a->return_on === null ? null : substr((string) $a->return_on, 0, 10),
+            'legal_extensions' => $a->legal_extensions ?? [],
+            'required_documents' => array_map(fn (string $code): array => ['code' => $code, 'label' => (string) trans('absences.legal_leave.documents.'.$code)], $definition['documents']),
             'is_paid' => $rule?->is_paid,
             'affects_attendance' => $rule?->affects_attendance,
             'status' => $a->status,
@@ -538,6 +571,12 @@ final class AbsenceRequestService
         } else {
             $row['reason'] = $a->reason;
             $row['attachments'] = $attachments;
+        }
+        // AUS-3: reparto empleador / subsidio y estado del expediente (sensibles: revelan un descanso médico).
+        if ($subsidyKind !== null) {
+            $row['employer_paid_days'] = $a->employer_paid_days === null ? null : self::number((string) $a->employer_paid_days);
+            $row['subsidized_days'] = $a->subsidized_days === null ? null : self::number((string) $a->subsidized_days);
+            $row['subsidy_status'] = DB::table('absence_subsidy_cases')->where('absence_request_id', $a->id)->whereNull('deleted_at')->value('status');
         }
         if ($detail && $a->workflow_instance_id !== null && $a->status === 'pending') {
             $row['approval'] = $this->approvals->summary($a->workflow_instance_id);
@@ -629,6 +668,14 @@ final class AbsenceRequestService
             $endTime = null;
         }
 
+        // AUS-4 · Licencia de ley: duración desde los parámetros (base + causales); sin fecha de fin se propone.
+        $extensions = self::extensions($input['legal_extensions'] ?? null);
+        $plan = $rule->unit === 'days' ? $this->legalLeave->plan($type, $startsOn, $extensions, $this->regime($employmentId, $startsOn)) : null;
+        $explicitEnd = isset($input['ends_on']) && is_string($input['ends_on']) && $input['ends_on'] !== '';
+        if (! $explicitEnd && $plan !== null) {
+            $endsOn = LegalLeave::proposedEnd($plan, $startsOn) ?? $endsOn;
+        }
+
         $context = $this->context($employmentId, $startsOn);
         $m = $this->days->measure($context, $startsOn, $endsOn, $startTime, $endTime);
         $days = $rule->unit === 'hours' ? null : (string) ($rule->day_count === 'working' ? $m['working_days'] : $m['calendar_days']);
@@ -637,7 +684,9 @@ final class AbsenceRequestService
             'starts_on' => $startsOn, 'ends_on' => $endsOn, 'start_time' => $startTime, 'end_time' => $endTime,
             'starts_at' => $m['starts_at'], 'ends_at' => $m['ends_at'],
             'days' => $days, 'hours' => $m['hours'], 'calendar_days' => (string) $m['calendar_days'],
-            'working_days' => $m['working_days'], 'holidays' => $m['holidays'],
+            'legal_extensions' => $extensions === [] ? null : $extensions,
+            'return_on' => $rule->unit === 'days' ? $this->days->returnOn($context, $endsOn) : null,
+            'working_days' => $m['working_days'], 'holidays' => $m['holidays'], 'legal_leave' => $plan,
         ];
     }
 
@@ -649,14 +698,14 @@ final class AbsenceRequestService
         $result = $this->evaluate($type, $absence->employment_id, [
             'starts_on' => $absence->day('starts_on'), 'ends_on' => $absence->day('ends_on'),
             'start_time' => self::time($absence->start_time), 'end_time' => self::time($absence->end_time),
-            'exception_reason' => $absence->exception_reason,
+            'exception_reason' => $absence->exception_reason, 'legal_extensions' => $absence->legal_extensions,
         ], $role, $absence->id);
         if ($result['issues'] !== []) {
             $first = $result['issues'][0];
             throw new AyniException($first['code'], $first['status'], $first['message'], [], ['issues' => $result['issues']]);
         }
         // El cómputo vigente al enviar es el que queda (los feriados pudieron cambiar desde el borrador).
-        $absence->forceFill(['days' => $result['days'], 'hours' => $result['hours'], 'calendar_days' => (string) $result['calendar_days']]);
+        $absence->forceFill(['days' => $result['days'], 'hours' => $result['hours'], 'calendar_days' => (string) $result['calendar_days'], 'return_on' => $result['return_on']]);
 
         return ['warnings' => $result['warnings']];
     }
@@ -679,6 +728,7 @@ final class AbsenceRequestService
             'hours' => $locked->hours,
             'starts_on' => $locked->day('starts_on'),
             'ends_on' => $locked->day('ends_on'),
+            'return_on' => $locked->return_on === null ? null : substr((string) $locked->return_on, 0, 10),
             'workflow_definition_id' => $rule->approval_workflow_definition_id,
             'submitted_by_user_id' => $userId,
         ]);
@@ -751,7 +801,7 @@ final class AbsenceRequestService
         /** @var AbsenceRequest $locked */
         $locked = AbsenceRequest::query()->whereKey($absence->id)->lockForUpdate()->firstOrFail();
         // Lo recalculado al validar (días con los feriados vigentes) se conserva.
-        foreach (['days', 'hours', 'calendar_days'] as $field) {
+        foreach (['days', 'hours', 'calendar_days', 'return_on'] as $field) {
             if ($absence->isDirty($field)) {
                 $locked->setAttribute($field, $absence->getAttribute($field));
             }
@@ -934,6 +984,11 @@ final class AbsenceRequestService
             'status' => $a->status,
             'tenant_id' => TenancyScope::requireTenant(),
         ] + $extra);
+
+        // AUS-3: el reparto empleador / subsidio del año cambia cuando una ausencia entra o sale del calendario.
+        if (in_array($kind, ['requested', 'approved', 'rejected', 'cancelled'], true) && $this->split->kind($type, $a->day('starts_on')) !== null) {
+            $this->split->recompute($a->employment_id, (int) substr($a->day('starts_on'), 0, 4));
+        }
     }
 
     /**
@@ -950,6 +1005,20 @@ final class AbsenceRequestService
             'has_reason' => $a->reason !== null, 'registered_directly' => $a->registered_directly,
             'exception_reason' => $a->exception_reason, 'workflow_instance_id' => $a->workflow_instance_id,
         ];
+    }
+
+    /**
+     * Códigos de causal de ley elegidos (sin repetidos).
+     *
+     * @return list<string>
+     */
+    private static function extensions(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter($value, fn ($v): bool => is_string($v) && $v !== '')));
     }
 
     private static function text(mixed $value): ?string

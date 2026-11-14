@@ -42,6 +42,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonInterface|null $cancelled_at
  * @property string|null $cancelled_by_user_id
  * @property string|null $cancellation_reason
+ * @property list<string>|null $legal_extensions
+ * @property string|null $return_on
  * @property int $lock_version
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
@@ -68,6 +70,7 @@ class AbsenceRequest extends Model
     protected $casts = [
         'starts_at' => 'datetime', 'ends_at' => 'datetime', 'registered_directly' => 'boolean',
         'submitted_at' => 'datetime', 'decided_at' => 'datetime', 'cancelled_at' => 'datetime', 'lock_version' => 'integer',
+        'legal_extensions' => 'array',
     ];
 
     /** Fecha laboral sin hora (la base la guarda como date; aquí siempre AAAA-MM-DD). */

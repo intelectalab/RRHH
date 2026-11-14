@@ -5354,6 +5354,8 @@ CREATE TABLE absence_requests (
   cancelled_at timestamptz,
   cancelled_by_user_id uuid,
   cancellation_reason text,
+  legal_extensions jsonb,
+  return_on date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -5391,6 +5393,9 @@ CREATE TABLE absence_medical_certificates (
   file_id uuid,
   validated_by_user_id uuid,
   validated_at timestamptz,
+  kind text NOT NULL DEFAULT 'citt' CHECK (kind IN ('citt','private')),
+  days_granted integer,
+  is_work_related boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -5399,14 +5404,52 @@ CREATE TABLE absence_medical_certificates (
   CONSTRAINT fk_absence_medical_certificates_file_id FOREIGN KEY (tenant_id, file_id) REFERENCES stored_files (tenant_id, id),
   CONSTRAINT fk_absence_medical_certificates_validated_by_user_id FOREIGN KEY (tenant_id, validated_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE absence_medical_certificates IS 'Certificado médico de un descanso; diagnóstico y número cifrados. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
-CREATE INDEX ix_absence_medical_certificates_absence_request_id ON absence_medical_certificates (tenant_id, absence_request_id);
+COMMENT ON TABLE absence_medical_certificates IS 'Certificado médico de un descanso; diagnóstico y número cifrados. AUS-3: uno por ausencia (CITT de EsSalud o certificado particular), con los días que otorga y si el descanso viene de un accidente o enfermedad de trabajo (SCTR). -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+CREATE UNIQUE INDEX uq_absence_medical_certificates_absence_request_id ON absence_medical_certificates (tenant_id, absence_request_id) WHERE deleted_at IS NULL;
 CREATE INDEX ix_absence_medical_certificates_file_id ON absence_medical_certificates (tenant_id, file_id);
 CREATE INDEX ix_absence_medical_certificates_validated_by_user_id ON absence_medical_certificates (tenant_id, validated_by_user_id);
 ALTER TABLE absence_medical_certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE absence_medical_certificates FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON absence_medical_certificates USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_absence_medical_certificates_touch BEFORE UPDATE ON absence_medical_certificates FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE absence_subsidy_cases (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  absence_request_id uuid NOT NULL,
+  employment_id uuid NOT NULL,
+  kind text NOT NULL CHECK (kind IN ('illness','maternity')),
+  status text NOT NULL DEFAULT 'pending_filing' CHECK (status IN ('pending_filing','filed','observed','approved','reimbursed','rejected','cancelled')),
+  subsidized_days numeric(6,2) NOT NULL,
+  starts_on date,
+  ends_on date,
+  year smallint,
+  filing_due_on date,
+  filed_on date,
+  filing_reference text,
+  amount_requested numeric(14,2),
+  amount_approved numeric(14,2),
+  amount_reimbursed numeric(14,2),
+  currency char(3),
+  reimbursed_on date,
+  observation text,
+  decision_reason text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_absence_subsidy_cases_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_absence_subsidy_cases_absence_request_id FOREIGN KEY (tenant_id, absence_request_id) REFERENCES absence_requests (tenant_id, id),
+  CONSTRAINT fk_absence_subsidy_cases_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id)
+);
+COMMENT ON TABLE absence_subsidy_cases IS 'Expediente de subsidio de un descanso (AUS-3): los días que pasan a subsidio (incapacidad desde el umbral a cargo del empleador o maternidad completa) y el seguimiento del reembolso ante la seguridad social. Estados por acciones: por presentar → presentado → observado / aprobado → reembolsado, o rechazado.';
+CREATE UNIQUE INDEX uq_absence_subsidy_cases_absence_request_id ON absence_subsidy_cases (tenant_id, absence_request_id) WHERE deleted_at IS NULL;
+CREATE INDEX ix_absence_subsidy_cases_employment_id ON absence_subsidy_cases (tenant_id, employment_id);
+CREATE INDEX ix_absence_subsidy_cases_status_filing_due_on ON absence_subsidy_cases (tenant_id, status, filing_due_on);
+ALTER TABLE absence_subsidy_cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absence_subsidy_cases FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON absence_subsidy_cases USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_absence_subsidy_cases_touch BEFORE UPDATE ON absence_subsidy_cases FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 -- --------------------------------------------------------------------------------------------------
 -- BHO · Horas extra y bolsa de horas

@@ -78,6 +78,10 @@ return [
             'in_app' => ['subject' => 'Sua conta de pagamento mudou', 'body' => 'Seus pagamentos irão para a conta terminada em {last4}. Se não foi você, avise o RH imediatamente.'],
             'email' => ['subject' => 'Sua conta de pagamento mudou', 'body' => "Olá {name}:\n\nEm {organization}, seus pagamentos irão a partir de agora para a conta terminada em {last4}.\n\nSe não foi você, avise o RH imediatamente."],
         ],
+        'absences.subsidy_started' => [
+            'in_app' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => 'O afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e registre o acompanhamento.'],
+            'email' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => "Olá {name}:\n\nEm {organization}, o afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e acompanhe aqui: {link}"],
+        ],
         'contracts.probation_ending' => [
             'in_app' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => 'O período de experiência de {employee} termina em {ends_on}. Revise o desempenho antes dessa data.'],
             'email' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => "Olá {name}:\n\nEm {organization}, o período de experiência de {employee} termina em {ends_on}. Revise o desempenho e decida antes dessa data.\n\nRevise aqui: {link}"],

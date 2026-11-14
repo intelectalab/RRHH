@@ -22,6 +22,7 @@ return [
         'below_legal_duration' => 'La duración de ley es de :days días: no se registra menos.',
         'legal_duration_pending' => 'La duración de ley de referencia es de :days días (parámetro por validar).',
         'legal_duration_unknown' => 'La duración de ley de este tipo aún no está validada.',
+        'legal_duration_proposed' => 'La duración de ley propuesta es de :days días (parámetro por validar).',
         'closed_period' => 'La ausencia cae en un periodo de planilla cerrado (hasta el :date): solo Recursos Humanos la registra.',
         'closed_period_adjustment' => 'Cae en un periodo de planilla cerrado (hasta el :date): su efecto irá como ajuste al periodo abierto.',
         'overlap' => 'Ya hay otra ausencia en esas fechas (del :from al :to).',
@@ -55,5 +56,41 @@ return [
             'month' => 'mes',
             'year' => 'año',
         ],
+    ],
+    // AUS-4 · Licencias de ley: causales de ampliación y documentos.
+    'legal_leave' => [
+        'extensions' => [
+            'multiple_birth' => 'Parto múltiple',
+            'child_disability' => 'Hijo o hija con discapacidad',
+            'premature_or_multiple' => 'Parto prematuro o múltiple',
+            'serious_condition' => 'Enfermedad grave o complicaciones de la madre o del recién nacido',
+        ],
+        'documents' => [
+            'maternity_certificate' => 'Certificado médico de maternidad (CITT)',
+            'birth_certificate' => 'Partida o certificado de nacimiento',
+            'death_certificate' => 'Acta o certificado de defunción',
+            'kinship_proof' => 'Documento que acredita el parentesco',
+            'medical_certificate' => 'Certificado médico o CITT',
+        ],
+        'unknown_extension' => 'Causal de ampliación desconocida para este tipo: :code.',
+        'documents_required' => 'Documentos que se piden: :documents.',
+    ],
+    // AUS-3 · Subsidios y certificado médico.
+    'subsidies' => [
+        'threshold_unknown' => 'El umbral de días a cargo del empleador aún no está validado: todo el descanso se cuenta a cargo del empleador hasta definirlo.',
+        'threshold_reached' => 'Con este descanso el acumulado del año llega a :accumulated días (umbral :threshold): :subsidized días pasan a subsidio.',
+        'invalid_action' => 'Acción no válida para el expediente de subsidio.',
+        'invalid_filter' => 'Filtro de estado no válido.',
+        'future_date' => 'La fecha de presentación no puede ser futura.',
+        'date_required' => 'Indica la fecha.',
+        'amount_required' => 'Indica el monto.',
+        'amount_invalid' => 'El monto debe ser un número no negativo con hasta dos decimales.',
+        'currency_mismatch' => 'El monto debe estar en :currency.',
+        'reason_required' => 'Indica el motivo.',
+    ],
+    'certificates' => [
+        'not_medical' => 'Solo los descansos médicos y las licencias de maternidad llevan certificado médico.',
+        'closed' => 'La ausencia está cerrada: no se registra el certificado.',
+        'forbidden' => 'Registrar el certificado exige permiso para ver datos de salud.',
     ],
 ];

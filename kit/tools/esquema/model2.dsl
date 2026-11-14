@@ -125,11 +125,19 @@
   starts_on date ; ends_on date ; start_time time ; end_time time ; calendar_days numeric(6,2)
   registered_directly bool=f ; document_due_on date ; exception_reason ; submitted_at ts ; decided_at ts ; decision_reason
   cancelled_at ts ; cancelled_by_user_id ?-> users ; cancellation_reason ; idx status, starts_on
+  legal_extensions j ; return_on date
   check starts_on IS NULL OR ends_on >= starts_on
   raw EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, tstzrange(starts_at, ends_at, '[)') WITH &&) WHERE (deleted_at IS NULL AND status IN ('pending','pending_document','approved','in_progress','completed')) DEFERRABLE INITIALLY IMMEDIATE
-@absence_medical_certificates soft sens | Certificado médico de un descanso; diagnóstico y número cifrados.
+@absence_medical_certificates soft sens | Certificado médico de un descanso; diagnóstico y número cifrados. AUS-3: uno por ausencia (CITT de EsSalud o certificado particular), con los días que otorga y si el descanso viene de un accidente o enfermedad de trabajo (SCTR).
   absence_request_id -> absence_requests ; certificate_number_enc ; issuer ; diagnosis_enc ; issued_on
   file_id ?-> stored_files ; validated_by_user_id ?-> users ; validated_at
+  kind enum(citt,private)=citt ; days_granted integer ; is_work_related bool=f ; uniq absence_request_id
+@absence_subsidy_cases soft lock | Expediente de subsidio de un descanso (AUS-3): los días que pasan a subsidio (incapacidad desde el umbral a cargo del empleador o maternidad completa) y el seguimiento del reembolso ante la seguridad social. Estados por acciones: por presentar → presentado → observado / aprobado → reembolsado, o rechazado.
+  absence_request_id -> absence_requests ; employment_id -> employments ; kind enum(illness,maternity)!
+  status enum(pending_filing,filed,observed,approved,reimbursed,rejected,cancelled)=pending_filing
+  subsidized_days numeric(6,2)! ; starts_on date ; ends_on date ; year smallint ; filing_due_on date ; filed_on date
+  filing_reference ; amount_requested money ; amount_approved money ; amount_reimbursed money ; currency cur?
+  reimbursed_on date ; observation ; decision_reason ; uniq absence_request_id ; idx status, filing_due_on
 
 #E BHO | Horas extra y bolsa de horas
 @overtime_requests soft lock | Autorización previa de sobretiempo.

@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 177,
+    "parametros": 183,
     "verificados": 128,
-    "sin_verificar": 49
+    "sin_verificar": 55
   },
   "parametros": [
     {
@@ -1398,6 +1398,96 @@
       "verificado": false,
       "base_legal": "Por confirmar",
       "nota": "Por confirmar si existe licencia general en el régimen privado o solo por convenio."
+    },
+    {
+      "codigo": "licencia_maternidad_dias_adicionales_parto_multiple",
+      "nombre": "Licencia por maternidad: días adicionales por parto múltiple",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 26644 modificada por Ley 27606",
+      "nota": "Por confirmar los días que se suman al descanso postnatal."
+    },
+    {
+      "codigo": "licencia_maternidad_dias_adicionales_discapacidad",
+      "nombre": "Licencia por maternidad: días adicionales por nacimiento de un hijo con discapacidad",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 26644 modificada por Ley 30367",
+      "nota": "Por confirmar los días que se suman al descanso postnatal."
+    },
+    {
+      "codigo": "licencia_paternidad_dias_prematuro_multiple",
+      "nombre": "Licencia por paternidad: duración por parto prematuro o múltiple",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 29409 modificada por Ley 30807",
+      "nota": "Duración total (no se suma a la general); por confirmar."
+    },
+    {
+      "codigo": "licencia_paternidad_dias_complicaciones",
+      "nombre": "Licencia por paternidad: duración por enfermedad grave, discapacidad del hijo o complicaciones de la madre",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 29409 modificada por Ley 30807",
+      "nota": "Duración total (no se suma a la general); por confirmar."
+    },
+    {
+      "codigo": "descanso_medico_dias_cargo_empleador",
+      "nombre": "Días de incapacidad temporal del año a cargo del empleador antes del subsidio",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 26790 art. 12 · DS 009-97-SA",
+      "nota": "Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario."
+    },
+    {
+      "codigo": "subsidio_reembolso_plazo_meses",
+      "nombre": "Plazo para solicitar el reembolso de un subsidio a la seguridad social",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "months",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 26790 · Acuerdo de EsSalud",
+      "nota": "Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso)."
     },
     {
       "codigo": "teletrabajo_respuesta_dias_habiles",

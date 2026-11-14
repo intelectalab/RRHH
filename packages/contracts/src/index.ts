@@ -4,6 +4,125 @@
  */
 
 export interface paths {
+    "/absence-subsidies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AUS-3 · Expedientes de subsidio (reembolso ante la seguridad social) en el alcance: estado, días de subsidio, plazo de presentación (parámetro subsidio_reembolso_plazo_meses), montos {amount, currency} y acciones permitidas */
+        get: operations["getAbsenceSubsidies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AUS-3 · Ver un expediente de subsidio */
+        get: operations["getAbsenceSubsidiesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-3 · Registrar la aprobación del subsidio (amount_approved {amount, currency}) */
+        post: operations["postAbsenceSubsidiesIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-3 · Presentar el expediente (filed_on, filing_reference, amount_requested {amount, currency}); también vuelve a presentar uno observado. 409 invalid_transition fuera de por presentar u observado */
+        post: operations["postAbsenceSubsidiesIdFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}/observe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-3 · Registrar la observación de la seguridad social (reason) */
+        post: operations["postAbsenceSubsidiesIdObserve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}/reimburse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-3 · Registrar el reembolso recibido (reimbursed_on, amount_reimbursed {amount, currency}) */
+        post: operations["postAbsenceSubsidiesIdReimburse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absence-subsidies/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-3 · Registrar el rechazo del subsidio (reason) */
+        post: operations["postAbsenceSubsidiesIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/absence-types": {
         parameters: {
             query?: never;
@@ -178,6 +297,24 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postAbsencesIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absences/{id}/medical-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AUS-3 · Certificado médico del descanso (CITT o particular): tipo, número y diagnóstico (sensibles, x-sensitive-fields de AbsenceMedicalCertificate: certificate_number, diagnosis; la lectura queda en data_access_logs), emisor, fecha, días otorgados frente a los días del descanso y origen laboral */
+        get: operations["getAbsencesIdMedicalCertificate"];
+        /** AUS-3 · Registrar o corregir el certificado médico (kind citt|private, certificate_number, issuer, diagnosis, issued_on, days_granted, is_work_related, validated). Exige además time.absences.medical_certificate.view (403); 422 not_medical_absence si el tipo no genera subsidio. Número y diagnóstico se guardan cifrados y no van a la auditoría */
+        put: operations["putAbsencesIdMedicalCertificate"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4909,6 +5046,23 @@ export interface paths {
         };
         /** Descargar la declaración firmada (exige además permiso de datos personales; se registra la descarga) */
         get: operations["getEmploymentsEmploymentIdLifeInsuranceDeclarationsIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/medical-leave-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AUS-3 · Acumulado anual de descansos médicos del trabajador: umbral a cargo del empleador (parámetro descanso_medico_dias_cargo_empleador, «por validar» si no tiene valor), días acumulados, del empleador y de subsidio, si se alcanzó el umbral y cada descanso con su expediente */
+        get: operations["getEmploymentsEmploymentIdMedicalLeaveSummary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -16879,7 +17033,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): medical_reason, medical_attachments */
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): employer_paid_days, subsidized_days, subsidy_status, medical_reason, medical_attachments */
         Absence: {
             /** @description Identificador opaco */
             id: string;
@@ -16907,6 +17061,15 @@ export interface components {
             days?: string | null;
             hours?: string | null;
             calendar_days?: string | null;
+            /** Format: date */
+            return_on?: string | null;
+            legal_extensions?: string[] | null;
+            required_documents?: {
+                [key: string]: unknown;
+            }[] | null;
+            employer_paid_days?: string | null;
+            subsidized_days?: string | null;
+            subsidy_status?: string | null;
             is_paid?: boolean | null;
             affects_attendance?: boolean | null;
             reason?: string | null;
@@ -16963,6 +17126,7 @@ export interface components {
             ends_on?: string | null;
             start_time?: string | null;
             end_time?: string | null;
+            legal_extensions?: string[] | null;
             reason?: string | null;
             medical_reason?: string | null;
             exception_reason?: string | null;
@@ -22783,6 +22947,247 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getAbsenceSubsidies: {
+        parameters: {
+            query?: {
+                /** @description Estados separados por coma (pending_filing, filed, observed, approved, reimbursed, rejected, cancelled) */
+                "filter[status]"?: string;
+                /** @description Solo los expedientes de esa relación laboral */
+                "filter[employment_id]"?: string;
+                /** @description Año del descanso (AAAA) */
+                "filter[year]"?: string;
+                /** @description true: solo los por presentar con el plazo vencido */
+                "filter[overdue]"?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getAbsenceSubsidiesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postAbsenceSubsidiesIdApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAbsenceSubsidiesIdFile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAbsenceSubsidiesIdObserve: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAbsenceSubsidiesIdReimburse: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postAbsenceSubsidiesIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getAbsenceTypes: {
         parameters: {
             query?: {
@@ -23270,6 +23675,64 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getAbsencesIdMedicalCertificate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    putAbsencesIdMedicalCertificate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postAbsencesIdRegister: {
@@ -35340,6 +35803,35 @@ export interface operations {
                     "image/jpeg": string;
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getEmploymentsEmploymentIdMedicalLeaveSummary: {
+        parameters: {
+            query?: {
+                /** @description Año calendario (AAAA); por defecto el actual */
+                year?: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];

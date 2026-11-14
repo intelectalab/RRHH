@@ -78,6 +78,10 @@ return [
             'in_app' => ['subject' => 'Your payment account changed', 'body' => 'Your payments will go to the account ending in {last4}. If you did not request it, tell HR right away.'],
             'email' => ['subject' => 'Your payment account changed', 'body' => "Hello {name}:\n\nAt {organization}, your payments will now go to the account ending in {last4}.\n\nIf you did not request it, tell HR right away."],
         ],
+        'absences.subsidy_started' => [
+            'in_app' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "{employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it."],
+            'email' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "Hi {name}:\n\nAt {organization}, {employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it here: {link}"],
+        ],
         'contracts.probation_ending' => [
             'in_app' => ['subject' => '{employee}\'s probation ends soon', 'body' => '{employee}\'s probation period ends on {ends_on}. Review their performance before that date.'],
             'email' => ['subject' => '{employee}\'s probation ends soon', 'body' => "Hello {name}:\n\nIn {organization}, {employee}'s probation period ends on {ends_on}. Review their performance and decide before that date.\n\nReview it here: {link}"],

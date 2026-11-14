@@ -9,7 +9,8 @@ import { useDateTime } from '@/modules/session/useDateTime'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Notice } from '@/ui/components/Notice'
 import { SidePanel } from '@/ui/components/SidePanel'
-import { ABSENCE_TONE, absenceFiles, absenceReason, type Absence, type AbsenceSimulation } from './absences'
+import { ABSENCE_TONE, SUBSIDY_TONE, absenceFiles, absenceReason, type Absence, type AbsenceSimulation, type MedicalCertificate } from './absences'
+import { toggleExtension } from './subsidies'
 
 type Toast = (text: string, kind?: 'ok' | 'error') => void
 type EmploymentOption = { id: string; person_name?: string | null; employee_code: string }
@@ -41,6 +42,7 @@ export function AbsenceFormPanel({ employmentId, onClose, onSaved }: { employmen
   const [types, setTypes] = useState<TypeOption[]>([])
   const [form, setForm] = useState({ employment_id: employmentId ?? '', absence_type_id: '', starts_on: '', ends_on: '', start_time: '', end_time: '', reason: '', exception_reason: '' })
   const [simulation, setSimulation] = useState<AbsenceSimulation | null>(null)
+  const [extensions, setExtensions] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
@@ -62,9 +64,11 @@ export function AbsenceFormPanel({ employmentId, onClose, onSaved }: { employmen
 
   const body = () => ({
     employment_id: form.employment_id, absence_type_id: form.absence_type_id, starts_on: form.starts_on,
-    ends_on: hours ? form.starts_on : (form.ends_on || form.starts_on),
+    // AUS-4: sin fecha de fin, el servidor propone la de la licencia de ley (o un solo día).
+    ends_on: hours ? form.starts_on : (form.ends_on || null),
     start_time: hours ? form.start_time || null : null, end_time: hours ? form.end_time || null : null,
     reason: form.reason.trim() || null, exception_reason: form.exception_reason.trim() || null,
+    legal_extensions: extensions,
   })
 
   // Simulación en el servidor (regla 11): se repite al cambiar el tipo, las fechas o las horas.
@@ -82,7 +86,10 @@ export function AbsenceFormPanel({ employmentId, onClose, onSaved }: { employmen
     }, 300)
     return () => window.clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.employment_id, form.absence_type_id, form.starts_on, form.ends_on, form.start_time, form.end_time, form.exception_reason, hours])
+  }, [form.employment_id, form.absence_type_id, form.starts_on, form.ends_on, form.start_time, form.end_time, form.exception_reason, hours, extensions])
+
+  // Las causales son del tipo: al cambiarlo se vacían.
+  useEffect(() => { setExtensions([]) }, [form.absence_type_id])
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -146,21 +153,39 @@ export function AbsenceFormPanel({ employmentId, onClose, onSaved }: { employmen
         )}
         {field('reason', t('abs.reason'), <textarea id="ab-reason" rows={2} className={cls('reason')} value={form.reason} onChange={set('reason')} />, type?.is_confidential ? t('abs.reason_confidential') : undefined)}
         {hr && field('exception_reason', t('abs.exception_reason'), <input id="ab-exception_reason" className={cls('exception_reason')} value={form.exception_reason} onChange={set('exception_reason')} />, t('abs.exception_help'))}
-        {simulation && <SimulationSummary simulation={simulation} />}
+        {simulation?.legal_leave && simulation.legal_leave.extensions.length > 0 && (
+          <fieldset className="mb-3">
+            <legend className="form-label">{t('abs.legal_extensions')}</legend>
+            {simulation.legal_leave.extensions.map((x) => (
+              <div className="form-check" key={x.code}>
+                <input id={`ab-ext-${x.code}`} type="checkbox" className="form-check-input" checked={extensions.includes(x.code)} onChange={() => setExtensions((l) => toggleExtension(l, x.code))} />
+                <label className="form-check-label" htmlFor={`ab-ext-${x.code}`}>{x.label}{x.pending_validation && <span className="sub2"> · {t('abs.pending_validation')}</span>}</label>
+              </div>
+            ))}
+            {errors.legal_extensions && <div className="invalid-feedback" style={{ display: 'block' }} role="alert">{errors.legal_extensions}</div>}
+          </fieldset>
+        )}
+        {simulation && <SimulationSummary simulation={simulation} proposedEnd={!hours && !form.ends_on} />}
         {error && <div className="invalid-feedback" style={{ display: 'block' }} role="alert">{error}</div>}
       </form>
     </SidePanel>
   )
 }
 
-function SimulationSummary({ simulation }: { simulation: AbsenceSimulation }) {
+function SimulationSummary({ simulation, proposedEnd }: { simulation: AbsenceSimulation; proposedEnd: boolean }) {
   const { t, locale } = useT()
+  const plan = simulation.legal_leave
+  const subsidy = simulation.subsidy
   return (
     <section className="mb-3" aria-label={t('abs.simulation')} aria-live="polite">
       <h3 className="h6">{t('abs.simulation')}</h3>
       <p className="mb-1"><AbsenceQuantity absence={simulation} />{simulation.unit === 'days' && <span className="sub2"> · {t('abs.calendar_working', { calendar: simulation.calendar_days, working: simulation.working_days })}</span>}</p>
       {simulation.holidays.length > 0 && <p className="small text-secondary mb-1">{t('abs.holidays', { dates: simulation.holidays.map((d) => formatDate(locale, d)).join(', ') })}</p>}
       <p className="small text-secondary">{t(simulation.is_paid ? 'abs.paid' : 'abs.unpaid')}{simulation.document_required ? ` · ${t('abs.document_required')}` : ''}</p>
+      {proposedEnd && plan?.total_days && <p className="small mb-1">{t('abs.proposed_end', { date: formatDate(locale, simulation.ends_on), days: formatNumber(locale, plan.total_days) })}{plan.pending_validation && <span className="sub2"> · {t('abs.pending_validation')}</span>}</p>}
+      {simulation.return_on && <p className="small mb-1">{t('abs.return_on_text', { date: formatDate(locale, simulation.return_on) })}</p>}
+      {simulation.required_documents.length > 0 && <p className="small text-secondary mb-1">{t('abs.required_documents', { documents: simulation.required_documents.map((d) => d.label).join(', ') })}</p>}
+      {subsidy && <p className="small mb-1">{t('abs.subsidy_preview', { employer: formatNumber(locale, subsidy.employer_paid_days), subsidized: formatNumber(locale, subsidy.subsidized_days), accumulated: formatNumber(locale, subsidy.accumulated_days) })}</p>}
       {simulation.issues.map((i) => <Notice key={i.code} tone="error">{i.message}</Notice>)}
       {simulation.warnings.map((w) => <Notice key={w.code} tone="warn">{w.message}</Notice>)}
     </section>
@@ -181,6 +206,7 @@ function saveFile(blob: Blob, name: string) {
 /** AUS-2 · Detalle con sus acciones (enviar, registrar, cancelar, adjuntar sustento). Aprobar se hace en el centro de aprobaciones. */
 export function AbsenceDetailPanel({ id, onClose, onChanged, toast }: { id: string; onClose: () => void; onChanged: () => void; toast: Toast }) {
   const { t, locale } = useT()
+  const { can } = useSession()
   const fmt = useDateTime()
   const [absence, setAbsence] = useState<Absence | null>(null)
   const [failed, setFailed] = useState(false)
@@ -251,7 +277,10 @@ export function AbsenceDetailPanel({ id, onClose, onChanged, toast }: { id: stri
             <dt>{t('abs.employee')}</dt><dd>{absence.person_name ?? '—'}{absence.employee_code && <span className="sub2"> · {absence.employee_code}</span>}</dd>
             <dt>{t('abs.col_dates')}</dt><dd><AbsenceDates absence={absence} /></dd>
             <dt>{t('abs.col_quantity')}</dt><dd><AbsenceQuantity absence={absence} />{absence.unit === 'days' && absence.calendar_days !== null && <span className="sub2"> · {t('abs.calendar_n', { n: formatNumber(locale, absence.calendar_days) })}</span>}</dd>
+            {absence.return_on && <><dt>{t('abs.return_on')}</dt><dd>{formatDate(locale, absence.return_on)}</dd></>}
             {absence.is_paid !== null && <><dt>{t('abs.pay')}</dt><dd>{t(absence.is_paid ? 'abs.paid' : 'abs.unpaid')}</dd></>}
+            {absence.employer_paid_days != null && absence.subsidized_days != null && <><dt>{t('abs.subsidy_split')}</dt><dd>{t('abs.subsidy_split_text', { employer: formatNumber(locale, absence.employer_paid_days), subsidized: formatNumber(locale, absence.subsidized_days) })}{absence.subsidy_status && <span className={`st ${SUBSIDY_TONE[absence.subsidy_status]}`}> {t(`sub.status_${absence.subsidy_status}`)}</span>}</dd></>}
+            {(absence.required_documents ?? []).length > 0 && <><dt>{t('abs.required_documents_label')}</dt><dd>{(absence.required_documents ?? []).map((d) => d.label).join(', ')}</dd></>}
             {text && <><dt>{t('abs.reason')}</dt><dd>{text}</dd></>}
             {absence.exception_reason && <><dt>{t('abs.exception_reason')}</dt><dd>{absence.exception_reason}</dd></>}
             {absence.requested_by_name && <><dt>{t('abs.requested_by')}</dt><dd>{absence.requested_by_name}</dd></>}
@@ -286,6 +315,7 @@ export function AbsenceDetailPanel({ id, onClose, onChanged, toast }: { id: stri
               )}
             </section>
           )}
+          {absence.employer_paid_days !== undefined && can('time.absences.medical_certificate.view') && <MedicalCertificateSection absenceId={id} editable={can('time.absences.create_for_others') && !['rejected', 'cancelled'].includes(absence.status)} toast={toast} />}
           {actions.includes('cancel') && absence.status !== 'draft' && (
             <div className="mb-3">
               <label className="form-label" htmlFor="ab-cancel-reason">{t('abs.cancel_reason')}</label>
@@ -295,5 +325,111 @@ export function AbsenceDetailPanel({ id, onClose, onChanged, toast }: { id: stri
         </>
       )}
     </SidePanel>
+  )
+}
+
+/**
+ * AUS-3 · Certificado médico del descanso (CITT o particular). Solo se muestra con permiso de datos de salud;
+ * el servidor no envía número ni diagnóstico sin él y registra cada lectura.
+ */
+function MedicalCertificateSection({ absenceId, editable, toast }: { absenceId: string; editable: boolean; toast: Toast }) {
+  const { t, locale } = useT()
+  const [cert, setCert] = useState<MedicalCertificate | null>(null)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({ kind: 'citt', certificate_number: '', issuer: '', diagnosis: '', issued_on: '', days_granted: '', is_work_related: false })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    void api.get<{ data: MedicalCertificate }>(`/absences/${absenceId}/medical-certificate`).then((r) => setCert(r.data)).catch(() => setCert(null))
+  }, [absenceId])
+
+  function edit() {
+    setForm({
+      kind: cert?.kind ?? 'citt', certificate_number: cert?.certificate_number ?? '', issuer: cert?.issuer ?? '', diagnosis: cert?.diagnosis ?? '',
+      issued_on: cert?.issued_on ?? '', days_granted: cert?.days_granted == null ? '' : String(cert.days_granted), is_work_related: cert?.is_work_related ?? false,
+    })
+    setErrors({})
+    setEditing(true)
+  }
+
+  async function save(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setBusy(true)
+    setErrors({})
+    try {
+      const res = await api.request<{ data: MedicalCertificate }>(`/absences/${absenceId}/medical-certificate`, 'PUT', {
+        kind: form.kind, certificate_number: form.certificate_number.trim() || null, issuer: form.issuer.trim() || null,
+        diagnosis: form.diagnosis.trim() || null, issued_on: form.issued_on || null,
+        days_granted: form.days_granted === '' ? null : Number(form.days_granted), is_work_related: form.is_work_related,
+      })
+      setCert(res.data)
+      setEditing(false)
+      toast(t('abs.cert_saved'))
+    } catch (err) {
+      const { fields, general } = formErrors(err, t)
+      setErrors(fields)
+      if (general) toast(general, 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const input = (key: 'certificate_number' | 'issuer' | 'issued_on' | 'days_granted', label: string, type = 'text') => (
+    <div className="mb-2">
+      <label className="form-label" htmlFor={`mc-${key}`}>{label}</label>
+      <input id={`mc-${key}`} type={type} className={`form-control${errors[key] ? ' is-invalid' : ''}`} value={form[key]} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))} />
+      {errors[key] && <div className="invalid-feedback" role="alert">{errors[key]}</div>}
+    </div>
+  )
+
+  return (
+    <section className="mb-3" aria-label={t('abs.cert_title')}>
+      <h3 className="h6">{t('abs.cert_title')}</h3>
+      {!editing && (
+        <>
+          {!cert?.id && <p className="small text-secondary">{t('abs.cert_empty')}</p>}
+          {cert?.id && (
+            <dl className="ficha mb-2">
+              <dt>{t('abs.cert_kind')}</dt><dd>{t(`abs.cert_kind_${cert.kind ?? 'citt'}`)}{cert.validated_at && <span className="st ok"> {t('abs.cert_validated')}</span>}</dd>
+              {cert.certificate_number && <><dt>{t('abs.cert_number')}</dt><dd>{cert.certificate_number}</dd></>}
+              {cert.issuer && <><dt>{t('abs.cert_issuer')}</dt><dd>{cert.issuer}</dd></>}
+              {cert.issued_on && <><dt>{t('abs.cert_issued_on')}</dt><dd>{formatDate(locale, cert.issued_on)}</dd></>}
+              {cert.diagnosis && <><dt>{t('abs.cert_diagnosis')}</dt><dd>{cert.diagnosis}</dd></>}
+              {cert.days_granted !== null && <><dt>{t('abs.cert_days')}</dt><dd>{t('abs.days_n', { n: String(cert.days_granted) })}</dd></>}
+              <dt>{t('abs.cert_work_related')}</dt><dd>{t(cert.is_work_related ? 'common.yes' : 'common.no')}</dd>
+            </dl>
+          )}
+          {cert?.days_mismatch && <Notice tone="warn">{t('abs.cert_mismatch', { granted: String(cert.days_granted ?? ''), days: String(cert.absence_calendar_days ?? '') })}</Notice>}
+          {editable && <button type="button" className="btn btn-sec btn-sm" onClick={edit}>{t(cert?.id ? 'abs.cert_edit' : 'abs.cert_add')}</button>}
+        </>
+      )}
+      {editing && (
+        <form onSubmit={save} noValidate>
+          <div className="mb-2">
+            <label className="form-label" htmlFor="mc-kind">{t('abs.cert_kind')}</label>
+            <select id="mc-kind" className="form-select" value={form.kind} onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value }))}>
+              <option value="citt">{t('abs.cert_kind_citt')}</option>
+              <option value="private">{t('abs.cert_kind_private')}</option>
+            </select>
+          </div>
+          {input('certificate_number', t('abs.cert_number'))}
+          {input('issuer', t('abs.cert_issuer'))}
+          {input('issued_on', t('abs.cert_issued_on'), 'date')}
+          {input('days_granted', t('abs.cert_days'), 'number')}
+          <div className="mb-2">
+            <label className="form-label" htmlFor="mc-diagnosis">{t('abs.cert_diagnosis')}</label>
+            <textarea id="mc-diagnosis" rows={2} className={`form-control${errors.diagnosis ? ' is-invalid' : ''}`} value={form.diagnosis} onChange={(e) => setForm((f) => ({ ...f, diagnosis: e.target.value }))} />
+            <p className="small text-secondary">{t('abs.cert_diagnosis_help')}</p>
+          </div>
+          <div className="form-check mb-2">
+            <input id="mc-work" type="checkbox" className="form-check-input" checked={form.is_work_related} onChange={(e) => setForm((f) => ({ ...f, is_work_related: e.target.checked }))} />
+            <label className="form-check-label" htmlFor="mc-work">{t('abs.cert_work_related')}</label>
+          </div>
+          <button type="button" className="btn btn-sec btn-sm" onClick={() => setEditing(false)}>{t('abs.close')}</button>{' '}
+          <button type="submit" className="btn btn-primary btn-sm" disabled={busy}>{busy && <span className="spin" aria-hidden="true" />}{t('abs.cert_save')}</button>
+        </form>
+      )}
+    </section>
   )
 }

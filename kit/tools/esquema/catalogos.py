@@ -375,6 +375,14 @@ LEGAL_PE = [
  lp('licencia_maternidad_dias', 'Licencia por maternidad (días naturales, prenatal y postnatal)', 'days', None, False, 'Ley 26644', 'Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad).'),
  lp('licencia_paternidad_dias', 'Licencia por paternidad (días naturales consecutivos)', 'days', None, False, 'Ley 29409 y Ley 30807', 'Por confirmar la duración vigente y los supuestos con más días.'),
  lp('licencia_fallecimiento_familiar_dias', 'Licencia por fallecimiento de un familiar directo (días)', 'days', None, False, 'Por confirmar', 'Por confirmar si existe licencia general en el régimen privado o solo por convenio.'),
+ # AUS-4 · Ampliaciones de las licencias de ley por causal (RN-AUS-04). Sin valor hasta validarlas.
+ lp('licencia_maternidad_dias_adicionales_parto_multiple', 'Licencia por maternidad: días adicionales por parto múltiple', 'days', None, False, 'Ley 26644 modificada por Ley 27606', 'Por confirmar los días que se suman al descanso postnatal.'),
+ lp('licencia_maternidad_dias_adicionales_discapacidad', 'Licencia por maternidad: días adicionales por nacimiento de un hijo con discapacidad', 'days', None, False, 'Ley 26644 modificada por Ley 30367', 'Por confirmar los días que se suman al descanso postnatal.'),
+ lp('licencia_paternidad_dias_prematuro_multiple', 'Licencia por paternidad: duración por parto prematuro o múltiple', 'days', None, False, 'Ley 29409 modificada por Ley 30807', 'Duración total (no se suma a la general); por confirmar.'),
+ lp('licencia_paternidad_dias_complicaciones', 'Licencia por paternidad: duración por enfermedad grave, discapacidad del hijo o complicaciones de la madre', 'days', None, False, 'Ley 29409 modificada por Ley 30807', 'Duración total (no se suma a la general); por confirmar.'),
+ # AUS-3 · Descansos médicos: días del año a cargo del empleador antes del subsidio (RN-AUS-03) y plazo del reembolso.
+ lp('descanso_medico_dias_cargo_empleador', 'Días de incapacidad temporal del año a cargo del empleador antes del subsidio', 'days', None, False, 'Ley 26790 art. 12 · DS 009-97-SA', 'Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario.'),
+ lp('subsidio_reembolso_plazo_meses', 'Plazo para solicitar el reembolso de un subsidio a la seguridad social', 'months', None, False, 'Ley 26790 · Acuerdo de EsSalud', 'Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso).'),
  lp('teletrabajo_respuesta_dias_habiles', 'Plazo de respuesta a solicitudes de teletrabajo (días hábiles)', 'days', 10, True, 'Ley 31572'),
  lp('teletrabajo_desconexion_horas', 'Desconexión digital mínima continua', 'hours', 12, True, 'Ley 31572'),
  lp('privacidad_notificacion_incidente_horas', 'Plazo para notificar un incidente de datos personales', 'hours', 48, True, 'DS 016-2024-JUS', vfrom='2025-03-30', vfrom_ok=True),

@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **49 parámetros sin valor verificado**; **42** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **55 parámetros sin valor verificado**; **48** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -16,6 +16,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `afp_remuneracion_maxima_asegurable` | Remuneración máxima asegurable | Todos | amount | SBS | Sí | Cargar desde la fuente oficial cada periodo. | |
 | `boletas_conservacion_anios` | Conservación de documentos de pago | Todos | years | DL 1310 | Sí | Citado de memoria en la investigación; validar con el texto vigente. | |
 | `contrato_modalidad_tope_acumulado_anios` | Tope acumulado de contratos a modalidad | Todos | years | DS 003-97-TR | Sí | El tope general no consta en la investigación. | |
+| `descanso_medico_dias_cargo_empleador` | Días de incapacidad temporal del año a cargo del empleador antes del subsidio | Todos | days | Ley 26790 art. 12 · DS 009-97-SA | Sí | Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario. | |
 | `discapacidad_cuota_minimo_trabajadores` | Trabajadores desde los que aplica la cuota | Todos | count | Ley 29973 | Sí | No confirmado en el texto. | |
 | `discapacidad_cuota_pct` | Cuota de empleo de personas con discapacidad | Todos | percent | Ley 29973 | Sí | No confirmado en el texto. | |
 | `eps_credito_pct` | Crédito por EPS contra el aporte de salud | Todos | percent | Ley 26790 | Sí | Porcentaje no verificado. | |
@@ -26,7 +27,11 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `lactario_minimo_mujeres_edad_fertil` | Mujeres en edad fértil por centro de trabajo que obligan a lactario | Todos | count | Ley 29896 | Sí | Umbral no verificado. | |
 | `licencia_fallecimiento_familiar_dias` | Licencia por fallecimiento de un familiar directo (días) | Todos | days | Por confirmar | Sí | Por confirmar si existe licencia general en el régimen privado o solo por convenio. | |
 | `licencia_maternidad_dias` | Licencia por maternidad (días naturales, prenatal y postnatal) | Todos | days | Ley 26644 | Sí | Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad). | |
+| `licencia_maternidad_dias_adicionales_discapacidad` | Licencia por maternidad: días adicionales por nacimiento de un hijo con discapacidad | Todos | days | Ley 26644 modificada por Ley 30367 | Sí | Por confirmar los días que se suman al descanso postnatal. | |
+| `licencia_maternidad_dias_adicionales_parto_multiple` | Licencia por maternidad: días adicionales por parto múltiple | Todos | days | Ley 26644 modificada por Ley 27606 | Sí | Por confirmar los días que se suman al descanso postnatal. | |
 | `licencia_paternidad_dias` | Licencia por paternidad (días naturales consecutivos) | Todos | days | Ley 29409 y Ley 30807 | Sí | Por confirmar la duración vigente y los supuestos con más días. | |
+| `licencia_paternidad_dias_complicaciones` | Licencia por paternidad: duración por enfermedad grave, discapacidad del hijo o complicaciones de la madre | Todos | days | Ley 29409 modificada por Ley 30807 | Sí | Duración total (no se suma a la general); por confirmar. | |
+| `licencia_paternidad_dias_prematuro_multiple` | Licencia por paternidad: duración por parto prematuro o múltiple | Todos | days | Ley 29409 modificada por Ley 30807 | Sí | Duración total (no se suma a la general); por confirmar. | |
 | `liquidacion_plazo_pago_horas` | Plazo de pago de la liquidación | Todos | hours | DS 001-97-TR | Sí | Las 48 horas no fueron verificadas. | |
 | `mype_recontratacion_meses` | Meses sin recontratación para aplicar el régimen especial a un extrabajador | Todos | months | Ley 32353 | Sí | Por confirmar con el TUO vigente. | |
 | `mype_sis_aporte` | Aporte al SIS de la microempresa | Microempresa | amount | DS 013-2013-PRODUCE | Sí | Lo fija el SIS; por confirmar. | |
@@ -40,6 +45,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `sobretiempo_tasa_tramo1_pct` | Sobretasa de las dos primeras horas extra | Todos | percent | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `sobretiempo_tasa_tramo2_pct` | Sobretasa de las horas extra siguientes | Todos | percent | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `sst_capacitaciones_anuales_min` | Capacitaciones mínimas al año | Todos | count | Ley 29783 art. 35 | Sí | Por confirmar. | |
+| `subsidio_reembolso_plazo_meses` | Plazo para solicitar el reembolso de un subsidio a la seguridad social | Todos | months | Ley 26790 · Acuerdo de EsSalud | Sí | Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso). | |
 | `sunafil_actuaciones_dias_habiles` | Duración de las actuaciones inspectivas | Todos | business_days | Ley 28806 | Sí | Por confirmar. | |
 | `sunafil_pas_apelacion_dias_habiles` | Procedimiento sancionador: apelación | Todos | business_days | DS 019-2006-TR | Sí | Por confirmar. | |
 | `sunafil_pas_descargos_dias_habiles` | Procedimiento sancionador: descargos a la imputación | Todos | business_days | DS 019-2006-TR | Sí | Por confirmar. | |
