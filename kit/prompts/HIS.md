@@ -3,7 +3,7 @@
 Registros con vigencia para asignación, compensación, contrato y jefe; nada se sobrescribe.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 6 (3 historias y 3 tareas); 6 del MVP. **Operaciones de API:** 18.
+- **Actividades:** 6 (3 historias y 3 tareas); 6 del MVP. **Operaciones de API:** 19.
 - **Especificación:** `kit/docs/modulos/M-HIS.md`.
 
 ## Prompt para una sesión nueva de Claude Code
