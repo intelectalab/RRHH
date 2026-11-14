@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'folders' => [
+        'personal' => 'Datos personales',
+        'contracts' => 'Contratos y adendas',
+        'payslips' => 'Boletas de pago',
+        'certificates' => 'Certificados y constancias',
+        'vacations' => 'Vacaciones y ausencias',
+        'sst' => 'Seguridad y salud en el trabajo',
+        'evaluations' => 'Evaluaciones',
+        'trainings' => 'Capacitaciones',
+    ],
+    'types' => [
+        'identity_document' => 'Documento de identidad',
+        'resume' => 'Currículum',
+        'academic_degree' => 'Grado o título académico',
+        'background_certificate' => 'Certificado de antecedentes',
+        'work_certificate' => 'Certificado o constancia de trabajo',
+        'medical_certificate' => 'Certificado médico',
+        'occupational_exam' => 'Examen médico ocupacional',
+        'sst_induction' => 'Inducción de seguridad',
+        'ppe_delivery' => 'Entrega de equipos de protección',
+        'training_certificate' => 'Certificado de capacitación',
+    ],
+    'modules' => [
+        'contracts' => 'Contratos',
+    ],
+    'categories' => [
+        'parent_not_folder' => 'Un tipo documental se crea dentro de una carpeta, no dentro de otro tipo.',
+        'code_taken' => 'Ya existe una carpeta o un tipo con ese código.',
+        'permission_unknown' => 'El permiso indicado no existe.',
+        'system' => 'Las carpetas y los tipos del sistema no se archivan; puede cambiar su comportamiento.',
+        'invalid_transition' => 'El tipo ya está en ese estado.',
+    ],
+    'documents' => [
+        'owner_required' => 'Indique el colaborador o la empresa a la que pertenece el documento.',
+        'owner_unknown' => 'El colaborador o la empresa indicada no existe.',
+        'signed' => 'Un documento firmado no se reemplaza: suba uno nuevo (RN-DOC-02).',
+        'not_deletable' => 'Solo se mueven a la papelera los documentos subidos al legajo; los generados o firmados se archivan.',
+        'managed' => 'Este documento se gestiona en el módulo :module.',
+        'category_unknown' => 'Elija una carpeta o un tipo documental vigente.',
+        'category_managed' => 'Los contratos y adendas se generan y firman en el módulo de contratos.',
+        'expiry_required' => 'Este tipo de documento exige fecha de vencimiento.',
+        'expiry_before_issue' => 'El vencimiento no puede ser anterior a la emisión.',
+        'classification_lower' => 'La confidencialidad no puede ser menor que la del tipo de documento.',
+        'responsible_unknown' => 'El responsable indicado no existe.',
+        'invalid_filter' => 'Filtro no válido.',
+        'self_review' => 'No puede aprobar ni rechazar sus propios documentos.',
+        'titular_replace' => 'Solo puede reemplazar los documentos que usted entregó.',
+        'check_expiry' => 'Documentos por vencer avisados: :expiring · vencidos: :expired',
+    ],
+];

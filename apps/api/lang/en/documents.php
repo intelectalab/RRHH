@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'folders' => [
+        'personal' => 'Personal records',
+        'contracts' => 'Contracts and addenda',
+        'payslips' => 'Payslips',
+        'certificates' => 'Certificates',
+        'vacations' => 'Vacations and absences',
+        'sst' => 'Occupational health and safety',
+        'evaluations' => 'Evaluations',
+        'trainings' => 'Training',
+    ],
+    'types' => [
+        'identity_document' => 'Identity document',
+        'resume' => 'Résumé',
+        'academic_degree' => 'Academic degree',
+        'background_certificate' => 'Background check certificate',
+        'work_certificate' => 'Employment certificate',
+        'medical_certificate' => 'Medical certificate',
+        'occupational_exam' => 'Occupational medical exam',
+        'sst_induction' => 'Safety induction',
+        'ppe_delivery' => 'Protective equipment delivery',
+        'training_certificate' => 'Training certificate',
+    ],
+    'modules' => [
+        'contracts' => 'Contracts',
+    ],
+    'categories' => [
+        'parent_not_folder' => 'A document type is created inside a folder, not inside another type.',
+        'code_taken' => 'A folder or type with that code already exists.',
+        'permission_unknown' => 'The permission does not exist.',
+        'system' => 'System folders and types are not archived; you can change how they behave.',
+        'invalid_transition' => 'The type is already in that state.',
+    ],
+    'documents' => [
+        'owner_required' => 'Choose the employee or the company the document belongs to.',
+        'owner_unknown' => 'The employee or company does not exist.',
+        'signed' => 'A signed document cannot be replaced: upload a new one (RN-DOC-02).',
+        'not_deletable' => 'Only documents uploaded to the file go to the trash; generated or signed ones are archived.',
+        'managed' => 'This document is managed in the :module module.',
+        'category_unknown' => 'Choose an active folder or document type.',
+        'category_managed' => 'Contracts and addenda are generated and signed in the contracts module.',
+        'expiry_required' => 'This document type requires an expiry date.',
+        'expiry_before_issue' => 'The expiry date cannot be earlier than the issue date.',
+        'classification_lower' => 'The confidentiality cannot be lower than the document type\'s.',
+        'responsible_unknown' => 'The person responsible does not exist.',
+        'invalid_filter' => 'Invalid filter.',
+        'self_review' => 'You cannot approve or reject your own documents.',
+        'titular_replace' => 'You can only replace documents you submitted.',
+        'check_expiry' => 'Expiring documents notified: :expiring · expired: :expired',
+    ],
+];

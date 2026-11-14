@@ -4,11 +4,13 @@ namespace App\Modules\Absences;
 
 use App\Modules\Absences\Console\AdvanceAbsences;
 use App\Modules\Absences\Infrastructure\Calendar\AbsenceCalendarSource;
+use App\Modules\Absences\Infrastructure\Documents\AbsenceLinkedDocuments;
 use App\Modules\Absences\Infrastructure\Home\AbsentTodayCard;
 use App\Modules\Absences\Infrastructure\SelfService\AbsencesHomeCard;
 use App\Modules\Absences\Infrastructure\Time\ApprovedAbsencesQuery;
 use App\Modules\Absences\Infrastructure\Workflow\AbsenceRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
+use App\Shared\Documents\LinkedDocumentRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Time\ApprovedAbsences;
@@ -36,6 +38,8 @@ final class AbsencesServiceProvider extends ServiceProvider
         // AUS-2 · Las ausencias aprobadas aparecen en el calendario del equipo (CFG-8).
         $this->app->make(CalendarRegistry::class)->register($this->app->make(AbsenceCalendarSource::class));
         $this->app->make(HomeRegistry::class)->register(new AbsentTodayCard);
+        // DOC-1 · Los sustentos y certificados de ausencias aparecen en el legajo sin copiar el archivo.
+        $this->app->make(LinkedDocumentRegistry::class)->register($this->app->make(AbsenceLinkedDocuments::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {

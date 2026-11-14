@@ -123,6 +123,17 @@ final class DomainEventTypes
     // Documentos / Archivos
     public const DOCUMENT_UPLOADED = 'document.uploaded.v1';
 
+    // DOC-1 · DOC-2 · ME-12: legajo digital (revisión, archivo y vencimientos, RN-DOC-09).
+    public const DOCUMENT_APPROVED = 'document.approved.v1';
+
+    public const DOCUMENT_REJECTED = 'document.rejected.v1';
+
+    public const DOCUMENT_ARCHIVED = 'document.archived.v1';
+
+    public const DOCUMENT_EXPIRING = 'document.expiring.v1';
+
+    public const DOCUMENT_EXPIRED = 'document.expired.v1';
+
     public const SIGNATURE_COMPLETED = 'signature.completed.v1';
 
     // Identidad
@@ -766,6 +777,11 @@ final class DomainEventTypes
             'required_fields' => ['stored_file_id', 'original_name', 'mime_type'],
             'description' => 'Documento almacenado en repositorio',
         ],
+        self::DOCUMENT_APPROVED => ['version' => 1, 'required_fields' => ['document_id', 'category_id'], 'description' => 'Un documento entregado por el colaborador fue aprobado en la revisión (ME-12)'],
+        self::DOCUMENT_REJECTED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'reason'], 'description' => 'Un documento entregado fue rechazado con motivo: se avisa a quien lo subió (ME-12)'],
+        self::DOCUMENT_ARCHIVED => ['version' => 1, 'required_fields' => ['document_id', 'category_id'], 'description' => 'Un documento del legajo se archivó (sigue consultable; no se borra)'],
+        self::DOCUMENT_EXPIRING => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'expires_on', 'days_left'], 'description' => 'Un documento vence dentro de la anticipación de su tipo: aviso al responsable y al titular (RN-DOC-09)'],
+        self::DOCUMENT_EXPIRED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'expires_on'], 'description' => 'Un documento llegó a su fecha de vencimiento y pasó a Vencido (RN-DOC-09)'],
         self::SIGNATURE_COMPLETED => [
             'version' => 1,
             'required_fields' => ['signature_request_id', 'completed_at'],

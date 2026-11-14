@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Shared\Cache\TenantCache;
 use App\Shared\Calendar\CalendarRegistry;
+use App\Shared\Documents\LinkedDocumentRegistry;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Features\FeatureFlags;
 use App\Shared\Files\Contracts\FileStorageService;
@@ -60,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TrashRegistry::class);
         $this->app->singleton(CalendarRegistry::class);
         $this->app->singleton(HomeRegistry::class);
+        $this->app->singleton(LinkedDocumentRegistry::class);
         $this->app->singleton(ProvisioningRegistry::class);
         $this->app->singleton(ApprovalOutcomeRegistry::class);
         $this->app->singleton(UsageRegistry::class);

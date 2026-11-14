@@ -94,6 +94,18 @@ return [
             'in_app' => ['subject' => '{employee} se aproxima do limite de contratos a prazo', 'body' => 'Ao terminar o contrato que vence em {ends_on}, {employee} fica perto do limite permitido. {explanation} Renovar pode descaracterizar o contrato.'],
             'email' => ['subject' => '{employee} se aproxima do limite de contratos a prazo', 'body' => "Olá {name}:\n\nEm {organization}, ao terminar o contrato que vence em {ends_on}, {employee} fica perto do limite de contratos a prazo. {explanation}\n\nRenovar pode descaracterizar o contrato. Revise aqui: {link}"],
         ],
+        'documents.expiring' => [
+            'in_app' => ['subject' => '{document} vence em {days_left} dias', 'body' => '{document} ({type}) de {employee} vence em {expires_on}. Solicite ou envie a versão renovada antes dessa data.'],
+            'email' => ['subject' => '{document} vence em {days_left} dias', 'body' => "Olá {name}:\n\nEm {organization}, {document} ({type}) de {employee} vence em {expires_on} (faltam {days_left} dias).\n\nSolicite ou envie a versão renovada antes dessa data: {link}"],
+        ],
+        'documents.expired' => [
+            'in_app' => ['subject' => '{document} venceu', 'body' => '{document} ({type}) de {employee} venceu em {expires_on}. Envie a versão vigente para regularizar o prontuário.'],
+            'email' => ['subject' => '{document} venceu', 'body' => "Olá {name}:\n\nEm {organization}, {document} ({type}) de {employee} venceu em {expires_on}.\n\nEnvie a versão vigente para regularizar o prontuário: {link}"],
+        ],
+        'documents.rejected' => [
+            'in_app' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => 'Recursos Humanos devolveu {document} ({type}): {reason} Envie uma versão corrigida.'],
+            'email' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos devolveu {document} ({type}): {reason}\n\nEnvie uma versão corrigida: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],

@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **55 parámetros sin valor verificado**; **48** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **56 parámetros sin valor verificado**; **49** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -25,6 +25,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `host_descargos_dias` | Hostigamiento: plazo interno de descargos | Todos | days | DS 014-2019-MIMP art. 29.5 | Sí | Lo fija el comité dentro de sus 15 días; por confirmar. | |
 | `jornada_maxima_semanal_horas` | Jornada máxima semanal | Todos | hours | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `lactario_minimo_mujeres_edad_fertil` | Mujeres en edad fértil por centro de trabajo que obligan a lactario | Todos | count | Ley 29896 | Sí | Umbral no verificado. | |
+| `legajo_conservacion_anios` | Conservación del legajo después del cese | Todos | years | Por definir (normas de conservación de documentos laborales) | Sí | DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura. | |
 | `licencia_fallecimiento_familiar_dias` | Licencia por fallecimiento de un familiar directo (días) | Todos | days | Por confirmar | Sí | Por confirmar si existe licencia general en el régimen privado o solo por convenio. | |
 | `licencia_maternidad_dias` | Licencia por maternidad (días naturales, prenatal y postnatal) | Todos | days | Ley 26644 | Sí | Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad). | |
 | `licencia_maternidad_dias_adicionales_discapacidad` | Licencia por maternidad: días adicionales por nacimiento de un hijo con discapacidad | Todos | days | Ley 26644 modificada por Ley 30367 | Sí | Por confirmar los días que se suman al descanso postnatal. | |

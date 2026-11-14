@@ -835,6 +835,19 @@
       "opciones": null
     },
     {
+      "codigo": "documentos.aviso_vencimiento_dias",
+      "modulo": "core",
+      "nombre": "Aviso de vencimiento de documentos",
+      "tipo": "integer",
+      "valor_por_defecto": 30,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "DOC-2 · RN-DOC-09: días de anticipación con que se avisa al responsable y al titular que un documento vence, cuando su tipo no fija los suyos.",
+      "opciones": null
+    },
+    {
       "codigo": "asistencia.metodos_permitidos",
       "modulo": "attendance",
       "nombre": "Métodos de marcación",

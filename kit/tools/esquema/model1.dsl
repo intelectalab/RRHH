@@ -500,19 +500,22 @@
   status enum(requested,approved,rejected,active,ended)=requested ; document_id ?-> documents
 
 #E DOC | Gestión documental, plantillas y firma
-@document_categories soft | Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención.
+@document_categories soft | Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención. DOC-1: las carpetas no tienen parent_id; los tipos documentales cuelgan de una carpeta y definen confidencialidad, visibilidad para el colaborador, revisión y, con DOC-2, si exigen vencimiento y con qué anticipación se avisa (RN-DOC-09).
   code ; name ; parent_id ?-> document_categories ; default_classification enum(public,internal,confidential,restricted)=internal
-  retention_policy_id ?-> retention_policies ; required_permission_code ?~> permissions.code ; uniq code
+  retention_policy_id ?-> retention_policies ; required_permission_code ?~> permissions.code ; scope enum(employee,company)=employee
+  description ; requires_expiry bool=f ; expiry_notice_days smallint ; visible_to_employee bool=f ; requires_review bool=f
+  is_system bool=f ; sort_order smallint=0 ; status enum(active,archived)=active ; uniq code
 @documents main soft lock | Documento del repositorio, ligado a una persona, relación laboral, empresa u otro registro.
   document_category_id -> document_categories ; title ; owner_person_id ?-> people ; employment_id ?-> employments
   legal_entity_id ?-> legal_entities ; subject_type ; subject_id uuid ; current_version_id ?-> document_versions
   classification enum(public,internal,confidential,restricted)=internal
   status enum(draft,pending_approval,active,archived,expired,rejected,requested)=draft ; issued_on ; expires_on
   source enum(upload,generated,import,signature,system)=upload ; document_template_version_id ?-> document_template_versions
-  visible_to_employee bool=f ; idx subject_type, subject_id
-@document_versions | Versiones de un documento; cada una apunta a un archivo y guarda su huella.
+  visible_to_employee bool=f ; responsible_user_id ?-> users ; description ; expiry_alerted_on ; archived_at ; archive_reason
+  idx subject_type, subject_id ; idx status, expires_on
+@document_versions | Versiones de un documento; cada una apunta a un archivo y guarda su huella. DOC-2 · RN-DOC-01: una versión nueva no reemplaza a la anterior, que queda consultable con sus propias fechas de emisión y vencimiento.
   document_id -> documents ; version integer! ; stored_file_id -> stored_files ; content_hash text!
-  uploaded_by_user_id ?-> users ; notes ; uniq document_id, version
+  uploaded_by_user_id ?-> users ; notes ; issued_on ; expires_on ; uniq document_id, version
 @document_access_grants | Permiso puntual sobre un documento para un usuario o rol.
   document_id -> documents ; user_id ?-> users ; role_id ?-> roles ; access enum(view,download,edit)=view ; expires_at
   check num_nonnulls(user_id, role_id) = 1

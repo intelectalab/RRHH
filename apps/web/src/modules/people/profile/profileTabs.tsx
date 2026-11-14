@@ -3,6 +3,7 @@ import { BankAccountsSection } from '../BankAccountsSection'
 import { DependentsSection } from '../DependentsSection'
 import { InsuranceSection } from '../InsuranceSection'
 import { PensionHealthSection } from '../PensionHealthSection'
+import { DocumentsTab } from '@/modules/documents/DocumentsTab'
 import { VacationsTab } from '@/modules/vacations/VacationsTab'
 import { AbsencesTab } from './AbsencesTab'
 import { CompensationTab } from './CompensationTab'
@@ -48,6 +49,8 @@ export const PROFILE_TABS: ProfileTabDef[] = [
     </>
   ) },
   { id: 'payment', label: 'ficha.tab_payment', module: 'core', permission: 'people.employments.view', render: (c) => <BankAccountsSection employmentId={c.header.id} personId={c.header.person_id} onToast={c.toast} /> },
+  // DOC-1 · DOC-2: legajo digital por carpeta, con versiones, vencimientos y los documentos de otros módulos.
+  { id: 'documents', label: 'ficha.tab_documents', module: 'core', permission: 'documents.documents.view', render: (c) => <DocumentsTab {...c} /> },
   // VAC-2: saldo, periodos y movimientos de vacaciones (los calcula el servidor).
   { id: 'vacations', label: 'ficha.tab_vacations', module: 'time_off', permission: 'time.vacation_balances.view', render: (c) => <VacationsTab {...c} /> },
   // AUS-2: ausencias y permisos de la relación laboral (módulo time_off).

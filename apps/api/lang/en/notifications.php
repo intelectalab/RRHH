@@ -94,6 +94,18 @@ return [
             'in_app' => ['subject' => '{employee} is close to the fixed-term contract cap', 'body' => 'When the contract ending on {ends_on} is over, {employee} will be close to the allowed cap. {explanation} Renewing could turn the contract into an indefinite one by law.'],
             'email' => ['subject' => '{employee} is close to the fixed-term contract cap', 'body' => "Hello {name}:\n\nIn {organization}, when the contract ending on {ends_on} is over, {employee} will be close to the fixed-term contract cap. {explanation}\n\nRenewing could turn the contract into an indefinite one by law. Review it here: {link}"],
         ],
+        'documents.expiring' => [
+            'in_app' => ['subject' => '{document} expires in {days_left} days', 'body' => '{document} ({type}) of {employee} expires on {expires_on}. Request or upload the renewed version before then.'],
+            'email' => ['subject' => '{document} expires in {days_left} days', 'body' => "Hello {name}:\n\nIn {organization}, {document} ({type}) of {employee} expires on {expires_on} ({days_left} days left).\n\nRequest or upload the renewed version before then: {link}"],
+        ],
+        'documents.expired' => [
+            'in_app' => ['subject' => '{document} has expired', 'body' => '{document} ({type}) of {employee} expired on {expires_on}. Upload the current version to bring the file up to date.'],
+            'email' => ['subject' => '{document} has expired', 'body' => "Hello {name}:\n\nIn {organization}, {document} ({type}) of {employee} expired on {expires_on}.\n\nUpload the current version to bring the file up to date: {link}"],
+        ],
+        'documents.rejected' => [
+            'in_app' => ['subject' => 'Your document {document} needs changes', 'body' => 'Human Resources returned {document} ({type}): {reason} Upload a corrected version.'],
+            'email' => ['subject' => 'Your document {document} needs changes', 'body' => "Hello {name}:\n\nIn {organization}, Human Resources returned {document} ({type}): {reason}\n\nUpload a corrected version: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],

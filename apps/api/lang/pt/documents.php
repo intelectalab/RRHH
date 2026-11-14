@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'folders' => [
+        'personal' => 'Dados pessoais',
+        'contracts' => 'Contratos e aditivos',
+        'payslips' => 'Holerites',
+        'certificates' => 'Certificados e declarações',
+        'vacations' => 'Férias e ausências',
+        'sst' => 'Segurança e saúde no trabalho',
+        'evaluations' => 'Avaliações',
+        'trainings' => 'Treinamentos',
+    ],
+    'types' => [
+        'identity_document' => 'Documento de identidade',
+        'resume' => 'Currículo',
+        'academic_degree' => 'Grau ou título acadêmico',
+        'background_certificate' => 'Certidão de antecedentes',
+        'work_certificate' => 'Declaração de trabalho',
+        'medical_certificate' => 'Atestado médico',
+        'occupational_exam' => 'Exame médico ocupacional',
+        'sst_induction' => 'Integração de segurança',
+        'ppe_delivery' => 'Entrega de equipamentos de proteção',
+        'training_certificate' => 'Certificado de treinamento',
+    ],
+    'modules' => [
+        'contracts' => 'Contratos',
+    ],
+    'categories' => [
+        'parent_not_folder' => 'Um tipo documental é criado dentro de uma pasta, não dentro de outro tipo.',
+        'code_taken' => 'Já existe uma pasta ou um tipo com esse código.',
+        'permission_unknown' => 'A permissão indicada não existe.',
+        'system' => 'As pastas e os tipos do sistema não são arquivados; você pode mudar o comportamento deles.',
+        'invalid_transition' => 'O tipo já está nesse estado.',
+    ],
+    'documents' => [
+        'owner_required' => 'Indique o colaborador ou a empresa a que o documento pertence.',
+        'owner_unknown' => 'O colaborador ou a empresa indicada não existe.',
+        'signed' => 'Um documento assinado não é substituído: envie um novo (RN-DOC-02).',
+        'not_deletable' => 'Somente os documentos enviados ao prontuário vão para a lixeira; os gerados ou assinados são arquivados.',
+        'managed' => 'Este documento é gerenciado no módulo :module.',
+        'category_unknown' => 'Escolha uma pasta ou um tipo documental vigente.',
+        'category_managed' => 'Os contratos e aditivos são gerados e assinados no módulo de contratos.',
+        'expiry_required' => 'Este tipo de documento exige data de vencimento.',
+        'expiry_before_issue' => 'O vencimento não pode ser anterior à emissão.',
+        'classification_lower' => 'A confidencialidade não pode ser menor que a do tipo de documento.',
+        'responsible_unknown' => 'O responsável indicado não existe.',
+        'invalid_filter' => 'Filtro inválido.',
+        'self_review' => 'Você não pode aprovar nem rejeitar seus próprios documentos.',
+        'titular_replace' => 'Você só pode substituir os documentos que você entregou.',
+        'check_expiry' => 'Documentos a vencer avisados: :expiring · vencidos: :expired',
+    ],
+];
