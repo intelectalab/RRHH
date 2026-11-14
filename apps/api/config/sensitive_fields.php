@@ -12,7 +12,11 @@
  * o si el permiso no existe en el catálogo.
  */
 return [
-    'Absence' => ['diagnosis' => ['time.absences.medical_certificate.view', 'health']],
+    // AUS-2 · RN-AUS-05: en los tipos confidenciales (salud) el motivo y el sustento.
+    'Absence' => [
+        'medical_reason' => ['time.absences.medical_certificate.view', 'health'],
+        'medical_attachments' => ['time.absences.medical_certificate.view', 'health'],
+    ],
     'AccountingEntry' => ['lines' => ['payroll.accounting_entries.view', 'salary']],
     'Application' => ['expected_salary' => ['recruiting.candidates.salary_expectation.view', 'salary']],
     'Benefit' => ['cost' => ['benefits.benefits.cost.view', 'salary']],

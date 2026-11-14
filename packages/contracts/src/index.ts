@@ -95,6 +95,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/absences/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Simular una ausencia sin registrarla: días calendario y hábiles (sin descanso semanal ni feriados de la sede), horas, reglas del tipo vigentes, problemas que impedirían enviarla y avisos */
+        post: operations["postAbsencesSimulate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/absences/{id}": {
         parameters: {
             query?: never;
@@ -113,7 +130,7 @@ export interface paths {
         patch: operations["patchAbsencesId"];
         trace?: never;
     };
-    "/absences/{id}/approve": {
+    "/absences/{id}/attachments": {
         parameters: {
             query?: never;
             header?: never;
@@ -122,11 +139,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «approve» sobre Absence
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postAbsencesIdApprove"];
+        /** Adjuntar un sustento (multipart: file, label; PDF, PNG o JPEG). Si la ausencia esperaba el documento, la enviada por el titular pasa a aprobación y la registrada por RRHH queda aprobada */
+        post: operations["postAbsencesIdAttachments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absences/{id}/attachments/{attachment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar un sustento (en tipos confidenciales exige time.absences.medical_certificate.view o ser el titular; se registra la descarga) */
+        get: operations["getAbsencesIdAttachmentsAttachmentId"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -153,7 +184,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/absences/{id}/reject": {
+    "/absences/{id}/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -162,11 +193,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «reject» sobre Absence
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postAbsencesIdReject"];
+        /** RRHH registra la ausencia directamente, sin flujo: queda aprobada (o pendiente de sustento por el plazo del tipo, RN-AUS-01); admite excepción al tope con motivo (RN-AUS-07) y periodos de planilla cerrados como ajuste (RN-AUS-08) */
+        post: operations["postAbsencesIdRegister"];
         delete?: never;
         options?: never;
         head?: never;
@@ -16668,23 +16696,70 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): diagnosis */
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): medical_reason, medical_attachments */
         Absence: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
             employment_id: string;
             /** @description Identificador opaco */
-            absence_type_id: string;
+            person_id?: string | null;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            absence_type_id?: string | null;
+            absence_type_name?: string | null;
+            absence_type_category?: string | null;
+            is_confidential?: boolean | null;
+            /** @enum {string|null} */
+            unit?: "days" | "hours" | null;
             /** Format: date */
             starts_on: string;
             /** Format: date */
-            ends_on: string;
-            days: number;
-            attachment_ids: string[];
-            diagnosis?: string | null;
+            ends_on?: string | null;
+            start_time?: string | null;
+            end_time?: string | null;
+            days?: string | null;
+            hours?: string | null;
+            calendar_days?: string | null;
+            is_paid?: boolean | null;
+            affects_attendance?: boolean | null;
+            reason?: string | null;
+            medical_reason?: string | null;
+            attachments?: {
+                [key: string]: unknown;
+            }[] | null;
+            medical_attachments?: {
+                [key: string]: unknown;
+            }[] | null;
             /** @enum {string} */
-            status: "draft" | "pending" | "approved" | "rejected" | "cancelled";
+            status: "draft" | "pending" | "pending_document" | "approved" | "in_progress" | "completed" | "rejected" | "cancelled";
+            registered_directly?: boolean | null;
+            document_required?: boolean | null;
+            /** Format: date */
+            document_due_on?: string | null;
+            has_document?: boolean | null;
+            exception_reason?: string | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            decision_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            cancellation_reason?: string | null;
+            /** @description Identificador opaco */
+            approval_request_id?: string | null;
+            approval?: {
+                [key: string]: unknown;
+            } | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -16694,14 +16769,20 @@ export interface components {
             /** @description Identificador opaco */
             employment_id?: string;
             /** @description Identificador opaco */
-            absence_type_id?: string;
+            person_id?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            absence_type_id?: string | null;
             /** Format: date */
             starts_on?: string;
             /** Format: date */
-            ends_on?: string;
-            days?: number;
-            attachment_ids?: string[];
-            diagnosis?: string | null;
+            ends_on?: string | null;
+            start_time?: string | null;
+            end_time?: string | null;
+            reason?: string | null;
+            medical_reason?: string | null;
+            exception_reason?: string | null;
         };
         AbsenceType: {
             /** @description Identificador opaco */
@@ -16736,7 +16817,6 @@ export interface components {
             category?: "medical_leave" | "maternity" | "paternity" | "personal" | "bereavement" | "union" | "compensatory" | "remote_work" | "unpaid" | "suspension" | "other";
             country_code?: string | null;
             is_system?: boolean;
-            is_confidential?: boolean;
             legal_duration_parameter_code?: string | null;
             legal_duration?: {
                 [key: string]: unknown;
@@ -19546,8 +19626,6 @@ export interface components {
             country?: string;
             regime?: string | null;
             description?: string;
-            /** @enum {string} */
-            unit?: "amount" | "percent" | "days" | "count";
             values?: {
                 [key: string]: unknown;
             };
@@ -21464,8 +21542,6 @@ export interface components {
             trial_ends_on?: string | null;
             /** Format: date-time */
             expired_at?: string | null;
-            /** Format: date-time */
-            cancelled_at?: string | null;
             cancel_reason?: string | null;
             addons?: {
                 [key: string]: unknown;
@@ -21720,8 +21796,6 @@ export interface components {
             contact_email?: string | null;
             contact_phone?: string | null;
             suspension_reason?: string | null;
-            /** Format: date-time */
-            cancelled_at?: string | null;
             /** Format: date */
             retention_until?: string | null;
             beta_groups?: string[];
@@ -22067,7 +22141,6 @@ export interface components {
             starts_on?: string;
             /** Format: date */
             ends_on?: string;
-            days?: number;
             advance?: boolean;
         };
         WageTable: {
@@ -22288,9 +22361,6 @@ export interface components {
         WorkScheduleInput: {
             name?: string;
             weekly_hours?: number;
-            days?: {
-                [key: string]: unknown;
-            };
             tolerance_minutes?: number;
             break_minutes?: number;
         };
@@ -22734,6 +22804,38 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    postAbsencesSimulate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getAbsencesId: {
         parameters: {
             query?: {
@@ -22803,7 +22905,7 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postAbsencesIdApprove: {
+    postAbsencesIdAttachments: {
         parameters: {
             query?: never;
             header?: {
@@ -22817,26 +22919,58 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    label?: string;
+                };
             };
         };
         responses: {
-            /** @description Correcto */
-            200: {
+            /** @description Creado */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Absence"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getAbsencesIdAttachmentsAttachmentId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                attachment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postAbsencesIdCancel: {
@@ -22875,7 +23009,7 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postAbsencesIdReject: {
+    postAbsencesIdRegister: {
         parameters: {
             query?: never;
             header?: {
@@ -22889,7 +23023,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -22899,16 +23033,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Absence"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postAbsencesIdSubmit: {

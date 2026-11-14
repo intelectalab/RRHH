@@ -3,6 +3,7 @@ import { BankAccountsSection } from '../BankAccountsSection'
 import { DependentsSection } from '../DependentsSection'
 import { InsuranceSection } from '../InsuranceSection'
 import { PensionHealthSection } from '../PensionHealthSection'
+import { AbsencesTab } from './AbsencesTab'
 import { CompensationTab } from './CompensationTab'
 import { ContractsTab } from './ContractsTab'
 import { HistoryTab } from './HistoryTab'
@@ -45,6 +46,8 @@ export const PROFILE_TABS: ProfileTabDef[] = [
     </>
   ) },
   { id: 'payment', label: 'ficha.tab_payment', module: 'core', permission: 'people.employments.view', render: (c) => <BankAccountsSection employmentId={c.header.id} personId={c.header.person_id} onToast={c.toast} /> },
+  // AUS-2: ausencias y permisos de la relación laboral (módulo time_off).
+  { id: 'absences', label: 'ficha.tab_absences', module: 'time_off', permission: 'time.absences.view', render: (c) => <AbsencesTab {...c} /> },
 ]
 
 /** Pestañas visibles para la sesión: módulo contratado y permiso. */

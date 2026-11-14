@@ -27,6 +27,12 @@ describe('ficha 360 (COL-3)', () => {
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.dependents.view').map((x) => x.id)).not.toContain('dependents')
   })
 
+  it('AUS-2 · la pestaña Ausencias aparece con el módulo time_off y el permiso de ver ausencias', () => {
+    expect(visibleTabs(PROFILE_TABS, ['core', 'time_off'], () => true).map((x) => x.id)).toContain('absences')
+    expect(visibleTabs(PROFILE_TABS, ['core', 'time_off'], (p) => p !== 'time.absences.view').map((x) => x.id)).not.toContain('absences')
+    expect(ficha.tab_absences).toBeTruthy()
+  })
+
   it('CON-2 · la pestaña Contratos ofrece solo las acciones permitidas por el estado y el permiso', () => {
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'contracts.contracts.view').map((x) => x.id)).not.toContain('contracts')
     const draft = { status: 'draft' as const, allowed_actions: ['submit', 'register-signature', 'void'] }

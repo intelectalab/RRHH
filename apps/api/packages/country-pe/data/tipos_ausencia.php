@@ -43,12 +43,12 @@ return [
         ],
         [
             'code' => 'compensacion', 'name' => 'Día de compensación', 'category' => 'compensatory', 'is_confidential' => false, 'legal_duration' => null,
-            'rules' => ['is_paid' => true, 'unit' => 'days', 'requires_document' => false, 'requestable_by' => 'employee'],
+            'rules' => ['is_paid' => true, 'unit' => 'days', 'day_count' => 'working', 'requires_document' => false, 'requestable_by' => 'employee'],
         ],
         [
             'code' => 'trabajo_remoto', 'name' => 'Trabajo remoto ocasional', 'category' => 'remote_work', 'is_confidential' => false, 'legal_duration' => null,
             // RN-AUS-09: no descuenta ni afecta asistencia.
-            'rules' => ['is_paid' => true, 'affects_attendance' => false, 'unit' => 'days', 'requires_document' => false, 'requestable_by' => 'employee'],
+            'rules' => ['is_paid' => true, 'affects_attendance' => false, 'unit' => 'days', 'day_count' => 'working', 'requires_document' => false, 'requestable_by' => 'employee'],
         ],
         [
             'code' => 'suspension', 'name' => 'Suspensión', 'category' => 'suspension', 'is_confidential' => false, 'legal_duration' => null,
