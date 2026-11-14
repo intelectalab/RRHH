@@ -6,10 +6,12 @@ use App\Modules\Vacations\Application\VacationLedger;
 use App\Modules\Vacations\Console\AccrueVacations;
 use App\Modules\Vacations\Console\AdvanceVacations;
 use App\Modules\Vacations\Infrastructure\Calendar\VacationCalendarSource;
+use App\Modules\Vacations\Infrastructure\Home\VacationsCard;
 use App\Modules\Vacations\Infrastructure\SelfService\VacationsHomeCard;
 use App\Modules\Vacations\Infrastructure\Subscribers\SyncVacationsOnEmploymentEvents;
 use App\Modules\Vacations\Infrastructure\Workflow\VacationRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
+use App\Shared\Home\HomeRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Time\VacationBalances;
@@ -39,6 +41,7 @@ final class VacationsServiceProvider extends ServiceProvider
         $this->app->make(CalendarRegistry::class)->register($this->app->make(VacationCalendarSource::class));
         // ESS-1 · Tarjeta «Mis vacaciones» del inicio del colaborador.
         $this->app->make(HomeCardRegistry::class)->register($this->app->make(VacationsHomeCard::class));
+        $this->app->make(HomeRegistry::class)->register(new VacationsCard);
 
         if ($this->app->runningInConsole()) {
             $this->commands([AccrueVacations::class, AdvanceVacations::class]);

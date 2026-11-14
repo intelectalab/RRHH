@@ -36,7 +36,7 @@ final class EmploymentController
 {
     private const SCHEMA = 'Employment';
 
-    private const FILTERS = ['status', 'legal_entity_id', 'site_id', 'org_unit_id', 'job_profile_id', 'position_id', 'manager_employment_id', 'kind'];
+    private const FILTERS = ['status', 'legal_entity_id', 'site_id', 'org_unit_id', 'job_profile_id', 'position_id', 'manager_employment_id', 'kind', 'hired_from', 'hired_to', 'terminated_from', 'terminated_to'];
 
     private const STATUSES = ['pending', 'active', 'suspended', 'terminating', 'terminated', 'cancelled'];
 
@@ -248,6 +248,18 @@ final class EmploymentController
         if ($unit !== null) {
             // La unidad incluye sus subunidades.
             $query->whereRaw('ca.org_unit_id IN (WITH RECURSIVE t AS (SELECT id FROM org_units WHERE id = ? UNION SELECT c.id FROM org_units c JOIN t ON c.parent_id = t.id) SELECT id FROM t)', [$unit]);
+        }
+
+        // COL-12 · Las tarjetas del inicio de RRHH enlazan aquí: ingresos y ceses entre dos fechas.
+        foreach (['hired_from' => ['employments.hire_date', '>='], 'hired_to' => ['employments.hire_date', '<='], 'terminated_from' => ['employments.termination_date', '>='], 'terminated_to' => ['employments.termination_date', '<=']] as $name => [$column, $op]) {
+            $value = TableQuery::filter($request, $name);
+            if ($value === null) {
+                continue;
+            }
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) !== 1) {
+                throw new InvalidFilterException((string) trans('errors.invalid_filter'), self::FILTERS);
+            }
+            $query->where($column, $op, $value);
         }
 
         $q = trim((string) $request->query('q', ''));

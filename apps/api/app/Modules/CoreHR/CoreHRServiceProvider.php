@@ -7,12 +7,20 @@ use App\Modules\CoreHR\Console\ApplyDuePersonnelActions;
 use App\Modules\CoreHR\Console\ApplyDueTerminations;
 use App\Modules\CoreHR\Console\ReviewDependentsMajority;
 use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
+use App\Modules\CoreHR\Infrastructure\Home\CelebrationsCard;
+use App\Modules\CoreHR\Infrastructure\Home\ChangeRequestsCard;
+use App\Modules\CoreHR\Infrastructure\Home\HeadcountCard;
+use App\Modules\CoreHR\Infrastructure\Home\LaborCostCard;
+use App\Modules\CoreHR\Infrastructure\Home\MovementsMonthCard;
+use App\Modules\CoreHR\Infrastructure\Home\PendingStartCard;
+use App\Modules\CoreHR\Infrastructure\Home\TurnoverCard;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
 use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\CoreHR\Infrastructure\Workflow\PersonnelActionOutcome;
 use App\Modules\CoreHR\Infrastructure\Workflow\SalaryChangeOutcome;
 use App\Shared\Exports\ExportRegistry;
+use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\AssignmentChanges;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Usage\UsageRegistry;
@@ -39,6 +47,11 @@ final class CoreHRServiceProvider extends ServiceProvider
         $this->app->make(ExportRegistry::class)->register($this->app->make(EmploymentsExportSource::class));
         // ESS-1 · Tarjeta «Mi perfil» del inicio del colaborador.
         $this->app->make(HomeCardRegistry::class)->register($this->app->make(ProfileHomeCard::class));
+        // COL-12 · MSS-1 · Tarjetas de los tableros de inicio.
+        $home = $this->app->make(HomeRegistry::class);
+        foreach ([new HeadcountCard, MovementsMonthCard::hires(), MovementsMonthCard::terminations(), new PendingStartCard, CelebrationsCard::birthdays(), CelebrationsCard::anniversaries(), new LaborCostCard, new TurnoverCard, new ChangeRequestsCard] as $card) {
+            $home->register($card);
+        }
         // HIS-3 · WFL-4 · La decisión del flujo sobre un cambio de sueldo se aplica aquí al instante.
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(SalaryChangeOutcome::class));
         // HIS-2 · WFL-4 · La decisión del flujo sobre un movimiento de personal se aplica aquí al instante.

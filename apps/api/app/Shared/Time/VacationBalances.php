@@ -55,4 +55,12 @@ interface VacationBalances
 
     /** Pasa los días reservados de la solicitud de «programadas» a «tomadas» (inicio del goce). */
     public function consume(string $vacationRequestId, string $effectiveOn, ?string $userId): void;
+
+    /**
+     * MSS-2 · De una lista de relaciones, las que están de vacaciones (aprobadas o en goce) en la fecha.
+     *
+     * @param  list<string>  $employmentIds
+     * @return list<string>
+     */
+    public function onLeave(array $employmentIds, string $date): array;
 }

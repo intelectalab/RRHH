@@ -5,8 +5,10 @@ use App\Modules\CoreHR\Http\Controllers\CompensationController;
 use App\Modules\CoreHR\Http\Controllers\DependentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentProfileController;
+use App\Modules\CoreHR\Http\Controllers\HomeController;
 use App\Modules\CoreHR\Http\Controllers\InsuranceCatalogController;
 use App\Modules\CoreHR\Http\Controllers\MeEmploymentController;
+use App\Modules\CoreHR\Http\Controllers\MyTeamController;
 use App\Modules\CoreHR\Http\Controllers\PersonalDataController;
 use App\Modules\CoreHR\Http\Controllers\PersonController;
 use App\Modules\CoreHR\Http\Controllers\PersonnelActionController;
@@ -17,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
     // ESS-2 · Mi perfil: solo la relación propia (RN-ESS-01).
     Route::get('/me/employment', MeEmploymentController::class);
+    // COL-12 · MSS-1 · Inicio según el rol (tablero de RRHH o del manager) y MSS-2 · Mi equipo.
+    Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/home/hr', [HomeController::class, 'hr'])->middleware('permission:people.employments.view');
+    Route::get('/home/manager', [HomeController::class, 'manager'])->middleware('permission:people.team.view');
+    Route::get('/my-team', [MyTeamController::class, 'index'])->middleware('permission:people.team.view');
 
     // COL-1 · Personas y deduplicación por documento.
     Route::get('/people', [PersonController::class, 'index'])->middleware('permission:people.people.view');
@@ -26,7 +33,8 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::patch('/people/{id}', [PersonController::class, 'update'])->middleware('permission:people.people.update');
 
     // COL-2 · COL-9 · Colaboradores: ingreso, listado, ficha básica y acciones de ME-01.
-    Route::get('/employment-options', [EmploymentController::class, 'options'])->middleware('permission:people.employments.create');
+    // Catálogos de estructura (sin datos de personas): también los usa el jefe al proponer un movimiento desde Mi equipo.
+    Route::get('/employment-options', [EmploymentController::class, 'options'])->middleware('permission:people.employments.view');
     Route::get('/employments', [EmploymentController::class, 'index'])->middleware('permission:people.employments.view');
     Route::post('/employments', [EmploymentController::class, 'store'])->middleware('permission:people.employments.create');
     Route::get('/employments/{id}', [EmploymentController::class, 'show'])->middleware('permission:people.employments.view');

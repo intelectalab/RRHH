@@ -75,6 +75,17 @@ export function nextSort(current: string, field: string, fallback: string): stri
  * recibe la tabla: una vista que las nombre simplemente no las muestra. En pantallas angostas cada
  * fila se ve como tarjeta (RN-UI-06).
  */
+/** Búsqueda y filtros que llegan en la dirección: ?q=… y ?filter[campo]=valor. */
+export function urlState(search: string): { q: string; filters: Record<string, string> } {
+  const params = new URLSearchParams(search)
+  const filters: Record<string, string> = {}
+  params.forEach((value, key) => {
+    const m = /^filter\[([a-z0-9_]+)\]$/.exec(key)
+    if (m && value.trim() !== '') filters[m[1]] = value.trim()
+  })
+  return { q: params.get('q')?.trim() ?? '', filters }
+}
+
 export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, filters = [], bulkActions = [], defaultSort, searchLabel, empty, toolbar, reloadKey = 0, onTotal, urlSearch = false, presets = [] }: {
   resource: string
   endpoint: string
@@ -119,11 +130,12 @@ export function DataTable<T>({ resource, endpoint, columns, rowKey, rowActions, 
 
   useEffect(() => setWidths(readWidths(resource)), [resource])
 
-  // Enlace desde la búsqueda global: …?q=texto abre la tabla ya filtrada.
+  // Enlace desde la búsqueda global (…?q=texto) o desde una tarjeta del inicio (…?filter[status]=active):
+  // la tabla abre ya filtrada.
   useEffect(() => {
     if (!urlSearch) return
-    const initial = new URLSearchParams(window.location.search).get('q')
-    if (initial) setState((s) => ({ ...s, q: initial }))
+    const initial = urlState(window.location.search)
+    if (initial.q || Object.keys(initial.filters).length > 0) setState((s) => ({ ...s, q: initial.q || s.q, filters: { ...s.filters, ...initial.filters } }))
   }, [urlSearch])
 
   const load = useCallback(async () => {

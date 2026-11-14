@@ -74,6 +74,17 @@ function MovementsHistory({ header, reload, toast }: ProfileTabContext) {
 
   useEffect(() => { void load() }, [load])
 
+  // MSS-2 · Desde «Mi equipo» (?accion=movimiento) el formulario del movimiento se abre directamente.
+  const [autoStarted, setAutoStarted] = useState(false)
+  useEffect(() => {
+    if (autoStarted || rows === null || !canMove || pending) return
+    if (new URLSearchParams(window.location.search).get('accion') !== 'movimiento') return
+    setAutoStarted(true)
+    void start({ kind: 'new' })
+    // start solo depende del estado ya cargado (rows); se ejecuta una vez.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, canMove, pending, autoStarted])
+
   async function start(next: Mode) {
     const current = rows?.find((r) => r.valid_to === null) ?? rows?.[0]
     const base: Form = {

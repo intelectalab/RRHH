@@ -267,7 +267,7 @@ EXTRA = [
     ("CON", 1, "post", "/contract-addenda/{id}/cancel", "contracts.addenda.cancel", "Cancelar la adenda antes de firmarse (reason)", False),
     ("CON", 1, "get", "/contract-addenda/{id}/document", "contracts.addenda.view", "Descargar el documento vigente de la adenda", False),
     ("COL", 1, "get", "/people/document-match", "people.people.view", "Buscar una persona por su documento (RN-COL-01): si ya existe, devuelve su identificación y sus relaciones para ofrecer reingreso o relación adicional", False),
-    ("COL", 1, "get", "/employment-options", "people.employments.create", "Opciones del formulario de ingreso: empresas, puestos, posiciones libres, unidades, sedes, centros de costo, tipos de contrato, regímenes y jefes", False),
+    ("COL", 1, "get", "/employment-options", "people.employments.view", "Opciones del formulario de ingreso: empresas, puestos, posiciones libres, unidades, sedes, centros de costo, tipos de contrato, regímenes y jefes", False),
     ("COL", 1, "post", "/employments/{id}/cancel", "people.employments.update", "Anular un ingreso que aún no empezó (ME-01: Por ingresar → Anulada); libera la posición", False),
     ("HIS", 1, "get", "/compensation-concepts", "people.compensations.view", "Conceptos fijos recurrentes del paquete de país que se pueden asignar como componentes de la compensación (HIS-3)", False),
     ("COL", 1, "get", "/termination-reasons", "people.employments.terminate", "Motivos de cese de la organización, enlazados a la Tabla 17 del paquete de país (COL-11)", False),
@@ -445,6 +445,9 @@ EXTRA = [
     ("HIS", 1, "post", "/personnel-actions/{id}/correct", "people.assignments.correct", "Corregir un movimiento aplicado con los valores correctos y el motivo: crea el movimiento de corrección y el original queda reemplazado (RN-HIS-06); con fecha pasada emite employment.retroactive_change con el rango afectado", False),
     ("ESS", 1, "get", "/me/employment", "-", "Mi perfil (ESS-2): ficha propia del colaborador con datos laborales vigentes, datos personales propios (cada lectura en el registro de accesos), contactos de emergencia, solicitudes de cambio, campos que puede proponer cambiar (colaboradores.campos_editables_portal), los que esperan a RRHH y los que tienen un cambio pendiente. Solo la relación propia (RN-ESS-01)", False),
     ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador (ESS-1): relaciones propias y la elegida (RN-ESS-04), pendientes de la bandeja y tarjetas de los módulos contratados (RN-ESS-02): perfil, vacaciones, ausencias. Solo datos propios (RN-ESS-01)", False),
+    ("COL", 1, "get", "/home", "-", "Vistas de inicio del usuario según su rol (RRHH, manager o colaborador) y la vista por defecto", False),
+    ("COL", 1, "get", "/home/hr", "people.employments.view", "Tablero de inicio de RRHH: dotación, ingresos y ceses del mes, vencimientos y pendientes (solo tarjetas de módulos contratados)", False),
+    ("MSS", 1, "get", "/home/manager", "people.team.view", "Tablero de inicio del manager: aprobaciones, ausencias y vencimientos de su equipo", False),
     ("MSS", 1, "get", "/my-team", "people.team.view", "Equipo directo e indirecto del manager", False),
     ("MSS", 1, "get", "/my-team/calendar", "people.team.view", "Calendario de ausencias del equipo", False),
     ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
@@ -589,6 +592,10 @@ QUERY = {
     ],
     ("get", "/me/employment"): [
         _q("employment_id", "Relación laboral propia que se muestra (RN-ESS-04); una ajena responde 404. Por defecto la activa más reciente"),
+    ],
+    ("get", "/my-team"): [
+        _q("filter[level]", "direct: solo reportes directos; indirect: solo indirectos (requiere people.team.view_indirect)"),
+        _q("q", "Nombre o código del colaborador"),
     ],
     ("get", "/absence-subsidies"): [
         _q("filter[status]", "Estados separados por coma (pending_filing, filed, observed, approved, reimbursed, rejected, cancelled)"),

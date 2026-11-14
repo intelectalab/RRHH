@@ -535,7 +535,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/employments/{employment_id}/dependents` | `people.dependents.{view,create}` | 1 |
 | GET, PATCH, DELETE | `/employments/{employment_id}/dependents/{id}` | `people.dependents.{view,update,delete}` | 1 |
 | GET | `/people/document-match` | `people.people.view` | 1 |
-| GET | `/employment-options` | `people.employments.create` | 1 |
+| GET | `/employment-options` | `people.employments.view` | 1 |
 | POST | `/employments/{id}/cancel` | `people.employments.update` | 1 |
 | GET | `/termination-reasons` | `people.employments.terminate` | 1 |
 | GET | `/employments/{id}/profile` | `people.employments.view` | 1 |
@@ -577,6 +577,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/employments/{employment_id}/bank-accounts/{id}/approve` | `people.change_requests.approve` | 1 |
 | POST | `/employments/{employment_id}/bank-accounts/{id}/reject` | `people.change_requests.approve` | 1 |
 | POST | `/employments/{employment_id}/bank-accounts/{id}/cancel` | `people.people.bank_account.edit` | 1 |
+| GET | `/home` | sesión | 1 |
+| GET | `/home/hr` | `people.employments.view` | 1 |
 
 **HIS · Historia con vigencia**
 
@@ -655,6 +657,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET | `/home/manager` | `people.team.view` | 1 |
 | GET | `/my-team` | `people.team.view` | 1 |
 | GET | `/my-team/calendar` | `people.team.view` | 1 |
 
