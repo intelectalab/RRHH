@@ -941,6 +941,31 @@
       "opciones": null
     },
     {
+      "codigo": "ausencias.dias_descanso_semanal",
+      "modulo": "time_off",
+      "nombre": "Días de descanso semanal (cómputo en días hábiles)",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "saturday",
+        "sunday"
+      ],
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site"
+      ],
+      "descripcion": "AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.",
+      "opciones": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
+      ]
+    },
+    {
       "codigo": "horas_extra.requiere_autorizacion",
       "modulo": "attendance",
       "nombre": "Autorización previa",

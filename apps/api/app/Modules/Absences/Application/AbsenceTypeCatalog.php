@@ -34,6 +34,8 @@ final class AbsenceTypeCatalog
         'statutory_suspension_code' => null,
         'subsidy_kind' => 'none',
         'counts_as_worked_for_benefits' => true,
+        // AUS-2 · Cómo se cuentan los días: calendario o hábiles (sin descanso semanal ni feriados de la sede).
+        'day_count' => 'calendar',
         'legal_entity_ids' => null,
         'labor_regime_codes' => null,
     ];

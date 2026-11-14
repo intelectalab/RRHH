@@ -760,8 +760,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/absence-types/{id}/archive` | `time.absence_types.archive` | 2 |
 | GET, POST | `/absences` | `time.absences.{view,create}` | 2 |
 | GET, PATCH | `/absences/{id}` | `time.absences.{view,update}` | 2 |
-| POST | `/absences/{id}/{submit,approve,reject,cancel}` | `time.absences.{submit,approve,reject,cancel}` | 2 |
+| POST | `/absences/{id}/{submit,cancel}` | `time.absences.{submit,cancel}` | 2 |
 | GET | `/absence-types/{id}/rules` | `time.absence_types.view` | 2 |
+| POST | `/absences/simulate` | `time.absences.create` | 2 |
+| POST | `/absences/{id}/register` | `time.absences.create_for_others` | 2 |
+| POST | `/absences/{id}/attachments` | `time.absences.update` | 2 |
+| GET | `/absences/{id}/attachments/{attachment_id}` | `time.absences.view` | 2 |
 
 **BHO · Horas extra y bolsa de horas**
 

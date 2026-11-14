@@ -473,6 +473,7 @@
 .cal-punto.holidays { background: var(--oc); }
 .cal-punto.tasks { background: var(--pe-500); }
 .cal-punto.contracts { background: var(--wa); }
+.cal-punto.absences { background: var(--ok); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .cal-dow { padding: 8px; font-size: var(--fs-s); color: var(--tx2); font-weight: 600; border-bottom: 1px solid var(--bd); text-transform: capitalize; }
 .cal-dia { min-height: 108px; padding: 6px; border-right: 1px solid var(--bd); border-bottom: 1px solid var(--bd); display: flex; flex-direction: column; gap: 4px; min-width: 0; }

@@ -215,6 +215,19 @@ final class DomainEventTypes
 
     public const POSITION_REQUEST_CANCELLED = 'position_request.cancelled.v1';
 
+    // Ausencias y permisos (AUS-2 · ME-16).
+    public const ABSENCE_REQUESTED = 'absence.requested.v1';
+
+    public const ABSENCE_APPROVED = 'absence.approved.v1';
+
+    public const ABSENCE_REJECTED = 'absence.rejected.v1';
+
+    public const ABSENCE_CANCELLED = 'absence.cancelled.v1';
+
+    public const ABSENCE_STARTED = 'absence.started.v1';
+
+    public const ABSENCE_ENDED = 'absence.ended.v1';
+
     // Organización (SAS-2): cambios de estado decididos desde la consola.
     public const TENANT_STATUS_CHANGED = 'tenant.status_changed.v1';
 
@@ -664,6 +677,36 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['position_request_id'],
             'description' => 'Solicitud de posición cancelada por el solicitante (ME-04)',
+        ],
+        self::ABSENCE_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'Ausencia enviada: en aprobación o pendiente de sustento (RN-AUS-01)',
+        ],
+        self::ABSENCE_APPROVED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'Ausencia aprobada por el flujo o registrada por RRHH: ocupa calendario y asistencia',
+        ],
+        self::ABSENCE_REJECTED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'Ausencia rechazada por el flujo o vencida sin sustento',
+        ],
+        self::ABSENCE_CANCELLED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'Ausencia cancelada antes de su inicio: revierte sus efectos',
+        ],
+        self::ABSENCE_STARTED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'La ausencia aprobada empezó (en curso)',
+        ],
+        self::ABSENCE_ENDED => [
+            'version' => 1,
+            'required_fields' => ['absence_request_id', 'employment_id', 'absence_type_id', 'starts_on', 'ends_on', 'affects_attendance', 'status'],
+            'description' => 'La ausencia terminó (finalizada); cierra su efecto en planilla',
         ],
         self::JOB_PROFILE_CREATED => [
             'version' => 1,

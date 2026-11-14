@@ -112,13 +112,18 @@
   max_quantity numeric(8,2) ; max_period enum(event,month,year)=year ; min_notice_days integer
   requires_document bool=f ; document_grace_days integer ; requestable_by enum(employee,manager,hr)=employee
   approval_workflow_definition_id ?-> workflow_definitions ; payroll_concept_code ; statutory_suspension_code
-  subsidy_kind enum(none,illness,maternity)=none ; counts_as_worked_for_benefits bool=t
+  subsidy_kind enum(none,illness,maternity)=none ; counts_as_worked_for_benefits bool=t ; day_count enum(calendar,working)=calendar
   legal_entity_ids j ; labor_regime_codes j ; vig absence_type_id
-@absence_requests main soft lock | Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados.
+@absence_requests main soft lock | Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados. AUS-2: las fechas laborales (starts_on, ends_on) son la referencia; starts_at y ends_at son el instante en la zona horaria de la empresa (fin exclusivo) y alimentan la exclusión que impide ausencias solapadas del mismo trabajador.
   employment_id -> employments ; absence_type_id -> absence_types ; starts_at ts! ; ends_at ts! ; days numeric(6,2)
   hours numeric(6,2) ; status enum(draft,pending,approved,rejected,cancelled,pending_document,in_progress,completed)=draft ; reason
   workflow_instance_id ?-> workflow_instances ; requested_by_user_id ?-> users ; employer_paid_days numeric(6,2)
   subsidized_days numeric(6,2) ; check ends_at >= starts_at ; idx employment_id, starts_at
+  starts_on date ; ends_on date ; start_time time ; end_time time ; calendar_days numeric(6,2)
+  registered_directly bool=f ; document_due_on date ; exception_reason ; submitted_at ts ; decided_at ts ; decision_reason
+  cancelled_at ts ; cancelled_by_user_id ?-> users ; cancellation_reason ; idx status, starts_on
+  check starts_on IS NULL OR ends_on >= starts_on
+  raw EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, tstzrange(starts_at, ends_at, '[)') WITH &&) WHERE (deleted_at IS NULL AND status IN ('pending','pending_document','approved','in_progress','completed')) DEFERRABLE INITIALLY IMMEDIATE
 @absence_medical_certificates soft sens | Certificado médico de un descanso; diagnóstico y número cifrados.
   absence_request_id -> absence_requests ; certificate_number_enc ; issuer ; diagnosis_enc ; issued_on
   file_id ?-> stored_files ; validated_by_user_id ?-> users ; validated_at

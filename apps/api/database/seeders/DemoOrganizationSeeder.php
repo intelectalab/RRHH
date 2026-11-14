@@ -111,6 +111,13 @@ class DemoOrganizationSeeder extends Seeder
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
+            // AUS-2: una ausencia solicitada la aprueba el jefe directo o Recursos Humanos (el primero que decida).
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'absence_request')->exists()) {
+                $flow = $flows->create(['name' => 'Ausencias · aprobación estándar', 'subject_type' => 'absence_request', 'steps' => ['levels' => [
+                    ['name' => 'Jefe directo o Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'manager'], ['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
             // POS-3: sin flujo publicado no se puede enviar una solicitud de posición (RN-WFL-01).
             if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'position_request')->exists()) {
                 $flow = $flows->create(['name' => 'Nuevas posiciones · aprobación estándar', 'subject_type' => 'position_request', 'steps' => ['levels' => [

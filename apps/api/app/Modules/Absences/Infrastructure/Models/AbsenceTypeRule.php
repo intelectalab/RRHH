@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $statutory_suspension_code
  * @property string $subsidy_kind
  * @property bool $counts_as_worked_for_benefits
+ * @property string $day_count
  * @property list<string>|null $legal_entity_ids
  * @property list<string>|null $labor_regime_codes
  * @property string $valid_from

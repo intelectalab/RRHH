@@ -2,6 +2,7 @@
 
 namespace Tests\Support\Isolation;
 
+use App\Modules\Absences\Infrastructure\Models\AbsenceRequest;
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
@@ -84,6 +85,11 @@ final class CrossTenantHarness
         'VacationBalance' => Employment::class,
         // AUS-1: historia de reglas de un tipo de ausencia de A.
         '/absence-types/{id}/rules' => AbsenceType::class,
+        // AUS-2: ausencias de A (esquema Absence), su registro directo y sus sustentos.
+        'Absence' => AbsenceRequest::class,
+        '/absences/{id}/register' => AbsenceRequest::class,
+        '/absences/{id}/attachments' => AbsenceRequest::class,
+        '/absences/{id}/attachments/{attachment_id}' => AbsenceRequest::class,
         // ORG-4: distribución por centros de costo de una relación laboral de A.
         '/employments/{employment_id}/cost-distributions' => EmploymentCostDistribution::class,
         // ORG-3: historia e impacto de una unidad de A; niveles de unidad de A.

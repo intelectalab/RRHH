@@ -203,6 +203,7 @@ final class AbsenceTypeController
             'rules.statutory_suspension_code' => ['sometimes', 'nullable', 'string', 'max:10'],
             'rules.subsidy_kind' => ['sometimes', Rule::in(['none', 'illness', 'maternity'])],
             'rules.counts_as_worked_for_benefits' => ['sometimes', 'boolean'],
+            'rules.day_count' => ['sometimes', Rule::in(['calendar', 'working'])],
             'rules.legal_entity_ids' => ['sometimes', 'nullable', 'array', 'max:200'],
             'rules.legal_entity_ids.*' => ['uuid', Rule::exists('legal_entities', 'id')->whereNull('deleted_at')],
             'rules.labor_regime_codes' => ['sometimes', 'nullable', 'array', 'max:50'],

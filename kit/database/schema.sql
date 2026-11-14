@@ -5289,6 +5289,7 @@ CREATE TABLE absence_type_rules (
   statutory_suspension_code text,
   subsidy_kind text NOT NULL DEFAULT 'none' CHECK (subsidy_kind IN ('none','illness','maternity')),
   counts_as_worked_for_benefits boolean NOT NULL DEFAULT true,
+  day_count text NOT NULL DEFAULT 'calendar' CHECK (day_count IN ('calendar','working')),
   legal_entity_ids jsonb,
   labor_regime_codes jsonb,
   valid_from date NOT NULL,
@@ -5324,22 +5325,41 @@ CREATE TABLE absence_requests (
   requested_by_user_id uuid,
   employer_paid_days numeric(6,2),
   subsidized_days numeric(6,2),
+  starts_on date,
+  ends_on date,
+  start_time time,
+  end_time time,
+  calendar_days numeric(6,2),
+  registered_directly boolean NOT NULL DEFAULT false,
+  document_due_on date,
+  exception_reason text,
+  submitted_at timestamptz,
+  decided_at timestamptz,
+  decision_reason text,
+  cancelled_at timestamptz,
+  cancelled_by_user_id uuid,
+  cancellation_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_absence_requests_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_absence_requests_1 CHECK (ends_at >= starts_at),
+  CONSTRAINT ck_absence_requests_2 CHECK (starts_on IS NULL OR ends_on >= starts_on),
+  CONSTRAINT ex_absence_requests_r1 EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, tstzrange(starts_at, ends_at, '[)') WITH &&) WHERE (deleted_at IS NULL AND status IN ('pending','pending_document','approved','in_progress','completed')) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_absence_requests_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_absence_requests_absence_type_id FOREIGN KEY (tenant_id, absence_type_id) REFERENCES absence_types (tenant_id, id),
   CONSTRAINT fk_absence_requests_workflow_instance_id FOREIGN KEY (tenant_id, workflow_instance_id) REFERENCES workflow_instances (tenant_id, id),
-  CONSTRAINT fk_absence_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_absence_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_absence_requests_cancelled_by_user_id FOREIGN KEY (tenant_id, cancelled_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE absence_requests IS 'Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados.';
+COMMENT ON TABLE absence_requests IS 'Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados. AUS-2: las fechas laborales (starts_on, ends_on) son la referencia; starts_at y ends_at son el instante en la zona horaria de la empresa (fin exclusivo) y alimentan la exclusión que impide ausencias solapadas del mismo trabajador.';
 CREATE INDEX ix_absence_requests_absence_type_id ON absence_requests (tenant_id, absence_type_id);
 CREATE INDEX ix_absence_requests_workflow_instance_id ON absence_requests (tenant_id, workflow_instance_id);
 CREATE INDEX ix_absence_requests_requested_by_user_id ON absence_requests (tenant_id, requested_by_user_id);
+CREATE INDEX ix_absence_requests_cancelled_by_user_id ON absence_requests (tenant_id, cancelled_by_user_id);
 CREATE INDEX ix_absence_requests_employment_id_starts_at ON absence_requests (tenant_id, employment_id, starts_at);
+CREATE INDEX ix_absence_requests_status_starts_on ON absence_requests (tenant_id, status, starts_on);
 ALTER TABLE absence_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE absence_requests FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON absence_requests USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -18299,6 +18319,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('vacaciones.anticipacion_minima_dias', 'time_off', 'Anticipación mínima', 'Días de anticipación para solicitar vacaciones.', 'integer', '7'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.valida_rrhh', 'time_off', 'Validación de RRHH', 'Tras el jefe, RRHH valida la solicitud.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.alerta_acumulacion_dias', 'time_off', 'Aviso de vacaciones acumuladas', 'Saldo desde el que se alerta acumulación.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('ausencias.dias_descanso_semanal', 'time_off', 'Días de descanso semanal (cómputo en días hábiles)', 'AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.', 'list', '["saturday", "sunday"]'::jsonb, ARRAY['organization','legal_entity','site'], '["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]'::jsonb),
   ('horas_extra.requiere_autorizacion', 'attendance', 'Autorización previa', 'El sobretiempo solo se reconoce si fue autorizado.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], NULL),
   ('horas_extra.compensacion', 'attendance', 'Compensación del sobretiempo', 'Pago, bolsa de horas o a elección.', 'select', '"pay"'::jsonb, ARRAY['organization','legal_entity'], '["pay", "time_bank", "choice"]'::jsonb),
   ('horas_extra.vencimiento_bolsa_dias', 'attendance', 'Vencimiento de la bolsa (días)', 'Días tras los que vence un abono en bolsa; vacío = según acuerdo.', 'integer', 'null'::jsonb, ARRAY['organization','legal_entity'], NULL),
