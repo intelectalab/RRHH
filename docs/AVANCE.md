@@ -6,8 +6,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 110 | 3 | 45,6 % |
-| Backlog completo | 512 | 110 | 3 | 21,5 % |
+| Primer corte comercial (MVP) | 241 | 112 | 3 | 46,5 % |
+| Backlog completo | 512 | 112 | 3 | 21,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -158,8 +158,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | DOC-6 | Flujo de firma | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | DOC-7 | Evidencia de firma electrónica propia | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
 | DOC-8 | Capa de proveedor de firma digital | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
-| ESS-1 | Inicio del colaborador | ESS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| ESS-2 | Mi perfil y actualización de datos | ESS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| ESS-1 | Inicio del colaborador | ESS | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Inicio del colaborador en (portal)/mi: GET /me/home con relaciones propias y selector (RN-ESS-01/04), pendientes y tarjetas de perfil, vacaciones y ausencias solo de módulos contratados (RN-ESS-02, HomeCardRegistry); accesos rápidos a vacaciones y ausencias; mobile-first con barra inferior; relación cesada en solo lectura. Pendiente: tarjeta de boleta (Nómina) y comunicados. |
+| ESS-2 | Mi perfil y actualización de datos | ESS | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Mi perfil en (portal)/mi/perfil: GET /me/employment con datos laborales y personales propios (lectura registrada), campos habilitables por organización (colaboradores.campos_editables_portal, 422 si no) y cambios pendientes marcados; propuestas por /profile-change-requests. Pendiente: contactos de emergencia y cuentas desde el portal, verificación OTP (RN-ESS-06) y plazo de acceso tras el cese (RN-ESS-05). |
 | ESS-3 | Mis documentos, contrato y firma | ESS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | ESS-4 | Solicitud de certificados y constancias | ESS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | ESS-5 | Solicitudes a RRHH desde el portal | ESS | Fase 1 · Core HR | Story | sí | pendiente | — |  |
