@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => 'El periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño antes de esa fecha.'],
             'email' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => "Hola {name}:\n\nEn {organization}, el periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño y decide antes de esa fecha.\n\nRevísalo aquí: {link}"],
         ],
+        'contracts.expiring' => [
+            'in_app' => ['subject' => 'El contrato de {employee} vence en {days_left} días', 'body' => 'El contrato de {employee} vence el {ends_on}. {explanation} Decide si se renueva, se convierte a plazo indeterminado o no se renueva.'],
+            'email' => ['subject' => 'El contrato de {employee} vence en {days_left} días', 'body' => "Hola {name}:\n\nEn {organization}, el contrato de {employee} vence el {ends_on} (faltan {days_left} días). {explanation}\n\nDecide si se renueva, se convierte a plazo indeterminado o no se renueva: {link}"],
+        ],
+        'contracts.cap_approaching' => [
+            'in_app' => ['subject' => '{employee} se acerca al tope de contratos a plazo', 'body' => 'Al terminar el contrato que vence el {ends_on}, {employee} queda cerca del tope permitido. {explanation} Renovar podría desnaturalizar el contrato.'],
+            'email' => ['subject' => '{employee} se acerca al tope de contratos a plazo', 'body' => "Hola {name}:\n\nEn {organization}, al terminar el contrato que vence el {ends_on}, {employee} queda cerca del tope de contratos a plazo. {explanation}\n\nRenovar podría desnaturalizar el contrato. Revísalo aquí: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],

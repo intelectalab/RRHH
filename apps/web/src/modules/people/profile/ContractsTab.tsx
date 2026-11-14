@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '@/lib/api'
+import { api, ApiRequestError } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
 import { formatDate, formatNumber } from '@/lib/format'
 import { useT } from '@/lib/useT'
@@ -52,6 +52,7 @@ export type Contract = {
   signed_at: string | null
   accumulated_days: number | null
   termination_reason: string | null
+  over_limit_reason?: string | null
   allowed_actions: string[]
   version: number
   addenda?: ContractAddendum[]
@@ -87,6 +88,8 @@ export function contractButtons(c: Pick<Contract, 'allowed_actions' | 'status'>,
 
 type EditForm = { contract_type_id: string; starts_on: string; ends_on: string; trial_period_ends_on: string; weekly_hours: string; work_modality: string; objective_cause: string }
 type RenewForm = { contract_type_id: string; starts_on: string; ends_on: string; objective_cause: string }
+/** CON-4 · Renovación que supera el tope: el servidor exige confirmación expresa y un motivo. */
+type OverLimit = { explanation: string; confirmed: boolean; reason: string }
 type AddForm = { kind: string; effective_on: string; description: string; amount: string; currency: string; weekly_hours: string; work_modality: string; ends_on: string }
 type SignTarget = { kind: 'contract' | 'addendum'; id: string; fromDraft: boolean }
 
@@ -123,6 +126,7 @@ export function ContractsTab({ header, toast }: ProfileTabContext) {
   const [warnings, setWarnings] = useState<string[]>([])
   const [edit, setEdit] = useState<{ contract: Contract; form: EditForm } | null>(null)
   const [renew, setRenew] = useState<{ contract: Contract; form: RenewForm } | null>(null)
+  const [overLimit, setOverLimit] = useState<OverLimit | null>(null)
   const [addendum, setAddendum] = useState<{ contract: Contract; form: AddForm } | null>(null)
   const [sign, setSign] = useState<SignTarget | null>(null)
   const [signFile, setSignFile] = useState<File | null>(null)
@@ -195,6 +199,7 @@ export function ContractsTab({ header, toast }: ProfileTabContext) {
     }
     if (action === 'renew') {
       void ensureTypes()
+      setOverLimit(null)
       setRenew({ contract: c, form: { contract_type_id: '', starts_on: '', ends_on: '', objective_cause: '' } })
       return
     }
@@ -229,8 +234,21 @@ export function ContractsTab({ header, toast }: ProfileTabContext) {
 
   function saveRenew() {
     if (!renew) return
-    const body = Object.fromEntries(Object.entries(renew.form).filter(([, v]) => v !== ''))
-    void run(() => api.post(`/contracts/${renew.contract.id}/renew`, body), t('ctr.renewed'), () => setRenew(null))
+    const body: Record<string, unknown> = Object.fromEntries(Object.entries(renew.form).filter(([, v]) => v !== ''))
+    if (overLimit) {
+      if (!overLimit.confirmed) { setGeneral(t('ctr.over_limit_confirm_required')); return }
+      body.confirm_over_limit = true
+      body.over_limit_reason = overLimit.reason
+    }
+    void run(
+      () => api.post(`/contracts/${renew.contract.id}/renew`, body).catch((e: unknown) => {
+        // El tope se supera: se pide confirmación expresa y motivo antes de reenviar.
+        if (e instanceof ApiRequestError && e.code === 'contract_limit_exceeded') setOverLimit((o) => o ?? { explanation: e.message, confirmed: false, reason: '' })
+        throw e
+      }),
+      t('ctr.renewed'),
+      () => { setRenew(null); setOverLimit(null) },
+    )
   }
 
   function saveAddendum() {
@@ -299,6 +317,7 @@ export function ContractsTab({ header, toast }: ProfileTabContext) {
                   {c.signed_at && <span className="text-secondary small">{t('ctr.signed_on', { date: date(c.signed_at.slice(0, 10)), origin: t(`ctr.origin_${c.signature_origin ?? 'physical_scan'}`) })}</span>}
                   {c.accumulated_days !== null && c.accumulated_days > 0 && <span className="text-secondary small">{t('ctr.accumulated', { days: formatNumber(locale, String(c.accumulated_days)) })}</span>}
                   {c.status === 'expired' && <span className="small text-danger">{t('ctr.expired_hint')}</span>}
+                  {c.over_limit_reason && <span className="small text-warning">{t('ctr.over_limit_note', { reason: c.over_limit_reason })}</span>}
                   {c.termination_reason && <span className="text-secondary small">{t('ctr.reason', { reason: c.termination_reason })}</span>}
                 </div>
                 <div className="sec-acciones">
@@ -405,6 +424,18 @@ export function ContractsTab({ header, toast }: ProfileTabContext) {
           <label className="form-label mt-3" htmlFor="ctr-r-cause">{t('ctr.f_cause')}</label>
           <textarea id="ctr-r-cause" className="form-control" rows={2} value={renew.form.objective_cause} onChange={(e) => setRenew({ ...renew, form: { ...renew.form, objective_cause: e.target.value } })} />
           <p className="small text-secondary mt-2">{t('ctr.renew_hint')}</p>
+          {overLimit && (
+            <div className="mt-3">
+              <Notice tone="warn">{overLimit.explanation}</Notice>
+              <div className="form-check mt-2">
+                <input id="ctr-r-over" type="checkbox" className="form-check-input" checked={overLimit.confirmed} onChange={(e) => setOverLimit({ ...overLimit, confirmed: e.target.checked })} />
+                <label className="form-check-label" htmlFor="ctr-r-over">{t('ctr.over_limit_confirm')}</label>
+              </div>
+              <label className="form-label mt-2" htmlFor="ctr-r-over-reason">{t('ctr.over_limit_reason')}</label>
+              <textarea id="ctr-r-over-reason" className="form-control" rows={2} value={overLimit.reason} onChange={(e) => setOverLimit({ ...overLimit, reason: e.target.value })} />
+              {err('over_limit_reason')}
+            </div>
+          )}
         </Modal>
       )}
 

@@ -162,4 +162,6 @@ return [
         'union_id' => ['unions.memberships.view', 'union'],
         'employment_id' => ['unions.memberships.view', 'union'],
     ],
+    // HIS-5: sueldo antes y después en la línea de tiempo laboral.
+    'TimelineEvent' => ['salary' => ['people.employments.salary.view', 'salary']],
 ];

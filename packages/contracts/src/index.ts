@@ -3418,6 +3418,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/contracts/expiring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Contratos que vencen dentro de la ventana (por defecto, la mayor anticipación de aviso de su empresa) y vencidos sin regularizar (RN-CON-05), con días para vencer, acumulado frente al tope (RN-CON-02/03) y acción sugerida (renew, convert_indefinite, continue_renewal, regularize); excluye los regularizados */
+        get: operations["getContractsExpiring"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/contracts/{id}": {
         parameters: {
             query?: never;
@@ -3513,7 +3530,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación */
+        /** Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación, salvo confirmación expresa (confirm_over_limit=true) con motivo (over_limit_reason), que queda auditada (CON-4) */
         post: operations["postContractsIdRenew"];
         delete?: never;
         options?: never;
@@ -5158,6 +5175,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postEmploymentsIdTerminate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Línea de tiempo laboral de la relación: ingreso o reingreso, movimientos con el antes y el después de cada campo, cambios de sueldo (solo con people.employments.salary.view; lectura registrada), contratos y adendas, estados y cese; cada tipo exige además el permiso de su recurso (meta.types) */
+        get: operations["getEmploymentsIdTimeline"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -17858,6 +17892,7 @@ export interface components {
             approved_at?: string | null;
             accumulated_days?: number | null;
             termination_reason?: string | null;
+            over_limit_reason?: string | null;
             accumulation?: {
                 [key: string]: unknown;
             } | null;
@@ -17943,6 +17978,7 @@ export interface components {
             objective_cause?: string | null;
             /** @description Identificador opaco */
             renewal_of_contract_id?: string | null;
+            over_limit_reason?: string | null;
         };
         ContractType: {
             /** @description Identificador opaco */
@@ -31005,6 +31041,42 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getContractsExpiring: {
+        parameters: {
+            query?: {
+                /** @description Días hacia adelante (1 a 365); por defecto, la mayor anticipación de aviso de la empresa de cada contrato */
+                within?: string;
+                /** @description Solo los contratos de esa empresa */
+                legal_entity_id?: string;
+                /** @description true (por defecto) incluye los vencidos sin regularizar */
+                include_expired?: string;
+                /** @description Nombre o código del colaborador, o número del contrato */
+                q?: string;
+                /** @description Página (desde 1) */
+                page?: string;
+                /** @description Tamaño de página (hasta 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getContractsId: {
         parameters: {
             query?: {
@@ -35608,6 +35680,35 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getEmploymentsIdTimeline: {
+        parameters: {
+            query?: {
+                /** @description Tipos separados por coma: hire, movement, compensation, contract, status, termination; vacío = todos los que el usuario puede ver */
+                types?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getEmploymentsIdWorkData: {

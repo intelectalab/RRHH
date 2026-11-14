@@ -35,6 +35,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $approved_at
  * @property string|null $termination_reason
  * @property Carbon|null $probation_alerted_on
+ * @property int|null $expiry_alerted_days
+ * @property Carbon|null $expiry_alerted_for
+ * @property Carbon|null $cap_alerted_on
+ * @property string|null $over_limit_reason
  * @property int $lock_version
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -60,6 +64,9 @@ class Contract extends Model
         'signed_at' => 'datetime',
         'approved_at' => 'datetime',
         'probation_alerted_on' => 'date',
+        'expiry_alerted_days' => 'integer',
+        'expiry_alerted_for' => 'date',
+        'cap_alerted_on' => 'date',
         'accumulated_days' => 'integer',
         'lock_version' => 'integer',
     ];

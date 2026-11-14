@@ -38,6 +38,8 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     // COL-3 · COL-5 · Ficha 360: cabecera, datos laborales vigentes e historia de la asignación (movimientos).
     Route::get('/employments/{id}/profile', [EmploymentProfileController::class, 'profile'])->middleware('permission:people.employments.view');
     Route::get('/employments/{id}/work-data', [EmploymentProfileController::class, 'workData'])->middleware('permission:people.employments.view');
+    // HIS-5 · Línea de tiempo laboral (cada tipo exige además el permiso de su recurso).
+    Route::get('/employments/{id}/timeline', [EmploymentProfileController::class, 'timeline'])->middleware('permission:people.employments.view');
     Route::get('/employments/{employment_id}/assignments', [EmploymentProfileController::class, 'assignments'])->middleware('permission:people.assignments.view');
     // HIS-2 · HIS-4 · Movimientos de personal: única vía para cambiar la asignación (con aprobación,
     // programados a futuro, corregidos). El jefe propone por /propose (siempre pasa por aprobación).

@@ -3660,6 +3660,10 @@ CREATE TABLE contracts (
   approved_at timestamptz,
   termination_reason text,
   probation_alerted_on date,
+  expiry_alerted_days integer,
+  expiry_alerted_for date,
+  cap_alerted_on date,
+  over_limit_reason text,
   valid_from date NOT NULL,
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -3674,7 +3678,7 @@ CREATE TABLE contracts (
   CONSTRAINT fk_contracts_renewal_of_contract_id FOREIGN KEY (tenant_id, renewal_of_contract_id) REFERENCES contracts (tenant_id, id),
   CONSTRAINT fk_contracts_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE contracts IS 'Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08).';
+COMMENT ON TABLE contracts IS 'Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08). CON-4: expiry_alerted_days/expiry_alerted_for recuerdan la última anticipación avisada para esa fecha de fin (no se repite el aviso), cap_alerted_on el aviso de tope acumulado y over_limit_reason el motivo con que se confirmó una renovación por encima del tope.';
 CREATE INDEX ix_contracts_contract_type_id ON contracts (tenant_id, contract_type_id);
 CREATE INDEX ix_contracts_renewal_of_contract_id ON contracts (tenant_id, renewal_of_contract_id);
 CREATE INDEX ix_contracts_document_id ON contracts (tenant_id, document_id);

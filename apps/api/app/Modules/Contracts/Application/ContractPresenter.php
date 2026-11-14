@@ -74,6 +74,7 @@ final class ContractPresenter
                 'approved_at' => $c->approved_at?->toIso8601String(),
                 'accumulated_days' => $c->accumulated_days,
                 'termination_reason' => $c->termination_reason,
+                'over_limit_reason' => $c->over_limit_reason,
                 'allowed_actions' => array_values(array_diff($this->machine->manualActions($c->status), $successors->has($c->id) ? ['renew'] : [])),
                 'version' => $c->lock_version,
                 'created_at' => $c->created_at?->toIso8601String(),

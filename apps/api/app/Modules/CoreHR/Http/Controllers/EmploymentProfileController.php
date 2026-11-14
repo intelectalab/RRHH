@@ -4,10 +4,12 @@ namespace App\Modules\CoreHR\Http\Controllers;
 
 use App\Modules\CoreHR\Application\AssignmentMovements;
 use App\Modules\CoreHR\Application\EmploymentProfile;
+use App\Modules\CoreHR\Application\EmploymentTimeline;
 use App\Modules\CoreHR\Http\Controllers\Concerns\ScopedAccess;
 use App\Shared\Audit\ActivityLogger;
 use App\Shared\Exceptions\InvalidFilterException;
 use App\Shared\Permissions\DataScope;
+use App\Shared\Permissions\SensitiveFields;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -24,6 +26,8 @@ final class EmploymentProfileController
         private readonly EmploymentProfile $profile,
         private readonly AssignmentMovements $movements,
         private readonly DataScope $scope,
+        private readonly EmploymentTimeline $timeline,
+        private readonly SensitiveFields $sensitive,
     ) {}
 
     public function profile(Request $request, string $id): JsonResponse
@@ -43,6 +47,30 @@ final class EmploymentProfileController
         $employment = $this->findEmployment($request, $id, 'people.employments.view');
 
         return response()->json(['data' => $this->profile->workData($employment, $this->asOf($request))]);
+    }
+
+    /**
+     * HIS-5 · Línea de tiempo laboral: ingreso, movimientos con su antes y después, sueldo (solo con el permiso
+     * de campo; su lectura queda registrada), contratos y adendas, estados y cese. ?types=movement,contract…
+     * filtra; un tipo sin permiso no se devuelve (meta.types dice cuáles puede ver el usuario).
+     */
+    public function timeline(Request $request, string $id): JsonResponse
+    {
+        $employment = $this->findEmployment($request, $id, 'people.employments.view');
+        $visible = $this->timeline->visibleTypes($this->permissions($request));
+        $wanted = $request->query('types');
+        $types = $visible;
+        if (is_string($wanted) && $wanted !== '') {
+            $asked = array_values(array_filter(array_map('trim', explode(',', $wanted))));
+            if (array_diff($asked, EmploymentTimeline::TYPES) !== []) {
+                throw new InvalidFilterException((string) trans('errors.invalid_filter'), ['types']);
+            }
+            $types = array_values(array_intersect($visible, $asked));
+        }
+        $events = $this->timeline->events($employment, $types, $this->permissions($request));
+        $events = $this->sensitive->presentMany('TimelineEvent', $events, $this->permissions($request), 'api', array_map(fn () => $employment->person_id, $events));
+
+        return response()->json(['data' => $events, 'meta' => ['types' => $visible, 'total' => count($events)]]);
     }
 
     public function assignments(Request $request, string $employmentId): JsonResponse

@@ -103,7 +103,7 @@ RES = [
     ("HIS", 1, "people.compensations", "/employments/{employment_id}/compensations", "Compensation", "base_salary!:m pay_frequency:e(monthly|biweekly|weekly|daily|hourly) salary_basis:e(monthly|daily|hourly) is_integral_salary:b change_reason?:e(hire|merit|promotion|adjustment|legal|review_cycle|correction) components!?:ao valid_from:d valid_to?:d personnel_action_id?:id", "LR", ""),
     ("HIS", 1, "people.compensations", "/employments/{employment_id}/compensation-changes", "CompensationChange", "base_salary!:m pay_frequency:e(monthly|biweekly|weekly|daily|hourly) salary_basis?:e(monthly|daily|hourly) is_integral_salary?:b components!?:ao effective_on:d reason:e(merit|promotion|adjustment|legal|review_cycle|correction) notes?:s status:e(pending_approval|applied|rejected|cancelled) previous_salary!?:m band_position?:e(below|within|above|none) compensation_id?:id approval_request_id?:id decided_at?:dt decision_reason?:s requested_by_user_id?:id requested_by_name?:s", "LCR", "cancel"),
     ("CON", 1, "contracts.contract_types", "/contract-types", "ContractType", "code:s name:s country_code?:s category:e(indefinite|fixed_term|part_time|internship|other) modality_code?:s requires_end_date:b requires_objective_cause:b max_duration_parameter_code?:s trial_period_parameter_code?:s document_template_id?:id is_system:b max_duration?:j trial_period?:j", "LCRU", ""),
-    ("CON", 1, "contracts.contracts", "/contracts", "Contract", "employment_id:id person_name?:s employee_code?:s legal_entity_id?:id legal_entity_name?:s contract_type_id:id contract_type_name?:s contract_type_category?:s number?:s starts_on:d ends_on?:d trial_period_ends_on?:d weekly_hours?:n work_modality:e(onsite|remote|hybrid) objective_cause?:s status:e(draft|pending_approval|pending_signature|signed|active|expired|terminated|superseded|cancelled) renewal_of_contract_id?:id renewed_by_contract_id?:id has_document?:b document_version?:i signature_origin?:e(physical_scan|electronic) signed_at?:dt approved_at?:dt accumulated_days?:i termination_reason?:s accumulation?:j warnings?:ao allowed_actions?:a version?:i", "LCRU", ""),
+    ("CON", 1, "contracts.contracts", "/contracts", "Contract", "employment_id:id person_name?:s employee_code?:s legal_entity_id?:id legal_entity_name?:s contract_type_id:id contract_type_name?:s contract_type_category?:s number?:s starts_on:d ends_on?:d trial_period_ends_on?:d weekly_hours?:n work_modality:e(onsite|remote|hybrid) objective_cause?:s status:e(draft|pending_approval|pending_signature|signed|active|expired|terminated|superseded|cancelled) renewal_of_contract_id?:id renewed_by_contract_id?:id has_document?:b document_version?:i signature_origin?:e(physical_scan|electronic) signed_at?:dt approved_at?:dt accumulated_days?:i termination_reason?:s over_limit_reason?:s accumulation?:j warnings?:ao allowed_actions?:a version?:i", "LCRU", ""),
     ("CON", 1, "contracts.addenda", "/contract-addenda", "ContractAddendum", "contract_id:id employment_id?:id number?:s kind:e(salary|position|schedule|extension|modality|other) effective_on:d description:s changes?:j salary_change!?:m status:e(draft|pending_signature|active|cancelled) has_document?:b document_version?:i signed_at?:dt signature_origin?:e(physical_scan|electronic) applied_refs?:j cancellation_reason?:s allowed_actions?:a version?:i", "LCR", ""),
     ("DOC", 1, "documents.documents", "/documents", "Document", "employment_id?:id folder:s name:s file_id:id version:i confidentiality:e(normal|restricted|sensitive) expires_on?:d status:e(active|archived)", "LCRU", "archive restore new-version"),
     ("DOC", 1, "documents.templates", "/document-templates", "DocumentTemplate", "name:s kind:s locale:s body:s variables:a status:e(draft|published|retired) version:i", "LCRU", "publish retire generate"),
@@ -252,7 +252,9 @@ EXTRA = [
     ("CON", 1, "post", "/contracts/{id}/decline-signature", "contracts.contracts.issue", "La firma no se completó: el contrato vuelve a borrador (reason)", False),
     ("CON", 1, "post", "/contracts/{id}/void", "contracts.contracts.update", "Anular el contrato antes de que empiece a regir (reason)", False),
     ("CON", 1, "post", "/contracts/{id}/terminate", "contracts.contracts.terminate", "Terminar el contrato vigente o vencido (reason, effective_on)", False),
-    ("CON", 1, "post", "/contracts/{id}/renew", "contracts.contracts.renew", "Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación", False),
+    ("CON", 1, "post", "/contracts/{id}/renew", "contracts.contracts.renew", "Renovar o convertir: crea el contrato sucesor en borrador enlazado al anterior; superar los topes acumulados responde 422 contract_limit_exceeded con la explicación, salvo confirmación expresa (confirm_over_limit=true) con motivo (over_limit_reason), que queda auditada (CON-4)", False),
+    # CON-4 · Por vencer y vencidos sin regularizar, con el acumulado frente al tope y la acción sugerida.
+    ("CON", 1, "get", "/contracts/expiring", "contracts.contracts.view", "Contratos que vencen dentro de la ventana (por defecto, la mayor anticipación de aviso de su empresa) y vencidos sin regularizar (RN-CON-05), con días para vencer, acumulado frente al tope (RN-CON-02/03) y acción sugerida (renew, convert_indefinite, continue_renewal, regularize); excluye los regularizados", False),
     ("CON", 1, "get", "/contracts/{id}/document", "contracts.contracts.view", "Descargar el documento vigente del contrato (generado o firmado)", False),
     ("CON", 1, "get", "/employments/{employment_id}/contracts", "contracts.contracts.view", "Cadena de contratos de la relación en orden: contrato inicial, renovaciones y sus adendas (CON-3)", False),
     ("CON", 1, "post", "/contract-addenda/{id}/issue", "contracts.addenda.issue", "Emitir la adenda: genera su documento y la deja en firma", False),
@@ -266,6 +268,8 @@ EXTRA = [
     ("COL", 1, "get", "/termination-reasons", "people.employments.terminate", "Motivos de cese de la organización, enlazados a la Tabla 17 del paquete de país (COL-11)", False),
     # COL-3 · COL-5 · Ficha 360: cabecera y datos laborales vigentes (la asignación cambia con un movimiento).
     ("COL", 1, "get", "/employments/{id}/profile", "people.employments.view", "Cabecera de la ficha 360: nombre, foto, puesto, unidad, estado, antigüedad calculada por el servidor y las otras relaciones laborales de la persona (dentro del alcance) para cambiar de ficha", False),
+    # HIS-5 · Línea de tiempo laboral.
+    ("HIS", 1, "get", "/employments/{id}/timeline", "people.employments.view", "Línea de tiempo laboral de la relación: ingreso o reingreso, movimientos con el antes y el después de cada campo, cambios de sueldo (solo con people.employments.salary.view; lectura registrada), contratos y adendas, estados y cese; cada tipo exige además el permiso de su recurso (meta.types)", False),
     ("COL", 1, "get", "/employments/{id}/work-data", "people.employments.view", "Datos laborales vigentes a una fecha (código, empresa, sede, unidad, puesto, posición, jefe, centro de costo, modalidad, régimen, contrato, estado): cada uno con su valor, desde cuándo rige y la historia a la que enlaza; antigüedad calculada", False),
     # COL-4 · Datos personales de la persona (compartidos entre sus relaciones laborales).
     ("COL", 1, "get", "/people/{id}/photo", "people.people.view", "Foto de la persona (404 si no tiene)", False),
@@ -548,6 +552,17 @@ CREATED = {("post", "/employments/{employment_id}/personnel-actions"), ("post", 
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/contracts/expiring"): [
+        _q("within", "Días hacia adelante (1 a 365); por defecto, la mayor anticipación de aviso de la empresa de cada contrato"),
+        _q("legal_entity_id", "Solo los contratos de esa empresa"),
+        _q("include_expired", "true (por defecto) incluye los vencidos sin regularizar"),
+        _q("q", "Nombre o código del colaborador, o número del contrato"),
+        _q("page", "Página (desde 1)"),
+        _q("per_page", "Tamaño de página (hasta 100)"),
+    ],
+    ("get", "/employments/{id}/timeline"): [
+        _q("types", "Tipos separados por coma: hire, movement, compensation, contract, status, termination; vacío = todos los que el usuario puede ver"),
+    ],
     ("get", "/employments/{id}/work-data"): [
         _q("as_of", "Fecha (AAAA-MM-DD) de los datos; por defecto hoy (o el ingreso si aún no empezó)", False, "date"),
     ],

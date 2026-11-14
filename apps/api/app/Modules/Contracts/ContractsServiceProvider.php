@@ -4,6 +4,8 @@ namespace App\Modules\Contracts;
 
 use App\Modules\Contracts\Application\ContractTypeCatalog;
 use App\Modules\Contracts\Console\ApplyDueContracts;
+use App\Modules\Contracts\Infrastructure\Calendar\ContractCalendarSource;
+use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Labor\ContractTypeSource;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -22,11 +24,14 @@ final class ContractsServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+        // CON-4 · Vencimientos de contratos en el calendario central.
+        $this->app->make(CalendarRegistry::class)->register($this->app->make(ContractCalendarSource::class));
 
         if ($this->app->runningInConsole()) {
             $this->commands([ApplyDueContracts::class]);
             $this->app->booted(function (): void {
-                // CON-2 · Después de los ceses (00:10) y de los ingresos (00:15): inicio, vencimiento y aviso de prueba.
+                // CON-2 · CON-4 · Después de los ceses (00:10) y de los ingresos (00:15): inicio, vencimiento, aviso de prueba
+                // y avisos de vencimiento y de tope acumulado.
                 $this->app->make(Schedule::class)->command('contracts:apply-due')->dailyAt('00:25')->withoutOverlapping();
             });
         }

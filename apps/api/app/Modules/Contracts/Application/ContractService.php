@@ -245,13 +245,32 @@ final class ContractService
         $values['valid_from'] = $start;
         $values['trial_period_ends_on'] = null;
         $warnings = $this->terms->validate($this->termsOf($values), $this->country());
-        $this->terms->accumulation($contract->employment_id, (string) $values['contract_type_id'], $start, $values['valid_to'] ?? null, null, $this->country(), true);
+        // CON-4: superar el tope exige confirmación expresa con motivo; sin ella, 422 contract_limit_exceeded
+        // con el acumulado y el tope (la UI lo muestra y pide la confirmación).
+        $overLimitReason = ($input['confirm_over_limit'] ?? false) === true ? trim((string) ($input['over_limit_reason'] ?? '')) : '';
+        if (($input['confirm_over_limit'] ?? false) === true && mb_strlen($overLimitReason) < 10) {
+            throw ValidationException::withMessages(['over_limit_reason' => [(string) trans('contracts.contracts.over_limit_reason_required')]]);
+        }
+        $accumulation = $this->terms->accumulation($contract->employment_id, (string) $values['contract_type_id'], $start, $values['valid_to'] ?? null, null, $this->country(), $overLimitReason === '');
+        $overLimit = ($accumulation['modality_max_days'] !== null && $accumulation['modality_days'] > $accumulation['modality_max_days'])
+            || ($accumulation['total_max_days'] !== null && $accumulation['total_days'] > $accumulation['total_max_days']);
+        if ($overLimit) {
+            $warnings[] = ['code' => 'over_limit_confirmed', 'message' => (string) trans('contracts.contracts.over_limit_confirmed', ['explanation' => $accumulation['explanation']])];
+        }
+        $values['over_limit_reason'] = $overLimit ? $overLimitReason : null;
 
-        $successor = DB::transaction(function () use ($contract, $values): Contract {
+        $successor = DB::transaction(function () use ($contract, $values, $overLimit, $accumulation): Contract {
             $successor = Contract::query()->create($values + [
                 'employment_id' => $contract->employment_id, 'status' => ContractStateMachine::DRAFT, 'renewal_of_contract_id' => $contract->id,
             ]);
             $this->audit->record('contract.renewal_created', 'contract', $successor->id, null, $this->snapshot($successor->refresh()) + ['renewal_of_contract_id' => $contract->id]);
+            if ($overLimit) {
+                // RN-CON-02/03 · La renovación por encima del tope queda registrada con quién, cuándo y por qué.
+                $this->audit->record('contract.renewal_over_limit', 'contract', $successor->id, null, [
+                    'modality_days' => $accumulation['modality_days'], 'modality_max_days' => $accumulation['modality_max_days'],
+                    'total_days' => $accumulation['total_days'], 'total_max_days' => $accumulation['total_max_days'],
+                ], (string) $values['over_limit_reason']);
+            }
 
             return $successor;
         });
@@ -337,8 +356,9 @@ final class ContractService
     private function check(Contract $contract): array
     {
         $warnings = $this->terms->validate($this->termsOf($contract->getAttributes()), $this->country());
+        // CON-4: una renovación confirmada por encima del tope (con motivo) no se vuelve a bloquear al enviarla.
         $this->terms->accumulation($contract->employment_id, $contract->contract_type_id, $contract->valid_from->toDateString(),
-            $contract->valid_to?->toDateString(), $contract->id, $this->country(), true);
+            $contract->valid_to?->toDateString(), $contract->id, $this->country(), $contract->over_limit_reason === null);
 
         return $warnings;
     }

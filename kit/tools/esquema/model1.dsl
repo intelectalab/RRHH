@@ -473,13 +473,14 @@
   code ; name ; country_code ; category enum(indefinite,fixed_term,part_time,internship,other)! ; modality_code
   max_duration_parameter_code ; trial_period_parameter_code ; requires_objective_cause ; requires_end_date bool=f ; is_system
   document_template_id ?-> document_templates ; uniq code
-@contracts main soft lock | Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08).
+@contracts main soft lock | Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08). CON-4: expiry_alerted_days/expiry_alerted_for recuerdan la última anticipación avisada para esa fecha de fin (no se repite el aviso), cap_alerted_on el aviso de tope acumulado y over_limit_reason el motivo con que se confirmó una renovación por encima del tope.
   employment_id -> employments ; contract_type_id -> contract_types ; number ; objective_cause ; trial_period_ends_on
   weekly_hours numeric(5,2) ; work_modality enum(onsite,remote,hybrid)=onsite
   status enum(draft,pending_signature,active,expired,terminated,superseded,cancelled,pending_approval,signed)=draft
   renewal_of_contract_id ?-> contracts ; document_id ?-> documents ; signature_request_id ?-> signature_requests
   accumulated_days integer ; signed_at ; signature_origin enum(physical_scan,electronic) ; approved_by_user_id ?-> users ; approved_at
-  termination_reason ; probation_alerted_on ; vig employment_id | status NOT IN ('draft','pending_approval','superseded','cancelled')
+  termination_reason ; probation_alerted_on ; expiry_alerted_days integer ; expiry_alerted_for date ; cap_alerted_on date ; over_limit_reason
+  vig employment_id | status NOT IN ('draft','pending_approval','superseded','cancelled')
 @contract_amendments soft lock | Adendas al contrato.
   contract_id -> contracts ; number ; kind enum(salary,position,schedule,extension,modality,other)! ; effective_on date!
   description text! ; document_id ?-> documents ; signature_request_id ?-> signature_requests

@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => 'O período de experiência de {employee} termina em {ends_on}. Revise o desempenho antes dessa data.'],
             'email' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => "Olá {name}:\n\nEm {organization}, o período de experiência de {employee} termina em {ends_on}. Revise o desempenho e decida antes dessa data.\n\nRevise aqui: {link}"],
         ],
+        'contracts.expiring' => [
+            'in_app' => ['subject' => 'O contrato de {employee} vence em {days_left} dias', 'body' => 'O contrato de {employee} vence em {ends_on}. {explanation} Decida se será renovado, convertido para prazo indeterminado ou não renovado.'],
+            'email' => ['subject' => 'O contrato de {employee} vence em {days_left} dias', 'body' => "Olá {name}:\n\nEm {organization}, o contrato de {employee} vence em {ends_on} (faltam {days_left} dias). {explanation}\n\nDecida se será renovado, convertido para prazo indeterminado ou não renovado: {link}"],
+        ],
+        'contracts.cap_approaching' => [
+            'in_app' => ['subject' => '{employee} se aproxima do limite de contratos a prazo', 'body' => 'Ao terminar o contrato que vence em {ends_on}, {employee} fica perto do limite permitido. {explanation} Renovar pode descaracterizar o contrato.'],
+            'email' => ['subject' => '{employee} se aproxima do limite de contratos a prazo', 'body' => "Olá {name}:\n\nEm {organization}, ao terminar o contrato que vence em {ends_on}, {employee} fica perto do limite de contratos a prazo. {explanation}\n\nRenovar pode descaracterizar o contrato. Revise aqui: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Contracts\Http\Controllers;
 
+use App\Modules\Contracts\Application\ContractAlerts;
 use App\Modules\Contracts\Application\ContractDocuments;
 use App\Modules\Contracts\Application\ContractPresenter;
 use App\Modules\Contracts\Application\ContractService;
@@ -16,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 /**
@@ -31,6 +33,7 @@ final class ContractController
         private readonly ContractDocuments $documents,
         private readonly DataScope $scope,
         private readonly SensitiveFields $sensitive,
+        private readonly ContractAlerts $alerts,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -54,6 +57,60 @@ final class ContractController
             ->forPage($page, $perPage)->get()->all();
 
         return response()->json(['data' => $this->presenter->many($rows), 'meta' => ['page' => $page, 'per_page' => $perPage, 'total' => $total, 'next_cursor' => null]]);
+    }
+
+    /**
+     * CON-4 · Contratos que vencen dentro de la ventana elegida (por defecto, la mayor anticipación de aviso de
+     * la organización) y los vencidos sin regularizar, con el acumulado frente al tope y la acción sugerida.
+     * Excluye los ya regularizados (renovación firmada o cese registrado). Alcance aplicado en la consulta.
+     */
+    public function expiring(Request $request): JsonResponse
+    {
+        // Los filtros llegan sueltos (?within=) o como filter[within] desde la tabla de la interfaz (UI-4).
+        $input = array_merge(array_intersect_key((array) $request->query('filter', []), array_flip(['within', 'legal_entity_id', 'include_expired'])), $request->query());
+        $data = Validator::make($input, [
+            'within' => ['sometimes', 'integer', 'min:1', 'max:365'],
+            'legal_entity_id' => ['sometimes', 'uuid'],
+            'include_expired' => ['sometimes', 'in:true,false,1,0'],
+            'q' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ])->validate();
+        $query = $this->scoped($request, 'contracts.contracts.view');
+        if (isset($data['legal_entity_id'])) {
+            $query->whereIn('contracts.employment_id', DB::table('employments')->where('legal_entity_id', $data['legal_entity_id'])->select('id'));
+        }
+        $q = trim((string) ($data['q'] ?? ''));
+        if ($q !== '') {
+            // Nombre del colaborador, su código o el número del contrato.
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], mb_strtolower($q)).'%';
+            $query->where(fn ($w) => $w->whereRaw('lower(contracts.number) LIKE ?', [$like])
+                ->orWhereIn('contracts.employment_id', DB::table('employments as e')->join('people as p', 'p.id', '=', 'e.person_id')
+                    ->where(fn ($p) => $p->whereRaw("lower(concat_ws(' ', coalesce(p.preferred_name, p.first_names), p.paternal_surname, p.maternal_surname)) LIKE ?", [$like])
+                        ->orWhereRaw('lower(e.employee_code) LIKE ?', [$like]))->select('e.id')));
+        }
+        $within = isset($data['within']) ? (int) $data['within'] : null;
+        $includeExpired = ! in_array((string) ($data['include_expired'] ?? 'true'), ['false', '0'], true);
+        $today = now()->toDateString();
+        $rows = $this->alerts->expiring($query, $today, $within ?? 365, $includeExpired);
+        if ($within === null) {
+            // Sin ventana explícita, cada contrato entra según la mayor anticipación de aviso de su empresa.
+            $rows = array_values(array_filter($rows, fn (array $r) => $r['contract']->status === 'expired'
+                || $r['days_left'] <= max([0, ...$r['alert_days']])));
+        }
+        $perPage = (int) ($data['per_page'] ?? 25);
+        $page = (int) ($data['page'] ?? 1);
+        $slice = array_slice($rows, ($page - 1) * $perPage, $perPage);
+        $presented = $this->presenter->many(array_map(fn (array $r) => $r['contract'], $slice));
+        $out = [];
+        foreach ($slice as $i => $r) {
+            $out[] = $presented[$i] + [
+                'days_left' => $r['days_left'], 'accumulation' => $r['accumulation'], 'suggested_action' => $r['suggested_action'],
+                'renewal_contract_id' => $r['renewal_contract_id'], 'alert_days' => $r['alert_days'],
+            ];
+        }
+
+        return response()->json(['data' => $out, 'meta' => ['page' => $page, 'per_page' => $perPage, 'total' => count($rows), 'next_cursor' => null]]);
     }
 
     public function store(Request $request): JsonResponse
@@ -145,7 +202,10 @@ final class ContractController
     public function renew(Request $request, string $id): JsonResponse
     {
         $contract = $this->find($request, $id, 'contracts.contracts.renew');
-        $data = $request->validate($this->rules());
+        $data = $request->validate($this->rules() + [
+            'confirm_over_limit' => ['sometimes', 'boolean'],
+            'over_limit_reason' => ['sometimes', 'nullable', 'string', 'max:1000'],
+        ]);
         [$successor, $warnings] = $this->contracts->renew($contract, $data, $this->userId($request));
 
         return response()->json(['data' => $this->presenter->one($successor, $warnings)], 201);

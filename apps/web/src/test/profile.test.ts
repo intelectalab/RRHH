@@ -17,8 +17,9 @@ describe('ficha 360 (COL-3)', () => {
     const all = () => true
     expect(visibleTabs(PROFILE_TABS, ['core'], all).map((x) => x.id)).toEqual(['summary', 'info', 'history', 'contracts', 'compensation', 'dependents', 'social_security', 'payment'])
     expect(visibleTabs(PROFILE_TABS, [], all)).toEqual([])
-    // Sin permiso de ver la historia de asignaciones, esa pestaña no aparece.
-    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toEqual(['summary', 'info', 'contracts', 'compensation', 'dependents', 'social_security', 'payment'])
+    // HIS-5: el Historial (línea de tiempo) basta con ver la ficha; sin ella, no aparece.
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.assignments.view').map((x) => x.id)).toContain('history')
+    expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.employments.view').map((x) => x.id)).not.toContain('history')
     // HIS-3: sin el permiso de campo de sueldo, la pestaña de compensación no aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.employments.salary.view').map((x) => x.id)).not.toContain('compensation')
     // CON-2: sin permiso de ver contratos, esa pestaña no aparece.

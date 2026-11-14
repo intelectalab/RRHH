@@ -13,6 +13,7 @@ import { ErrorState } from '@/ui/components/States'
 import { StatusBadge } from '@/ui/components/Status'
 import { Timeline } from '@/ui/components/Timeline'
 import { ofEntity, type Employment, type HireOptions } from '../employment'
+import { EmploymentTimelineCard } from './EmploymentTimelineCard'
 import { MOVEMENT_TONE, movementLines } from './movements'
 import { MOVEMENT_FIELDS, MOVEMENT_KINDS, type Assignment, type MovementField, type PersonnelAction, type ProfileTabContext } from './types'
 
@@ -25,8 +26,20 @@ type Mode = { kind: 'new' } | { kind: 'edit'; action: PersonnelAction } | { kind
  * solo con un movimiento con fecha efectiva: con fecha futura queda programado (se edita o anula antes de su
  * fecha), los tipos que la organización somete a aprobación o lo que propone un jefe esperan el flujo, y un
  * movimiento aplicado se corrige (el original queda reemplazado, nunca se borra).
+ * HIS-5 · Arriba, la línea de tiempo laboral consolidada (ingreso, movimientos, sueldo, contratos, estados y
+ * cese) que arma el servidor con los permisos de cada tipo; la gestión de movimientos sigue debajo.
  */
-export function HistoryTab({ header, reload, toast }: ProfileTabContext) {
+export function HistoryTab(ctx: ProfileTabContext) {
+  const { can } = useSession()
+  return (
+    <>
+      <EmploymentTimelineCard header={ctx.header} />
+      {can('people.assignments.view') && <MovementsHistory {...ctx} />}
+    </>
+  )
+}
+
+function MovementsHistory({ header, reload, toast }: ProfileTabContext) {
   const { t, locale } = useT()
   const { can } = useSession()
   const [rows, setRows] = useState<Assignment[] | null>(null)

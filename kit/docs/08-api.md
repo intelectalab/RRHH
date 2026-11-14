@@ -590,6 +590,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/employments/{employment_id}/compensation-changes/{id}` | `people.compensations.view` | 1 |
 | POST | `/employments/{employment_id}/compensation-changes/{id}/cancel` | `people.compensations.cancel` | 1 |
 | GET | `/compensation-concepts` | `people.compensations.view` | 1 |
+| GET | `/employments/{id}/timeline` | `people.employments.view` | 1 |
 | GET | `/employments/{employment_id}/timeline` | `people.employments.view` | 1 |
 | GET | `/employments/{employment_id}/personnel-actions` | `people.assignments.view` | 1 |
 | POST | `/employments/{employment_id}/personnel-actions` | `people.assignments.create` | 1 |
@@ -618,6 +619,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/contracts/{id}/void` | `contracts.contracts.update` | 1 |
 | POST | `/contracts/{id}/terminate` | `contracts.contracts.terminate` | 1 |
 | POST | `/contracts/{id}/renew` | `contracts.contracts.renew` | 1 |
+| GET | `/contracts/expiring` | `contracts.contracts.view` | 1 |
 | GET | `/contracts/{id}/document` | `contracts.contracts.view` | 1 |
 | GET | `/employments/{employment_id}/contracts` | `contracts.contracts.view` | 1 |
 | POST | `/contract-addenda/{id}/issue` | `contracts.addenda.issue` | 1 |

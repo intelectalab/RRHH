@@ -60,6 +60,11 @@ export function EmploymentProfileScreen({ id }: { id: string }) {
   }, [id])
 
   useEffect(() => { void load() }, [load])
+  // ?tab=contracts (p. ej., desde Contratos por vencer o el calendario) abre esa pestaña si el usuario la tiene.
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get('tab')
+    if (wanted) setTab(wanted)
+  }, [])
 
   async function activate() {
     setBusy(true)

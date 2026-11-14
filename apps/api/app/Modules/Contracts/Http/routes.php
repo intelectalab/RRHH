@@ -13,6 +13,8 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
 
     // CON-2 · CON-3 · Contrato de la relación laboral (ME-11): registro, documento, firma y renovación.
     Route::get('/contracts', [ContractController::class, 'index'])->middleware('permission:contracts.contracts.view');
+    // CON-4 · Por vencer y vencidos sin regularizar (antes de /contracts/{id}).
+    Route::get('/contracts/expiring', [ContractController::class, 'expiring'])->middleware('permission:contracts.contracts.view');
     Route::post('/contracts', [ContractController::class, 'store'])->middleware('permission:contracts.contracts.create');
     Route::get('/contracts/{id}', [ContractController::class, 'show'])->middleware('permission:contracts.contracts.view');
     Route::patch('/contracts/{id}', [ContractController::class, 'update'])->middleware('permission:contracts.contracts.update');

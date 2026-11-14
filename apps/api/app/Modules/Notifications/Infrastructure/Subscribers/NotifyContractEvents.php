@@ -11,12 +11,17 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * CON-2 · El fin del periodo de prueba se avisa al jefe del colaborador y a RRHH (quien edita contratos),
- * con la anticipación del parámetro contratos.aviso_fin_prueba_dias. El aviso no lleva condiciones del
- * contrato: solo el nombre, la fecha y el enlace a la ficha.
+ * con la anticipación del parámetro contratos.aviso_fin_prueba_dias. CON-4 · RN-CON-04: también el vencimiento
+ * próximo (con el acumulado frente al tope) y el tope acumulado cercano. Los avisos no llevan condiciones
+ * económicas del contrato: solo el nombre, las fechas, el acumulado en días y el enlace.
  */
 final class NotifyContractEvents implements DomainEventSubscriber
 {
     public const PROBATION_ENDING = 'contracts.probation_ending';
+
+    public const EXPIRING = 'contracts.expiring';
+
+    public const CAP_APPROACHING = 'contracts.cap_approaching';
 
     public function __construct(private readonly Notifier $notifier) {}
 
@@ -27,7 +32,7 @@ final class NotifyContractEvents implements DomainEventSubscriber
 
     public function handles(): array
     {
-        return [DomainEventTypes::CONTRACT_PROBATION_ENDING];
+        return [DomainEventTypes::CONTRACT_PROBATION_ENDING, DomainEventTypes::CONTRACT_EXPIRING, DomainEventTypes::CONTRACT_CAP_APPROACHING];
     }
 
     public function handle(OutboxEvent $event): void
@@ -44,12 +49,18 @@ final class NotifyContractEvents implements DomainEventSubscriber
             if ($recipients === []) {
                 return;
             }
-            $ends = (string) ($p['trial_period_ends_on'] ?? '');
-            $this->notifier->notify(self::PROBATION_ENDING, $recipients, [
-                'employee' => trim(($person->preferred_name ?: $person->first_names).' '.$person->paternal_surname),
-                'ends_on' => $ends,
-                'employment_id' => $employmentId,
-            ], 'contract', (string) ($p['contract_id'] ?? ''));
+            $employee = trim(($person->preferred_name ?: $person->first_names).' '.$person->paternal_surname);
+            [$type, $vars] = match ($event->event_type) {
+                DomainEventTypes::CONTRACT_EXPIRING => [self::EXPIRING, [
+                    'ends_on' => (string) ($p['ends_on'] ?? ''), 'days_left' => (string) ($p['days_left'] ?? ''), 'explanation' => (string) ($p['explanation'] ?? ''),
+                ]],
+                DomainEventTypes::CONTRACT_CAP_APPROACHING => [self::CAP_APPROACHING, [
+                    'ends_on' => (string) ($p['ends_on'] ?? ''), 'explanation' => (string) ($p['explanation'] ?? ''),
+                ]],
+                default => [self::PROBATION_ENDING, ['ends_on' => (string) ($p['trial_period_ends_on'] ?? '')]],
+            };
+            $this->notifier->notify($type, $recipients, ['employee' => $employee, 'employment_id' => $employmentId] + $vars,
+                'contract', (string) ($p['contract_id'] ?? ''));
         });
     }
 

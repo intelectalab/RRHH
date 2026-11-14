@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee}\'s probation ends soon', 'body' => '{employee}\'s probation period ends on {ends_on}. Review their performance before that date.'],
             'email' => ['subject' => '{employee}\'s probation ends soon', 'body' => "Hello {name}:\n\nIn {organization}, {employee}'s probation period ends on {ends_on}. Review their performance and decide before that date.\n\nReview it here: {link}"],
         ],
+        'contracts.expiring' => [
+            'in_app' => ['subject' => '{employee}\'s contract ends in {days_left} days', 'body' => '{employee}\'s contract ends on {ends_on}. {explanation} Decide whether to renew it, convert it to an indefinite contract or let it end.'],
+            'email' => ['subject' => '{employee}\'s contract ends in {days_left} days', 'body' => "Hello {name}:\n\nIn {organization}, {employee}'s contract ends on {ends_on} ({days_left} days left). {explanation}\n\nDecide whether to renew it, convert it to an indefinite contract or let it end: {link}"],
+        ],
+        'contracts.cap_approaching' => [
+            'in_app' => ['subject' => '{employee} is close to the fixed-term contract cap', 'body' => 'When the contract ending on {ends_on} is over, {employee} will be close to the allowed cap. {explanation} Renewing could turn the contract into an indefinite one by law.'],
+            'email' => ['subject' => '{employee} is close to the fixed-term contract cap', 'body' => "Hello {name}:\n\nIn {organization}, when the contract ending on {ends_on} is over, {employee} will be close to the fixed-term contract cap. {explanation}\n\nRenewing could turn the contract into an indefinite one by law. Review it here: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],

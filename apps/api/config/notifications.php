@@ -39,6 +39,9 @@ return [
         'people.bank_account_changed' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         // CON-2: el periodo de prueba de un colaborador termina pronto; el jefe y RRHH lo revisan en la ficha.
         'contracts.probation_ending' => ['variables' => ['employee', 'ends_on'], 'link' => '/personas/colaboradores/{employment_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // CON-4 · RN-CON-04: un contrato vence pronto (con el acumulado frente al tope) o el acumulado se acerca al tope.
+        'contracts.expiring' => ['variables' => ['employee', 'ends_on', 'days_left', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'contracts.cap_approaching' => ['variables' => ['employee', 'ends_on', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 
