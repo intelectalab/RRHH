@@ -6,10 +6,12 @@ use App\Modules\Vacations\Application\VacationLedger;
 use App\Modules\Vacations\Console\AccrueVacations;
 use App\Modules\Vacations\Console\AdvanceVacations;
 use App\Modules\Vacations\Infrastructure\Calendar\VacationCalendarSource;
+use App\Modules\Vacations\Infrastructure\SelfService\VacationsHomeCard;
 use App\Modules\Vacations\Infrastructure\Subscribers\SyncVacationsOnEmploymentEvents;
 use App\Modules\Vacations\Infrastructure\Workflow\VacationRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Outbox\OutboxService;
+use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Time\VacationBalances;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -35,6 +37,8 @@ final class VacationsServiceProvider extends ServiceProvider
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(VacationRequestOutcome::class));
         // VAC-3 · VAC-4 · Las vacaciones aprobadas aparecen en el calendario del equipo (CFG-8).
         $this->app->make(CalendarRegistry::class)->register($this->app->make(VacationCalendarSource::class));
+        // ESS-1 · Tarjeta «Mis vacaciones» del inicio del colaborador.
+        $this->app->make(HomeCardRegistry::class)->register($this->app->make(VacationsHomeCard::class));
 
         if ($this->app->runningInConsole()) {
             $this->commands([AccrueVacations::class, AdvanceVacations::class]);

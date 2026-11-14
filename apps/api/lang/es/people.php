@@ -69,6 +69,7 @@ return [
     'disability_purpose_description' => 'Registrar la condición de discapacidad del colaborador para ajustes razonables, cuota de empleo y beneficios, con su consentimiento expreso.',
     'disability_consent_text' => 'Autorizo a mi empleador a registrar y tratar mi condición de discapacidad para ajustes razonables, cuota de empleo y beneficios. Puedo revocar esta autorización cuando lo decida.',
     'change_request_empty' => 'Indica al menos un dato que quieres cambiar.',
+    'change_request_field_not_editable' => 'Tu organización no permite cambiar este dato desde el portal. Pídelo a RRHH.',
     'change_request_open' => 'Ya tienes una solicitud de cambio pendiente: espera la respuesta de RRHH o cancélala.',
     'change_request_own_only' => 'Solo puedes proponer cambios de tus propios datos. RRHH edita los datos desde la ficha.',
     'change_request_self_approval' => 'No puedes revisar una solicitud que hiciste tú.',

@@ -10,6 +10,7 @@ use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
 use App\Modules\Platform\PlatformServiceProvider;
 use App\Modules\Reports\ReportsServiceProvider;
+use App\Modules\SelfService\SelfServiceServiceProvider;
 use App\Modules\Settings\SettingsServiceProvider;
 use App\Modules\Vacations\VacationsServiceProvider;
 use App\Modules\Workflow\WorkflowServiceProvider;
@@ -30,4 +31,5 @@ return [
     ImportsServiceProvider::class,
     CoreHRServiceProvider::class,
     VacationsServiceProvider::class,
+    SelfServiceServiceProvider::class,
 ];

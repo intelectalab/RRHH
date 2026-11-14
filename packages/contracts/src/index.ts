@@ -8153,7 +8153,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Ficha propia del colaborador */
+        /** Mi perfil (ESS-2): ficha propia del colaborador con datos laborales vigentes, datos personales propios (cada lectura en el registro de accesos), contactos de emergencia, solicitudes de cambio, campos que puede proponer cambiar (colaboradores.campos_editables_portal), los que esperan a RRHH y los que tienen un cambio pendiente. Solo la relación propia (RN-ESS-01) */
         get: operations["getMeEmployment"];
         put?: never;
         post?: never;
@@ -8170,7 +8170,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Inicio del colaborador: saldos, próximo pago, pendientes */
+        /** Inicio del colaborador (ESS-1): relaciones propias y la elegida (RN-ESS-04), pendientes de la bandeja y tarjetas de los módulos contratados (RN-ESS-02): perfil, vacaciones, ausencias. Solo datos propios (RN-ESS-01) */
         get: operations["getMeHome"];
         put?: never;
         post?: never;
@@ -43410,7 +43410,10 @@ export interface operations {
     };
     getMeEmployment: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Relación laboral propia que se muestra (RN-ESS-04); una ajena responde 404. Por defecto la activa más reciente */
+                employment_id?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -43426,13 +43429,18 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getMeHome: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Relación laboral propia con la que opera (RN-ESS-04); una ajena responde 404. Por defecto la activa más reciente */
+                employment_id?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -43448,8 +43456,10 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getMeMfa: {

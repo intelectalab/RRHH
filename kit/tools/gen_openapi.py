@@ -443,8 +443,8 @@ EXTRA = [
     ("HIS", 1, "patch", "/personnel-actions/{id}", "people.assignments.create", "Editar un movimiento programado antes de su fecha (fecha futura, cambios, motivo)", False),
     ("HIS", 1, "post", "/personnel-actions/{id}/cancel", "people.assignments.cancel", "Anular un movimiento programado o en aprobación antes de aplicarse (motivo obligatorio)", False),
     ("HIS", 1, "post", "/personnel-actions/{id}/correct", "people.assignments.correct", "Corregir un movimiento aplicado con los valores correctos y el motivo: crea el movimiento de corrección y el original queda reemplazado (RN-HIS-06); con fecha pasada emite employment.retroactive_change con el rango afectado", False),
-    ("ESS", 1, "get", "/me/employment", "-", "Ficha propia del colaborador", False),
-    ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador: saldos, próximo pago, pendientes", False),
+    ("ESS", 1, "get", "/me/employment", "-", "Mi perfil (ESS-2): ficha propia del colaborador con datos laborales vigentes, datos personales propios (cada lectura en el registro de accesos), contactos de emergencia, solicitudes de cambio, campos que puede proponer cambiar (colaboradores.campos_editables_portal), los que esperan a RRHH y los que tienen un cambio pendiente. Solo la relación propia (RN-ESS-01)", False),
+    ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador (ESS-1): relaciones propias y la elegida (RN-ESS-04), pendientes de la bandeja y tarjetas de los módulos contratados (RN-ESS-02): perfil, vacaciones, ausencias. Solo datos propios (RN-ESS-01)", False),
     ("MSS", 1, "get", "/my-team", "people.team.view", "Equipo directo e indirecto del manager", False),
     ("MSS", 1, "get", "/my-team/calendar", "people.team.view", "Calendario de ausencias del equipo", False),
     ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
@@ -584,6 +584,12 @@ CREATED = {("post", "/vacation-policies"), ("post", "/employments/{employment_id
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/me/home"): [
+        _q("employment_id", "Relación laboral propia con la que opera (RN-ESS-04); una ajena responde 404. Por defecto la activa más reciente"),
+    ],
+    ("get", "/me/employment"): [
+        _q("employment_id", "Relación laboral propia que se muestra (RN-ESS-04); una ajena responde 404. Por defecto la activa más reciente"),
+    ],
     ("get", "/absence-subsidies"): [
         _q("filter[status]", "Estados separados por coma (pending_filing, filed, observed, approved, reimbursed, rejected, cancelled)"),
         _q("filter[employment_id]", "Solo los expedientes de esa relación laboral"),
@@ -923,7 +929,8 @@ def build():
             # Webhook de un proveedor: 401 si la firma no es válida.
             res.update(errs("401"))
         # La consola SaaS responde 404 desde el host de una organización (SAS-1).
-        if "{" in path or path.startswith("/platform/"):
+        # ESS: ?employment_id que no es propio responde 404 (RN-ESS-01).
+        if "{" in path or path.startswith("/platform/") or path in ("/me/home", "/me/employment"):
             res.update(errs("404"))
         op["responses"] = dict(sorted(res.items()))
         p = None if perm in (None, "-") else perm

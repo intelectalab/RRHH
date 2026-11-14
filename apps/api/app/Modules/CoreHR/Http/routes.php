@@ -6,6 +6,7 @@ use App\Modules\CoreHR\Http\Controllers\DependentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentController;
 use App\Modules\CoreHR\Http\Controllers\EmploymentProfileController;
 use App\Modules\CoreHR\Http\Controllers\InsuranceCatalogController;
+use App\Modules\CoreHR\Http\Controllers\MeEmploymentController;
 use App\Modules\CoreHR\Http\Controllers\PersonalDataController;
 use App\Modules\CoreHR\Http\Controllers\PersonController;
 use App\Modules\CoreHR\Http\Controllers\PersonnelActionController;
@@ -14,6 +15,9 @@ use App\Modules\CoreHR\Http\Controllers\SocialSecurityController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
+    // ESS-2 · Mi perfil: solo la relación propia (RN-ESS-01).
+    Route::get('/me/employment', MeEmploymentController::class);
+
     // COL-1 · Personas y deduplicación por documento.
     Route::get('/people', [PersonController::class, 'index'])->middleware('permission:people.people.view');
     Route::post('/people', [PersonController::class, 'store'])->middleware('permission:people.people.create');

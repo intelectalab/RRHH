@@ -4,9 +4,11 @@ namespace App\Modules\Absences;
 
 use App\Modules\Absences\Console\AdvanceAbsences;
 use App\Modules\Absences\Infrastructure\Calendar\AbsenceCalendarSource;
+use App\Modules\Absences\Infrastructure\SelfService\AbsencesHomeCard;
 use App\Modules\Absences\Infrastructure\Time\ApprovedAbsencesQuery;
 use App\Modules\Absences\Infrastructure\Workflow\AbsenceRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
+use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Time\ApprovedAbsences;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -27,6 +29,8 @@ final class AbsencesServiceProvider extends ServiceProvider
     {
         // AUS-2 · WFL-4 · La decisión del flujo sobre una ausencia se aplica aquí al instante.
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(AbsenceRequestOutcome::class));
+        // ESS-1 · Tarjeta «Mis ausencias y permisos» del inicio del colaborador.
+        $this->app->make(HomeCardRegistry::class)->register($this->app->make(AbsencesHomeCard::class));
         // AUS-2 · Las ausencias aprobadas aparecen en el calendario del equipo (CFG-8).
         $this->app->make(CalendarRegistry::class)->register($this->app->make(AbsenceCalendarSource::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');

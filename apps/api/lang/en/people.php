@@ -69,6 +69,7 @@ return [
     'disability_purpose_description' => 'Record the employee\'s disability for reasonable accommodations, employment quotas and benefits, with their explicit consent.',
     'disability_consent_text' => 'I authorize my employer to record and process my disability for reasonable accommodations, employment quotas and benefits. I may revoke this authorization at any time.',
     'change_request_empty' => 'Enter at least one detail you want to change.',
+    'change_request_field_not_editable' => 'Your organization does not allow changing this detail from the portal. Ask HR.',
     'change_request_open' => 'You already have a pending change request: wait for HR or cancel it.',
     'change_request_own_only' => 'You can only propose changes to your own data. HR edits data from the profile.',
     'change_request_self_approval' => 'You cannot review a request you made.',

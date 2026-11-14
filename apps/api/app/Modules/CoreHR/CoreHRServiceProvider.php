@@ -8,11 +8,13 @@ use App\Modules\CoreHR\Console\ApplyDueTerminations;
 use App\Modules\CoreHR\Console\ReviewDependentsMajority;
 use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
+use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\CoreHR\Infrastructure\Workflow\PersonnelActionOutcome;
 use App\Modules\CoreHR\Infrastructure\Workflow\SalaryChangeOutcome;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Labor\AssignmentChanges;
+use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Usage\UsageRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -35,6 +37,8 @@ final class CoreHRServiceProvider extends ServiceProvider
         // SAS-6 · RN-COL-13 · Colaboradores activos frente al límite del plan.
         $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
         $this->app->make(ExportRegistry::class)->register($this->app->make(EmploymentsExportSource::class));
+        // ESS-1 · Tarjeta «Mi perfil» del inicio del colaborador.
+        $this->app->make(HomeCardRegistry::class)->register($this->app->make(ProfileHomeCard::class));
         // HIS-3 · WFL-4 · La decisión del flujo sobre un cambio de sueldo se aplica aquí al instante.
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(SalaryChangeOutcome::class));
         // HIS-2 · WFL-4 · La decisión del flujo sobre un movimiento de personal se aplica aquí al instante.

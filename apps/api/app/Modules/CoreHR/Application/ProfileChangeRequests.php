@@ -37,6 +37,19 @@ final class ProfileChangeRequests
     ) {}
 
     /**
+     * ESS-2 · Campos que el colaborador puede proponer cambiar desde su perfil (parámetro de la organización);
+     * los demás solo los cambia RRHH.
+     *
+     * @return array<int, string>
+     */
+    public function editableFields(): array
+    {
+        $list = $this->parameters->value('colaboradores.campos_editables_portal');
+
+        return is_array($list) ? array_values(array_intersect(self::FIELDS, array_filter($list, 'is_string'))) : self::FIELDS;
+    }
+
+    /**
      * Campos que esperan aprobación según la organización.
      *
      * @return array<int, string>
@@ -59,6 +72,14 @@ final class ProfileChangeRequests
         $changes = array_intersect_key($changes, array_flip(self::FIELDS));
         if ($changes === []) {
             throw ValidationException::withMessages(['changes' => [(string) trans('people.change_request_empty')]]);
+        }
+        // ESS-2 · El colaborador no puede proponer cambios en campos que la organización no habilitó.
+        $blocked = array_values(array_diff(array_keys($changes), $this->editableFields()));
+        if ($blocked !== []) {
+            throw ValidationException::withMessages(array_combine(
+                array_map(fn (string $f) => "changes.{$f}", $blocked),
+                array_map(fn () => [(string) trans('people.change_request_field_not_editable')], $blocked),
+            ));
         }
         $needsApproval = $this->fieldsRequiringApproval();
         $pending = array_values(array_intersect(array_keys($changes), $needsApproval));

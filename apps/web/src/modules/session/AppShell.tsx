@@ -26,6 +26,7 @@ type NavLink = { href: string; key: string; icon: IconName; module: string; visi
 /** Menú principal (docs/10 §3.12 y §4). Se agregan entradas a medida que existen pantallas (sin botones sin función). */
 const MENU: NavLink[] = [
   { href: '/', key: 'shell.modules_home', icon: 'home', module: 'base', visible: () => true },
+  { href: '/mi', key: 'shell.modules_portal', icon: 'user', module: 'core', visible: (can) => can('people.employments.view') },
   { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
   { href: '/personas/colaboradores', key: 'shell.modules_employees', icon: 'user', module: 'core', visible: (can) => can('people.employments.view'), exact: true },
   { href: '/personas/directorio', key: 'shell.modules_directory', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },

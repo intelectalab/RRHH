@@ -69,6 +69,7 @@ return [
     'disability_purpose_description' => 'Registrar a condição de deficiência do colaborador para adaptações razoáveis, cotas de emprego e benefícios, com seu consentimento expresso.',
     'disability_consent_text' => 'Autorizo meu empregador a registrar e tratar minha condição de deficiência para adaptações razoáveis, cotas de emprego e benefícios. Posso revogar esta autorização quando quiser.',
     'change_request_empty' => 'Indique pelo menos um dado que deseja alterar.',
+    'change_request_field_not_editable' => 'Sua organização não permite alterar este dado pelo portal. Solicite ao RH.',
     'change_request_open' => 'Você já tem uma solicitação de alteração pendente: aguarde o RH ou cancele-a.',
     'change_request_own_only' => 'Você só pode propor alterações dos seus próprios dados. O RH edita os dados pela ficha.',
     'change_request_self_approval' => 'Você não pode revisar uma solicitação feita por você.',

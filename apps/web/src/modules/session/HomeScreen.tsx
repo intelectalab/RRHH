@@ -1,12 +1,21 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useT } from '@/lib/useT'
+import { prefersPortal } from '@/modules/selfservice/portal'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { useSession } from './SessionProvider'
 
 export function HomeScreen() {
   const { t } = useT()
   const { session } = useSession()
+  const router = useRouter()
+  const portal = prefersPortal(session.scopes) && session.modules.includes('core')
+
+  // ESS-1 · Quien solo ve su propia relación laboral entra directo a su portal.
+  useEffect(() => { if (portal) router.replace('/mi') }, [portal, router])
+  if (portal) return null
 
   return (
     <>

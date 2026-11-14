@@ -640,6 +640,38 @@
       ]
     },
     {
+      "codigo": "colaboradores.campos_editables_portal",
+      "modulo": "core",
+      "nombre": "Datos que el colaborador cambia desde el portal",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "preferred_name",
+        "birth_date",
+        "marital_status",
+        "nationality_code",
+        "personal_email",
+        "mobile_phone",
+        "address"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "ESS-2 · Datos personales que el colaborador puede proponer cambiar desde su perfil; los demás solo los cambia RRHH (con sustento). Los de colaboradores.campos_requieren_aprobacion esperan a RRHH.",
+      "opciones": [
+        "first_names",
+        "paternal_surname",
+        "maternal_surname",
+        "preferred_name",
+        "birth_date",
+        "sex",
+        "marital_status",
+        "nationality_code",
+        "personal_email",
+        "mobile_phone",
+        "address"
+      ]
+    },
+    {
       "codigo": "contratos.requiere_aprobacion",
       "modulo": "core",
       "nombre": "Contratos con aprobación antes de la firma",

@@ -36,6 +36,19 @@ export function SummaryTab({ header, onHistory }: ProfileTabContext & { onHistor
   if (failed) return <ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} />
   if (!data) return <span className="esq" style={{ width: 240 }} />
 
+  return (
+    <>
+      {header.status === 'pending' && (
+        <Notice tone="info" title={t('emp.pending_title')}>{t('emp.pending_text', { date: formatDate(locale, header.hire_date) })}</Notice>
+      )}
+      <WorkDataCards data={data} onHistory={onHistory} />
+    </>
+  )
+}
+
+/** COL-5 · ESS-2 · Datos laborales vigentes (puesto y relación), con desde cuándo rige cada uno. */
+export function WorkDataCards({ data, onHistory }: { data: WorkData; onHistory?: () => void }) {
+  const { t, locale } = useT()
   const value = (key: WorkFieldKey): string | null => {
     const f = data.fields[key]
     if (!f || f.value === null) return null
@@ -69,7 +82,7 @@ export function SummaryTab({ header, onHistory }: ProfileTabContext & { onHistor
           {f?.since && shown && (
             <span className="sub2">
               {t('ficha.since', { date: formatDate(locale, f.since) })}
-              {f.history === 'assignments' && (
+              {f.history === 'assignments' && onHistory && (
                 <>{' · '}<button type="button" className="ficha-link" onClick={onHistory}>{t('ficha.see_history')}</button></>
               )}
             </span>
@@ -80,24 +93,19 @@ export function SummaryTab({ header, onHistory }: ProfileTabContext & { onHistor
   }
 
   return (
-    <>
-      {header.status === 'pending' && (
-        <Notice tone="info" title={t('emp.pending_title')}>{t('emp.pending_text', { date: formatDate(locale, header.hire_date) })}</Notice>
-      )}
-      <div className="emp-resumen">
-        <Card title={t('emp.section_job')} context={t('ficha.as_of', { date: formatDate(locale, data.as_of) })}>
-          <dl className="ficha ficha-vig">{JOB.map(row)}</dl>
-        </Card>
-        <Card title={t('emp.section_relation')}>
-          <dl className="ficha ficha-vig">
-            {RELATION.map(row)}
-            <div className="ficha-dato">
-              <dt>{t('ficha.f_seniority')}</dt>
-              <dd><span>{data.seniority ? seniorityText(t, data.seniority) : '—'}</span><span className="sub2">{t('ficha.seniority_calculated')}</span></dd>
-            </div>
-          </dl>
-        </Card>
-      </div>
-    </>
+    <div className="emp-resumen">
+      <Card title={t('emp.section_job')} context={t('ficha.as_of', { date: formatDate(locale, data.as_of) })}>
+        <dl className="ficha ficha-vig">{JOB.map(row)}</dl>
+      </Card>
+      <Card title={t('emp.section_relation')}>
+        <dl className="ficha ficha-vig">
+          {RELATION.map(row)}
+          <div className="ficha-dato">
+            <dt>{t('ficha.f_seniority')}</dt>
+            <dd><span>{data.seniority ? seniorityText(t, data.seniority) : '—'}</span><span className="sub2">{t('ficha.seniority_calculated')}</span></dd>
+          </div>
+        </dl>
+      </Card>
+    </div>
   )
 }

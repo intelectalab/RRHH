@@ -766,3 +766,30 @@
 .cal-eq-leyenda .t-abs { background: var(--in-50); border: 1px solid var(--in); }
 .cal-eq-leyenda .t-pend { background: var(--wa-50); border: 1px dashed var(--wa); }
 .cal-eq-leyenda .t-other { background: var(--bd); }
+
+/* ESS-1 · ESS-2 · Portal del colaborador (mobile-first): acciones rápidas, tarjetas y barra inferior. */
+.portal-main { max-width: 1100px; }
+.portal-cards { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.portal-cards .card { margin-bottom: 0; }
+.portal-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.portal-action { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 72px; padding: 12px; border: 1px solid var(--bd); border-radius: var(--r-l); background: var(--sup); color: var(--tx); text-align: center; font-weight: 700; font-size: var(--fs-s); }
+.portal-action:hover { border-color: var(--pe-500); text-decoration: none; box-shadow: var(--sombra-1); }
+.portal-action:focus-visible, .portal-link:focus-visible, .portal-nav-i:focus-visible { outline: none; box-shadow: var(--foco-anillo); }
+.portal-big { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px; }
+.portal-big b { font-size: var(--fs-cifra, 32px); line-height: 1; font-variant-numeric: tabular-nums; }
+.portal-big span { color: var(--tx2); }
+.portal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.portal-list .sub2 { display: block; }
+.portal-link { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; color: var(--tx); }
+.portal-link:hover { text-decoration: none; color: var(--pe-700); }
+.portal-switch { max-width: 420px; }
+.portal-nav { display: none; }
+@media (min-width: 768px) { .portal-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .portal { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  .portal-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; background: var(--sup); border-top: 1px solid var(--bd); padding-bottom: env(safe-area-inset-bottom); }
+  .portal-nav-i { flex: 1 1 0; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: var(--fs-xs); color: var(--tx2); }
+  .portal-nav-i:hover { text-decoration: none; }
+  .portal-nav-i span { max-width: 100%; padding: 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .portal-nav-i.on { color: var(--pe-700); font-weight: 700; }
+}

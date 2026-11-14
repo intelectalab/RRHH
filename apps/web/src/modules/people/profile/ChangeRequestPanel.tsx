@@ -18,7 +18,17 @@ export const REQUEST_TONE: Record<ChangeRequest['status'], StatusTone> = { pendi
  * RN-COL-06 · El colaborador propone cambios de sus propios datos. Los de bajo riesgo se aplican en el acto;
  * los demás esperan a RRHH. Ve el estado de sus solicitudes y puede cancelar la pendiente.
  */
-export function ChangeRequestPanel({ personId, toast, onChanged }: { personId: string; toast: (text: string, kind?: 'ok' | 'error') => void; onChanged: () => Promise<void> }) {
+export function ChangeRequestPanel({ personId, toast, onChanged, fields = CHANGE_FIELDS, pendingFields = [], disabled = false }: {
+  personId: string
+  toast: (text: string, kind?: 'ok' | 'error') => void
+  onChanged: () => Promise<void>
+  /** ESS-2 · Campos que la organización deja proponer desde el portal (colaboradores.campos_editables_portal). */
+  fields?: readonly ChangeField[]
+  /** Campos con un cambio en espera de RRHH: se muestran como pendientes. */
+  pendingFields?: readonly string[]
+  /** RN-ESS-05 · Relación cesada: solo lectura. */
+  disabled?: boolean
+}) {
   const { t, locale } = useT()
   const { can } = useSession()
   const [requests, setRequests] = useState<ChangeRequest[]>([])
@@ -40,6 +50,7 @@ export function ChangeRequestPanel({ personId, toast, onChanged }: { personId: s
   useEffect(() => { void load() }, [load])
 
   if (!can('people.change_requests.create')) return null
+  const canPropose = !disabled && fields.length > 0
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -77,7 +88,7 @@ export function ChangeRequestPanel({ personId, toast, onChanged }: { personId: s
     const type = key === 'birth_date' ? 'date' : key === 'personal_email' ? 'email' : key === 'mobile_phone' ? 'tel' : 'text'
     return (
       <div className="mb-3" key={key}>
-        <label className="form-label" htmlFor={`cr-${key}`}>{t(`ficha.change_${key}`)}</label>
+        <label className="form-label" htmlFor={`cr-${key}`}>{t(`ficha.change_${key}`)}{pendingFields.includes(key) && <>{' '}<StatusBadge tone="wa">{t('portal.field_pending')}</StatusBadge></>}</label>
         {key === 'marital_status' ? (
           <select id={`cr-${key}`} className="form-select" value={values[key] ?? ''} onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))}>
             <option value="">{t('ficha.no_change')}</option>
@@ -94,7 +105,7 @@ export function ChangeRequestPanel({ personId, toast, onChanged }: { personId: s
 
   return (
     <Card title={t('ficha.my_requests')} context={t('ficha.my_requests_help')}
-      actions={<button type="button" className="btn btn-primary btn-sm" onClick={() => { setErrors({}); setGeneral(null); setOpen(true) }}>{t('ficha.propose_change')}</button>}>
+      actions={canPropose ? <button type="button" className="btn btn-primary btn-sm" onClick={() => { setErrors({}); setGeneral(null); setOpen(true) }}>{t('ficha.propose_change')}</button> : undefined}>
       {requests.length === 0 ? <p className="text-secondary">{t('ficha.no_requests')}</p> : (
         <ul className="ficha-lista">
           {requests.map((r) => (
@@ -125,7 +136,7 @@ export function ChangeRequestPanel({ personId, toast, onChanged }: { personId: s
           <form id="form-cambio" onSubmit={(e) => void submit(e)} noValidate>
             <p className="small text-secondary">{t('ficha.propose_help')}</p>
             {general && <Notice tone="error">{general}</Notice>}
-            {CHANGE_FIELDS.map(field)}
+            {fields.map(field)}
           </form>
         </Modal>
       )}
