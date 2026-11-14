@@ -22,4 +22,41 @@ return [
     'adjust_zero' => 'O ajuste não pode ser zero.',
     'period_not_found' => 'O período não pertence a este vínculo.',
     'accrued' => 'Períodos de férias em dia em :count vínculos.',
+
+    // VAC-3 · Solicitações de férias.
+    'requests' => [
+        'only_draft' => 'Só se edita uma solicitação em rascunho.',
+        'employment_not_active' => 'O vínculo empregatício não está ativo.',
+        'outside_employment' => 'As datas estão fora do vínculo empregatício.',
+        'no_days' => 'O intervalo não tem dias a descontar.',
+        'insufficient_notice' => 'A solicitação deve ser apresentada com pelo menos :days dias de antecedência.',
+        'below_min_fraction' => 'Cada período deve ter pelo menos :days dias.',
+        'min_fraction_pending' => 'O fracionamento mínimo legal (:days dias) está pendente de validação: é permitido, mas revise-o quando a norma for confirmada.',
+        'hr_exception_hint' => 'Informe um motivo de exceção para registrá-la.',
+        'uses_advance' => 'Serão tomados :days dias por conta do período em curso (adiantamento).',
+        'pending_requests' => 'Já há :days dias em outras solicitações em andamento.',
+        'vacation_overlap' => 'Já há outras férias nessas datas (de :from a :to).',
+        'vacation_overlap_generic' => 'O trabalhador já tem outras férias nessas datas.',
+        'absence_overlap' => 'Há uma ausência do trabalhador nessas datas (de :from a :to).',
+        'closed_period_adjustment' => 'A folha está fechada até :date: o efeito irá como ajuste no período aberto.',
+        'closed_period' => 'A folha está fechada até :date: só o RH pode registrar nessas datas.',
+        'coverage_exceeded' => 'De :from a :to haveria mais de :limit pessoas ausentes na unidade.',
+        'reason_required' => 'Informe o motivo do cancelamento.',
+        'cancelled_reason' => 'Solicitação de férias cancelada.',
+        'cancel_started' => 'As férias já começaram: não podem ser canceladas.',
+        'cancel_forbidden' => 'Só o titular ou o RH podem cancelar a solicitação.',
+        'ends_before_start' => 'A data final não pode ser anterior à inicial.',
+        'too_long' => 'O intervalo não pode passar de um ano.',
+        'invalid_filter' => 'O filtro de status não é válido.',
+        'advanced' => 'Férias iniciadas: :started · finalizadas: :finished.',
+    ],
+
+    // VAC-4 · Calendário da equipe.
+    'team' => [
+        'invalid_range' => 'A data final não pode ser anterior à inicial.',
+        'range_too_long' => 'O intervalo não pode passar de :days dias.',
+        'absent' => 'Ausente',
+        'vacation' => 'Férias',
+        'vacation_days' => 'Férias · :days dias',
+    ],
 ];

@@ -34,6 +34,7 @@ const MENU: NavLink[] = [
   { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
   { href: '/calendario', key: 'shell.modules_calendar', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
   { href: '/tiempo/ausencias', key: 'shell.modules_absences', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
+  { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
 ]
 
 const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'settings.organization.view']

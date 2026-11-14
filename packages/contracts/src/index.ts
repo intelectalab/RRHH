@@ -15158,6 +15158,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/team-calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Calendario de ausencias del equipo (VAC-4): vacaciones y ausencias aprobadas y en trámite por persona y día, con el alcance del usuario; en alcance propio, solo los compañeros de su unidad y lo aprobado, sin tipo ni motivo. Incluye ausentes por día y alertas de cobertura por unidad (vacaciones.maximo_ausentes_simultaneos) */
+        get: operations["getTeamCalendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tenant": {
         parameters: {
             query?: never;
@@ -16192,6 +16209,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/vacation-requests/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Simular una solicitud de vacaciones sin registrarla: días que descuenta según la política (calendario o hábiles, sin descanso semanal ni feriados de la sede), saldo disponible y adelanto, problemas que impedirían enviarla (saldo, anticipación, fraccionamiento, solapes, planilla cerrada) y avisos (adelanto, cobertura del equipo, reglas por validar) */
+        post: operations["postVacationRequestsSimulate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/vacation-requests/{id}": {
         parameters: {
             query?: never;
@@ -16208,26 +16242,6 @@ export interface paths {
         head?: never;
         /** Actualizar VacationRequest */
         patch: operations["patchVacationRequestsId"];
-        trace?: never;
-    };
-    "/vacation-requests/{id}/approve": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acción «approve» sobre VacationRequest
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postVacationRequestsIdApprove"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/vacation-requests/{id}/cancel": {
@@ -16250,7 +16264,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/vacation-requests/{id}/reject": {
+    "/vacation-requests/{id}/overlaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cruces de la solicitud con su unidad antes de aprobar (VAC-4): personas ausentes en esas fechas (con el alcance de quien consulta) y tramos en que se supera el máximo de ausentes simultáneos */
+        get: operations["getVacationRequestsIdOverlaps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/vacation-requests/{id}/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -16259,11 +16290,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «reject» sobre VacationRequest
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postVacationRequestsIdReject"];
+        /** RRHH registra la solicitud directamente aprobada, sin flujo: reserva los días en el libro (RN-VAC-03); admite excepción de anticipación o fraccionamiento con motivo y periodos de planilla cerrados como ajuste */
+        post: operations["postVacationRequestsIdRegister"];
         delete?: never;
         options?: never;
         head?: never;
@@ -22309,16 +22337,48 @@ export interface components {
             id: string;
             /** @description Identificador opaco */
             employment_id: string;
+            /** @description Identificador opaco */
+            person_id?: string | null;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** Format: date */
             starts_on: string;
             /** Format: date */
             ends_on: string;
-            days: number;
+            days: string;
+            calendar_days?: string | null;
+            advance_days?: string | null;
             advance: boolean;
+            /** @enum {string|null} */
+            kind?: "leave" | "advance" | "sale" | null;
             /** @enum {string} */
-            status: "draft" | "pending" | "approved" | "rejected" | "cancelled" | "taken";
+            status: "draft" | "pending" | "hr_review" | "approved" | "in_progress" | "taken" | "rejected" | "cancelled";
+            notes?: string | null;
+            exception_reason?: string | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            decision_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            cancellation_reason?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: date-time */
+            completed_at?: string | null;
             /** @description Identificador opaco */
             approval_request_id?: string | null;
+            approval?: {
+                [key: string]: unknown;
+            } | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -22327,11 +22387,24 @@ export interface components {
         VacationRequestInput: {
             /** @description Identificador opaco */
             employment_id?: string;
+            /** @description Identificador opaco */
+            person_id?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** Format: date */
             starts_on?: string;
             /** Format: date */
             ends_on?: string;
+            advance_days?: string | null;
             advance?: boolean;
+            /** @enum {string|null} */
+            kind?: "leave" | "advance" | "sale" | null;
+            notes?: string | null;
+            exception_reason?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: date-time */
+            completed_at?: string | null;
         };
         WageTable: {
             /** @description Identificador opaco */
@@ -60626,6 +60699,36 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getTeamCalendar: {
+        parameters: {
+            query: {
+                /** @description Primer día (AAAA-MM-DD) */
+                from: string;
+                /** @description Último día, inclusive; hasta 92 días después de from */
+                to: string;
+                /** @description Solo las personas de esa unidad */
+                org_unit_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getTenant: {
         parameters: {
             query?: never;
@@ -63251,6 +63354,39 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    postVacationRequestsSimulate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getVacationRequestsId: {
         parameters: {
             query?: {
@@ -63320,42 +63456,6 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postVacationRequestsIdApprove: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionRequest"];
-            };
-        };
-        responses: {
-            /** @description Correcto */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["VacationRequest"];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["Unprocessable"];
-        };
-    };
     postVacationRequestsIdCancel: {
         parameters: {
             query?: never;
@@ -63392,7 +63492,32 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
-    postVacationRequestsIdReject: {
+    getVacationRequestsIdOverlaps: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postVacationRequestsIdRegister: {
         parameters: {
             query?: never;
             header?: {
@@ -63406,7 +63531,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -63416,16 +63541,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["VacationRequest"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postVacationRequestsIdSubmit: {

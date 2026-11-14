@@ -91,10 +91,13 @@
   accrued_days numeric(6,2)=0 ; enjoy_by date ; status enum(accruing,earned,overdue,closed)=accruing
   vacation_policy_id ?-> vacation_policies ; entitlement_detail j ; earned_on date ; pending_validation bool=f
   uniq employment_id, period_start
-@vacation_requests main soft lock | Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación.
+@vacation_requests main soft lock | Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación. VAC-3: days es lo que descuenta del saldo según el cómputo de la política (calendario o hábil, con los feriados de la sede); advance_days es la parte tomada a cuenta del periodo en curso. La exclusión impide dos solicitudes activas solapadas del mismo trabajador.
   employment_id -> employments ; starts_on date! ; ends_on date! ; days numeric(6,2)! ; kind enum(leave,advance,sale)=leave
   status enum(draft,pending,approved,rejected,cancelled,taken,hr_review,in_progress)=draft ; workflow_instance_id ?-> workflow_instances ; notes
   requested_by_user_id ?-> users ; approved_at ; check ends_on >= starts_on ; idx employment_id, starts_on
+  calendar_days numeric(6,2) ; advance_days numeric(6,2) ; exception_reason ; submitted_at ts ; decided_at ts ; decision_reason
+  cancelled_at ts ; cancelled_by_user_id ?-> users ; cancellation_reason ; started_at ts ; completed_at ts ; idx status, starts_on
+  raw EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(starts_on, ends_on, '[]') WITH &&) WHERE (deleted_at IS NULL AND kind IN ('leave','advance') AND status IN ('pending','hr_review','approved','in_progress','taken')) DEFERRABLE INITIALLY IMMEDIATE
 @vacation_ledger_entries imm | Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento. Los días llevan signo: suman el devengo, el saldo inicial y los ajustes a favor; restan la reserva (programadas), el goce, la venta y la liquidación.
   employment_id -> employments ; vacation_accrual_period_id ?-> vacation_accrual_periods
   entry_type enum(accrual,taken,scheduled,sold,adjustment,expired,opening_balance,reversal,settlement)! ; days numeric(6,2)!

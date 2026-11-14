@@ -226,6 +226,7 @@ PARAMS = [
  ('asistencia.redondeo_minutos', 'attendance', 'Redondeo (min)', 'integer', 0, [O, E], 'Redondeo del tiempo trabajado; 0 = sin redondeo.', None),
  ('vacaciones.anticipacion_minima_dias', 'time_off', 'Anticipación mínima', 'integer', 7, [O, E], 'Días de anticipación para solicitar vacaciones.', None),
  ('vacaciones.valida_rrhh', 'time_off', 'Validación de RRHH', 'boolean', False, [O, E], 'Tras el jefe, RRHH valida la solicitud.', None),
+ ('vacaciones.maximo_ausentes_simultaneos', 'time_off', 'Máximo de ausentes simultáneos por unidad', 'integer', 0, [O, E], 'VAC-4 · Si más personas de una misma unidad estarán ausentes el mismo día (vacaciones y ausencias aprobadas o pendientes), el calendario del equipo y la aprobación lo alertan. 0 = sin límite.', None),
  ('vacaciones.alerta_acumulacion_dias', 'time_off', 'Aviso de vacaciones acumuladas', 'integer', 30, [O, E], 'Saldo desde el que se alerta acumulación.', None),
  ('ausencias.dias_descanso_semanal', 'time_off', 'Días de descanso semanal (cómputo en días hábiles)', 'list', ['saturday', 'sunday'], [O, E, S], 'AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
  ('horas_extra.requiere_autorizacion', 'attendance', 'Autorización previa', 'boolean', True, [O, E, S, U], 'El sobretiempo solo se reconoce si fue autorizado.', None),

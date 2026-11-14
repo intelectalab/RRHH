@@ -744,3 +744,25 @@
 .mov-cambios { margin: 4px 0; padding-left: 18px; overflow-wrap: anywhere; }
 .mov-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .mov-acciones:empty { display: none; }
+
+/* VAC-4 · Calendario de ausencias del equipo: una fila por persona, una columna por día. */
+.cal-eq-wrap { overflow-x: auto; border: 1px solid var(--bd); border-radius: 8px; }
+.cal-eq { border-collapse: separate; border-spacing: 0; font-size: 12px; min-width: 100%; }
+.cal-eq th, .cal-eq td { border-bottom: 1px solid var(--bd2); padding: 0; text-align: center; }
+.cal-eq th.per, .cal-eq td.per { position: sticky; left: 0; background: var(--sup); text-align: start; padding: 6px 10px; min-width: 180px; z-index: 1; }
+.cal-eq thead th { padding: 6px 2px; font-weight: 600; color: var(--tx2); min-width: 26px; }
+.cal-eq thead th.over { color: var(--er); }
+.cal-eq td.dia { height: 30px; min-width: 26px; }
+.cal-eq td.dia span { display: block; height: 18px; margin: 0 1px; border-radius: 4px; }
+.cal-eq .t-vac span { background: var(--ok-50); border: 1px solid var(--ok); }
+.cal-eq .t-abs span { background: var(--in-50); border: 1px solid var(--in); }
+.cal-eq .t-pend span { background: var(--wa-50); border: 1px dashed var(--wa); }
+.cal-eq .t-other span { background: var(--bd); }
+.cal-eq tfoot td { padding: 4px 2px; color: var(--tx2); font-weight: 600; }
+.cal-eq tfoot td.over { color: var(--er); background: var(--er-50); }
+.cal-eq-leyenda { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; font-size: 12px; color: var(--tx2); }
+.cal-eq-leyenda i { display: inline-block; width: 14px; height: 10px; border-radius: 3px; margin-inline-end: 6px; vertical-align: middle; }
+.cal-eq-leyenda .t-vac { background: var(--ok-50); border: 1px solid var(--ok); }
+.cal-eq-leyenda .t-abs { background: var(--in-50); border: 1px solid var(--in); }
+.cal-eq-leyenda .t-pend { background: var(--wa-50); border: 1px dashed var(--wa); }
+.cal-eq-leyenda .t-other { background: var(--bd); }

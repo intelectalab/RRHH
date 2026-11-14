@@ -26,6 +26,7 @@ return [
         'closed_period_adjustment' => 'Cae en un periodo de planilla cerrado (hasta el :date): su efecto irá como ajuste al periodo abierto.',
         'overlap' => 'Ya hay otra ausencia en esas fechas (del :from al :to).',
         'overlap_generic' => 'Ya hay otra ausencia del trabajador en esas fechas.',
+        'vacation_overlap' => 'El trabajador tiene vacaciones en esas fechas (del :from al :to).',
         'document_grace' => 'Si falta el sustento, queda pendiente y hay :days días para adjuntarlo.',
         'document_required' => 'Este tipo de ausencia exige sustento: adjúntalo antes de enviarla.',
         'document_type' => 'El sustento debe ser PDF, PNG o JPEG.',

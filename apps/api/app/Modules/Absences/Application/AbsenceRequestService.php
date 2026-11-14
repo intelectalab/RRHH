@@ -231,6 +231,15 @@ final class AbsenceRequestService
         if ($overlap !== null) {
             $issue('absence_overlap', 409, (string) trans('absences.requests.overlap', ['from' => $overlap['starts_on'], 'to' => $overlap['ends_on']]));
         }
+        // VAC-3 · Ni con vacaciones activas (en trámite, aprobadas, en goce o gozadas) del mismo trabajador. La
+        // tabla se lee directamente (con RLS): el módulo de vacaciones no se importa.
+        $vacation = DB::table('vacation_requests')->where('employment_id', $employmentId)->whereNull('deleted_at')
+            ->whereIn('kind', ['leave', 'advance'])->whereIn('status', ['pending', 'hr_review', 'approved', 'in_progress', 'taken'])
+            ->where('starts_on', '<=', (string) $values['ends_on'])->where('ends_on', '>=', (string) $values['starts_on'])
+            ->first(['starts_on', 'ends_on']);
+        if ($vacation !== null) {
+            $issue('vacation_overlap', 409, (string) trans('absences.requests.vacation_overlap', ['from' => substr((string) $vacation->starts_on, 0, 10), 'to' => substr((string) $vacation->ends_on, 0, 10)]));
+        }
 
         if ($rule->requires_document && $rule->document_grace_days !== null) {
             $warnings[] = ['code' => 'document_grace', 'message' => (string) trans('absences.requests.document_grace', ['days' => $rule->document_grace_days])];

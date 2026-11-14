@@ -26,6 +26,7 @@ return [
         'closed_period_adjustment' => 'Cai em um período de folha fechado (até :date): seu efeito irá como ajuste no período aberto.',
         'overlap' => 'Já existe outra ausência nessas datas (de :from a :to).',
         'overlap_generic' => 'O trabalhador já tem outra ausência nessas datas.',
+        'vacation_overlap' => 'O trabalhador tem férias nessas datas (de :from a :to).',
         'document_grace' => 'Se faltar o comprovante, fica pendente e há :days dias para anexá-lo.',
         'document_required' => 'Este tipo de ausência exige comprovante: anexe-o antes de enviar.',
         'document_type' => 'O comprovante deve ser PDF, PNG ou JPEG.',

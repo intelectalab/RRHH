@@ -90,6 +90,11 @@ final class DomainEventTypes
 
     public const LEAVE_CANCELLED = 'leave.cancelled.v1';
 
+    // VAC-3 · Inicio y fin del goce de vacaciones aprobadas (la reserva pasa a «tomadas» al iniciar).
+    public const LEAVE_STARTED = 'leave.started.v1';
+
+    public const LEAVE_COMPLETED = 'leave.completed.v1';
+
     // VAC-2 · Libro de vacaciones: ajuste de saldo (RN-VAC-13), periodo ganado y periodo vencido (RN-VAC-09).
     public const LEAVE_BALANCE_ADJUSTED = 'leave.balance_adjusted.v1';
 
@@ -397,6 +402,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['leave_id', 'employee_id'],
             'description' => 'Solicitud de vacación cancelada',
+        ],
+        self::LEAVE_STARTED => [
+            'version' => 1,
+            'required_fields' => ['leave_id', 'employee_id', 'start_date', 'end_date', 'days'],
+            'description' => 'Empezó el goce de una vacación aprobada (VAC-3)',
+        ],
+        self::LEAVE_COMPLETED => [
+            'version' => 1,
+            'required_fields' => ['leave_id', 'employee_id', 'start_date', 'end_date'],
+            'description' => 'Terminó el goce de una vacación (VAC-3)',
         ],
         self::LEAVE_BALANCE_ADJUSTED => [
             'version' => 1,

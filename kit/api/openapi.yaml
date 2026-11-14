@@ -37781,6 +37781,47 @@ paths:
       x-phase: 0
       x-permission: workflow.tasks.complete
       operationId: postTasksIdComplete
+  /team-calendar:
+    get:
+      summary: 'Calendario de ausencias del equipo (VAC-4): vacaciones y ausencias aprobadas y en trámite por persona y día,
+        con el alcance del usuario; en alcance propio, solo los compañeros de su unidad y lo aprobado, sin tipo ni motivo.
+        Incluye ausentes por día y alertas de cobertura por unidad (vacaciones.maximo_ausentes_simultaneos)'
+      parameters:
+      - name: from
+        in: query
+        required: true
+        description: Primer día (AAAA-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        description: Último día, inclusive; hasta 92 días después de from
+        schema:
+          type: string
+          format: date
+      - name: org_unit_id
+        in: query
+        required: false
+        description: Solo las personas de esa unidad
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.view
+      operationId: getTeamCalendar
   /tenant:
     get:
       summary: 'Organización actual: datos, plan, módulos y límites'
@@ -40370,6 +40411,37 @@ paths:
       x-phase: 2
       x-permission: time.vacation_requests.create
       operationId: postVacationRequests
+  /vacation-requests/simulate:
+    post:
+      summary: 'Simular una solicitud de vacaciones sin registrarla: días que descuenta según la política (calendario o hábiles,
+        sin descanso semanal ni feriados de la sede), saldo disponible y adelanto, problemas que impedirían enviarla (saldo,
+        anticipación, fraccionamiento, solapes, planilla cerrada) y avisos (adelanto, cobertura del equipo, reglas por validar)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
+        '401': *id002
+        '403': *id003
+        '409': *id006
+        '422': *id007
+        '429': *id004
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.create
+      operationId: postVacationRequestsSimulate
   /vacation-requests/{id}:
     get:
       summary: Ver VacationRequest
@@ -40439,45 +40511,6 @@ paths:
       x-phase: 2
       x-permission: time.vacation_requests.update
       operationId: patchVacationRequestsId
-  /vacation-requests/{id}/approve:
-    post:
-      summary: Acción «approve» sobre VacationRequest
-      description: Transición explícita; valida la máquina de estados y deja auditoría.
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActionRequest'
-      responses:
-        '200':
-          description: Correcto
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/VacationRequest'
-        '401': *id002
-        '403': *id003
-        '404': *id005
-        '409': *id006
-        '422': *id007
-      tags:
-      - VAC
-      x-phase: 2
-      x-permission: time.vacation_requests.approve
-      operationId: postVacationRequestsIdApprove
   /vacation-requests/{id}/cancel:
     post:
       summary: Acción «cancel» sobre VacationRequest
@@ -40517,10 +40550,41 @@ paths:
       x-phase: 2
       x-permission: time.vacation_requests.cancel
       operationId: postVacationRequestsIdCancel
-  /vacation-requests/{id}/reject:
+  /vacation-requests/{id}/overlaps:
+    get:
+      summary: 'Cruces de la solicitud con su unidad antes de aprobar (VAC-4): personas ausentes en esas fechas (con el alcance
+        de quien consulta) y tramos en que se supera el máximo de ausentes simultáneos'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id002
+        '403': *id003
+        '404': *id005
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.view
+      operationId: getVacationRequestsIdOverlaps
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /vacation-requests/{id}/register:
     post:
-      summary: Acción «reject» sobre VacationRequest
-      description: Transición explícita; valida la máquina de estados y deja auditoría.
+      summary: 'RRHH registra la solicitud directamente aprobada, sin flujo: reserva los días en el libro (RN-VAC-03); admite
+        excepción de anticipación o fraccionamiento con motivo y periodos de planilla cerrados como ajuste'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
       parameters:
       - name: id
         in: path
@@ -40528,34 +40592,25 @@ paths:
         schema:
           type: string
       - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActionRequest'
       responses:
         '200':
           description: Correcto
           content:
             application/json:
               schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/VacationRequest'
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id001
         '401': *id002
         '403': *id003
         '404': *id005
         '409': *id006
         '422': *id007
+        '429': *id004
       tags:
       - VAC
       x-phase: 2
-      x-permission: time.vacation_requests.reject
-      operationId: postVacationRequestsIdReject
+      x-permission: time.vacation_requests.validate
+      operationId: postVacationRequestsIdRegister
   /vacation-requests/{id}/submit:
     post:
       summary: Acción «submit» sobre VacationRequest
@@ -51823,28 +51878,107 @@ components:
         employment_id: &id956
           type: string
           description: Identificador opaco
-        starts_on: &id957
+        person_id: &id957
+          type: string
+          description: Identificador opaco
+          nullable: true
+        person_name:
+          type: string
+          nullable: true
+        employee_code:
+          type: string
+          nullable: true
+        legal_entity_id: &id958
+          type: string
+          description: Identificador opaco
+          nullable: true
+        starts_on: &id959
           type: string
           format: date
-        ends_on: &id958
+        ends_on: &id960
           type: string
           format: date
         days:
-          type: number
-        advance: &id959
+          type: string
+        calendar_days:
+          type: string
+          nullable: true
+        advance_days: &id961
+          type: string
+          nullable: true
+        advance: &id962
           type: boolean
+        kind: &id963
+          type: string
+          enum:
+          - leave
+          - advance
+          - sale
+          nullable: true
         status:
           type: string
           enum:
           - draft
           - pending
+          - hr_review
           - approved
+          - in_progress
+          - taken
           - rejected
           - cancelled
-          - taken
+        notes: &id964
+          type: string
+          nullable: true
+        exception_reason: &id965
+          type: string
+          nullable: true
+        requested_by_user_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        requested_by_name:
+          type: string
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        decided_at:
+          type: string
+          format: date-time
+          nullable: true
+        decision_reason:
+          type: string
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        cancellation_reason:
+          type: string
+          nullable: true
+        started_at: &id966
+          type: string
+          format: date-time
+          nullable: true
+        completed_at: &id967
+          type: string
+          format: date-time
+          nullable: true
         approval_request_id:
           type: string
           description: Identificador opaco
+          nullable: true
+        approval:
+          type: object
+          additionalProperties: true
+          nullable: true
+        allowed_actions:
+          type: array
+          items: *id038
+          nullable: true
+        version:
+          type: integer
           nullable: true
         created_at:
           type: string
@@ -51856,9 +51990,17 @@ components:
       type: object
       properties:
         employment_id: *id956
-        starts_on: *id957
-        ends_on: *id958
-        advance: *id959
+        person_id: *id957
+        legal_entity_id: *id958
+        starts_on: *id959
+        ends_on: *id960
+        advance_days: *id961
+        advance: *id962
+        kind: *id963
+        notes: *id964
+        exception_reason: *id965
+        started_at: *id966
+        completed_at: *id967
     WageTable:
       type: object
       required:
@@ -51874,25 +52016,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        country: &id960
+        country: &id968
           type: string
-        regime: &id961
+        regime: &id969
           type: string
-        name: &id962
+        name: &id970
           type: string
-        legal_source: &id963
+        legal_source: &id971
           type: string
-        valid_from: &id964
+        valid_from: &id972
           type: string
           format: date
-        valid_to: &id965
+        valid_to: &id973
           type: string
           format: date
           nullable: true
-        values: &id966
+        values: &id974
           type: object
           additionalProperties: true
-        verified: &id967
+        verified: &id975
           type: boolean
         created_at:
           type: string
@@ -51903,14 +52045,14 @@ components:
     WageTableInput:
       type: object
       properties:
-        country: *id960
-        regime: *id961
-        name: *id962
-        legal_source: *id963
-        valid_from: *id964
-        valid_to: *id965
-        values: *id966
-        verified: *id967
+        country: *id968
+        regime: *id969
+        name: *id970
+        legal_source: *id971
+        valid_from: *id972
+        valid_to: *id973
+        values: *id974
+        verified: *id975
     WebComplaint:
       type: object
       required:
@@ -51974,25 +52116,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        web_lead_id: &id968
+        web_lead_id: &id976
           type: string
           description: Identificador opaco
-        starts_at: &id969
+        starts_at: &id977
           type: string
           format: date-time
-        ends_at: &id970
+        ends_at: &id978
           type: string
           format: date-time
-        channel: &id971
+        channel: &id979
           type: string
           enum:
           - video
           - phone
-        host_platform_user_id: &id972
+        host_platform_user_id: &id980
           type: string
           description: Identificador opaco
           nullable: true
-        meeting_url: &id973
+        meeting_url: &id981
           type: string
           nullable: true
         status:
@@ -52012,12 +52154,12 @@ components:
     WebDemoBookingInput:
       type: object
       properties:
-        web_lead_id: *id968
-        starts_at: *id969
-        ends_at: *id970
-        channel: *id971
-        host_platform_user_id: *id972
-        meeting_url: *id973
+        web_lead_id: *id976
+        starts_at: *id977
+        ends_at: *id978
+        channel: *id979
+        host_platform_user_id: *id980
+        meeting_url: *id981
     WebLead:
       type: object
       required:
@@ -52029,7 +52171,7 @@ components:
         id:
           type: string
           description: Identificador opaco
-        kind: &id974
+        kind: &id982
           type: string
           enum:
           - demo
@@ -52042,27 +52184,27 @@ components:
         full_name:
           type: string
           nullable: true
-        email: &id975
+        email: &id983
           type: string
-        phone: &id976
-          type: string
-          nullable: true
-        company_name: &id977
+        phone: &id984
           type: string
           nullable: true
-        ruc: &id978
+        company_name: &id985
           type: string
           nullable: true
-        product_code: &id979
+        ruc: &id986
           type: string
           nullable: true
-        module_code: &id980
+        product_code: &id987
           type: string
           nullable: true
-        source_page: &id981
+        module_code: &id988
           type: string
           nullable: true
-        utm: &id982
+        source_page: &id989
+          type: string
+          nullable: true
+        utm: &id990
           type: object
           additionalProperties: true
           nullable: true
@@ -52074,11 +52216,11 @@ components:
           - qualified
           - converted
           - discarded
-        assigned_platform_user_id: &id983
+        assigned_platform_user_id: &id991
           type: string
           description: Identificador opaco
           nullable: true
-        notified_at: &id984
+        notified_at: &id992
           type: string
           format: date-time
           nullable: true
@@ -52091,17 +52233,17 @@ components:
     WebLeadInput:
       type: object
       properties:
-        kind: *id974
-        email: *id975
-        phone: *id976
-        company_name: *id977
-        ruc: *id978
-        product_code: *id979
-        module_code: *id980
-        source_page: *id981
-        utm: *id982
-        assigned_platform_user_id: *id983
-        notified_at: *id984
+        kind: *id982
+        email: *id983
+        phone: *id984
+        company_name: *id985
+        ruc: *id986
+        product_code: *id987
+        module_code: *id988
+        source_page: *id989
+        utm: *id990
+        assigned_platform_user_id: *id991
+        notified_at: *id992
     WebProduct:
       type: object
       required:
@@ -52118,23 +52260,23 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id985
+        code: &id993
           type: string
-        name: &id986
+        name: &id994
           type: string
-        acronym: &id987
+        acronym: &id995
           type: string
-        slug: &id988
+        slug: &id996
           type: string
-        tagline: &id989
+        tagline: &id997
           type: string
           nullable: true
-        module_codes: &id990
+        module_codes: &id998
           type: array
           items: *id038
-        is_suite: &id991
+        is_suite: &id999
           type: boolean
-        sort_order: &id992
+        sort_order: &id1000
           type: integer
         status:
           type: string
@@ -52151,14 +52293,14 @@ components:
     WebProductInput:
       type: object
       properties:
-        code: *id985
-        name: *id986
-        acronym: *id987
-        slug: *id988
-        tagline: *id989
-        module_codes: *id990
-        is_suite: *id991
-        sort_order: *id992
+        code: *id993
+        name: *id994
+        acronym: *id995
+        slug: *id996
+        tagline: *id997
+        module_codes: *id998
+        is_suite: *id999
+        sort_order: *id1000
     WebhookDelivery:
       type: object
       required:
@@ -52214,12 +52356,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        url: &id993
+        url: &id1001
           type: string
-        events: &id994
+        events: &id1002
           type: array
           items: *id038
-        secret_hint: &id995
+        secret_hint: &id1003
           type: string
         status:
           type: string
@@ -52236,9 +52378,9 @@ components:
     WebhookEndpointInput:
       type: object
       properties:
-        url: *id993
-        events: *id994
-        secret_hint: *id995
+        url: *id1001
+        events: *id1002
+        secret_hint: *id1003
     WorkSchedule:
       type: object
       required:
@@ -52253,16 +52395,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id996
+        name: &id1004
           type: string
-        weekly_hours: &id997
+        weekly_hours: &id1005
           type: number
         days:
           type: object
           additionalProperties: true
-        tolerance_minutes: &id998
+        tolerance_minutes: &id1006
           type: integer
-        break_minutes: &id999
+        break_minutes: &id1007
           type: integer
         status:
           type: string
@@ -52278,10 +52420,10 @@ components:
     WorkScheduleInput:
       type: object
       properties:
-        name: *id996
-        weekly_hours: *id997
-        tolerance_minutes: *id998
-        break_minutes: *id999
+        name: *id1004
+        weekly_hours: *id1005
+        tolerance_minutes: *id1006
+        break_minutes: *id1007
     Workflow:
       type: object
       required:
@@ -52297,14 +52439,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id1000
+        name: &id1008
           type: string
-        trigger_event: &id1001
+        trigger_event: &id1009
           type: string
-        conditions: &id1002
+        conditions: &id1010
           type: object
           additionalProperties: true
-        actions: &id1003
+        actions: &id1011
           type: array
           items: *id008
         status:
@@ -52317,7 +52459,7 @@ components:
         allowed_actions:
           type: array
           items: *id038
-        last_run_at: &id1004
+        last_run_at: &id1012
           type: string
           format: date-time
           nullable: true
@@ -52332,11 +52474,11 @@ components:
     WorkflowInput:
       type: object
       properties:
-        name: *id1000
-        trigger_event: *id1001
-        conditions: *id1002
-        actions: *id1003
-        last_run_at: *id1004
+        name: *id1008
+        trigger_event: *id1009
+        conditions: *id1010
+        actions: *id1011
+        last_run_at: *id1012
     WorkflowRun:
       type: object
       required:

@@ -7,6 +7,7 @@ import { formatDate, formatNumber } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import type { ProfileTabContext } from '@/modules/people/profile/types'
 import { useSession } from '@/modules/session/SessionProvider'
+import { VacationRequestDetailPanel, VacationRequestFormPanel } from '@/modules/time/VacationRequestPanels'
 import { Card } from '@/ui/components/Card'
 import { Modal } from '@/ui/components/Modal'
 import { Notice } from '@/ui/components/Notice'
@@ -69,6 +70,9 @@ export function VacationsTab({ header, toast }: ProfileTabContext) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [general, setGeneral] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // VAC-3 · Solicitar vacaciones desde la ficha (el servidor valida saldo, fechas y solapes).
+  const [requesting, setRequesting] = useState(false)
+  const [requestDetail, setRequestDetail] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -119,9 +123,10 @@ export function VacationsTab({ header, toast }: ProfileTabContext) {
           context={balance.policy.source === 'policy'
             ? t('vac.policy_context', { name: balance.policy.policy_name ?? '' })
             : t('vac.legal_context')}
-          actions={can('time.vacation_balances.adjust')
-            ? <button type="button" className="btn btn-sec btn-sm" onClick={() => { setErrors({}); setGeneral(null); setForm({ period_id: '', days: '', reason: '', evidence: '' }) }}>{t('vac.adjust')}</button>
-            : undefined}
+          actions={(can('time.vacation_requests.create') || can('time.vacation_balances.adjust')) ? <>
+            {can('time.vacation_requests.create') && <button type="button" className="btn btn-primary btn-sm" onClick={() => setRequesting(true)}>{t('vreq.request_from_profile')}</button>}
+            {can('time.vacation_balances.adjust') && <button type="button" className="btn btn-sec btn-sm" onClick={() => { setErrors({}); setGeneral(null); setForm({ period_id: '', days: '', reason: '', evidence: '' }) }}>{t('vac.adjust')}</button>}
+          </> : undefined}
         >
           <dl className="ficha">
             <dt>{t('vac.col_available')}</dt><dd><b>{days(balance.totals.available)}</b></dd>
@@ -184,6 +189,9 @@ export function VacationsTab({ header, toast }: ProfileTabContext) {
           )}
         </Card>
       )}
+
+      {requesting && <VacationRequestFormPanel employmentId={header.id} onClose={() => setRequesting(false)} onSaved={(id) => { setRequesting(false); toast(t('vreq.saved')); setRequestDetail(id) }} />}
+      {requestDetail && <VacationRequestDetailPanel id={requestDetail} onClose={() => setRequestDetail(null)} onChanged={() => void load()} toast={toast} />}
 
       {form && balance && (
         <Modal title={t('vac.adjust_title')} onClose={() => setForm(null)} footer={<>

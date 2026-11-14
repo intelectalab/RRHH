@@ -99,7 +99,7 @@ function vacBalance(string $employmentId, string $tenant = VAC_TENANT): array
 function vacRequest(string $employmentId, string $days): string
 {
     return TenancyScope::runAs(VAC_TENANT, fn (): string => (string) DB::table('vacation_requests')->insertGetId([
-        'tenant_id' => VAC_TENANT, 'employment_id' => $employmentId, 'starts_on' => '2026-12-01', 'ends_on' => '2026-12-10', 'days' => $days, 'status' => 'approved',
+        'tenant_id' => VAC_TENANT, 'employment_id' => $employmentId, 'starts_on' => '2026-12-01', 'ends_on' => '2026-12-10', 'days' => $days, 'status' => 'draft',
     ]));
 }
 

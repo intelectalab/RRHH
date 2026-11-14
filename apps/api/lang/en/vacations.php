@@ -22,4 +22,41 @@ return [
     'adjust_zero' => 'The adjustment cannot be zero.',
     'period_not_found' => 'The period does not belong to this employment.',
     'accrued' => 'Vacation periods up to date for :count employments.',
+
+    // VAC-3 · Vacation requests.
+    'requests' => [
+        'only_draft' => 'Only a draft request can be edited.',
+        'employment_not_active' => 'The employment is not active.',
+        'outside_employment' => 'The dates are outside the employment.',
+        'no_days' => 'The range has no days to deduct.',
+        'insufficient_notice' => 'The request must be filed at least :days days in advance.',
+        'below_min_fraction' => 'Each portion must have at least :days days.',
+        'min_fraction_pending' => 'The legal minimum portion (:days days) is pending validation: it is allowed, but review it once the law is confirmed.',
+        'hr_exception_hint' => 'Enter an exception reason to register it.',
+        'uses_advance' => ':days days will be taken from the current period (advance).',
+        'pending_requests' => 'There are already :days days in other pending requests.',
+        'vacation_overlap' => 'There is already other vacation on those dates (from :from to :to).',
+        'vacation_overlap_generic' => 'The employee already has other vacation on those dates.',
+        'absence_overlap' => 'The employee has an absence on those dates (from :from to :to).',
+        'closed_period_adjustment' => 'Payroll is closed until :date: the effect will go as an adjustment in the open period.',
+        'closed_period' => 'Payroll is closed until :date: only HR can register on those dates.',
+        'coverage_exceeded' => 'From :from to :to more than :limit people would be absent in the unit.',
+        'reason_required' => 'Enter the cancellation reason.',
+        'cancelled_reason' => 'Vacation request cancelled.',
+        'cancel_started' => 'The vacation has already started: it cannot be cancelled.',
+        'cancel_forbidden' => 'Only the employee or HR can cancel the request.',
+        'ends_before_start' => 'The end date cannot be before the start date.',
+        'too_long' => 'The range cannot exceed one year.',
+        'invalid_filter' => 'The status filter is not valid.',
+        'advanced' => 'Vacations started: :started · finished: :finished.',
+    ],
+
+    // VAC-4 · Team calendar.
+    'team' => [
+        'invalid_range' => 'The end date cannot be before the start date.',
+        'range_too_long' => 'The range cannot exceed :days days.',
+        'absent' => 'Away',
+        'vacation' => 'Vacation',
+        'vacation_days' => 'Vacation · :days days',
+    ],
 ];

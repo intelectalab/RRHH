@@ -2,9 +2,8 @@
 
 namespace App\Modules\Absences\Application;
 
-use App\Shared\Settings\ParameterResolver;
+use App\Shared\Time\WorkingDays;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\DB;
 
 /**
  * AUS-2 · Cómputo de una ausencia en el servidor (regla 11: el navegador no calcula días).
@@ -20,9 +19,7 @@ use Illuminate\Support\Facades\DB;
  */
 final class AbsenceDays
 {
-    private const WEEKDAYS = [1 => 'monday', 2 => 'tuesday', 3 => 'wednesday', 4 => 'thursday', 5 => 'friday', 6 => 'saturday', 7 => 'sunday'];
-
-    public function __construct(private readonly ParameterResolver $parameters) {}
+    public function __construct(private readonly WorkingDays $workingDays) {}
 
     /**
      * @param  array{legal_entity_id: string, site_id: string|null, timezone: string}  $context
@@ -34,14 +31,9 @@ final class AbsenceDays
         $to = CarbonImmutable::parse($endsOn, $context['timezone'])->startOfDay();
         $calendar = (int) $from->diffInDays($to) + 1;
 
-        $holidays = $this->holidays($context['site_id'], $startsOn, $endsOn);
-        $rest = $this->restDays($context['legal_entity_id']);
-        $working = 0;
-        for ($d = $from; $d->lessThanOrEqualTo($to); $d = $d->addDay()) {
-            if (! in_array(self::WEEKDAYS[$d->dayOfWeekIso], $rest, true) && ! in_array($d->toDateString(), $holidays, true)) {
-                $working++;
-            }
-        }
+        $count = $this->workingDays->count($context['legal_entity_id'], $context['site_id'], $startsOn, $endsOn);
+        $holidays = $count['holidays'];
+        $working = $count['working_days'];
 
         $hours = null;
         if ($startTime !== null && $endTime !== null) {
@@ -72,31 +64,6 @@ final class AbsenceDays
      */
     public function holidays(?string $siteId, string $from, string $to): array
     {
-        $calendars = DB::table('holiday_calendars')->whereNull('deleted_at')->where('is_default', true)->pluck('id')->map(fn ($id) => (string) $id)->all();
-        if ($siteId !== null) {
-            $own = DB::table('sites')->where('id', $siteId)->value('holiday_calendar_id');
-            if ($own !== null) {
-                $calendars[] = (string) $own;
-            }
-        }
-        if ($calendars === []) {
-            return [];
-        }
-
-        /** @var list<string> */
-        return DB::table('holidays')->whereIn('holiday_calendar_id', array_values(array_unique($calendars)))
-            ->whereBetween('holiday_date', [$from, $to])->orderBy('holiday_date')
-            ->pluck('holiday_date')->map(fn ($d) => substr((string) $d, 0, 10))->unique()->values()->all();
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function restDays(string $legalEntityId): array
-    {
-        $value = $this->parameters->value('ausencias.dias_descanso_semanal', $legalEntityId);
-
-        // Sin el parámetro (no debería faltar: lo siembra el catálogo) ningún día se descuenta.
-        return is_array($value) ? array_values(array_filter($value, 'is_string')) : [];
+        return $this->workingDays->holidays($siteId, $from, $to);
     }
 }

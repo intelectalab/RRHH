@@ -928,6 +928,19 @@
       "opciones": null
     },
     {
+      "codigo": "vacaciones.maximo_ausentes_simultaneos",
+      "modulo": "time_off",
+      "nombre": "Máximo de ausentes simultáneos por unidad",
+      "tipo": "integer",
+      "valor_por_defecto": 0,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "VAC-4 · Si más personas de una misma unidad estarán ausentes el mismo día (vacaciones y ausencias aprobadas o pendientes), el calendario del equipo y la aprobación lo alertan. 0 = sin límite.",
+      "opciones": null
+    },
+    {
       "codigo": "vacaciones.alerta_acumulacion_dias",
       "modulo": "time_off",
       "nombre": "Aviso de vacaciones acumuladas",

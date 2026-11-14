@@ -26,6 +26,7 @@ return [
         'closed_period_adjustment' => 'It falls in a closed payroll period (until :date): its effect will go as an adjustment to the open period.',
         'overlap' => 'There is already another absence on those dates (from :from to :to).',
         'overlap_generic' => 'The employee already has another absence on those dates.',
+        'vacation_overlap' => 'The employee has vacation on those dates (from :from to :to).',
         'document_grace' => 'If the supporting document is missing, it stays pending and there are :days days to attach it.',
         'document_required' => 'This absence type requires a supporting document: attach it before submitting.',
         'document_type' => 'The supporting document must be PDF, PNG or JPEG.',

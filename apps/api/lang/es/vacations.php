@@ -22,4 +22,41 @@ return [
     'adjust_zero' => 'El ajuste no puede ser cero.',
     'period_not_found' => 'El periodo no pertenece a esta relación laboral.',
     'accrued' => 'Periodos vacacionales al día en :count relaciones laborales.',
+
+    // VAC-3 · Solicitudes de vacaciones.
+    'requests' => [
+        'only_draft' => 'Solo se edita una solicitud en borrador.',
+        'employment_not_active' => 'La relación laboral no está activa.',
+        'outside_employment' => 'Las fechas están fuera de la relación laboral.',
+        'no_days' => 'El rango no tiene días que descontar.',
+        'insufficient_notice' => 'La solicitud debe presentarse con al menos :days días de anticipación.',
+        'below_min_fraction' => 'Cada tramo debe tener al menos :days días.',
+        'min_fraction_pending' => 'El fraccionamiento mínimo legal (:days días) está por validar: se permite, pero revísalo cuando se confirme la norma.',
+        'hr_exception_hint' => 'Indica un motivo de excepción para registrarla.',
+        'uses_advance' => 'Se tomarán :days días a cuenta del periodo en curso (adelanto).',
+        'pending_requests' => 'Ya hay :days días en otras solicitudes en trámite.',
+        'vacation_overlap' => 'Ya hay otras vacaciones en esas fechas (del :from al :to).',
+        'vacation_overlap_generic' => 'Ya hay otras vacaciones del trabajador en esas fechas.',
+        'absence_overlap' => 'Hay una ausencia del trabajador en esas fechas (del :from al :to).',
+        'closed_period_adjustment' => 'La planilla está cerrada hasta el :date: el efecto irá como ajuste en el periodo abierto.',
+        'closed_period' => 'La planilla está cerrada hasta el :date: solo RRHH puede registrar en esas fechas.',
+        'coverage_exceeded' => 'Del :from al :to habría más de :limit personas ausentes en la unidad.',
+        'reason_required' => 'Indica el motivo de la cancelación.',
+        'cancelled_reason' => 'Solicitud de vacaciones cancelada.',
+        'cancel_started' => 'Las vacaciones ya empezaron: no se pueden cancelar.',
+        'cancel_forbidden' => 'Solo el titular o RRHH pueden cancelar la solicitud.',
+        'ends_before_start' => 'La fecha de fin no puede ser anterior a la de inicio.',
+        'too_long' => 'El rango no puede superar un año.',
+        'invalid_filter' => 'El filtro de estado no es válido.',
+        'advanced' => 'Vacaciones iniciadas: :started · finalizadas: :finished.',
+    ],
+
+    // VAC-4 · Calendario del equipo.
+    'team' => [
+        'invalid_range' => 'La fecha final no puede ser anterior a la inicial.',
+        'range_too_long' => 'El rango no puede superar :days días.',
+        'absent' => 'Ausente',
+        'vacation' => 'Vacaciones',
+        'vacation_days' => 'Vacaciones · :days días',
+    ],
 ];

@@ -20,30 +20,30 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 503 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 441 |
+| Tablas | 511 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 449 |
 | Tablas de plataforma (sin RLS de organización) | 62 |
-| Políticas RLS | 441 |
-| Claves foráneas | 1579 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1033 |
-| — simples `tenant_id` → `tenants(id)` | 453 |
-| — resto (hacia catálogos y tablas de plataforma) | 93 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2241 |
-| — creados con `CREATE INDEX` | 1116 |
-| Triggers | 519 |
-| Restricciones de exclusión (vigencias sin solapamiento) | 23 |
-| Restricciones `CHECK` | 586 |
-| Restricciones `UNIQUE` | 599 |
-| Columnas | 6549 |
-| Columnas marcadas `-- SENSIBLE` | 164 |
+| Políticas RLS | 449 |
+| Claves foráneas | 1622 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1066 |
+| — simples `tenant_id` → `tenants(id)` | 461 |
+| — resto (hacia catálogos y tablas de plataforma) | 95 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2300 |
+| — creados con `CREATE INDEX` | 1147 |
+| Triggers | 531 |
+| Restricciones de exclusión (vigencias sin solapamiento) | 30 |
+| Restricciones `CHECK` | 616 |
+| Restricciones `UNIQUE` | 612 |
+| Columnas | 6767 |
+| Columnas marcadas `-- SENSIBLE` | 166 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
-| Tablas con vigencia (`valid_from` / `valid_to`) | 35 |
-| Tablas inalterables (solo inserción, por trigger) | 22 |
-| Tablas con borrado lógico (`deleted_at`) | 164 |
-| Tablas con concurrencia optimista (`lock_version`) | 238 |
-| Funciones | 22 |
+| Tablas con vigencia (`valid_from` / `valid_to`) | 41 |
+| Tablas inalterables (solo inserción, por trigger) | 23 |
+| Tablas con borrado lógico (`deleted_at`) | 166 |
+| Tablas con concurrencia optimista (`lock_version`) | 246 |
+| Funciones | 26 |
 | Vistas | 1 |
-| Permisos en el catálogo | 910 |
+| Permisos en el catálogo | 912 |
 | — de campo / marcados sensibles | 28 / 108 |
 | Roles de sistema | 11 |
 | Módulos comerciales | 28 |
@@ -64,10 +64,10 @@ Tablas por épica:
 | 0 | WFL | Motor de aprobaciones y workflows | 11 |
 | 0 | NOT | Notificaciones y mensajería | 6 |
 | 0 | CFG | Configuración, parámetros, campos personalizados, i18n y multimoneda | 10 |
-| 1 | ORG | Estructura organizacional | 8 |
-| 1 | POS | Posiciones y headcount | 6 |
+| 1 | ORG | Estructura organizacional | 11 |
+| 1 | POS | Posiciones y headcount | 7 |
 | 1 | COL | Colaboradores y ficha 360 | 11 |
-| 1 | HIS | Historia con vigencia | 6 |
+| 1 | HIS | Historia con vigencia | 8 |
 | 1 | CON | Contratos y adendas | 6 |
 | 1 | DOC | Gestión documental, plantillas y firma | 11 |
 | 1 | ESS | Portal del colaborador | 2 |
@@ -76,8 +76,8 @@ Tablas por épica:
 | 1 | AYU | Centro de ayuda | 10 |
 | 2 | ASI | Asistencia y marcación | 8 |
 | 2 | TUR | Horarios, jornadas y turnos | 10 |
-| 2 | VAC | Vacaciones | 4 |
-| 2 | AUS | Ausencias y permisos | 3 |
+| 2 | VAC | Vacaciones | 5 |
+| 2 | AUS | Ausencias y permisos | 4 |
 | 2 | BHO | Horas extra y bolsa de horas | 3 |
 | 2 | TSH | Hojas de tiempo por proyecto | 5 |
 | 3 | NOM | Motor de nómina | 10 |
@@ -172,8 +172,13 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 | `tenant_settings` | — | No: conviven filas de distinto alcance |
 | `master_catalog_items` | — | No: conviven filas de distinto alcance |
 | `org_units` | — | No: conviven filas de distinto alcance |
+| `org_unit_versions` | `org_unit_id` | Sí |
+| `positions` | — | No: conviven filas de distinto alcance |
+| `headcount_budgets` | `org_unit_id` | Sí |
 | `person_addresses` | — | No: conviven filas de distinto alcance |
+| `person_bank_accounts` | `employment_id`, `purpose` | Sí (filas con status = 'active') |
 | `employment_assignments` | `employment_id` | Sí |
+| `employment_cost_distributions` | `employment_id` | Sí |
 | `employment_compensations` | `employment_id` | Sí |
 | `employment_compensation_items` | `employment_id`, `payroll_concept_id` | Sí |
 | `employment_labor_regimes` | `employment_id` | Sí |
@@ -181,7 +186,8 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 | `contracts` | `employment_id` | Sí (filas con status NOT IN ('draft','pending_approval','superseded','cancelled')) |
 | `employment_work_schedules` | `employment_id` | Sí |
 | `time_policies` | — | No: conviven filas de distinto alcance |
-| `vacation_policies` | — | No: conviven filas de distinto alcance |
+| `vacation_policy_rules` | `vacation_policy_id` | Sí |
+| `absence_type_rules` | `absence_type_id` | Sí |
 | `pension_fund_rates` | `pension_fund_id` | Sí |
 | `legal_entity_regimes` | `legal_entity_id` | Sí |
 | `pe_construction_assignments` | `employment_id` | Sí |
@@ -206,7 +212,7 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 
 ### 2.4 Registros inalterables y auditoría (C-07)
 
-- Tablas de solo inserción, protegidas por trigger (`reject_mutation`, SQLSTATE `AY001`) contra `UPDATE`, `DELETE` y `TRUNCATE`, y además sin esos privilegios para `gestia_app` y `gestia_platform`: `ai_interactions`, `application_stage_events`, `asset_events`, `attendance_punches`, `audit_events`, `calibration_adjustments`, `complaint_events`, `compliance_ledger_anchors`, `compliance_ledger_entries`, `data_access_logs`, `employment_status_events`, `evidence_exports`, `fifth_category_ledger`, `help_article_versions`, `kb_article_versions`, `platform_audit_events`, `position_status_events`, `signature_events`, `tenant_status_events`, `time_bank_entries`, `vacation_ledger_entries`, `workflow_decisions`.
+- Tablas de solo inserción, protegidas por trigger (`reject_mutation`, SQLSTATE `AY001`) contra `UPDATE`, `DELETE` y `TRUNCATE`, y además sin esos privilegios para `gestia_app` y `gestia_platform`: `ai_interactions`, `application_stage_events`, `asset_events`, `attendance_punches`, `audit_events`, `calibration_adjustments`, `complaint_events`, `compliance_ledger_anchors`, `compliance_ledger_entries`, `data_access_logs`, `employment_status_events`, `evidence_exports`, `fifth_category_ledger`, `help_article_versions`, `job_profile_versions`, `kb_article_versions`, `platform_audit_events`, `position_status_events`, `signature_events`, `tenant_status_events`, `time_bank_entries`, `vacation_ledger_entries`, `workflow_decisions`.
 - Los saldos (vacaciones, bolsa de horas) son libros de movimientos: el saldo es la suma y un error se corrige con un contraasiento.
 - Una marcación (`attendance_punches`) no se edita: la corrección es otra fila con `entry_type = 'correction'`, `corrects_punch_id` y `correction_reason`.
 - Boletas y corridas de planilla se pueden modificar mientras son borrador; cerradas (`closed_at`), cualquier cambio falla con `AY002`.
@@ -327,8 +333,8 @@ erDiagram
 
 #### `tenants`
 
-- **Propósito:** Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id.
-- **Columnas clave:** `slug`, `name`, `status`, `default_currency`, `default_locale`, `timezone`, `is_demo`, `is_partner_managed`, `trial_ends_at`, `suspended_at`, `suspension_reason`, `storage_region`.
+- **Propósito:** Organización cliente (tenant). Raíz del aislamiento: toda tabla de organización referencia su id. beta_groups: grupos beta a los que pertenece, para las banderas de funcionalidad (SAS-7).
+- **Columnas clave:** `slug`, `name`, `status`, `default_currency`, `default_locale`, `timezone`, `is_demo`, `is_partner_managed`, `trial_ends_at`, `suspended_at`, `suspension_reason`, `storage_region`, `contact_name`, `contact_email`, `contact_phone`, `cancelled_at`, `retention_until`, `beta_groups`.
 - **Relaciones:** `country_code` → `countries.code`.
 - **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `slug`; la aplicación solo ve su fila por la vista `current_tenant`.
 
@@ -366,9 +372,9 @@ erDiagram
 #### `plans`
 
 - **Propósito:** Planes comerciales definidos por el superadministrador (nombres libres, duplicables).
-- **Columnas clave:** `code`, `name`, `description`, `status`, `billing_cycle`, `price`, `currency`, `trial_days`, `is_public`.
-- **Relaciones:** `duplicated_from_plan_id` → `plans` (opcional).
-- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
+- **Columnas clave:** `code`, `name`, `description`, `status`, `billing_cycle`, `price`, `currency`, `trial_days`, `is_public`, `version`.
+- **Relaciones:** `duplicated_from_plan_id` → `plans` (opcional); `superseded_by_plan_id` → `plans` (opcional).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`, `version`.
 
 #### `plan_modules`
 
@@ -408,9 +414,9 @@ erDiagram
 #### `subscriptions`
 
 - **Propósito:** Suscripción de una organización a un plan, con su ciclo, estado y periodo de prueba.
-- **Columnas clave:** `status`, `billing_cycle`, `price`, `currency`, `starts_on`, `ends_on`, `trial_ends_on`, `cancelled_at`, `cancel_reason`, `license_key`.
+- **Columnas clave:** `status`, `billing_cycle`, `price`, `currency`, `starts_on`, `ends_on`, `trial_ends_on`, `cancelled_at`, `cancel_reason`, `license_key`, `expired_at`.
 - **Relaciones:** `tenant_id` → `tenants`; `plan_id` → `plans`.
-- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`); único: `tenant_id`.
 
 #### `subscription_addons`
 
@@ -436,20 +442,20 @@ erDiagram
 #### `tenant_modules`
 
 - **Propósito:** Módulos activos por organización (resultado de plan, complemento o activación manual). Condiciona menú, API y permisos.
-- **Columnas clave:** `status`, `source`, `activated_at`, `deactivated_at`.
+- **Columnas clave:** `status`, `source`, `activated_at`, `deactivated_at`, `read_only_until`.
 - **Relaciones:** `module_code` → `modules.code`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `module_code`.
 
 #### `tenant_limits`
 
-- **Propósito:** Límites efectivos de la organización (plan + complementos + ajustes).
-- **Columnas clave:** `limit_code`, `limit_value`, `is_unlimited`, `source`.
+- **Propósito:** Límites efectivos de la organización (plan + complementos + ajustes). warned_at / reached_at marcan el aviso ya enviado al acercarse o llegar al tope (SAS-6, RN-SAS-02); se limpian cuando el consumo baja.
+- **Columnas clave:** `limit_code`, `limit_value`, `is_unlimited`, `source`, `warned_at`, `reached_at`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `limit_code`.
 
 #### `tenant_usage_counters`
 
-- **Propósito:** Consumo medido por organización y periodo (colaboradores, almacenamiento, llamadas de API) para comparar con límites.
+- **Propósito:** Consumo medido por organización y periodo para comparar con límites (SAS-6): colaboradores, administradores, empresas y almacenamiento en MB guardan una foto por día (period_start = día); las llamadas de API acumulan por mes (period_start = primer día del mes).
 - **Columnas clave:** `metric_code`, `period_start`, `value`, `measured_at`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `metric_code`, `period_start`.
@@ -463,10 +469,10 @@ erDiagram
 
 #### `feature_flag_rules`
 
-- **Propósito:** Reglas de activación de una bandera por plan, país, grupo beta o porcentaje.
+- **Propósito:** Reglas de activación de una bandera por plan, país, grupo beta o porcentaje. Orden de evaluación (RN-SAS-07): organización, plan, grupo beta, país; después el porcentaje gradual y, al final, el valor por defecto.
 - **Columnas clave:** `target_kind`, `target_value`, `enabled`.
 - **Relaciones:** `feature_flag_id` → `feature_flags`.
-- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; único: `feature_flag_id`, `target_kind`, `target_value`.
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación solo la lee; único: `feature_flag_id`, `target_kind`, `target_value`.
 
 #### `tenant_feature_flags`
 
@@ -706,7 +712,7 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `user_identities`
 
 - **Propósito:** Identificadores con los que un usuario inicia sesión: correo, documento de identidad, teléfono, usuario o SSO (C-09).
-- **Columnas clave:** `kind`, `identifier_hash`, `identifier_enc` (S), `verified_at`, `is_primary`.
+- **Columnas clave:** `kind`, `identifier_hash`, `identifier_enc` (S), `verified_at`, `is_primary`, `bounced_at`, `bounce_reason`.
 - **Relaciones:** `user_id` → `users`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación; único: `kind`, `identifier_hash`.
 
@@ -955,8 +961,8 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 
 #### `notification_templates`
 
-- **Propósito:** Plantillas de mensaje por código, canal e idioma.
-- **Columnas clave:** `code`, `channel`, `locale`, `subject`, `body`, `variables`, `is_system`.
+- **Propósito:** Plantillas de mensaje por código, canal e idioma. Las de WhatsApp requieren aprobación del proveedor (approval_status) antes de usarse; sin aprobación el mensaje sale por SMS.
+- **Columnas clave:** `code`, `channel`, `locale`, `subject`, `body`, `variables`, `is_system`, `approval_status`, `provider_template_ref`, `approval_requested_at`, `approval_decided_at`, `rejection_reason`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`, `channel`, `locale`.
 
@@ -969,10 +975,10 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 
 #### `notification_deliveries`
 
-- **Propósito:** Envío de una notificación por un canal externo (correo, push, WhatsApp, SMS) con su estado.
-- **Columnas clave:** `channel`, `recipient_address_enc` (S), `status`, `provider`, `provider_message_id`, `attempts`, `sent_at`, `delivered_at`, `error`.
+- **Propósito:** Envío de una notificación o de un mensaje directo (código de ingreso, activación) por un canal externo (correo, push, WhatsApp, SMS) con su estado; idempotency_key evita enviar dos veces el mismo mensaje.
+- **Columnas clave:** `channel`, `recipient_address_enc` (S), `status`, `provider`, `provider_message_id`, `attempts`, `sent_at`, `delivered_at`, `error`, `purpose`, `template_code`, `fallback_from`, `idempotency_key`.
 - **Relaciones:** `notification_id` → `notifications` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación; único: `idempotency_key`.
 
 #### `notification_preferences`
 
@@ -990,8 +996,8 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 
 #### `message_channels`
 
-- **Propósito:** Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas).
-- **Columnas clave:** `channel`, `provider`, `config_enc` (S), `sender_identity`, `status`.
+- **Propósito:** Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas). El remitente propio de correo solo se usa verificado (NOT-3); mientras tanto sale el de la plataforma.
+- **Columnas clave:** `channel`, `provider`, `config_enc` (S), `sender_identity`, `status`, `verification_status`, `verified_at`, `verification_error`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación; único: `channel`, `provider`.
 
@@ -1097,6 +1103,7 @@ erDiagram
   employments ||--o{ contracts : "employment_id"
   documents |o--o{ contracts : "document_id"
   signature_requests |o--o{ contracts : "signature_request_id"
+  users |o--o{ contracts : "approved_by_user_id"
   people |o--o{ documents : "owner_person_id"
   employments |o--o{ documents : "employment_id"
   legal_entities |o--o{ documents : "legal_entity_id"
@@ -1117,42 +1124,56 @@ erDiagram
 #### `sites`
 
 - **Propósito:** Sede, sucursal o ubicación física; base de feriados, geocercas e indicadores por centro de trabajo.
-- **Columnas clave:** `code`, `name`, `kind`, `address`, `district_code`, `country_code`, `latitude`, `longitude`, `timezone`, `establishment_code`, `is_risk_site`, `status`.
-- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`; `CHECK (establishment_code IS NULL OR country_code IS DISTINCT FROM 'PE' OR establishment_code ~ '^[0-9]{4}$')`.
+- **Columnas clave:** `code`, `name`, `kind`, `address`, `district_code`, `country_code`, `latitude`, `longitude`, `geofence_radius_m`, `timezone`, `establishment_code`, `is_risk_site`, `status`.
+- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `holiday_calendar_id` → `holiday_calendars` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`; `CHECK (establishment_code IS NULL OR country_code IS DISTINCT FROM 'PE' OR establishment_code ~ '^[0-9]{4}$')`; `CHECK ((latitude IS NULL) = (longitude IS NULL) AND (latitude IS NULL OR latitude BETWEEN -90 AND 90) AND (longitude IS NULL OR longitude BETWEEN -180 AND 180))`; `CHECK (geofence_radius_m IS NULL OR (geofence_radius_m > 0 AND latitude IS NOT NULL))`.
+
+#### `org_unit_types`
+
+- **Propósito:** Tipos o niveles de unidad con los nombres que usa cada organización (gerencia, área, departamento, equipo…); rank ordena del nivel más alto al más bajo (ORG-3).
+- **Columnas clave:** `code`, `name`, `rank`, `status`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
 #### `org_units`
 
-- **Propósito:** Unidad organizativa jerárquica (gerencia, área, departamento, subdepartamento, unidad, equipo).
-- **Columnas clave:** `code`, `name`, `kind`, `path`, `depth`, `valid_from`, `valid_to`, `status`.
-- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `parent_id` → `org_units` (opcional); `head_position_id` → `positions` (opcional); `cost_center_id` → `cost_centers` (opcional).
+- **Propósito:** Unidad organizativa jerárquica. Las columnas de estructura (superior, nombre, tipo, responsable, centro de costo, ruta) reflejan la versión vigente hoy; la historia y los cambios programados viven en org_unit_versions (ORG-3). valid_from / valid_to marcan la vida de la unidad.
+- **Columnas clave:** `code`, `name`, `path`, `depth`, `valid_from`, `valid_to`, `status`.
+- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `parent_id` → `org_units` (opcional); `org_unit_type_id` → `org_unit_types` (opcional); `head_position_id` → `positions` (opcional); `cost_center_id` → `cost_centers` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
+
+#### `org_unit_versions`
+
+- **Propósito:** Estructura de una unidad con vigencia (ORG-3): superior, nombre, tipo, responsable y centro de costo desde una fecha. Mover o renombrar cierra la versión vigente e inserta otra; los reportes de periodos anteriores leen la versión de su fecha.
+- **Columnas clave:** `name`, `reason`, `valid_from`, `valid_to`.
+- **Relaciones:** `org_unit_id` → `org_units`; `parent_id` → `org_units` (opcional); `org_unit_type_id` → `org_unit_types` (opcional); `head_position_id` → `positions` (opcional); `cost_center_id` → `cost_centers` (opcional); `changed_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `org_unit_id`; concurrencia optimista (`lock_version`).
 
 #### `cost_centers`
 
-- **Propósito:** Centro de costo para imputar planilla, gastos y horas.
-- **Columnas clave:** `code`, `name`, `accounting_code`, `status`.
+- **Propósito:** Centro de costo para imputar planilla, gastos y horas. opened_on / closed_on delimitan su vigencia (closed_on = último día que admite imputaciones); cerrado no admite nuevas asignaciones.
+- **Columnas clave:** `code`, `name`, `accounting_code`, `opened_on`, `closed_on`, `status`.
 - **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `parent_id` → `cost_centers` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`; `CHECK (closed_on IS NULL OR opened_on IS NULL OR closed_on >= opened_on)`.
 
 #### `job_families`
 
-- **Propósito:** Familias de puestos.
-- **Columnas clave:** `code`, `name`, `description`.
+- **Propósito:** Familias de puestos (catálogo configurable; se archivan, no se borran).
+- **Columnas clave:** `code`, `name`, `description`, `status`.
 - **Relaciones:** ninguna además de la organización.
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
 #### `job_levels`
 
-- **Propósito:** Niveles jerárquicos del catálogo de puestos.
-- **Columnas clave:** `code`, `name`, `rank`, `description`.
+- **Propósito:** Niveles jerárquicos del catálogo de puestos (catálogo configurable; se archivan, no se borran).
+- **Columnas clave:** `code`, `name`, `rank`, `description`, `status`.
 - **Relaciones:** ninguna además de la organización.
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
 #### `job_categories`
 
 - **Propósito:** Categorías laborales; es el cuadro de categorías y funciones que exige la Ley 30709 (E-05).
-- **Columnas clave:** `code`, `name`, `description`, `functions`, `responsibility_level`, `requirements`, `rank`.
+- **Columnas clave:** `code`, `name`, `description`, `functions`, `responsibility_level`, `requirements`, `rank`, `status`.
 - **Relaciones:** ninguna además de la organización.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
@@ -1163,20 +1184,27 @@ erDiagram
 - **Relaciones:** `job_family_id` → `job_families` (opcional); `job_level_id` → `job_levels` (opcional); `job_category_id` → `job_categories` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
+#### `job_profile_versions`
+
+- **Propósito:** Versiones inalterables de la descripción de un puesto de catálogo (misión, funciones y requisitos), ORG-5.
+- **Columnas clave:** `version`, `name`, `mission`, `functions`, `requirements`, `change_reason`.
+- **Relaciones:** `job_profile_id` → `job_profiles`; `changed_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001); único: `job_profile_id`, `version`.
+
 
 ### POS · Posiciones y headcount
 
 #### `positions`
 
-- **Propósito:** Posición o plaza presupuestada (C-02): una silla concreta. Base del organigrama, vacantes y sucesión.
-- **Columnas clave:** `code`, `title`, `status`, `is_critical`, `fte`, `budgeted_from`, `budgeted_to`, `budgeted_cost` (S), `currency`.
-- **Relaciones:** `job_profile_id` → `job_profiles`; `org_unit_id` → `org_units`; `site_id` → `sites` (opcional); `legal_entity_id` → `legal_entities`; `reports_to_position_id` → `positions` (opcional); `cost_center_id` → `cost_centers` (opcional); `headcount_plan_line_id` → `headcount_plan_lines` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); único: `code`.
+- **Propósito:** Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza.
+- **Columnas clave:** `code`, `title`, `status`, `is_critical`, `fte`, `is_shared`, `seats`, `valid_from`, `valid_to`, `budgeted_from`, `budgeted_to`, `budgeted_cost` (S), `currency`.
+- **Relaciones:** `job_profile_id` → `job_profiles`; `org_unit_id` → `org_units`; `site_id` → `sites` (opcional); `legal_entity_id` → `legal_entities`; `reports_to_position_id` → `positions` (opcional); `cost_center_id` → `cost_centers` (opcional); `salary_band_id` → `salary_bands` (opcional); `headcount_plan_line_id` → `headcount_plan_lines` (opcional); `position_request_id` → `position_requests` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); único: `code`; `CHECK (seats >= 1 AND (is_shared OR seats = 1))`; `CHECK (valid_to IS NULL OR valid_to >= valid_from)`; `CHECK (reports_to_position_id IS NULL OR reports_to_position_id <> id)`.
 
 #### `position_status_events`
 
-- **Propósito:** Historial inalterable de estados de una posición (aprobada, congelada, eliminada...).
-- **Columnas clave:** `from_status`, `to_status`, `reason`, `effective_on`.
+- **Propósito:** Historial inalterable de estados de una posición (aprobada, congelada, cerrada...) con la acción, el motivo y quién la hizo (POS-2).
+- **Columnas clave:** `action`, `from_status`, `to_status`, `reason`, `effective_on`.
 - **Relaciones:** `position_id` → `positions`; `changed_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001).
 
@@ -1203,10 +1231,17 @@ erDiagram
 
 #### `position_requests`
 
-- **Propósito:** Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar.
-- **Columnas clave:** `quantity`, `justification`, `kind`, `estimated_cost`, `currency`, `status`, `needed_by`.
-- **Relaciones:** `requested_by_user_id` → `users`; `org_unit_id` → `org_units`; `job_profile_id` → `job_profiles`; `site_id` → `sites` (opcional); `replaces_employment_id` → `employments` (opcional); `workflow_instance_id` → `workflow_instances` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
+- **Propósito:** Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar (POS-3, ME-04). Al aprobarse por el motor de aprobaciones crea sus posiciones en «aprobada» (positions.position_request_id). over_budget: al enviarla superaba el presupuesto disponible de la unidad (RN-POS-05).
+- **Columnas clave:** `title`, `quantity`, `justification`, `kind`, `estimated_cost` (S), `currency`, `status`, `needed_by`, `over_budget`, `submitted_at`, `decided_at`, `decision_reason`.
+- **Relaciones:** `requested_by_user_id` → `users`; `legal_entity_id` → `legal_entities` (opcional); `org_unit_id` → `org_units`; `job_profile_id` → `job_profiles`; `site_id` → `sites` (opcional); `cost_center_id` → `cost_centers` (opcional); `reports_to_position_id` → `positions` (opcional); `salary_band_id` → `salary_bands` (opcional); `replaces_employment_id` → `employments` (opcional); `workflow_instance_id` → `workflow_instances` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); `CHECK (quantity >= 1)`.
+
+#### `headcount_budgets`
+
+- **Propósito:** Presupuesto de dotación por unidad y periodo (POS-4): plazas y costo mensual presupuestados. Un solo presupuesto vigente por unidad a la vez (valid_from / valid_to); el tablero compara contra él las posiciones aprobadas, ocupadas, vacantes y congeladas.
+- **Columnas clave:** `budgeted_positions`, `monthly_cost` (S), `currency`, `notes`, `valid_from`, `valid_to`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`; `org_unit_id` → `org_units`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `org_unit_id`; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); `CHECK (budgeted_positions >= 0)`.
 
 
 ### COL · Colaboradores y ficha 360
@@ -1241,10 +1276,10 @@ erDiagram
 
 #### `person_bank_accounts`
 
-- **Propósito:** Cuentas de la persona para pago de haberes y depósito de CTS.
-- **Columnas clave:** `purpose`, `bank_code`, `account_type`, `account_number_enc` (S), `interbank_code_enc` (S), `currency`, `is_active`, `verified_at`.
-- **Relaciones:** `person_id` → `people`.
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación.
+- **Propósito:** Cuentas de pago de haberes y depósito de CTS por relación laboral y finalidad, con vigencia (COL-8). Un cambio queda pendiente hasta que otra persona lo aprueba (RN-COL-11); la exclusión solo rige entre cuentas activas.
+- **Columnas clave:** `purpose`, `bank_code`, `account_type`, `account_number_enc` (S), `interbank_code_enc` (S), `currency`, `is_active`, `verified_at`, `status`, `decided_at`, `decision_reason`, `valid_from`, `valid_to`.
+- **Relaciones:** `person_id` → `people`; `employment_id` → `employments`; `requested_by_user_id` → `users` (opcional); `decided_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id`, `purpose` (solo filas con status = 'active'); borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación.
 
 #### `person_education`
 
@@ -1270,14 +1305,14 @@ erDiagram
 #### `dependents`
 
 - **Propósito:** Derechohabientes del trabajador (E-19): cónyuge, conviviente, hijos; sustento de asignación familiar y registro laboral.
-- **Columnas clave:** `full_name` (S), `relationship`, `doc_type`, `number_enc` (S), `number_hash`, `birth_date` (S), `is_student`, `disability_enc` (S), `registered_on`, `deregistered_on`, `deregistration_reason`, `registry_status`, `entitles_family_allowance`.
+- **Columnas clave:** `full_name` (S), `relationship`, `doc_type`, `number_enc` (S), `number_hash`, `birth_date` (S), `is_student`, `disability_enc` (S), `registered_on`, `deregistered_on`, `deregistration_reason`, `registry_status`, `entitles_family_allowance`, `majority_alerted_on`.
 - **Relaciones:** `person_id` → `people`; `proof_file_id` → `stored_files` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); contiene columnas sensibles (S); columnas `_enc` cifradas en la aplicación.
 
 #### `employments`
 
-- **Propósito:** Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí.
-- **Columnas clave:** `employee_code`, `kind`, `worker_category`, `hire_date`, `seniority_date`, `termination_date`, `status`, `probation_ends_on`.
+- **Propósito:** Relación laboral (C-01) entre una persona y una razón social. Todo lo laboral cuelga de aquí. work_email, work_phone y work_phone_ext son el contacto laboral que el directorio puede publicar (ORG-7 · RN-ORG-08); nunca el correo o celular personal.
+- **Columnas clave:** `employee_code`, `kind`, `worker_category`, `hire_date`, `seniority_date`, `termination_date`, `status`, `probation_ends_on`, `work_email`, `work_phone`, `work_phone_ext`.
 - **Relaciones:** `person_id` → `people`; `legal_entity_id` → `legal_entities`; `rehire_of_employment_id` → `employments` (opcional); `source_application_id` → `applications` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `legal_entity_id`, `employee_code`; `CHECK (termination_date IS NULL OR termination_date >= hire_date)`.
 
@@ -1293,17 +1328,31 @@ erDiagram
 
 #### `personnel_actions`
 
-- **Propósito:** Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera.
-- **Columnas clave:** `kind`, `effective_on`, `reason`, `status`, `applied_at`, `payload`.
-- **Relaciones:** `employment_id` → `employments`; `requested_by_user_id` → `users` (opcional); `workflow_instance_id` → `workflow_instances` (opcional).
+- **Propósito:** Movimiento de personal con fecha efectiva (ingreso, promoción, traslado, cambio de sueldo, de jefe...); agrupa los registros con vigencia que genera. HIS-2: queda en aprobación según la configuración; HIS-4: con fecha futura queda «programado» (scheduled) y se aplica solo ese día; una corrección deja el original como «reemplazado» (replaced) y enlazado.
+- **Columnas clave:** `kind`, `effective_on`, `reason`, `status`, `applied_at`, `payload`, `changes`, `decided_at`, `decision_reason`, `cancelled_at`, `is_retroactive`, `affected_from`, `affected_to`.
+- **Relaciones:** `employment_id` → `employments`; `requested_by_user_id` → `users` (opcional); `workflow_instance_id` → `workflow_instances` (opcional); `cancelled_by_user_id` → `users` (opcional); `replaces_personnel_action_id` → `personnel_actions` (opcional); `replaced_by_personnel_action_id` → `personnel_actions` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
 #### `employment_assignments`
 
-- **Propósito:** Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11).
+- **Propósito:** Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).
 - **Columnas clave:** `work_modality`, `reason`, `valid_from`, `valid_to`.
 - **Relaciones:** `employment_id` → `employments`; `job_profile_id` → `job_profiles`; `position_id` → `positions` (opcional); `org_unit_id` → `org_units`; `site_id` → `sites`; `manager_employment_id` → `employments` (opcional); `cost_center_id` → `cost_centers` (opcional); `personnel_action_id` → `personnel_actions` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id`; una posición no puede tener dos ocupantes en el mismo periodo; concurrencia optimista (`lock_version`).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id`; concurrencia optimista (`lock_version`).
+
+#### `employment_cost_distributions`
+
+- **Propósito:** Distribución con vigencia de una relación laboral entre varios centros de costo (ORG-4 · RN-ORG-06); sus líneas suman siempre 100 %.
+- **Columnas clave:** `reason`, `valid_from`, `valid_to`.
+- **Relaciones:** `employment_id` → `employments`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id`; concurrencia optimista (`lock_version`).
+
+#### `employment_cost_distribution_lines`
+
+- **Propósito:** Línea de una distribución: centro de costo y porcentaje (dos decimales).
+- **Columnas clave:** `percentage`.
+- **Relaciones:** `employment_cost_distribution_id` → `employment_cost_distributions`; `cost_center_id` → `cost_centers`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `employment_cost_distribution_id`, `cost_center_id`; `CHECK (percentage > 0 AND percentage <= 100)`.
 
 #### `employment_compensations`
 
@@ -1322,7 +1371,7 @@ erDiagram
 #### `employment_labor_regimes`
 
 - **Propósito:** Régimen laboral y de salud del trabajador con vigencia (C-05).
-- **Columnas clave:** `health_scheme`, `has_risk_insurance`, `has_family_allowance`, `valid_from`, `valid_to`.
+- **Columnas clave:** `health_scheme`, `health_plan_code`, `has_risk_insurance`, `has_family_allowance`, `valid_from`, `valid_to`.
 - **Relaciones:** `employment_id` → `employments`; `labor_regime_code` → `labor_regimes.code`; `health_provider_id` → `health_providers` (opcional); `personnel_action_id` → `personnel_actions` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id`; concurrencia optimista (`lock_version`).
 
@@ -1345,15 +1394,15 @@ erDiagram
 
 #### `contracts`
 
-- **Propósito:** Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08).
-- **Columnas clave:** `number`, `objective_cause`, `trial_period_ends_on`, `weekly_hours`, `work_modality`, `status`, `accumulated_days`, `valid_from`, `valid_to`.
-- **Relaciones:** `employment_id` → `employments`; `contract_type_id` → `contract_types`; `renewal_of_contract_id` → `contracts` (opcional); `document_id` → `documents` (opcional); `signature_request_id` → `signature_requests` (opcional).
+- **Propósito:** Contrato de la relación laboral con vigencia (C-03); controla vencimiento y tope acumulado (E-08). CON-4: expiry_alerted_days/expiry_alerted_for recuerdan la última anticipación avisada para esa fecha de fin (no se repite el aviso), cap_alerted_on el aviso de tope acumulado y over_limit_reason el motivo con que se confirmó una renovación por encima del tope.
+- **Columnas clave:** `number`, `objective_cause`, `trial_period_ends_on`, `weekly_hours`, `work_modality`, `status`, `accumulated_days`, `signed_at`, `signature_origin`, `approved_at`, `termination_reason`, `probation_alerted_on`, `expiry_alerted_days`, `expiry_alerted_for`, `cap_alerted_on`, `over_limit_reason`, `valid_from`, `valid_to`.
+- **Relaciones:** `employment_id` → `employments`; `contract_type_id` → `contract_types`; `renewal_of_contract_id` → `contracts` (opcional); `document_id` → `documents` (opcional); `signature_request_id` → `signature_requests` (opcional); `approved_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `employment_id` (solo filas con status NOT IN ('draft','pending_approval','superseded','cancelled')); borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
 #### `contract_amendments`
 
 - **Propósito:** Adendas al contrato.
-- **Columnas clave:** `number`, `kind`, `effective_on`, `description`, `status`.
+- **Columnas clave:** `number`, `kind`, `effective_on`, `description`, `status`, `changes`, `applied_refs`, `signed_at`, `signature_origin`, `cancellation_reason`.
 - **Relaciones:** `contract_id` → `contracts`; `document_id` → `documents` (opcional); `signature_request_id` → `signature_requests` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
@@ -1741,48 +1790,62 @@ erDiagram
 
 #### `vacation_policies`
 
-- **Propósito:** Política de vacaciones por empresa y régimen con vigencia (días por año, venta, adelanto, arrastre).
-- **Columnas clave:** `name`, `days_per_year`, `counts_calendar_days`, `min_days_per_request`, `allow_advance`, `max_advance_days`, `allow_sale`, `max_sale_days`, `carryover_rule`, `valid_from`, `valid_to`.
-- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `labor_regime_code` → `labor_regimes.code` (opcional); `approval_workflow_definition_id` → `workflow_definitions` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** (`valid_from`/`valid_to`); se admiten filas simultáneas con distinto alcance; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
+- **Propósito:** Política de vacaciones (VAC-1): identidad y alcance por empresa, régimen y categoría laboral. Las reglas viven en vacation_policy_rules con vigencia; la más específica que aplica a la relación manda.
+- **Columnas clave:** `code`, `name`, `status`.
+- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `labor_regime_code` → `labor_regimes.code` (opcional); `job_category_id` → `job_categories` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
+
+#### `vacation_policy_rules`
+
+- **Propósito:** Reglas de una política de vacaciones con vigencia (VAC-1): días por año (vacío = los del régimen en los parámetros legales), cómputo calendario o hábil, fraccionamiento mínimo, adelanto, venta, máximo de periodos acumulados y validación de RRHH. Cambiar una regla cierra la fila vigente e inserta otra.
+- **Columnas clave:** `days_per_year`, `counts_calendar_days`, `min_days_per_request`, `allow_advance`, `max_advance_days`, `allow_sale`, `max_sale_days`, `max_accumulated_periods`, `requires_hr_validation`, `valid_from`, `valid_to`.
+- **Relaciones:** `vacation_policy_id` → `vacation_policies`; `approval_workflow_definition_id` → `workflow_definitions` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `vacation_policy_id`; concurrencia optimista (`lock_version`).
 
 #### `vacation_accrual_periods`
 
-- **Propósito:** Récord vacacional por año de servicio: días ganados y fecha límite de goce.
-- **Columnas clave:** `period_start`, `period_end`, `entitled_days`, `accrued_days`, `enjoy_by`, `status`.
+- **Propósito:** Récord vacacional por año de servicio (VAC-2): días que corresponden (prorrateados por política y régimen vigentes en el año), fecha en que se ganan y fecha límite de goce.
+- **Columnas clave:** `period_start`, `period_end`, `entitled_days`, `accrued_days`, `enjoy_by`, `status`, `entitlement_detail`, `earned_on`, `pending_validation`.
 - **Relaciones:** `employment_id` → `employments`; `vacation_policy_id` → `vacation_policies` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); único: `employment_id`, `period_start`.
 
 #### `vacation_requests`
 
-- **Propósito:** Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación.
-- **Columnas clave:** `starts_on`, `ends_on`, `days`, `kind`, `status`, `notes`, `approved_at`.
-- **Relaciones:** `employment_id` → `employments`; `workflow_instance_id` → `workflow_instances` (opcional); `requested_by_user_id` → `users` (opcional).
+- **Propósito:** Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación. VAC-3: days es lo que descuenta del saldo según el cómputo de la política (calendario o hábil, con los feriados de la sede); advance_days es la parte tomada a cuenta del periodo en curso. La exclusión impide dos solicitudes activas solapadas del mismo trabajador.
+- **Columnas clave:** `starts_on`, `ends_on`, `days`, `kind`, `status`, `notes`, `approved_at`, `calendar_days`, `advance_days`, `exception_reason`, `submitted_at`, `decided_at`, `decision_reason`, `cancelled_at`, `cancellation_reason`, `started_at`, `completed_at`.
+- **Relaciones:** `employment_id` → `employments`; `workflow_instance_id` → `workflow_instances` (opcional); `requested_by_user_id` → `users` (opcional); `cancelled_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); `CHECK (ends_on >= starts_on)`.
 
 #### `vacation_ledger_entries`
 
-- **Propósito:** Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento.
-- **Columnas clave:** `entry_type`, `days`, `effective_on`, `reason`.
+- **Propósito:** Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento. Los días llevan signo: suman el devengo, el saldo inicial y los ajustes a favor; restan la reserva (programadas), el goce, la venta y la liquidación.
+- **Columnas clave:** `entry_type`, `days`, `effective_on`, `reason`, `evidence`, `idempotency_key`.
 - **Relaciones:** `employment_id` → `employments`; `vacation_accrual_period_id` → `vacation_accrual_periods` (opcional); `vacation_request_id` → `vacation_requests` (opcional); `reverses_entry_id` → `vacation_ledger_entries` (opcional); `created_by_user_id` → `users` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001); único: `idempotency_key`.
 
 
 ### AUS · Ausencias y permisos
 
 #### `absence_types`
 
-- **Propósito:** Tipos de ausencia configurables, cada uno con sus reglas (pagada, tope, sustento, subsidio, concepto de planilla).
-- **Columnas clave:** `code`, `name`, `category`, `is_paid`, `affects_attendance`, `requires_document`, `max_days_per_year`, `unit`, `statutory_suspension_code`, `subsidy_kind`, `counts_as_worked_for_benefits`, `rules`.
-- **Relaciones:** `payroll_concept_id` → `payroll_concepts` (opcional); `approval_workflow_definition_id` → `workflow_definitions` (opcional).
+- **Propósito:** Tipo de ausencia configurable (descanso médico, licencias, permiso personal, compensación, trabajo remoto…). Las reglas viven en absence_type_rules con vigencia; los del paquete de país (is_system) no se editan.
+- **Columnas clave:** `code`, `name`, `category`, `is_system`, `is_confidential`, `legal_duration_parameter_code`, `status`.
+- **Relaciones:** `country_code` → `countries.code` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
+
+#### `absence_type_rules`
+
+- **Propósito:** Reglas de un tipo de ausencia con vigencia (AUS-1): goce, unidad, tope por periodo, anticipación, sustento, quién la solicita, flujo de aprobación, efecto en planilla y alcance por empresa o régimen. Cambiar una regla cierra la fila vigente e inserta otra.
+- **Columnas clave:** `is_paid`, `affects_attendance`, `unit`, `max_quantity`, `max_period`, `min_notice_days`, `requires_document`, `document_grace_days`, `requestable_by`, `payroll_concept_code`, `statutory_suspension_code`, `subsidy_kind`, `counts_as_worked_for_benefits`, `day_count`, `legal_entity_ids`, `labor_regime_codes`, `valid_from`, `valid_to`.
+- **Relaciones:** `absence_type_id` → `absence_types`; `approval_workflow_definition_id` → `workflow_definitions` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** sin solapamiento por `absence_type_id`; concurrencia optimista (`lock_version`).
 
 #### `absence_requests`
 
-- **Propósito:** Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados.
-- **Columnas clave:** `starts_at`, `ends_at`, `days`, `hours`, `status`, `reason`, `employer_paid_days`, `subsidized_days`.
-- **Relaciones:** `employment_id` → `employments`; `absence_type_id` → `absence_types`; `workflow_instance_id` → `workflow_instances` (opcional); `requested_by_user_id` → `users` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); `CHECK (ends_at >= starts_at)`.
+- **Propósito:** Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados. AUS-2: las fechas laborales (starts_on, ends_on) son la referencia; starts_at y ends_at son el instante en la zona horaria de la empresa (fin exclusivo) y alimentan la exclusión que impide ausencias solapadas del mismo trabajador.
+- **Columnas clave:** `starts_at`, `ends_at`, `days`, `hours`, `status`, `reason`, `employer_paid_days`, `subsidized_days`, `starts_on`, `ends_on`, `start_time`, `end_time`, `calendar_days`, `registered_directly`, `document_due_on`, `exception_reason`, `submitted_at`, `decided_at`, `decision_reason`, `cancelled_at`, `cancellation_reason`.
+- **Relaciones:** `employment_id` → `employments`; `absence_type_id` → `absence_types`; `workflow_instance_id` → `workflow_instances` (opcional); `requested_by_user_id` → `users` (opcional); `cancelled_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); `CHECK (ends_at >= starts_at)`; `CHECK (starts_on IS NULL OR ends_on >= starts_on)`.
 
 #### `absence_medical_certificates`
 
@@ -2121,10 +2184,10 @@ erDiagram
 
 #### `insurance_beneficiaries`
 
-- **Propósito:** Beneficiarios declarados por el trabajador para el seguro de vida.
-- **Columnas clave:** `full_name_enc` (S), `document_number_enc` (S), `relationship`, `percentage`, `declared_on`.
-- **Relaciones:** `employment_id` → `employments`; `insurance_policy_member_id` → `insurance_policy_members` (opcional); `declaration_document_id` → `documents` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación.
+- **Propósito:** Beneficiarios declarados por el trabajador para el seguro de vida (COL-7). Cada declaración (declaration_id) agrupa sus beneficiarios con el archivo firmado; una declaración nueva deja la anterior como superseded.
+- **Columnas clave:** `full_name_enc` (S), `document_number_enc` (S), `relationship`, `percentage`, `declared_on`, `declaration_id`, `signed_on`, `status`.
+- **Relaciones:** `employment_id` → `employments`; `insurance_policy_member_id` → `insurance_policy_members` (opcional); `declaration_document_id` → `documents` (opcional); `declaration_file_id` → `stored_files` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación; `CHECK (percentage IS NULL OR (percentage > 0 AND percentage <= 100))`.
 
 
 ### PRE · Préstamos, adelantos y adelanto de sueldo

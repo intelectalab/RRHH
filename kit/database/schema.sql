@@ -5187,20 +5187,35 @@ CREATE TABLE vacation_requests (
   notes text,
   requested_by_user_id uuid,
   approved_at timestamptz,
+  calendar_days numeric(6,2),
+  advance_days numeric(6,2),
+  exception_reason text,
+  submitted_at timestamptz,
+  decided_at timestamptz,
+  decision_reason text,
+  cancelled_at timestamptz,
+  cancelled_by_user_id uuid,
+  cancellation_reason text,
+  started_at timestamptz,
+  completed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_vacation_requests_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_vacation_requests_1 CHECK (ends_on >= starts_on),
+  CONSTRAINT ex_vacation_requests_r1 EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(starts_on, ends_on, '[]') WITH &&) WHERE (deleted_at IS NULL AND kind IN ('leave','advance') AND status IN ('pending','hr_review','approved','in_progress','taken')) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_vacation_requests_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_vacation_requests_workflow_instance_id FOREIGN KEY (tenant_id, workflow_instance_id) REFERENCES workflow_instances (tenant_id, id),
-  CONSTRAINT fk_vacation_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_vacation_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_vacation_requests_cancelled_by_user_id FOREIGN KEY (tenant_id, cancelled_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE vacation_requests IS 'Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación.';
+COMMENT ON TABLE vacation_requests IS 'Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación. VAC-3: days es lo que descuenta del saldo según el cómputo de la política (calendario o hábil, con los feriados de la sede); advance_days es la parte tomada a cuenta del periodo en curso. La exclusión impide dos solicitudes activas solapadas del mismo trabajador.';
 CREATE INDEX ix_vacation_requests_workflow_instance_id ON vacation_requests (tenant_id, workflow_instance_id);
 CREATE INDEX ix_vacation_requests_requested_by_user_id ON vacation_requests (tenant_id, requested_by_user_id);
+CREATE INDEX ix_vacation_requests_cancelled_by_user_id ON vacation_requests (tenant_id, cancelled_by_user_id);
 CREATE INDEX ix_vacation_requests_employment_id_starts_on ON vacation_requests (tenant_id, employment_id, starts_on);
+CREATE INDEX ix_vacation_requests_status_starts_on ON vacation_requests (tenant_id, status, starts_on);
 ALTER TABLE vacation_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vacation_requests FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON vacation_requests USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -18318,6 +18333,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('asistencia.redondeo_minutos', 'attendance', 'Redondeo (min)', 'Redondeo del tiempo trabajado; 0 = sin redondeo.', 'integer', '0'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.anticipacion_minima_dias', 'time_off', 'Anticipación mínima', 'Días de anticipación para solicitar vacaciones.', 'integer', '7'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.valida_rrhh', 'time_off', 'Validación de RRHH', 'Tras el jefe, RRHH valida la solicitud.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('vacaciones.maximo_ausentes_simultaneos', 'time_off', 'Máximo de ausentes simultáneos por unidad', 'VAC-4 · Si más personas de una misma unidad estarán ausentes el mismo día (vacaciones y ausencias aprobadas o pendientes), el calendario del equipo y la aprobación lo alertan. 0 = sin límite.', 'integer', '0'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.alerta_acumulacion_dias', 'time_off', 'Aviso de vacaciones acumuladas', 'Saldo desde el que se alerta acumulación.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('ausencias.dias_descanso_semanal', 'time_off', 'Días de descanso semanal (cómputo en días hábiles)', 'AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.', 'list', '["saturday", "sunday"]'::jsonb, ARRAY['organization','legal_entity','site'], '["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]'::jsonb),
   ('horas_extra.requiere_autorizacion', 'attendance', 'Autorización previa', 'El sobretiempo solo se reconoce si fue autorizado.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], NULL),

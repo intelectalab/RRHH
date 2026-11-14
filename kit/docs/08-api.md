@@ -742,7 +742,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/vacation-policies/{id}` | `time.vacation_policies.view` | 2 |
 | GET, POST | `/vacation-requests` | `time.vacation_requests.{view,create}` | 2 |
 | GET, PATCH | `/vacation-requests/{id}` | `time.vacation_requests.{view,update}` | 2 |
-| POST | `/vacation-requests/{id}/{submit,approve,reject,cancel}` | `time.vacation_requests.{submit,approve,reject,cancel}` | 2 |
+| POST | `/vacation-requests/{id}/{submit,cancel}` | `time.vacation_requests.{submit,cancel}` | 2 |
 | POST | `/vacation-policies` | `time.vacation_policies.update` | 2 |
 | PATCH | `/vacation-policies/{id}` | `time.vacation_policies.update` | 2 |
 | POST | `/vacation-policies/{id}/archive` | `time.vacation_policies.update` | 2 |
@@ -750,6 +750,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/vacation-policies/{id}/rules` | `time.vacation_policies.view` | 2 |
 | GET | `/vacation-legal-limits` | `time.vacation_policies.view` | 2 |
 | GET | `/vacation-balances/{id}/ledger` | `time.vacation_balances.view` | 2 |
+| POST | `/vacation-requests/simulate` | `time.vacation_requests.create` | 2 |
+| POST | `/vacation-requests/{id}/register` | `time.vacation_requests.validate` | 2 |
+| GET | `/vacation-requests/{id}/overlaps` | `time.vacation_requests.view` | 2 |
+| GET | `/team-calendar` | `time.vacation_requests.view` | 2 |
 
 **AUS · Ausencias y permisos**
 
