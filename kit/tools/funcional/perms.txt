@@ -97,7 +97,7 @@ TUR | time.shifts | turnos | AD RH PY MG AU EM° | AD RH |
 TUR | time.shift_assignments | la planificación de turnos | AD RH PY MG AU EM° | AD RH MG | +swap#Proponer intercambio de turno:EM° MG°; +approve_swap#Aprobar intercambios:AD RH MG
 VAC,ESS | time.vacation_requests | solicitudes de vacaciones | AD RH PY MG AU EM° | AD° RH° PY° RC° MG° EM° ST° CT° | approve:AD RH MG; reject:AD RH MG; +validate#Validación final de RRHH:AD RH; +schedule#Programar el rol anual y vacaciones colectivas:AD RH MG
 VAC | time.vacation_balances | saldos de vacaciones | AD RH PY MG AU EM° | AD RH |
-VAC | time.vacation_policies | políticas de vacaciones |  |  | +update#Configurar políticas de vacaciones:AD RH
+VAC | time.vacation_policies | políticas de vacaciones |  |  | +view#Ver políticas de vacaciones:AD RH PY AU; +update#Configurar políticas de vacaciones:AD RH
 AUS,ESS | time.absences | ausencias y permisos (sin diagnóstico) | AD RH PY MG AU EM° | AD° RH° PY° RC° MG° EM° ST° CT° | approve:AD RH MG; reject:AD RH MG; +create_for_others#Registrar ausencias a nombre de otros:AD RH; +manage_subsidy#Gestionar subsidios y reembolsos:AD RH PY
 AUS | time.absence_types | tipos de ausencia y sus reglas | AD RH PY MG EM AU | AD RH |
 AUS | *time.absences.medical_certificate.view | Ver certificados médicos y sustentos confidenciales | RH

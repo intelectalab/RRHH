@@ -5085,37 +5085,61 @@ CREATE TRIGGER trg_time_policies_touch BEFORE UPDATE ON time_policies FOR EACH R
 CREATE TABLE vacation_policies (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
+  code text NOT NULL,
   name text NOT NULL,
   legal_entity_id uuid,
   labor_regime_code text,
-  days_per_year numeric(5,2) NOT NULL,
-  counts_calendar_days boolean NOT NULL DEFAULT true,
-  min_days_per_request numeric(5,2),
-  allow_advance boolean NOT NULL DEFAULT false,
-  max_advance_days numeric(5,2),
-  allow_sale boolean NOT NULL DEFAULT true,
-  max_sale_days numeric(5,2),
-  carryover_rule jsonb,
-  approval_workflow_definition_id uuid,
-  valid_from date NOT NULL,
-  valid_to date,
+  job_category_id uuid,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_vacation_policies_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT ck_vacation_policies_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
   CONSTRAINT fk_vacation_policies_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
-  CONSTRAINT fk_vacation_policies_approval_workflow_definition_id FOREIGN KEY (tenant_id, approval_workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id)
+  CONSTRAINT fk_vacation_policies_job_category_id FOREIGN KEY (tenant_id, job_category_id) REFERENCES job_categories (tenant_id, id)
 );
-COMMENT ON TABLE vacation_policies IS 'Política de vacaciones por empresa y régimen con vigencia (días por año, venta, adelanto, arrastre).';
+COMMENT ON TABLE vacation_policies IS 'Política de vacaciones (VAC-1): identidad y alcance por empresa, régimen y categoría laboral. Las reglas viven en vacation_policy_rules con vigencia; la más específica que aplica a la relación manda.';
+CREATE UNIQUE INDEX uq_vacation_policies_code ON vacation_policies (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_vacation_policies_legal_entity_id ON vacation_policies (tenant_id, legal_entity_id);
 CREATE INDEX ix_vacation_policies_labor_regime_code ON vacation_policies (tenant_id, labor_regime_code);
-CREATE INDEX ix_vacation_policies_approval_workflow_definition_id ON vacation_policies (tenant_id, approval_workflow_definition_id);
+CREATE INDEX ix_vacation_policies_job_category_id ON vacation_policies (tenant_id, job_category_id);
 ALTER TABLE vacation_policies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vacation_policies FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON vacation_policies USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_vacation_policies_touch BEFORE UPDATE ON vacation_policies FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE vacation_policy_rules (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  vacation_policy_id uuid NOT NULL,
+  days_per_year numeric(5,2),
+  counts_calendar_days boolean NOT NULL DEFAULT true,
+  min_days_per_request numeric(5,2),
+  allow_advance boolean NOT NULL DEFAULT false,
+  max_advance_days numeric(5,2),
+  allow_sale boolean NOT NULL DEFAULT false,
+  max_sale_days numeric(5,2),
+  max_accumulated_periods smallint,
+  requires_hr_validation boolean NOT NULL DEFAULT false,
+  approval_workflow_definition_id uuid,
+  valid_from date NOT NULL,
+  valid_to date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_vacation_policy_rules_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_vacation_policy_rules_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
+  CONSTRAINT ex_vacation_policy_rules_vigencia EXCLUDE USING gist (tenant_id WITH =, vacation_policy_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT fk_vacation_policy_rules_vacation_policy_id FOREIGN KEY (tenant_id, vacation_policy_id) REFERENCES vacation_policies (tenant_id, id),
+  CONSTRAINT fk_vacation_policy_rules_approval_workflow_definition_id FOREIGN KEY (tenant_id, approval_workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id)
+);
+COMMENT ON TABLE vacation_policy_rules IS 'Reglas de una política de vacaciones con vigencia (VAC-1): días por año (vacío = los del régimen en los parámetros legales), cómputo calendario o hábil, fraccionamiento mínimo, adelanto, venta, máximo de periodos acumulados y validación de RRHH. Cambiar una regla cierra la fila vigente e inserta otra.';
+CREATE INDEX ix_vacation_policy_rules_approval_workflow_definition_id ON vacation_policy_rules (tenant_id, approval_workflow_definition_id);
+ALTER TABLE vacation_policy_rules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vacation_policy_rules FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON vacation_policy_rules USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_vacation_policy_rules_touch BEFORE UPDATE ON vacation_policy_rules FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE vacation_accrual_periods (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -5128,6 +5152,9 @@ CREATE TABLE vacation_accrual_periods (
   enjoy_by date,
   status text NOT NULL DEFAULT 'accruing' CHECK (status IN ('accruing','earned','overdue','closed')),
   vacation_policy_id uuid,
+  entitlement_detail jsonb,
+  earned_on date,
+  pending_validation boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -5136,7 +5163,7 @@ CREATE TABLE vacation_accrual_periods (
   CONSTRAINT fk_vacation_accrual_periods_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_vacation_accrual_periods_vacation_policy_id FOREIGN KEY (tenant_id, vacation_policy_id) REFERENCES vacation_policies (tenant_id, id)
 );
-COMMENT ON TABLE vacation_accrual_periods IS 'Récord vacacional por año de servicio: días ganados y fecha límite de goce.';
+COMMENT ON TABLE vacation_accrual_periods IS 'Récord vacacional por año de servicio (VAC-2): días que corresponden (prorrateados por política y régimen vigentes en el año), fecha en que se ganan y fecha límite de goce.';
 CREATE INDEX ix_vacation_accrual_periods_vacation_policy_id ON vacation_accrual_periods (tenant_id, vacation_policy_id);
 ALTER TABLE vacation_accrual_periods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vacation_accrual_periods FORCE ROW LEVEL SECURITY;
@@ -5187,15 +5214,18 @@ CREATE TABLE vacation_ledger_entries (
   reverses_entry_id uuid,
   reason text,
   created_by_user_id uuid,
+  evidence text,
+  idempotency_key text,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_vacation_ledger_entries_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_vacation_ledger_entries_idempotency_key UNIQUE (tenant_id, idempotency_key),
   CONSTRAINT fk_vacation_ledger_entries_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_vacation_ledger_entries_vacation_accrual_period_id FOREIGN KEY (tenant_id, vacation_accrual_period_id) REFERENCES vacation_accrual_periods (tenant_id, id),
   CONSTRAINT fk_vacation_ledger_entries_vacation_request_id FOREIGN KEY (tenant_id, vacation_request_id) REFERENCES vacation_requests (tenant_id, id),
   CONSTRAINT fk_vacation_ledger_entries_reverses_entry_id FOREIGN KEY (tenant_id, reverses_entry_id) REFERENCES vacation_ledger_entries (tenant_id, id),
   CONSTRAINT fk_vacation_ledger_entries_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE vacation_ledger_entries IS 'Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento.';
+COMMENT ON TABLE vacation_ledger_entries IS 'Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento. Los días llevan signo: suman el devengo, el saldo inicial y los ajustes a favor; restan la reserva (programadas), el goce, la venta y la liquidación.';
 CREATE INDEX ix_vacation_ledger_entries_vacation_accrual_period_id ON vacation_ledger_entries (tenant_id, vacation_accrual_period_id);
 CREATE INDEX ix_vacation_ledger_entries_vacation_request_id ON vacation_ledger_entries (tenant_id, vacation_request_id);
 CREATE INDEX ix_vacation_ledger_entries_reverses_entry_id ON vacation_ledger_entries (tenant_id, reverses_entry_id);
@@ -14956,6 +14986,7 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('time.vacation_requests.schedule', 'time_off', 'vacation_requests', 'schedule', 'action', false, 'Programar el rol anual y vacaciones colectivas'),
   ('time.vacation_balances.view', 'time_off', 'vacation_balances', 'view', 'action', false, 'Ver saldos de vacaciones'),
   ('time.vacation_balances.adjust', 'time_off', 'vacation_balances', 'adjust', 'action', false, 'Ajustar saldos de vacaciones'),
+  ('time.vacation_policies.view', 'time_off', 'vacation_policies', 'view', 'action', false, 'Ver políticas de vacaciones'),
   ('time.vacation_policies.update', 'time_off', 'vacation_policies', 'update', 'action', false, 'Configurar políticas de vacaciones'),
   ('time.absences.view', 'time_off', 'absences', 'view', 'action', false, 'Ver ausencias y permisos (sin diagnóstico)'),
   ('time.absences.approve', 'time_off', 'absences', 'approve', 'action', false, 'Aprobar ausencias y permisos (sin diagnóstico)'),
@@ -15870,6 +15901,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('admin_empresa', 'time.vacation_requests.schedule', 'organization'),
   ('admin_empresa', 'time.vacation_balances.view', 'organization'),
   ('admin_empresa', 'time.vacation_balances.adjust', 'organization'),
+  ('admin_empresa', 'time.vacation_policies.view', 'organization'),
   ('admin_empresa', 'time.vacation_policies.update', 'organization'),
   ('admin_empresa', 'time.absences.view', 'organization'),
   ('admin_empresa', 'time.absences.approve', 'organization'),
@@ -16636,6 +16668,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('rrhh', 'time.vacation_requests.schedule', 'organization'),
   ('rrhh', 'time.vacation_balances.view', 'organization'),
   ('rrhh', 'time.vacation_balances.adjust', 'organization'),
+  ('rrhh', 'time.vacation_policies.view', 'organization'),
   ('rrhh', 'time.vacation_policies.update', 'organization'),
   ('rrhh', 'time.absences.view', 'organization'),
   ('rrhh', 'time.absences.approve', 'organization'),
@@ -17080,6 +17113,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('payroll', 'time.vacation_requests.submit', 'assigned'),
   ('payroll', 'time.vacation_requests.update', 'assigned'),
   ('payroll', 'time.vacation_balances.view', 'organization'),
+  ('payroll', 'time.vacation_policies.view', 'organization'),
   ('payroll', 'time.absences.view', 'organization'),
   ('payroll', 'time.absences.cancel', 'assigned'),
   ('payroll', 'time.absences.create', 'assigned'),
@@ -17801,6 +17835,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('auditor', 'time.shift_assignments.view', 'organization'),
   ('auditor', 'time.vacation_requests.view', 'organization'),
   ('auditor', 'time.vacation_balances.view', 'organization'),
+  ('auditor', 'time.vacation_policies.view', 'organization'),
   ('auditor', 'time.absences.view', 'organization'),
   ('auditor', 'time.absence_types.view', 'organization'),
   ('auditor', 'time.overtime_requests.view', 'organization'),

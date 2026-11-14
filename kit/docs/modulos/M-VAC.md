@@ -43,6 +43,7 @@ Llevar el saldo de vacaciones de cada relación laboral con exactitud y resolver
 | `time.vacation_requests.schedule` **(+)** | Programar el rol anual y vacaciones colectivas | Administrador empresa, RRHH, Manager |
 | `time.vacation_balances.view` | Ver saldos de vacaciones | Administrador empresa, RRHH, Payroll, Manager, Auditor; solo sobre lo propio o asignado: Empleado |
 | `time.vacation_balances.adjust` | Ajustar saldos de vacaciones | Administrador empresa, RRHH |
+| `time.vacation_policies.view` **(+)** | Ver políticas de vacaciones | Administrador empresa, RRHH, Payroll, Auditor |
 | `time.vacation_policies.update` **(+)** | Configurar políticas de vacaciones | Administrador empresa, RRHH |
 
 **(S)** sensible · **(+)** por añadir a `api/openapi.yaml`. Alcance, permisos por campo y matriz completa: `07-permisos-y-roles.md`.

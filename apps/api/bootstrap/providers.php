@@ -11,6 +11,7 @@ use App\Modules\Organization\OrganizationServiceProvider;
 use App\Modules\Platform\PlatformServiceProvider;
 use App\Modules\Reports\ReportsServiceProvider;
 use App\Modules\Settings\SettingsServiceProvider;
+use App\Modules\Vacations\VacationsServiceProvider;
 use App\Modules\Workflow\WorkflowServiceProvider;
 use App\Providers\AppServiceProvider;
 
@@ -28,4 +29,5 @@ return [
     AbsencesServiceProvider::class,
     ImportsServiceProvider::class,
     CoreHRServiceProvider::class,
+    VacationsServiceProvider::class,
 ];

@@ -271,6 +271,7 @@ DESDE_2025 = {
     'utilidades_pct_comercio_restaurantes', 'utilidades_pct_otras_actividades', 'vacaciones_dias', 'cts_dias_por_anio',
     'cts_aplica', 'gratificacion_aplica', 'gratificacion_factor', 'cts_tope_dias', 'indemnizacion_dias_por_anio',
     'indemnizacion_tope_dias', 'asignacion_familiar_aplica', 'dias_base_mes', 'indemnizacion_plazo_fijo_dias_por_mes', 'indemnizacion_vacacional_aplica',
+    'vacaciones_plazo_goce_meses',
 }
 NOTA_2025 = 'Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior.'
 def lp(code, name, unit, value, verified, source, note='', regime=None, vfrom='2026-01-01', vfrom_ok=False, json_value=None, vto=None):
@@ -322,6 +323,13 @@ LEGAL_PE = [
  lp('vacaciones_dias', 'Días de vacaciones por año', 'days', None, False, 'DL 713', 'Régimen general. No consta en la investigación; se espera 30 días, por confirmar.', regime='pe_general'),
  lp('vacaciones_dias', 'Días de vacaciones por año', 'days', 15, True, 'DS 013-2013-PRODUCE', regime='pe_micro'),
  lp('vacaciones_dias', 'Días de vacaciones por año', 'days', 15, True, 'DS 013-2013-PRODUCE', regime='pe_pequena'),
+ # VAC-1 · VAC-2: plazo de goce, récord y límites de venta, fraccionamiento y adelanto (RN-VAC-04, 05, 09).
+ lp('vacaciones_plazo_goce_meses', 'Plazo para gozar un periodo vacacional ganado', 'months', 12, True, 'DL 713 art. 23', 'Las vacaciones se gozan dentro del año siguiente a aquel en que se generó el derecho; vencido ese plazo, el periodo queda «vencido».'),
+ lp('vacaciones_record_dias_jornada_6', 'Récord vacacional: días efectivos con jornada de 6 días a la semana', 'days', None, False, 'DL 713 art. 10', 'Se espera 260 días de labor efectiva; por confirmar.'),
+ lp('vacaciones_record_dias_jornada_5', 'Récord vacacional: días efectivos con jornada de 5 días a la semana', 'days', None, False, 'DL 713 art. 10', 'Se espera 210 días de labor efectiva; por confirmar.'),
+ lp('vacaciones_venta_max_dias', 'Días de vacaciones que se pueden vender (reducción del descanso)', 'days', None, False, 'DL 713 art. 19 · DL 1405', 'Tope de la reducción por acuerdo escrito; por confirmar por régimen.'),
+ lp('vacaciones_fraccion_minima_dias', 'Bloque mínimo al fraccionar las vacaciones', 'days', None, False, 'DL 1405 art. 2 · DS 013-2019-TR', 'Fraccionamiento del descanso en bloques; por confirmar.'),
+ lp('vacaciones_adelanto_max_dias', 'Días de vacaciones que se pueden adelantar antes de cumplir el récord', 'days', None, False, 'DL 1405 art. 3 · DS 013-2019-TR', 'Adelanto a cuenta de días generados en proporción al tiempo trabajado; por confirmar.'),
  lp('cts_dias_por_anio', 'Días de remuneración de CTS por año', 'days', 30, True, 'DS 001-97-TR', 'Valor general: una remuneración computable por año. La calculadora divide el valor del régimen entre este para obtener su proporción.'),
  lp('cts_aplica', 'Corresponde CTS', 'count', 1, True, 'DS 001-97-TR', 'Valor general; el régimen lo reemplaza con 0 si no corresponde.'),
  lp('gratificacion_aplica', 'Corresponde gratificación', 'count', 1, True, 'Ley 27735', 'Valor general; el régimen lo reemplaza con 0 si no corresponde.'),

@@ -80,6 +80,8 @@ final class CrossTenantHarness
         '/catalog-items/{id}' => CatalogItem::class,
         '/catalog-items/{id}/archive' => CatalogItem::class,
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
+        // VAC-2: el saldo de vacaciones se identifica por la relación laboral de A.
+        'VacationBalance' => Employment::class,
         // AUS-1: historia de reglas de un tipo de ausencia de A.
         '/absence-types/{id}/rules' => AbsenceType::class,
         // ORG-4: distribución por centros de costo de una relación laboral de A.

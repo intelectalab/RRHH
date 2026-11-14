@@ -78,24 +78,28 @@
   offline_allowed bool=t ; vigcols
 
 #E VAC | Vacaciones
-@vacation_policies soft lock | Política de vacaciones por empresa y régimen con vigencia (días por año, venta, adelanto, arrastre).
-  name ; legal_entity_id ?-> legal_entities ; labor_regime_code ?~> labor_regimes.code ; days_per_year numeric(5,2)!
-  counts_calendar_days bool=t ; min_days_per_request numeric(5,2) ; allow_advance bool=f ; max_advance_days numeric(5,2)
-  allow_sale bool=t ; max_sale_days numeric(5,2) ; carryover_rule j
-  approval_workflow_definition_id ?-> workflow_definitions ; vigcols
-@vacation_accrual_periods lock | Récord vacacional por año de servicio: días ganados y fecha límite de goce.
+@vacation_policies soft lock | Política de vacaciones (VAC-1): identidad y alcance por empresa, régimen y categoría laboral. Las reglas viven en vacation_policy_rules con vigencia; la más específica que aplica a la relación manda.
+  code ; name ; legal_entity_id ?-> legal_entities ; labor_regime_code ?~> labor_regimes.code ; job_category_id ?-> job_categories
+  status enum(active,archived)=active ; uniq code
+@vacation_policy_rules lock | Reglas de una política de vacaciones con vigencia (VAC-1): días por año (vacío = los del régimen en los parámetros legales), cómputo calendario o hábil, fraccionamiento mínimo, adelanto, venta, máximo de periodos acumulados y validación de RRHH. Cambiar una regla cierra la fila vigente e inserta otra.
+  vacation_policy_id -> vacation_policies ; days_per_year numeric(5,2) ; counts_calendar_days bool=t
+  min_days_per_request numeric(5,2) ; allow_advance bool=f ; max_advance_days numeric(5,2)
+  allow_sale bool=f ; max_sale_days numeric(5,2) ; max_accumulated_periods smallint ; requires_hr_validation bool=f
+  approval_workflow_definition_id ?-> workflow_definitions ; vig vacation_policy_id
+@vacation_accrual_periods lock | Récord vacacional por año de servicio (VAC-2): días que corresponden (prorrateados por política y régimen vigentes en el año), fecha en que se ganan y fecha límite de goce.
   employment_id -> employments ; period_start date! ; period_end date! ; entitled_days numeric(6,2)!
   accrued_days numeric(6,2)=0 ; enjoy_by date ; status enum(accruing,earned,overdue,closed)=accruing
-  vacation_policy_id ?-> vacation_policies ; uniq employment_id, period_start
+  vacation_policy_id ?-> vacation_policies ; entitlement_detail j ; earned_on date ; pending_validation bool=f
+  uniq employment_id, period_start
 @vacation_requests main soft lock | Solicitud de vacaciones (goce, adelanto o venta) con su flujo de aprobación.
   employment_id -> employments ; starts_on date! ; ends_on date! ; days numeric(6,2)! ; kind enum(leave,advance,sale)=leave
   status enum(draft,pending,approved,rejected,cancelled,taken,hr_review,in_progress)=draft ; workflow_instance_id ?-> workflow_instances ; notes
   requested_by_user_id ?-> users ; approved_at ; check ends_on >= starts_on ; idx employment_id, starts_on
-@vacation_ledger_entries imm | Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento.
+@vacation_ledger_entries imm | Libro de movimientos de vacaciones, de solo inserción. El saldo es la suma de movimientos (C-11); un error se corrige con un contraasiento. Los días llevan signo: suman el devengo, el saldo inicial y los ajustes a favor; restan la reserva (programadas), el goce, la venta y la liquidación.
   employment_id -> employments ; vacation_accrual_period_id ?-> vacation_accrual_periods
   entry_type enum(accrual,taken,scheduled,sold,adjustment,expired,opening_balance,reversal,settlement)! ; days numeric(6,2)!
   effective_on date! ; vacation_request_id ?-> vacation_requests ; reverses_entry_id ?-> vacation_ledger_entries ; reason
-  created_by_user_id ?-> users ; idx employment_id, effective_on
+  created_by_user_id ?-> users ; evidence ; idempotency_key ; uniq idempotency_key ; idx employment_id, effective_on
 
 #E AUS | Ausencias y permisos
 @absence_types soft lock | Tipo de ausencia configurable (descanso médico, licencias, permiso personal, compensación, trabajo remoto…). Las reglas viven en absence_type_rules con vigencia; los del paquete de país (is_system) no se editan.

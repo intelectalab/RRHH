@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'insufficient_balance' => 'Você pede :requested dias e há :available disponíveis (mais :advance de adiantamento permitido).',
+    'legal_pending' => 'O limite legal de «:field» (:parameter) está pendente de validação: a regra é salva, mas revise-a quando a norma for confirmada.',
+    'legal_min' => 'Não pode ser menor que o mínimo legal vigente (:value, :parameter).',
+    'legal_max' => 'Não pode ser maior que o máximo legal vigente (:value, :parameter).',
+    'sale_disabled' => 'Ative a venda de dias para definir seu limite.',
+    'advance_disabled' => 'Ative o adiantamento para definir seu limite.',
+    'rules_invalid' => 'As regras não cumprem a lei vigente do regime.',
+    'legal_days_pending' => 'Os dias por ano deste regime (:parameter) estão pendentes de validação: até confirmá-los, o período não soma dias, salvo se a política os definir.',
+    'code_exists' => 'Já existe uma política com esse código.',
+    'archived' => 'A política está arquivada: restaure-a para alterá-la.',
+    'entity_out_of_scope' => 'Você não tem escopo sobre essa empresa.',
+    'employment_not_found' => 'O vínculo empregatício não foi encontrado.',
+    'settlement_reason' => 'Desligamento: os dias pendentes vão para a rescisão (RN-VAC-12).',
+    'accrual_reason' => 'Ano de férias de :from a :to completado.',
+    'scheduled_reason' => 'Dias reservados por uma solicitação aprovada.',
+    'consumed_reason' => 'Início do gozo: a reserva passa a dias gozados.',
+    'taken_reason' => 'Dias gozados.',
+    'days_positive' => 'Os dias devem ser maiores que zero.',
+    'adjust_zero' => 'O ajuste não pode ser zero.',
+    'period_not_found' => 'O período não pertence a este vínculo.',
+    'accrued' => 'Períodos de férias em dia em :count vínculos.',
+];

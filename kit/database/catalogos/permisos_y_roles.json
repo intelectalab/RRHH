@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 911,
+    "permisos": 912,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 139,
+    "fuera_del_contrato_api": 140,
     "roles": 11
   },
   "permisos": [
@@ -3900,6 +3900,18 @@
       "en_contrato_api": true,
       "ambito": "organizacion",
       "descripcion": "Ajustar saldos de vacaciones"
+    },
+    {
+      "codigo": "time.vacation_policies.view",
+      "epica": "VAC",
+      "modulo": "time_off",
+      "recurso": "vacation_policies",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "organizacion",
+      "descripcion": "Ver políticas de vacaciones"
     },
     {
       "codigo": "time.vacation_policies.update",
@@ -12288,6 +12300,10 @@
           "alcance": "organization"
         },
         {
+          "codigo": "time.vacation_policies.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "time.vacation_policies.update",
           "alcance": "organization"
         },
@@ -15357,6 +15373,10 @@
           "alcance": "organization"
         },
         {
+          "codigo": "time.vacation_policies.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "time.vacation_policies.update",
           "alcance": "organization"
         },
@@ -17135,6 +17155,10 @@
         },
         {
           "codigo": "time.vacation_balances.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "time.vacation_policies.view",
           "alcance": "organization"
         },
         {
@@ -20039,6 +20063,10 @@
         },
         {
           "codigo": "time.vacation_balances.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "time.vacation_policies.view",
           "alcance": "organization"
         },
         {

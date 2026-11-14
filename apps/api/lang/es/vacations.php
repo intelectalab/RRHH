@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'insufficient_balance' => 'Pides :requested días y hay :available disponibles (más :advance de adelanto permitido).',
+    'legal_pending' => 'El límite legal de «:field» (:parameter) está por validar: la regla se guarda, pero revísala cuando se confirme la norma.',
+    'legal_min' => 'No puede ser menor que el mínimo legal vigente (:value, :parameter).',
+    'legal_max' => 'No puede ser mayor que el máximo legal vigente (:value, :parameter).',
+    'sale_disabled' => 'Activa la venta de días para fijar su tope.',
+    'advance_disabled' => 'Activa el adelanto para fijar su tope.',
+    'rules_invalid' => 'Las reglas no cumplen la ley vigente del régimen.',
+    'legal_days_pending' => 'Los días por año de este régimen (:parameter) están por validar: hasta confirmarlos, el periodo no suma días salvo que la política los fije.',
+    'code_exists' => 'Ya existe una política con ese código.',
+    'archived' => 'La política está archivada: restáurala para cambiarla.',
+    'entity_out_of_scope' => 'No tienes alcance sobre esa empresa.',
+    'employment_not_found' => 'No se encontró la relación laboral.',
+    'settlement_reason' => 'Cese: los días pendientes pasan a la liquidación (RN-VAC-12).',
+    'accrual_reason' => 'Año vacacional del :from al :to completado.',
+    'scheduled_reason' => 'Días reservados por una solicitud aprobada.',
+    'consumed_reason' => 'Inicio del goce: la reserva pasa a días tomados.',
+    'taken_reason' => 'Días gozados.',
+    'days_positive' => 'Los días deben ser mayores que cero.',
+    'adjust_zero' => 'El ajuste no puede ser cero.',
+    'period_not_found' => 'El periodo no pertenece a esta relación laboral.',
+    'accrued' => 'Periodos vacacionales al día en :count relaciones laborales.',
+];
