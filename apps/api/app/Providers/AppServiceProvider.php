@@ -8,6 +8,7 @@ use App\Shared\Exports\ExportRegistry;
 use App\Shared\Features\FeatureFlags;
 use App\Shared\Files\Contracts\FileStorageService;
 use App\Shared\Files\FileService;
+use App\Shared\Home\HomeRegistry;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Inbox\InboxRegistry;
 use App\Shared\Integrations\IntegrationManager;
@@ -55,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ImportRegistry::class);
         $this->app->singleton(TrashRegistry::class);
         $this->app->singleton(CalendarRegistry::class);
+        $this->app->singleton(HomeRegistry::class);
         $this->app->singleton(ProvisioningRegistry::class);
         $this->app->singleton(ApprovalOutcomeRegistry::class);
         $this->app->singleton(UsageRegistry::class);

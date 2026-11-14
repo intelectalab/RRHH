@@ -766,3 +766,20 @@
 .cal-eq-leyenda .t-abs { background: var(--in-50); border: 1px solid var(--in); }
 .cal-eq-leyenda .t-pend { background: var(--wa-50); border: 1px dashed var(--wa); }
 .cal-eq-leyenda .t-other { background: var(--bd); }
+
+/* COL-12 · MSS-1 · Tableros de inicio y MSS-2 · Mi equipo */
+.inicio-vistas { margin-top: 0; min-width: 260px; }
+.inicio-vistas button { padding: 6px 12px; }
+.inicio-tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; align-items: start; }
+.inicio-tarjeta { margin-bottom: 0; }
+.inicio-tarjeta .card-body { display: flex; flex-direction: column; gap: 8px; }
+.inicio-tarjeta.tono-warning { border-top: 3px solid var(--wa); }
+.inicio-tarjeta.tono-danger { border-top: 3px solid var(--er); }
+.inicio-titulo { font-size: var(--fs-s); font-weight: 700; color: var(--tx2); margin: 0; }
+.inicio-cifra { color: var(--tx); text-decoration: none; }
+.inicio-cifra b { font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.inicio-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.inicio-items li { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-s); min-width: 0; }
+.inicio-items li > a, .inicio-items li > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inicio-ver { align-self: flex-start; }
+@media (max-width: 600px) { .inicio-vistas { min-width: 0; width: 100%; } }

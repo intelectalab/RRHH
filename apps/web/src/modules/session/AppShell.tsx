@@ -27,6 +27,7 @@ type NavLink = { href: string; key: string; icon: IconName; module: string; visi
 const MENU: NavLink[] = [
   { href: '/', key: 'shell.modules_home', icon: 'home', module: 'base', visible: () => true },
   { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
+  { href: '/mi-equipo', key: 'shell.modules_my_team', icon: 'users', module: 'core', visible: (can) => can('people.team.view') },
   { href: '/personas/colaboradores', key: 'shell.modules_employees', icon: 'user', module: 'core', visible: (can) => can('people.employments.view'), exact: true },
   { href: '/personas/directorio', key: 'shell.modules_directory', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
   { href: '/personas/organigrama', key: 'shell.modules_org_chart', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },

@@ -356,4 +356,16 @@ final class VacationLedger implements VacationBalances
     {
         return (string) BigDecimal::of($s)->toScale(2);
     }
+
+    public function onLeave(array $employmentIds, string $date): array
+    {
+        if ($employmentIds === []) {
+            return [];
+        }
+
+        /** @var list<string> */
+        return DB::table('vacation_requests')->whereIn('employment_id', $employmentIds)->whereNull('deleted_at')
+            ->whereIn('status', ['approved', 'in_progress'])->where('starts_on', '<=', $date)->where('ends_on', '>=', $date)
+            ->distinct()->pluck('employment_id')->map(fn ($id) => (string) $id)->values()->all();
+    }
 }

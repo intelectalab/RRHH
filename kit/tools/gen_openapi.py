@@ -445,6 +445,9 @@ EXTRA = [
     ("HIS", 1, "post", "/personnel-actions/{id}/correct", "people.assignments.correct", "Corregir un movimiento aplicado con los valores correctos y el motivo: crea el movimiento de corrección y el original queda reemplazado (RN-HIS-06); con fecha pasada emite employment.retroactive_change con el rango afectado", False),
     ("ESS", 1, "get", "/me/employment", "-", "Ficha propia del colaborador", False),
     ("ESS", 1, "get", "/me/home", "-", "Inicio del colaborador: saldos, próximo pago, pendientes", False),
+    ("COL", 1, "get", "/home", "-", "Vistas de inicio del usuario según su rol (RRHH, manager o colaborador) y la vista por defecto", False),
+    ("COL", 1, "get", "/home/hr", "people.employments.view", "Tablero de inicio de RRHH: dotación, ingresos y ceses del mes, vencimientos y pendientes (solo tarjetas de módulos contratados)", False),
+    ("MSS", 1, "get", "/home/manager", "people.team.view", "Tablero de inicio del manager: aprobaciones, ausencias y vencimientos de su equipo", False),
     ("MSS", 1, "get", "/my-team", "people.team.view", "Equipo directo e indirecto del manager", False),
     ("MSS", 1, "get", "/my-team/calendar", "people.team.view", "Calendario de ausencias del equipo", False),
     ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
@@ -584,6 +587,10 @@ CREATED = {("post", "/vacation-policies"), ("post", "/employments/{employment_id
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/my-team"): [
+        _q("filter[level]", "direct: solo reportes directos; indirect: solo indirectos (requiere people.team.view_indirect)"),
+        _q("q", "Nombre o código del colaborador"),
+    ],
     ("get", "/absence-subsidies"): [
         _q("filter[status]", "Estados separados por coma (pending_filing, filed, observed, approved, reimbursed, rejected, cancelled)"),
         _q("filter[employment_id]", "Solo los expedientes de esa relación laboral"),

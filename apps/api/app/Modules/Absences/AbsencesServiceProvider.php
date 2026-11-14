@@ -4,9 +4,11 @@ namespace App\Modules\Absences;
 
 use App\Modules\Absences\Console\AdvanceAbsences;
 use App\Modules\Absences\Infrastructure\Calendar\AbsenceCalendarSource;
+use App\Modules\Absences\Infrastructure\Home\AbsentTodayCard;
 use App\Modules\Absences\Infrastructure\Time\ApprovedAbsencesQuery;
 use App\Modules\Absences\Infrastructure\Workflow\AbsenceRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
+use App\Shared\Home\HomeRegistry;
 use App\Shared\Time\ApprovedAbsences;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -29,6 +31,7 @@ final class AbsencesServiceProvider extends ServiceProvider
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(AbsenceRequestOutcome::class));
         // AUS-2 · Las ausencias aprobadas aparecen en el calendario del equipo (CFG-8).
         $this->app->make(CalendarRegistry::class)->register($this->app->make(AbsenceCalendarSource::class));
+        $this->app->make(HomeRegistry::class)->register(new AbsentTodayCard);
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {
