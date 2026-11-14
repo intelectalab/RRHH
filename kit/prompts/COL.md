@@ -3,7 +3,7 @@
 Personas, relaciones laborales y la ficha 360 como fuente única de información del colaborador.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 12 (10 historias y 2 tareas); 12 del MVP. **Operaciones de API:** 61.
+- **Actividades:** 12 (10 historias y 2 tareas); 12 del MVP. **Operaciones de API:** 63.
 - **Especificación:** `kit/docs/modulos/M-COL.md`.
 
 ## Prompt para una sesión nueva de Claude Code

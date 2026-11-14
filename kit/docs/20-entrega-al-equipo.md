@@ -69,12 +69,12 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 35 | Sí | D-39, D-40, D-41 |
 | 1 | [ORG](../prompts/ORG.md) · Estructura organizacional | Core HR | 7 | 0 | 7 | 64 | — | — |
 | 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 34 | — | D-05 |
-| 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 61 | — | A-05, A-10, D-14, D-17, D-30, D-35 |
+| 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 63 | — | A-05, A-10, D-14, D-17, D-30, D-35 |
 | 1 | [HIS](../prompts/HIS.md) · Historia con vigencia | Core HR | 3 | 3 | 6 | 19 | — | — |
 | 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 26 | — | D-10 |
 | 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 22 | — | A-11, D-10 |
 | 1 | [ESS](../prompts/ESS.md) · Portal del colaborador | Core HR | 5 | 1 | 6 | 8 | — | A-12, D-23 |
-| 1 | [MSS](../prompts/MSS.md) · Portal del manager | Core HR | 4 | 0 | 4 | 2 | — | — |
+| 1 | [MSS](../prompts/MSS.md) · Portal del manager | Core HR | 4 | 0 | 4 | 3 | — | — |
 | 1 | [IMP](../prompts/IMP.md) · Importador y puesta en marcha | Core HR | 4 | 3 | 7 | 12 | — | — |
 | 1 | [AYU](../prompts/AYU.md) · Centro de ayuda | Core HR | 6 | 1 | 7 | 24 | — | A-05, A-09, D-38 |
 | 2 | [ASI](../prompts/ASI.md) · Asistencia y marcación | Asistencia y turnos | 7 | 4 | 0 | 20 | — | A-06, A-12, D-16 |
