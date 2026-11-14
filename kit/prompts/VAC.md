@@ -3,7 +3,7 @@
 Saldos, solicitudes con aprobación, programación y calendario del equipo.
 
 - **Fase:** Fase 2 · Tiempo. **Módulo comercial:** Vacaciones y ausencias.
-- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 11.
+- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 20.
 - **Especificación:** `kit/docs/modulos/M-VAC.md`.
 
 ## Prompt para una sesión nueva de Claude Code

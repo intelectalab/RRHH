@@ -79,8 +79,8 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 1 | [AYU](../prompts/AYU.md) · Centro de ayuda | Core HR | 6 | 1 | 7 | 24 | — | A-05, A-09, D-38 |
 | 2 | [ASI](../prompts/ASI.md) · Asistencia y marcación | Asistencia y turnos | 7 | 4 | 0 | 20 | — | A-06, A-12, D-16 |
 | 2 | [TUR](../prompts/TUR.md) · Horarios, jornadas y turnos | Asistencia y turnos | 6 | 0 | 0 | 21 | — | — |
-| 2 | [VAC](../prompts/VAC.md) · Vacaciones | Vacaciones y ausencias | 5 | 2 | 7 | 11 | — | — |
-| 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 14 | — | — |
+| 2 | [VAC](../prompts/VAC.md) · Vacaciones | Vacaciones y ausencias | 5 | 2 | 7 | 20 | — | — |
+| 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 16 | — | — |
 | 2 | [BHO](../prompts/BHO.md) · Horas extra y bolsa de horas | Asistencia y turnos | 3 | 2 | 0 | 8 | — | — |
 | 2 | [TSH](../prompts/TSH.md) · Hojas de tiempo por proyecto | Hojas de tiempo | 4 | 0 | 0 | 12 | — | — |
 | 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 15 | Sí | A-10, A-14, D-06, D-07 |
@@ -188,7 +188,7 @@ El MVP puede empezar con todas: se aplica la recomendación detrás de un parám
 
 ## 8. Lo que aporta el negocio
 
-- **Parámetros legales:** 44 sin valor verificado, 37 de ellos del MVP (`kit/docs/19`). Los valida el especialista laboral y se cargan en `kit/tools/esquema/catalogos.py`.
+- **Parámetros legales:** 49 sin valor verificado, 42 de ellos del MVP (`kit/docs/19`). Los valida el especialista laboral y se cargan en `kit/tools/esquema/catalogos.py`.
 - **Textos legales:** revisión del abogado de lo marcado [validar] y datos de la empresa marcados [por definir] (`kit/tools/sitio/legales.py`).
 - **Precios definitivos**, razón social, RUC, dominio `gestiahr.com` y registro de la marca.
 - **Clientes, logos y testimonios reales**, con su permiso.
