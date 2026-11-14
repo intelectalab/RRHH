@@ -79,7 +79,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 1 | [AYU](../prompts/AYU.md) · Centro de ayuda | Core HR | 6 | 1 | 7 | 24 | — | A-05, A-09, D-38 |
 | 2 | [ASI](../prompts/ASI.md) · Asistencia y marcación | Asistencia y turnos | 7 | 4 | 0 | 20 | — | A-06, A-12, D-16 |
 | 2 | [TUR](../prompts/TUR.md) · Horarios, jornadas y turnos | Asistencia y turnos | 6 | 0 | 0 | 21 | — | — |
-| 2 | [VAC](../prompts/VAC.md) · Vacaciones | Vacaciones y ausencias | 5 | 2 | 7 | 20 | — | — |
+| 2 | [VAC](../prompts/VAC.md) · Vacaciones | Vacaciones y ausencias | 5 | 2 | 7 | 22 | — | — |
 | 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 16 | — | — |
 | 2 | [BHO](../prompts/BHO.md) · Horas extra y bolsa de horas | Asistencia y turnos | 3 | 2 | 0 | 8 | — | — |
 | 2 | [TSH](../prompts/TSH.md) · Hojas de tiempo por proyecto | Hojas de tiempo | 4 | 0 | 0 | 12 | — | — |

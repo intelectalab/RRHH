@@ -6,8 +6,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 106 | 3 | 44,0 % |
-| Backlog completo | 512 | 106 | 3 | 20,7 % |
+| Primer corte comercial (MVP) | 241 | 108 | 3 | 44,8 % |
+| Backlog completo | 512 | 108 | 3 | 21,1 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -201,8 +201,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | TUR-6 | Publicación de turnos y cambios entre compañeros | TUR | Fase 2 · Tiempo | Story | — | pendiente | — |  |
 | VAC-1 | Política de vacaciones por régimen | VAC | Fase 2 · Tiempo | Task | sí | hecha | 2026-11-13 | Políticas por empresa, régimen y categoría con reglas con vigencia; los días salen del parámetro legal del régimen si la política no los fija (lo verificado bloquea con 422, lo por validar avisa); archivar y restaurar por acción; Configuración → Políticas de vacaciones. Por validar: días del régimen general, récord vacacional, venta, fraccionamiento y adelanto. |
 | VAC-2 | Devengo y saldos de vacaciones | VAC | Fase 2 · Tiempo | Task | sí | hecha | 2026-11-13 | Periodos por año vacacional anclados a la antigüedad reconocida o el ingreso, prorrateados si cambia régimen o política; libro inmutable e idempotente y saldo como suma del libro; vencidos y adelanto posible; ajustes con motivo y sustento auditados; al cesar lo pendiente pasa a liquidación; devengo diario y por eventos; pestaña Vacaciones en la ficha; contrato VacationBalances para VAC-3. Pendiente: descontar faltas del récord (asistencia) y regla de reingreso en el mismo año. |
-| VAC-3 | Solicitud y aprobación de vacaciones | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
-| VAC-4 | Calendario de ausencias del equipo | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
+| VAC-3 | Solicitud y aprobación de vacaciones | VAC | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-13 | Borrador → simulación → envío al flujo vacation_request → aprobación (reserva en el libro) → en goce (consume) → gozada; RRHH registra directo con motivo; cancelar devuelve los días; días según política con feriados de la sede; saldo, adelanto, anticipación, fraccionamiento (por validar), solapes con vacaciones y ausencias (409 y exclusión en base) y planilla cerrada; pantalla /tiempo/vacaciones y acción en la pestaña Vacaciones. Pendiente: interrumpir goce. |
+| VAC-4 | Calendario de ausencias del equipo | VAC | Fase 2 · Tiempo | Story | sí | hecha | 2026-11-13 | GET /team-calendar con vacaciones y ausencias aprobadas y pendientes por persona y día dentro del alcance (en alcance propio, compañeros de la unidad como «Ausente»); fuente vacations en /calendar; cruces antes de aprobar (/vacation-requests/{id}/overlaps); alerta de cobertura por unidad con vacaciones.maximo_ausentes_simultaneos. |
 | VAC-5 | Programación anual y vacaciones acumuladas | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
 | VAC-6 | Fraccionamiento, adelanto y venta de vacaciones | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
 | VAC-7 | Importación de saldos de vacaciones | VAC | Fase 2 · Tiempo | Story | sí | pendiente | — |  |
