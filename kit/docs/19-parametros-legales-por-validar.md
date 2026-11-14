@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **44 parámetros sin valor verificado**; **37** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **49 parámetros sin valor verificado**; **42** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -46,7 +46,12 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `sunafil_pas_informe_final_dias_habiles` | Procedimiento sancionador: descargos al informe final | Todos | business_days | DS 019-2006-TR | Sí | Por confirmar. | |
 | `treg_baja_dias` | T-Registro: baja | Todos | days | DS 018-2007-TR art. 4-A | Sí | SUNAT: al día siguiente; otras fuentes: primer día hábil siguiente. Tipo de día por confirmar; alertar con día calendario. | |
 | `utilidades_pct_otros_sectores` | Participación en utilidades: demás sectores de la norma | Todos | scale | DL 892 | Sí | La norma tiene más sectores que los citados; verificar. | |
+| `vacaciones_adelanto_max_dias` | Días de vacaciones que se pueden adelantar antes de cumplir el récord | Todos | days | DL 1405 art. 3 · DS 013-2019-TR | Sí | Adelanto a cuenta de días generados en proporción al tiempo trabajado; por confirmar. | |
 | `vacaciones_dias` | Días de vacaciones por año | Régimen general | days | DL 713 | Sí | Régimen general. No consta en la investigación; se espera 30 días, por confirmar. | |
+| `vacaciones_fraccion_minima_dias` | Bloque mínimo al fraccionar las vacaciones | Todos | days | DL 1405 art. 2 · DS 013-2019-TR | Sí | Fraccionamiento del descanso en bloques; por confirmar. | |
+| `vacaciones_record_dias_jornada_5` | Récord vacacional: días efectivos con jornada de 5 días a la semana | Todos | days | DL 713 art. 10 | Sí | Se espera 210 días de labor efectiva; por confirmar. | |
+| `vacaciones_record_dias_jornada_6` | Récord vacacional: días efectivos con jornada de 6 días a la semana | Todos | days | DL 713 art. 10 | Sí | Se espera 260 días de labor efectiva; por confirmar. | |
+| `vacaciones_venta_max_dias` | Días de vacaciones que se pueden vender (reducción del descanso) | Todos | days | DL 713 art. 19 · DL 1405 | Sí | Tope de la reducción por acuerdo escrito; por confirmar por régimen. | |
 | `agr_essalud_pct` | Aporte a EsSalud por tramo de la razón social | Agrario | scale | Ley 31110 art. 9 | No | Tramo A (100 o más trabajadores o ventas mayores de 1 700 UIT): 9 % desde 2025, verificado. Tramo B: 6 % hasta 2027 y 9 % desde 2028, año por confirmar. | |
 | `cc_altitud` | Bonificación por altitud | Construcción civil | amount | Convenio CAPECO-FTCCP | No | No verificado. | |
 | `cc_asignacion_escolar_modo` | Asignación escolar: devengo diario o pago en oportunidad única | Construcción civil | text | Convenio CAPECO-FTCCP | No | Por confirmar. | |
@@ -57,7 +62,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 
 ## 2. Con valor, pero con fecha de inicio no verificada
 
-103 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
+104 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
 
 | Código | Parámetro | Régimen | Valor | Vigente desde | Base legal citada |
 |---|---|---|---|---|---|
@@ -163,4 +168,5 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `utilidades_pct_otras_actividades` | Participación en utilidades: otras actividades | Todos | 5 | 2025-01-01 | DL 892 |
 | `vacaciones_dias` | Días de vacaciones por año | Microempresa | 15 | 2025-01-01 | DS 013-2013-PRODUCE |
 | `vacaciones_dias` | Días de vacaciones por año | Pequeña empresa | 15 | 2025-01-01 | DS 013-2013-PRODUCE |
+| `vacaciones_plazo_goce_meses` | Plazo para gozar un periodo vacacional ganado | Todos | 12 | 2025-01-01 | DL 713 art. 23 |
 | `vida_ley_registro_poliza_dias` | Plazo para registrar la póliza de vida | Todos | 30 | 2026-01-01 | DS 009-2020-TR |

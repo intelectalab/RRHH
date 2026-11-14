@@ -3,6 +3,7 @@ import { BankAccountsSection } from '../BankAccountsSection'
 import { DependentsSection } from '../DependentsSection'
 import { InsuranceSection } from '../InsuranceSection'
 import { PensionHealthSection } from '../PensionHealthSection'
+import { VacationsTab } from '@/modules/vacations/VacationsTab'
 import { CompensationTab } from './CompensationTab'
 import { ContractsTab } from './ContractsTab'
 import { HistoryTab } from './HistoryTab'
@@ -46,6 +47,8 @@ export const PROFILE_TABS: ProfileTabDef[] = [
     </>
   ) },
   { id: 'payment', label: 'ficha.tab_payment', module: 'core', permission: 'people.employments.view', render: (c) => <BankAccountsSection employmentId={c.header.id} personId={c.header.person_id} onToast={c.toast} /> },
+  // VAC-2: saldo, periodos y movimientos de vacaciones (los calcula el servidor).
+  { id: 'vacations', label: 'ficha.tab_vacations', module: 'time_off', permission: 'time.vacation_balances.view', render: (c) => <VacationsTab {...c} /> },
 ]
 
 /** Pestañas visibles para la sesión: módulo contratado y permiso. */

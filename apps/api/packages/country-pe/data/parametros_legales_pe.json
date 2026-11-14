@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 171,
-    "verificados": 127,
-    "sin_verificar": 44
+    "parametros": 177,
+    "verificados": 128,
+    "sin_verificar": 49
   },
   "parametros": [
     {
@@ -678,6 +678,96 @@
       "verificado": true,
       "base_legal": "DS 013-2013-PRODUCE",
       "nota": "Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
+    },
+    {
+      "codigo": "vacaciones_plazo_goce_meses",
+      "nombre": "Plazo para gozar un periodo vacacional ganado",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "months",
+      "valor": 12,
+      "valor_json": null,
+      "vigente_desde": "2025-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": true,
+      "base_legal": "DL 713 art. 23",
+      "nota": "Las vacaciones se gozan dentro del año siguiente a aquel en que se generó el derecho; vencido ese plazo, el periodo queda «vencido». Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
+    },
+    {
+      "codigo": "vacaciones_record_dias_jornada_6",
+      "nombre": "Récord vacacional: días efectivos con jornada de 6 días a la semana",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 713 art. 10",
+      "nota": "Se espera 260 días de labor efectiva; por confirmar."
+    },
+    {
+      "codigo": "vacaciones_record_dias_jornada_5",
+      "nombre": "Récord vacacional: días efectivos con jornada de 5 días a la semana",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 713 art. 10",
+      "nota": "Se espera 210 días de labor efectiva; por confirmar."
+    },
+    {
+      "codigo": "vacaciones_venta_max_dias",
+      "nombre": "Días de vacaciones que se pueden vender (reducción del descanso)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 713 art. 19 · DL 1405",
+      "nota": "Tope de la reducción por acuerdo escrito; por confirmar por régimen."
+    },
+    {
+      "codigo": "vacaciones_fraccion_minima_dias",
+      "nombre": "Bloque mínimo al fraccionar las vacaciones",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 1405 art. 2 · DS 013-2019-TR",
+      "nota": "Fraccionamiento del descanso en bloques; por confirmar."
+    },
+    {
+      "codigo": "vacaciones_adelanto_max_dias",
+      "nombre": "Días de vacaciones que se pueden adelantar antes de cumplir el récord",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 1405 art. 3 · DS 013-2019-TR",
+      "nota": "Adelanto a cuenta de días generados en proporción al tiempo trabajado; por confirmar."
     },
     {
       "codigo": "cts_dias_por_anio",

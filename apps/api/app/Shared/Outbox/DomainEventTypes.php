@@ -90,6 +90,13 @@ final class DomainEventTypes
 
     public const LEAVE_CANCELLED = 'leave.cancelled.v1';
 
+    // VAC-2 · Libro de vacaciones: ajuste de saldo (RN-VAC-13), periodo ganado y periodo vencido (RN-VAC-09).
+    public const LEAVE_BALANCE_ADJUSTED = 'leave.balance_adjusted.v1';
+
+    public const LEAVE_PERIOD_EARNED = 'leave.period_earned.v1';
+
+    public const LEAVE_PERIOD_EXPIRING = 'leave.period_expiring.v1';
+
     public const ATTENDANCE_PUNCHED = 'attendance.punched.v1';
 
     public const ATTENDANCE_PERIOD_CLOSED = 'attendance.period_closed.v1';
@@ -377,6 +384,21 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['leave_id', 'employee_id'],
             'description' => 'Solicitud de vacación cancelada',
+        ],
+        self::LEAVE_BALANCE_ADJUSTED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'entry_id', 'days', 'reason'],
+            'description' => 'RRHH ajustó el saldo de vacaciones con motivo y sustento (RN-VAC-13)',
+        ],
+        self::LEAVE_PERIOD_EARNED => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'period_id', 'period_start', 'period_end', 'days'],
+            'description' => 'Se completó un año vacacional y sus días pasaron al saldo',
+        ],
+        self::LEAVE_PERIOD_EXPIRING => [
+            'version' => 1,
+            'required_fields' => ['employment_id', 'period_id', 'enjoy_by', 'available_days'],
+            'description' => 'Un periodo vacacional venció sin gozarse por completo (RN-VAC-09)',
         ],
         self::ATTENDANCE_PUNCHED => [
             'version' => 1,

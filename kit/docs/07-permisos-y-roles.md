@@ -144,7 +144,7 @@ Leyenda de columnas: **SA** Superadmin SaaS · **AD** Administrador empresa · *
 
 `✓` concedido con el alcance por defecto del rol (sección 3). `○` concedido solo sobre lo propio o lo asignado a la persona (sus solicitudes, sus casos, sus tareas, lo que debe firmar o evaluar). Vacío = no concedido. **(S)** = permiso de campo o recurso sensible: su uso queda en el registro de accesos. **(+)** = no figura aún en `api/openapi.yaml`; debe añadirse al contrato (permisos de campo y acciones funcionales).
 
-Totales: 911 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 111 acciones funcionales por añadir al contrato · 108 sensibles.
+Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112 acciones funcionales por añadir al contrato · 108 sensibles.
 
 ### Fase 0 · Cimientos
 
@@ -587,6 +587,7 @@ Totales: 911 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 111
 | `time.vacation_requests.schedule` **(+)** | Programar el rol anual y vacaciones colectivas |  | ✓ | ✓ |  |  | ✓ |  |  |  |  |  |
 | `time.vacation_balances.view` | Ver saldos de vacaciones |  | ✓ | ✓ | ✓ |  | ✓ | ○ | ✓ |  |  |  |
 | `time.vacation_balances.adjust` | Ajustar saldos de vacaciones |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `time.vacation_policies.view` **(+)** | Ver políticas de vacaciones |  | ✓ | ✓ | ✓ |  |  |  | ✓ |  |  |  |
 | `time.vacation_policies.update` **(+)** | Configurar políticas de vacaciones |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 
 #### AUS · Ausencias y permisos

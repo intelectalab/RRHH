@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'insufficient_balance' => 'You are requesting :requested days and :available are available (plus :advance days of allowed advance).',
+    'legal_pending' => 'The legal limit for “:field” (:parameter) is pending validation: the rule is saved, but review it once the law is confirmed.',
+    'legal_min' => 'It cannot be lower than the current legal minimum (:value, :parameter).',
+    'legal_max' => 'It cannot be higher than the current legal maximum (:value, :parameter).',
+    'sale_disabled' => 'Enable selling days to set its limit.',
+    'advance_disabled' => 'Enable advance days to set its limit.',
+    'rules_invalid' => 'The rules do not meet the current law for the regime.',
+    'legal_days_pending' => 'The days per year for this regime (:parameter) are pending validation: until confirmed, the period adds no days unless the policy sets them.',
+    'code_exists' => 'A policy with that code already exists.',
+    'archived' => 'The policy is archived: restore it to change it.',
+    'entity_out_of_scope' => 'You do not have scope over that company.',
+    'employment_not_found' => 'The employment was not found.',
+    'settlement_reason' => 'Termination: pending days go to the final settlement (RN-VAC-12).',
+    'accrual_reason' => 'Vacation year from :from to :to completed.',
+    'scheduled_reason' => 'Days reserved by an approved request.',
+    'consumed_reason' => 'Leave started: the reservation becomes days taken.',
+    'taken_reason' => 'Days taken.',
+    'days_positive' => 'Days must be greater than zero.',
+    'adjust_zero' => 'The adjustment cannot be zero.',
+    'period_not_found' => 'The period does not belong to this employment.',
+    'accrued' => 'Vacation periods up to date for :count employments.',
+];

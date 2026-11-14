@@ -26,6 +26,9 @@ describe('ficha 360 (COL-3)', () => {
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'contracts.contracts.view').map((x) => x.id)).not.toContain('contracts')
     // COL-6: sin permiso de derechohabientes, esa pestaña tampoco aparece.
     expect(visibleTabs(PROFILE_TABS, ['core'], (p) => p !== 'people.dependents.view').map((x) => x.id)).not.toContain('dependents')
+    // VAC-2: la pestaña Vacaciones exige el módulo time_off y el permiso de ver saldos.
+    expect(visibleTabs(PROFILE_TABS, ['core', 'time_off'], all).map((x) => x.id).at(-1)).toBe('vacations')
+    expect(visibleTabs(PROFILE_TABS, ['core', 'time_off'], (p) => p !== 'time.vacation_balances.view').map((x) => x.id)).not.toContain('vacations')
   })
 
   it('CON-2 · la pestaña Contratos ofrece solo las acciones permitidas por el estado y el permiso', () => {
