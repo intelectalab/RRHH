@@ -3,7 +3,7 @@
 Repositorio de documentos con permisos, plantillas dinámicas, generación de PDF y firma electrónica con evidencia.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 8 (5 historias y 3 tareas); 8 del MVP. **Operaciones de API:** 36.
+- **Actividades:** 8 (5 historias y 3 tareas); 8 del MVP. **Operaciones de API:** 45.
 - **Especificación:** `kit/docs/modulos/M-DOC.md`.
 
 ## Prompt para una sesión nueva de Claude Code

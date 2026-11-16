@@ -6,8 +6,8 @@ Actualizado el **2026-11-15** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 117 | 3 | 48,5 % |
-| Backlog completo | 512 | 117 | 3 | 22,9 % |
+| Primer corte comercial (MVP) | 241 | 120 | 3 | 49,8 % |
+| Backlog completo | 512 | 120 | 3 | 23,4 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -152,9 +152,9 @@ Actualizado el **2026-11-15** con `python3 scripts/gen_avance.py` desde `kit/bac
 | CON-6 | Acuerdo de teletrabajo | CON | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | DOC-1 | Repositorio y carpetas del legajo | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | 8 carpetas del sistema con tipos documentales y tipos propios (confidencialidad, visible al colaborador, revisión, vencimiento obligatorio); lo que sube RRHH queda activo y lo que envía el colaborador pasa a revisión con aprobación o devolución con motivo; confidenciales solo con permiso y con registro de lectura; contratos y sustentos de ausencias aparecen en el legajo sin copiar el archivo; archivar, restaurar y papelera (la purga espera la retención legal por validar); pestaña Documentos y /configuracion/tipos-documentales. |
 | DOC-2 | Versiones, archivo y vencimientos | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Versiones que conservan las anteriores con su emisión y vencimiento (RN-DOC-01); lo firmado no se reemplaza (RN-DOC-02); tarea diaria con aviso único al entrar en el periodo de aviso y marca de vencido (RN-DOC-09); pantalla /documentos/vencimientos y fuente de calendario; una versión nueva limpia el vencido. Por validar: legajo_conservacion_anios. |
-| DOC-3 | Solicitud y aprobación de documentos | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| DOC-4 | Plantillas dinámicas con variables | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| DOC-5 | Generación de PDF | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
+| DOC-3 | Solicitud y aprobación de documentos | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-15 | RRHH pide documentos a personas o empresa con fecha límite; entrega desde portal o ficha; revisión por Aprobaciones; rechazo vuelve con observación. |
+| DOC-4 | Plantillas dinámicas con variables | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-15 | Plantillas versionadas con variables {{grupo.variable}} y condicionales; vista previa; sueldo con permiso de campo y registro de accesos; certificado y constancia de trabajo publicados. |
+| DOC-5 | Generación de PDF | DOC | Fase 1 · Core HR | Task | sí | hecha | 2026-11-15 | PDF al legajo (individual o lote en segundo plano con avance); regenerar crea versión; lo emitido conserva su versión de plantilla. |
 | DOC-6 | Flujo de firma | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | DOC-7 | Evidencia de firma electrónica propia | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
 | DOC-8 | Capa de proveedor de firma digital | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
