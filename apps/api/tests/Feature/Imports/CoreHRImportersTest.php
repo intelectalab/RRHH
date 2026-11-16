@@ -262,6 +262,22 @@ test('IMP-2 · históricos de sueldos y movimientos: tramos con vigencia, marcad
             ->and(DB::table('people')->whereNull('deleted_at')->count())->toBe(0)
             ->and(DB::table('positions')->whereNull('deleted_at')->where('is_implicit', true)->count())->toBe(0);
     });
+
+    // Regla 2: nada laboral se borró físicamente. Para la aplicación ya no existen, pero siguen en base con
+    // deleted_at (papelera): el ingreso, el movimiento y los tres tramos de sueldo deshechos.
+    TenancyScope::runAs(I2_TENANT, function () use ($employment): void {
+        DB::statement('RESET ROLE');
+        try {
+            $trashed = fn (string $table) => DB::table($table)->where('employment_id', $employment->id)->get(['deleted_at'])
+                ->map(fn ($r) => $r->deleted_at !== null)->all();
+            expect($trashed('employment_assignments'))->toBe([true, true])
+                ->and($trashed('employment_compensations'))->toBe([true, true, true])
+                ->and($trashed('employment_labor_regimes'))->toBe([true])
+                ->and(DB::table('employments')->where('id', $employment->id)->whereNotNull('deleted_at')->exists())->toBeTrue();
+        } finally {
+            DB::statement('SET ROLE gestia_app');
+        }
+    });
 });
 
 test('IMP-6 · historial con autor y resultado, descarga del archivo original y del informe de errores', function (): void {

@@ -144,7 +144,8 @@ final class AssignmentHistoryImporter implements Importer
         if ($row === null || $previous === null) {
             return;
         }
-        DB::table('employment_assignments')->where('id', $entityId)->delete();
+        // Regla 2: el tramo importado va a la papelera (no se borra) antes de reabrir el anterior.
+        DB::select('SELECT trash_labor_history_row(?, ?)', ['employment_assignments', $entityId]);
         DB::table('employment_assignments')->where('id', (string) $previous['closed_id'])->update(['valid_to' => $previous['closed_valid_to']]);
         DB::table('personnel_actions')->where('id', (string) $previous['action_id'])->update(['deleted_at' => now()]);
         $closedPosition = DB::table('employment_assignments')->where('id', (string) $previous['closed_id'])->value('position_id');

@@ -250,9 +250,9 @@ final class EmployeesImporter implements Importer
     }
 
     /**
-     * Deshace el ingreso importado: quita lo que el ingreso creó (asignación, régimen, sueldo y contrato
-     * de ingreso), la relación pasa a la papelera y la persona también si la creó esta importación y no
-     * tiene otra relación. La plaza implícita del ingreso (POS-6) se retira; una plaza real se libera.
+     * Deshace el ingreso importado: lleva a la papelera lo que el ingreso creó (asignación, régimen,
+     * sueldo y contrato de ingreso) junto con la relación, y también la persona si la creó esta importación
+     * y no tiene otra relación. La plaza implícita del ingreso (POS-6) se retira; una plaza real se libera.
      */
     public function revert(string $entityId, ?array $previous, ImportContext $context): void
     {
@@ -262,9 +262,12 @@ final class EmployeesImporter implements Importer
         }
         $positionId = DB::table('employment_assignments')->where('employment_id', $entityId)->value('position_id');
         $before = $employment->only(['person_id', 'legal_entity_id', 'employee_code', 'hire_date', 'status']);
-        DB::table('employment_assignments')->where('employment_id', $entityId)->delete();
-        DB::table('employment_labor_regimes')->where('employment_id', $entityId)->delete();
-        DB::table('employment_compensations')->where('employment_id', $entityId)->delete();
+        // Regla 2: nada laboral se borra físicamente; los tramos del ingreso van a la papelera con la relación.
+        foreach (['employment_assignments', 'employment_labor_regimes', 'employment_compensations'] as $table) {
+            foreach (DB::table($table)->where('employment_id', $entityId)->pluck('id') as $rowId) {
+                DB::select('SELECT trash_labor_history_row(?, ?)', [$table, (string) $rowId]);
+            }
+        }
         DB::table('contracts')->where('employment_id', $entityId)->update(['deleted_at' => now()]);
         $employment->delete();
         if (is_string($positionId)) {

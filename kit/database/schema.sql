@@ -3425,10 +3425,11 @@ CREATE TABLE employment_assignments (
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_employment_assignments_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_employment_assignments_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
-  CONSTRAINT ex_employment_assignments_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT ex_employment_assignments_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_employment_assignments_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_employment_assignments_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
   CONSTRAINT fk_employment_assignments_position_id FOREIGN KEY (tenant_id, position_id) REFERENCES positions (tenant_id, id),
@@ -3510,10 +3511,11 @@ CREATE TABLE employment_compensations (
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_employment_compensations_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_employment_compensations_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
-  CONSTRAINT ex_employment_compensations_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT ex_employment_compensations_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_employment_compensations_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_employment_compensations_personnel_action_id FOREIGN KEY (tenant_id, personnel_action_id) REFERENCES personnel_actions (tenant_id, id)
 );
@@ -3567,10 +3569,11 @@ CREATE TABLE employment_labor_regimes (
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_employment_labor_regimes_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_employment_labor_regimes_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
-  CONSTRAINT ex_employment_labor_regimes_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
+  CONSTRAINT ex_employment_labor_regimes_vigencia EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) WHERE (deleted_at IS NULL) DEFERRABLE INITIALLY IMMEDIATE,
   CONSTRAINT fk_employment_labor_regimes_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_employment_labor_regimes_personnel_action_id FOREIGN KEY (tenant_id, personnel_action_id) REFERENCES personnel_actions (tenant_id, id)
 );
@@ -19084,6 +19087,7 @@ BEGIN
   SELECT seats INTO cupos FROM positions WHERE tenant_id = NEW.tenant_id AND id = NEW.position_id;
   SELECT count(*) INTO usados FROM employment_assignments a
    WHERE a.tenant_id = NEW.tenant_id AND a.position_id = NEW.position_id AND a.id <> NEW.id
+     AND a.deleted_at IS NULL
      AND daterange(a.valid_from, a.valid_to, '[]') && daterange(NEW.valid_from, NEW.valid_to, '[]');
   IF usados >= COALESCE(cupos, 1) THEN
     RAISE EXCEPTION 'La posición % ya tiene % ocupante(s) en esas fechas y solo admite %.', NEW.position_id, usados, COALESCE(cupos, 1) USING ERRCODE = 'AY007';
@@ -19093,4 +19097,26 @@ END
 $$;
 CREATE TRIGGER trg_employment_assignments_position_seats BEFORE INSERT OR UPDATE OF position_id, valid_from, valid_to ON employment_assignments
   FOR EACH ROW EXECUTE FUNCTION check_position_seats();
+
+-- IMP-2 · Regla 2: la historia laboral no se borra físicamente. Deshacer una importación lleva sus tramos a la
+-- papelera (deleted_at); para el rol de aplicación esas filas dejan de existir en cualquier consulta (as_of,
+-- cupos, alcance, equipo), y la exclusión de solapes ya las ignora. Solo esta función las marca: el rol de
+-- aplicación no podría actualizar una fila que la política de lectura deja de ver.
+CREATE POLICY hide_deleted ON employment_assignments AS RESTRICTIVE FOR SELECT TO gestia_app USING (deleted_at IS NULL);
+CREATE POLICY hide_deleted ON employment_compensations AS RESTRICTIVE FOR SELECT TO gestia_app USING (deleted_at IS NULL);
+CREATE POLICY hide_deleted ON employment_labor_regimes AS RESTRICTIVE FOR SELECT TO gestia_app USING (deleted_at IS NULL);
+CREATE OR REPLACE FUNCTION trash_labor_history_row(p_table text, p_id uuid) RETURNS boolean
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE n integer;
+BEGIN
+  IF p_table NOT IN ('employment_assignments', 'employment_compensations', 'employment_labor_regimes') THEN
+    RAISE EXCEPTION 'tabla no admitida: %', p_table;
+  END IF;
+  EXECUTE format('UPDATE %I SET deleted_at = now() WHERE id = $1 AND tenant_id = app_tenant_id() AND deleted_at IS NULL', p_table) USING p_id;
+  GET DIAGNOSTICS n = ROW_COUNT;
+  RETURN n = 1;
+END
+$$;
+REVOKE ALL ON FUNCTION trash_labor_history_row(text, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION trash_labor_history_row(text, uuid) TO gestia_app;
 

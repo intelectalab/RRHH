@@ -161,7 +161,8 @@ final class CompensationHistoryImporter implements Importer
         if ($row === null || $previous === null) {
             return;
         }
-        DB::table('employment_compensations')->where('id', $entityId)->delete();
+        // Regla 2: el tramo importado va a la papelera (no se borra) antes de reabrir el anterior.
+        DB::select('SELECT trash_labor_history_row(?, ?)', ['employment_compensations', $entityId]);
         if (is_string($previous['closed_id'] ?? null)) {
             DB::table('employment_compensations')->where('id', $previous['closed_id'])->update(['valid_to' => $previous['closed_valid_to']]);
         }
