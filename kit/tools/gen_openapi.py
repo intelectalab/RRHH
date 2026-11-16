@@ -76,7 +76,7 @@ RES = [
     ("AUD", 0, "audit.logs", "/audit-integrity-checks", "AuditIntegrityCheck", "status:e(ok|failed) checked_rows:i archived_rows:i unchained_rows:i first_seq?:i last_seq?:i issues:ao started_at:dt finished_at?:dt", "L", ""),
     ("AUD", 0, "audit.logs", "/audit-archives", "AuditArchive", "period_month:d from_seq?:i to_seq?:i row_count:i sha256:s size_bytes?:i archived_at:dt purge_after:d purged_at?:dt available:b", "LR", ""),
     ("WFL", 0, "workflow.approval_flows", "/approval-flows", "ApprovalFlow", "name:s subject_type:s steps:j conditions:j status:e(draft|published|retired) version:i has_draft?:b allowed_actions?:a", "LCRU", "publish retire"),
-    ("WFL", 0, "workflow.approval_requests", "/approval-requests", "ApprovalRequest", "subject_type:s subject_id:id flow_id:id flow_name?:s current_step:i current_step_name?:s levels?:i status:e(pending|approved|rejected|cancelled|expired) escalated?:b due_at?:dt started_by_user_id?:id requester_name?:s tasks?:ao can_decide?:b bulk_safe?:b finished_at?:dt", "LR", "approve reject delegate"),
+    ("WFL", 0, "workflow.approval_requests", "/approval-requests", "ApprovalRequest", "subject_type:s subject_id:id flow_id:id flow_name?:s current_step:i current_step_name?:s levels?:i status:e(pending|approved|rejected|cancelled|expired) escalated?:b due_at?:dt started_by_user_id?:id requester_name?:s employment_id?:id employee_name?:s tasks?:ao can_decide?:b bulk_safe?:b finished_at?:dt", "LR", "approve reject delegate"),
     ("WFL", 0, "workflow.workflows", "/workflows", "Workflow", "name:s trigger_event:s conditions:j actions:ao status:e(draft|active|paused|retired) allowed_actions:a last_run_at?:dt version:i", "LCRU", "activate pause retire"),
     ("WFL", 0, "workflow.runs", "/workflow-runs", "WorkflowRun", "workflow_id:id workflow_name?:s trigger_event_id?:id event_type?:s status:e(running|succeeded|failed|skipped|queued|waiting|cancelled) attempts:i next_retry_at?:dt actions:ao allowed_actions:a started_at:dt finished_at?:dt error?:s", "LR", "retry cancel"),
     ("WFL", 0, "workflow.tasks", "/tasks", "Task", "title:s description?:s assignee_user_id?:id assignee_role_id?:id assignee_name?:s created_by_name?:s due_on?:d priority:e(low|normal|high|urgent) status:e(pending|in_progress|done|cancelled) overdue?:b related_type?:s related_id?:id completed_at?:dt allowed_actions?:a custom_fields?:j", "LCRU", "complete cancel"),
@@ -495,6 +495,7 @@ EXTRA = [
     ("COL", 1, "get", "/home/hr", "people.employments.view", "Tablero de inicio de RRHH: dotación, ingresos y ceses del mes, vencimientos y pendientes (solo tarjetas de módulos contratados)", False),
     ("MSS", 1, "get", "/home/manager", "people.team.view", "Tablero de inicio del manager: aprobaciones, ausencias y vencimientos de su equipo", False),
     ("MSS", 1, "get", "/my-team", "people.team.view", "Equipo directo e indirecto del manager", False),
+    ("MSS", 1, "get", "/my-team/key-dates", "people.team.view", "Fechas clave del equipo (MSS-4): cumpleaños (solo el día; ocultables con celebraciones.mostrar_cumpleanos), aniversarios de ingreso, fin del periodo de prueba y fin de contrato (con contracts.contracts.view) de quienes reportan al usuario (RN-MSS-01). Rango de hasta 90 días; leer cumpleaños queda en el registro de accesos", False),
     ("MSS", 1, "get", "/my-team/calendar", "people.team.view", "Calendario de ausencias del equipo", False),
     ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
     ("IMP", 1, "get", "/imports/{id}/rows", "imports.imports.view", "Vista previa de una importación: filas con su estado, datos interpretados, errores y advertencias; ?filter[status]=valid|invalid|imported|skipped|failed", False),
@@ -642,6 +643,11 @@ QUERY = {
     ("get", "/my-team"): [
         _q("filter[level]", "direct: solo reportes directos; indirect: solo indirectos (requiere people.team.view_indirect)"),
         _q("q", "Nombre o código del colaborador"),
+    ],
+    ("get", "/my-team/key-dates"): [
+        _q("from", "Desde (AAAA-MM-DD); por defecto hoy", fmt="date"),
+        _q("to", "Hasta (AAAA-MM-DD); por defecto 30 días después de from; como máximo 90 días", fmt="date"),
+        _q("filter[kind]", "Tipos separados por coma: birthday, anniversary, probation_end, contract_end"),
     ],
     ("get", "/documents/expiring"): [
         _q("within", "Días hacia adelante (1 a 365); por defecto, la anticipación de cada tipo o el parámetro documentos.aviso_vencimiento_dias"),

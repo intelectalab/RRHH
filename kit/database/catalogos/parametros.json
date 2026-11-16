@@ -701,6 +701,33 @@
       }
     },
     {
+      "codigo": "celebraciones.mostrar_cumpleanos",
+      "modulo": "core",
+      "nombre": "Mostrar cumpleaños",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "MSS-4 · RN-CIN-04: con «no», los cumpleaños no aparecen en ningún tablero, en las fechas clave del equipo ni en los recordatorios. Cuando se muestran, solo viaja el día (nunca el año ni la edad).",
+      "opciones": null
+    },
+    {
+      "codigo": "equipo.aviso_fechas_clave_dias",
+      "modulo": "core",
+      "nombre": "Recordatorio de cumpleaños y aniversarios (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 1,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "MSS-4: días antes de un cumpleaños o aniversario de ingreso en que se avisa al jefe. 0: el mismo día. El fin del periodo de prueba y el vencimiento de contrato se avisan con sus propios parámetros.",
+      "opciones": {
+        "min": 0,
+        "max": 30
+      }
+    },
+    {
       "codigo": "colaboradores.cuenta_bancaria_requiere_aprobacion",
       "modulo": "core",
       "nombre": "Cambio de cuenta de pago con aprobación",

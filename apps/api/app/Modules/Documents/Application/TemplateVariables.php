@@ -2,6 +2,7 @@
 
 namespace App\Modules\Documents\Application;
 
+use App\Shared\Labor\MasterData;
 use App\Shared\Permissions\EffectivePermissions;
 use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\TenancyScope;
@@ -180,9 +181,9 @@ final class TemplateVariables
             ];
         }
         if (in_array('compensacion', $groups, true)) {
-            $m = DB::table('employment_compensations')->where('employment_id', $employmentId)->where('valid_from', '<=', $today->toDateString())
-                ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $today->toDateString()))
-                ->orderByDesc('valid_from')->first(['base_salary', 'currency', 'pay_frequency']);
+            // HIS-6 · El sueldo vigente se pide al servicio de datos maestros.
+            $salary = app(MasterData::class)->salaryAt($employmentId, $today->toDateString());
+            $m = $salary === null ? null : (object) ['base_salary' => $salary['amount'], 'currency' => $salary['currency'], 'pay_frequency' => $salary['pay_frequency']];
             $values += [
                 'compensacion.sueldo_basico' => $m === null ? null : $m->currency.' '.self::amount((string) $m->base_salary),
                 'compensacion.moneda' => $m?->currency,

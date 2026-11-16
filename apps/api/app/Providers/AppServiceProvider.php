@@ -22,6 +22,7 @@ use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Search\SearchRegistry;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Team\TeamDateRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
 use App\Shared\Trash\TrashRegistry;
@@ -61,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TrashRegistry::class);
         $this->app->singleton(CalendarRegistry::class);
         $this->app->singleton(HomeRegistry::class);
+        $this->app->singleton(TeamDateRegistry::class);
         $this->app->singleton(LinkedDocumentRegistry::class);
         $this->app->singleton(ProvisioningRegistry::class);
         $this->app->singleton(ApprovalOutcomeRegistry::class);

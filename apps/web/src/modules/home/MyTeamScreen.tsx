@@ -9,6 +9,7 @@ import { useSession } from '@/modules/session/SessionProvider'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import type { Money } from './homeView'
+import { teamTabs } from './team'
 
 export type TeamMember = {
   id: string
@@ -74,7 +75,7 @@ export function MyTeamScreen() {
 
   return (
     <>
-      <PageHeader title={t('my_team.title')} sub={meta ? t('my_team.sub', { n: meta.total, direct: meta.direct }) : undefined} />
+      <PageHeader title={t('my_team.title')} sub={meta ? t('my_team.sub', { n: meta.total, direct: meta.direct }) : undefined} tabs={teamTabs(t, can, 'members')} />
       <main className="main" id="contenido" tabIndex={-1}>
         {meta && (
           <div className="hc-kpis mb-3">

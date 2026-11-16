@@ -8894,6 +8894,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/my-team/key-dates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fechas clave del equipo (MSS-4): cumpleaños (solo el día; ocultables con celebraciones.mostrar_cumpleanos), aniversarios de ingreso, fin del periodo de prueba y fin de contrato (con contracts.contracts.view) de quienes reportan al usuario (RN-MSS-01). Rango de hasta 90 días; leer cumpleaños queda en el registro de accesos */
+        get: operations["getMyTeamKeyDates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notification-deliveries": {
         parameters: {
             query?: never;
@@ -18076,6 +18093,9 @@ export interface components {
             /** @description Identificador opaco */
             started_by_user_id?: string | null;
             requester_name?: string | null;
+            /** @description Identificador opaco */
+            employment_id?: string | null;
+            employee_name?: string | null;
             tasks?: {
                 [key: string]: unknown;
             }[] | null;
@@ -45685,6 +45705,36 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getMyTeamKeyDates: {
+        parameters: {
+            query?: {
+                /** @description Desde (AAAA-MM-DD); por defecto hoy */
+                from?: string;
+                /** @description Hasta (AAAA-MM-DD); por defecto 30 días después de from; como máximo 90 días */
+                to?: string;
+                /** @description Tipos separados por coma: birthday, anniversary, probation_end, contract_end */
+                "filter[kind]"?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };

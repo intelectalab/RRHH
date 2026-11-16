@@ -9,10 +9,18 @@ use Illuminate\Support\Facades\DB;
  * indirectamente. Es la misma regla que el alcance «equipo» de SEG-10 (jefe por posición, con excepción por
  * relación cuando la asignación indica manager_employment_id), con la profundidad de cada persona.
  *
- * Se calcula en cada consulta: un cambio de estructura o de jefe aplica solo.
+ * Se calcula en cada consulta: un cambio de estructura o de jefe aplica solo. Durante una suplencia (RN-MSS-05)
+ * el suplente ve también al equipo de quien le delegó sus aprobaciones.
  */
 final class TeamLine
 {
+    /**
+     * RN-MSS-05 · Usuarios que delegaron todas sus aprobaciones (sin tipo) en el usuario durante una suplencia
+     * vigente: el suplente ve también a su equipo. Parámetros: el suplente y la fecha dos veces.
+     */
+    public const DELEGATORS = 'SELECT d.from_user_id FROM approval_delegations d WHERE d.to_user_id = ? AND d.revoked_at IS NULL '
+        .'AND d.subject_type IS NULL AND d.starts_on <= ?::date AND d.ends_on >= ?::date';
+
     /**
      * Relaciones laborales del equipo con su nivel (1 = directo, 2 o más = indirecto).
      *
@@ -24,7 +32,7 @@ final class TeamLine
         $sql = 'WITH RECURSIVE mine AS ('
             .'SELECT e.id AS emp_id, a.position_id AS pos_id FROM employments e JOIN users u ON u.person_id = e.person_id '
             ."JOIN employment_assignments a ON a.employment_id = e.id AND {$current} "
-            ."WHERE u.id = ? AND e.status IN ('active','suspended','terminating') AND e.deleted_at IS NULL"
+            .'WHERE (u.id = ? OR u.id IN ('.self::DELEGATORS.")) AND e.status IN ('active','suspended','terminating') AND e.deleted_at IS NULL"
             .'), team AS ('
             .'SELECT emp_id, pos_id, 0 AS depth FROM mine '
             .'UNION '
@@ -35,7 +43,7 @@ final class TeamLine
             ."WHERE {$current} AND t.depth < 20"
             .') SELECT emp_id, MIN(depth) AS depth FROM team WHERE emp_id NOT IN (SELECT emp_id FROM mine) GROUP BY emp_id';
 
-        $rows = DB::select($sql, [$asOf, $asOf, $userId, $asOf, $asOf]);
+        $rows = DB::select($sql, [$asOf, $asOf, $userId, $userId, $asOf, $asOf, $asOf, $asOf]);
         $out = [];
         foreach ($rows as $row) {
             $depth = (int) $row->depth;

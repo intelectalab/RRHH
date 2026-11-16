@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => 'O afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e registre o acompanhamento.'],
             'email' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => "Olá {name}:\n\nEm {organization}, o afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e acompanhe aqui: {link}"],
         ],
+        'team.birthday' => [
+            'in_app' => ['subject' => 'Aniversário de {employee}', 'body' => 'Em {date} é o aniversário de {employee}, da sua equipe.'],
+            'email' => ['subject' => 'Aniversário de {employee}', 'body' => "Olá {name}:\n\nEm {organization}, {date} é o aniversário de {employee}, da sua equipe.\n\nVeja as datas da sua equipe aqui: {link}"],
+        ],
+        'team.anniversary' => [
+            'in_app' => ['subject' => '{employee} completa {years} anos na empresa', 'body' => 'Em {date}, {employee}, da sua equipe, completa {years} anos desde a admissão.'],
+            'email' => ['subject' => '{employee} completa {years} anos na empresa', 'body' => "Olá {name}:\n\nEm {organization}, em {date}, {employee}, da sua equipe, completa {years} anos desde a admissão.\n\nVeja as datas da sua equipe aqui: {link}"],
+        ],
         'contracts.probation_ending' => [
             'in_app' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => 'O período de experiência de {employee} termina em {ends_on}. Revise o desempenho antes dessa data.'],
             'email' => ['subject' => 'O período de experiência de {employee} termina em breve', 'body' => "Olá {name}:\n\nEm {organization}, o período de experiência de {employee} termina em {ends_on}. Revise o desempenho e decida antes dessa data.\n\nRevise aqui: {link}"],

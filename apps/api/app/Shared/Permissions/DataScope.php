@@ -161,7 +161,7 @@ final class DataScope
                     $parts[] = 'WITH RECURSIVE mine AS ('
                         .'SELECT e.id AS emp_id, a.position_id AS pos_id FROM employments e JOIN users u ON u.person_id = e.person_id '
                         ."JOIN employment_assignments a ON a.employment_id = e.id AND {$current} "
-                        ."WHERE u.id = ? AND e.status IN ('active','suspended','terminating')"
+                        .'WHERE (u.id = ? OR u.id IN ('.TeamLine::DELEGATORS.")) AND e.status IN ('active','suspended','terminating')"
                         .'), team AS ('
                         .'SELECT emp_id, pos_id FROM mine '
                         .'UNION '
@@ -170,7 +170,8 @@ final class DataScope
                         .'JOIN team t ON (a.manager_employment_id = t.emp_id OR (a.manager_employment_id IS NULL AND p.reports_to_position_id = t.pos_id)) '
                         ."WHERE {$current}"
                         .') SELECT emp_id FROM team WHERE emp_id NOT IN (SELECT emp_id FROM mine)';
-                    array_push($bindings, $date, $date, $userId, $date, $date);
+                    // RN-MSS-05 · El suplente con una delegación vigente ve también el equipo de quien delegó.
+                    array_push($bindings, $date, $date, $userId, $userId, $date, $date, $date, $date);
                     break;
                 case 'own':
                     $parts[] = 'SELECT e.id FROM employments e JOIN users u ON u.person_id = e.person_id WHERE u.id = ?';

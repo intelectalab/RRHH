@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "{employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it."],
             'email' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "Hi {name}:\n\nAt {organization}, {employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it here: {link}"],
         ],
+        'team.birthday' => [
+            'in_app' => ['subject' => '{employee}\'s birthday', 'body' => '{date} is the birthday of {employee}, from your team.'],
+            'email' => ['subject' => '{employee}\'s birthday', 'body' => "Hello {name}:\n\nIn {organization}, {date} is the birthday of {employee}, from your team.\n\nSee your team's dates here: {link}"],
+        ],
+        'team.anniversary' => [
+            'in_app' => ['subject' => '{employee} completes {years} years at the company', 'body' => 'On {date}, {employee}, from your team, completes {years} years since joining.'],
+            'email' => ['subject' => '{employee} completes {years} years at the company', 'body' => "Hello {name}:\n\nIn {organization}, on {date}, {employee}, from your team, completes {years} years since joining.\n\nSee your team's dates here: {link}"],
+        ],
         'contracts.probation_ending' => [
             'in_app' => ['subject' => '{employee}\'s probation ends soon', 'body' => '{employee}\'s probation period ends on {ends_on}. Review their performance before that date.'],
             'email' => ['subject' => '{employee}\'s probation ends soon', 'body' => "Hello {name}:\n\nIn {organization}, {employee}'s probation period ends on {ends_on}. Review their performance and decide before that date.\n\nReview it here: {link}"],

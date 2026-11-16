@@ -2,6 +2,7 @@
 
 namespace App\Modules\Certificates\Application;
 
+use App\Shared\Labor\MasterData;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -60,17 +61,16 @@ final class CertificateContent
         $lines[] = (string) trans($ended ? 'certificates.body.employment_ended' : 'certificates.body.employment_current', $vars, $locale);
 
         if ($kind === 'income_certificate') {
-            $salary = DB::table('employment_compensations')->where('employment_id', $employmentId)
-                ->where('valid_from', '<=', $today)->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', $today))
-                ->orderByDesc('valid_from')->first(['id', 'base_salary', 'currency']);
+            // HIS-6 · El sueldo vigente se pide al servicio de datos maestros.
+            $salary = app(MasterData::class)->salaryAt($employmentId, $today);
             if ($salary !== null) {
-                $vars['salary'] = $salary->currency.' '.self::amount((string) $salary->base_salary);
+                $vars['salary'] = $salary['currency'].' '.self::amount($salary['amount']);
                 $lines[] = '';
                 $lines[] = (string) trans('certificates.body.salary', $vars, $locale);
                 // Regla 7 · Leer un campo sensible deja fila en el registro de accesos.
                 DB::table('data_access_logs')->insert([
                     'tenant_id' => TenancyScope::requireTenant(), 'user_id' => $readerUserId, 'access_kind' => 'view', 'data_category' => 'salary',
-                    'subject_person_id' => $e->person_id, 'entity_type' => 'employment_compensation', 'entity_id' => $salary->id,
+                    'subject_person_id' => $e->person_id, 'entity_type' => 'employment_compensation', 'entity_id' => $salary['id'],
                     'fields' => '{base_salary}', 'purpose' => 'certificate', 'occurred_at' => now()->format('Y-m-d H:i:s.uP'),
                 ]);
             } else {
