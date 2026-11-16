@@ -856,3 +856,15 @@ button.portal-link { background: none; border: 0; padding: 0; text-align: start;
 .ayuda-campo-btn { border: 0; background: none; padding: 0; color: var(--tx2); cursor: pointer; line-height: 1; }
 .ayuda-campo-btn:hover, .ayuda-campo-btn:focus-visible { color: var(--pe-700); }
 .ayuda-campo-texto { display: grid; gap: 4px; margin-top: 4px; padding: 8px 10px; border-radius: var(--r); background: var(--bg); color: var(--tx2); font-size: var(--fs-s); max-width: 420px; }
+/* IMP-3 · IMP-4 · primeros pasos y plantillas del país */
+.barra-avance { height: 8px; border-radius: 999px; background: var(--pe-50); margin-top: 8px; overflow: hidden; }
+.barra-avance > span { display: block; height: 100%; background: var(--primario); border-radius: inherit; transition: width .3s ease; }
+.setup-pasos { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--bd); }
+.setup-paso { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--bd); }
+.setup-paso:last-child { border-bottom: 0; }
+.setup-num { flex: 0 0 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--pe-50); color: var(--pe-700); font-weight: 700; font-size: var(--fs-s); }
+.setup-done .setup-num { background: var(--ok-50); color: var(--ok); }
+.setup-skipped .setup-texto { opacity: .75; }
+.setup-texto { flex: 1 1 auto; min-width: 0; }
+.setup-acciones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 599px) { .setup-paso { flex-wrap: wrap; } .setup-acciones { width: 100%; justify-content: flex-start; padding-left: 40px; } }

@@ -148,7 +148,8 @@
     "group_people": "Personas",
     "group_time": "Tiempo",
     "offline": "Sin conexión. Las acciones que necesitan la red no estarán disponibles hasta que vuelva.",
-    "install": "Instalar aplicación"
+    "install": "Instalar aplicación",
+    "modules_setup": "Primeros pasos"
   },
   "home": {
     "title": "Hola, {name}",
@@ -878,7 +879,9 @@
     "card_vacation_policies": "Políticas de vacaciones",
     "card_vacation_policies_help": "Días por año, adelanto, venta y validación de RRHH por empresa, régimen y categoría, con vigencia.",
     "card_document_types": "Tipos documentales",
-    "card_document_types_help": "Carpetas del legajo y tipos: confidencialidad, visibilidad, revisión y vencimientos."
+    "card_document_types_help": "Carpetas del legajo y tipos: confidencialidad, visibilidad, revisión y vencimientos.",
+    "card_country_packs": "Plantillas del país",
+    "card_country_packs_help": "Tipos de contrato, ausencias, feriados, constancias y políticas listas para usar"
   },
   "cfgroup": {
     "analitica": "Analítica",
@@ -4307,5 +4310,49 @@
     "version": "Versión {version} · producto {product} · publicada el {date}",
     "empty_link": "¿Cómo funciona esta pantalla?",
     "field": "Ayuda: {title}"
+  },
+  "setup": {
+    "title": "Primeros pasos",
+    "sub": "Pon en marcha tu organización paso a paso; puedes retomarlo cuando quieras",
+    "progress": "Puesta en marcha: {n} %",
+    "counts": "{done} hechos · {skipped} omitidos · {total} pasos",
+    "completed": "¡Listo! Tu organización ya está en marcha.",
+    "next": "Siguiente paso:",
+    "hidden_note": "El asistente está oculto en el inicio. Puedes volver a mostrarlo.",
+    "hide": "Ocultar asistente",
+    "show": "Mostrar asistente",
+    "go": "Ir",
+    "skip": "Saltar",
+    "reopen": "Retomar",
+    "status_pending": "Pendiente",
+    "status_done": "Hecho",
+    "status_skipped": "Omitido",
+    "when_done": "Hecho el {date}",
+    "when_skipped": "Omitido el {date}",
+    "import_hint": "¿Tienes una lista? Impórtala desde un archivo",
+    "action_error": "No se pudo guardar el cambio. Intenta de nuevo.",
+    "banner_title": "Primeros pasos · {n} % completado",
+    "see_all": "Ver todos los pasos"
+  },
+  "packs": {
+    "title": "Plantillas del país",
+    "sub": "Configuración inicial lista para usar; todo lo creado se puede editar después",
+    "version": "Versión {v} del {date}",
+    "installed": "instalada la {v} el {date}",
+    "not_installed": "sin aplicar",
+    "action_apply": "Aplicar plantillas",
+    "action_update": "Aplicar lo que falta",
+    "action_complete": "Volver a aplicar",
+    "applied": "Se crearon {n} registros. Puedes editarlos en cada pantalla.",
+    "applied_nothing": "Ya tenías todo: no se creó nada nuevo.",
+    "apply_error": "No se pudieron aplicar las plantillas. Intenta de nuevo.",
+    "pending_validation": "Por validar",
+    "module_off": "Módulo no contratado",
+    "present": "{present} de {total} en tu organización",
+    "show_items": "Ver qué incluye ({n})",
+    "hide_items": "Ocultar",
+    "edit": "Editar",
+    "empty_title": "Sin plantillas para tu país",
+    "empty_text": "Todavía no hay un paquete de configuración inicial para el país de tu organización."
   }
 }

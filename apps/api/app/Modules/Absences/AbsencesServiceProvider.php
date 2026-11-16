@@ -7,12 +7,14 @@ use App\Modules\Absences\Infrastructure\Calendar\AbsenceCalendarSource;
 use App\Modules\Absences\Infrastructure\Documents\AbsenceLinkedDocuments;
 use App\Modules\Absences\Infrastructure\Home\AbsentTodayCard;
 use App\Modules\Absences\Infrastructure\SelfService\AbsencesHomeCard;
+use App\Modules\Absences\Infrastructure\Setup\AbsenceTypesPackComponent;
 use App\Modules\Absences\Infrastructure\Time\ApprovedAbsencesQuery;
 use App\Modules\Absences\Infrastructure\Workflow\AbsenceRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Documents\LinkedDocumentRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Time\ApprovedAbsences;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -31,6 +33,8 @@ final class AbsencesServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(AbsenceTypesPackComponent::class));
         // AUS-2 · WFL-4 · La decisión del flujo sobre una ausencia se aplica aquí al instante.
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(AbsenceRequestOutcome::class));
         // ESS-1 · Tarjeta «Mis ausencias y permisos» del inicio del colaborador.

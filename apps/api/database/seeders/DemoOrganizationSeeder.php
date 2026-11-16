@@ -5,11 +5,13 @@ namespace Database\Seeders;
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Identity\Infrastructure\Models\UserIdentity;
+use App\Modules\Imports\Application\CountryPackService;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Workflow\Application\ApprovalFlowService;
 use App\Modules\Workflow\Application\TaskService;
 use App\Modules\Workflow\Infrastructure\Models\ApprovalFlow;
 use App\Modules\Workflow\Infrastructure\Models\Task;
+use App\Shared\Permissions\ModuleGate;
 use App\Shared\Security\BlindIndex;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Seeder;
@@ -97,6 +99,17 @@ class DemoOrganizationSeeder extends Seeder
                     'country_code' => 'PE', 'currency' => 'PEN', 'timezone' => 'America/Lima', 'status' => 'active',
                 ]);
                 $entity->regimes()->create(['labor_regime_code' => $c['regime'], 'valid_from' => '2024-01-01']);
+            }
+        });
+
+        // IMP-4 · IMP-5 · La organización demo tiene contratado Vacaciones y ausencias (para recorrerlas) y arranca
+        // con el paquete del Perú aplicado (idempotente).
+        TenancyScope::runAs((string) $tenantId, function (): void {
+            DB::table('tenant_modules')->insertOrIgnore(['tenant_id' => TenancyScope::requireTenant(), 'module_code' => 'time_off',
+                'status' => 'active', 'source' => 'manual', 'activated_at' => now()]);
+            app(ModuleGate::class)->forget();
+            if (! DB::table('tenant_country_packs')->exists()) {
+                app(CountryPackService::class)->apply('pe-base', null);
             }
         });
 

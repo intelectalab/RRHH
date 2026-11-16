@@ -27,6 +27,8 @@ use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
 use App\Modules\Helpdesk\Infrastructure\Models\Ticket;
 use App\Modules\Helpdesk\Infrastructure\Models\TicketCategory;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Imports\Infrastructure\Models\SetupChecklistItem;
+use App\Modules\Imports\Infrastructure\Models\TenantCountryPack;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Organization\Infrastructure\Models\DirectoryEmployment;
@@ -87,6 +89,10 @@ final class CrossTenantHarness
         '/catalogs' => Catalog::class,
         '/catalogs/{code}/items' => Catalog::class,
         '/catalog-items/{id}' => CatalogItem::class,
+        // IMP-3 · IMP-4: el avance de A (un paso propio) y el paquete que A instaló; B no los toca.
+        '/setup-checklist/{code}/skip' => SetupChecklistItem::class,
+        '/setup-checklist/{code}/reopen' => SetupChecklistItem::class,
+        '/setup/country-packs/{code}/apply' => TenantCountryPack::class,
         '/catalog-items/{id}/archive' => CatalogItem::class,
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
         // VAC-2: el saldo de vacaciones se identifica por la relación laboral de A.

@@ -39,6 +39,7 @@ const MENU: NavLink[] = [
   { href: '/personas/colaboradores', key: 'shell.modules_employees', group: 'people', icon: 'user', module: 'core', visible: (can) => can('people.employments.view'), exact: true },
   { href: '/personas/directorio', key: 'shell.modules_directory', group: 'people', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
   { href: '/personas/organigrama', key: 'shell.modules_org_chart', group: 'people', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
+  { href: '/primeros-pasos', key: 'shell.modules_setup', group: 'home', icon: 'checkSquare', module: 'core', visible: (can) => can('imports.setup.use') },
   { href: '/aprobaciones', key: 'shell.modules_approvals', group: 'home', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
   { href: '/tareas', key: 'shell.modules_tasks', group: 'home', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
   { href: '/documentos/vencimientos', key: 'shell.modules_documents', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
@@ -52,7 +53,7 @@ const MENU: NavLink[] = [
   { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
 ]
 
-const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'settings.organization.view']
+const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'imports.setup.use', 'settings.organization.view']
 
 const MIN_KEY = 'gestia.side_min'
 

@@ -148,7 +148,8 @@
     "group_people": "Pessoas",
     "group_time": "Tempo",
     "offline": "Sem conexão. As ações que precisam da rede ficam indisponíveis até a conexão voltar.",
-    "install": "Instalar aplicativo"
+    "install": "Instalar aplicativo",
+    "modules_setup": "Primeiros passos"
   },
   "home": {
     "title": "Olá, {name}",
@@ -878,7 +879,9 @@
     "card_vacation_policies": "Políticas de férias",
     "card_vacation_policies_help": "Dias por ano, adiantamento, venda e validação do RH por empresa, regime e categoria, com vigência.",
     "card_document_types": "Tipos documentais",
-    "card_document_types_help": "Pastas do prontuário e tipos: confidencialidade, visibilidade, revisão e vencimentos."
+    "card_document_types_help": "Pastas do prontuário e tipos: confidencialidade, visibilidade, revisão e vencimentos.",
+    "card_country_packs": "Modelos do país",
+    "card_country_packs_help": "Tipos de contrato, ausências, feriados, declarações e políticas prontos para usar"
   },
   "cfgroup": {
     "analitica": "Análise",
@@ -4307,5 +4310,49 @@
     "version": "Versão {version} · produto {product} · publicada em {date}",
     "empty_link": "Como funciona esta tela?",
     "field": "Ajuda: {title}"
+  },
+  "setup": {
+    "title": "Primeiros passos",
+    "sub": "Coloque sua organização em funcionamento passo a passo; retome quando quiser",
+    "progress": "Implantação: {n} %",
+    "counts": "{done} feitos · {skipped} pulados · {total} passos",
+    "completed": "Pronto! Sua organização já está em funcionamento.",
+    "next": "Próximo passo:",
+    "hidden_note": "O assistente está oculto no início. Você pode mostrá-lo novamente.",
+    "hide": "Ocultar assistente",
+    "show": "Mostrar assistente",
+    "go": "Ir",
+    "skip": "Pular",
+    "reopen": "Retomar",
+    "status_pending": "Pendente",
+    "status_done": "Feito",
+    "status_skipped": "Pulado",
+    "when_done": "Feito em {date}",
+    "when_skipped": "Pulado em {date}",
+    "import_hint": "Tem uma lista? Importe de um arquivo",
+    "action_error": "Não foi possível salvar a alteração. Tente novamente.",
+    "banner_title": "Primeiros passos · {n} % concluído",
+    "see_all": "Ver todos os passos"
+  },
+  "packs": {
+    "title": "Modelos do país",
+    "sub": "Configuração inicial pronta para usar; tudo o que for criado pode ser editado depois",
+    "version": "Versão {v} de {date}",
+    "installed": "versão {v} instalada em {date}",
+    "not_installed": "não aplicado",
+    "action_apply": "Aplicar modelos",
+    "action_update": "Aplicar o que falta",
+    "action_complete": "Aplicar novamente",
+    "applied": "Foram criados {n} registros. Você pode editá-los em cada tela.",
+    "applied_nothing": "Você já tinha tudo: nada novo foi criado.",
+    "apply_error": "Não foi possível aplicar os modelos. Tente novamente.",
+    "pending_validation": "A validar",
+    "module_off": "Módulo não contratado",
+    "present": "{present} de {total} na sua organização",
+    "show_items": "Ver o que inclui ({n})",
+    "hide_items": "Ocultar",
+    "edit": "Editar",
+    "empty_title": "Sem modelos para seu país",
+    "empty_text": "Ainda não há um pacote de configuração inicial para o país da sua organização."
   }
 }
