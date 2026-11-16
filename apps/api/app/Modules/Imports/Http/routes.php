@@ -10,6 +10,7 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/imports/{id}', [ImportController::class, 'show'])->middleware('permission:imports.imports.view');
     Route::get('/imports/{id}/rows', [ImportController::class, 'rows'])->middleware('permission:imports.imports.view');
     Route::get('/imports/{id}/errors/download', [ImportController::class, 'downloadErrors'])->middleware('permission:imports.imports.view');
+    Route::get('/imports/{id}/file', [ImportController::class, 'downloadFile'])->middleware('permission:imports.imports.view');
     Route::post('/imports/{id}/map', [ImportController::class, 'map'])->middleware('permission:imports.imports.map');
     Route::post('/imports/{id}/validate', [ImportController::class, 'validate'])->middleware('permission:imports.imports.validate');
     Route::post('/imports/{id}/execute', [ImportController::class, 'execute'])->middleware('permission:imports.imports.execute');

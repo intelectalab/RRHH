@@ -15,6 +15,9 @@ use App\Modules\CoreHR\Infrastructure\Home\LaborCostCard;
 use App\Modules\CoreHR\Infrastructure\Home\MovementsMonthCard;
 use App\Modules\CoreHR\Infrastructure\Home\PendingStartCard;
 use App\Modules\CoreHR\Infrastructure\Home\TurnoverCard;
+use App\Modules\CoreHR\Infrastructure\Imports\AssignmentHistoryImporter;
+use App\Modules\CoreHR\Infrastructure\Imports\CompensationHistoryImporter;
+use App\Modules\CoreHR\Infrastructure\Imports\EmployeesImporter;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
 use App\Modules\CoreHR\Infrastructure\Labor\MasterDataAdapter;
 use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
@@ -24,6 +27,7 @@ use App\Modules\CoreHR\Infrastructure\Workflow\PersonnelActionOutcome;
 use App\Modules\CoreHR\Infrastructure\Workflow\SalaryChangeOutcome;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Home\HomeRegistry;
+use App\Shared\Imports\ImportRegistry;
 use App\Shared\Labor\AssignmentChanges;
 use App\Shared\Labor\MasterData;
 use App\Shared\SelfService\HomeCardRegistry;
@@ -52,6 +56,11 @@ final class CoreHRServiceProvider extends ServiceProvider
         // SAS-6 · RN-COL-13 · Colaboradores activos frente al límite del plan.
         $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
         $this->app->make(ExportRegistry::class)->register($this->app->make(EmploymentsExportSource::class));
+        // IMP-2 · Colaboradores (con contrato y sueldo de ingreso) e históricos de movimientos y sueldos.
+        $imports = $this->app->make(ImportRegistry::class);
+        foreach ([EmployeesImporter::class, AssignmentHistoryImporter::class, CompensationHistoryImporter::class] as $importer) {
+            $imports->register($this->app->make($importer));
+        }
         // ESS-1 · Tarjeta «Mi perfil» del inicio del colaborador.
         $this->app->make(HomeCardRegistry::class)->register($this->app->make(ProfileHomeCard::class));
         // COL-12 · MSS-1 · Tarjetas de los tableros de inicio.

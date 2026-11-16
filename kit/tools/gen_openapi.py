@@ -115,7 +115,7 @@ RES = [
     ("DOC", 1, "documents.documents", "/document-requests", "DocumentRequest", "employment_id:id person_id?:id person_name?:s employee_code?:s category_id:id category_name?:s title:s instructions?:s due_on?:d overdue:b status:e(requested|submitted|approved|rejected|cancelled) document_id?:id rejection_reason?:s request_group_id?:id requested_by_user_id?:id requested_by_name?:s submitted_at?:dt reviewed_at?:dt cancellation_reason?:s approval_request_id?:id approval?:j allowed_actions:a version:i", "LR", ""),
     ("DOC", 1, "documents.signature_requests", "/signature-requests", "SignatureRequest", "document_id:id signers:j ordered:b provider:s status:e(draft|sent|viewed|partially_signed|completed|declined|cancelled|expired) evidence?:j", "LCR", "send sign decline cancel remind"),
     ("ESS", 1, "people.change_requests", "/profile-change-requests", "ProfileChangeRequest", "person_id?:id person_name?:s changes:j applied_fields?:a pending_fields?:a status:e(pending|approved|rejected|cancelled) requested_by_user_id?:id requested_by_name?:s reviewed_at?:dt rejection_reason?:s allowed_actions?:a", "LCR", "approve reject cancel"),
-    ("IMP", 1, "imports.imports", "/imports", "ImportJob", "entity:e(legal_entities|employees|contracts|vacation_balances|salaries|attendance|concepts|history|org_structure|dependents|positions) file_name?:s file_id?:id headers?:a mapping?:j suggested_mapping?:j status:e(uploaded|mapped|validated|with_errors|importing|completed|failed|cancelled|reverted) total_rows?:i valid_rows?:i error_rows?:i imported_rows?:i batch_size?:i summary?:j error_message?:s created_by_user_id?:id created_by_name?:s started_at?:dt finished_at?:dt allowed_actions?:a", "LCR", "map validate execute cancel revert"),
+    ("IMP", 1, "imports.imports", "/imports", "ImportJob", "entity:e(legal_entities|employees|contracts|vacation_balances|salaries|attendance|concepts|history|org_structure|dependents|positions|job_profiles) file_name?:s file_id?:id headers?:a mapping?:j suggested_mapping?:j status:e(uploaded|mapped|validated|with_errors|importing|completed|failed|cancelled|reverted) total_rows?:i valid_rows?:i error_rows?:i imported_rows?:i created_rows?:i updated_rows?:i rejected_rows?:i batch_size?:i summary?:j error_message?:s created_by_user_id?:id created_by_name?:s started_at?:dt finished_at?:dt allowed_actions?:a", "LCR", "map validate execute cancel revert"),
     ("AYU", 1, "platform.help_articles", "/platform/help-articles", "HelpArticle", "slug:s locale:s title:s body:s module_code:s roles:a screen_keys:a product_version:s status:e(draft|published|archived)", "LCRU", "publish archive"),
     ("AYU", 1, "help.org_articles", "/help/org-articles", "HelpOrgArticle", "title:s category_id?:id body:s audience:j owner_user_id:id review_on?:d version:i status:e(draft|published|in_review|archived)", "LCRU", "publish archive"),
     # ---------- Fase 2 ----------
@@ -502,6 +502,7 @@ EXTRA = [
     ("IMP", 1, "get", "/import-types", "imports.imports.view", "Tipos de datos que el usuario puede importar: columnas con obligatoriedad, ejemplo y si son sensibles, para armar la plantilla (IMP-1)", False),
     ("IMP", 1, "get", "/imports/{id}/rows", "imports.imports.view", "Vista previa de una importación: filas con su estado, datos interpretados, errores y advertencias; ?filter[status]=valid|invalid|imported|skipped|failed", False),
     ("IMP", 1, "get", "/imports/{id}/errors/download", "imports.imports.view", "Descargar en CSV las filas con error de una importación, con el motivo por fila", False),
+    ("IMP", 1, "get", "/imports/{id}/file", "imports.imports.view", "Descargar el archivo original de una importación (IMP-6); la descarga queda registrada", False),
     ("IMP", 1, "get", "/setup-checklist", "imports.imports.view", "Avance de la puesta en marcha guiada", False),
     ("AYU", 1, "get", "/help/articles", "help.articles.view", "Artículos de ayuda visibles para el usuario (producto y organización), filtrados por rol, módulo y pantalla", False),
     ("AYU", 1, "get", "/help/articles/{id}", "help.articles.view", "Detalle de un artículo de ayuda con su versión", False),
@@ -980,6 +981,10 @@ def build():
             res.update(errs("409"))
         if method == "get" and (path.endswith("/proof") or path.endswith("/file") or path.endswith("/document") or path.endswith("/attachments/{attachment_id}")):
             res["200"] = {"description": "Archivo", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("application/pdf", "image/png", "image/jpeg")}}
+        if (method, path) == ("get", "/imports/{id}/file"):
+            # IMP-6 · El archivo original tal como se subió (CSV o Excel); 409 si la importación se descartó.
+            res["200"] = {"description": "Archivo", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("text/csv", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/octet-stream")}}
+            res.update(errs("409"))
         if (path.endswith("/logo") or path.endswith("/photo")) and method == "get":
             res["200"] = {"description": "Imagen", "content": {m: {"schema": {"type": "string", "format": "binary"}} for m in ("image/png", "image/jpeg", "image/webp")}}
         if (method, path) in QUERY:

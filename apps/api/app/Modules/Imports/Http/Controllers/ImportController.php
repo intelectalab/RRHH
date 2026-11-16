@@ -145,6 +145,20 @@ final class ImportController
         ]);
     }
 
+    /** IMP-6 · Descarga del archivo original tal como se subió. */
+    public function downloadFile(Request $request, string $id): Response
+    {
+        $file = $this->imports->originalFile($this->find($id), $this->userId($request), $this->locale($request));
+        $name = str_replace(['"', "\r", "\n"], '', $file['name'] !== '' ? $file['name'] : 'import');
+
+        return response($file['contents'], 200, [
+            'Content-Type' => $file['mime'] !== '' ? $file['mime'] : 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="'.$name.'"',
+            'Cache-Control' => 'no-store',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     private function find(string $id): ImportJob
     {
         if (preg_match('/^[0-9a-f-]{36}$/i', $id) !== 1) {

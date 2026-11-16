@@ -8,7 +8,10 @@ use App\Modules\Organization\Console\ApplyStructureChanges;
 use App\Modules\Organization\Console\SyncPositionOccupancy;
 use App\Modules\Organization\Infrastructure\Exports\LegalEntitiesExportSource;
 use App\Modules\Organization\Infrastructure\Home\VacantPositionsCard;
+use App\Modules\Organization\Infrastructure\Imports\JobProfilesImporter;
 use App\Modules\Organization\Infrastructure\Imports\LegalEntitiesImporter;
+use App\Modules\Organization\Infrastructure\Imports\OrgUnitsImporter;
+use App\Modules\Organization\Infrastructure\Imports\PositionsImporter;
 use App\Modules\Organization\Infrastructure\Provisioning\CreateFirstLegalEntity;
 use App\Modules\Organization\Infrastructure\Search\LegalEntitySearchSource;
 use App\Modules\Organization\Infrastructure\Usage\LegalEntitiesUsageSource;
@@ -39,7 +42,12 @@ final class OrganizationServiceProvider extends ServiceProvider
             ->register($this->app->make(LegalEntitySearchSource::class));
 
         $this->app->make(ExportRegistry::class)->register($this->app->make(LegalEntitiesExportSource::class));
-        $this->app->make(ImportRegistry::class)->register($this->app->make(LegalEntitiesImporter::class));
+        $imports = $this->app->make(ImportRegistry::class);
+        $imports->register($this->app->make(LegalEntitiesImporter::class));
+        // IMP-2 · Estructura, puestos y posiciones (en ese orden de carga).
+        $imports->register($this->app->make(OrgUnitsImporter::class));
+        $imports->register($this->app->make(JobProfilesImporter::class));
+        $imports->register($this->app->make(PositionsImporter::class));
         $this->app->make(ProvisioningRegistry::class)->register($this->app->make(CreateFirstLegalEntity::class));
         // SAS-6 · Consumo frente a los límites del plan.
         $this->app->make(UsageRegistry::class)->register(new LegalEntitiesUsageSource);

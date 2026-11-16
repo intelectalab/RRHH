@@ -4276,7 +4276,7 @@ CREATE TRIGGER trg_certificate_requests_touch BEFORE UPDATE ON certificate_reque
 CREATE TABLE import_templates (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
-  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions')),
+  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles')),
   name text NOT NULL,
   column_mapping jsonb NOT NULL,
   is_system boolean NOT NULL DEFAULT false,
@@ -4294,7 +4294,7 @@ CREATE TRIGGER trg_import_templates_touch BEFORE UPDATE ON import_templates FOR 
 CREATE TABLE import_jobs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
-  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions')),
+  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles')),
   import_template_id uuid,
   stored_file_id uuid NOT NULL,
   status text NOT NULL DEFAULT 'uploaded' CHECK (status IN ('uploaded','mapped','validating','validated','previewed','importing','completed','failed','cancelled','with_errors','reverted')),

@@ -133,6 +133,38 @@ final class AssignmentMovements
     }
 
     /**
+     * IMP-2 · RN-IMP-05 · Carga un movimiento histórico importado: mismas validaciones que el movimiento
+     * manual (preview), queda aplicado y marcado «importado» en su payload, sincroniza las posiciones y
+     * se audita, pero no emite eventos de negocio ni notificaciones. Devuelve lo necesario para deshacerlo.
+     *
+     * @param  array<string, mixed>  $changes
+     * @return array{action_id: string, assignment_id: string, closed_id: string, closed_valid_to: string|null}
+     */
+    public function applyImported(Employment $employment, array $changes, string $validFrom, ?string $kind, ?string $reason, ?string $userId, string $importJobId): array
+    {
+        return DB::transaction(function () use ($employment, $changes, $validFrom, $kind, $reason, $userId, $importJobId): array {
+            Employment::query()->whereKey($employment->id)->lockForUpdate()->first();
+            $p = $this->preview($employment, $changes, $validFrom, $kind);
+            $tenant = TenancyScope::requireTenant();
+            $actionId = (string) DB::table('personnel_actions')->insertGetId([
+                'tenant_id' => $tenant, 'employment_id' => $employment->id, 'kind' => $p['kind'], 'effective_on' => $p['from'],
+                'reason' => $reason, 'status' => 'applied', 'requested_by_user_id' => $userId, 'applied_at' => now(),
+                'payload' => json_encode(['before' => $p['before'], 'after' => $p['after'], 'imported' => true, 'import_job_id' => $importJobId], JSON_THROW_ON_ERROR),
+                'changes' => json_encode($changes, JSON_THROW_ON_ERROR),
+            ]);
+            $closed = $p['current'];
+            $id = $this->validity->change('employment_assignments', ['tenant_id' => $tenant, 'employment_id' => $employment->id],
+                $p['values'] + ['reason' => $reason ?? $p['kind'], 'personnel_action_id' => $actionId], $p['from']);
+            foreach (array_unique(array_filter([$closed->position_id, $p['values']['position_id'] ?? null])) as $positionId) {
+                $this->occupancy->sync((string) $positionId, $userId);
+            }
+            $this->audit->record('employment.assignment_imported', 'employment', $employment->id, $p['before'], $p['after'] + ['valid_from' => $p['from'], 'kind' => $p['kind']], 'import:'.$importJobId);
+
+            return ['action_id' => $actionId, 'assignment_id' => $id, 'closed_id' => (string) $closed->id, 'closed_valid_to' => $closed->valid_to === null ? null : (string) $closed->valid_to];
+        });
+    }
+
+    /**
      * HIS-4 · RN-HIS-06 · Corrige el tramo que abrió un movimiento aplicado: solo el último tramo y abierto
      * (si hay movimientos posteriores, se corrigen o anulan primero esos). El valor original queda en la
      * historia del movimiento corregido (payload «after») y en la auditoría; el tramo toma los valores

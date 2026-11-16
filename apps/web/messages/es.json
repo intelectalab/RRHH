@@ -2001,6 +2001,8 @@
     "validate": "Validar",
     "discard": "Descartar",
     "download_errors": "Descargar filas con error",
+    "download_original": "Descargar archivo original",
+    "outcome": "{created} creadas · {updated} actualizadas · {rejected} rechazadas",
     "total": "Filas",
     "valid": "Válidas",
     "with_errors": "Con error",

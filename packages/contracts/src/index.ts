@@ -7493,6 +7493,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/imports/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el archivo original de una importación (IMP-6); la descarga queda registrada */
+        get: operations["getImportsIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/imports/{id}/map": {
         parameters: {
             query?: never;
@@ -20300,7 +20317,7 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @enum {string} */
-            entity: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions";
+            entity: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles";
             file_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
@@ -20317,6 +20334,9 @@ export interface components {
             valid_rows?: number | null;
             error_rows?: number | null;
             imported_rows?: number | null;
+            created_rows?: number | null;
+            updated_rows?: number | null;
+            rejected_rows?: number | null;
             batch_size?: number | null;
             summary?: {
                 [key: string]: unknown;
@@ -20337,7 +20357,7 @@ export interface components {
         };
         ImportJobInput: {
             /** @enum {string} */
-            entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions";
+            entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles";
             /** @description Identificador opaco */
             file_id?: string | null;
             headers?: string[] | null;
@@ -20351,6 +20371,9 @@ export interface components {
             valid_rows?: number | null;
             error_rows?: number | null;
             imported_rows?: number | null;
+            created_rows?: number | null;
+            updated_rows?: number | null;
+            rejected_rows?: number | null;
             batch_size?: number | null;
             summary?: {
                 [key: string]: unknown;
@@ -42349,6 +42372,34 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getImportsIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                    "application/octet-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     postImportsIdMap: {

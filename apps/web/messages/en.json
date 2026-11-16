@@ -2001,6 +2001,8 @@
     "validate": "Validate",
     "discard": "Discard",
     "download_errors": "Download rows with errors",
+    "download_original": "Download original file",
+    "outcome": "{created} created · {updated} updated · {rejected} rejected",
     "total": "Rows",
     "valid": "Valid",
     "with_errors": "With errors",

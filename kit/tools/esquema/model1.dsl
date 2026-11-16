@@ -569,10 +569,10 @@
 
 #E IMP | Importador y puesta en marcha
 @import_templates soft | Plantilla de mapeo de columnas para el importador.
-  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   name ; column_mapping j! ; is_system
 @import_jobs main lock | Importación masiva por etapas: subir, mapear, validar, previsualizar e importar (nunca directo).
-  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   import_template_id ?-> import_templates ; stored_file_id -> stored_files
   status enum(uploaded,mapped,validating,validated,previewed,importing,completed,failed,cancelled,with_errors,reverted)=uploaded ; column_mapping j
   total_rows integer ; valid_rows integer ; error_rows integer ; imported_rows integer ; created_by_user_id -> users

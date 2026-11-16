@@ -502,11 +502,46 @@ final class ImportService
     }
 
     /**
+     * IMP-6 · Archivo original de la importación (mientras no se haya descartado). La descarga queda
+     * registrada por el servicio de archivos.
+     *
+     * @return array{name: string, mime: string, contents: string}
+     */
+    public function originalFile(ImportJob $job, ?string $userId, string $locale): array
+    {
+        if ($job->status === 'cancelled') {
+            throw new AyniException('conflict', 409, (string) trans('imports.file_unavailable', [], $locale));
+        }
+        $file = $this->files->contentsForDownload($job->stored_file_id, $job->tenant_id, $userId);
+        $this->audit->record('import.file_downloaded', 'import_job', $job->id, null, ['file_name' => $job->file_name]);
+
+        return $file;
+    }
+
+    /**
+     * IMP-6 · Filas creadas, actualizadas y rechazadas del lote. Un importador marca como creada la fila
+     * cuyos datos de reversión no son una versión anterior (previous_data nulo o con «__created»).
+     *
+     * @return array{created: int, updated: int, rejected: int}
+     */
+    public function outcome(ImportJob $job): array
+    {
+        $row = DB::table('import_job_rows')->where('import_job_id', $job->id)->selectRaw(
+            "count(*) filter (where status = 'imported' and (previous_data is null or jsonb_exists(previous_data, '__created'))) as created,
+             count(*) filter (where status = 'imported' and previous_data is not null and not (jsonb_exists(previous_data, '__created'))) as updated,
+             count(*) filter (where status in ('invalid', 'skipped', 'failed')) as rejected"
+        )->first();
+
+        return ['created' => (int) ($row->created ?? 0), 'updated' => (int) ($row->updated ?? 0), 'rejected' => (int) ($row->rejected ?? 0)];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function present(ImportJob $job): array
     {
         $author = DB::table('users')->where('id', $job->created_by_user_id)->value('display_name');
+        $outcome = in_array($job->status, ['completed', 'reverted', 'failed'], true) ? $this->outcome($job) : null;
 
         return [
             'id' => $job->id,
@@ -521,6 +556,9 @@ final class ImportService
             'valid_rows' => $job->valid_rows,
             'error_rows' => $job->error_rows,
             'imported_rows' => $job->imported_rows,
+            'created_rows' => $outcome['created'] ?? null,
+            'updated_rows' => $outcome['updated'] ?? null,
+            'rejected_rows' => $outcome['rejected'] ?? null,
             'batch_size' => $job->batch_size,
             'summary' => (object) ($job->summary ?? []),
             'error_message' => $job->error_message,
