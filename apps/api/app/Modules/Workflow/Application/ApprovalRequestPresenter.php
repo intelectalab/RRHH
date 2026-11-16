@@ -31,6 +31,11 @@ final class ApprovalRequestPresenter
         $stepNames = $steps->pluck('name', 'id');
         $stepOrder = $steps->pluck('sort_order', 'id');
 
+        // MSS-3 · La persona de la que trata el trámite (los módulos la pasan en el contexto); solo el nombre.
+        $employmentId = is_string($request->context['employment_id'] ?? null) ? (string) $request->context['employment_id'] : null;
+        $employee = $employmentId === null ? null : DB::table('employments as e')->join('people as p', 'p.id', '=', 'e.person_id')
+            ->where('e.id', $employmentId)->first(['p.first_names', 'p.preferred_name', 'p.paternal_surname']);
+
         $open = ! in_array($request->status, ['approved', 'rejected', 'cancelled'], true);
         $canDecide = false;
         $dueAt = null;
@@ -74,6 +79,8 @@ final class ApprovalRequestPresenter
             'due_at' => $dueAt?->toIso8601String(),
             'started_by_user_id' => $request->started_by_user_id,
             'requester_name' => $request->started_by_user_id !== null ? ($names[$request->started_by_user_id] ?? null) : null,
+            'employment_id' => $employmentId,
+            'employee_name' => $employee === null ? null : trim(($employee->preferred_name ?: $employee->first_names).' '.$employee->paternal_surname),
             'tasks' => $rows,
             'can_decide' => $canDecide,
             'bulk_safe' => $this->bulkSafe($request->subject_type),

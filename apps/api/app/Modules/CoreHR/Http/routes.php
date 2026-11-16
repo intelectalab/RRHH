@@ -24,6 +24,7 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/home/hr', [HomeController::class, 'hr'])->middleware('permission:people.employments.view');
     Route::get('/home/manager', [HomeController::class, 'manager'])->middleware('permission:people.team.view');
     Route::get('/my-team', [MyTeamController::class, 'index'])->middleware('permission:people.team.view');
+    Route::get('/my-team/key-dates', [MyTeamController::class, 'keyDates'])->middleware('permission:people.team.view');
 
     // COL-1 · Personas y deduplicación por documento.
     Route::get('/people', [PersonController::class, 'index'])->middleware('permission:people.people.view');

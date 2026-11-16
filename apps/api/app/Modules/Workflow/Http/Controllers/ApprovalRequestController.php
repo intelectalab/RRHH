@@ -8,17 +8,22 @@ use App\Modules\Workflow\Infrastructure\Models\ApprovalRequest;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
+use App\Shared\Permissions\EffectivePermissions;
+use App\Shared\Permissions\TeamLine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
  * WFL-2 · Solicitudes de aprobación: listado (todas o «asignadas a mí»), detalle y decisiones.
+ * MSS-3 · filter[team]=1: solo las de personas del equipo del usuario (RN-MSS-01) y las que él inició sin
+ * persona (una nueva posición). Acota, nunca amplía: sigue aplicando el alcance de lectura.
  */
 final class ApprovalRequestController
 {
     public function __construct(
         private readonly ApprovalEngine $engine,
         private readonly ApprovalRequestPresenter $presenter,
+        private readonly TeamLine $team,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -34,6 +39,15 @@ final class ApprovalRequestController
             $query->whereIn('status', ['pending', 'running', 'escalated']);
         } elseif (in_array($status, ['approved', 'rejected', 'cancelled'], true)) {
             $query->where('status', $status);
+        }
+        if (in_array((string) $request->input('filter.team', ''), ['1', 'true'], true)) {
+            $effective = $request->attributes->get('effective_permissions');
+            $indirect = $effective instanceof EffectivePermissions && $effective->has('people.team.view_indirect');
+            $members = array_keys($this->team->members($userId, now()->toDateString(), $indirect));
+            $query->where(function ($w) use ($members, $userId): void {
+                $w->whereRaw("context->>'employment_id' = ANY (?::text[])", ['{'.implode(',', $members).'}'])
+                    ->orWhere(fn ($own) => $own->where('started_by_user_id', $userId)->whereRaw("context->>'employment_id' IS NULL"));
+            });
         }
         $type = $request->input('filter.subject_type', $request->query('subject_type'));
         if (is_string($type) && $type !== '') {

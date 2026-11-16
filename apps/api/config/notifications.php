@@ -37,6 +37,9 @@ return [
         // COL-8 · RN-COL-11: se registró o cambió la cuenta de pago del titular (solo los últimos dígitos).
         'people.bank_account_requested' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'people.bank_account_changed' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // MSS-4 · Cumpleaños y aniversario de ingreso de alguien del equipo (al jefe; solo el día, nunca la edad).
+        'team.birthday' => ['variables' => ['employee', 'date'], 'link' => '/mi-equipo/fechas', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],
+        'team.anniversary' => ['variables' => ['employee', 'date', 'years'], 'link' => '/mi-equipo/fechas', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],
         // CON-2: el periodo de prueba de un colaborador termina pronto; el jefe y RRHH lo revisan en la ficha.
         'contracts.probation_ending' => ['variables' => ['employee', 'ends_on'], 'link' => '/personas/colaboradores/{employment_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // CON-4 · RN-CON-04: un contrato vence pronto (con el acumulado frente al tope) o el acumulado se acerca al tope.

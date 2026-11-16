@@ -47,6 +47,9 @@ final class DomainEventTypes
 
     public const CONTRACT_CAP_APPROACHING = 'contract.cap_approaching.v1';
 
+    /** MSS-4 · Un cumpleaños o aniversario de un integrante del equipo se acerca (recordatorio al jefe). */
+    public const TEAM_KEY_DATE_UPCOMING = 'team.key_date_upcoming.v1';
+
     // COL-10 · COL-11 · ME-01: reingreso y cese (registro, reversión) de la relación laboral.
     public const EMPLOYEE_REHIRED = 'employee.rehired.v1';
 
@@ -364,6 +367,7 @@ final class DomainEventTypes
         self::CONTRACT_PROBATION_ENDING => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'trial_period_ends_on'], 'description' => 'El periodo de prueba termina pronto: aviso al jefe y a RRHH (CON-2)'],
         self::CONTRACT_EXPIRING => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'ends_on', 'days_left'], 'description' => 'Un contrato vence dentro de la anticipación configurada: aviso al jefe y a RRHH con el acumulado (RN-CON-04)'],
         self::CONTRACT_CAP_APPROACHING => ['version' => 1, 'required_fields' => ['contract_id', 'employment_id', 'explanation'], 'description' => 'El tiempo acumulado a modalidad se acerca al tope: renovar podría desnaturalizar el contrato (RN-CON-02/03)'],
+        self::TEAM_KEY_DATE_UPCOMING => ['version' => 1, 'required_fields' => ['employment_id', 'kind', 'date'], 'description' => 'Se acerca el cumpleaños o el aniversario de ingreso de un integrante del equipo (MSS-4)'],
         self::OFFBOARDING_STARTED => [
             'version' => 1,
             'required_fields' => ['employment_id', 'termination_id', 'termination_date', 'reason'],

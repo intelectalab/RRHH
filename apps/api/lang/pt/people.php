@@ -74,6 +74,10 @@ return [
     'change_request_own_only' => 'Você só pode propor alterações dos seus próprios dados. O RH edita os dados pela ficha.',
     'change_request_self_approval' => 'Você não pode revisar uma solicitação feita por você.',
     'before_hire' => 'A data não pode ser anterior à admissão.',
+    'team' => [
+        'reminders_sent' => 'Lembretes de datas da equipe registrados: :count.',
+        'invalid_range' => 'O intervalo de datas não é válido: até 90 dias.',
+    ],
     'dependents' => [
         'child_birth_date' => 'Um filho exige a data de nascimento.',
         'duplicated' => 'Esta pessoa já tem um dependente com esse documento.',

@@ -74,6 +74,10 @@ return [
     'change_request_own_only' => 'You can only propose changes to your own data. HR edits data from the profile.',
     'change_request_self_approval' => 'You cannot review a request you made.',
     'before_hire' => 'The date cannot be earlier than the hire date.',
+    'team' => [
+        'reminders_sent' => 'Team key date reminders recorded: :count.',
+        'invalid_range' => 'The date range is not valid: up to 90 days.',
+    ],
     'dependents' => [
         'child_birth_date' => 'A child requires a date of birth.',
         'duplicated' => 'This person already has a dependent with that document.',

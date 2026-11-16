@@ -702,6 +702,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 |---|---|---|---|
 | GET | `/home/manager` | `people.team.view` | 1 |
 | GET | `/my-team` | `people.team.view` | 1 |
+| GET | `/my-team/key-dates` | `people.team.view` | 1 |
 | GET | `/my-team/calendar` | `people.team.view` | 1 |
 
 **IMP · Importador y puesta en marcha**

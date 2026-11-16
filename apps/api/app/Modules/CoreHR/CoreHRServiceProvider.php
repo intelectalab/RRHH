@@ -6,6 +6,7 @@ use App\Modules\CoreHR\Console\ActivateDueEmployments;
 use App\Modules\CoreHR\Console\ApplyDuePersonnelActions;
 use App\Modules\CoreHR\Console\ApplyDueTerminations;
 use App\Modules\CoreHR\Console\ReviewDependentsMajority;
+use App\Modules\CoreHR\Console\SendTeamKeyDateReminders;
 use App\Modules\CoreHR\Infrastructure\Exports\EmploymentsExportSource;
 use App\Modules\CoreHR\Infrastructure\Home\CelebrationsCard;
 use App\Modules\CoreHR\Infrastructure\Home\ChangeRequestsCard;
@@ -15,14 +16,18 @@ use App\Modules\CoreHR\Infrastructure\Home\MovementsMonthCard;
 use App\Modules\CoreHR\Infrastructure\Home\PendingStartCard;
 use App\Modules\CoreHR\Infrastructure\Home\TurnoverCard;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
+use App\Modules\CoreHR\Infrastructure\Labor\MasterDataAdapter;
 use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
+use App\Modules\CoreHR\Infrastructure\Team\CelebrationTeamDates;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\CoreHR\Infrastructure\Workflow\PersonnelActionOutcome;
 use App\Modules\CoreHR\Infrastructure\Workflow\SalaryChangeOutcome;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\AssignmentChanges;
+use App\Shared\Labor\MasterData;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Team\TeamDateRegistry;
 use App\Shared\Usage\UsageRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -38,6 +43,8 @@ final class CoreHRServiceProvider extends ServiceProvider
     {
         // CON-3 · RN-CON-08: las adendas firmadas registran el movimiento de la asignación sin importar Core HR.
         $this->app->bind(AssignmentChanges::class, AssignmentChangesAdapter::class);
+        // HIS-6 · Servicio único de datos maestros vigentes a una fecha para los demás módulos.
+        $this->app->bind(MasterData::class, MasterDataAdapter::class);
     }
 
     public function boot(): void
@@ -52,6 +59,9 @@ final class CoreHRServiceProvider extends ServiceProvider
         foreach ([new HeadcountCard, MovementsMonthCard::hires(), MovementsMonthCard::terminations(), new PendingStartCard, CelebrationsCard::birthdays(), CelebrationsCard::anniversaries(), new LaborCostCard, new TurnoverCard, new ChangeRequestsCard] as $card) {
             $home->register($card);
         }
+        // MSS-4 · Cumpleaños y aniversarios en las fechas clave del equipo.
+        $this->app->make(TeamDateRegistry::class)->register(CelebrationTeamDates::birthdays());
+        $this->app->make(TeamDateRegistry::class)->register(CelebrationTeamDates::anniversaries());
         // HIS-3 · WFL-4 · La decisión del flujo sobre un cambio de sueldo se aplica aquí al instante.
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(SalaryChangeOutcome::class));
         // HIS-2 · WFL-4 · La decisión del flujo sobre un movimiento de personal se aplica aquí al instante.
@@ -59,7 +69,7 @@ final class CoreHRServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ActivateDueEmployments::class, ApplyDueTerminations::class, ApplyDuePersonnelActions::class, ReviewDependentsMajority::class]);
+            $this->commands([ActivateDueEmployments::class, ApplyDueTerminations::class, ApplyDuePersonnelActions::class, ReviewDependentsMajority::class, SendTeamKeyDateReminders::class]);
             $this->app->booted(function (): void {
                 // RN-COL-04 · Los ingresos de hoy se activan al empezar el día, después de los cambios de estructura.
                 $this->app->make(Schedule::class)->command('employments:activate-due')->dailyAt('00:15')->withoutOverlapping();
@@ -70,6 +80,8 @@ final class CoreHRServiceProvider extends ServiceProvider
                 $this->app->make(Schedule::class)->command('personnel-actions:apply-due')->dailyAt('00:12')->withoutOverlapping();
                 // COL-6 · Hijos que cumplen la mayoría de edad: aviso de revisión a RRHH.
                 $this->app->make(Schedule::class)->command('dependents:review-majority')->dailyAt('06:10')->withoutOverlapping();
+                // MSS-4 · Recordatorios de cumpleaños y aniversarios del equipo a cada jefe.
+                $this->app->make(Schedule::class)->command('team:key-date-reminders')->dailyAt('07:05')->withoutOverlapping();
             });
         }
     }

@@ -5,6 +5,7 @@ namespace App\Modules\CoreHR\Infrastructure\Home;
 use App\Shared\Home\HomeCard;
 use App\Shared\Home\HomeContext;
 use App\Shared\Home\HomeSql;
+use App\Shared\Settings\ParameterResolver;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\DB;
  *   y deja la lectura en el registro de accesos (regla 7).
  * - anniversaries: aniversarios de ingreso (antigüedad reconocida o fecha de ingreso), con los años que
  *   se cumplen. No es un dato sensible.
+ *
+ * MSS-4 · Con celebraciones.mostrar_cumpleanos = no, la tarjeta de cumpleaños viaja vacía y marcada oculta.
  */
 final class CelebrationsCard implements HomeCard
 {
@@ -54,6 +57,9 @@ final class CelebrationsCard implements HomeCard
 
     public function compute(HomeContext $context): array
     {
+        if ($this->kind === 'birthdays' && ! (bool) (app(ParameterResolver::class)->value('celebraciones.mostrar_cumpleanos') ?? true)) {
+            return ['value' => 0, 'link' => $context->link('/calendario', '/mi-equipo'), 'items' => [], 'meta' => ['window_days' => self::WINDOW_DAYS, 'hidden' => true]];
+        }
         $today = $context->today->toDateString();
         $until = $context->today->addDays(self::WINDOW_DAYS)->toDateString();
         $source = $this->kind === 'birthdays' ? 'p.birth_date' : 'coalesce(e.seniority_date, e.hire_date)';

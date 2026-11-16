@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} tiene {days} días de subsidio por tramitar', 'body' => 'El descanso de {employee} pasa a subsidio desde el {starts_on} ({days} días). Presenta la solicitud de reembolso y registra su seguimiento.'],
             'email' => ['subject' => '{employee} tiene {days} días de subsidio por tramitar', 'body' => "Hola {name}:\n\nEn {organization}, el descanso de {employee} pasa a subsidio desde el {starts_on} ({days} días). Presenta la solicitud de reembolso y registra su seguimiento aquí: {link}"],
         ],
+        'team.birthday' => [
+            'in_app' => ['subject' => 'Cumpleaños de {employee}', 'body' => 'El {date} es el cumpleaños de {employee}, de tu equipo.'],
+            'email' => ['subject' => 'Cumpleaños de {employee}', 'body' => "Hola {name}:\n\nEn {organization}, el {date} es el cumpleaños de {employee}, de tu equipo.\n\nMira las fechas de tu equipo aquí: {link}"],
+        ],
+        'team.anniversary' => [
+            'in_app' => ['subject' => '{employee} cumple {years} años en la empresa', 'body' => 'El {date} {employee}, de tu equipo, cumple {years} años desde su ingreso.'],
+            'email' => ['subject' => '{employee} cumple {years} años en la empresa', 'body' => "Hola {name}:\n\nEn {organization}, el {date} {employee}, de tu equipo, cumple {years} años desde su ingreso.\n\nMira las fechas de tu equipo aquí: {link}"],
+        ],
         'contracts.probation_ending' => [
             'in_app' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => 'El periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño antes de esa fecha.'],
             'email' => ['subject' => 'El periodo de prueba de {employee} termina pronto', 'body' => "Hola {name}:\n\nEn {organization}, el periodo de prueba de {employee} termina el {ends_on}. Revisa su desempeño y decide antes de esa fecha.\n\nRevísalo aquí: {link}"],

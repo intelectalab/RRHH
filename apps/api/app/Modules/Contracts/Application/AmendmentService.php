@@ -9,6 +9,7 @@ use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Labor\AssignmentChanges;
+use App\Shared\Labor\MasterData;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Tenancy\TenancyScope;
@@ -193,8 +194,7 @@ final class AmendmentService
             'salary' => ['employment_compensation_id' => $this->validity->change('employment_compensations',
                 ['tenant_id' => $tenant, 'employment_id' => $contract->employment_id], [
                     'base_salary' => (string) $changes['base_salary']['amount'], 'currency' => (string) $changes['base_salary']['currency'],
-                    'pay_frequency' => (string) (DB::table('employment_compensations')->where('employment_id', $contract->employment_id)
-                        ->where('valid_from', '<=', $from)->orderByDesc('valid_from')->value('pay_frequency') ?? 'monthly'),
+                    'pay_frequency' => app(MasterData::class)->salaryAt($contract->employment_id, $from)['pay_frequency'] ?? 'monthly',
                     'change_reason' => 'adjustment',
                 ], $from)],
             'position' => ['personnel_action_id' => $this->assignments->apply($contract->employment_id, $changes, $from, $reason, $userId)],

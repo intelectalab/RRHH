@@ -13,6 +13,7 @@ use App\Modules\Notifications\Infrastructure\Subscribers\NotifyDocumentEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyEmailBounce;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyOrganizationStatus;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyPeopleChanges;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyTeamKeyDates;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyUsageLimit;
 use App\Modules\Notifications\Infrastructure\Subscribers\SubmitTemplateApproval;
 use App\Modules\Notifications\Infrastructure\Subscribers\VerifyEmailSender;
@@ -43,6 +44,8 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(NotifyEmailBounce::class));
         $outbox->subscribe($this->app->make(NotifyPeopleChanges::class));
         $outbox->subscribe($this->app->make(NotifyContractEvents::class));
+        // MSS-4 · Recordatorios de cumpleaños y aniversarios del equipo al jefe.
+        $outbox->subscribe($this->app->make(NotifyTeamKeyDates::class));
         $outbox->subscribe($this->app->make(NotifyAbsenceSubsidy::class));
         $outbox->subscribe($this->app->make(NotifyDocumentEvents::class));
 

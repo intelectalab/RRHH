@@ -74,6 +74,11 @@ return [
     'change_request_own_only' => 'Solo puedes proponer cambios de tus propios datos. RRHH edita los datos desde la ficha.',
     'change_request_self_approval' => 'No puedes revisar una solicitud que hiciste tú.',
     'before_hire' => 'La fecha no puede ser anterior al ingreso.',
+    // MSS-4 · Fechas clave del equipo.
+    'team' => [
+        'reminders_sent' => 'Recordatorios de fechas del equipo registrados: :count.',
+        'invalid_range' => 'El rango de fechas no es válido: hasta 90 días.',
+    ],
     // COL-6 · Derechohabientes.
     'dependents' => [
         'child_birth_date' => 'Un hijo exige su fecha de nacimiento.',
