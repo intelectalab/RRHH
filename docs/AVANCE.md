@@ -175,9 +175,9 @@ Actualizado el **2026-11-16** con `python3 scripts/gen_avance.py` desde `kit/bac
 | IMP-5 | Organización demo coherente | IMP | Fase 1 · Core HR | Task | sí | pendiente | — |  |
 | IMP-6 | Informe y reversión de importaciones | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | IMP-7 | Importadores desde otros sistemas de RRHH y planilla | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| AYU-1 | Contenido de ayuda del producto con versiones | AYU | Fase 1 · Core HR | Task | sí | pendiente | — |  |
-| AYU-2 | Centro de ayuda para todos los roles | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| AYU-3 | Ayuda contextual por pantalla | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| AYU-1 | Contenido de ayuda del producto con versiones | AYU | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Ayuda del producto en la consola con versiones inmutables por idioma, módulo, roles y pantallas; 44 artículos es/en/pt cargados por migración y help:sync-bundled sin pisar lo editado. |
+| AYU-2 | Centro de ayuda para todos los roles | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Botón de ayuda en todas las pantallas y el portal; pestañas Esta pantalla y Guías con búsqueda; filtra por módulo activo, rol y pantallas permitidas; búsquedas sin resultado anónimas. |
+| AYU-3 | Ayuda contextual por pantalla | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Clave de ayuda por pantalla (API y web sincronizadas por prueba), ayudas de campo versionadas y estados vacíos que enlazan a la ayuda. |
 | AYU-4 | Artículos y políticas de la organización | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | AYU-5 | Buscador de ayuda y valoración de artículos | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | AYU-6 | Derivar la consulta a RRHH o a soporte | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
