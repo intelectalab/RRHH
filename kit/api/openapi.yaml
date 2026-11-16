@@ -35200,7 +35200,9 @@ paths:
       operationId: postSettlementsIdVoid
   /setup-checklist:
     get:
-      summary: Avance de la puesta en marcha guiada
+      summary: 'Asistente de primeros pasos (IMP-3): pasos de los módulos contratados con su estado (pending, done, skipped),
+        la pantalla real a la que llevan, el porcentaje de avance y si el asistente se muestra (visible) u ocultó la organización
+        (dismissed)'
       responses:
         '200':
           description: Correcto
@@ -35213,8 +35215,161 @@ paths:
       tags:
       - IMP
       x-phase: 1
-      x-permission: imports.imports.view
+      x-permission: imports.setup.use
       operationId: getSetupChecklist
+  /setup-checklist/dismiss:
+    post:
+      summary: Ocultar (hidden=true) o volver a mostrar (hidden=false) el asistente de primeros pasos; queda en el parámetro
+        puesta_en_marcha.omitida con vigencia y auditoría
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - IMP
+      x-phase: 1
+      x-permission: imports.setup.use
+      operationId: postSetupChecklistDismiss
+  /setup-checklist/{code}/reopen:
+    post:
+      summary: Retomar un paso saltado del asistente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - IMP
+      x-phase: 1
+      x-permission: imports.setup.use
+      operationId: postSetupChecklistCodeReopen
+  /setup-checklist/{code}/skip:
+    post:
+      summary: 'Saltar un paso pendiente del asistente (un paso hecho no se salta: 409)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - IMP
+      x-phase: 1
+      x-permission: imports.setup.use
+      operationId: postSetupChecklistCodeSkip
+  /setup/country-packs:
+    get:
+      summary: 'Paquetes de configuración inicial del país de la organización (IMP-4): versión, partes con lo que crea cada
+        una (items), cuánto ya existe (present), la pantalla donde se edita y la versión instalada'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+      tags:
+      - IMP
+      x-phase: 1
+      x-permission: imports.setup.use
+      operationId: getSetupCountryPacks
+  /setup/country-packs/{code}/apply:
+    post:
+      summary: 'Aplicar el paquete del país: crea solo lo que falta (tipos de contrato y de ausencia, feriados, plantillas,
+        políticas de vacaciones, motivos de cese), no pisa lo editado y registra la versión instalada; responde lo creado
+        por parte'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - IMP
+      x-phase: 1
+      x-permission: imports.setup.use
+      operationId: postSetupCountryPacksCodeApply
   /shift-assignments:
     get:
       summary: Listar ShiftAssignment

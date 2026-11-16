@@ -7,6 +7,7 @@ use App\Modules\Documents\Console\CheckDocumentExpiry;
 use App\Modules\Documents\Infrastructure\Calendar\DocumentCalendarSource;
 use App\Modules\Documents\Infrastructure\Catalog\DocumentTypesAdapter;
 use App\Modules\Documents\Infrastructure\SelfService\DocumentsHomeCard;
+use App\Modules\Documents\Infrastructure\Setup\DocumentTemplatesPackComponent;
 use App\Modules\Documents\Infrastructure\Subscribers\RunDocumentGeneration;
 use App\Modules\Documents\Infrastructure\Trash\DocumentTrashSource;
 use App\Modules\Documents\Infrastructure\Workflow\DocumentRequestOutcome;
@@ -15,6 +16,7 @@ use App\Shared\Documents\DocumentTypes;
 use App\Shared\Documents\TemplateRenderer;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Trash\TrashRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -35,6 +37,8 @@ final class DocumentsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(DocumentTemplatesPackComponent::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         // DOC-2 · Vencimientos de documentos en el calendario central.
         $this->app->make(CalendarRegistry::class)->register($this->app->make(DocumentCalendarSource::class));

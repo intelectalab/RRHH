@@ -59,4 +59,29 @@ return [
     'revert_blocked' => 'It cannot be undone: :n records of the batch are already used by other processes.',
     'no_errors' => 'This import has no rows with errors.',
     'failed_unexpected' => 'An unexpected error occurred while importing; no records were saved.',
+    'packs' => [
+        'names' => ['pe-base' => 'Peru · starter configuration'],
+        'components' => [
+            'contract_types' => 'Contract types and modalities',
+            'absence_types' => 'Absence types and statutory leave',
+            'holidays' => 'National holidays',
+            'document_templates' => 'Certificate templates',
+            'vacation_policies' => 'Vacation policies by regime',
+            'termination_reasons' => 'Termination reasons (Table 17)',
+            'roles' => 'Suggested roles',
+        ],
+    ],
+    'setup' => [
+        'steps' => [
+            'company' => ['title' => 'Company details', 'description' => 'Legal name, tax ID, labor regime and address of each company in the group.'],
+            'country_pack' => ['title' => 'Country templates', 'description' => 'Contract types, absences, holidays, certificates and vacation policies ready for Peru.'],
+            'sites' => ['title' => 'Sites', 'description' => 'Offices and branches: time zone, holidays and address.'],
+            'structure' => ['title' => 'Organizational structure', 'description' => 'Divisions, areas and teams with their head.'],
+            'jobs' => ['title' => 'Jobs', 'description' => 'Job catalog with category and level.'],
+            'employees' => ['title' => 'Employees', 'description' => 'Add your staff one by one or import them from a file.'],
+            'users' => ['title' => 'Users and roles', 'description' => 'Invite HR and managers and assign their role.'],
+            'policies' => ['title' => 'Vacation policies', 'description' => 'Review the policies by regime or create your own.'],
+            'approval_flows' => ['title' => 'Approval flows', 'description' => 'Who approves vacations, absences and changes.'],
+        ],
+    ],
 ];

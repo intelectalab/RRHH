@@ -259,6 +259,8 @@ def seeds():
     o.append(',\n'.join(f"  ((SELECT id FROM addons WHERE code = {q(k)}), {q(m)})" for k, n, pr, mods in C.ADDONS for m in mods) + ';')
     o.append('INSERT INTO labor_regimes (code, country_code, name, kind) VALUES')
     o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)})" for c, n, k in C.REGIMES_PE) + ';')
+    # IMP-4 · Paquete de configuración inicial del país (su contenido vive en packages/country-pe/data/paquete.php).
+    o.append("INSERT INTO country_packs (country_code, code, name, status, current_version) VALUES ('PE', 'pe-base', 'Perú · configuración inicial', 'available', '1.0.0');")
     o.append('INSERT INTO pension_funds (code, country_code, name, kind, status) VALUES')  # COL-7
     o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)}, 'active')" for c, n, k in C.PENSION_FUNDS_PE) + ';')
     o.append('INSERT INTO system_roles (code, name, description, realm, mfa_required_default) VALUES')

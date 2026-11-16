@@ -59,4 +59,29 @@ return [
     'revert_blocked' => 'No se puede deshacer: :n registros del lote ya se usan en otros procesos.',
     'no_errors' => 'Esta importación no tiene filas con error.',
     'failed_unexpected' => 'Ocurrió un error inesperado al importar; no se guardó ningún registro.',
+    'packs' => [
+        'names' => ['pe-base' => 'Perú · configuración inicial'],
+        'components' => [
+            'contract_types' => 'Tipos de contrato y modalidades',
+            'absence_types' => 'Tipos de ausencia y licencias de ley',
+            'holidays' => 'Feriados nacionales',
+            'document_templates' => 'Plantillas de constancias y certificados',
+            'vacation_policies' => 'Políticas de vacaciones por régimen',
+            'termination_reasons' => 'Motivos de cese (Tabla 17)',
+            'roles' => 'Roles sugeridos',
+        ],
+    ],
+    'setup' => [
+        'steps' => [
+            'company' => ['title' => 'Datos de la empresa', 'description' => 'Razón social, RUC, régimen laboral y domicilio de cada empresa del grupo.'],
+            'country_pack' => ['title' => 'Plantillas del país', 'description' => 'Tipos de contrato, ausencias, feriados, constancias y políticas de vacaciones listas para el Perú.'],
+            'sites' => ['title' => 'Sedes', 'description' => 'Locales y sucursales: zona horaria, feriados y dirección.'],
+            'structure' => ['title' => 'Estructura organizacional', 'description' => 'Gerencias, áreas y equipos con su responsable.'],
+            'jobs' => ['title' => 'Puestos', 'description' => 'Catálogo de puestos con su categoría y nivel.'],
+            'employees' => ['title' => 'Colaboradores', 'description' => 'Registra a tu personal uno por uno o impórtalo desde un archivo.'],
+            'users' => ['title' => 'Usuarios y roles', 'description' => 'Invita a RRHH y a los jefes, y asígnales su rol.'],
+            'policies' => ['title' => 'Políticas de vacaciones', 'description' => 'Revisa las políticas por régimen o crea las propias.'],
+            'approval_flows' => ['title' => 'Flujos de aprobación', 'description' => 'Quién aprueba vacaciones, ausencias y cambios.'],
+        ],
+    ],
 ];

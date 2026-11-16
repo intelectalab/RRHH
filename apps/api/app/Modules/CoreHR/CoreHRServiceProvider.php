@@ -18,6 +18,7 @@ use App\Modules\CoreHR\Infrastructure\Home\TurnoverCard;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
 use App\Modules\CoreHR\Infrastructure\Labor\MasterDataAdapter;
 use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
+use App\Modules\CoreHR\Infrastructure\Setup\TerminationReasonsPackComponent;
 use App\Modules\CoreHR\Infrastructure\Team\CelebrationTeamDates;
 use App\Modules\CoreHR\Infrastructure\Usage\EmployeesUsageSource;
 use App\Modules\CoreHR\Infrastructure\Workflow\PersonnelActionOutcome;
@@ -27,6 +28,7 @@ use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\AssignmentChanges;
 use App\Shared\Labor\MasterData;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Team\TeamDateRegistry;
 use App\Shared\Usage\UsageRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
@@ -49,6 +51,8 @@ final class CoreHRServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(TerminationReasonsPackComponent::class));
         // SAS-6 · RN-COL-13 · Colaboradores activos frente al límite del plan.
         $this->app->make(UsageRegistry::class)->register(new EmployeesUsageSource);
         $this->app->make(ExportRegistry::class)->register($this->app->make(EmploymentsExportSource::class));

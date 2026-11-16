@@ -59,4 +59,29 @@ return [
     'revert_blocked' => 'Não é possível desfazer: :n registros do lote já são usados em outros processos.',
     'no_errors' => 'Esta importação não tem linhas com erro.',
     'failed_unexpected' => 'Ocorreu um erro inesperado ao importar; nenhum registro foi salvo.',
+    'packs' => [
+        'names' => ['pe-base' => 'Peru · configuração inicial'],
+        'components' => [
+            'contract_types' => 'Tipos de contrato e modalidades',
+            'absence_types' => 'Tipos de ausência e licenças legais',
+            'holidays' => 'Feriados nacionais',
+            'document_templates' => 'Modelos de declarações e certificados',
+            'vacation_policies' => 'Políticas de férias por regime',
+            'termination_reasons' => 'Motivos de desligamento (Tabela 17)',
+            'roles' => 'Papéis sugeridos',
+        ],
+    ],
+    'setup' => [
+        'steps' => [
+            'company' => ['title' => 'Dados da empresa', 'description' => 'Razão social, RUC, regime trabalhista e endereço de cada empresa do grupo.'],
+            'country_pack' => ['title' => 'Modelos do país', 'description' => 'Tipos de contrato, ausências, feriados, declarações e políticas de férias prontos para o Peru.'],
+            'sites' => ['title' => 'Unidades', 'description' => 'Locais e filiais: fuso horário, feriados e endereço.'],
+            'structure' => ['title' => 'Estrutura organizacional', 'description' => 'Gerências, áreas e equipes com seu responsável.'],
+            'jobs' => ['title' => 'Cargos', 'description' => 'Catálogo de cargos com categoria e nível.'],
+            'employees' => ['title' => 'Colaboradores', 'description' => 'Cadastre sua equipe um a um ou importe de um arquivo.'],
+            'users' => ['title' => 'Usuários e papéis', 'description' => 'Convide RH e gestores e atribua o papel de cada um.'],
+            'policies' => ['title' => 'Políticas de férias', 'description' => 'Revise as políticas por regime ou crie as próprias.'],
+            'approval_flows' => ['title' => 'Fluxos de aprovação', 'description' => 'Quem aprova férias, ausências e mudanças.'],
+        ],
+    ],
 ];

@@ -22,6 +22,13 @@ return [
         'fraccion_minima_dias' => 'vacaciones_fraccion_minima_dias',
         'adelanto_max_dias' => 'vacaciones_adelanto_max_dias',
     ],
+    // IMP-4 · Políticas que crea el paquete de país: una por régimen, sin días propios (rige la ley del régimen,
+    // RN-VAC-01). La organización las ajusta después en Configuración → Políticas de vacaciones.
+    'politicas' => [
+        ['code' => 'pe_general', 'name' => 'Vacaciones · Régimen general', 'regimen' => 'pe_general'],
+        ['code' => 'pe_pequena', 'name' => 'Vacaciones · Pequeña empresa', 'regimen' => 'pe_pequena'],
+        ['code' => 'pe_micro', 'name' => 'Vacaciones · Microempresa', 'regimen' => 'pe_micro'],
+    ],
     'por_validar' => [
         'ancla' => 'Confirmar si un reingreso dentro del mismo año conserva el récord del vínculo anterior.',
         'record' => 'El récord se verifica con la asistencia (faltas, licencias sin goce) cuando exista el módulo de asistencia.',

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useT } from '@/lib/useT'
 import { HomeBoard } from '@/modules/home/HomeBoard'
+import { SetupBanner } from '@/modules/setup/SetupBanner'
 import { HOME_VIEW_KEY, pickView, type HomeView } from '@/modules/home/homeView'
 import { prefersPortal } from '@/modules/selfservice/portal'
 import { PageHeader } from '@/ui/components/PageHeader'
@@ -77,6 +78,7 @@ export function HomeScreen() {
         ) : undefined}
       />
       <main className="main" id="contenido" tabIndex={-1}>
+        {view === 'hr' && <SetupBanner />}
         {(view === 'hr' || view === 'manager') && <HomeBoard audience={view} />}
         {view === 'employee' && (
           <div className="grid-2">

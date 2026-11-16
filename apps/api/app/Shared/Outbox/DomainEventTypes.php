@@ -207,6 +207,11 @@ final class DomainEventTypes
 
     public const IMPORT_REVERTED = 'import.reverted.v1';
 
+    // Puesta en marcha (IMP-3, IMP-4)
+    public const COUNTRY_PACK_APPLIED = 'country_pack.applied.v1';
+
+    public const ONBOARDING_SETUP_COMPLETED = 'onboarding_setup.completed.v1';
+
     // Organización
     public const COMPANY_CREATED = 'company.created.v1';
 
@@ -607,6 +612,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['import_job_id', 'entity', 'reverted_rows'],
             'description' => 'Lote importado deshecho',
+        ],
+        self::COUNTRY_PACK_APPLIED => [
+            'version' => 1,
+            'required_fields' => ['country_pack_code', 'version', 'created'],
+            'description' => 'Paquete de país aplicado a la organización con lo que creó cada parte (IMP-4)',
+        ],
+        self::ONBOARDING_SETUP_COMPLETED => [
+            'version' => 1,
+            'required_fields' => ['steps'],
+            'description' => 'Puesta en marcha guiada terminada: todos los pasos hechos u omitidos (IMP-3)',
         ],
         self::TENANT_STATUS_CHANGED => [
             'version' => 1,

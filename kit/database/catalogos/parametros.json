@@ -728,6 +728,18 @@
       "opciones": null
     },
     {
+      "codigo": "puesta_en_marcha.omitida",
+      "modulo": "core",
+      "nombre": "Ocultar el asistente de primeros pasos",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "IMP-3: con «sí», el asistente de primeros pasos deja de mostrarse en el inicio aunque falten pasos; se vuelve a mostrar desde Primeros pasos. Se oculta solo cuando todos los pasos están hechos u omitidos.",
+      "opciones": null
+    },
+    {
       "codigo": "equipo.aviso_fechas_clave_dias",
       "modulo": "core",
       "nombre": "Recordatorio de cumpleaños y aniversarios (días)",

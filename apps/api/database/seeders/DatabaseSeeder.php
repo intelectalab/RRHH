@@ -18,5 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DemoOrganizationSeeder::class);
         // COL-2 · Estructura y colaboradores demo (directorio, organigrama, posiciones y listado con datos).
         $this->call(DemoPeopleSeeder::class);
+        // IMP-5 · Historia demo: vacaciones, descanso médico, promoción programada y un cese, con fechas relativas.
+        $this->call(DemoStorySeeder::class);
     }
 }

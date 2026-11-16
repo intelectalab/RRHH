@@ -6,10 +6,12 @@ use App\Modules\Contracts\Application\ContractTypeCatalog;
 use App\Modules\Contracts\Console\ApplyDueContracts;
 use App\Modules\Contracts\Infrastructure\Calendar\ContractCalendarSource;
 use App\Modules\Contracts\Infrastructure\Home\ContractDatesCard;
+use App\Modules\Contracts\Infrastructure\Setup\ContractTypesPackComponent;
 use App\Modules\Contracts\Infrastructure\Team\ContractTeamDates;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\ContractTypeSource;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Team\TeamDateRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,8 @@ final class ContractsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(ContractTypesPackComponent::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         // CON-4 · Vencimientos de contratos en el calendario central.
         $this->app->make(CalendarRegistry::class)->register($this->app->make(ContractCalendarSource::class));

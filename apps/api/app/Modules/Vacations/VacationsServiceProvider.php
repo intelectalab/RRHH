@@ -8,12 +8,14 @@ use App\Modules\Vacations\Console\AdvanceVacations;
 use App\Modules\Vacations\Infrastructure\Calendar\VacationCalendarSource;
 use App\Modules\Vacations\Infrastructure\Home\VacationsCard;
 use App\Modules\Vacations\Infrastructure\SelfService\VacationsHomeCard;
+use App\Modules\Vacations\Infrastructure\Setup\VacationPoliciesPackComponent;
 use App\Modules\Vacations\Infrastructure\Subscribers\SyncVacationsOnEmploymentEvents;
 use App\Modules\Vacations\Infrastructure\Workflow\VacationRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\SelfService\HomeCardRegistry;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Time\VacationBalances;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -33,6 +35,8 @@ final class VacationsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(VacationPoliciesPackComponent::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         $this->app->make(OutboxService::class)->subscribe($this->app->make(SyncVacationsOnEmploymentEvents::class));
         // VAC-3 · El motor de aprobaciones devuelve aquí la decisión sobre una solicitud de vacaciones.

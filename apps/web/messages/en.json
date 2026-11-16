@@ -148,7 +148,8 @@
     "group_people": "People",
     "group_time": "Time",
     "offline": "Offline. Actions that need the network are unavailable until the connection returns.",
-    "install": "Install app"
+    "install": "Install app",
+    "modules_setup": "Getting started"
   },
   "home": {
     "title": "Hello, {name}",
@@ -878,7 +879,9 @@
     "card_vacation_policies": "Vacation policies",
     "card_vacation_policies_help": "Days per year, advance, selling and HR validation by company, regime and category, with effective dates.",
     "card_document_types": "Document types",
-    "card_document_types_help": "Employee file folders and types: confidentiality, visibility, review and expiry."
+    "card_document_types_help": "Employee file folders and types: confidentiality, visibility, review and expiry.",
+    "card_country_packs": "Country templates",
+    "card_country_packs_help": "Contract types, absences, holidays, certificates and policies ready to use"
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -4244,5 +4247,49 @@
     "title": "Offline",
     "body": "There is no internet connection. When it returns, reload the page to keep working.",
     "retry": "Retry"
+  },
+  "setup": {
+    "title": "Getting started",
+    "sub": "Set up your organization step by step; pick it up again whenever you want",
+    "progress": "Setup: {n} %",
+    "counts": "{done} done · {skipped} skipped · {total} steps",
+    "completed": "All set! Your organization is up and running.",
+    "next": "Next step:",
+    "hidden_note": "The assistant is hidden from the home page. You can show it again.",
+    "hide": "Hide assistant",
+    "show": "Show assistant",
+    "go": "Go",
+    "skip": "Skip",
+    "reopen": "Resume",
+    "status_pending": "Pending",
+    "status_done": "Done",
+    "status_skipped": "Skipped",
+    "when_done": "Done on {date}",
+    "when_skipped": "Skipped on {date}",
+    "import_hint": "Have a list? Import it from a file",
+    "action_error": "The change could not be saved. Try again.",
+    "banner_title": "Getting started · {n} % complete",
+    "see_all": "See all steps"
+  },
+  "packs": {
+    "title": "Country templates",
+    "sub": "Starter configuration ready to use; everything created can be edited later",
+    "version": "Version {v} of {date}",
+    "installed": "version {v} installed on {date}",
+    "not_installed": "not applied",
+    "action_apply": "Apply templates",
+    "action_update": "Apply what is missing",
+    "action_complete": "Apply again",
+    "applied": "{n} records were created. You can edit them on each screen.",
+    "applied_nothing": "You already had everything: nothing new was created.",
+    "apply_error": "The templates could not be applied. Try again.",
+    "pending_validation": "Pending validation",
+    "module_off": "Module not subscribed",
+    "present": "{present} of {total} in your organization",
+    "show_items": "See what it includes ({n})",
+    "hide_items": "Hide",
+    "edit": "Edit",
+    "empty_title": "No templates for your country",
+    "empty_text": "There is no starter configuration package for your organization's country yet."
   }
 }

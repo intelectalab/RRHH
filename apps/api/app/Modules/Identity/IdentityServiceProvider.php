@@ -7,6 +7,7 @@ use App\Modules\Identity\Infrastructure\Exports\UsersExportSource;
 use App\Modules\Identity\Infrastructure\Provisioning\InviteFirstAdmin;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
+use App\Modules\Identity\Infrastructure\Setup\RolesPackComponent;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendMessageCode;
 use App\Modules\Identity\Infrastructure\Subscribers\SendPasswordResetLink;
@@ -15,6 +16,7 @@ use App\Modules\Identity\Infrastructure\Usage\AdminsUsageSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
+use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\TenancyScope;
 use App\Shared\Trash\TrashRegistry;
@@ -34,6 +36,8 @@ final class IdentityServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // IMP-4 · Parte del paquete de país que siembra este módulo.
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(RolesPackComponent::class));
         // Guard de sesión web: resuelve la cookie dentro de la organización activa (RLS).
         Auth::viaRequest('ayni-session', function (Request $request) {
             if (TenancyScope::current() === null) {
