@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-15** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 115 | 3 | 47,7 % |
-| Backlog completo | 512 | 115 | 3 | 22,5 % |
+| Primer corte comercial (MVP) | 241 | 117 | 3 | 48,5 % |
+| Backlog completo | 512 | 117 | 3 | 22,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -150,8 +150,8 @@ Actualizado el **2026-11-13** con `python3 scripts/gen_avance.py` desde `kit/bac
 | CON-4 | Alertas de vencimiento y de tope acumulado | CON | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Tarea diaria avisa al jefe y a RRHH cuando un contrato está por vencer (contratos.alerta_vencimiento_dias, sin repetir umbral) o se acerca al tope acumulado; GET /contracts/expiring con días restantes, acumulado frente al tope y acción sugerida; renovar sobre el tope exige confirmación y motivo auditado; fuente de calendario; pantalla Personas → Contratos por vencer. Pendiente: renovación masiva (CON-5). |
 | CON-5 | Renovación masiva con firma | CON | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | CON-6 | Acuerdo de teletrabajo | CON | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| DOC-1 | Repositorio y carpetas del legajo | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| DOC-2 | Versiones, archivo y vencimientos | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| DOC-1 | Repositorio y carpetas del legajo | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | 8 carpetas del sistema con tipos documentales y tipos propios (confidencialidad, visible al colaborador, revisión, vencimiento obligatorio); lo que sube RRHH queda activo y lo que envía el colaborador pasa a revisión con aprobación o devolución con motivo; confidenciales solo con permiso y con registro de lectura; contratos y sustentos de ausencias aparecen en el legajo sin copiar el archivo; archivar, restaurar y papelera (la purga espera la retención legal por validar); pestaña Documentos y /configuracion/tipos-documentales. |
+| DOC-2 | Versiones, archivo y vencimientos | DOC | Fase 1 · Core HR | Story | sí | hecha | 2026-11-13 | Versiones que conservan las anteriores con su emisión y vencimiento (RN-DOC-01); lo firmado no se reemplaza (RN-DOC-02); tarea diaria con aviso único al entrar en el periodo de aviso y marca de vencido (RN-DOC-09); pantalla /documentos/vencimientos y fuente de calendario; una versión nueva limpia el vencido. Por validar: legajo_conservacion_anios. |
 | DOC-3 | Solicitud y aprobación de documentos | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | DOC-4 | Plantillas dinámicas con variables | DOC | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | DOC-5 | Generación de PDF | DOC | Fase 1 · Core HR | Task | sí | pendiente | — |  |
