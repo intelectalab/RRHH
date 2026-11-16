@@ -20,30 +20,30 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 513 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 451 |
+| Tablas | 512 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 450 |
 | Tablas de plataforma (sin RLS de organización) | 62 |
-| Políticas RLS | 451 |
-| Claves foráneas | 1633 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1075 |
-| — simples `tenant_id` → `tenants(id)` | 463 |
+| Políticas RLS | 450 |
+| Claves foráneas | 1630 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1073 |
+| — simples `tenant_id` → `tenants(id)` | 462 |
 | — resto (hacia catálogos y tablas de plataforma) | 95 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2316 |
-| — creados con `CREATE INDEX` | 1159 |
-| Triggers | 533 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2311 |
+| — creados con `CREATE INDEX` | 1156 |
+| Triggers | 532 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 622 |
-| Restricciones `UNIQUE` | 614 |
-| Columnas | 6837 |
+| Restricciones `CHECK` | 623 |
+| Restricciones `UNIQUE` | 613 |
+| Columnas | 6825 |
 | Columnas marcadas `-- SENSIBLE` | 166 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 41 |
 | Tablas inalterables (solo inserción, por trigger) | 23 |
 | Tablas con borrado lógico (`deleted_at`) | 167 |
-| Tablas con concurrencia optimista (`lock_version`) | 248 |
+| Tablas con concurrencia optimista (`lock_version`) | 247 |
 | Funciones | 26 |
 | Vistas | 1 |
-| Permisos en el catálogo | 912 |
+| Permisos en el catálogo | 914 |
 | — de campo / marcados sensibles | 28 / 108 |
 | Roles de sistema | 11 |
 | Módulos comerciales | 28 |
@@ -69,7 +69,7 @@ Tablas por épica:
 | 1 | COL | Colaboradores y ficha 360 | 11 |
 | 1 | HIS | Historia con vigencia | 8 |
 | 1 | CON | Contratos y adendas | 6 |
-| 1 | DOC | Gestión documental, plantillas y firma | 12 |
+| 1 | DOC | Gestión documental, plantillas y firma | 11 |
 | 1 | ESS | Portal del colaborador | 2 |
 | 1 | MSS | Portal del manager | 0 |
 | 1 | IMP | Importador y puesta en marcha | 4 |
@@ -1461,31 +1461,24 @@ erDiagram
 
 #### `document_requests`
 
-- **Propósito:** Solicitud de un documento a un colaborador o candidato, con revisión. DOC-3: RRHH pide un tipo documental a una o varias personas (request_group_id agrupa el envío) con fecha límite; el colaborador lo entrega desde el portal (submitted_at), la revisión pasa por el motor de aprobaciones y, si se rechaza, vuelve al colaborador con la observación (rejection_reason) para entregarlo de nuevo.
-- **Columnas clave:** `due_on`, `status`, `rejection_reason`, `instructions`, `request_group_id`, `title`, `submitted_at`, `reviewed_at`, `cancellation_reason`.
-- **Relaciones:** `employment_id` → `employments` (opcional); `person_id` → `people` (opcional); `document_category_id` → `document_categories`; `requested_by_user_id` → `users` (opcional); `document_id` → `documents` (opcional); `reviewed_by_user_id` → `users` (opcional).
+- **Propósito:** Solicitud de un documento a un colaborador o candidato, con revisión.
+- **Columnas clave:** `due_on`, `status`, `rejection_reason`, `instructions`.
+- **Relaciones:** `employment_id` → `employments` (opcional); `person_id` → `people` (opcional); `document_category_id` → `document_categories`; `requested_by_user_id` → `users` (opcional); `document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `document_templates`
 
-- **Propósito:** Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas). DOC-4: se organiza por tipo documental y empresa (legal_entity_id vacío = todas); current_version_id es la versión publicada con la que se genera (active = publicada, inactive = retirada).
-- **Columnas clave:** `code`, `name`, `kind`, `locale`, `country_code`, `is_system`, `status`, `description`.
-- **Relaciones:** `document_category_id` → `document_categories` (opcional); `current_version_id` → `document_template_versions` (opcional); `legal_entity_id` → `legal_entities` (opcional).
+- **Propósito:** Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas).
+- **Columnas clave:** `code`, `name`, `kind`, `locale`, `country_code`, `is_system`, `status`.
+- **Relaciones:** `document_category_id` → `document_categories` (opcional); `current_version_id` → `document_template_versions` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `code`.
 
 #### `document_template_versions`
 
-- **Propósito:** Versión del cuerpo de una plantilla. DOC-4: la versión sin published_at es el borrador que se edita; al publicarse queda fija y los documentos generados conservan la suya (RN-DOC-11). page_settings guarda el encabezado de la empresa.
-- **Columnas clave:** `version`, `body`, `variables`, `page_settings`, `published_at`, `notes`.
-- **Relaciones:** `document_template_id` → `document_templates`; `created_by_user_id` → `users` (opcional).
+- **Propósito:** Versión del cuerpo de una plantilla.
+- **Columnas clave:** `version`, `body`, `variables`, `page_settings`, `published_at`.
+- **Relaciones:** `document_template_id` → `document_templates`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `document_template_id`, `version`.
-
-#### `document_generation_batches`
-
-- **Propósito:** DOC-5: generación de documentos PDF desde una plantilla para una o varias relaciones laborales, en segundo plano: avance (generados y con error) y el resultado por persona en items, con el motivo de los omitidos.
-- **Columnas clave:** `status`, `total`, `generated`, `failed`, `items`, `started_at`, `finished_at`.
-- **Relaciones:** `document_template_id` → `document_templates`; `document_template_version_id` → `document_template_versions`; `requested_by_user_id` → `users` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `document_acknowledgements`
 
@@ -1528,8 +1521,8 @@ erDiagram
 #### `certificate_requests`
 
 - **Propósito:** Solicitud de constancias y certificados desde el portal.
-- **Columnas clave:** `kind`, `purpose`, `status`, `issued_at`.
-- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional).
+- **Columnas clave:** `kind`, `purpose`, `status`, `issued_at`, `decided_at`, `rejection_reason`, `auto_issued`.
+- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional); `requested_by_user_id` → `users` (opcional); `workflow_instance_id` → `workflow_instances` (opcional); `decided_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 
@@ -3278,7 +3271,7 @@ erDiagram
 #### `ticket_categories`
 
 - **Propósito:** Categorías de solicitudes a RRHH.
-- **Columnas clave:** `code`, `name`, `form`, `is_confidential`.
+- **Columnas clave:** `code`, `name`, `form`, `is_confidential`, `description`, `requires_attachment`, `sort_order`, `status`.
 - **Relaciones:** `parent_id` → `ticket_categories` (opcional); `default_assignee_role_id` → `roles` (opcional); `sla_policy_id` → `sla_policies` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
 
@@ -3292,8 +3285,8 @@ erDiagram
 #### `ticket_messages`
 
 - **Propósito:** Mensajes y notas internas de una solicitud.
-- **Columnas clave:** `body`, `is_internal_note`, `via`.
-- **Relaciones:** `ticket_id` → `tickets`; `author_user_id` → `users` (opcional).
+- **Columnas clave:** `body`, `is_internal_note`, `via`, `event`, `file_name`.
+- **Relaciones:** `ticket_id` → `tickets`; `author_user_id` → `users` (opcional); `stored_file_id` → `stored_files` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas.
 
 #### `ticket_article_links`

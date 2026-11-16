@@ -676,6 +676,21 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/profile-change-requests` | `people.change_requests.{view,create}` | 1 |
 | GET | `/profile-change-requests/{id}` | `people.change_requests.view` | 1 |
 | POST | `/profile-change-requests/{id}/{approve,reject,cancel}` | `people.change_requests.{approve,reject,cancel}` | 1 |
+| GET, POST | `/tickets` | `helpdesk.tickets.{view,create}` | 1 |
+| GET, PATCH | `/tickets/{id}` | `helpdesk.tickets.{view,update}` | 1 |
+| POST | `/tickets/{id}/{assign,request-info,resolve,close,reopen}` | `helpdesk.tickets.{assign,request_info,resolve,close,reopen}` | 1 |
+| GET | `/certificate-types` | `people.certificates.request` | 1 |
+| GET | `/certificate-requests` | `people.certificates.view` | 1 |
+| POST | `/certificate-requests` | `people.certificates.request` | 1 |
+| GET | `/certificate-requests/{id}` | `people.certificates.view` | 1 |
+| POST | `/certificate-requests/{id}/issue` | `people.certificates.issue` | 1 |
+| POST | `/certificate-requests/{id}/reject` | `people.certificates.issue` | 1 |
+| GET | `/certificate-requests/{id}/file` | `people.certificates.view` | 1 |
+| GET | `/ticket-categories` | `helpdesk.tickets.create` | 1 |
+| POST | `/ticket-categories` | `helpdesk.settings.update` | 1 |
+| PATCH | `/ticket-categories/{id}` | `helpdesk.settings.update` | 1 |
+| POST | `/tickets/{id}/messages` | `helpdesk.tickets.create` | 1 |
+| GET | `/tickets/{id}/messages/{message_id}/file` | `helpdesk.tickets.view` | 1 |
 | GET | `/me/employment` | sesión | 1 |
 | GET | `/me/home` | sesión | 1 |
 
@@ -1152,14 +1167,6 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/announcements` | `engagement.announcements.{view,create}` | 6 |
 | GET, PATCH | `/announcements/{id}` | `engagement.announcements.{view,update}` | 6 |
 | POST | `/announcements/{id}/{publish,archive,acknowledge}` | `engagement.announcements.{publish,archive,acknowledge}` | 6 |
-
-**HSD · Mesa de ayuda**
-
-| Método | Ruta | Permiso | Fase |
-|---|---|---|---|
-| GET, POST | `/tickets` | `helpdesk.tickets.{view,create}` | 6 |
-| GET, PATCH | `/tickets/{id}` | `helpdesk.tickets.{view,update}` | 6 |
-| POST | `/tickets/{id}/{assign,request-info,resolve,close,reopen}` | `helpdesk.tickets.{assign,request_info,resolve,close,reopen}` | 6 |
 
 ### Fase 7 · Operación y cumplimiento
 

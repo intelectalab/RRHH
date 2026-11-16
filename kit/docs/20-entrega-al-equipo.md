@@ -73,7 +73,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 1 | [HIS](../prompts/HIS.md) · Historia con vigencia | Core HR | 3 | 3 | 6 | 19 | — | — |
 | 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 26 | — | D-10 |
 | 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 45 | — | A-11, D-10 |
-| 1 | [ESS](../prompts/ESS.md) · Portal del colaborador | Core HR | 5 | 1 | 6 | 8 | — | A-12, D-23 |
+| 1 | [ESS](../prompts/ESS.md) · Portal del colaborador | Core HR | 5 | 1 | 6 | 29 | — | A-12, D-23 |
 | 1 | [MSS](../prompts/MSS.md) · Portal del manager | Core HR | 4 | 0 | 4 | 3 | — | — |
 | 1 | [IMP](../prompts/IMP.md) · Importador y puesta en marcha | Core HR | 4 | 3 | 7 | 12 | — | — |
 | 1 | [AYU](../prompts/AYU.md) · Centro de ayuda | Core HR | 6 | 1 | 7 | 24 | — | A-05, A-09, D-38 |
@@ -109,7 +109,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 6 | [ENC](../prompts/ENC.md) · Encuestas, clima y eNPS | Clima y encuestas | 6 | 2 | 0 | 13 | — | D-26 |
 | 6 | [REC](../prompts/REC.md) · Reconocimientos | Clima y encuestas | 4 | 0 | 0 | 4 | — | — |
 | 6 | [CIN](../prompts/CIN.md) · Comunicación interna | Clima y encuestas | 4 | 0 | 0 | 7 | — | — |
-| 6 | [HSD](../prompts/HSD.md) · Mesa de ayuda y base de conocimiento | Mesa de ayuda | 7 | 0 | 0 | 9 | — | — |
+| 6 | [HSD](../prompts/HSD.md) · Mesa de ayuda y base de conocimiento | Mesa de ayuda | 7 | 0 | 0 | 0 | — | — |
 | 7 | [SST](../prompts/SST.md) · Seguridad y salud en el trabajo | Seguridad y salud | 10 | 1 | 0 | 54 | — | D-15, D-33 |
 | 7 | [DEN](../prompts/DEN.md) · Canal de denuncias y hostigamiento | Denuncias | 7 | 1 | 0 | 20 | — | D-26, D-31, D-32 |
 | 7 | [DIS](../prompts/DIS.md) · Casos disciplinarios | Denuncias | 4 | 0 | 0 | 8 | — | — |

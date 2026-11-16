@@ -34,6 +34,9 @@ final class DocumentArchive
     /**
      * Crea el documento con su primera versión.
      *
+     * Por defecto nace confidencial y no visible para el colaborador; quien lo publica para él (ESS-4: una
+     * constancia emitida) lo indica con classification y visible_to_employee.
+     *
      * DOC-5: un documento generado desde plantilla va al legajo sin módulo dueño (subject_type null), con la
      * clasificación y visibilidad de su tipo y la versión de la plantilla con que se emitió (RN-DOC-11).
      *

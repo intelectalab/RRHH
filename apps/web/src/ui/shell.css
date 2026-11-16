@@ -818,3 +818,15 @@
 .inicio-items li > a, .inicio-items li > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .inicio-ver { align-self: flex-start; }
 @media (max-width: 600px) { .inicio-vistas { min-width: 0; width: 100%; } }
+
+/* ESS-3 · ESS-4 · ESS-5 · Documentos, constancias y solicitudes del portal */
+.portal-list > li:has(> .btn) { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+button.portal-link { background: none; border: 0; padding: 0; text-align: start; font: inherit; cursor: pointer; width: 100%; }
+.portal-viewer { width: 100%; height: min(70vh, 720px); border: 1px solid var(--bd); border-radius: var(--r-m, 8px); background: var(--sup); }
+.portal-viewer-img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.ticket-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ticket-history > li { border-inline-start: 3px solid var(--bd); padding-inline-start: 10px; }
+.ticket-history > li.internal { border-color: var(--pe-500); background: var(--pe-50); }
+.ticket-body { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ticket-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 380px) { .portal-nav-i span { font-size: 10px; } }

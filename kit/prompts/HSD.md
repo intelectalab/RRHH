@@ -3,7 +3,7 @@
 Solicitudes a RRHH con colas, SLA y base de conocimiento vinculada.
 
 - **Fase:** Fase 6 · Experiencia. **Módulo comercial:** Mesa de ayuda.
-- **Actividades:** 7 (7 historias y 0 tareas); 0 del MVP. **Operaciones de API:** 9.
+- **Actividades:** 7 (7 historias y 0 tareas); 0 del MVP. **Operaciones de API:** 0.
 - **Especificación:** `kit/docs/modulos/M-HSD.md`.
 
 ## Prompt para una sesión nueva de Claude Code

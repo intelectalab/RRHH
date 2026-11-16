@@ -110,6 +110,30 @@ return [
             'in_app' => ['subject' => 'Your document {document} needs changes', 'body' => 'Human Resources returned {document} ({type}): {reason} Upload a corrected version.'],
             'email' => ['subject' => 'Your document {document} needs changes', 'body' => "Hello {name}:\n\nIn {organization}, Human Resources returned {document} ({type}): {reason}\n\nUpload a corrected version: {link}"],
         ],
+        'certificates.requested' => [
+            'in_app' => ['subject' => 'Certificate to issue: {certificate}', 'body' => '{employee} requested a {certificate}. Review it and issue or reject it.'],
+            'email' => ['subject' => 'Certificate to issue: {certificate}', 'body' => "Hi {name}:\n\nAt {organization}, {employee} requested a {certificate} from their portal.\n\nIssue or reject it here: {link}"],
+        ],
+        'certificates.issued' => [
+            'in_app' => ['subject' => 'Your {certificate} is ready', 'body' => 'Your {certificate} is now in your documents. Download it whenever you need it.'],
+            'email' => ['subject' => 'Your {certificate} is ready', 'body' => "Hi {name}:\n\nAt {organization}, your {certificate} was issued and saved in your documents.\n\nDownload it here: {link}"],
+        ],
+        'certificates.rejected' => [
+            'in_app' => ['subject' => 'Your {certificate} was not issued', 'body' => 'Human Resources did not issue your {certificate}: {reason}'],
+            'email' => ['subject' => 'Your {certificate} was not issued', 'body' => "Hi {name}:\n\nAt {organization}, Human Resources did not issue your {certificate}: {reason}\n\nCheck your requests here: {link}"],
+        ],
+        'tickets.created' => [
+            'in_app' => ['subject' => 'New request {number}: {subject}', 'body' => '{employee} sent a {category} request: {subject}.'],
+            'email' => ['subject' => 'New request {number}: {subject}', 'body' => "Hi {name}:\n\nAt {organization}, {employee} sent request {number} ({category}): {subject}.\n\nHandle it here: {link}"],
+        ],
+        'tickets.replied' => [
+            'in_app' => ['subject' => '{employee} replied to request {number}', 'body' => '{employee} added information to {number}: {subject}.'],
+            'email' => ['subject' => '{employee} replied to request {number}', 'body' => "Hi {name}:\n\nAt {organization}, {employee} replied to request {number}: {subject}.\n\nReview it here: {link}"],
+        ],
+        'tickets.updated' => [
+            'in_app' => ['subject' => 'Your request {number} changed', 'body' => '{number} · {subject}: {status}.'],
+            'email' => ['subject' => 'Your request {number} changed', 'body' => "Hi {name}:\n\nAt {organization}, your request {number} ({subject}) is now: {status}.\n\nSee the details here: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],
@@ -127,6 +151,7 @@ return [
         'job_requisition' => 'job requisition',
         'position_request' => 'new position',
         'compensation_change' => 'compensation change',
+        'certificate_request' => 'certificate',
         'other' => 'request',
     ],
     'invalid_variables' => 'Variables not allowed: :vars. Use only: :allowed.',

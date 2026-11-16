@@ -14,5 +14,7 @@ return [
         'job_requisition' => ['bulk_safe' => false],
         'position_request' => ['bulk_safe' => false],
         'compensation_change' => ['bulk_safe' => false],
+        // ESS-4 · Constancias que no se emiten solas (constancias.emision_automatica).
+        'certificate_request' => ['bulk_safe' => true],
     ],
 ];

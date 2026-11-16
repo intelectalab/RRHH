@@ -5,6 +5,7 @@ namespace Tests\Support\Isolation;
 use App\Modules\Absences\Infrastructure\Models\AbsenceRequest;
 use App\Modules\Absences\Infrastructure\Models\AbsenceSubsidyCase;
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
+use App\Modules\Certificates\Infrastructure\Models\CertificateRequest;
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
 use App\Modules\CoreHR\Infrastructure\Models\BankAccount;
@@ -23,6 +24,8 @@ use App\Modules\Documents\Infrastructure\Models\Document;
 use App\Modules\Documents\Infrastructure\Models\DocumentCategory;
 use App\Modules\Documents\Infrastructure\Models\DocumentRequest;
 use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
+use App\Modules\Helpdesk\Infrastructure\Models\Ticket;
+use App\Modules\Helpdesk\Infrastructure\Models\TicketCategory;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -173,6 +176,15 @@ final class CrossTenantHarness
         '/contract-addenda/{id}/document' => ContractAddendum::class,
         // DOC-1 · DOC-2 · Tipos documentales y documentos por vencer (respuesta genérica).
         '/document-categories/{id}' => DocumentCategory::class,
+        // ESS-4 · ESS-5: constancias, solicitudes a RRHH y sus tipos de A.
+        '/certificate-requests/{id}' => CertificateRequest::class,
+        '/certificate-requests/{id}/file' => CertificateRequest::class,
+        '/certificate-requests/{id}/issue' => CertificateRequest::class,
+        '/certificate-requests/{id}/reject' => CertificateRequest::class,
+        '/ticket-categories/{id}' => TicketCategory::class,
+        'Ticket' => Ticket::class,
+        '/tickets/{id}/messages' => Ticket::class,
+        '/tickets/{id}/messages/{message_id}/file' => Ticket::class,
         '/document-categories/{id}/archive' => DocumentCategory::class,
         '/document-categories/{id}/restore' => DocumentCategory::class,
         '/documents/expiring' => Document::class,

@@ -2352,6 +2352,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/certificate-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Solicitudes de constancias: las propias para el colaborador, las del alcance para RRHH; ?filter[status], ?filter[employment_id], ?q */
+        get: operations["getCertificateRequests"];
+        put?: never;
+        /** Pedir una constancia propia (employment_id, kind, purpose). Si su tipo es de emisión automática se emite al instante (201 issued); si hay flujo publicado para certificate_request entra a aprobación; si no, espera a RRHH. 422 kind_not_available si el tipo no está disponible */
+        post: operations["postCertificateRequests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/certificate-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalle de una solicitud de constancia con su aprobación y el documento emitido */
+        get: operations["getCertificateRequestsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/certificate-requests/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el PDF de una constancia emitida (cada descarga queda en el registro de accesos) */
+        get: operations["getCertificateRequestsIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/certificate-requests/{id}/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** RRHH emite la constancia pedida: genera el PDF y lo guarda en el legajo del colaborador (visible para él). 409 invalid_transition si ya se emitió o se rechazó */
+        post: operations["postCertificateRequestsIdIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/certificate-requests/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** RRHH rechaza la solicitud con motivo (reason). 409 invalid_transition si ya se emitió o se rechazó */
+        post: operations["postCertificateRequestsIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/certificate-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Constancias que el colaborador puede pedir para su relación laboral (?employment_id propia): trabajo, vacaciones y remuneraciones (esta solo con people.employments.salary.view propio); indica si se emite al instante */
+        get: operations["getCertificateTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/whatsapp/settings": {
         parameters: {
             query?: never;
@@ -15736,6 +15839,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ticket-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tipos de solicitud a RRHH activos (los archivados con ?include_archived=true y helpdesk.settings.update): nombre, descripción, rol que la atiende, si exige adjunto y si es confidencial */
+        get: operations["getTicketCategories"];
+        put?: never;
+        /** Crear un tipo de solicitud a RRHH (code, name, description, default_assignee_role_id, requires_attachment, is_confidential, sort_order) */
+        post: operations["postTicketCategories"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ticket-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar un tipo de solicitud a RRHH; status active|archived para archivarlo o reactivarlo (las solicitudes existentes lo conservan) */
+        patch: operations["patchTicketCategoriesId"];
+        trace?: never;
+    };
     "/tickets": {
         parameters: {
             query?: never;
@@ -15806,6 +15944,40 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postTicketsIdClose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tickets/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Agregar un mensaje con adjunto opcional (multipart: body, file, is_internal_note). Si la solicitud espera información y responde el solicitante, vuelve a «en atención» (ME-31 responder). La nota interna solo la ve RRHH (helpdesk.tickets.update) */
+        post: operations["postTicketsIdMessages"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tickets/{id}/messages/{message_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el adjunto de un mensaje (se registra la descarga) */
+        get: operations["getTicketsIdMessagesMessageIdFile"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -22678,32 +22850,84 @@ export interface components {
         Ticket: {
             /** @description Identificador opaco */
             id: string;
+            number: string;
             /** @description Identificador opaco */
-            employment_id: string;
-            category: string;
+            category_id: string;
+            category_name?: string | null;
+            /** @description Identificador opaco */
+            employment_id?: string | null;
+            person_name?: string | null;
+            /** @description Identificador opaco */
+            requester_user_id: string;
+            requester_name?: string | null;
             subject: string;
-            body: string;
-            /** @description Identificador opaco */
-            assignee_id?: string | null;
-            /** Format: date-time */
-            sla_due_at?: string | null;
+            description?: string | null;
             /** @enum {string} */
-            status: "new" | "in_progress" | "waiting_info" | "resolved" | "closed";
+            status: "new" | "in_progress" | "waiting_info" | "resolved" | "closed" | "cancelled";
+            /** @enum {string} */
+            priority: "low" | "normal" | "high" | "urgent";
+            /** @description Identificador opaco */
+            assignee_user_id?: string | null;
+            assignee_name?: string | null;
+            /** @description Identificador opaco */
+            assignee_role_id?: string | null;
+            /** Format: date-time */
+            first_response_due_at?: string | null;
+            /** Format: date-time */
+            resolution_due_at?: string | null;
+            /** Format: date-time */
+            first_responded_at?: string | null;
+            /** Format: date-time */
+            resolved_at?: string | null;
+            /** Format: date-time */
+            closed_at?: string | null;
+            overdue?: boolean | null;
+            /** @enum {string} */
+            channel: "portal" | "email" | "whatsapp" | "ai_assistant";
+            messages?: {
+                [key: string]: unknown;
+            }[] | null;
+            allowed_actions: string[];
+            version: number;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
         };
         TicketInput: {
+            number?: string;
             /** @description Identificador opaco */
-            employment_id?: string;
-            category?: string;
+            category_id?: string;
+            /** @description Identificador opaco */
+            employment_id?: string | null;
+            /** @description Identificador opaco */
+            requester_user_id?: string;
+            requester_name?: string | null;
             subject?: string;
-            body?: string;
+            description?: string | null;
+            /** @enum {string} */
+            priority?: "low" | "normal" | "high" | "urgent";
             /** @description Identificador opaco */
-            assignee_id?: string | null;
+            assignee_user_id?: string | null;
+            assignee_name?: string | null;
+            /** @description Identificador opaco */
+            assignee_role_id?: string | null;
             /** Format: date-time */
-            sla_due_at?: string | null;
+            first_response_due_at?: string | null;
+            /** Format: date-time */
+            resolution_due_at?: string | null;
+            /** Format: date-time */
+            first_responded_at?: string | null;
+            /** Format: date-time */
+            resolved_at?: string | null;
+            /** Format: date-time */
+            closed_at?: string | null;
+            overdue?: boolean | null;
+            /** @enum {string} */
+            channel?: "portal" | "email" | "whatsapp" | "ai_assistant";
+            messages?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         TimeBankMovement: {
             /** @description Identificador opaco */
@@ -29065,6 +29289,209 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getCertificateRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postCertificateRequests: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getCertificateRequestsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getCertificateRequestsIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postCertificateRequestsIdIssue: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postCertificateRequestsIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getCertificateTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getChannelsWhatsappSettings: {
@@ -62686,6 +63113,92 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getTicketCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postTicketCategories: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchTicketCategoriesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getTickets: {
         parameters: {
             query?: {
@@ -62902,6 +63415,75 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postTicketsIdMessages: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    body: string;
+                    /** Format: binary */
+                    file?: string;
+                    is_internal_note?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getTicketsIdMessagesMessageIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postTicketsIdReopen: {

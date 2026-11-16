@@ -219,6 +219,7 @@ PARAMS = [
  ('documentos.firma_nivel_defecto', 'core', 'Nivel de firma por defecto', 'select', 'simple', [O, E], 'Nivel de firma electrónica para documentos laborales.', ['simple', 'advanced', 'digital_certificate']),
  ('documentos.firma_otp_obligatorio', 'core', 'OTP al firmar', 'boolean', True, [O], 'Exige clave temporal como parte de la evidencia de firma.', None),
  ('documentos.tamano_maximo_mb', 'core', 'Tamaño máximo de archivo (MB)', 'integer', 20, [O], 'Tamaño máximo por archivo subido.', None),
+ ('constancias.emision_automatica', 'core', 'Constancias de emisión automática', 'list', ['employment_certificate'], [O], 'ESS-4 · Constancias que el colaborador obtiene al instante desde el portal, sin intervención de RRHH; las demás pasan por el flujo de aprobación de constancias o las emite RRHH.', ['employment_certificate', 'income_certificate', 'vacation_certificate']),
  ('documentos.aviso_vencimiento_dias', 'core', 'Aviso de vencimiento de documentos', 'integer', 30, [O, E], 'DOC-2 · RN-DOC-09: días de anticipación con que se avisa al responsable y al titular que un documento vence, cuando su tipo no fija los suyos.', None),
  ('asistencia.metodos_permitidos', 'attendance', 'Métodos de marcación', 'list', ['web', 'app'], [O, E, S, U], 'Métodos de marcación habilitados.', ['web', 'app', 'qr', 'kiosk', 'pin', 'biometric', 'crew', 'api']),
  ('asistencia.tolerancia_minutos', 'attendance', 'Tolerancia de ingreso (min)', 'integer', 5, [O, E, S, U], 'Minutos de tolerancia antes de contar tardanza.', None),

@@ -148,6 +148,14 @@ class DemoOrganizationSeeder extends Seeder
                 $flows->publish($flow, null);
             }
 
+            // ESS-4: la constancia de trabajo sale sola (constancias.emision_automatica); las demás las aprueba RRHH.
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'certificate_request')->exists()) {
+                $flow = $flows->create(['name' => 'Constancias · Recursos Humanos', 'subject_type' => 'certificate_request', 'steps' => ['levels' => [
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
+
             $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
             if ($admin === null || Task::query()->exists()) {
                 return;

@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 912,
+    "permisos": 914,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 140,
+    "fuera_del_contrato_api": 138,
     "roles": 11
   },
   "permisos": [
@@ -3002,6 +3002,18 @@
       "descripcion": "Ver documentos de tipos marcados confidenciales"
     },
     {
+      "codigo": "people.certificates.view",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "certificates",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver solicitudes de constancias"
+    },
+    {
       "codigo": "people.certificates.request",
       "epica": "ESS",
       "modulo": "core",
@@ -3009,9 +3021,141 @@
       "accion": "request",
       "tipo": "accion",
       "sensible": false,
-      "en_contrato_api": false,
+      "en_contrato_api": true,
       "ambito": "organizacion",
       "descripcion": "Solicitar certificados y constancias propios"
+    },
+    {
+      "codigo": "people.certificates.issue",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "certificates",
+      "accion": "issue",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Emitir o rechazar constancias pedidas"
+    },
+    {
+      "codigo": "helpdesk.tickets.view",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.assign",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "assign",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Asignar solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.close",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "close",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Cerrar solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.create",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "create",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Crear solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.reopen",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "reopen",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Reabrir solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.request_info",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "request_info",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Pedir información en solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.resolve",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "resolve",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Resolver solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.tickets.update",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets",
+      "accion": "update",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Editar solicitudes a RRHH"
+    },
+    {
+      "codigo": "helpdesk.settings.update",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "settings",
+      "accion": "update",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Configurar los tipos de solicitud a RRHH (y, con la mesa de ayuda, colas, SLA y plantillas)"
+    },
+    {
+      "codigo": "helpdesk.tickets.confidential.view",
+      "epica": "ESS",
+      "modulo": "core",
+      "recurso": "tickets.confidential",
+      "accion": "view",
+      "tipo": "campo",
+      "sensible": true,
+      "en_contrato_api": false,
+      "ambito": "organizacion",
+      "descripcion": "Ver solicitudes de categorías confidenciales"
     },
     {
       "codigo": "people.team.view",
@@ -8078,126 +8222,6 @@
       "descripcion": "Crear eventos y gestionar asistencia"
     },
     {
-      "codigo": "helpdesk.tickets.view",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "view",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Ver solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.assign",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "assign",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Asignar solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.close",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "close",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Cerrar solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.create",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "create",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Crear solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.reopen",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "reopen",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Reabrir solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.request_info",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "request_info",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Pedir información en solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.resolve",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "resolve",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Resolver solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.tickets.update",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets",
-      "accion": "update",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Editar solicitudes a RRHH"
-    },
-    {
-      "codigo": "helpdesk.settings.update",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "settings",
-      "accion": "update",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": false,
-      "ambito": "organizacion",
-      "descripcion": "Configurar la mesa de ayuda"
-    },
-    {
-      "codigo": "helpdesk.tickets.confidential.view",
-      "epica": "HSD",
-      "modulo": "helpdesk",
-      "recurso": "tickets.confidential",
-      "accion": "view",
-      "tipo": "campo",
-      "sensible": true,
-      "en_contrato_api": false,
-      "ambito": "organizacion",
-      "descripcion": "Ver solicitudes de categorías confidenciales"
-    },
-    {
       "codigo": "sst.incidents.view",
       "epica": "SST",
       "modulo": "sst",
@@ -12032,6 +12056,54 @@
           "alcance": "organization"
         },
         {
+          "codigo": "people.certificates.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "people.certificates.issue",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.assign",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.close",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.request_info",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.resolve",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.settings.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.confidential.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "people.team.view",
           "alcance": "organization"
         },
@@ -13648,46 +13720,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.assign",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.close",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.request_info",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.resolve",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.settings.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.confidential.view",
-          "alcance": "organization"
-        },
-        {
           "codigo": "sst.incidents.view",
           "alcance": "organization"
         },
@@ -15117,6 +15149,54 @@
           "alcance": "organization"
         },
         {
+          "codigo": "people.certificates.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "people.certificates.issue",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.assign",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.close",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.request_info",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.resolve",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.settings.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.confidential.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "people.team.view",
           "alcance": "organization"
         },
@@ -16361,46 +16441,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.assign",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.close",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.request_info",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.resolve",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.settings.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.confidential.view",
-          "alcance": "organization"
-        },
-        {
           "codigo": "sst.incidents.view",
           "alcance": "organization"
         },
@@ -17074,6 +17114,34 @@
           "alcance": "assigned"
         },
         {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.close",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.request_info",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.resolve",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.update",
+          "alcance": "organization"
+        },
+        {
           "codigo": "imports.imports.view",
           "alcance": "organization"
         },
@@ -17686,34 +17754,6 @@
           "alcance": "assigned"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.close",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.request_info",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.resolve",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.update",
-          "alcance": "organization"
-        },
-        {
           "codigo": "assets.ppe_deliveries.sign",
           "alcance": "assigned"
         },
@@ -18015,6 +18055,18 @@
           "alcance": "assigned"
         },
         {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
           "codigo": "help.articles.view",
           "alcance": "organization"
         },
@@ -18283,18 +18335,6 @@
           "alcance": "assigned"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "assigned"
-        },
-        {
           "codigo": "assets.ppe_deliveries.sign",
           "alcance": "assigned"
         },
@@ -18528,7 +18568,27 @@
           "alcance": "own"
         },
         {
+          "codigo": "people.certificates.view",
+          "alcance": "own"
+        },
+        {
           "codigo": "people.certificates.request",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.close",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
           "alcance": "own"
         },
         {
@@ -19068,22 +19128,6 @@
           "alcance": "team"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.close",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "own"
-        },
-        {
           "codigo": "sst.incidents.view",
           "alcance": "team"
         },
@@ -19373,7 +19417,27 @@
           "alcance": "own"
         },
         {
+          "codigo": "people.certificates.view",
+          "alcance": "own"
+        },
+        {
           "codigo": "people.certificates.request",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.close",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "own"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
           "alcance": "own"
         },
         {
@@ -19693,22 +19757,6 @@
           "alcance": "own"
         },
         {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.close",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "own"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
-          "alcance": "own"
-        },
-        {
           "codigo": "sst.incidents.create",
           "alcance": "own"
         },
@@ -20010,6 +20058,14 @@
           "alcance": "organization"
         },
         {
+          "codigo": "people.certificates.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "organization"
+        },
+        {
           "codigo": "imports.imports.view",
           "alcance": "organization"
         },
@@ -20267,10 +20323,6 @@
         },
         {
           "codigo": "engagement.announcements.view_reads",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "helpdesk.tickets.view",
           "alcance": "organization"
         },
         {
@@ -20587,6 +20639,18 @@
           "alcance": "assigned"
         },
         {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
           "codigo": "help.articles.view",
           "alcance": "organization"
         },
@@ -20732,18 +20796,6 @@
         },
         {
           "codigo": "engagement.announcements.acknowledge",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
           "alcance": "assigned"
         },
         {
@@ -21329,6 +21381,18 @@
           "alcance": "assigned"
         },
         {
+          "codigo": "helpdesk.tickets.view",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "helpdesk.tickets.reopen",
+          "alcance": "assigned"
+        },
+        {
           "codigo": "help.articles.view",
           "alcance": "organization"
         },
@@ -21542,18 +21606,6 @@
         },
         {
           "codigo": "engagement.announcements.acknowledge",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.view",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "helpdesk.tickets.reopen",
           "alcance": "assigned"
         },
         {

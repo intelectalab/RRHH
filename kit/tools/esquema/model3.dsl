@@ -66,7 +66,8 @@
   name ; first_response_hours integer ; resolution_hours integer ; business_hours_only bool=t ; escalation j
 @ticket_categories soft | Categorías de solicitudes a RRHH.
   code ; name ; parent_id ?-> ticket_categories ; default_assignee_role_id ?-> roles ; sla_policy_id ?-> sla_policies
-  form j ; is_confidential ; uniq code
+  form j ; is_confidential ; description ; requires_attachment bool=f ; sort_order integer=100
+  status enum(active,archived)=active ; uniq code
 @tickets main soft lock | Solicitud del colaborador a RRHH con estados y plazos.
   number text! ; ticket_category_id -> ticket_categories ; requester_user_id -> users ; employment_id ?-> employments
   subject text! ; description ; status enum(new,in_progress,waiting_info,resolved,closed,cancelled)=new
@@ -75,6 +76,7 @@
   channel enum(portal,email,whatsapp,ai_assistant)=portal ; uniq number
 @ticket_messages | Mensajes y notas internas de una solicitud.
   ticket_id -> tickets ; author_user_id ?-> users ; body text! ; is_internal_note ; via enum(portal,email,whatsapp,system)=portal
+  event enum(created,assigned,info_requested,replied,resolved,reopened,closed,comment)=comment ; stored_file_id ?-> stored_files ; file_name
 @ticket_article_links | Artículos sugeridos o usados para resolver una solicitud.
   ticket_id -> tickets ; kb_article_id -> kb_articles ; kind enum(suggested,used_in_resolution)=suggested
   uniq ticket_id, kb_article_id

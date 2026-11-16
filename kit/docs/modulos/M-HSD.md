@@ -46,7 +46,7 @@ Atender las consultas y pedidos a RRHH con orden, plazos y respuestas reutilizab
 | `helpdesk.tickets.request_info` | Pedir información en solicitudes a RRHH | Administrador empresa, RRHH, Payroll |
 | `helpdesk.tickets.resolve` | Resolver solicitudes a RRHH | Administrador empresa, RRHH, Payroll |
 | `helpdesk.tickets.update` | Editar solicitudes a RRHH | Administrador empresa, RRHH, Payroll |
-| `helpdesk.settings.update` **(+)** | Configurar la mesa de ayuda | Administrador empresa, RRHH |
+| `helpdesk.settings.update` | Configurar los tipos de solicitud a RRHH (y, con la mesa de ayuda, colas, SLA y plantillas); desde ESS-5 forma parte de core | Administrador empresa, RRHH |
 | `helpdesk.tickets.confidential.view` **(S)** **(+)** | Ver solicitudes de categorías confidenciales | Administrador empresa, RRHH |
 
 **(S)** sensible · **(+)** por añadir a `api/openapi.yaml`. Alcance, permisos por campo y matriz completa: `07-permisos-y-roles.md`.
