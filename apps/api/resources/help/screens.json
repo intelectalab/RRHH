@@ -1,36 +1,204 @@
 {
   "_comment": "AYU-3 · Claves de ayuda por pantalla: módulo que la habilita y permisos que permiten abrirla (basta uno; vacío = cualquier usuario de la organización). La web resuelve la clave por ruta en src/modules/help/screens.ts y una prueba exige que ambas listas coincidan.",
   "screens": {
-    "home": { "module": "base", "permissions": [] },
-    "inbox": { "module": "base", "permissions": [] },
-    "notifications": { "module": "base", "permissions": [] },
-    "approvals": { "module": "base", "permissions": ["workflow.approval_requests.view"] },
-    "tasks": { "module": "base", "permissions": ["workflow.tasks.view"] },
-    "calendar": { "module": "base", "permissions": ["time.calendar.view"] },
-    "account.security": { "module": "base", "permissions": [] },
-    "account.notifications": { "module": "base", "permissions": [] },
-    "settings": { "module": "base", "permissions": ["settings.catalogs.update", "identity.users.view", "identity.roles.view", "workflow.approval_flows.view", "workflow.workflows.view", "notifications.templates.view", "settings.parameters.view", "time.holiday_calendars.view", "audit.trash.view", "settings.custom_fields.view", "settings.exchange_rates.view", "audit.logs.view", "contracts.contract_types.view", "time.absence_types.view", "time.vacation_policies.view", "audit.activity.view", "imports.imports.view", "settings.organization.view"] },
-    "org": { "module": "base", "permissions": ["org.legal_entities.view"] },
-    "org.companies": { "module": "base", "permissions": ["org.legal_entities.view"] },
-    "org.positions": { "module": "core", "permissions": ["org.positions.view"] },
-    "people.employees": { "module": "core", "permissions": ["people.employments.view"] },
-    "people.directory": { "module": "core", "permissions": ["people.directory.view"] },
-    "people.org_chart": { "module": "core", "permissions": ["people.directory.view"] },
-    "people.contracts": { "module": "core", "permissions": ["contracts.contracts.view"] },
-    "people.movements": { "module": "core", "permissions": ["people.assignments.view"] },
-    "people.changes": { "module": "core", "permissions": ["people.change_requests.view"] },
-    "people.certificates": { "module": "core", "permissions": ["people.certificates.issue"] },
-    "people.requests": { "module": "core", "permissions": ["helpdesk.tickets.update"] },
-    "my_team": { "module": "core", "permissions": ["people.team.view"] },
-    "documents.expiry": { "module": "core", "permissions": ["documents.documents.view"] },
-    "documents.requests": { "module": "core", "permissions": ["documents.documents.request"] },
-    "documents.templates": { "module": "core", "permissions": ["documents.templates.view"] },
-    "time.vacations": { "module": "time_off", "permissions": ["time.vacation_requests.view"] },
-    "time.absences": { "module": "time_off", "permissions": ["time.absences.view"] },
-    "time.subsidies": { "module": "time_off", "permissions": ["time.absences.manage_subsidy"] },
-    "portal.home": { "module": "core", "permissions": ["people.employments.view"] },
-    "portal.documents": { "module": "core", "permissions": ["people.employments.view"] },
-    "portal.profile": { "module": "core", "permissions": ["people.employments.view"] },
-    "portal.requests": { "module": "core", "permissions": ["people.employments.view"] }
+    "home": {
+      "module": "base",
+      "permissions": []
+    },
+    "inbox": {
+      "module": "base",
+      "permissions": []
+    },
+    "notifications": {
+      "module": "base",
+      "permissions": []
+    },
+    "approvals": {
+      "module": "base",
+      "permissions": [
+        "workflow.approval_requests.view"
+      ]
+    },
+    "tasks": {
+      "module": "base",
+      "permissions": [
+        "workflow.tasks.view"
+      ]
+    },
+    "calendar": {
+      "module": "base",
+      "permissions": [
+        "time.calendar.view"
+      ]
+    },
+    "account.security": {
+      "module": "base",
+      "permissions": []
+    },
+    "account.notifications": {
+      "module": "base",
+      "permissions": []
+    },
+    "settings": {
+      "module": "base",
+      "permissions": [
+        "settings.catalogs.update",
+        "identity.users.view",
+        "identity.roles.view",
+        "workflow.approval_flows.view",
+        "workflow.workflows.view",
+        "notifications.templates.view",
+        "settings.parameters.view",
+        "time.holiday_calendars.view",
+        "audit.trash.view",
+        "settings.custom_fields.view",
+        "settings.exchange_rates.view",
+        "audit.logs.view",
+        "contracts.contract_types.view",
+        "time.absence_types.view",
+        "time.vacation_policies.view",
+        "audit.activity.view",
+        "imports.imports.view",
+        "settings.organization.view"
+      ]
+    },
+    "org": {
+      "module": "base",
+      "permissions": [
+        "org.legal_entities.view"
+      ]
+    },
+    "org.companies": {
+      "module": "base",
+      "permissions": [
+        "org.legal_entities.view"
+      ]
+    },
+    "org.positions": {
+      "module": "core",
+      "permissions": [
+        "org.positions.view"
+      ]
+    },
+    "people.employees": {
+      "module": "core",
+      "permissions": [
+        "people.employments.view"
+      ]
+    },
+    "people.directory": {
+      "module": "core",
+      "permissions": [
+        "people.directory.view"
+      ]
+    },
+    "people.org_chart": {
+      "module": "core",
+      "permissions": [
+        "people.directory.view"
+      ]
+    },
+    "people.contracts": {
+      "module": "core",
+      "permissions": [
+        "contracts.contracts.view"
+      ]
+    },
+    "people.movements": {
+      "module": "core",
+      "permissions": [
+        "people.assignments.view"
+      ]
+    },
+    "people.changes": {
+      "module": "core",
+      "permissions": [
+        "people.change_requests.view"
+      ]
+    },
+    "people.certificates": {
+      "module": "core",
+      "permissions": [
+        "people.certificates.issue"
+      ]
+    },
+    "people.requests": {
+      "module": "core",
+      "permissions": [
+        "helpdesk.tickets.update"
+      ]
+    },
+    "my_team": {
+      "module": "core",
+      "permissions": [
+        "people.team.view"
+      ]
+    },
+    "documents.expiry": {
+      "module": "core",
+      "permissions": [
+        "documents.documents.view"
+      ]
+    },
+    "documents.requests": {
+      "module": "core",
+      "permissions": [
+        "documents.documents.request"
+      ]
+    },
+    "documents.templates": {
+      "module": "core",
+      "permissions": [
+        "documents.templates.view"
+      ]
+    },
+    "time.vacations": {
+      "module": "time_off",
+      "permissions": [
+        "time.vacation_requests.view"
+      ]
+    },
+    "time.absences": {
+      "module": "time_off",
+      "permissions": [
+        "time.absences.view"
+      ]
+    },
+    "time.subsidies": {
+      "module": "time_off",
+      "permissions": [
+        "time.absences.manage_subsidy"
+      ]
+    },
+    "portal.home": {
+      "module": "core",
+      "permissions": [
+        "people.employments.view"
+      ]
+    },
+    "portal.documents": {
+      "module": "core",
+      "permissions": [
+        "people.employments.view"
+      ]
+    },
+    "portal.profile": {
+      "module": "core",
+      "permissions": [
+        "people.employments.view"
+      ]
+    },
+    "portal.requests": {
+      "module": "core",
+      "permissions": [
+        "people.employments.view"
+      ]
+    },
+    "setup": {
+      "module": "core",
+      "permissions": [
+        "imports.setup.use"
+      ]
+    }
   }
 }

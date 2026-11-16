@@ -29,6 +29,7 @@ return [
     'pantalla-calendario' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['calendar']],
     'pantalla-seguridad-cuenta' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.security']],
     'pantalla-mis-notificaciones' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.notifications']],
+    'pantalla-primeros-pasos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['setup']],
     'pantalla-configuracion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['settings']],
     'pantalla-organizacion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['org']],
     'pantalla-empresas' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['org.companies']],
