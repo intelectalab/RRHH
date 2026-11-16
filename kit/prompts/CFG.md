@@ -3,7 +3,7 @@
 Centro de configuración, parámetros con vigencia, campos personalizados, idiomas, monedas, calendarios y papelera.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** Plataforma base.
-- **Actividades:** 10 (5 historias y 5 tareas); 10 del MVP. **Operaciones de API:** 29.
+- **Actividades:** 10 (5 historias y 5 tareas); 10 del MVP. **Operaciones de API:** 30.
 - **Especificación:** `kit/docs/modulos/M-CFG.md`.
 
 ## Prompt para una sesión nueva de Claude Code
