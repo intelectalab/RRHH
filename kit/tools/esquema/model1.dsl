@@ -442,7 +442,7 @@
   changes j ; decided_at ts ; decision_reason ; cancelled_at ts ; cancelled_by_user_id ?-> users
   replaces_personnel_action_id ?-> personnel_actions ; replaced_by_personnel_action_id ?-> personnel_actions
   is_retroactive bool=f ; affected_from date ; affected_to date ; idx status, effective_on
-@employment_assignments main lock | Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).
+@employment_assignments main soft lock | Asignación con vigencia (C-03): puesto, posición, unidad, sede, jefe y centro de costo. Fuente única de «dónde trabaja y a quién reporta» (C-11). Los cupos de la posición (seats) los controla un disparador (RN-POS-02).
   employment_id -> employments ; job_profile_id -> job_profiles ; position_id ?-> positions ; org_unit_id -> org_units
   site_id -> sites ; manager_employment_id ?-> employments ; cost_center_id ?-> cost_centers
   work_modality enum(onsite,remote,hybrid)=onsite ; reason ; personnel_action_id ?-> personnel_actions ; vig employment_id
@@ -452,7 +452,7 @@
   employment_cost_distribution_id -> employment_cost_distributions ; cost_center_id -> cost_centers ; percentage numeric(5,2)!
   uniq employment_cost_distribution_id, cost_center_id
   check percentage > 0 AND percentage <= 100
-@employment_compensations main lock sens | Compensación con vigencia (C-03): sueldo base y periodicidad. Fuente única del sueldo (C-11).
+@employment_compensations main soft lock sens | Compensación con vigencia (C-03): sueldo base y periodicidad. Fuente única del sueldo (C-11).
   employment_id -> employments ; base_salary money! #S ; currency cur ; pay_frequency enum(monthly,biweekly,weekly,daily,hourly)=monthly
   salary_basis enum(monthly,daily,hourly)=monthly ; is_integral_salary
   change_reason enum(hire,merit,promotion,adjustment,legal,review_cycle,correction) ; salary_band_id ?-> salary_bands
@@ -460,7 +460,7 @@
 @employment_compensation_items lock sens | Conceptos fijos recurrentes con vigencia (bonos, asignaciones, movilidad) atados a un concepto de planilla.
   employment_id -> employments ; payroll_concept_id -> payroll_concepts ; amount money #S ; percentage numeric(7,4) ; currency cur?
   notes ; vig employment_id, payroll_concept_id
-@employment_labor_regimes lock | Régimen laboral y de salud del trabajador con vigencia (C-05).
+@employment_labor_regimes soft lock | Régimen laboral y de salud del trabajador con vigencia (C-05).
   employment_id -> employments ; labor_regime_code ~> labor_regimes.code ; health_scheme enum(essalud,eps,sis,other)=essalud
   health_provider_id ?-> health_providers ; health_plan_code ; has_risk_insurance ; has_family_allowance
   personnel_action_id ?-> personnel_actions ; vig employment_id
@@ -569,10 +569,10 @@
 
 #E IMP | Importador y puesta en marcha
 @import_templates soft | Plantilla de mapeo de columnas para el importador.
-  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   name ; column_mapping j! ; is_system
 @import_jobs main lock | Importación masiva por etapas: subir, mapear, validar, previsualizar e importar (nunca directo).
-  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions)!
+  entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   import_template_id ?-> import_templates ; stored_file_id -> stored_files
   status enum(uploaded,mapped,validating,validated,previewed,importing,completed,failed,cancelled,with_errors,reverted)=uploaded ; column_mapping j
   total_rows integer ; valid_rows integer ; error_rows integer ; imported_rows integer ; created_by_user_id -> users

@@ -721,6 +721,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/setup-checklist/{code}/reopen` | `imports.setup.use` | 1 |
 | GET | `/setup/country-packs` | `imports.setup.use` | 1 |
 | POST | `/setup/country-packs/{code}/apply` | `imports.setup.use` | 1 |
+| GET | `/imports/{id}/file` | `imports.imports.view` | 1 |
 
 **AYU · Centro de ayuda**
 

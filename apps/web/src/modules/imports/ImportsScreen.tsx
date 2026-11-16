@@ -6,6 +6,7 @@ import { api, ApiRequestError, type Schema } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
 import { formatDateTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
+import { outcomeText } from './outcome'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
 import { PageHeader } from '@/ui/components/PageHeader'
@@ -119,7 +120,7 @@ export function ImportsScreen() {
                       <td><button type="button" className="link-btn" onClick={() => open(j)}><b>{j.file_name}</b></button></td>
                       <td>{typeLabel(j.entity)}</td>
                       <td><span className={`st ${TONE[j.status] ?? 'gr'}`}>{t(`imp.status_${j.status}`)}</span></td>
-                      <td>{t('imp.rows_summary', { total: j.total_rows ?? 0, valid: j.valid_rows ?? 0, errors: j.error_rows ?? 0, imported: j.imported_rows ?? 0 })}</td>
+                      <td>{outcomeText(j, t) ?? t('imp.rows_summary', { total: j.total_rows ?? 0, valid: j.valid_rows ?? 0, errors: j.error_rows ?? 0, imported: j.imported_rows ?? 0 })}</td>
                       <td>{j.created_by_name ?? ''}</td>
                       <td>{formatDateTime(locale, j.created_at)}</td>
                     </tr>
@@ -326,6 +327,19 @@ function ErrorsDownload({ job }: { job: ImportJob }) {
   )
 }
 
+/** IMP-6 · Archivo original tal como se subió (no existe si la importación se descartó). */
+function OriginalDownload({ job }: { job: ImportJob }) {
+  const { t } = useT()
+  const [busy, setBusy] = useState(false)
+  if (job.status === 'cancelled' || !job.file_id) return null
+  return (
+    <button type="button" className="btn btn-sec" disabled={busy} aria-busy={busy} onClick={() => {
+      setBusy(true)
+      void api.download(`/imports/${job.id}/file`).then(({ blob, filename }) => saveFile(blob, filename)).catch(() => undefined).finally(() => setBusy(false))
+    }}><Icon name="download" /> {t('imp.download_original')}</button>
+  )
+}
+
 function ReviewStep({ job, type, onJob, onCancelled }: { job: ImportJob; type: ImportType | undefined; onJob: (j: ImportJob) => void; onCancelled: () => void }) {
   const { t } = useT()
   const { can } = useSession()
@@ -455,11 +469,13 @@ function ResultStep({ job, onJob, onToast }: { job: ImportJob; onJob: (j: Import
         {job.finished_at && <span className="sub2">{formatDateTime(locale, job.finished_at)}</span>}
       </p>
       {job.status === 'completed' && <p>{t('imp.completed_text', { n: job.imported_rows ?? 0, skipped: job.error_rows ?? 0 })}</p>}
+      {outcomeText(job, t) && <p className="sub2">{outcomeText(job, t)}</p>}
       {job.status === 'failed' && <div className="nota imp-aviso" role="alert">{t('imp.failed_text')} {job.error_message}</div>}
       {job.status === 'reverted' && <p>{t('imp.reverted_text')}</p>}
       {error && <div className="invalid-feedback mb-2" role="alert">{error}</div>}
       <div className="imp-acciones">
         <ErrorsDownload job={job} />
+        <OriginalDownload job={job} />
         <CancelButton job={job} onCancelled={() => onToast(t('imp.cancelled'))} />
         {(job.allowed_actions ?? []).includes('revert') && can('imports.imports.revert') && !confirming && (
           <button type="button" className="btn btn-sec" onClick={() => setConfirming(true)}><Icon name="trash" /> {t('imp.revert')}</button>
