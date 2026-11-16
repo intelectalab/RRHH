@@ -106,6 +106,30 @@ return [
             'in_app' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => 'Recursos Humanos devolveu {document} ({type}): {reason} Envie uma versão corrigida.'],
             'email' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos devolveu {document} ({type}): {reason}\n\nEnvie uma versão corrigida: {link}"],
         ],
+        'certificates.requested' => [
+            'in_app' => ['subject' => 'Declaração para emitir: {certificate}', 'body' => '{employee} pediu uma {certificate}. Revise e emita ou recuse.'],
+            'email' => ['subject' => 'Declaração para emitir: {certificate}', 'body' => "Olá {name}:\n\nEm {organization}, {employee} pediu uma {certificate} pelo portal.\n\nEmita ou recuse aqui: {link}"],
+        ],
+        'certificates.issued' => [
+            'in_app' => ['subject' => 'Sua {certificate} está pronta', 'body' => 'Sua {certificate} já está nos seus documentos. Baixe quando quiser.'],
+            'email' => ['subject' => 'Sua {certificate} está pronta', 'body' => "Olá {name}:\n\nEm {organization}, sua {certificate} foi emitida e ficou nos seus documentos.\n\nBaixe aqui: {link}"],
+        ],
+        'certificates.rejected' => [
+            'in_app' => ['subject' => 'Sua {certificate} não foi emitida', 'body' => 'Recursos Humanos não emitiu sua {certificate}: {reason}'],
+            'email' => ['subject' => 'Sua {certificate} não foi emitida', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos não emitiu sua {certificate}: {reason}\n\nVeja suas solicitações aqui: {link}"],
+        ],
+        'tickets.created' => [
+            'in_app' => ['subject' => 'Nova solicitação {number}: {subject}', 'body' => '{employee} enviou uma solicitação de {category}: {subject}.'],
+            'email' => ['subject' => 'Nova solicitação {number}: {subject}', 'body' => "Olá {name}:\n\nEm {organization}, {employee} enviou a solicitação {number} ({category}): {subject}.\n\nAtenda aqui: {link}"],
+        ],
+        'tickets.replied' => [
+            'in_app' => ['subject' => '{employee} respondeu a solicitação {number}', 'body' => '{employee} acrescentou informações a {number}: {subject}.'],
+            'email' => ['subject' => '{employee} respondeu a solicitação {number}', 'body' => "Olá {name}:\n\nEm {organization}, {employee} respondeu a solicitação {number}: {subject}.\n\nVeja aqui: {link}"],
+        ],
+        'tickets.updated' => [
+            'in_app' => ['subject' => 'Sua solicitação {number} mudou', 'body' => '{number} · {subject}: {status}.'],
+            'email' => ['subject' => 'Sua solicitação {number} mudou', 'body' => "Olá {name}:\n\nEm {organization}, sua solicitação {number} ({subject}) agora está: {status}.\n\nVeja o detalhe aqui: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],
@@ -123,6 +147,7 @@ return [
         'job_requisition' => 'requisição de pessoal',
         'position_request' => 'nova posição',
         'compensation_change' => 'alteração de remuneração',
+        'certificate_request' => 'declaração',
         'other' => 'solicitação',
     ],
     'invalid_variables' => 'Variáveis não permitidas: :vars. Use apenas: :allowed.',

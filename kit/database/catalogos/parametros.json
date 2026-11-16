@@ -835,6 +835,24 @@
       "opciones": null
     },
     {
+      "codigo": "constancias.emision_automatica",
+      "modulo": "core",
+      "nombre": "Constancias de emisión automática",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "employment_certificate"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "ESS-4 · Constancias que el colaborador obtiene al instante desde el portal, sin intervención de RRHH; las demás pasan por el flujo de aprobación de constancias o las emite RRHH.",
+      "opciones": [
+        "employment_certificate",
+        "income_certificate",
+        "vacation_certificate"
+      ]
+    },
+    {
       "codigo": "documentos.aviso_vencimiento_dias",
       "modulo": "core",
       "nombre": "Aviso de vencimiento de documentos",

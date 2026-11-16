@@ -42,7 +42,10 @@ Dar a cada colaborador un autoservicio sencillo, pensado primero para el móvil,
 | `people.change_requests.cancel` | Cancelar solicitudes de cambio de datos | Administrador empresa, RRHH; solo sobre lo propio o asignado: Empleado, Manager |
 | `people.change_requests.create` | Crear solicitudes de cambio de datos | Administrador empresa, RRHH; solo sobre lo propio o asignado: Empleado, Manager |
 | `people.change_requests.reject` | Rechazar solicitudes de cambio de datos | Administrador empresa, RRHH |
-| `people.certificates.request` **(+)** | Solicitar certificados y constancias propios | solo sobre lo propio o asignado: Empleado, Manager |
+| `people.certificates.view` | Ver solicitudes de constancias | Administrador empresa, RRHH, Auditor; solo sobre lo propio o asignado: Empleado, Manager |
+| `people.certificates.request` | Solicitar certificados y constancias propios | solo sobre lo propio o asignado: Empleado, Manager |
+| `people.certificates.issue` | Emitir o rechazar constancias pedidas | Administrador empresa, RRHH |
+| `helpdesk.settings.update` | Configurar los tipos de solicitud a RRHH (y, con la mesa de ayuda, colas, SLA y plantillas) | Administrador empresa, RRHH |
 | `time.punches.view` | Ver marcaciones | Administrador empresa, RRHH, Payroll, Manager, Auditor; solo sobre lo propio o asignado: Empleado |
 | `time.punches.create` | Crear marcaciones | solo sobre lo propio o asignado: todos los roles de organización |
 | `time.punches.create_for_crew` **(+)** | Marcar por los integrantes de su cuadrilla | Manager |

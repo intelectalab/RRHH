@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CHANGE_FIELDS } from '@/modules/people/profile/types'
-import { cardOf, days, isActive, portalNav, prefersPortal, proposableFields } from '@/modules/selfservice/portal'
+import { cardOf, certificateTone, days, isActive, missingAttachment, portalNav, prefersPortal, proposableFields, ticketTone } from '@/modules/selfservice/portal'
 import type { HomeCard } from '@/modules/selfservice/types'
 import es from '../../messages/es.json'
 import en from '../../messages/en.json'
@@ -54,5 +54,41 @@ describe('ESS-2 · mi perfil', () => {
     expect(proposableFields(CHANGE_FIELDS, ['mobile_phone', 'address', 'sex'])).toEqual(['mobile_phone', 'address'])
     expect(proposableFields(CHANGE_FIELDS, undefined)).toEqual([...CHANGE_FIELDS])
     expect(proposableFields(CHANGE_FIELDS, [])).toEqual([])
+  })
+})
+
+describe('ESS-3 · ESS-4 · ESS-5 · documentos y trámites del portal', () => {
+  it('muestra Documentos y Trámites solo con permiso (Trámites con cualquiera de sus dos permisos)', () => {
+    const hrefs = (perms: string[]) => portalNav(['core', 'base'], (p) => perms.includes(p)).map((n) => n.href)
+    expect(hrefs(['documents.documents.view'])).toContain('/mi/documentos')
+    expect(hrefs(['helpdesk.tickets.create'])).toContain('/mi/solicitudes')
+    expect(hrefs(['people.certificates.request'])).toContain('/mi/solicitudes')
+    expect(hrefs([])).toEqual(['/mi', '/pendientes'])
+  })
+
+  it('resalta la solicitud que espera al colaborador y la constancia emitida', () => {
+    expect(ticketTone('waiting_info')).toBe('wa')
+    expect(ticketTone('resolved')).toBe('ok')
+    expect(ticketTone('closed')).toBe('gr')
+    expect(ticketTone('new')).toBe('in')
+    expect(certificateTone('issued')).toBe('ok')
+    expect(certificateTone('rejected')).toBe('er')
+    expect(certificateTone('requested')).toBe('wa')
+  })
+
+  it('no envía sin archivo un tipo que exige adjunto', () => {
+    const file = new File(['x'], 'a.pdf', { type: 'application/pdf' })
+    expect(missingAttachment({ requires_attachment: true }, [])).toBe(true)
+    expect(missingAttachment({ requires_attachment: true }, [file])).toBe(false)
+    expect(missingAttachment({ requires_attachment: false }, [])).toBe(false)
+    expect(missingAttachment(undefined, [])).toBe(false)
+  })
+
+  it('tiene las claves de constancias y solicitudes en los tres idiomas', () => {
+    for (const ns of ['certificates', 'tickets'] as const) {
+      const base = Object.keys(es[ns]).sort()
+      expect(Object.keys(en[ns]).sort()).toEqual(base)
+      expect(Object.keys(pt[ns]).sort()).toEqual(base)
+    }
   })
 })

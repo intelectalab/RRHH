@@ -106,6 +106,30 @@ return [
             'in_app' => ['subject' => 'Tu documento {document} fue observado', 'body' => 'Recursos Humanos observó {document} ({type}): {reason} Sube una versión corregida.'],
             'email' => ['subject' => 'Tu documento {document} fue observado', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos observó {document} ({type}): {reason}\n\nSube una versión corregida: {link}"],
         ],
+        'certificates.requested' => [
+            'in_app' => ['subject' => 'Constancia por emitir: {certificate}', 'body' => '{employee} pidió una {certificate}. Revísala y emítela o recházala.'],
+            'email' => ['subject' => 'Constancia por emitir: {certificate}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} pidió una {certificate} desde su portal.\n\nEmítela o recházala aquí: {link}"],
+        ],
+        'certificates.issued' => [
+            'in_app' => ['subject' => 'Tu {certificate} está lista', 'body' => 'Tu {certificate} ya está en tus documentos. Puedes descargarla cuando quieras.'],
+            'email' => ['subject' => 'Tu {certificate} está lista', 'body' => "Hola {name}:\n\nEn {organization}, tu {certificate} ya fue emitida y quedó en tus documentos.\n\nDescárgala aquí: {link}"],
+        ],
+        'certificates.rejected' => [
+            'in_app' => ['subject' => 'Tu {certificate} no se emitió', 'body' => 'Recursos Humanos no emitió tu {certificate}: {reason}'],
+            'email' => ['subject' => 'Tu {certificate} no se emitió', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos no emitió tu {certificate}: {reason}\n\nRevisa tus solicitudes aquí: {link}"],
+        ],
+        'tickets.created' => [
+            'in_app' => ['subject' => 'Nueva solicitud {number}: {subject}', 'body' => '{employee} envió una solicitud de {category}: {subject}.'],
+            'email' => ['subject' => 'Nueva solicitud {number}: {subject}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} envió la solicitud {number} ({category}): {subject}.\n\nAtiéndela aquí: {link}"],
+        ],
+        'tickets.replied' => [
+            'in_app' => ['subject' => '{employee} respondió la solicitud {number}', 'body' => '{employee} agregó información a {number}: {subject}.'],
+            'email' => ['subject' => '{employee} respondió la solicitud {number}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} respondió la solicitud {number}: {subject}.\n\nRevísala aquí: {link}"],
+        ],
+        'tickets.updated' => [
+            'in_app' => ['subject' => 'Tu solicitud {number} cambió', 'body' => '{number} · {subject}: {status}.'],
+            'email' => ['subject' => 'Tu solicitud {number} cambió', 'body' => "Hola {name}:\n\nEn {organization}, tu solicitud {number} ({subject}) ahora está: {status}.\n\nRevisa el detalle aquí: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],
@@ -123,6 +147,7 @@ return [
         'job_requisition' => 'requerimiento de personal',
         'position_request' => 'nueva posición',
         'compensation_change' => 'cambio de compensación',
+        'certificate_request' => 'constancia',
         'other' => 'trámite',
     ],
     'invalid_variables' => 'Variables no permitidas: :vars. Usa solo: :allowed.',

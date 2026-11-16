@@ -20,30 +20,30 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 511 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 449 |
+| Tablas | 512 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 450 |
 | Tablas de plataforma (sin RLS de organización) | 62 |
-| Políticas RLS | 449 |
-| Claves foráneas | 1622 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1066 |
-| — simples `tenant_id` → `tenants(id)` | 461 |
+| Políticas RLS | 450 |
+| Claves foráneas | 1630 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1073 |
+| — simples `tenant_id` → `tenants(id)` | 462 |
 | — resto (hacia catálogos y tablas de plataforma) | 95 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2300 |
-| — creados con `CREATE INDEX` | 1147 |
-| Triggers | 531 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2311 |
+| — creados con `CREATE INDEX` | 1156 |
+| Triggers | 532 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 616 |
-| Restricciones `UNIQUE` | 612 |
-| Columnas | 6767 |
+| Restricciones `CHECK` | 623 |
+| Restricciones `UNIQUE` | 613 |
+| Columnas | 6825 |
 | Columnas marcadas `-- SENSIBLE` | 166 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 41 |
 | Tablas inalterables (solo inserción, por trigger) | 23 |
-| Tablas con borrado lógico (`deleted_at`) | 166 |
-| Tablas con concurrencia optimista (`lock_version`) | 246 |
+| Tablas con borrado lógico (`deleted_at`) | 167 |
+| Tablas con concurrencia optimista (`lock_version`) | 247 |
 | Funciones | 26 |
 | Vistas | 1 |
-| Permisos en el catálogo | 912 |
+| Permisos en el catálogo | 914 |
 | — de campo / marcados sensibles | 28 / 108 |
 | Roles de sistema | 11 |
 | Módulos comerciales | 28 |
@@ -77,7 +77,7 @@ Tablas por épica:
 | 2 | ASI | Asistencia y marcación | 8 |
 | 2 | TUR | Horarios, jornadas y turnos | 10 |
 | 2 | VAC | Vacaciones | 5 |
-| 2 | AUS | Ausencias y permisos | 4 |
+| 2 | AUS | Ausencias y permisos | 5 |
 | 2 | BHO | Horas extra y bolsa de horas | 3 |
 | 2 | TSH | Hojas de tiempo por proyecto | 5 |
 | 3 | NOM | Motor de nómina | 10 |
@@ -1107,6 +1107,7 @@ erDiagram
   people |o--o{ documents : "owner_person_id"
   employments |o--o{ documents : "employment_id"
   legal_entities |o--o{ documents : "legal_entity_id"
+  users |o--o{ documents : "responsible_user_id"
   documents ||--o{ signature_requests : "document_id"
   users |o--o{ signature_requests : "requested_by_user_id"
   users ||--o{ import_jobs : "created_by_user_id"
@@ -1432,22 +1433,22 @@ erDiagram
 
 #### `document_categories`
 
-- **Propósito:** Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención.
-- **Columnas clave:** `code`, `name`, `default_classification`.
+- **Propósito:** Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención. DOC-1: las carpetas no tienen parent_id; los tipos documentales cuelgan de una carpeta y definen confidencialidad, visibilidad para el colaborador, revisión y, con DOC-2, si exigen vencimiento y con qué anticipación se avisa (RN-DOC-09).
+- **Columnas clave:** `code`, `name`, `default_classification`, `scope`, `description`, `requires_expiry`, `expiry_notice_days`, `visible_to_employee`, `requires_review`, `is_system`, `sort_order`, `status`.
 - **Relaciones:** `parent_id` → `document_categories` (opcional); `retention_policy_id` → `retention_policies` (opcional); `required_permission_code` → `permissions.code` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
 
 #### `documents`
 
 - **Propósito:** Documento del repositorio, ligado a una persona, relación laboral, empresa u otro registro.
-- **Columnas clave:** `title`, `subject_type`, `subject_id`, `classification`, `status`, `issued_on`, `expires_on`, `source`, `visible_to_employee`.
-- **Relaciones:** `document_category_id` → `document_categories`; `owner_person_id` → `people` (opcional); `employment_id` → `employments` (opcional); `legal_entity_id` → `legal_entities` (opcional); `current_version_id` → `document_versions` (opcional); `document_template_version_id` → `document_template_versions` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
+- **Columnas clave:** `title`, `subject_type`, `subject_id`, `classification`, `status`, `issued_on`, `expires_on`, `source`, `visible_to_employee`, `description`, `expiry_alerted_on`, `archived_at`, `archive_reason`.
+- **Relaciones:** `document_category_id` → `document_categories`; `owner_person_id` → `people` (opcional); `employment_id` → `employments` (opcional); `legal_entity_id` → `legal_entities` (opcional); `current_version_id` → `document_versions` (opcional); `document_template_version_id` → `document_template_versions` (opcional); `responsible_user_id` → `users` (opcional); `subject_type` + `subject_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
 
 #### `document_versions`
 
-- **Propósito:** Versiones de un documento; cada una apunta a un archivo y guarda su huella.
-- **Columnas clave:** `version`, `content_hash`, `notes`.
+- **Propósito:** Versiones de un documento; cada una apunta a un archivo y guarda su huella. DOC-2 · RN-DOC-01: una versión nueva no reemplaza a la anterior, que queda consultable con sus propias fechas de emisión y vencimiento.
+- **Columnas clave:** `version`, `content_hash`, `notes`, `issued_on`, `expires_on`.
 - **Relaciones:** `document_id` → `documents`; `stored_file_id` → `stored_files`; `uploaded_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `document_id`, `version`.
 
@@ -1520,8 +1521,8 @@ erDiagram
 #### `certificate_requests`
 
 - **Propósito:** Solicitud de constancias y certificados desde el portal.
-- **Columnas clave:** `kind`, `purpose`, `status`, `issued_at`.
-- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional).
+- **Columnas clave:** `kind`, `purpose`, `status`, `issued_at`, `decided_at`, `rejection_reason`, `auto_issued`.
+- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional); `requested_by_user_id` → `users` (opcional); `workflow_instance_id` → `workflow_instances` (opcional); `decided_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 
@@ -1843,16 +1844,23 @@ erDiagram
 #### `absence_requests`
 
 - **Propósito:** Ausencia o permiso solicitado, con días a cargo del empleador y días subsidiados. AUS-2: las fechas laborales (starts_on, ends_on) son la referencia; starts_at y ends_at son el instante en la zona horaria de la empresa (fin exclusivo) y alimentan la exclusión que impide ausencias solapadas del mismo trabajador.
-- **Columnas clave:** `starts_at`, `ends_at`, `days`, `hours`, `status`, `reason`, `employer_paid_days`, `subsidized_days`, `starts_on`, `ends_on`, `start_time`, `end_time`, `calendar_days`, `registered_directly`, `document_due_on`, `exception_reason`, `submitted_at`, `decided_at`, `decision_reason`, `cancelled_at`, `cancellation_reason`.
+- **Columnas clave:** `starts_at`, `ends_at`, `days`, `hours`, `status`, `reason`, `employer_paid_days`, `subsidized_days`, `starts_on`, `ends_on`, `start_time`, `end_time`, `calendar_days`, `registered_directly`, `document_due_on`, `exception_reason`, `submitted_at`, `decided_at`, `decision_reason`, `cancelled_at`, `cancellation_reason`, `legal_extensions`, `return_on`.
 - **Relaciones:** `employment_id` → `employments`; `absence_type_id` → `absence_types`; `workflow_instance_id` → `workflow_instances` (opcional); `requested_by_user_id` → `users` (opcional); `cancelled_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); `CHECK (ends_at >= starts_at)`; `CHECK (starts_on IS NULL OR ends_on >= starts_on)`.
 
 #### `absence_medical_certificates`
 
-- **Propósito:** Certificado médico de un descanso; diagnóstico y número cifrados.
-- **Columnas clave:** `certificate_number_enc` (S), `issuer`, `diagnosis_enc` (S), `issued_on`, `validated_at`.
+- **Propósito:** Certificado médico de un descanso; diagnóstico y número cifrados. AUS-3: uno por ausencia (CITT de EsSalud o certificado particular), con los días que otorga y si el descanso viene de un accidente o enfermedad de trabajo (SCTR).
+- **Columnas clave:** `certificate_number_enc` (S), `issuer`, `diagnosis_enc` (S), `issued_on`, `validated_at`, `kind`, `days_granted`, `is_work_related`.
 - **Relaciones:** `absence_request_id` → `absence_requests`; `file_id` → `stored_files` (opcional); `validated_by_user_id` → `users` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); **sensible**: permiso por campo y acceso registrado; columnas `_enc` cifradas en la aplicación; único: `absence_request_id`.
+
+#### `absence_subsidy_cases`
+
+- **Propósito:** Expediente de subsidio de un descanso (AUS-3): los días que pasan a subsidio (incapacidad desde el umbral a cargo del empleador o maternidad completa) y el seguimiento del reembolso ante la seguridad social. Estados por acciones: por presentar → presentado → observado / aprobado → reembolsado, o rechazado.
+- **Columnas clave:** `kind`, `status`, `subsidized_days`, `starts_on`, `ends_on`, `year`, `filing_due_on`, `filed_on`, `filing_reference`, `amount_requested`, `amount_approved`, `amount_reimbursed`, `currency`, `reimbursed_on`, `observation`, `decision_reason`.
+- **Relaciones:** `absence_request_id` → `absence_requests`; `employment_id` → `employments`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `absence_request_id`.
 
 
 ### BHO · Horas extra y bolsa de horas
@@ -3263,7 +3271,7 @@ erDiagram
 #### `ticket_categories`
 
 - **Propósito:** Categorías de solicitudes a RRHH.
-- **Columnas clave:** `code`, `name`, `form`, `is_confidential`.
+- **Columnas clave:** `code`, `name`, `form`, `is_confidential`, `description`, `requires_attachment`, `sort_order`, `status`.
 - **Relaciones:** `parent_id` → `ticket_categories` (opcional); `default_assignee_role_id` → `roles` (opcional); `sla_policy_id` → `sla_policies` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); único: `code`.
 
@@ -3277,8 +3285,8 @@ erDiagram
 #### `ticket_messages`
 
 - **Propósito:** Mensajes y notas internas de una solicitud.
-- **Columnas clave:** `body`, `is_internal_note`, `via`.
-- **Relaciones:** `ticket_id` → `tickets`; `author_user_id` → `users` (opcional).
+- **Columnas clave:** `body`, `is_internal_note`, `via`, `event`, `file_name`.
+- **Relaciones:** `ticket_id` → `tickets`; `author_user_id` → `users` (opcional); `stored_file_id` → `stored_files` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas.
 
 #### `ticket_article_links`

@@ -48,6 +48,14 @@ return [
         'documents.expiring' => ['variables' => ['document', 'type', 'employee', 'expires_on', 'days_left'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'documents.expired' => ['variables' => ['document', 'type', 'employee', 'expires_on'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'documents.rejected' => ['variables' => ['document', 'type', 'reason'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // ESS-4: constancia por emitir (a RRHH), emitida o rechazada (al colaborador).
+        'certificates.requested' => ['variables' => ['certificate', 'employee'], 'link' => '/personas/constancias', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'certificates.issued' => ['variables' => ['certificate'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'certificates.rejected' => ['variables' => ['certificate', 'reason'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // ESS-5: solicitud a RRHH nueva o respondida (a quien la atiende) y cambio de estado (al solicitante).
+        'tickets.created' => ['variables' => ['number', 'subject', 'employee', 'category'], 'link' => '/personas/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'tickets.replied' => ['variables' => ['number', 'subject', 'employee', 'category'], 'link' => '/personas/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'tickets.updated' => ['variables' => ['number', 'subject', 'status'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 

@@ -480,7 +480,19 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 
 | Permiso | Qué permite | SA | AD | RH | PY | RC | MG | EM | AU | ST | IV | CT |
 |---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `people.certificates.request` **(+)** | Solicitar certificados y constancias propios |  |  |  |  |  | ○ | ○ |  |  |  |  |
+| `people.certificates.view` | Ver solicitudes de constancias |  | ✓ | ✓ |  |  | ○ | ○ | ✓ |  |  |  |
+| `people.certificates.request` | Solicitar certificados y constancias propios |  |  |  |  |  | ○ | ○ |  |  |  |  |
+| `people.certificates.issue` | Emitir o rechazar constancias pedidas |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `helpdesk.tickets.view` | Ver solicitudes a RRHH |  | ✓ | ✓ | ○ | ○ | ○ | ○ | ✓ | ○ |  | ○ |
+| `helpdesk.tickets.assign` | Asignar solicitudes a RRHH |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `helpdesk.tickets.close` | Cerrar solicitudes a RRHH |  | ✓ | ✓ | ✓ |  | ○ | ○ |  |  |  |  |
+| `helpdesk.tickets.create` | Crear solicitudes a RRHH |  | ○ | ○ | ○ | ○ | ○ | ○ |  | ○ |  | ○ |
+| `helpdesk.tickets.reopen` | Reabrir solicitudes a RRHH |  | ○ | ○ | ○ | ○ | ○ | ○ |  | ○ |  | ○ |
+| `helpdesk.tickets.request_info` | Pedir información en solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
+| `helpdesk.tickets.resolve` | Resolver solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
+| `helpdesk.tickets.update` | Editar solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
+| `helpdesk.settings.update` | Configurar los tipos de solicitud a RRHH (y, con la mesa de ayuda, colas, SLA y plantillas) |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `helpdesk.tickets.confidential.view` **(S)** **(+)** | Ver solicitudes de categorías confidenciales |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 
 #### MSS · Portal del manager
 
@@ -1093,16 +1105,6 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 
 | Permiso | Qué permite | SA | AD | RH | PY | RC | MG | EM | AU | ST | IV | CT |
 |---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `helpdesk.tickets.view` | Ver solicitudes a RRHH |  | ✓ | ✓ | ○ | ○ | ○ | ○ | ✓ | ○ |  | ○ |
-| `helpdesk.tickets.assign` | Asignar solicitudes a RRHH |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
-| `helpdesk.tickets.close` | Cerrar solicitudes a RRHH |  | ✓ | ✓ | ✓ |  | ○ | ○ |  |  |  |  |
-| `helpdesk.tickets.create` | Crear solicitudes a RRHH |  | ○ | ○ | ○ | ○ | ○ | ○ |  | ○ |  | ○ |
-| `helpdesk.tickets.reopen` | Reabrir solicitudes a RRHH |  | ○ | ○ | ○ | ○ | ○ | ○ |  | ○ |  | ○ |
-| `helpdesk.tickets.request_info` | Pedir información en solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
-| `helpdesk.tickets.resolve` | Resolver solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
-| `helpdesk.tickets.update` | Editar solicitudes a RRHH |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |
-| `helpdesk.settings.update` **(+)** | Configurar la mesa de ayuda |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
-| `helpdesk.tickets.confidential.view` **(S)** **(+)** | Ver solicitudes de categorías confidenciales |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 
 ### Fase 7 · Operación y cumplimiento
 

@@ -117,7 +117,7 @@ test('ESS-1: el inicio trae solo la relación propia, sus pendientes y las tarje
         ->and($r->json('data.pending'))->toHaveKeys(['total', 'counts', 'items']);
 
     $cards = collect($r->json('data.cards'))->keyBy('key');
-    expect($cards->keys()->all())->toBe(['profile', 'vacations', 'absences'])
+    expect($cards->keys()->all())->toBe(['profile', 'vacations', 'absences', 'documents', 'certificates', 'hr_requests'])
         ->and($cards['profile']['data']['first_names'])->toBe('Rosa')
         ->and($cards['profile']['href'])->toBe('/mi/perfil')
         ->and($cards['vacations']['data'])->toHaveKeys(['available_days', 'pending_requests', 'next'])
@@ -143,7 +143,7 @@ test('RN-ESS-01: una relación laboral ajena responde 404, también la de otra o
 test('RN-ESS-02: sin el módulo de ausencias no hay tarjetas de vacaciones ni ausencias; sin Core HR, 403', function (): void {
     IdentityFixtures::disableModule(ESS_TENANT, 'time_off');
     $r = essCall($this->employee, 'get', '/me/home')->assertOk();
-    expect(collect($r->json('data.cards'))->pluck('key')->all())->toBe(['profile']);
+    expect(collect($r->json('data.cards'))->pluck('key')->all())->toBe(['profile', 'documents', 'certificates', 'hr_requests']);
 
     IdentityFixtures::disableModule(ESS_TENANT, 'core');
     $off = essCall($this->employee, 'get', '/me/home')->assertStatus(403)->assertJsonPath('error.code', 'module_not_enabled');

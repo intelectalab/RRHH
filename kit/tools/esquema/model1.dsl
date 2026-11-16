@@ -553,8 +553,10 @@
   person_id -> people ; requested_by_user_id -> users ; changes j! #S ; status enum(pending,approved,rejected,cancelled)=pending
   reviewed_by_user_id ?-> users ; reviewed_at ; rejection_reason ; workflow_instance_id ?-> workflow_instances
 @certificate_requests lock | Solicitud de constancias y certificados desde el portal.
-  employment_id -> employments ; kind enum(employment_certificate,income_certificate,cts_letter,withholding_certificate,other)!
+  employment_id -> employments ; kind enum(employment_certificate,income_certificate,vacation_certificate,cts_letter,withholding_certificate,other)!
   purpose ; status enum(requested,in_progress,issued,rejected)=requested ; document_id ?-> documents ; issued_at
+  requested_by_user_id ?-> users ; workflow_instance_id ?-> workflow_instances ; decided_by_user_id ?-> users ; decided_at
+  rejection_reason ; auto_issued bool=f
 
 #E MSS | Portal del manager
 #N El portal del manager no tiene tablas propias: consume asignaciones (jefe), tareas de aprobación, asistencia, vacaciones, objetivos y evaluaciones con alcance «equipo».

@@ -15,7 +15,7 @@ import { SkeletonBlock } from '@/ui/components/Skeleton'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { StatusBadge } from '@/ui/components/Status'
 import { EmploymentSwitch } from './EmploymentSwitch'
-import { cardOf, days } from './portal'
+import { cardOf, certificateTone, days, ticketTone } from './portal'
 import type { MeHome } from './types'
 
 /**
@@ -45,6 +45,9 @@ export function MyHomeScreen() {
   const profile = home ? cardOf(home.cards, 'profile') : undefined
   const vacations = home ? cardOf(home.cards, 'vacations') : undefined
   const absences = home ? cardOf(home.cards, 'absences') : undefined
+  const documents = home ? cardOf(home.cards, 'documents') : undefined
+  const certificates = home ? cardOf(home.cards, 'certificates') : undefined
+  const hrRequests = home ? cardOf(home.cards, 'hr_requests') : undefined
   const name = profile?.data.first_names ?? session.user.display_name
   const readOnly = home?.employment?.read_only ?? false
 
@@ -74,6 +77,12 @@ export function MyHomeScreen() {
                 )}
                 {profile && (
                   <Link className="portal-action" href="/mi/perfil"><Icon name="user" size={22} /><span>{t('portal.my_profile')}</span></Link>
+                )}
+                {certificates && (
+                  <Link className="portal-action" href="/mi/solicitudes"><Icon name="file" size={22} /><span>{t('portal.request_certificate')}</span></Link>
+                )}
+                {hrRequests && !readOnly && (
+                  <Link className="portal-action" href="/mi/solicitudes"><Icon name="checkSquare" size={22} /><span>{t('portal.request_hr')}</span></Link>
                 )}
               </div>
             )}
@@ -106,6 +115,39 @@ export function MyHomeScreen() {
                     <ul className="portal-list">
                       {absences.data.upcoming.map((a) => (
                         <li key={a.id}><b>{a.type_name}</b><span className="sub2">{t('portal.range', { from: formatDate(locale, a.starts_on), to: formatDate(locale, a.ends_on) })}</span></li>
+                      ))}
+                    </ul>
+                  )}
+                </Card>
+              )}
+
+              {documents && (
+                <Card title={t('portal.card_documents')} actions={<Link className="btn btn-ter btn-sm" href={documents.href}>{t('portal.see_more')}</Link>}>
+                  <p className="portal-big"><b>{documents.data.count}</b><span>{t('portal.published_documents')}</span></p>
+                  <ul className="portal-list">
+                    {documents.data.recent.map((d) => (
+                      <li key={d.id}><b>{d.title}</b>{d.issued_on && <span className="sub2">{formatDate(locale, d.issued_on)}</span>}</li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
+
+              {certificates && (
+                <Card title={t('portal.card_certificates')} actions={<Link className="btn btn-ter btn-sm" href={certificates.href}>{t('portal.see_more')}</Link>}>
+                  {certificates.data.pending_requests > 0 && <p><StatusBadge tone={certificateTone('requested')}>{t('portal.requests_pending', { n: certificates.data.pending_requests })}</StatusBadge></p>}
+                  {certificates.data.last_issued ? (
+                    <p>{t('portal.last_certificate', { name: certificates.data.last_issued.kind_name, date: formatDate(locale, certificates.data.last_issued.issued_at) })}</p>
+                  ) : <p className="text-secondary">{t('portal.no_certificates')}</p>}
+                </Card>
+              )}
+
+              {hrRequests && (
+                <Card title={t('portal.card_hr_requests')} actions={<Link className="btn btn-ter btn-sm" href={hrRequests.href}>{t('portal.see_more')}</Link>}>
+                  {hrRequests.data.waiting_info > 0 && <p><StatusBadge tone="wa">{t('portal.waiting_your_reply', { n: hrRequests.data.waiting_info })}</StatusBadge></p>}
+                  {hrRequests.data.latest.length === 0 ? <p className="text-secondary">{t('portal.no_hr_requests')}</p> : (
+                    <ul className="portal-list">
+                      {hrRequests.data.latest.map((r) => (
+                        <li key={r.id}><b>{r.number} · {r.subject}</b> <StatusBadge tone={ticketTone(r.status)}>{t(`tickets.status_${r.status}`)}</StatusBadge></li>
                       ))}
                     </ul>
                   )}
