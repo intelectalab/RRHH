@@ -2825,6 +2825,7 @@ CREATE TABLE positions (
   fte numeric(4,2) NOT NULL DEFAULT 1,
   is_shared boolean NOT NULL DEFAULT false,
   seats smallint NOT NULL DEFAULT 1,
+  is_implicit boolean NOT NULL DEFAULT false,
   valid_from date NOT NULL DEFAULT current_date,
   valid_to date,
   budgeted_from date,
@@ -2848,7 +2849,7 @@ CREATE TABLE positions (
   CONSTRAINT fk_positions_reports_to_position_id FOREIGN KEY (tenant_id, reports_to_position_id) REFERENCES positions (tenant_id, id),
   CONSTRAINT fk_positions_cost_center_id FOREIGN KEY (tenant_id, cost_center_id) REFERENCES cost_centers (tenant_id, id)
 );
-COMMENT ON TABLE positions IS 'Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza.';
+COMMENT ON TABLE positions IS 'Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza. is_implicit: la creó el sistema al registrar un ingreso sin posición con la política «contratar solo contra posición» desactivada (POS-6).';
 CREATE UNIQUE INDEX uq_positions_code ON positions (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_positions_job_profile_id ON positions (tenant_id, job_profile_id);
 CREATE INDEX ix_positions_org_unit_id ON positions (tenant_id, org_unit_id);
@@ -18413,6 +18414,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('org.idioma_defecto', 'base', 'Idioma por defecto', 'Idioma de la interfaz y de los documentos.', 'select', '"es"'::jsonb, ARRAY['organization','legal_entity'], '["es", "en", "pt"]'::jsonb),
   ('org.zona_horaria', 'base', 'Zona horaria', 'Zona horaria para fechas, marcaciones y vencimientos.', 'text', '"America/Lima"'::jsonb, ARRAY['organization','legal_entity','site'], NULL),
   ('org.moneda_defecto', 'base', 'Moneda por defecto', 'Moneda ISO 4217 de los montos nuevos.', 'text', '"PEN"'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('org.tipo_cambio_faltante', 'base', 'Sin tipo de cambio de la fecha', 'RN-CFG-07 · Si falta el tipo de cambio de la fecha al convertir o consolidar: usar el último anterior disponible (el resultado se marca como «tipo de cambio referencial») o bloquear la conversión.', 'select', '"use_previous"'::jsonb, ARRAY['organization'], '["use_previous", "block"]'::jsonb),
   ('org.inicio_semana', 'base', 'Primer día de la semana', 'Día en que empieza la semana en calendarios.', 'select', '"lunes"'::jsonb, ARRAY['organization'], '["lunes", "domingo"]'::jsonb),
   ('seguridad.acceso_con_documento', 'base', 'Acceso con documento de identidad', 'Permite ingresar con documento y clave u OTP, sin correo (C-09).', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('seguridad.canal_otp', 'base', 'Canal de clave temporal', 'Canal para enviar la clave temporal.', 'select', '"sms"'::jsonb, ARRAY['organization'], '["sms", "whatsapp", "email"]'::jsonb),
@@ -18459,7 +18461,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('colaboradores.cuenta_bancaria_requiere_aprobacion', 'core', 'Cambio de cuenta de pago con aprobación', 'COL-8 · RN-COL-11: una cuenta nueva o cambiada queda pendiente hasta que otra persona con permiso la aprueba; sin aprobación la registra activa quien la carga.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('movimientos.tipos_con_aprobacion', 'core', 'Movimientos que pasan por aprobación', 'HIS-2: tipos de movimiento de personal que, aunque los registre RRHH, esperan el flujo de aprobación publicado para «personnel_action» antes de aplicarse. Lo que propone un jefe siempre pasa por aprobación.', 'list', '["promotion"]'::jsonb, ARRAY['organization','legal_entity'], '["promotion", "transfer", "manager_change", "cost_center_change", "data_correction"]'::jsonb),
   ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),
-  ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'Impide el ingreso de un colaborador sin una posición aprobada y libre.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'POS-6 · RN-POS-01 · Activa: un ingreso sin una posición aprobada y libre se rechaza. Desactivada: el ingreso sin posición crea una posición implícita para la persona, así la dotación siempre cuenta plazas.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'Días de anticipación con que se avisa el vencimiento.', 'list', '[60, 30, 15]'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_tope_acumulado_dias', 'core', 'Aviso de tope acumulado', 'Días de anticipación con que se avisa que un contrato a modalidad se acerca a su plazo máximo.', 'integer', '90'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('documentos.firma_nivel_defecto', 'core', 'Nivel de firma por defecto', 'Nivel de firma electrónica para documentos laborales.', 'select', '"simple"'::jsonb, ARRAY['organization','legal_entity'], '["simple", "advanced", "digital_certificate"]'::jsonb),

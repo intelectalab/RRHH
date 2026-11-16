@@ -103,6 +103,7 @@ return [
         'seats_below_occupied' => 'La posición tiene :count ocupante(s): no puede tener menos cupos.',
         'budget_forbidden' => 'No tienes permiso para registrar el costo de las posiciones.',
         'over_budget_reason_required' => 'Esta plaza excede el presupuesto de dotación de su unidad: para aprobarla registra el motivo de la excepción.',
+        'implicit_reason' => 'Posición implícita creada al registrar un ingreso sin posición (política «contratar solo contra posición» desactivada).',
         'over_budget_exception' => 'Excepción de presupuesto: :reason',
         'not_assignable_proposed' => 'La posición todavía no está aprobada: no admite ocupantes.',
         'not_assignable_frozen' => 'La posición está congelada: no admite ocupantes ni vacantes (RN-POS-03).',

@@ -5,6 +5,8 @@ namespace App\Modules\Organization\Http\Controllers;
 use App\Modules\Organization\Application\HeadcountService;
 use App\Modules\Organization\Infrastructure\Models\HeadcountBudget;
 use App\Shared\Exceptions\InvalidFilterException;
+use App\Shared\Money\Money;
+use App\Shared\Money\MoneyConsolidator;
 use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
 use App\Shared\Permissions\SensitiveFields;
@@ -28,6 +30,7 @@ final class HeadcountController
         private readonly HeadcountService $headcount,
         private readonly DataScope $scope,
         private readonly SensitiveFields $sensitive,
+        private readonly MoneyConsolidator $consolidator,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -40,6 +43,11 @@ final class HeadcountController
         $board['units'] = $this->sensitive->presentMany('HeadcountUnit', $board['units'], $permissions);
         if (! $permissions->has('org.positions.budget.view')) {
             unset($board['totals']['projected_cost'], $board['totals']['budgeted_cost'], $board['load_factor_pct']);
+        }
+        // CFG-7 · Consolidado en una moneda: indica la moneda y el tipo de cambio aplicado a cada una.
+        $reportCurrency = $this->reportCurrency($request);
+        if ($reportCurrency !== null && $permissions->has('org.positions.budget.view')) {
+            $board['totals']['consolidated'] = ['currency' => $reportCurrency] + $this->consolidate($board['totals'], $reportCurrency, $date);
         }
 
         return response()->json(['data' => $board, 'meta' => ['as_of' => $date]]);
@@ -179,6 +187,42 @@ final class HeadcountController
             }
             throw ValidationException::withMessages(['org_unit_id' => [(string) trans('organization.out_of_scope')]]);
         }
+    }
+
+    private function reportCurrency(Request $request): ?string
+    {
+        $value = $request->query('report_currency');
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (! is_string($value) || preg_match('/^[A-Z]{3}$/', $value) !== 1 || ! DB::table('currencies')->where('code', $value)->exists()) {
+            throw new InvalidFilterException((string) trans('errors.invalid_filter'), ['as_of', 'legal_entity_id', 'org_unit_id', 'report_currency']);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param  array<string, mixed>  $totals
+     * @return array<string, mixed>
+     */
+    private function consolidate(array $totals, string $currency, string $date): array
+    {
+        $out = [];
+        $rates = [];
+        $referential = false;
+        foreach (['projected_cost', 'budgeted_cost'] as $key) {
+            /** @var list<array{amount: string, currency: string}> $list */
+            $list = $totals[$key] ?? [];
+            $r = $this->consolidator->sum(array_map(fn (array $m) => new Money($m['amount'], $m['currency']), $list), $currency, $date);
+            $out[$key] = $r['total'];
+            foreach ($r['rates'] as $rate) {
+                $rates[$rate['from']] = $rate;
+            }
+            $referential = $referential || $r['referential'];
+        }
+
+        return $out + ['as_of' => $date, 'rates' => array_values($rates), 'referential' => $referential];
     }
 
     /**

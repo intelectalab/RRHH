@@ -386,6 +386,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/legal-entities/{id}/logo` | `org.legal_entities.update` | 0 |
 | DELETE | `/legal-entities/{id}/logo` | `org.legal_entities.update` | 0 |
 | GET | `/exchange-rates/convert` | `settings.exchange_rates.view` | 0 |
+| POST | `/exchange-rates/import` | `settings.exchange_rates.create` | 0 |
 | GET | `/catalogs` | sesión | 0 |
 | POST | `/catalogs` | `settings.catalogs.update` | 0 |
 | GET | `/catalogs/{code}/items` | sesión | 0 |
@@ -503,6 +504,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/headcount-plans/{id}` | `org.headcount_plans.{view,update}` | 1 |
 | POST | `/headcount-plans/{id}/{submit,approve,close}` | `org.headcount_plans.{submit,approve,close}` | 1 |
 | GET | `/headcount` | `org.positions.view` | 1 |
+| GET | `/positions/org-chart` | `org.positions.view` | 1 |
 | POST | `/positions/{id}/reject` | `org.positions.approve` | 1 |
 | POST | `/positions/{id}/open-recruitment` | `org.positions.update` | 1 |
 | POST | `/positions/{id}/cancel-recruitment` | `org.positions.update` | 1 |

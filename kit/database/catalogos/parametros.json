@@ -52,6 +52,21 @@
       "opciones": null
     },
     {
+      "codigo": "org.tipo_cambio_faltante",
+      "modulo": "base",
+      "nombre": "Sin tipo de cambio de la fecha",
+      "tipo": "select",
+      "valor_por_defecto": "use_previous",
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "RN-CFG-07 · Si falta el tipo de cambio de la fecha al convertir o consolidar: usar el último anterior disponible (el resultado se marca como «tipo de cambio referencial») o bloquear la conversión.",
+      "opciones": [
+        "use_previous",
+        "block"
+      ]
+    },
+    {
       "codigo": "org.inicio_semana",
       "modulo": "base",
       "nombre": "Primer día de la semana",
@@ -760,7 +775,7 @@
         "organization",
         "legal_entity"
       ],
-      "descripcion": "Impide el ingreso de un colaborador sin una posición aprobada y libre.",
+      "descripcion": "POS-6 · RN-POS-01 · Activa: un ingreso sin una posición aprobada y libre se rechaza. Desactivada: el ingreso sin posición crea una posición implícita para la persona, así la dotación siempre cuenta plazas.",
       "opciones": null
     },
     {

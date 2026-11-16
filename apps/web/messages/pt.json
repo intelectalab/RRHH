@@ -1029,7 +1029,15 @@
     "result": "{amount} com câmbio {rate} de {date}",
     "inverse": "(inverso)",
     "save": "Publicar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "import": "Trazer taxas do dia",
+    "imported": "Taxas importadas: {n}",
+    "import_error": "Não foi possível trazer as taxas de câmbio.",
+    "import_summary": "Importadas: {imported} · omitidas: {skipped}",
+    "skip_already_published": "{pair}: já publicada hoje",
+    "skip_not_published": "{pair}: a fonte não a publica",
+    "import_fake": "Fonte de teste: os valores não são reais.",
+    "referential": "(taxa referencial: não há taxa publicada nesse dia)"
   },
   "acct": {
     "title": "Segurança da conta",
@@ -2343,7 +2351,18 @@
     "tab_employees": "Colaboradores",
     "tab_requests": "Alterações de dados",
     "tab_movements": "Movimentações",
-    "tab_contracts": "Contratos a vencer"
+    "tab_contracts": "Contratos a vencer",
+    "view_positions": "Posições",
+    "chart_heading_positions": "Organograma por posições em {date}",
+    "chart_sub_positions": "Posições: {n}",
+    "chart_empty_positions_title": "Ainda não há posições nessa data",
+    "chart_empty_positions_text": "As vagas aprovadas aparecem aqui com o ocupante, ou como vagas abertas ou congeladas.",
+    "go_positions": "Ir para posições",
+    "chart_free_seats": "{n} vaga(s) livre(s)",
+    "chart_state_vacant": "Vaga",
+    "chart_state_recruiting": "Em recrutamento",
+    "chart_state_frozen": "Congelada",
+    "chart_branch": "Ramo: {occupied} de {approved} ocupadas"
   },
   "pos": {
     "sub": "Posições: vagas concretas da estrutura, com seu cargo, unidade, chefe e ocupantes",
@@ -2553,7 +2572,14 @@
     "budget_saved": "Orçamento salvo.",
     "budget_help": "Registrar um novo orçamento encerra o vigente da unidade no dia anterior.",
     "monthly_cost": "Custo mensal orçado",
-    "notes": "Notas"
+    "notes": "Notas",
+    "report_currency": "Consolidar em",
+    "report_currency_none": "Sem consolidar",
+    "consolidated": "Consolidado: custo projetado {projected} · orçado {budgeted}",
+    "consolidated_no_rates": "Todos os valores já estão em {currency}.",
+    "rate_applied": "{from} → {to}: {rate} de {date}",
+    "rate_referential": "{from} → {to}: {rate} de {date} (referencial)",
+    "consolidate_error": "Não foi possível consolidar nessa moeda."
   },
   "emp": {
     "title": "Colaborador",

@@ -641,6 +641,12 @@
 .oc-t1 { font-size: 13px; font-weight: 700; fill: var(--tx); }
 .oc-t2 { font-size: 11.5px; fill: var(--tx); }
 .oc-t3 { font-size: 11px; fill: var(--tx2); }
+/* POS-7 · Plazas sin ocupante: borde punteado y marca de estado (el texto del nodo también lo dice). */
+.oc-nodo.tone-vacant .oc-caja, .oc-nodo.tone-recruiting .oc-caja, .oc-nodo.tone-frozen .oc-caja { stroke-dasharray: 6 4; stroke-width: 1.5; }
+.oc-nodo.tone-vacant .oc-marca { fill: var(--wa); }
+.oc-nodo.tone-recruiting .oc-marca { fill: var(--in); }
+.oc-nodo.tone-frozen .oc-marca { fill: var(--g-gris); }
+.oc-nodo.tone-frozen .oc-caja { fill: var(--bg); }
 .oc-nodo.hit .oc-caja { stroke: var(--pe-500); stroke-width: 2.5; fill: var(--pe-50); }
 .oc-pliegue { cursor: pointer; }
 .oc-pliegue circle { fill: var(--sup); stroke: var(--bd2); }

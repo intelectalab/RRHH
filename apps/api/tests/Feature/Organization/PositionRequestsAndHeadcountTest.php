@@ -444,3 +444,83 @@ test('aislamiento: otra organización no ve solicitudes, presupuestos ni unidade
     expect(prqCall($intruder, 'GET', '/position-requests')->json('data'))->toBe([])
         ->and(prqCall($intruder, 'GET', '/headcount')->json('data.units'))->toBe([]);
 });
+
+// ---------------------------------------------------------------- POS-7 · Organigrama por posiciones
+
+test('POS-7 · el organigrama por posiciones dibuja vacantes y congeladas y suma por rama ocupadas sobre aprobadas', function (): void {
+    $band = prqBand('2000.00', '4000.00');
+    $boss = prqPosition('approved', $band);
+    $filled = prqPosition('approved', $band);
+    $vacant = prqPosition('approved', $band);
+    $frozen = prqPosition('frozen', $band);
+    $proposed = prqPosition('proposed');
+    TenancyScope::runAs(PRQ_TENANT, function () use ($boss, $filled, $vacant, $frozen): void {
+        DB::table('positions')->whereIn('id', [$filled, $vacant, $frozen])->update(['reports_to_position_id' => $boss]);
+        $employment = EmploymentCostDistributionFactory::employment($this->entity);
+        DB::table('employment_assignments')->insert(['tenant_id' => PRQ_TENANT, 'employment_id' => $employment, 'job_profile_id' => $this->profile,
+            'position_id' => $filled, 'org_unit_id' => $this->unit, 'site_id' => $this->site, 'valid_from' => '2026-01-01', 'reason' => 'Ingreso']);
+        DB::table('employment_compensations')->insert(['tenant_id' => PRQ_TENANT, 'employment_id' => $employment, 'base_salary' => '3500.00',
+            'currency' => 'PEN', 'valid_from' => '2026-01-01']);
+        app(PositionOccupancy::class)->sync($filled);
+    });
+
+    $chart = prqCall($this->admin, 'GET', '/positions/org-chart?as_of=2026-11-30');
+    $chart->assertOk();
+    $this->assertMatchesOpenApi($chart, 'get', '/positions/org-chart', 200);
+    $nodes = collect($chart->json('data'))->keyBy('id');
+    expect($nodes->has($proposed))->toBeFalse()
+        ->and($nodes[$filled]['chart_state'])->toBe('filled')
+        ->and($nodes[$filled]['occupants'])->toHaveCount(1)
+        ->and($nodes[$vacant]['chart_state'])->toBe('vacant')
+        ->and($nodes[$frozen]['chart_state'])->toBe('frozen')
+        ->and($nodes[$vacant]['parent_id'])->toBe($boss)
+        ->and($nodes[$boss]['parent_id'])->toBeNull()
+        // La rama del jefe: 4 plazas aprobadas, 1 ocupada, 1 congelada y 2 vacantes.
+        ->and($nodes[$boss]['branch'])->toMatchArray(['positions' => 4, 'approved_seats' => 4, 'occupied_seats' => 1, 'frozen_seats' => 1, 'vacant_seats' => 2])
+        // 3500 del ocupante + 3 plazas al punto medio 3000 (sin cargas) = 12 500.
+        ->and($nodes[$boss]['branch_projected_cost'])->toBe([['amount' => '12500.00', 'currency' => 'PEN']])
+        ->and($chart->json('meta.totals.approved_seats'))->toBe(4);
+
+    // Sin permiso para ver costos de posiciones, el costo de la rama no viaja.
+    $recruiter = prqUser(PRQ_TENANT, 'recruiter');
+    $plain = prqCall($recruiter, 'GET', '/positions/org-chart?as_of=2026-11-30');
+    $plain->assertOk();
+    $plainBoss = collect($plain->json('data'))->firstWhere('id', $boss);
+    expect($plainBoss)->not->toHaveKey('branch_projected_cost')->and($plainBoss['branch']['occupied_seats'])->toBe(1);
+
+    prqCall($this->admin, 'GET', '/positions/org-chart?as_of=30-11-2026')->assertStatus(400);
+    $noPermission = prqUser(PRQ_TENANT, 'empleado');
+    $this->assertMatchesOpenApi(prqCall($noPermission, 'GET', '/positions/org-chart'), 'get', '/positions/org-chart', 403);
+    $other = prqUser(PRQ_OTHER, 'admin_empresa');
+    $foreign = prqCall($other, 'GET', '/positions/org-chart?as_of=2026-11-30');
+    $foreign->assertOk();
+    expect(collect($foreign->json('data'))->pluck('id')->intersect([$boss, $filled])->all())->toBe([]);
+});
+
+// ---------------------------------------------------------------- CFG-7 · Consolidado en una moneda
+
+test('CFG-7 · el tablero consolidado convierte cada moneda e indica el tipo de cambio aplicado', function (): void {
+    prqCall($this->hr, 'POST', '/headcount-budgets', ['org_unit_id' => $this->unit, 'budgeted_positions' => 2,
+        'monthly_cost' => ['amount' => '1000.00', 'currency' => 'USD'], 'valid_from' => '2026-01-01'])->assertCreated();
+    prqPosition('approved', prqBand('2000.00', '4000.00'));
+    prqCall($this->admin, 'POST', '/exchange-rates', ['from_currency' => 'USD', 'to_currency' => 'PEN', 'rate' => '3.75', 'valid_on' => '2026-11-01', 'source' => 'Prueba'])->assertCreated();
+
+    $board = prqCall($this->admin, 'GET', '/headcount?as_of=2026-11-30&report_currency=PEN');
+    $board->assertOk();
+    $this->assertMatchesOpenApi($board, 'get', '/headcount', 200);
+    $c = $board->json('data.totals.consolidated');
+    // El costo proyectado de la unidad está en dólares (moneda del presupuesto) y la plaza en soles: va aparte.
+    expect($c['currency'])->toBe('PEN')
+        ->and($c['budgeted_cost'])->toBe(['amount' => '3750.00', 'currency' => 'PEN'])
+        ->and($c['rates'][0])->toMatchArray(['from' => 'USD', 'to' => 'PEN', 'rate' => '3.75', 'rate_date' => '2026-11-01', 'referential' => true])
+        ->and($c['referential'])->toBeTrue()
+        // Los montos originales no cambian.
+        ->and($board->json('data.totals.budgeted_cost'))->toBe([['amount' => '1000.00', 'currency' => 'USD']]);
+
+    // Sin tipo de cambio para una moneda: 422 explicado; moneda desconocida: 400.
+    prqCall($this->admin, 'GET', '/headcount?as_of=2026-11-30&report_currency=EUR')->assertStatus(422);
+    prqCall($this->admin, 'GET', '/headcount?as_of=2026-11-30&report_currency=pen')->assertStatus(400);
+    // Quien no ve costos no recibe el consolidado.
+    $plain = prqCall(prqUser(PRQ_TENANT, 'recruiter'), 'GET', '/headcount?as_of=2026-11-30&report_currency=PEN');
+    expect($plain->json('data.totals'))->not->toHaveKey('consolidated');
+});

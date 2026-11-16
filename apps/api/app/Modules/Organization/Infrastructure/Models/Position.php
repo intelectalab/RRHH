@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $is_critical
  * @property string $fte
  * @property bool $is_shared
+ * @property bool $is_implicit
  * @property int $seats
  * @property CarbonInterface $valid_from
  * @property CarbonInterface|null $valid_to
@@ -55,7 +56,7 @@ class Position extends Model
     protected $guarded = ['id', 'tenant_id', 'lock_version'];
 
     protected $casts = [
-        'lock_version' => 'integer', 'seats' => 'integer', 'is_shared' => 'boolean', 'is_critical' => 'boolean',
+        'lock_version' => 'integer', 'seats' => 'integer', 'is_shared' => 'boolean', 'is_implicit' => 'boolean', 'is_critical' => 'boolean',
         'valid_from' => 'date', 'valid_to' => 'date',
     ];
 

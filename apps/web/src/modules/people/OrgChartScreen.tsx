@@ -14,10 +14,11 @@ import { exportChart } from './chartExport'
 import type { DirectoryPerson } from './DirectoryScreen'
 import { ancestorsOf, collapsedFromDepth, fit, layoutChart, NODE_H, NODE_W, type ChartNode } from './orgChartLayout'
 import { peopleTabs } from './peopleTabs'
+import { positionNode, type PositionNode } from './positionChart'
 
 type UnitNode = { id: string; parent_id: string | null; code: string; name: string; type_name: string | null; head_name: string | null; head_position_title: string | null; people_count: number }
 type PersonNode = DirectoryPerson & { id: string; parent_id: string | null }
-type View = 'units' | 'people'
+type View = 'units' | 'people' | 'positions'
 
 const ZOOMS = [0.4, 0.55, 0.7, 0.85, 1, 1.25, 1.5]
 const OPEN_DEPTH = 2
@@ -36,12 +37,25 @@ export function OrgChartScreen() {
   const [q, setQ] = useState('')
   const [zoom, setZoom] = useState(4)
   const [busy, setBusy] = useState(false)
+  // POS-7 · La vista por posiciones solo aparece a quien ve posiciones (el servidor lo valida igual).
+  const views: View[] = can('org.positions.view') ? ['units', 'people', 'positions'] : ['units', 'people']
 
   const load = useCallback(async () => {
     setNodes(null)
     try {
+      const mapped: ChartNode[] = view === 'positions'
+        ? (await api.get<{ data: PositionNode[] }>(`/positions/org-chart?as_of=${asOf}`)).data.map((p) => positionNode(p, t))
+        : await loadStructure()
+      setNodes(mapped)
+      setCollapsed(collapsedFromDepth(mapped, OPEN_DEPTH))
+      setLoadError(false)
+    } catch {
+      setLoadError(true)
+    }
+
+    async function loadStructure(): Promise<ChartNode[]> {
       const res = await api.get<{ data: Array<UnitNode | PersonNode> }>(`/org-chart?view=${view}&as_of=${asOf}`)
-      const mapped: ChartNode[] = view === 'units'
+      return view === 'units'
         ? (res.data as UnitNode[]).map((u) => ({
             id: u.id, parent_id: u.parent_id, title: u.name,
             subtitle: u.head_name ?? (u.head_position_title ? t('people.chart_vacant', { title: u.head_position_title }) : u.type_name),
@@ -51,11 +65,6 @@ export function OrgChartScreen() {
             id: p.id, parent_id: p.parent_id, title: p.display_name,
             subtitle: p.job_title, detail: [p.org_unit?.name, p.site?.name].filter(Boolean).join(' · '),
           }))
-      setNodes(mapped)
-      setCollapsed(collapsedFromDepth(mapped, OPEN_DEPTH))
-      setLoadError(false)
-    } catch {
-      setLoadError(true)
     }
   }, [view, asOf, t])
 
@@ -90,7 +99,7 @@ export function OrgChartScreen() {
     if (!layout) return
     setBusy(true)
     try {
-      const heading = t(view === 'units' ? 'people.chart_heading_units' : 'people.chart_heading_people', { date: formatDate(locale, asOf) })
+      const heading = t(`people.chart_heading_${view}`, { date: formatDate(locale, asOf) })
       await exportChart(layout, kind, heading, t('people.chart_file', { date: asOf }))
     } catch {
       toast(t('people.export_error'), 'error')
@@ -103,7 +112,7 @@ export function OrgChartScreen() {
     <>
       <PageHeader
         title={t('people.title')}
-        sub={nodes ? t(view === 'units' ? 'people.chart_sub_units' : 'people.chart_sub_people', { n: nodes.length }) : undefined}
+        sub={nodes ? t(`people.chart_sub_${view}`, { n: nodes.length }) : undefined}
         tabs={peopleTabs(t, 'chart', can)}
         actions={(
           <>
@@ -116,7 +125,7 @@ export function OrgChartScreen() {
         <section className="card">
           <div className="oc-barra">
             <div className="seg" role="group" aria-label={t('people.chart_view')}>
-              {(['units', 'people'] as const).map((v) => (
+              {views.map((v) => (
                 <button key={v} type="button" className={view === v ? 'on' : undefined} aria-pressed={view === v} onClick={() => setView(v)}>{t(`people.view_${v}`)}</button>
               ))}
             </div>
@@ -143,9 +152,10 @@ export function OrgChartScreen() {
           {!loadError && nodes === null && <div className="oc-lienzo" aria-busy="true"><span className="esq" style={{ width: 240 }} /></div>}
           {!loadError && nodes?.length === 0 && (
             <EmptyState
-              title={t(view === 'units' ? 'people.chart_empty_units_title' : 'people.chart_empty_people_title')}
-              text={t(view === 'units' ? 'people.chart_empty_units_text' : 'people.chart_empty_people_text')}
-              action={view === 'units' ? <Link className="btn btn-sec btn-sm" href="/organizacion/unidades">{t('people.go_units')}</Link> : undefined}
+              title={t(`people.chart_empty_${view}_title`)}
+              text={t(`people.chart_empty_${view}_text`)}
+              action={view === 'units' ? <Link className="btn btn-sec btn-sm" href="/organizacion/unidades">{t('people.go_units')}</Link>
+                : view === 'positions' ? <Link className="btn btn-sec btn-sm" href="/organizacion/posiciones">{t('people.go_positions')}</Link> : undefined}
             />
           )}
           {!loadError && layout && layout.nodes.length > 0 && (
@@ -156,14 +166,14 @@ export function OrgChartScreen() {
                 height={layout.height * scale}
                 viewBox={`0 0 ${layout.width} ${layout.height}`}
                 role="tree"
-                aria-label={t(view === 'units' ? 'people.chart_heading_units' : 'people.chart_heading_people', { date: formatDate(locale, asOf) })}
+                aria-label={t(`people.chart_heading_${view}`, { date: formatDate(locale, asOf) })}
               >
                 {layout.edges.map((e) => <path key={`${e.from}-${e.to}`} d={e.path} className="oc-linea" />)}
                 {layout.nodes.map((n) => (
                   <g
                     key={n.id}
                     transform={`translate(${n.x},${n.y})`}
-                    className={`oc-nodo${matches.has(n.id) ? ' hit' : ''}`}
+                    className={`oc-nodo${n.tone ? ` tone-${n.tone}` : ''}${matches.has(n.id) ? ' hit' : ''}`}
                     role="treeitem"
                     aria-level={n.depth + 1}
                     aria-expanded={n.childCount > 0 ? !n.collapsed : undefined}

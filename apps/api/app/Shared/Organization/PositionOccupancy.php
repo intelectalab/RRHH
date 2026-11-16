@@ -28,4 +28,13 @@ interface PositionOccupancy
      * Devuelve el estado resultante, o null si la posición no existe.
      */
     public function sync(string $positionId, ?string $userId = null): ?string;
+
+    /**
+     * POS-6 · Con la política «contratar solo contra posición» desactivada, un ingreso sin posición crea
+     * una posición implícita aprobada con la estructura del ingreso (puesto, unidad, sede, centro de costo)
+     * y vigente desde esa fecha; quien la crea luego asigna a la persona y llama a sync(). Devuelve su id.
+     *
+     * @param  array{job_profile_id: string, org_unit_id: string, site_id?: string|null, cost_center_id?: string|null}  $structure
+     */
+    public function createImplicit(string $legalEntityId, array $structure, string $from, ?string $userId = null): string;
 }

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
-import { formatNumber, localToday } from '@/lib/format'
+import { formatDate, formatNumber, localToday } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Icon } from '@/ui/components/Icon'
@@ -27,7 +27,11 @@ type UnitRow = {
   deviation_cost?: Money
   positions_without_cost?: number
 }
-type Board = { units: UnitRow[]; totals: Counts & { budgeted_positions: number; deviation_positions: number; projected_cost?: Money[]; budgeted_cost?: Money[] }; load_factor_pct?: string }
+type Rate = { from: string; to: string; rate: string; rate_date: string; referential: boolean }
+type Consolidated = { currency: string; projected_cost: Money; budgeted_cost: Money; as_of: string; rates: Rate[]; referential: boolean }
+type Board = { units: UnitRow[]; totals: Counts & { budgeted_positions: number; deviation_positions: number; projected_cost?: Money[]; budgeted_cost?: Money[]; consolidated?: Consolidated }; load_factor_pct?: string }
+/** Monedas ofrecidas para el consolidado (CFG-7); la conversión la hace la API. */
+const REPORT_CURRENCIES = ['PEN', 'USD', 'EUR']
 type Explained = {
   position_id: string
   code: string
@@ -59,13 +63,26 @@ export function HeadcountScreen() {
   const [units, setUnits] = useState<Option[]>([])
   const [explain, setExplain] = useState<UnitRow | null>(null)
   const [budgetFor, setBudgetFor] = useState<{ unitId: string | null; budget: Budget | null } | null>(null)
+  const [reportCurrency, setReportCurrency] = useState('')
+  const [consolidateError, setConsolidateError] = useState<string | null>(null)
   const canCost = can('org.positions.budget.view')
   const money = (m?: Money) => (m ? `${m.currency} ${formatNumber(locale, m.amount)}` : '—')
 
   const load = useCallback(() => {
     setFailed(false)
-    void api.get<{ data: Board }>(`/headcount?as_of=${asOf}`).then((r) => setBoard(r.data)).catch(() => setFailed(true))
-  }, [asOf])
+    setConsolidateError(null)
+    const base = `/headcount?as_of=${asOf}`
+    const plain = () => api.get<{ data: Board }>(base).then((r) => setBoard(r.data)).catch(() => setFailed(true))
+    if (reportCurrency === '') {
+      void plain()
+      return
+    }
+    // Sin tipo de cambio para alguna moneda la API responde 422: se explica y se muestra el tablero sin consolidar.
+    void api.get<{ data: Board }>(`${base}&report_currency=${reportCurrency}`).then((r) => setBoard(r.data)).catch((err: unknown) => {
+      setConsolidateError(formErrors(err, t).general ?? t('hc.consolidate_error'))
+      void plain()
+    })
+  }, [asOf, reportCurrency, t])
   useEffect(load, [load])
   useEffect(() => {
     void api.get<{ data: { org_units: Option[] } }>('/position-options').then((r) => setUnits(r.data.org_units)).catch(() => setUnits([]))
@@ -93,6 +110,15 @@ export function HeadcountScreen() {
             <label className="form-label" htmlFor="hc-as-of">{t('hc.as_of')}</label>
             <input id="hc-as-of" type="date" className="form-control" value={asOf} onChange={(e) => setAsOf(e.target.value || localToday())} />
           </div>
+          {canCost && (
+            <div>
+              <label className="form-label" htmlFor="hc-currency">{t('hc.report_currency')}</label>
+              <select id="hc-currency" className="form-select" value={reportCurrency} onChange={(e) => setReportCurrency(e.target.value)}>
+                <option value="">{t('hc.report_currency_none')}</option>
+                {REPORT_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          )}
           {can('org.headcount_plans.create') && <button type="button" className="btn btn-primary btn-sm" onClick={() => setBudgetFor({ unitId: null, budget: null })}><Icon name="plus" /> {t('hc.new_budget')}</button>}
         </div>
         {failed && <p role="alert">{t('hc.load_error')}</p>}
@@ -109,6 +135,17 @@ export function HeadcountScreen() {
                 <div key={m.currency} className="hc-kpi" role="listitem"><span className="sub2">{t('hc.projected_cost')}</span><b className="h4 mb-0">{money(m)}</b></div>
               ))}
             </div>
+            {consolidateError && <p className="small text-danger" role="alert">{consolidateError}</p>}
+            {canCost && board.totals.consolidated && (
+              <div className="nota mb-3" role="status">
+                <b>{t('hc.consolidated', { projected: money(board.totals.consolidated.projected_cost), budgeted: money(board.totals.consolidated.budgeted_cost) })}</b>
+                <span className="sub2">
+                  {board.totals.consolidated.rates.length === 0
+                    ? t('hc.consolidated_no_rates', { currency: board.totals.consolidated.currency })
+                    : board.totals.consolidated.rates.map((r) => t(r.referential ? 'hc.rate_referential' : 'hc.rate_applied', { from: r.from, to: r.to, rate: r.rate, date: formatDate(locale, r.rate_date) })).join(' · ')}
+                </span>
+              </div>
+            )}
             {canCost && board.load_factor_pct !== undefined && <p className="small text-secondary">{t('hc.load_factor', { pct: formatNumber(locale, board.load_factor_pct) })}</p>}
             <div className="tabla-wrap">
               <table className="table">

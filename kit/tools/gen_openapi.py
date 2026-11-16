@@ -93,7 +93,7 @@ RES = [
     ("ORG", 1, "org.job_profiles", "/job-families", "JobFamily", "code:s name:s description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-levels", "JobLevel", "code:s name:s rank:i description?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
     ("ORG", 1, "org.job_profiles", "/job-categories", "JobCategory", "code:s name:s rank?:i description?:s functions?:s responsibility_level?:s requirements?:s profiles_count?:i status:e(active|archived) allowed_actions?:a version?:i", "LCRU", "archive restore"),
-    ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) position_request_id?:id budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
+    ("POS", 1, "org.positions", "/positions", "Position", "code:s title:s job_profile_id:id job_profile_name?:s legal_entity_id:id legal_entity_name?:s org_unit_id:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s reports_to_position_id?:id reports_to_title?:s effective_reports_to_position_id?:id salary_band_id?:id is_critical:b fte:n is_shared:b is_implicit?:b seats:i occupied_seats?:i occupants?:ao heads_units?:ao valid_from:d valid_to?:d status:e(proposed|approved|open|recruiting|filled|frozen|closed) position_request_id?:id budget!?:m allowed_actions?:a version?:i", "LCRU", "approve freeze unfreeze close"),
     ("POS", 1, "org.headcount_plans", "/headcount-plans", "HeadcountPlan", "name:s scenario:e(current|conservative|growth|custom) year:i status:e(draft|submitted|approved|closed) totals:j", "LCRU", "submit approve close"),
     ("COL", 1, "people.people", "/people", "Person", "first_names:s paternal_surname:s maternal_surname?:s preferred_name?:s full_name?:s document_type:e(dni|ce|passport|ptp|cpp|other) document_country?:s document_number!?:s document_number_masked?:s birth_date!?:d sex!?:e(female|male|unspecified) nationality_code?:s marital_status!?:e(single|married|cohabiting|divorced|widowed) personal_email!?:s mobile_phone!?:s employments?:ao version?:i", "LCRU", "merge"),
     ("COL", 1, "people.employments", "/employments", "Employment", "person_id:id person_name?:s document_number_masked?:s legal_entity_id:id legal_entity_name?:s employee_code:s kind:e(employee|intern|apprentice) worker_category:e(executive|employee|worker) hire_date:d seniority_date?:d probation_ends_on?:d termination_date?:d status:e(pending|active|suspended|terminating|terminated|cancelled) rehire_of_employment_id?:id work_email?:s work_phone?:s work_phone_ext?:s job_profile_id?:id job_profile_name?:s position_id?:id position_title?:s org_unit_id?:id org_unit_name?:s site_id?:id site_name?:s cost_center_id?:id cost_center_name?:s manager_employment_id?:id manager_name?:s work_modality?:e(onsite|remote|hybrid) labor_regime_code?:s contract_type_id?:id contract_end_date?:d base_salary!?:m termination?:j other_employments?:ao allowed_actions?:a version?:i", "LCRU", "activate suspend terminate cancel-termination"),
@@ -456,7 +456,8 @@ EXTRA = [
     ("CFG", 0, "get", "/legal-entities/{id}/logo", "org.legal_entities.view", "Logo de la empresa (imagen PNG, JPEG o WebP); 404 si no tiene", False),
     ("CFG", 0, "post", "/legal-entities/{id}/logo", "org.legal_entities.update", "Subir o reemplazar el logo de la empresa (multipart, campo file; PNG, JPEG o WebP de hasta 1 MB)", False),
     ("CFG", 0, "delete", "/legal-entities/{id}/logo", "org.legal_entities.update", "Quitar el logo de la empresa", False),
-    ("CFG", 0, "get", "/exchange-rates/convert", "settings.exchange_rates.view", "Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha (indica el tipo aplicado)", False),
+    ("CFG", 0, "get", "/exchange-rates/convert", "settings.exchange_rates.view", "Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha: indica el tipo aplicado, su fecha y si es referencial (RN-CFG-07: sin tipo del mismo día se usa el último anterior, o se rechaza si org.tipo_cambio_faltante = block)", False),
+    ("CFG", 0, "post", "/exchange-rates/import", "settings.exchange_rates.create", "Traer de la fuente de tipos de cambio (puerto con implementación falsa en desarrollo) los tipos de una fecha y publicarlos con su fuente; por defecto los pares registrados y los de cada empresa con otra moneda. Lo ya publicado se omite: repetirla no duplica", False),
     ("CFG", 0, "get", "/catalogs", "-", "Catálogos maestros y de la organización (CFG-10): código, nombre, si la organización puede extenderlo y cantidad de elementos", False),
     ("CFG", 0, "post", "/catalogs", "settings.catalogs.update", "Crear un catálogo propio de la organización (tipos, motivos, categorías)", False),
     ("CFG", 0, "get", "/catalogs/{code}/items", "-", "Elementos de un catálogo con código estable y código oficial, etiqueta en el idioma del usuario y vigencia; ?as_of= y ?include_archived=1. Une los del catálogo maestro con los propios de la organización", False),
@@ -476,7 +477,8 @@ EXTRA = [
     ("ORG", 1, "get", "/org-chart", "people.directory.view", "Organigrama a una fecha (ORG-6): view=units dibuja el árbol de unidades con su responsable y dotación; view=people, la línea de reporte (jefe directo por asignación o por posición jefe). Solo nombre, puesto, unidad, sede y el contacto laboral que la organización publica", False),
     ("ORG", 1, "get", "/job-profiles/{id}/versions", "org.job_profiles.view", "Versiones de la descripción del puesto (misión, funciones y requisitos), de la más reciente a la más antigua; inalterables (ORG-5)", False),
     ("ORG", 1, "get", "/legal-entities/{id}/regimes", "org.legal_entities.view", "Historia del régimen laboral de la empresa con su vigencia (valid_from / valid_to), de la más reciente a la más antigua (ORG-1)", False),
-    ("POS", 1, "get", "/headcount", "org.positions.view", "Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas", False),
+    ("POS", 1, "get", "/headcount", "org.positions.view", "Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas. Con report_currency (y org.positions.budget.view) agrega totals.consolidated: los costos de todas las monedas convertidos a esa moneda con el tipo de cambio de la fecha, indicando cada tipo aplicado (CFG-7)", False),
+    ("POS", 1, "get", "/positions/org-chart", "org.positions.view", "Organigrama por posiciones a una fecha (POS-7): cada plaza con su estado (ocupada, vacante, en reclutamiento, congelada), ocupantes y, por rama, plazas ocupadas sobre aprobadas; el costo proyectado de la rama solo con org.positions.budget.view", False),
     ("ORG", 1, "get", "/directory", "people.directory.view", "Directorio de personas (ORG-7): búsqueda por nombre, puesto, unidad y sede; solo nombre, puesto, unidad, sede y el contacto laboral publicado por la organización (RN-ORG-08), nunca datos personales ni sensibles", False),
     ("ORG", 1, "get", "/directory/{employment_id}", "people.directory.view", "Tarjeta de contacto (ORG-7) con su equipo: jefe directo, compañeros con el mismo jefe y reportes directos", False),
     ("HIS", 1, "get", "/employments/{employment_id}/timeline", "people.employments.view", "Línea de tiempo de la relación laboral", False),
@@ -691,6 +693,12 @@ QUERY = {
         _q("as_of", "Fecha (AAAA-MM-DD) de la dotación; por defecto hoy", False, "date"),
         _q("legal_entity_id", "Solo esa empresa"),
         _q("org_unit_id", "Solo esa unidad y sus subunidades"),
+        _q("report_currency", "Moneda ISO 4217 del consolidado de costos (CFG-7)"),
+    ],
+    ("get", "/positions/org-chart"): [
+        _q("as_of", "Fecha (AAAA-MM-DD); por defecto hoy", False, "date"),
+        _q("legal_entity_id", "Solo esa empresa"),
+        _q("org_unit_id", "Solo las posiciones de esa unidad y sus subunidades"),
     ],
     ("get", "/headcount/positions"): [
         _q("org_unit_id", "Unidad cuyas posiciones se explican", True),
@@ -827,8 +835,13 @@ ERRS = {
     "400": ref("responses/BadRequest"), "401": ref("responses/Unauthorized"),
     "403": ref("responses/Forbidden"), "404": ref("responses/NotFound"),
     "409": ref("responses/Conflict"), "422": ref("responses/Unprocessable"),
-    "429": ref("responses/TooManyRequests"),
+    "429": ref("responses/TooManyRequests"), "503": ref("responses/UpstreamUnavailable"),
 }
+
+# Consultas que pueden responder 422 por una regla de negocio (CFG-7: falta el tipo de cambio).
+GET_RULES = {("get", "/exchange-rates/convert"), ("get", "/headcount")}
+# Operaciones que dependen de un proveedor externo por su puerto (503 upstream_unavailable).
+UPSTREAM = {("post", "/exchange-rates/import")}
 
 
 def errs(*codes):
@@ -966,6 +979,10 @@ def build():
         if (method, path) in QUERY:
             op["parameters"] = QUERY[(method, path)]
             res.update(errs("400"))
+        if (method, path) in GET_RULES:
+            res.update(errs("422"))
+        if (method, path) in UPSTREAM:
+            res.update(errs("503"))
         if method in ("post", "put", "patch"):
             op["requestBody"] = body(ref("schemas/GenericInput"))
             if method == "post":
@@ -1083,6 +1100,7 @@ def build():
                 "Conflict": err_resp("Conflicto: transición inválida, versión desactualizada o duplicado"),
                 "Unprocessable": err_resp("Validación de datos o regla de negocio"),
                 "TooManyRequests": err_resp("Límite de solicitudes superado"),
+                "UpstreamUnavailable": err_resp("Un servicio externo requerido no responde (upstream_unavailable)"),
             },
             "schemas": {
                 "Error": {"type": "object", "required": ["error"], "properties": {"error": {

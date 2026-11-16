@@ -361,12 +361,12 @@
   changed_by_user_id ?-> users ; uniq job_profile_id, version
 
 #E POS | Posiciones y headcount
-@positions main soft lock | Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza.
+@positions main soft lock | Posición o plaza presupuestada (C-02): una silla concreta con puesto de catálogo, unidad, sede, centro de costo, posición jefe y banda de referencia (POS-1). Admite un ocupante, o tantos como seats si es compartida (RN-POS-02). Ocupada o vacante se deriva de las asignaciones vigentes (POS-2). valid_from / valid_to: vigencia de la plaza. is_implicit: la creó el sistema al registrar un ingreso sin posición con la política «contratar solo contra posición» desactivada (POS-6).
   code ; title ; job_profile_id -> job_profiles ; org_unit_id -> org_units ; site_id ?-> sites
   legal_entity_id -> legal_entities ; reports_to_position_id ?-> positions ; cost_center_id ?-> cost_centers
   salary_band_id ?-> salary_bands
   status enum(proposed,approved,open,filled,frozen,closed,recruiting)=proposed ; is_critical ; fte numeric(4,2)=1
-  is_shared ; seats smallint=1 ; valid_from date=today ; valid_to date
+  is_shared ; seats smallint=1 ; is_implicit bool=f ; valid_from date=today ; valid_to date
   budgeted_from date ; budgeted_to date ; budgeted_cost money #S ; currency cur?
   headcount_plan_line_id ?-> headcount_plan_lines ; position_request_id ?-> position_requests ; uniq code
   check seats >= 1 AND (is_shared OR seats = 1)

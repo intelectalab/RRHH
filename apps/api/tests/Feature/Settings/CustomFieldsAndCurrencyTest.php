@@ -7,7 +7,10 @@
 use App\Modules\Identity\Infrastructure\Models\Role;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Shared\Integrations\Fake\FakeExchangeRatesAdapter;
+use App\Shared\Integrations\IntegrationManager;
 use App\Shared\Permissions\PermissionResolver;
+use App\Shared\Settings\ParameterResolver;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -151,6 +154,50 @@ test('tipos de cambio con fecha: la conversión indica el tipo aplicado y no alt
     $list = cfCall($this->admin, 'GET', '/exchange-rates');
     $list->assertOk()->assertJsonPath('data.0.valid_on', '2026-11-01');
     $this->assertMatchesOpenApi($list, 'get', '/exchange-rates', 200);
+});
+
+test('RN-CFG-07 · sin tipo del mismo día se usa el último anterior como referencial, o se bloquea según el parámetro', function (): void {
+    cfCall($this->admin, 'POST', '/exchange-rates', ['from_currency' => 'USD', 'to_currency' => 'PEN', 'rate' => '3.75', 'valid_on' => '2026-10-01', 'source' => 'SBS'])->assertCreated();
+    $same = cfCall($this->admin, 'GET', '/exchange-rates/convert?amount=10&from=USD&to=PEN&date=2026-10-01');
+    $same->assertOk()->assertJsonPath('data.referential', false);
+    $later = cfCall($this->admin, 'GET', '/exchange-rates/convert?amount=10&from=USD&to=PEN&date=2026-10-05');
+    $later->assertOk()->assertJsonPath('data.referential', true)->assertJsonPath('data.rate_date', '2026-10-01');
+    $this->assertMatchesOpenApi($later, 'get', '/exchange-rates/convert', 200);
+
+    TenancyScope::runAs(CF_TENANT, fn () => app(ParameterResolver::class)->set('org.tipo_cambio_faltante', 'block', 'organization', null, null, 'Solo tipos del día'));
+    $blocked = cfCall($this->admin, 'GET', '/exchange-rates/convert?amount=10&from=USD&to=PEN&date=2026-10-05');
+    $this->assertMatchesOpenApi($blocked, 'get', '/exchange-rates/convert', 422);
+    cfCall($this->admin, 'GET', '/exchange-rates/convert?amount=10&from=USD&to=PEN&date=2026-10-01')->assertOk();
+});
+
+test('CFG-7 · los tipos del día se importan por el puerto (falso en pruebas) sin duplicar ni tocar lo publicado', function (): void {
+    $fake = new FakeExchangeRatesAdapter;
+    $fake->fix('USD', 'PEN', '2026-11-02', '3.7612');
+    $fake->fix('EUR', 'PEN', '2026-11-02', null);
+    app(IntegrationManager::class)->setExchangeRatesAdapter($fake);
+    cfCall($this->admin, 'POST', '/exchange-rates', ['from_currency' => 'USD', 'to_currency' => 'EUR', 'rate' => '0.91', 'valid_on' => '2026-11-02', 'source' => 'Manual'])->assertCreated();
+
+    $body = ['date' => '2026-11-02', 'pairs' => [['from_currency' => 'USD', 'to_currency' => 'PEN'], ['from_currency' => 'EUR', 'to_currency' => 'PEN'], ['from_currency' => 'USD', 'to_currency' => 'EUR']]];
+    $first = cfCall($this->admin, 'POST', '/exchange-rates/import', $body);
+    $this->assertMatchesOpenApi($first, 'post', '/exchange-rates/import', 200);
+    expect($first->json('data.imported'))->toHaveCount(1)
+        ->and($first->json('data.imported.0'))->toMatchArray(['from_currency' => 'USD', 'to_currency' => 'PEN', 'rate' => '3.7612', 'valid_on' => '2026-11-02'])
+        ->and(collect($first->json('data.skipped'))->pluck('reason', 'from_currency')->all())->toBe(['EUR' => 'not_published', 'USD' => 'already_published'])
+        ->and($first->json('data.is_fake'))->toBeTrue();
+    TenancyScope::runAs(CF_TENANT, function (): void {
+        expect(DB::table('exchange_rates')->where('from_currency', 'USD')->where('to_currency', 'EUR')->value('rate'))->toStartWith('0.91');
+        expect(DB::table('audit_events')->where('action', 'exchange_rate.created')->count())->toBe(2);
+    });
+
+    // Repetir no duplica; un fallo de la fuente responde 503 y no deja nada a medias.
+    cfCall($this->admin, 'POST', '/exchange-rates/import', $body)->assertOk()->assertJsonPath('data.imported', []);
+    $fake->failNext(new RuntimeException('caída'));
+    $down = cfCall($this->admin, 'POST', '/exchange-rates/import', ['date' => '2026-11-03', 'pairs' => [['from_currency' => 'USD', 'to_currency' => 'PEN']]]);
+    $this->assertMatchesOpenApi($down, 'post', '/exchange-rates/import', 503);
+    TenancyScope::runAs(CF_TENANT, fn () => expect(DB::table('exchange_rates')->where('rate_date', '2026-11-03')->count())->toBe(0));
+
+    $this->assertMatchesOpenApi(cfCall($this->admin, 'POST', '/exchange-rates/import', ['date' => 'mañana']), 'post', '/exchange-rates/import', 422);
+    $this->assertMatchesOpenApi(cfCall(cfUser('empleado'), 'POST', '/exchange-rates/import', ['date' => '2026-11-02']), 'post', '/exchange-rates/import', 403);
 });
 
 test('ningún monto del esquema se guarda sin su moneda', function (): void {

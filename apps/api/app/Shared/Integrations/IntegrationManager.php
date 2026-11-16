@@ -8,6 +8,7 @@ use App\Shared\Integrations\Fake\FakeAiAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
 use App\Shared\Integrations\Fake\FakeBiometricAdapter;
 use App\Shared\Integrations\Fake\FakeEmailAdapter;
+use App\Shared\Integrations\Fake\FakeExchangeRatesAdapter;
 use App\Shared\Integrations\Fake\FakeMessagingAdapter;
 use App\Shared\Integrations\Fake\FakeSignatureAdapter;
 use App\Shared\Integrations\Logging\IntegrationCallRecorder;
@@ -15,6 +16,7 @@ use App\Shared\Integrations\Ports\AiPort;
 use App\Shared\Integrations\Ports\BankingPort;
 use App\Shared\Integrations\Ports\BiometricPort;
 use App\Shared\Integrations\Ports\EmailPort;
+use App\Shared\Integrations\Ports\ExchangeRatesPort;
 use App\Shared\Integrations\Ports\MessagingPort;
 use App\Shared\Integrations\Ports\SignaturePort;
 use RuntimeException;
@@ -35,6 +37,8 @@ final class IntegrationManager
     private ?BiometricPort $biometricAdapter = null;
 
     private ?AiPort $aiAdapter = null;
+
+    private ?ExchangeRatesPort $exchangeRatesAdapter = null;
 
     public function __construct(
         private readonly IntegrationCallRecorder $recorder,
@@ -160,6 +164,22 @@ final class IntegrationManager
         throw new RuntimeException('No live AI provider configured for production.');
     }
 
+    /** CFG-7 · Fuente de tipos de cambio (sin proveedor real configurado: la falsa fuera de producción). */
+    public function exchangeRates(): ExchangeRatesPort
+    {
+        if ($this->exchangeRatesAdapter !== null) {
+            return $this->exchangeRatesAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->exchangeRatesAdapter = new FakeExchangeRatesAdapter($this->recorder);
+
+            return $this->exchangeRatesAdapter;
+        }
+
+        throw new RuntimeException('No live Exchange rates provider configured for production.');
+    }
+
     /** Desarrollo local: correo y mensajes al buzón de pruebas (config integrations.dev_inbox). */
     private function devInbox(): bool
     {
@@ -194,5 +214,10 @@ final class IntegrationManager
     public function setAiAdapter(AiPort $adapter): void
     {
         $this->aiAdapter = $adapter;
+    }
+
+    public function setExchangeRatesAdapter(ExchangeRatesPort $adapter): void
+    {
+        $this->exchangeRatesAdapter = $adapter;
     }
 }
