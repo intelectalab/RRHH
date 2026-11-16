@@ -6,8 +6,8 @@ Actualizado el **2026-11-16** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 132 | 0 | 54,8 % |
-| Backlog completo | 512 | 132 | 0 | 25,8 % |
+| Primer corte comercial (MVP) | 241 | 138 | 0 | 57,3 % |
+| Backlog completo | 512 | 138 | 0 | 27,0 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -170,9 +170,9 @@ Actualizado el **2026-11-16** con `python3 scripts/gen_avance.py` desde `kit/bac
 | MSS-4 | Fechas clave y alertas del equipo | MSS | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Fechas clave del equipo (cumpleaños solo día, aniversarios, fin de prueba y de contrato) con registro de accesos; recordatorio diario al jefe según parámetro; cumpleaños desactivables por la organización. |
 | IMP-1 | Motor de importación | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-11 | Motor por pasos: CSV (detecta separador y codificación) o Excel, mapeo propuesto y guardable, validación con vista previa sin escribir (RN-IMP-01), política de errores por parámetro (RN-IMP-02), columnas sensibles ignoradas sin permiso (RN-IMP-04), aviso de archivo repetido (RN-IMP-08), importación en segundo plano por lotes transaccionales, deshacer con bloqueos explicados (RN-IMP-07) y descarga de filas con error; primer importador: empresas; pantalla Configuración → Importar datos. Pendiente: importadores de Core HR (IMP-2), crear faltantes (RN-IMP-03) e históricos (RN-IMP-05). |
 | IMP-2 | Importadores de Core HR | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| IMP-3 | Asistente de primeros pasos | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| IMP-4 | Plantillas peruanas listas para usar | IMP | Fase 1 · Core HR | Task | sí | pendiente | — |  |
-| IMP-5 | Organización demo coherente | IMP | Fase 1 · Core HR | Task | sí | pendiente | — |  |
+| IMP-3 | Asistente de primeros pasos | IMP | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Primeros pasos con los pasos de los módulos contratados; cada paso abre la pantalla real y se marca hecho solo cuando existe el dato; omitir/retomar y avance guardado. |
+| IMP-4 | Plantillas peruanas listas para usar | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Paquete Perú pe-base 1.0.0 versionado: tipos de contrato, ausencias y licencias, feriados, constancias, políticas de vacaciones, motivos de cese y roles; aplica solo lo que falta sin pisar lo editado. |
+| IMP-5 | Organización demo coherente | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Demo con fechas relativas: 6 unidades, 22 ingresos con jefes, contratos y sueldos de ejemplo, vencimientos, vacaciones, ausencia en curso, promoción en flujo y una renuncia; idempotente. |
 | IMP-6 | Informe y reversión de importaciones | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | IMP-7 | Importadores desde otros sistemas de RRHH y planilla | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
 | AYU-1 | Contenido de ayuda del producto con versiones | AYU | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Ayuda del producto en la consola con versiones inmutables por idioma, módulo, roles y pantallas; 44 artículos es/en/pt cargados por migración y help:sync-bundled sin pisar lo editado. |
