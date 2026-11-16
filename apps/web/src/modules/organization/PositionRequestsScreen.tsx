@@ -15,6 +15,7 @@ import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { orgTabs } from './orgTabs'
+import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 
 type Money = { amount: string; currency: string }
 type Approval = { id: string; status: string; level: number | null; pending_approvers: string[] }
@@ -69,6 +70,7 @@ export function PositionRequestsScreen() {
   const [options, setOptions] = useState<Options | null>(null)
   const [reloadKey, setReloadKey] = useState(0)
   const [editing, setEditing] = useState<PositionRequest | 'new' | null>(null)
+  useQuickCreateRequest('position_request', () => setEditing('new'), can('org.position_requests.create') && options !== null)
   const [detail, setDetail] = useState<string | null>(null)
   const reload = () => setReloadKey((k) => k + 1)
 

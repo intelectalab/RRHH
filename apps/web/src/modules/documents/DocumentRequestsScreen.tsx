@@ -17,6 +17,7 @@ import { StatusBadge } from '@/ui/components/Status'
 import { useToast } from '@/ui/components/Toast'
 import type { DocumentFolder } from './documents'
 import { REQUEST_TONE, type DocumentRequestRow, type RequestStatus } from './templates'
+import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 
 type EmploymentOption = { id: string; person_name?: string | null; employee_code?: string | null; legal_entity_id?: string; legal_entity_name?: string | null }
 type RequestForm = { category_id: string; mode: 'people' | 'company'; employment_ids: string[]; legal_entity_id: string; title: string; instructions: string; due_on: string }
@@ -36,6 +37,8 @@ export function DocumentRequestsScreen() {
   const [employments, setEmployments] = useState<EmploymentOption[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [general, setGeneral] = useState<string | null>(null)
+  const startRequest = () => { setErrors({}); setGeneral(null); setForm({ category_id: '', mode: 'people', employment_ids: [], legal_entity_id: '', title: '', instructions: '', due_on: '' }) }
+  useQuickCreateRequest('document_request', startRequest, can('documents.documents.request'))
   const [busy, setBusy] = useState(false)
   const [reload, setReload] = useState(0)
 
@@ -100,7 +103,7 @@ export function DocumentRequestsScreen() {
       <PageHeader title={t('dreq.title')} sub={t('dreq.sub')} actions={<>
         {can('workflow.approval_requests.view') && <Link className="btn btn-sec" href="/aprobaciones">{t('dreq.to_approvals')}</Link>}
         {can('documents.documents.request') && (
-          <button type="button" className="btn btn-primary" onClick={() => { setErrors({}); setGeneral(null); setForm({ category_id: '', mode: 'people', employment_ids: [], legal_entity_id: '', title: '', instructions: '', due_on: '' }) }}>
+          <button type="button" className="btn btn-primary" onClick={startRequest}>
             <Icon name="plus" /> {t('dreq.new')}
           </button>
         )}

@@ -14,6 +14,7 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { CustomFieldsEditor, useCustomFields, type CustomValues } from '@/modules/customfields/CustomFieldsEditor'
 import { notifyInboxChanged } from './shared'
+import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 
 type Task = Schema<'Task'> & { mine?: boolean; version?: number }
 type Option = { id: string; name: string }
@@ -33,6 +34,7 @@ export function TasksScreen() {
   const [rows, setRows] = useState<Task[] | null>(null)
   const [loadError, setLoadError] = useState(false)
   const [editing, setEditing] = useState<Task | 'new' | null>(null)
+  useQuickCreateRequest('task', () => setEditing('new'), can('workflow.tasks.create'))
 
   const load = useCallback(async () => {
     const q = new URLSearchParams({ per_page: '100' })

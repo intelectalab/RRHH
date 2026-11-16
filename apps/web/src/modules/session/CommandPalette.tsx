@@ -5,10 +5,12 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '@/lib/api'
 import { useT } from '@/lib/useT'
 import { Icon } from '@/ui/components/Icon'
+import { useOpenQuickCreate } from './QuickCreate'
+import { quickCreateOptions, type QuickCreateOption } from './quickCreateRegistry'
 import { useSession } from './SessionProvider'
 
 type Hit = { type: string; id: string; title: string; subtitle: string | null; href: string }
-type Item = { key: string; label: string; hint?: string; href: string; group: 'pages' | 'results' }
+type Item = { key: string; label: string; hint?: string; href: string; group: 'pages' | 'results' | 'create'; create?: QuickCreateOption }
 
 const PAGES: Array<{ key: string; href: string; permission?: string }> = [
   { key: 'palette.go_home', href: '/' },
@@ -21,11 +23,12 @@ const PAGES: Array<{ key: string; href: string; permission?: string }> = [
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
-/** Paleta de comandos y búsqueda global (UI-7). Ctrl/⌘ + K. Los resultados vienen filtrados por el servidor. */
+/** Paleta de comandos y búsqueda global (UI-7). Ctrl/⌘ + K. Los resultados vienen filtrados por el servidor; también ofrece crear (UI-8). */
 export function CommandPalette() {
   const { t } = useT()
-  const { can } = useSession()
+  const { session, can } = useSession()
   const router = useRouter()
+  const openCreate = useOpenQuickCreate()
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const [hits, setHits] = useState<Hit[]>([])
@@ -74,15 +77,20 @@ export function CommandPalette() {
       .map((p) => ({ key: p.href, label: t(p.key), href: p.href, group: 'pages' as const }))
       .filter((p) => term === '' || normalize(p.label).includes(term))
     const results = hits.map((h) => ({ key: `${h.type}:${h.id}`, label: h.title, hint: [t(`palette.type_${h.type}`), h.type === 'user' && h.subtitle ? t(`users.status_${h.subtitle}`) : h.subtitle].filter(Boolean).join(' · '), href: h.href, group: 'results' as const }))
-    return [...results, ...pages]
-  }, [q, hits, can, t])
+    // UI-8: las mismas opciones de «+ Crear» (módulo contratado y permiso).
+    const create = quickCreateOptions(session.modules, can)
+      .map((o) => ({ key: `create:${o.id}`, label: t(o.key), href: o.href, group: 'create' as const, create: o }))
+      .filter((o) => term === '' || normalize(o.label).includes(term))
+    return [...results, ...create, ...pages]
+  }, [q, hits, can, t, session.modules])
 
   useEffect(() => setActive(0), [items.length])
 
   function go(item: Item | undefined) {
     if (!item) return
     setOpen(false)
-    router.push(item.href)
+    if (item.create) openCreate(item.create)
+    else router.push(item.href)
   }
 
   function onKeyDown(e: React.KeyboardEvent) {

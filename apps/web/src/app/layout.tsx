@@ -3,6 +3,7 @@ import '@/ui/tokens.css'
 import '@/ui/base.css'
 import '@/ui/shell.css'
 import { themeBootScript } from '@/lib/theme'
+import { ServiceWorker } from '@/modules/pwa/ServiceWorker'
 
 export const metadata: Metadata = {
   title: 'GestiaHR',
@@ -26,7 +27,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ServiceWorker />
+      </body>
     </html>
   )
 }

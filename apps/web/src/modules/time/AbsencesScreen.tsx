@@ -11,6 +11,7 @@ import { EmptyState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 import { AbsenceDates, AbsenceDetailPanel, AbsenceFormPanel, AbsenceQuantity } from './AbsencePanels'
 import { ABSENCE_STATUSES, ABSENCE_TONE, type Absence } from './absences'
+import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 
 /**
  * Tiempo → Ausencias y permisos (AUS-2 · ME-16). El colaborador ve y pide las suyas, el jefe las de su
@@ -24,6 +25,7 @@ export function AbsencesScreen() {
   const { toast, node: toastNode } = useToast()
   const [reloadKey, setReloadKey] = useState(0)
   const [creating, setCreating] = useState(false)
+  useQuickCreateRequest('absence', () => setCreating(true), can('time.absences.create'))
   const [detail, setDetail] = useState<string | null>(null)
   const reload = () => setReloadKey((k) => k + 1)
 

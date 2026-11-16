@@ -143,7 +143,12 @@
     "modules_document_requests": "Document requests",
     "modules_document_templates": "Document templates",
     "modules_certificates": "Certificates",
-    "modules_hr_requests": "Requests to HR"
+    "modules_hr_requests": "Requests to HR",
+    "group_home": "Home",
+    "group_people": "People",
+    "group_time": "Time",
+    "offline": "Offline. Actions that need the network are unavailable until the connection returns.",
+    "install": "Install app"
   },
   "home": {
     "title": "Hello, {name}",
@@ -471,7 +476,8 @@
     "go_users": "Settings · Users",
     "go_roles": "Settings · Roles and permissions",
     "go_audit": "Settings · Audit",
-    "go_sensitive": "Settings · Sensitive access"
+    "go_sensitive": "Settings · Sensitive access",
+    "create": "Create"
   },
   "wtype": {
     "vacation_request": "Vacation",
@@ -4165,5 +4171,21 @@
     "tab_inbox": "Requests",
     "code": "Code",
     "name": "Name"
+  },
+  "quick": {
+    "button": "Create",
+    "open": "Create new",
+    "shortcut": "Create new (Alt + N)",
+    "employee": "Employee",
+    "position_request": "Position request",
+    "vacation_request": "Vacation request",
+    "absence": "Absence",
+    "document_request": "Document request",
+    "task": "Task"
+  },
+  "offline": {
+    "title": "Offline",
+    "body": "There is no internet connection. When it returns, reload the page to keep working.",
+    "retry": "Retry"
   }
 }

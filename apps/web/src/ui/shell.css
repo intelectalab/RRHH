@@ -830,3 +830,11 @@ button.portal-link { background: none; border: 0; padding: 0; text-align: start;
 .ticket-body { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .ticket-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 @media (max-width: 380px) { .portal-nav-i span { font-size: 10px; } }
+
+/* UI-2 · grupos de la barra lateral */
+.side-grupo { display: contents; }
+/* UI-8 · botón «+ Crear» de la barra superior */
+.qcreate-btn { gap: 6px; white-space: nowrap; }
+@media (max-width: 1199px) { .qcreate-btn { width: 40px; height: 40px; padding: 0; justify-content: center; } .qcreate-t { display: none; } }
+/* UI-9 · aviso sin conexión */
+.offline-aviso { background: var(--oc-50); color: var(--tx); border-bottom: 1px solid var(--bd); padding: 8px 16px; font-size: var(--fs-s); }

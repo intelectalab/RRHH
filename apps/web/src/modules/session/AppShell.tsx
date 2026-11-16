@@ -14,6 +14,8 @@ import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { InboxButton, useInboxCount } from './InboxButton'
+import { QuickCreate } from './QuickCreate'
+import { useInstallPrompt, useOnline } from '@/modules/pwa/pwa'
 import { NotificationBell } from '@/modules/notifications/NotificationBell'
 import { SessionProvider, useSession } from './SessionProvider'
 import { ShellTitleProvider, useShellTitle } from './ShellTitle'
@@ -21,28 +23,32 @@ import { ShellTitleProvider, useShellTitle } from './ShellTitle'
 type IconName = Parameters<typeof Icon>[0]['name']
 
 /** module: código del módulo contratado (tenant_modules); visible: permisos que lo habilitan. */
-type NavLink = { href: string; key: string; icon: IconName; module: string; visible: (can: (p: string) => boolean) => boolean; count?: 'approval' | 'task'; exact?: boolean }
+type NavGroup = 'home' | 'people' | 'time'
+type NavLink = { href: string; key: string; group: NavGroup; icon: IconName; module: string; visible: (can: (p: string) => boolean) => boolean; count?: 'approval' | 'task'; exact?: boolean }
+
+/** UI-2 · Grupos de la barra lateral en el orden de docs/10 §4 (se agregan a medida que existen pantallas). */
+const GROUPS: NavGroup[] = ['home', 'people', 'time']
 
 /** Menú principal (docs/10 §3.12 y §4). Se agregan entradas a medida que existen pantallas (sin botones sin función). */
 const MENU: NavLink[] = [
-  { href: '/', key: 'shell.modules_home', icon: 'home', module: 'base', visible: () => true },
-  { href: '/mi', key: 'shell.modules_portal', icon: 'user', module: 'core', visible: (can) => can('people.employments.view') },
-  { href: '/organizacion/empresas', key: 'shell.modules_org', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
-  { href: '/mi-equipo', key: 'shell.modules_my_team', icon: 'users', module: 'core', visible: (can) => can('people.team.view') },
-  { href: '/personas/colaboradores', key: 'shell.modules_employees', icon: 'user', module: 'core', visible: (can) => can('people.employments.view'), exact: true },
-  { href: '/personas/directorio', key: 'shell.modules_directory', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
-  { href: '/personas/organigrama', key: 'shell.modules_org_chart', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
-  { href: '/aprobaciones', key: 'shell.modules_approvals', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
-  { href: '/tareas', key: 'shell.modules_tasks', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
-  { href: '/documentos/vencimientos', key: 'shell.modules_documents', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
-  { href: '/documentos/solicitudes', key: 'shell.modules_document_requests', icon: 'inbox', module: 'core', visible: (can) => can('documents.documents.request') },
-  { href: '/documentos/plantillas', key: 'shell.modules_document_templates', icon: 'file', module: 'core', visible: (can) => can('documents.templates.view') },
-  { href: '/personas/constancias', key: 'shell.modules_certificates', icon: 'file', module: 'core', visible: (can) => can('people.certificates.issue') },
-  { href: '/personas/solicitudes', key: 'shell.modules_hr_requests', icon: 'inbox', module: 'core', visible: (can) => can('helpdesk.tickets.update') },
-  { href: '/calendario', key: 'shell.modules_calendar', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
-  { href: '/tiempo/ausencias', key: 'shell.modules_absences', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
-  { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
-  { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
+  { href: '/', key: 'shell.modules_home', group: 'home', icon: 'home', module: 'base', visible: () => true },
+  { href: '/mi', key: 'shell.modules_portal', group: 'home', icon: 'user', module: 'core', visible: (can) => can('people.employments.view') },
+  { href: '/organizacion/empresas', key: 'shell.modules_org', group: 'people', icon: 'building', module: 'base', visible: (can) => can('org.legal_entities.view') },
+  { href: '/mi-equipo', key: 'shell.modules_my_team', group: 'people', icon: 'users', module: 'core', visible: (can) => can('people.team.view') },
+  { href: '/personas/colaboradores', key: 'shell.modules_employees', group: 'people', icon: 'user', module: 'core', visible: (can) => can('people.employments.view'), exact: true },
+  { href: '/personas/directorio', key: 'shell.modules_directory', group: 'people', icon: 'users', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
+  { href: '/personas/organigrama', key: 'shell.modules_org_chart', group: 'people', icon: 'orgChart', module: 'core', visible: (can) => can('people.directory.view'), exact: true },
+  { href: '/aprobaciones', key: 'shell.modules_approvals', group: 'home', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
+  { href: '/tareas', key: 'shell.modules_tasks', group: 'home', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
+  { href: '/documentos/vencimientos', key: 'shell.modules_documents', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
+  { href: '/documentos/solicitudes', key: 'shell.modules_document_requests', group: 'people', icon: 'inbox', module: 'core', visible: (can) => can('documents.documents.request') },
+  { href: '/documentos/plantillas', key: 'shell.modules_document_templates', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.templates.view') },
+  { href: '/personas/constancias', key: 'shell.modules_certificates', group: 'people', icon: 'file', module: 'core', visible: (can) => can('people.certificates.issue') },
+  { href: '/personas/solicitudes', key: 'shell.modules_hr_requests', group: 'people', icon: 'inbox', module: 'core', visible: (can) => can('helpdesk.tickets.update') },
+  { href: '/calendario', key: 'shell.modules_calendar', group: 'time', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
+  { href: '/tiempo/ausencias', key: 'shell.modules_absences', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
+  { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
+  { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
 ]
 
 const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'settings.organization.view']
@@ -65,6 +71,8 @@ function Shell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeChoice>('system')
   const menuRef = useRef<HTMLDivElement>(null)
   const inbox = useInboxCount()
+  const online = useOnline()
+  const { install } = useInstallPrompt()
 
   useEffect(() => {
     setTheme(storedTheme())
@@ -116,6 +124,9 @@ function Shell({ children }: { children: ReactNode }) {
   const visibleModules = [...session.modules, ...(session.modules_read_only ?? [])]
   const items = MENU.filter((m) => visibleModules.includes(m.module) && m.visible(can))
   const showSettings = session.modules.includes('base') && SETTINGS_PERMS.some((p) => can(p))
+  // Miga de pan: organización · grupo de la pantalla abierta (en el inicio, el rol).
+  const current = items.filter((m) => m.href !== '/' && active(m.href, m.exact)).sort((a, b) => b.href.length - a.href.length)[0]
+  const crumb = [session.tenant?.name, current ? t(`shell.group_${current.group}`) : role].filter(Boolean).join(' · ')
 
   const navLink = (href: string, label: string, icon: IconName, count = 0, exact = false) => (
     <Link key={href} href={href} className={`nav${active(href, exact) ? ' on' : ''}`} aria-current={active(href, exact) ? 'page' : undefined} title={min ? label : undefined}>
@@ -149,8 +160,16 @@ function Shell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="side-nav">
-          <div className="side-sec">{t('shell.menu_section')}</div>
-          {items.map((m) => navLink(m.href, t(m.key), m.icon, m.count ? (inbox?.[m.count] ?? 0) : 0, m.exact))}
+          {GROUPS.map((g) => {
+            const inGroup = items.filter((m) => m.group === g)
+            if (inGroup.length === 0) return null
+            return (
+              <div key={g} className="side-grupo" role="group" aria-labelledby={`side-g-${g}`}>
+                <div className="side-sec" id={`side-g-${g}`}>{t(`shell.group_${g}`)}</div>
+                {inGroup.map((m) => navLink(m.href, t(m.key), m.icon, m.count ? (inbox?.[m.count] ?? 0) : 0, m.exact))}
+              </div>
+            )
+          })}
         </nav>
         <div className="side-foot">
           <div className="side-sec">{t('shell.account_section')}</div>
@@ -170,10 +189,11 @@ function Shell({ children }: { children: ReactNode }) {
             <Icon name="menu" />
           </button>
           <div className="top-t">
-            <span className="crumb">{[session.tenant?.name, role].filter(Boolean).join(' · ')}</span>
+            <span className="crumb">{crumb}</span>
             {title && <h1 className="ttl">{title}</h1>}
           </div>
           <CommandPalette />
+          <QuickCreate />
           <CompanySelector />
           <InboxButton counts={inbox} />
           <NotificationBell />
@@ -213,6 +233,11 @@ function Shell({ children }: { children: ReactNode }) {
                 <Link href="/cuenta/notificaciones" className="menu-item" role="menuitem" onClick={() => setUserOpen(false)}>
                   <Icon name="bell" /> {t('shell.my_notifications')}
                 </Link>
+                {install && (
+                  <button type="button" className="menu-item" role="menuitem" onClick={() => { setUserOpen(false); void install() }}>
+                    <Icon name="download" /> {t('shell.install')}
+                  </button>
+                )}
                 <button type="button" className="menu-item" role="menuitem" onClick={() => void logout()}>
                   <Icon name="signOut" /> {t('shell.logout')}
                 </button>
@@ -220,6 +245,7 @@ function Shell({ children }: { children: ReactNode }) {
             )}
           </div>
         </header>
+        {!online && <div className="offline-aviso" role="status">{t('shell.offline')}</div>}
         <div className="app-content">{children}</div>
       </div>
     </div>

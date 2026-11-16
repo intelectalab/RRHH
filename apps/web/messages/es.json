@@ -143,7 +143,12 @@
     "modules_document_requests": "Solicitudes de documentos",
     "modules_document_templates": "Plantillas de documentos",
     "modules_certificates": "Constancias",
-    "modules_hr_requests": "Solicitudes a RRHH"
+    "modules_hr_requests": "Solicitudes a RRHH",
+    "group_home": "Inicio",
+    "group_people": "Personas",
+    "group_time": "Tiempo",
+    "offline": "Sin conexión. Las acciones que necesitan la red no estarán disponibles hasta que vuelva.",
+    "install": "Instalar aplicación"
   },
   "home": {
     "title": "Hola, {name}",
@@ -471,7 +476,8 @@
     "go_users": "Configuración · Usuarios",
     "go_roles": "Configuración · Roles y permisos",
     "go_audit": "Configuración · Auditoría",
-    "go_sensitive": "Configuración · Accesos sensibles"
+    "go_sensitive": "Configuración · Accesos sensibles",
+    "create": "Crear"
   },
   "wtype": {
     "vacation_request": "Vacaciones",
@@ -4165,5 +4171,21 @@
     "tab_inbox": "Solicitudes",
     "code": "Código",
     "name": "Nombre"
+  },
+  "quick": {
+    "button": "Crear",
+    "open": "Crear nuevo",
+    "shortcut": "Crear nuevo (Alt + N)",
+    "employee": "Colaborador",
+    "position_request": "Solicitud de posición",
+    "vacation_request": "Solicitud de vacaciones",
+    "absence": "Ausencia",
+    "document_request": "Solicitud de documentos",
+    "task": "Tarea"
+  },
+  "offline": {
+    "title": "Sin conexión",
+    "body": "No hay conexión a internet. Cuando vuelva, recarga la página para seguir trabajando.",
+    "retry": "Reintentar"
   }
 }

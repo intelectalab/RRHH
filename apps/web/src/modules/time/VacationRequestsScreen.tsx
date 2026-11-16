@@ -14,6 +14,7 @@ import { useToast } from '@/ui/components/Toast'
 import { TeamCalendarView } from './TeamCalendarView'
 import { VacationDates, VacationRequestDetailPanel, VacationRequestFormPanel } from './VacationRequestPanels'
 import { VACATION_REQUEST_STATUSES, VACATION_TONE, type VacationRequest } from './vacationRequests'
+import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 
 /**
  * Tiempo → Vacaciones (VAC-3 · ME-15 y VAC-4). Solicitudes: el colaborador ve y pide las suyas, el jefe
@@ -29,6 +30,7 @@ export function VacationRequestsScreen() {
   const [tab, setTab] = useState('requests')
   const [reloadKey, setReloadKey] = useState(0)
   const [creating, setCreating] = useState(false)
+  useQuickCreateRequest('vacation_request', () => setCreating(true), can('time.vacation_requests.create'))
   const [detail, setDetail] = useState<string | null>(null)
   const reload = () => setReloadKey((k) => k + 1)
 

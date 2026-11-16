@@ -2,6 +2,7 @@
   "name": "GestiaHR",
   "short_name": "GestiaHR",
   "description": "Gestión de personas",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
