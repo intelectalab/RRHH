@@ -15,6 +15,7 @@ import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { InboxButton, useInboxCount } from './InboxButton'
 import { QuickCreate } from './QuickCreate'
+import { HelpButton, HelpProvider } from '@/modules/help/HelpCenter'
 import { useInstallPrompt, useOnline } from '@/modules/pwa/pwa'
 import { NotificationBell } from '@/modules/notifications/NotificationBell'
 import { SessionProvider, useSession } from './SessionProvider'
@@ -137,6 +138,7 @@ function Shell({ children }: { children: ReactNode }) {
   )
 
   return (
+    <HelpProvider>
     <div className={`app${min ? ' min' : ''}${drawer ? ' sopen' : ''}`}>
       <a href="#contenido" className="saltar">{t('shell.skip')}</a>
       <aside className="side" id="menu-principal" aria-label={t('shell.modules')}>
@@ -197,6 +199,7 @@ function Shell({ children }: { children: ReactNode }) {
           <CompanySelector />
           <InboxButton counts={inbox} />
           <NotificationBell />
+          <HelpButton />
           <div className="menu" ref={menuRef}>
             <button type="button" className="userbtn" onClick={() => setUserOpen((v) => !v)} aria-expanded={userOpen} aria-haspopup="menu" aria-label={t('shell.account', { name: session.user.display_name })}>
               <span className="av" aria-hidden="true">{initials(session.user.display_name)}</span>
@@ -249,6 +252,7 @@ function Shell({ children }: { children: ReactNode }) {
         <div className="app-content">{children}</div>
       </div>
     </div>
+    </HelpProvider>
   )
 }
 

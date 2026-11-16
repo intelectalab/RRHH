@@ -1707,7 +1707,51 @@
     "plan_fit_over_title": "O consumo passa dos limites desse plano",
     "plan_fit_over": "A mudança é permitida, mas novos cadastros ficarão bloqueados até regularizar: {metrics}.",
     "plan_fit_item": "{metric} {current} de {limit}",
-    "plan_fit_ok": "O consumo atual cabe nos limites desse plano."
+    "plan_fit_ok": "O consumo atual cabe nos limites desse plano.",
+    "tab_help": "Ajuda do produto",
+    "help_title": "Ajuda do produto",
+    "help_sub": "Artigos por módulo, perfil e tela em cada idioma. Publicar cria uma nova versão e mantém as anteriores.",
+    "help_new": "Novo artigo",
+    "help_edit": "Editar artigo",
+    "help_search": "Buscar por título ou identificador",
+    "help_all_status": "Todos os status",
+    "help_all_locales": "Todos os idiomas",
+    "help_empty_title": "Sem artigos",
+    "help_empty": "Crie o primeiro artigo de ajuda ou ajuste os filtros.",
+    "help_article": "Título",
+    "help_kind": "Tipo",
+    "help_module": "Módulo",
+    "help_version": "Versão",
+    "help_version_n": "v{n} · produto {product}",
+    "help_unpublished": "Com alterações não publicadas",
+    "help_slug": "Identificador (igual em todos os idiomas)",
+    "help_locale": "Idioma",
+    "help_product_version": "Versão do produto",
+    "help_summary": "Resumo",
+    "help_body": "Texto",
+    "help_body_help": "Parágrafos separados por uma linha em branco; as linhas que começam com «- » são marcadores. Sem preços nem números legais.",
+    "help_roles": "Perfis destinatários",
+    "help_roles_help": "Sem perfis marcados, o artigo é para todos os perfis.",
+    "help_screens": "Telas",
+    "help_versions": "Versões publicadas",
+    "help_publish_note": "As organizações só veem as alterações depois que a nova versão é publicada.",
+    "help_status": {
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "archived": "Arquivado"
+    },
+    "help_action": {
+      "publish": "Publicar",
+      "archive": "Arquivar"
+    },
+    "help_kind_label": {
+      "guide": "Guia",
+      "screen": "Tela",
+      "field": "Campo",
+      "tour": "Tour",
+      "release_note": "Novidade",
+      "faq": "Pergunta frequente"
+    }
   },
   "ui": {
     "close": "Fechar",
@@ -4244,5 +4288,24 @@
     "title": "Sem conexão",
     "body": "Não há conexão com a internet. Quando voltar, recarregue a página para continuar.",
     "retry": "Tentar novamente"
+  },
+  "help": {
+    "open": "Ajuda",
+    "title": "Central de ajuda",
+    "tab_screen": "Esta tela",
+    "tab_guides": "Guias",
+    "search_label": "Buscar na ajuda",
+    "search_placeholder": "Buscar na ajuda",
+    "search_button": "Buscar",
+    "results": "Resultados",
+    "no_results": "Não encontramos artigos com esse texto. Tente outras palavras ou veja os guias.",
+    "empty_screen": "Esta tela ainda não tem artigos de ajuda.",
+    "empty_guides": "Ainda não há guias para o seu perfil.",
+    "error": "Não foi possível carregar a ajuda. Tente novamente.",
+    "back": "Voltar",
+    "translation_missing": "Este artigo ainda não está traduzido para o seu idioma; é exibido em espanhol.",
+    "version": "Versão {version} · produto {product} · publicada em {date}",
+    "empty_link": "Como funciona esta tela?",
+    "field": "Ajuda: {title}"
   }
 }

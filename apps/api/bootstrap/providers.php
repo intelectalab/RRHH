@@ -6,6 +6,7 @@ use App\Modules\Certificates\CertificatesServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
 use App\Modules\CoreHR\CoreHRServiceProvider;
 use App\Modules\Documents\DocumentsServiceProvider;
+use App\Modules\HelpCenter\HelpCenterServiceProvider;
 use App\Modules\Helpdesk\HelpdeskServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Imports\ImportsServiceProvider;
@@ -37,5 +38,6 @@ return [
     SelfServiceServiceProvider::class,
     CertificatesServiceProvider::class,
     HelpdeskServiceProvider::class,
+    HelpCenterServiceProvider::class,
     DocumentsServiceProvider::class,
 ];

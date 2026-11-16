@@ -3,6 +3,7 @@
 use App\Modules\Platform\Http\Controllers\ConsoleAuthController;
 use App\Modules\Platform\Http\Controllers\ConsoleController;
 use App\Modules\Platform\Http\Controllers\FeatureFlagController;
+use App\Modules\Platform\Http\Controllers\HelpArticleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
 use App\Modules\Platform\Http\Controllers\TenantController;
@@ -94,6 +95,14 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::post('/feature-flags/{id}/tenants', [FeatureFlagController::class, 'setTenant'])->middleware('platform.permission:platform.feature_flags.update');
             Route::post('/feature-flags/{id}/tenants/{tenantId}/remove', [FeatureFlagController::class, 'removeTenant'])->middleware('platform.permission:platform.feature_flags.update');
             Route::get('/tenants/{id}/feature-flags', [FeatureFlagController::class, 'forTenant'])->middleware('platform.permission:platform.feature_flags.view');
+
+            // AYU-1 · Ayuda del producto: artículos por módulo, rol y pantalla con versiones (RN-AYU-02).
+            Route::get('/help-articles', [HelpArticleController::class, 'index'])->middleware('platform.permission:platform.help_articles.view');
+            Route::post('/help-articles', [HelpArticleController::class, 'store'])->middleware('platform.permission:platform.help_articles.create');
+            Route::get('/help-articles/{id}', [HelpArticleController::class, 'show'])->middleware('platform.permission:platform.help_articles.view');
+            Route::patch('/help-articles/{id}', [HelpArticleController::class, 'update'])->middleware('platform.permission:platform.help_articles.update');
+            Route::post('/help-articles/{id}/publish', [HelpArticleController::class, 'publish'])->middleware('platform.permission:platform.help_articles.publish');
+            Route::post('/help-articles/{id}/archive', [HelpArticleController::class, 'archive'])->middleware('platform.permission:platform.help_articles.archive');
         });
     });
 });

@@ -116,7 +116,8 @@ RES = [
     ("DOC", 1, "documents.signature_requests", "/signature-requests", "SignatureRequest", "document_id:id signers:j ordered:b provider:s status:e(draft|sent|viewed|partially_signed|completed|declined|cancelled|expired) evidence?:j", "LCR", "send sign decline cancel remind"),
     ("ESS", 1, "people.change_requests", "/profile-change-requests", "ProfileChangeRequest", "person_id?:id person_name?:s changes:j applied_fields?:a pending_fields?:a status:e(pending|approved|rejected|cancelled) requested_by_user_id?:id requested_by_name?:s reviewed_at?:dt rejection_reason?:s allowed_actions?:a", "LCR", "approve reject cancel"),
     ("IMP", 1, "imports.imports", "/imports", "ImportJob", "entity:e(legal_entities|employees|contracts|vacation_balances|salaries|attendance|concepts|history|org_structure|dependents|positions) file_name?:s file_id?:id headers?:a mapping?:j suggested_mapping?:j status:e(uploaded|mapped|validated|with_errors|importing|completed|failed|cancelled|reverted) total_rows?:i valid_rows?:i error_rows?:i imported_rows?:i batch_size?:i summary?:j error_message?:s created_by_user_id?:id created_by_name?:s started_at?:dt finished_at?:dt allowed_actions?:a", "LCR", "map validate execute cancel revert"),
-    ("AYU", 1, "platform.help_articles", "/platform/help-articles", "HelpArticle", "slug:s locale:s title:s body:s module_code:s roles:a screen_keys:a product_version:s status:e(draft|published|archived)", "LCRU", "publish archive"),
+    # AYU-1 · Ayuda del producto (uno por slug e idioma): publicar copia el borrador a una versión nueva e inmutable (RN-AYU-02); versions solo en el detalle.
+    ("AYU", 1, "platform.help_articles", "/platform/help-articles", "HelpArticle", "slug:s locale:s title:s summary?:s body:s kind?:e(guide|screen|field|tour|release_note|faq) module_code:s roles:a screen_keys:a product_version:s version_number?:i has_unpublished_changes?:b published_at?:dt versions?:ao status:e(draft|published|archived)", "LCRU", "publish archive"),
     ("AYU", 1, "help.org_articles", "/help/org-articles", "HelpOrgArticle", "title:s category_id?:id body:s audience:j owner_user_id:id review_on?:d version:i status:e(draft|published|in_review|archived)", "LCRU", "publish archive"),
     # ---------- Fase 2 ----------
     ("ASI", 2, "time.punches", "/time-punches", "TimePunch", "employment_id:id punched_at:dt kind:e(in|out|break_start|break_end) method:e(web|app|kiosk|qr|pin|crew|biometric|whatsapp) site_id?:id geo?:j device_id?:id offline:b corrects_id?:id reason?:s", "LCR", ""),
@@ -504,10 +505,10 @@ EXTRA = [
     ("IMP", 1, "get", "/imports/{id}/errors/download", "imports.imports.view", "Descargar en CSV las filas con error de una importación, con el motivo por fila", False),
     ("IMP", 1, "get", "/setup-checklist", "imports.imports.view", "Avance de la puesta en marcha guiada", False),
     ("AYU", 1, "get", "/help/articles", "help.articles.view", "Artículos de ayuda visibles para el usuario (producto y organización), filtrados por rol, módulo y pantalla", False),
-    ("AYU", 1, "get", "/help/articles/{id}", "help.articles.view", "Detalle de un artículo de ayuda con su versión", False),
+    ("AYU", 1, "get", "/help/articles/{id}", "help.articles.view", "Detalle de un artículo de ayuda con su versión, en el idioma del usuario o en español con translation_missing (RN-AYU-07); 404 si el usuario no puede verlo (RN-AYU-01)", False),
     ("AYU", 1, "post", "/help/articles/{id}/feedback", "help.articles.view", "Valorar un artículo («¿te sirvió?»)", False),
     ("AYU", 1, "get", "/help/search", "help.articles.view", "Búsqueda de texto completo en la ayuda visible para el usuario", False),
-    ("AYU", 1, "get", "/help/screens/{screen_key}", "help.articles.view", "Artículos de una pantalla (ayuda contextual y ayudas de campo)", False),
+    ("AYU", 1, "get", "/help/screens/{screen_key}", "help.articles.view", "Artículos de una pantalla (primero su ayuda propia, después las guías que la incluyen) y sus ayudas de campo por clave (fields); 404 si la pantalla no existe o el usuario no puede abrirla", False),
     ("AYU", 1, "get", "/help/whats-new", "help.articles.view", "Novedades de versión de los módulos contratados", False),
     ("AYU", 1, "post", "/help/tours/{tour_key}/complete", "help.articles.view", "Marcar un recorrido guiado como visto o saltado", False),
     ("AYU", 1, "get", "/help/escalations", "help.escalations.view", "Consultas derivadas desde la ayuda y su estado", False),
@@ -645,6 +646,15 @@ QUERY = {
     ("get", "/my-team"): [
         _q("filter[level]", "direct: solo reportes directos; indirect: solo indirectos (requiere people.team.view_indirect)"),
         _q("q", "Nombre o código del colaborador"),
+    ],
+    ("get", "/help/articles"): [
+        _q("filter[kind]", "guide, screen, field, tour, release_note o faq"),
+        _q("filter[module]", "Código del módulo"),
+        _q("screen_key", "Solo los artículos de esa pantalla"),
+    ],
+    ("get", "/help/search"): [
+        _q("q", "Texto a buscar (mínimo 2 caracteres); sin resultados se registra la búsqueda sin datos de la persona (RN-AYU-05)", required=True),
+        _q("screen_key", "Pantalla desde la que se busca"),
     ],
     ("get", "/my-team/key-dates"): [
         _q("from", "Desde (AAAA-MM-DD); por defecto hoy", fmt="date"),

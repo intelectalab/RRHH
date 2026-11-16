@@ -1,5 +1,6 @@
 'use client'
 
+import { FieldHelp } from '@/modules/help/HelpCenter'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
@@ -89,6 +90,7 @@ export function VacationRequestFormPanel({ employmentId, onClose, onSaved }: { e
   const field = (key: string, label: string, input: ReactNode, help?: string) => (
     <div className="mb-3">
       <label className="form-label" htmlFor={`vr-${key}`}>{label}</label>
+      {key === 'starts_on' && <FieldHelp field="dates" />}
       {input}
       {help && <p className="small text-secondary">{help}</p>}
       {errors[key] && <div className="invalid-feedback" role="alert">{errors[key]}</div>}

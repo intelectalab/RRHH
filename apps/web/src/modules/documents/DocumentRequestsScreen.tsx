@@ -1,5 +1,6 @@
 'use client'
 
+import { FieldHelp } from '@/modules/help/HelpCenter'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '@/lib/api'
@@ -164,7 +165,7 @@ export function DocumentRequestsScreen() {
           {err('employment_ids')}
           <label className="form-label mt-3" htmlFor="rq-title">{t('dreq.f_title')}</label>
           <input id="rq-title" className="form-control" value={form.title} placeholder={t('dreq.title_hint')} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-          <label className="form-label mt-3" htmlFor="rq-due">{t('dreq.f_due')}</label>
+          <label className="form-label mt-3" htmlFor="rq-due">{t('dreq.f_due')}</label> <FieldHelp field="due_on" />
           <input id="rq-due" type="date" className="form-control" value={form.due_on} onChange={(e) => setForm({ ...form, due_on: e.target.value })} />
           {err('due_on')}
           <label className="form-label mt-3" htmlFor="rq-ins">{t('dreq.f_instructions')}</label>

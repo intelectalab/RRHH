@@ -7091,7 +7091,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Detalle de un artículo de ayuda con su versión */
+        /** Detalle de un artículo de ayuda con su versión, en el idioma del usuario o en español con translation_missing (RN-AYU-07); 404 si el usuario no puede verlo (RN-AYU-01) */
         get: operations["getHelpArticlesId"];
         put?: never;
         post?: never;
@@ -7236,7 +7236,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Artículos de una pantalla (ayuda contextual y ayudas de campo) */
+        /** Artículos de una pantalla (primero su ayuda propia, después las guías que la incluyen) y sus ayudas de campo por clave (fields); 404 si la pantalla no existe o el usuario no puede abrirla */
         get: operations["getHelpScreensScreenKey"];
         put?: never;
         post?: never;
@@ -20209,11 +20209,21 @@ export interface components {
             slug: string;
             locale: string;
             title: string;
+            summary?: string | null;
             body: string;
+            /** @enum {string|null} */
+            kind?: "guide" | "screen" | "field" | "tour" | "release_note" | "faq" | null;
             module_code: string;
             roles: string[];
             screen_keys: string[];
             product_version: string;
+            version_number?: number | null;
+            has_unpublished_changes?: boolean | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
             /** @enum {string} */
             status: "draft" | "published" | "archived";
             /** Format: date-time */
@@ -20225,11 +20235,21 @@ export interface components {
             slug?: string;
             locale?: string;
             title?: string;
+            summary?: string | null;
             body?: string;
+            /** @enum {string|null} */
+            kind?: "guide" | "screen" | "field" | "tour" | "release_note" | "faq" | null;
             module_code?: string;
             roles?: string[];
             screen_keys?: string[];
             product_version?: string;
+            version_number?: number | null;
+            has_unpublished_changes?: boolean | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         HelpOrgArticle: {
             /** @description Identificador opaco */
@@ -41432,7 +41452,14 @@ export interface operations {
     };
     getHelpArticles: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description guide, screen, field, tour, release_note o faq */
+                "filter[kind]"?: string;
+                /** @description Código del módulo */
+                "filter[module]"?: string;
+                /** @description Solo los artículos de esa pantalla */
+                screen_key?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -41448,6 +41475,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };
@@ -41833,7 +41861,12 @@ export interface operations {
     };
     getHelpSearch: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Texto a buscar (mínimo 2 caracteres); sin resultados se registra la búsqueda sin datos de la persona (RN-AYU-05) */
+                q: string;
+                /** @description Pantalla desde la que se busca */
+                screen_key?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -41849,6 +41882,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };

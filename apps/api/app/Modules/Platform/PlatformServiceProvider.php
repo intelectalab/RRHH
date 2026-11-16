@@ -7,6 +7,7 @@ use App\Modules\Platform\Console\CreatePlatformAdminCommand;
 use App\Modules\Platform\Console\ResetPlatformMfaCommand;
 use App\Modules\Platform\Console\RunTrialLifecycleCommand;
 use App\Modules\Platform\Console\SnapshotUsageCommand;
+use App\Modules\Platform\Console\SyncBundledHelpCommand;
 use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
 use App\Modules\Platform\Http\Middleware\EnsureConsoleSecondFactor;
 use App\Modules\Platform\Http\Middleware\RequirePlatformPermission;
@@ -61,7 +62,7 @@ final class PlatformServiceProvider extends ServiceProvider
         $router->aliasMiddleware(RequirePlatformPermission::ALIAS, RequirePlatformPermission::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class]);
+            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class]);
             // SAS-4 · RN-SAS-04: vencimiento de pruebas y fin de la gracia, una vez al día.
             $this->app->booted(function (): void {
                 $schedule = $this->app->make(Schedule::class);

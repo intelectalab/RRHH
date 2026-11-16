@@ -62,4 +62,11 @@ return [
         'invalid_rule' => 'Regla no válida: el plan o el país deben existir, el grupo beta es un código simple y el porcentaje va de 0 a 100, sin repetir.',
         'archived' => 'La bandera está archivada: restáurala para activarla en una organización.',
     ],
+    'help' => [
+        'duplicate_slug' => 'Ya existe un artículo con ese identificador en ese idioma.',
+        'unknown_module' => 'El módulo no existe.',
+        'unknown_role' => 'Hay roles que no son roles de organización.',
+        'unknown_screen' => 'Hay claves de pantalla que no existen.',
+        'synced' => 'Se cargaron :count artículos de la ayuda del producto.',
+    ],
 ];

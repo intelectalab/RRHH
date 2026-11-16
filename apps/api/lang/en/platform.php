@@ -62,4 +62,11 @@ return [
         'invalid_rule' => 'Invalid rule: the plan or country must exist, the beta group is a simple code and the percentage goes from 0 to 100, without repeats.',
         'archived' => 'The flag is archived: restore it to enable it for an organization.',
     ],
+    'help' => [
+        'duplicate_slug' => 'An article with that identifier already exists in that language.',
+        'unknown_module' => 'The module does not exist.',
+        'unknown_role' => 'Some roles are not organization roles.',
+        'unknown_screen' => 'Some screen keys do not exist.',
+        'synced' => 'Loaded :count product help articles.',
+    ],
 ];

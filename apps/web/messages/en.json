@@ -1707,7 +1707,51 @@
     "plan_fit_over_title": "Usage exceeds that plan limits",
     "plan_fit_over": "The change is allowed, but new additions will be blocked until usage is regularized: {metrics}.",
     "plan_fit_item": "{metric} {current} of {limit}",
-    "plan_fit_ok": "Current usage fits within that plan limits."
+    "plan_fit_ok": "Current usage fits within that plan limits.",
+    "tab_help": "Product help",
+    "help_title": "Product help",
+    "help_sub": "Articles by module, role and screen in each language. Publishing creates a new version and keeps the previous ones.",
+    "help_new": "New article",
+    "help_edit": "Edit article",
+    "help_search": "Search by title or identifier",
+    "help_all_status": "All statuses",
+    "help_all_locales": "All languages",
+    "help_empty_title": "No articles",
+    "help_empty": "Create the first help article or adjust the filters.",
+    "help_article": "Title",
+    "help_kind": "Type",
+    "help_module": "Module",
+    "help_version": "Version",
+    "help_version_n": "v{n} · product {product}",
+    "help_unpublished": "Has unpublished changes",
+    "help_slug": "Identifier (same in every language)",
+    "help_locale": "Language",
+    "help_product_version": "Product version",
+    "help_summary": "Summary",
+    "help_body": "Text",
+    "help_body_help": "Paragraphs separated by a blank line; lines starting with «- » are bullets. No prices or legal figures.",
+    "help_roles": "Target roles",
+    "help_roles_help": "With no roles checked, the article is for every role.",
+    "help_screens": "Screens",
+    "help_versions": "Published versions",
+    "help_publish_note": "Organizations see the changes only after the new version is published.",
+    "help_status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "help_action": {
+      "publish": "Publish",
+      "archive": "Archive"
+    },
+    "help_kind_label": {
+      "guide": "Guide",
+      "screen": "Screen",
+      "field": "Field",
+      "tour": "Tour",
+      "release_note": "Release note",
+      "faq": "FAQ"
+    }
   },
   "ui": {
     "close": "Close",
@@ -4244,5 +4288,24 @@
     "title": "Offline",
     "body": "There is no internet connection. When it returns, reload the page to keep working.",
     "retry": "Retry"
+  },
+  "help": {
+    "open": "Help",
+    "title": "Help center",
+    "tab_screen": "This screen",
+    "tab_guides": "Guides",
+    "search_label": "Search help",
+    "search_placeholder": "Search help",
+    "search_button": "Search",
+    "results": "Results",
+    "no_results": "We found no articles with that text. Try other words or check the guides.",
+    "empty_screen": "This screen has no help articles yet.",
+    "empty_guides": "There are no guides for your role yet.",
+    "error": "Help could not be loaded. Try again.",
+    "back": "Back",
+    "translation_missing": "This article is not translated into your language yet; it is shown in Spanish.",
+    "version": "Version {version} · product {product} · published on {date}",
+    "empty_link": "How does this screen work?",
+    "field": "Help: {title}"
   }
 }

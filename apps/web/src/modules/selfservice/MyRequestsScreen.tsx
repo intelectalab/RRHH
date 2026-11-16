@@ -1,5 +1,6 @@
 'use client'
 
+import { FieldHelp } from '@/modules/help/HelpCenter'
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiRequestError } from '@/lib/api'
 import { formatDate } from '@/lib/format'
@@ -232,7 +233,7 @@ export function MyRequestsScreen() {
           </>
         }>
           <form id="form-ticket" onSubmit={(e) => void createTicket(e)}>
-            <label className="form-label" htmlFor="tk-cat">{t('tickets.category')}</label>
+            <label className="form-label" htmlFor="tk-cat">{t('tickets.category')}</label> <FieldHelp field="category" />
             <select id="tk-cat" className="form-select" required value={form.category_id} onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}>
               <option value="">{t('tickets.choose_category')}</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}

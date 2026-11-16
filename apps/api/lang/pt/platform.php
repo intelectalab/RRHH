@@ -62,4 +62,11 @@ return [
         'invalid_rule' => 'Regra inválida: o plano ou o país devem existir, o grupo beta é um código simples e a porcentagem vai de 0 a 100, sem repetir.',
         'archived' => 'A flag está arquivada: restaure-a para ativá-la em uma organização.',
     ],
+    'help' => [
+        'duplicate_slug' => 'Já existe um artigo com esse identificador nesse idioma.',
+        'unknown_module' => 'O módulo não existe.',
+        'unknown_role' => 'Há perfis que não são perfis da organização.',
+        'unknown_screen' => 'Há chaves de tela que não existem.',
+        'synced' => 'Foram carregados :count artigos da ajuda do produto.',
+    ],
 ];

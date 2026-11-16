@@ -215,6 +215,15 @@ final class CrossTenantHarness
      */
     public const AGGREGATING_COLLECTIONS = ['/search', '/notifications', '/notification-deliveries', '/catalogs', '/directory', '/org-chart', '/insurance-policies', '/health-providers', '/personnel-actions', '/absence-subsidies', '/documents/expiring'];
 
+    /**
+     * AYU-2 · AYU-3: la ayuda del producto es contenido de la plataforma, el mismo para todas las
+     * organizaciones (help_articles no tiene tenant_id). Lo que cambia por organización es qué artículos se
+     * ven (módulos contratados, roles y pantallas, RN-AYU-01), y eso se prueba en HelpCenterTest.
+     *
+     * @var array<int, string>
+     */
+    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}'];
+
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
 
@@ -326,6 +335,10 @@ final class CrossTenantHarness
             // Consola SaaS (SAS-1): opera entre organizaciones por diseño y responde 404 desde el
             // host de una organización; su frontera se prueba en tests/Feature/Platform.
             if (str_starts_with($op['path'], '/platform/') && ($permission === 'public' || str_starts_with($permission, 'platform'))) {
+                continue;
+            }
+
+            if (in_array($op['path'], self::SHARED_PRODUCT_CONTENT, true)) {
                 continue;
             }
 

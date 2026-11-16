@@ -29,6 +29,7 @@ export function useConsoleTabs(): Tab[] {
     { href: '/plataforma/planes', label: t('console.tab_plans'), active: pathname.startsWith('/plataforma/planes'), perm: 'platform.plans.view' },
     { href: '/plataforma/suscripciones', label: t('console.tab_subscriptions'), active: pathname.startsWith('/plataforma/suscripciones'), perm: 'platform.subscriptions.view' },
     { href: '/plataforma/funciones', label: t('console.tab_flags'), active: pathname.startsWith('/plataforma/funciones'), perm: 'platform.feature_flags.view' },
+    { href: '/plataforma/ayuda', label: t('console.tab_help'), active: pathname.startsWith('/plataforma/ayuda'), perm: 'platform.help_articles.view' },
     { href: '/plataforma/auditoria', label: t('console.tab_audit'), active: pathname.startsWith('/plataforma/auditoria'), perm: 'platform.audit.view' },
   ]
   return tabs.filter((tab) => me.permissions.includes(tab.perm)).map(({ perm: _perm, ...tab }) => tab)

@@ -1707,7 +1707,51 @@
     "plan_fit_over_title": "El consumo supera los límites de ese plan",
     "plan_fit_over": "El cambio se permite, pero quedarán bloqueadas las nuevas altas hasta regularizar: {metrics}.",
     "plan_fit_item": "{metric} {current} de {limit}",
-    "plan_fit_ok": "El consumo actual entra en los límites de ese plan."
+    "plan_fit_ok": "El consumo actual entra en los límites de ese plan.",
+    "tab_help": "Ayuda del producto",
+    "help_title": "Ayuda del producto",
+    "help_sub": "Artículos por módulo, rol y pantalla en cada idioma. Publicar crea una versión nueva y conserva las anteriores.",
+    "help_new": "Nuevo artículo",
+    "help_edit": "Editar artículo",
+    "help_search": "Buscar por título o identificador",
+    "help_all_status": "Todos los estados",
+    "help_all_locales": "Todos los idiomas",
+    "help_empty_title": "Sin artículos",
+    "help_empty": "Crea el primer artículo de ayuda o ajusta los filtros.",
+    "help_article": "Título",
+    "help_kind": "Tipo",
+    "help_module": "Módulo",
+    "help_version": "Versión",
+    "help_version_n": "v{n} · producto {product}",
+    "help_unpublished": "Con cambios sin publicar",
+    "help_slug": "Identificador (igual en todos los idiomas)",
+    "help_locale": "Idioma",
+    "help_product_version": "Versión del producto",
+    "help_summary": "Resumen",
+    "help_body": "Texto",
+    "help_body_help": "Párrafos separados por una línea en blanco; las líneas que empiezan con «- » son viñetas. Sin precios ni números legales.",
+    "help_roles": "Roles destinatarios",
+    "help_roles_help": "Sin roles marcados, el artículo es para todos los roles.",
+    "help_screens": "Pantallas",
+    "help_versions": "Versiones publicadas",
+    "help_publish_note": "Los cambios se ven en las organizaciones recién al publicar la versión nueva.",
+    "help_status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "archived": "Archivado"
+    },
+    "help_action": {
+      "publish": "Publicar",
+      "archive": "Archivar"
+    },
+    "help_kind_label": {
+      "guide": "Guía",
+      "screen": "Pantalla",
+      "field": "Campo",
+      "tour": "Recorrido",
+      "release_note": "Novedad",
+      "faq": "Pregunta frecuente"
+    }
   },
   "ui": {
     "close": "Cerrar",
@@ -4244,5 +4288,24 @@
     "title": "Sin conexión",
     "body": "No hay conexión a internet. Cuando vuelva, recarga la página para seguir trabajando.",
     "retry": "Reintentar"
+  },
+  "help": {
+    "open": "Ayuda",
+    "title": "Centro de ayuda",
+    "tab_screen": "Esta pantalla",
+    "tab_guides": "Guías",
+    "search_label": "Buscar en la ayuda",
+    "search_placeholder": "Buscar en la ayuda",
+    "search_button": "Buscar",
+    "results": "Resultados",
+    "no_results": "No encontramos artículos con ese texto. Prueba con otras palabras o revisa las guías.",
+    "empty_screen": "Esta pantalla todavía no tiene artículos de ayuda.",
+    "empty_guides": "No hay guías para tu rol todavía.",
+    "error": "No se pudo cargar la ayuda. Intenta de nuevo.",
+    "back": "Volver",
+    "translation_missing": "Este artículo todavía no está traducido a tu idioma; se muestra en español.",
+    "version": "Versión {version} · producto {product} · publicada el {date}",
+    "empty_link": "¿Cómo funciona esta pantalla?",
+    "field": "Ayuda: {title}"
   }
 }
