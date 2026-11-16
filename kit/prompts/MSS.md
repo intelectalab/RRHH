@@ -3,7 +3,7 @@
 Experiencia del responsable de equipo: su gente, solicitudes, fechas clave y aprobaciones.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 4 (4 historias y 0 tareas); 4 del MVP. **Operaciones de API:** 3.
+- **Actividades:** 4 (4 historias y 0 tareas); 4 del MVP. **Operaciones de API:** 4.
 - **Especificación:** `kit/docs/modulos/M-MSS.md`.
 
 ## Prompt para una sesión nueva de Claude Code
