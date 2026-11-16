@@ -519,17 +519,23 @@
 @document_access_grants | Permiso puntual sobre un documento para un usuario o rol.
   document_id -> documents ; user_id ?-> users ; role_id ?-> roles ; access enum(view,download,edit)=view ; expires_at
   check num_nonnulls(user_id, role_id) = 1
-@document_requests lock | Solicitud de un documento a un colaborador o candidato, con revisión.
+@document_requests lock | Solicitud de un documento a un colaborador o candidato, con revisión. DOC-3: RRHH pide un tipo documental a una o varias personas (request_group_id agrupa el envío) con fecha límite; el colaborador lo entrega desde el portal (submitted_at), la revisión pasa por el motor de aprobaciones y, si se rechaza, vuelve al colaborador con la observación (rejection_reason) para entregarlo de nuevo.
   employment_id ?-> employments ; person_id ?-> people ; document_category_id -> document_categories
   requested_by_user_id ?-> users ; due_on ; status enum(requested,submitted,approved,rejected,cancelled)=requested
-  document_id ?-> documents ; rejection_reason ; instructions
-@document_templates soft lock | Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas).
+  document_id ?-> documents ; rejection_reason ; instructions ; request_group_id uuid ; title ; submitted_at
+  reviewed_by_user_id ?-> users ; reviewed_at ; cancellation_reason ; idx status, due_on
+@document_templates soft lock | Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas). DOC-4: se organiza por tipo documental y empresa (legal_entity_id vacío = todas); current_version_id es la versión publicada con la que se genera (active = publicada, inactive = retirada).
   code ; name ; document_category_id ?-> document_categories
   kind enum(contract,amendment,certificate,letter,offer,policy,payslip,settlement,other)! ; locale text=es ; country_code
   current_version_id ?-> document_template_versions ; is_system ; status enum(draft,active,inactive)=draft ; uniq code
-@document_template_versions | Versión del cuerpo de una plantilla.
+  legal_entity_id ?-> legal_entities ; description
+@document_template_versions | Versión del cuerpo de una plantilla. DOC-4: la versión sin published_at es el borrador que se edita; al publicarse queda fija y los documentos generados conservan la suya (RN-DOC-11). page_settings guarda el encabezado de la empresa.
   document_template_id -> document_templates ; version integer! ; body text! ; variables j ; page_settings j ; published_at
-  uniq document_template_id, version
+  created_by_user_id ?-> users ; notes ; uniq document_template_id, version
+@document_generation_batches lock | DOC-5: generación de documentos PDF desde una plantilla para una o varias relaciones laborales, en segundo plano: avance (generados y con error) y el resultado por persona en items, con el motivo de los omitidos.
+  document_template_id -> document_templates ; document_template_version_id -> document_template_versions
+  requested_by_user_id ?-> users ; status enum(queued,running,completed,completed_with_errors,failed)=queued
+  total integer=0 ; generated integer=0 ; failed integer=0 ; items j ; started_at ; finished_at
 @document_acknowledgements | Constancia de lectura o recepción de un documento por un colaborador.
   document_id -> documents ; employment_id -> employments ; acknowledged_at ; method enum(click,signature,otp)
   uniq document_id, employment_id

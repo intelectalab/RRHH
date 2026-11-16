@@ -102,6 +102,10 @@ return [
             'in_app' => ['subject' => '{document} has expired', 'body' => '{document} ({type}) of {employee} expired on {expires_on}. Upload the current version to bring the file up to date.'],
             'email' => ['subject' => '{document} has expired', 'body' => "Hello {name}:\n\nIn {organization}, {document} ({type}) of {employee} expired on {expires_on}.\n\nUpload the current version to bring the file up to date: {link}"],
         ],
+        'documents.requested' => [
+            'in_app' => ['subject' => 'A document is requested from you: {document}', 'body' => 'Human Resources asks you for {document} by {due_on}. {instructions} Submit it from your portal, under My documents.'],
+            'email' => ['subject' => 'A document is requested from you: {document}', 'body' => "Hi {name}:\n\nAt {organization}, Human Resources asks you for {document} by {due_on}.\n\n{instructions}\n\nSubmit it from your portal: {link}"],
+        ],
         'documents.rejected' => [
             'in_app' => ['subject' => 'Your document {document} needs changes', 'body' => 'Human Resources returned {document} ({type}): {reason} Upload a corrected version.'],
             'email' => ['subject' => 'Your document {document} needs changes', 'body' => "Hello {name}:\n\nIn {organization}, Human Resources returned {document} ({type}): {reason}\n\nUpload a corrected version: {link}"],

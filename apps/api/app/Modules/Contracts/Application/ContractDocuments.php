@@ -6,6 +6,7 @@ use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
 use App\Shared\Documents\DocumentArchive;
 use App\Shared\Documents\SimplePdf;
+use App\Shared\Documents\TemplateRenderer;
 use App\Shared\Security\FieldCipher;
 use Illuminate\Support\Facades\DB;
 
@@ -13,19 +14,27 @@ use Illuminate\Support\Facades\DB;
  * CON-2 · CON-3 · Documento del contrato, de la prórroga y de la adenda: se genera desde la plantilla del
  * tipo de contrato (document_templates, si la organización la configuró) o desde la plantilla por defecto
  * del paquete de país, y se archiva en el repositorio documental con sus versiones (generado → firmado).
+ *
+ * DOC-4 · Puente al motor de plantillas: si la plantilla del tipo de contrato usa la sintaxis del motor
+ * ({{empleado.nombre_completo}}, {{contrato.inicio}}, bloques {{#if}}), se resuelve con TemplateRenderer y los datos
+ * de este contrato (no los del vigente); las plantillas con la sintaxis anterior ({employee}, {starts_on}) y las del
+ * paquete de país siguen funcionando igual, así que migrar una plantilla es solo reescribir sus variables y publicarla.
  */
 final class ContractDocuments
 {
     public const CATEGORY = 'contracts';
 
-    public function __construct(private readonly DocumentArchive $archive) {}
+    public function __construct(
+        private readonly DocumentArchive $archive,
+        private readonly TemplateRenderer $templates,
+    ) {}
 
     /** Genera (o regenera como versión nueva) el documento del contrato. Devuelve el id del documento. */
     public function generateContract(Contract $contract, ?string $userId): string
     {
         $kind = $contract->renewal_of_contract_id === null ? 'contract' : 'renewal';
         $vars = $this->contractVariables($contract);
-        [$title, $body] = $this->render($kind, (string) DB::table('contract_types')->where('id', $contract->contract_type_id)->value('document_template_id'), $vars);
+        [$title, $body] = $this->render($kind, (string) DB::table('contract_types')->where('id', $contract->contract_type_id)->value('document_template_id'), $vars, $contract);
         $pdf = SimplePdf::render($title, $body, $vars['employer'].' · '.$vars['number']);
 
         return $this->store($contract->document_id, $contract->employment_id, 'contract', $contract->id, $title, $pdf, 'contrato-'.$vars['number'].'.pdf', $userId, 'generated');
@@ -92,13 +101,24 @@ final class ContractDocuments
      * @param  array<string, string>  $vars
      * @return array{0: string, 1: string}
      */
-    private function render(string $kind, ?string $templateId, array $vars): array
+    private function render(string $kind, ?string $templateId, array $vars, ?Contract $contract = null): array
     {
         $title = null;
         $body = null;
         if ($templateId !== null && $templateId !== '' && $kind !== 'amendment') {
             $template = DB::table('document_templates as t')->join('document_template_versions as v', 'v.id', '=', 't.current_version_id')
                 ->where('t.id', $templateId)->where('t.status', 'active')->whereNull('t.deleted_at')->first(['t.name', 'v.body']);
+            if ($template !== null && $contract !== null && str_contains((string) $template->body, '{{')) {
+                $rendered = $this->templates->renderPublished($templateId, $contract->employment_id, [
+                    'contrato.tipo' => $vars['contract_type'], 'contrato.numero' => $vars['number'], 'contrato.inicio' => $vars['starts_on'],
+                    'contrato.fin' => $contract->valid_to === null ? null : $vars['ends_on'], 'contrato.causa_objetiva' => $contract->objective_cause,
+                    'contrato.jornada_semanal' => $vars['weekly_hours'], 'contrato.fin_periodo_prueba' => $vars['trial_period_ends_on'],
+                    'empleado.cargo' => $vars['job'], 'empleado.modalidad_trabajo' => $vars['work_modality'],
+                ]);
+                if ($rendered !== null) {
+                    return [$rendered['title'], $rendered['body']];
+                }
+            }
             if ($template !== null) {
                 $title = (string) $template->name;
                 $body = (string) $template->body;

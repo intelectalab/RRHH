@@ -102,6 +102,10 @@ return [
             'in_app' => ['subject' => '{document} venció', 'body' => '{document} ({type}) de {employee} venció el {expires_on}. Sube la versión vigente para regularizar el legajo.'],
             'email' => ['subject' => '{document} venció', 'body' => "Hola {name}:\n\nEn {organization}, {document} ({type}) de {employee} venció el {expires_on}.\n\nSube la versión vigente para regularizar el legajo: {link}"],
         ],
+        'documents.requested' => [
+            'in_app' => ['subject' => 'Te piden un documento: {document}', 'body' => 'Recursos Humanos te pide {document} hasta el {due_on}. {instructions} Entrégalo desde tu portal, en Mis documentos.'],
+            'email' => ['subject' => 'Te piden un documento: {document}', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos te pide {document} hasta el {due_on}.\n\n{instructions}\n\nEntrégalo desde tu portal: {link}"],
+        ],
         'documents.rejected' => [
             'in_app' => ['subject' => 'Tu documento {document} fue observado', 'body' => 'Recursos Humanos observó {document} ({type}): {reason} Sube una versión corregida.'],
             'email' => ['subject' => 'Tu documento {document} fue observado', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos observó {document} ({type}): {reason}\n\nSube una versión corregida: {link}"],

@@ -22,6 +22,8 @@ final class NotifyDocumentEvents implements DomainEventSubscriber
 
     public const REJECTED = 'documents.rejected';
 
+    public const REQUESTED = 'documents.requested';
+
     public function __construct(private readonly Notifier $notifier) {}
 
     public function consumerName(): string
@@ -31,13 +33,18 @@ final class NotifyDocumentEvents implements DomainEventSubscriber
 
     public function handles(): array
     {
-        return [DomainEventTypes::DOCUMENT_EXPIRING, DomainEventTypes::DOCUMENT_EXPIRED, DomainEventTypes::DOCUMENT_REJECTED];
+        return [DomainEventTypes::DOCUMENT_EXPIRING, DomainEventTypes::DOCUMENT_EXPIRED, DomainEventTypes::DOCUMENT_REJECTED, DomainEventTypes::DOCUMENT_REQUESTED];
     }
 
     public function handle(OutboxEvent $event): void
     {
         TenancyScope::runAs($event->tenant_id, function () use ($event): void {
             $p = $event->payload;
+            if ($event->event_type === DomainEventTypes::DOCUMENT_REQUESTED) {
+                $this->requested($p);
+
+                return;
+            }
             $doc = DB::table('documents')->where('id', (string) ($p['document_id'] ?? ''))->first([
                 'id', 'title', 'classification', 'document_category_id', 'owner_person_id', 'employment_id', 'responsible_user_id', 'visible_to_employee',
             ]);
@@ -76,5 +83,27 @@ final class NotifyDocumentEvents implements DomainEventSubscriber
                 'employment_id' => (string) ($doc->employment_id ?? ''),
             ] + $vars, 'document', (string) $doc->id);
         });
+    }
+
+    /**
+     * DOC-3 · Al colaborador se le avisa qué documento le piden y hasta cuándo, para que lo entregue desde el portal.
+     *
+     * @param  array<string, mixed>  $p
+     */
+    private function requested(array $p): void
+    {
+        $request = DB::table('document_requests')->where('id', (string) ($p['document_request_id'] ?? ''))->first(['id', 'title', 'person_id', 'due_on', 'instructions', 'employment_id']);
+        if ($request === null || $request->person_id === null) {
+            return;
+        }
+        $titular = DB::table('users')->where('person_id', $request->person_id)->where('status', 'active')->whereNull('deleted_at')->value('id');
+        if ($titular === null) {
+            return;
+        }
+        $due = $request->due_on === null ? (string) trans('documents.requests.no_due') : substr((string) $request->due_on, 0, 10);
+        $this->notifier->notify(self::REQUESTED, [(string) $titular], [
+            'document' => (string) $request->title, 'due_on' => $due, 'instructions' => (string) ($request->instructions ?? ''),
+            'employment_id' => (string) ($request->employment_id ?? ''),
+        ], 'document_request', (string) $request->id);
     }
 }

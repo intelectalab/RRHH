@@ -3958,6 +3958,12 @@ CREATE TABLE document_requests (
   document_id uuid,
   rejection_reason text,
   instructions text,
+  request_group_id uuid,
+  title text NOT NULL,
+  submitted_at timestamptz,
+  reviewed_by_user_id uuid,
+  reviewed_at timestamptz,
+  cancellation_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -3966,14 +3972,17 @@ CREATE TABLE document_requests (
   CONSTRAINT fk_document_requests_person_id FOREIGN KEY (tenant_id, person_id) REFERENCES people (tenant_id, id),
   CONSTRAINT fk_document_requests_document_category_id FOREIGN KEY (tenant_id, document_category_id) REFERENCES document_categories (tenant_id, id),
   CONSTRAINT fk_document_requests_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
-  CONSTRAINT fk_document_requests_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_document_requests_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_document_requests_reviewed_by_user_id FOREIGN KEY (tenant_id, reviewed_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE document_requests IS 'Solicitud de un documento a un colaborador o candidato, con revisión.';
+COMMENT ON TABLE document_requests IS 'Solicitud de un documento a un colaborador o candidato, con revisión. DOC-3: RRHH pide un tipo documental a una o varias personas (request_group_id agrupa el envío) con fecha límite; el colaborador lo entrega desde el portal (submitted_at), la revisión pasa por el motor de aprobaciones y, si se rechaza, vuelve al colaborador con la observación (rejection_reason) para entregarlo de nuevo.';
 CREATE INDEX ix_document_requests_employment_id ON document_requests (tenant_id, employment_id);
 CREATE INDEX ix_document_requests_person_id ON document_requests (tenant_id, person_id);
 CREATE INDEX ix_document_requests_document_category_id ON document_requests (tenant_id, document_category_id);
 CREATE INDEX ix_document_requests_requested_by_user_id ON document_requests (tenant_id, requested_by_user_id);
 CREATE INDEX ix_document_requests_document_id ON document_requests (tenant_id, document_id);
+CREATE INDEX ix_document_requests_reviewed_by_user_id ON document_requests (tenant_id, reviewed_by_user_id);
+CREATE INDEX ix_document_requests_status_due_on ON document_requests (tenant_id, status, due_on);
 ALTER TABLE document_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_requests FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON document_requests USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -3991,17 +4000,21 @@ CREATE TABLE document_templates (
   current_version_id uuid,
   is_system boolean NOT NULL DEFAULT false,
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','active','inactive')),
+  legal_entity_id uuid,
+  description text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_document_templates_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_document_templates_document_category_id FOREIGN KEY (tenant_id, document_category_id) REFERENCES document_categories (tenant_id, id)
+  CONSTRAINT fk_document_templates_document_category_id FOREIGN KEY (tenant_id, document_category_id) REFERENCES document_categories (tenant_id, id),
+  CONSTRAINT fk_document_templates_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id)
 );
-COMMENT ON TABLE document_templates IS 'Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas).';
+COMMENT ON TABLE document_templates IS 'Plantilla con variables para generar documentos (contratos, certificados, cartas, ofertas). DOC-4: se organiza por tipo documental y empresa (legal_entity_id vacío = todas); current_version_id es la versión publicada con la que se genera (active = publicada, inactive = retirada).';
 CREATE UNIQUE INDEX uq_document_templates_code ON document_templates (tenant_id, code) WHERE deleted_at IS NULL;
 CREATE INDEX ix_document_templates_document_category_id ON document_templates (tenant_id, document_category_id);
 CREATE INDEX ix_document_templates_current_version_id ON document_templates (tenant_id, current_version_id);
+CREATE INDEX ix_document_templates_legal_entity_id ON document_templates (tenant_id, legal_entity_id);
 ALTER TABLE document_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_templates FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON document_templates USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -4016,17 +4029,51 @@ CREATE TABLE document_template_versions (
   variables jsonb,
   page_settings jsonb,
   published_at timestamptz,
+  created_by_user_id uuid,
+  notes text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_document_template_versions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_document_template_versions_document_template_id_version UNIQUE (tenant_id, document_template_id, version),
-  CONSTRAINT fk_document_template_versions_document_template_id FOREIGN KEY (tenant_id, document_template_id) REFERENCES document_templates (tenant_id, id)
+  CONSTRAINT fk_document_template_versions_document_template_id FOREIGN KEY (tenant_id, document_template_id) REFERENCES document_templates (tenant_id, id),
+  CONSTRAINT fk_document_template_versions_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE document_template_versions IS 'Versión del cuerpo de una plantilla.';
+COMMENT ON TABLE document_template_versions IS 'Versión del cuerpo de una plantilla. DOC-4: la versión sin published_at es el borrador que se edita; al publicarse queda fija y los documentos generados conservan la suya (RN-DOC-11). page_settings guarda el encabezado de la empresa.';
+CREATE INDEX ix_document_template_versions_created_by_user_id ON document_template_versions (tenant_id, created_by_user_id);
 ALTER TABLE document_template_versions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_template_versions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON document_template_versions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_document_template_versions_touch BEFORE UPDATE ON document_template_versions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE document_generation_batches (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  document_template_id uuid NOT NULL,
+  document_template_version_id uuid NOT NULL,
+  requested_by_user_id uuid,
+  status text NOT NULL DEFAULT 'queued' CHECK (status IN ('queued','running','completed','completed_with_errors','failed')),
+  total integer NOT NULL DEFAULT 0,
+  generated integer NOT NULL DEFAULT 0,
+  failed integer NOT NULL DEFAULT 0,
+  items jsonb,
+  started_at timestamptz,
+  finished_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_document_generation_batches_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_document_generation_batches_document_template_id FOREIGN KEY (tenant_id, document_template_id) REFERENCES document_templates (tenant_id, id),
+  CONSTRAINT fk_document_generation_batches_document_template_version_id FOREIGN KEY (tenant_id, document_template_version_id) REFERENCES document_template_versions (tenant_id, id),
+  CONSTRAINT fk_document_generation_batches_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE document_generation_batches IS 'DOC-5: generación de documentos PDF desde una plantilla para una o varias relaciones laborales, en segundo plano: avance (generados y con error) y el resultado por persona en items, con el motivo de los omitidos.';
+CREATE INDEX ix_document_generation_batches_document_template_id ON document_generation_batches (tenant_id, document_template_id);
+CREATE INDEX ix_document_generation_batches_document_template_version_id ON document_generation_batches (tenant_id, document_template_version_id);
+CREATE INDEX ix_document_generation_batches_requested_by_user_id ON document_generation_batches (tenant_id, requested_by_user_id);
+ALTER TABLE document_generation_batches ENABLE ROW LEVEL SECURITY;
+ALTER TABLE document_generation_batches FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON document_generation_batches USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_document_generation_batches_touch BEFORE UPDATE ON document_generation_batches FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE document_acknowledgements (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),

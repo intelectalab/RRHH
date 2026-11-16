@@ -34,7 +34,10 @@ final class DocumentArchive
     /**
      * Crea el documento con su primera versión.
      *
-     * @param  array{category_id: string, title: string, employment_id?: string|null, person_id?: string|null, legal_entity_id?: string|null, subject_type: string, subject_id: string, source: string, status?: string, issued_on?: string|null}  $meta
+     * DOC-5: un documento generado desde plantilla va al legajo sin módulo dueño (subject_type null), con la
+     * clasificación y visibilidad de su tipo y la versión de la plantilla con que se emitió (RN-DOC-11).
+     *
+     * @param  array{category_id: string, title: string, employment_id?: string|null, person_id?: string|null, legal_entity_id?: string|null, subject_type: string|null, subject_id: string|null, source: string, status?: string, issued_on?: string|null, classification?: string, visible_to_employee?: bool, document_template_version_id?: string|null}  $meta
      */
     public function create(array $meta, string $contents, string $fileName, string $mime, ?string $userId, ?string $notes = null): string
     {
@@ -43,8 +46,9 @@ final class DocumentArchive
             'tenant_id' => $tenant, 'document_category_id' => $meta['category_id'], 'title' => $meta['title'],
             'owner_person_id' => $meta['person_id'] ?? null, 'employment_id' => $meta['employment_id'] ?? null,
             'legal_entity_id' => $meta['legal_entity_id'] ?? null, 'subject_type' => $meta['subject_type'],
-            'subject_id' => $meta['subject_id'], 'classification' => 'confidential', 'status' => $meta['status'] ?? 'draft',
+            'subject_id' => $meta['subject_id'], 'classification' => $meta['classification'] ?? 'confidential', 'status' => $meta['status'] ?? 'draft',
             'source' => $meta['source'], 'issued_on' => $meta['issued_on'] ?? null,
+            'visible_to_employee' => $meta['visible_to_employee'] ?? false, 'document_template_version_id' => $meta['document_template_version_id'] ?? null,
         ]);
         $this->addVersion($documentId, $contents, $fileName, $mime, $userId, $notes);
 

@@ -48,6 +48,8 @@ return [
         'documents.expiring' => ['variables' => ['document', 'type', 'employee', 'expires_on', 'days_left'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'documents.expired' => ['variables' => ['document', 'type', 'employee', 'expires_on'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'documents.rejected' => ['variables' => ['document', 'type', 'reason'], 'link' => '/documentos/vencimientos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // DOC-3 · Documento solicitado al colaborador: lo entrega desde su portal.
+        'documents.requested' => ['variables' => ['document', 'due_on', 'instructions'], 'link' => '/mi', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'limits.reached' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
     ],
 

@@ -4509,6 +4509,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/document-generation-batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar DocumentGenerationBatch */
+        get: operations["getDocumentGenerationBatches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-generation-batches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver DocumentGenerationBatch */
+        get: operations["getDocumentGenerationBatchesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar DocumentRequest */
+        get: operations["getDocumentRequests"];
+        put?: never;
+        /** Solicitar un tipo documental a una o varias personas (category_id, employment_ids o filter {legal_entity_id, org_unit_id, site_id}, title, instructions, due_on): crea una solicitud por persona en el mismo envío y avisa a cada colaborador */
+        post: operations["postDocumentRequests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver DocumentRequest */
+        get: operations["getDocumentRequestsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancelar una solicitud pendiente, entregada o rechazada (reason); anula la aprobación en curso */
+        post: operations["postDocumentRequestsIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-requests/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Entregar el documento solicitado (multipart: file, issued_on, expires_on): entra al legajo en revisión y la aprobación sigue el flujo publicado (document_request); una solicitud rechazada se vuelve a entregar */
+        post: operations["postDocumentRequestsIdSubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/document-templates": {
         parameters: {
             query?: never;
@@ -4521,6 +4624,23 @@ export interface paths {
         put?: never;
         /** Crear DocumentTemplate */
         post: operations["postDocumentTemplates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-templates/variables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catálogo de variables seguras de la ficha, la empresa, el contrato y la compensación ({{grupo.variable}}), con su descripción, ejemplo y el permiso de campo que exigen (RN-DOC-10); también la sintaxis de bloques condicionales {{#if variable}}…{{else}}…{{/if}} */
+        get: operations["getDocumentTemplatesVariables"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4554,11 +4674,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «generate» sobre DocumentTemplate
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** Generar el PDF desde la versión publicada para una o varias relaciones laborales (employment_ids): una sola se genera en el acto y varias en segundo plano; devuelve el lote con su avance y el documento de cada persona en el legajo (versión nueva si ya se generó antes). 403 si la plantilla usa una variable cuyo permiso de campo no se tiene (RN-DOC-10) */
         post: operations["postDocumentTemplatesIdGenerate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/document-templates/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Vista previa con los datos vigentes de una relación laboral (employment_id; body opcional para probar el borrador sin guardarlo): texto resuelto, variables desconocidas y las omitidas por falta de permiso de campo. La lectura de un dato sensible queda en el registro de accesos */
+        post: operations["postDocumentTemplatesIdPreview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -19067,6 +19201,33 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
+        DocumentGenerationBatch: {
+            /** @description Identificador opaco */
+            id: string;
+            /** @description Identificador opaco */
+            template_id: string;
+            template_name?: string | null;
+            template_version: number;
+            /** @enum {string} */
+            status: "queued" | "running" | "completed" | "completed_with_errors" | "failed";
+            total: number;
+            generated: number;
+            failed: number;
+            items: {
+                [key: string]: unknown;
+            }[];
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
         DocumentInput: {
             /** @description Identificador opaco */
             category_id?: string;
@@ -19090,16 +19251,81 @@ export interface components {
             /** @enum {string} */
             source?: "upload" | "generated" | "import" | "signature" | "system";
         };
+        DocumentRequest: {
+            /** @description Identificador opaco */
+            id: string;
+            /** @description Identificador opaco */
+            employment_id: string;
+            /** @description Identificador opaco */
+            person_id?: string | null;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            category_id: string;
+            category_name?: string | null;
+            title: string;
+            instructions?: string | null;
+            /** Format: date */
+            due_on?: string | null;
+            overdue: boolean;
+            /** @enum {string} */
+            status: "requested" | "submitted" | "approved" | "rejected" | "cancelled";
+            /** @description Identificador opaco */
+            document_id?: string | null;
+            rejection_reason?: string | null;
+            /** @description Identificador opaco */
+            request_group_id?: string | null;
+            /** @description Identificador opaco */
+            requested_by_user_id?: string | null;
+            requested_by_name?: string | null;
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            cancellation_reason?: string | null;
+            /** @description Identificador opaco */
+            approval_request_id?: string | null;
+            approval?: {
+                [key: string]: unknown;
+            } | null;
+            allowed_actions: string[];
+            version: number;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
         DocumentTemplate: {
             /** @description Identificador opaco */
             id: string;
+            code: string;
             name: string;
-            kind: string;
+            description?: string | null;
+            /** @enum {string} */
+            kind: "contract" | "amendment" | "certificate" | "letter" | "offer" | "policy" | "payslip" | "settlement" | "other";
+            /** @description Identificador opaco */
+            category_id?: string | null;
+            category_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            legal_entity_name?: string | null;
             locale: string;
+            is_system: boolean;
+            /** @enum {string} */
+            status: "draft" | "active" | "inactive";
             body: string;
             variables: string[];
-            /** @enum {string} */
-            status: "draft" | "published" | "retired";
+            page_settings?: {
+                [key: string]: unknown;
+            } | null;
+            has_draft: boolean;
+            current_version?: number | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
+            allowed_actions: string[];
             version: number;
             /** Format: date-time */
             created_at?: string;
@@ -19107,11 +19333,28 @@ export interface components {
             updated_at?: string;
         };
         DocumentTemplateInput: {
+            code?: string;
             name?: string;
-            kind?: string;
+            description?: string | null;
+            /** @enum {string} */
+            kind?: "contract" | "amendment" | "certificate" | "letter" | "offer" | "policy" | "payslip" | "settlement" | "other";
+            /** @description Identificador opaco */
+            category_id?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             locale?: string;
+            is_system?: boolean;
             body?: string;
             variables?: string[];
+            page_settings?: {
+                [key: string]: unknown;
+            } | null;
+            has_draft?: boolean;
+            /** Format: date-time */
+            published_at?: string | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): base_salary */
         Employment: {
@@ -34533,6 +34776,265 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getDocumentGenerationBatches: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentGenerationBatch"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDocumentGenerationBatchesId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentGenerationBatch"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getDocumentRequests: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentRequest"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postDocumentRequests: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDocumentRequestsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentRequest"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postDocumentRequestsIdCancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postDocumentRequestsIdSubmit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: date */
+                    issued_on?: string;
+                    /** Format: date */
+                    expires_on?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getDocumentTemplates: {
         parameters: {
             query?: {
@@ -34608,6 +35110,28 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDocumentTemplatesVariables: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getDocumentTemplatesId: {
@@ -34693,7 +35217,43 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postDocumentTemplatesIdPreview: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -34703,16 +35263,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["DocumentTemplate"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postDocumentTemplatesIdPublish: {

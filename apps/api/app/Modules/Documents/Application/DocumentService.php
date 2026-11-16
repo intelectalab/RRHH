@@ -68,7 +68,8 @@ final class DocumentService
         $this->validateDates($category, $issued, $expires);
         $classification = $this->classification($category, isset($data['classification']) ? (string) $data['classification'] : null, $canClassify);
         $byTitular = $employment !== null && $uploaderPerson !== null && (string) $employment->person_id === $uploaderPerson;
-        $status = $byTitular && $category->requires_review ? DocumentStateMachine::PENDING : DocumentStateMachine::ACTIVE;
+        // DOC-3: lo que se entrega para una solicitud siempre pasa por revisión (la decide el flujo de aprobación).
+        $status = ($byTitular && $category->requires_review) || ! empty($data['review']) ? DocumentStateMachine::PENDING : DocumentStateMachine::ACTIVE;
         if ($status === DocumentStateMachine::ACTIVE && $expires !== null && $expires < now()->toDateString()) {
             $status = DocumentStateMachine::EXPIRED;
         }

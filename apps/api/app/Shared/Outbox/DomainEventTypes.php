@@ -134,6 +134,13 @@ final class DomainEventTypes
 
     public const DOCUMENT_EXPIRED = 'document.expired.v1';
 
+    // DOC-3 · DOC-5 · Solicitudes de documentos y documentos generados desde plantilla.
+    public const DOCUMENT_REQUESTED = 'document.requested.v1';
+
+    public const DOCUMENT_GENERATED = 'document.generated.v1';
+
+    public const DOCUMENT_GENERATION_STARTED = 'document.generation_started.v1';
+
     public const SIGNATURE_COMPLETED = 'signature.completed.v1';
 
     // Identidad
@@ -782,6 +789,9 @@ final class DomainEventTypes
         self::DOCUMENT_ARCHIVED => ['version' => 1, 'required_fields' => ['document_id', 'category_id'], 'description' => 'Un documento del legajo se archivó (sigue consultable; no se borra)'],
         self::DOCUMENT_EXPIRING => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'expires_on', 'days_left'], 'description' => 'Un documento vence dentro de la anticipación de su tipo: aviso al responsable y al titular (RN-DOC-09)'],
         self::DOCUMENT_EXPIRED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'expires_on'], 'description' => 'Un documento llegó a su fecha de vencimiento y pasó a Vencido (RN-DOC-09)'],
+        self::DOCUMENT_REQUESTED => ['version' => 1, 'required_fields' => ['document_request_id', 'category_id', 'employment_id'], 'description' => 'RRHH pidió un documento a un colaborador con fecha límite (DOC-3): se le avisa para que lo entregue desde el portal'],
+        self::DOCUMENT_GENERATION_STARTED => ['version' => 1, 'required_fields' => ['batch_id', 'template_id'], 'description' => 'Se pidió generar documentos para varias personas: el lote se procesa en segundo plano con su avance (DOC-5)'],
+        self::DOCUMENT_GENERATED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'template_version_id'], 'description' => 'Se generó un documento PDF desde una plantilla y entró al legajo con la versión de la plantilla con que se emitió (DOC-5 · RN-DOC-11)'],
         self::SIGNATURE_COMPLETED => [
             'version' => 1,
             'required_fields' => ['signature_request_id', 'completed_at'],

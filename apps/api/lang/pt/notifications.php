@@ -102,6 +102,10 @@ return [
             'in_app' => ['subject' => '{document} venceu', 'body' => '{document} ({type}) de {employee} venceu em {expires_on}. Envie a versão vigente para regularizar o prontuário.'],
             'email' => ['subject' => '{document} venceu', 'body' => "Olá {name}:\n\nEm {organization}, {document} ({type}) de {employee} venceu em {expires_on}.\n\nEnvie a versão vigente para regularizar o prontuário: {link}"],
         ],
+        'documents.requested' => [
+            'in_app' => ['subject' => 'Pedem um documento a você: {document}', 'body' => 'Recursos Humanos pede {document} até {due_on}. {instructions} Envie pelo seu portal, em Meus documentos.'],
+            'email' => ['subject' => 'Pedem um documento a você: {document}', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos pede {document} até {due_on}.\n\n{instructions}\n\nEnvie pelo seu portal: {link}"],
+        ],
         'documents.rejected' => [
             'in_app' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => 'Recursos Humanos devolveu {document} ({type}): {reason} Envie uma versão corrigida.'],
             'email' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos devolveu {document} ({type}): {reason}\n\nEnvie uma versão corrigida: {link}"],

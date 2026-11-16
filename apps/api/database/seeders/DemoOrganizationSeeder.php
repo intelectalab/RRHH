@@ -140,6 +140,13 @@ class DemoOrganizationSeeder extends Seeder
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
+            // DOC-3: lo que entrega un colaborador para una solicitud de documentos lo revisa Recursos Humanos.
+            if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'document_request')->exists()) {
+                $flow = $flows->create(['name' => 'Documentos solicitados · revisión estándar', 'subject_type' => 'document_request', 'steps' => ['levels' => [
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 48, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                ]], 'conditions' => []]);
+                $flows->publish($flow, null);
+            }
 
             $admin = UserIdentity::query()->where('kind', 'email')->where('identifier_hash', BlindIndex::for('email', $email))->value('user_id');
             if ($admin === null || Task::query()->exists()) {

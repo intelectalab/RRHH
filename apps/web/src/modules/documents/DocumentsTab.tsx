@@ -1,5 +1,6 @@
 'use client'
 
+import { MyDocumentRequests } from './MyDocumentRequests'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
@@ -238,6 +239,8 @@ export function DocumentsTab({ header, toast }: ProfileTabContext) {
   )
 
   return (
+    <>
+    <MyDocumentRequests employmentId={header.id} />
     <Card
       title={t('doc.title')}
       context={t('doc.context')}
@@ -402,5 +405,6 @@ export function DocumentsTab({ header, toast }: ProfileTabContext) {
         </Modal>
       )}
     </Card>
+    </>
   )
 }

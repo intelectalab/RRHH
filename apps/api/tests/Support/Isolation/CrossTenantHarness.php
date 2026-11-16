@@ -21,6 +21,8 @@ use App\Modules\CoreHR\Infrastructure\Models\PensionAffiliation;
 use App\Modules\CoreHR\Infrastructure\Models\PersonnelAction;
 use App\Modules\Documents\Infrastructure\Models\Document;
 use App\Modules\Documents\Infrastructure\Models\DocumentCategory;
+use App\Modules\Documents\Infrastructure\Models\DocumentRequest;
+use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
@@ -176,6 +178,11 @@ final class CrossTenantHarness
         '/documents/expiring' => Document::class,
         '/employments/{employment_id}/documents' => Document::class,
         '/employments/{employment_id}/linked-documents/{ref}/file' => Document::class,
+        // DOC-3 · DOC-4 · DOC-5: entregar y cancelar una solicitud de A; vista previa y generación con una plantilla de A.
+        '/document-requests/{id}/submit' => DocumentRequest::class,
+        '/document-requests/{id}/cancel' => DocumentRequest::class,
+        '/document-templates/{id}/preview' => DocumentTemplate::class,
+        '/document-templates/{id}/generate' => DocumentTemplate::class,
         // COL-5: historia y movimientos de la asignación de una relación laboral de A.
         '/employments/{employment_id}/assignments' => Employment::class,
         '/employments/{employment_id}/assignments/{id}' => Employment::class,

@@ -20,7 +20,7 @@ type Flow = Omit<Schema<'ApprovalFlow'>, 'steps'> & { steps: { levels: Level[] }
 type Option = { id: string; name: string }
 
 /** Tipos que hoy ofrecen los módulos para pedir aprobación. */
-const SUBJECT_TYPES = ['vacation_request', 'permission_request', 'overtime_request', 'expense_report', 'job_requisition', 'position_request', 'compensation_change']
+const SUBJECT_TYPES = ['vacation_request', 'permission_request', 'overtime_request', 'expense_report', 'job_requisition', 'position_request', 'compensation_change', 'document_request']
 const KINDS: ApproverKind[] = ['manager', 'manager_of_manager', 'role', 'user']
 
 /** Configuración → Flujos de aprobación (WFL-1): niveles, quién aprueba, modo y plazo; versiones al publicar. */

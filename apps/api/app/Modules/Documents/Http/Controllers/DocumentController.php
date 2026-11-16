@@ -130,6 +130,7 @@ final class DocumentController
     {
         $doc = $this->access->find($request, $id, 'documents.documents.approve');
         $this->assertNotOwnReview($request, $doc);
+        $this->assertNotInFlow($doc);
 
         return $this->respond($this->documents->approve($doc, $this->access->userId($request)), $request);
     }
@@ -138,6 +139,7 @@ final class DocumentController
     {
         $doc = $this->access->find($request, $id, 'documents.documents.approve');
         $this->assertNotOwnReview($request, $doc);
+        $this->assertNotInFlow($doc);
         $reason = trim((string) $request->validate(['reason' => ['required', 'string', 'min:3', 'max:500']])['reason']);
 
         return $this->respond($this->documents->reject($doc, $reason, $this->access->userId($request)), $request);
@@ -321,5 +323,15 @@ final class DocumentController
     private static function str(mixed $v): ?string
     {
         return is_string($v) && $v !== '' ? $v : null;
+    }
+
+    /** DOC-3 · Lo entregado para una solicitud se decide en el centro de aprobaciones (flujo document_request). */
+    private function assertNotInFlow(Document $doc): void
+    {
+        if (DB::table('document_requests')->where('document_id', $doc->id)->where('status', 'submitted')->exists()) {
+            throw new AyniException('managed_by_flow', 409, (string) trans('documents.requests.decided_in_flow'), [], [
+                'current_status' => $doc->status, 'allowed_actions' => [], 'managed_by' => 'approval_requests',
+            ]);
+        }
     }
 }

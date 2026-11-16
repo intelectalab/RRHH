@@ -2,6 +2,9 @@
 
 use App\Modules\Documents\Http\Controllers\DocumentCategoryController;
 use App\Modules\Documents\Http\Controllers\DocumentController;
+use App\Modules\Documents\Http\Controllers\DocumentGenerationBatchController;
+use App\Modules\Documents\Http\Controllers\DocumentRequestController;
+use App\Modules\Documents\Http\Controllers\DocumentTemplateController;
 use App\Modules\Documents\Http\Controllers\EmploymentDocumentsController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +36,25 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     // DOC-1 · Legajo de la relación laboral por carpeta, con los documentos que aportan otros módulos.
     Route::get('/employments/{employment_id}/documents', [EmploymentDocumentsController::class, 'index'])->middleware('permission:documents.documents.view');
     Route::get('/employments/{employment_id}/linked-documents/{ref}/file', [EmploymentDocumentsController::class, 'linkedFile'])->middleware('permission:documents.documents.view');
+
+    // DOC-3 · Solicitudes de documentos: RRHH pide, el colaborador entrega y la revisión va por el motor de aprobaciones.
+    Route::get('/document-requests', [DocumentRequestController::class, 'index'])->middleware('permission:documents.documents.view');
+    Route::post('/document-requests', [DocumentRequestController::class, 'store'])->middleware('permission:documents.documents.request');
+    Route::get('/document-requests/{id}', [DocumentRequestController::class, 'show'])->middleware('permission:documents.documents.view');
+    Route::post('/document-requests/{id}/submit', [DocumentRequestController::class, 'submit'])->middleware('permission:documents.documents.create');
+    Route::post('/document-requests/{id}/cancel', [DocumentRequestController::class, 'cancel'])->middleware('permission:documents.documents.request');
+
+    // DOC-4 · Plantillas con variables y versiones (el catálogo de variables, antes de /document-templates/{id}).
+    Route::get('/document-templates', [DocumentTemplateController::class, 'index'])->middleware('permission:documents.templates.view');
+    Route::post('/document-templates', [DocumentTemplateController::class, 'store'])->middleware('permission:documents.templates.create');
+    Route::get('/document-templates/variables', [DocumentTemplateController::class, 'variables'])->middleware('permission:documents.templates.view');
+    Route::get('/document-templates/{id}', [DocumentTemplateController::class, 'show'])->middleware('permission:documents.templates.view');
+    Route::patch('/document-templates/{id}', [DocumentTemplateController::class, 'update'])->middleware('permission:documents.templates.update');
+    Route::post('/document-templates/{id}/publish', [DocumentTemplateController::class, 'publish'])->middleware('permission:documents.templates.publish');
+    Route::post('/document-templates/{id}/retire', [DocumentTemplateController::class, 'retire'])->middleware('permission:documents.templates.retire');
+    Route::post('/document-templates/{id}/preview', [DocumentTemplateController::class, 'preview'])->middleware('permission:documents.templates.generate');
+    // DOC-5 · Generación de PDF al legajo (una persona en el acto; varias en segundo plano) y avance de los lotes.
+    Route::post('/document-templates/{id}/generate', [DocumentTemplateController::class, 'generate'])->middleware('permission:documents.templates.generate');
+    Route::get('/document-generation-batches', [DocumentGenerationBatchController::class, 'index'])->middleware('permission:documents.templates.view');
+    Route::get('/document-generation-batches/{id}', [DocumentGenerationBatchController::class, 'show'])->middleware('permission:documents.templates.view');
 });

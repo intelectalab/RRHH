@@ -638,7 +638,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/documents/{id}/{archive,restore}` | `documents.documents.{archive,restore}` | 1 |
 | GET, POST | `/document-templates` | `documents.templates.{view,create}` | 1 |
 | GET, PATCH | `/document-templates/{id}` | `documents.templates.{view,update}` | 1 |
-| POST | `/document-templates/{id}/{publish,retire,generate}` | `documents.templates.{publish,retire,generate}` | 1 |
+| POST | `/document-templates/{id}/{publish,retire}` | `documents.templates.{publish,retire}` | 1 |
+| GET | `/document-generation-batches` | `documents.templates.view` | 1 |
+| GET | `/document-generation-batches/{id}` | `documents.templates.view` | 1 |
+| GET | `/document-requests` | `documents.documents.view` | 1 |
+| GET | `/document-requests/{id}` | `documents.documents.view` | 1 |
 | GET, POST | `/signature-requests` | `documents.signature_requests.{view,create}` | 1 |
 | GET | `/signature-requests/{id}` | `documents.signature_requests.view` | 1 |
 | POST | `/signature-requests/{id}/{send,sign,decline,cancel,remind}` | `documents.signature_requests.{send,sign,decline,cancel,remind}` | 1 |
@@ -658,6 +662,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/documents/{id}/versions/{version}/file` | `documents.documents.view` | 1 |
 | GET | `/employments/{employment_id}/documents` | `documents.documents.view` | 1 |
 | GET | `/employments/{employment_id}/linked-documents/{ref}/file` | `documents.documents.view` | 1 |
+| POST | `/document-requests` | `documents.documents.request` | 1 |
+| POST | `/document-requests/{id}/submit` | `documents.documents.create` | 1 |
+| POST | `/document-requests/{id}/cancel` | `documents.documents.request` | 1 |
+| GET | `/document-templates/variables` | `documents.templates.view` | 1 |
+| POST | `/document-templates/{id}/preview` | `documents.templates.generate` | 1 |
+| POST | `/document-templates/{id}/generate` | `documents.templates.generate` | 1 |
 
 **ESS · Portal del colaborador**
 

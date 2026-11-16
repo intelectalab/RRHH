@@ -14,6 +14,7 @@ import { PageHeader } from '@/ui/components/PageHeader'
 import { SkeletonBlock } from '@/ui/components/Skeleton'
 import { EmptyState, ErrorState } from '@/ui/components/States'
 import { StatusBadge } from '@/ui/components/Status'
+import { MyDocumentRequests } from '@/modules/documents/MyDocumentRequests'
 import { EmploymentSwitch } from './EmploymentSwitch'
 import { cardOf, days } from './portal'
 import type { MeHome } from './types'
@@ -123,6 +124,8 @@ export function MyHomeScreen() {
                   {profile.data.pending_changes > 0 && <p className="mt-2"><StatusBadge tone="wa">{t('portal.changes_pending', { n: profile.data.pending_changes })}</StatusBadge></p>}
                 </Card>
               )}
+
+              {!readOnly && <MyDocumentRequests employmentId={home.employment?.id ?? null} />}
 
               <Card title={t('portal.card_pending')} actions={home.pending.total > 0 ? <Link className="btn btn-ter btn-sm" href="/pendientes">{t('portal.see_all')}</Link> : undefined}>
                 {home.pending.items.length === 0 ? (
