@@ -145,6 +145,8 @@ return [
         'budgeted_cost' => ['org.positions.budget.view', 'salary'],
         'deviation_cost' => ['org.positions.budget.view', 'salary'],
     ],
+    // POS-7 · Nodo del organigrama por posiciones (/positions/org-chart).
+    'PositionChartNode' => ['branch_projected_cost' => ['org.positions.budget.view', 'salary']],
     'HeadcountPosition' => [
         'base_cost' => ['org.positions.budget.view', 'salary'],
         'projected_cost' => ['org.positions.budget.view', 'salary'],

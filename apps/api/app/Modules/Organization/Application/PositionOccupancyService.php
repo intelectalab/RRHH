@@ -6,6 +6,7 @@ use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Shared\Organization\PositionOccupancy;
 use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -65,6 +66,24 @@ final class PositionOccupancyService implements PositionOccupancy
         }
 
         return $position->status;
+    }
+
+    public function createImplicit(string $legalEntityId, array $structure, string $from, ?string $userId = null): string
+    {
+        $title = (string) (DB::table('job_profiles')->where('id', $structure['job_profile_id'])->value('name') ?? '');
+        $position = $this->positions->createApproved([
+            'code' => 'AUTO-'.strtoupper(substr(str_replace('-', '', (string) Str::uuid()), -8)),
+            'title' => $title !== '' ? $title : null,
+            'job_profile_id' => $structure['job_profile_id'],
+            'legal_entity_id' => $legalEntityId,
+            'org_unit_id' => $structure['org_unit_id'],
+            'site_id' => $structure['site_id'] ?? null,
+            'cost_center_id' => $structure['cost_center_id'] ?? null,
+            'valid_from' => $from,
+            'is_implicit' => true,
+        ], (string) trans('organization.positions.implicit_reason'));
+
+        return $position->id;
     }
 
     /** Asignaciones de otros que siguen vigentes en algún momento desde la fecha (sin fin). */

@@ -231,6 +231,36 @@ test('COL-2 · el ingreso consume la posición vacante y la política puede exig
     expect($required->json('error.details.0.field'))->toBe('position_id');
 });
 
+test('POS-6 · con la política desactivada el ingreso sin posición crea una implícita; activarla por empresa queda auditado', function (): void {
+    $hired = colCall($this->admin, 'post', '/employments', colHire());
+    $this->assertMatchesOpenApi($hired, 'post', '/employments', 201);
+    $positionId = (string) $hired->json('data.position_id');
+    expect($positionId)->not->toBe('');
+    TenancyScope::runAs(COL_TENANT, function () use ($positionId): void {
+        $p = DB::table('positions')->where('id', $positionId)->first();
+        expect($p->is_implicit)->toBeTrue()->and($p->status)->toBe('filled')
+            ->and((string) $p->org_unit_id)->toBe($this->unit)->and((string) $p->job_profile_id)->toBe($this->profile)
+            ->and((string) $p->legal_entity_id)->toBe($this->entity);
+    });
+
+    // La política se activa solo para esta empresa (nivel empresa) y el cambio queda en la auditoría.
+    $on = colCall($this->admin, 'put', '/settings/posiciones', ['legal_entity_id' => $this->entity, 'reason' => 'Control de plazas',
+        'values' => [['code' => 'posiciones.contratar_solo_con_posicion', 'value' => true]]]);
+    $this->assertMatchesOpenApi($on, 'put', '/settings/{group}', 200);
+    TenancyScope::runAs(COL_TENANT, function (): void {
+        expect(DB::table('audit_events')->where('action', 'setting.changed')->where('reason', 'Control de plazas')->exists())->toBeTrue();
+    });
+    $rejected = colCall($this->admin, 'post', '/employments', colHire());
+    $this->assertMatchesOpenApi($rejected, 'post', '/employments', 422);
+    expect($rejected->json('error.details.0.field'))->toBe('position_id');
+
+    // En otra empresa sin la política, el ingreso sin posición sigue permitido.
+    $other = TenancyScope::runAs(COL_TENANT, fn () => LegalEntity::factory()->create()->id);
+    $otherUnit = TenancyScope::runAs(COL_TENANT, fn () => OrgUnit::factory()->create(['legal_entity_id' => $other])->id);
+    $otherSite = TenancyScope::runAs(COL_TENANT, fn () => Site::factory()->create(['legal_entity_id' => $other])->id);
+    colCall($this->admin, 'post', '/employments', colHire(['legal_entity_id' => $other, 'org_unit_id' => $otherUnit, 'site_id' => $otherSite, 'labor_regime_code' => 'pe_general']))->assertCreated();
+});
+
 test('COL-2 · anular un ingreso por empezar libera la posición; una transición inválida responde 409', function (): void {
     $position = TenancyScope::runAs(COL_TENANT, fn () => Position::factory()->create([
         'legal_entity_id' => $this->entity, 'job_profile_id' => $this->profile, 'org_unit_id' => $this->unit, 'site_id' => $this->site, 'status' => 'open',

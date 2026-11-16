@@ -70,6 +70,13 @@ final class EmploymentService
 
             $assignment = $this->assignment($input, $legalEntityId, $hireDate);
             $previous = $this->assertNoOpenRelation($person, $legalEntityId, $hireDate);
+            if ($assignment['position_id'] === null) {
+                // POS-6 · Sin la política «contratar solo contra posición», el ingreso sin plaza crea una implícita.
+                $assignment['position_id'] = $this->occupancy->createImplicit($legalEntityId, [
+                    'job_profile_id' => (string) $assignment['job_profile_id'], 'org_unit_id' => (string) $assignment['org_unit_id'],
+                    'site_id' => $assignment['site_id'] ?? null, 'cost_center_id' => $assignment['cost_center_id'] ?? null,
+                ], $hireDate, $userId);
+            }
             $status = $hireDate <= $today ? 'active' : 'pending';
             if ($status === 'active') {
                 // RN-COL-13 · El límite cuenta relaciones activas; un ingreso futuro se valida al activarse.
@@ -111,9 +118,8 @@ final class EmploymentService
                     'change_reason' => 'hire',
                 ], $hireDate);
             }
-            if ($assignment['position_id'] !== null) {
-                $this->occupancy->sync((string) $assignment['position_id'], $userId);
-            }
+            // Con posición elegida o implícita (POS-6), el ingreso la ocupa.
+            $this->occupancy->sync((string) $assignment['position_id'], $userId);
 
             $this->outbox->record(DomainEventTypes::EMPLOYEE_HIRED, 'employment', $employment->id, [
                 'employee_id' => $employment->id,

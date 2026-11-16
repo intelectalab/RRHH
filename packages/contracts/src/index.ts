@@ -5939,10 +5939,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha (indica el tipo aplicado) */
+        /** Convertir un monto a otra moneda con el tipo de cambio vigente a una fecha: indica el tipo aplicado, su fecha y si es referencial (RN-CFG-07: sin tipo del mismo día se usa el último anterior, o se rechaza si org.tipo_cambio_faltante = block) */
         get: operations["getExchangeRatesConvert"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exchange-rates/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Traer de la fuente de tipos de cambio (puerto con implementación falsa en desarrollo) los tipos de una fecha y publicarlos con su fuente; por defecto los pares registrados y los de cada empresa con otra moneda. Lo ya publicado se omite: repetirla no duplica */
+        post: operations["postExchangeRatesImport"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6856,7 +6873,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas */
+        /** Resumen de dotación: aprobadas, ocupadas, vacantes, congeladas. Con report_currency (y org.positions.budget.view) agrega totals.consolidated: los costos de todas las monedas convertidos a esa moneda con el tipo de cambio de la fecha, indicando cada tipo aplicado (CFG-7) */
         get: operations["getHeadcount"];
         put?: never;
         post?: never;
@@ -12274,6 +12291,23 @@ export interface paths {
         put?: never;
         /** Crear Position */
         post: operations["postPositions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/positions/org-chart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Organigrama por posiciones a una fecha (POS-7): cada plaza con su estado (ocupada, vacante, en reclutamiento, congelada), ocupantes y, por rama, plazas ocupadas sobre aprobadas; el costo proyectado de la rama solo con org.positions.budget.view */
+        get: operations["getPositionsOrgChart"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -21410,6 +21444,7 @@ export interface components {
             is_critical: boolean;
             fte: number;
             is_shared: boolean;
+            is_implicit?: boolean | null;
             seats: number;
             occupied_seats?: number | null;
             occupants?: {
@@ -21454,6 +21489,7 @@ export interface components {
             is_critical?: boolean;
             fte?: number;
             is_shared?: boolean;
+            is_implicit?: boolean | null;
             seats?: number;
             /** Format: date */
             valid_from?: string;
@@ -23655,6 +23691,15 @@ export interface components {
         };
         /** @description Límite de solicitudes superado */
         TooManyRequests: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Un servicio externo requerido no responde (upstream_unavailable) */
+        UpstreamUnavailable: {
             headers: {
                 [name: string]: unknown;
             };
@@ -38671,6 +38716,40 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postExchangeRatesImport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["UpstreamUnavailable"];
         };
     };
     getExpensePolicies: {
@@ -40829,6 +40908,8 @@ export interface operations {
                 legal_entity_id?: string;
                 /** @description Solo esa unidad y sus subunidades */
                 org_unit_id?: string;
+                /** @description Moneda ISO 4217 del consolidado de costos (CFG-7) */
+                report_currency?: string;
             };
             header?: never;
             path?: never;
@@ -40848,6 +40929,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     getHeadcountBudgets: {
@@ -53868,6 +53950,36 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPositionsOrgChart: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+                /** @description Solo esa empresa */
+                legal_entity_id?: string;
+                /** @description Solo las posiciones de esa unidad y sus subunidades */
+                org_unit_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getPositionsId: {

@@ -89,6 +89,7 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/position-options', [PositionController::class, 'options'])->middleware('permission:org.positions.view');
     Route::get('/positions', [PositionController::class, 'index'])->middleware('permission:org.positions.view');
     Route::post('/positions', [PositionController::class, 'store'])->middleware('permission:org.positions.create');
+    Route::get('/positions/org-chart', [PositionController::class, 'orgChart'])->middleware('permission:org.positions.view');
     Route::get('/positions/{id}', [PositionController::class, 'show'])->middleware('permission:org.positions.view');
     Route::patch('/positions/{id}', [PositionController::class, 'update'])->middleware('permission:org.positions.update');
     Route::get('/positions/{id}/occupants', [PositionController::class, 'occupants'])->middleware('permission:org.positions.view');

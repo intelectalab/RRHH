@@ -103,6 +103,7 @@ return [
         'seats_below_occupied' => 'The position has :count occupant(s): it cannot have fewer seats.',
         'budget_forbidden' => 'You are not allowed to record position costs.',
         'over_budget_reason_required' => 'This position exceeds its unit\'s headcount budget: to approve it, record the reason for the exception.',
+        'implicit_reason' => 'Implicit position created when registering a hire without a position ("hire only against a position" policy turned off).',
         'over_budget_exception' => 'Budget exception: :reason',
         'not_assignable_proposed' => 'The position is not approved yet: it cannot have occupants.',
         'not_assignable_frozen' => 'The position is frozen: it accepts no occupants or openings (RN-POS-03).',

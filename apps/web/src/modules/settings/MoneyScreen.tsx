@@ -13,7 +13,8 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { useToast } from '@/ui/components/Toast'
 
 type Rate = { id: string; from_currency: string; to_currency: string; rate: string; valid_on: string; source: string }
-type Conversion = { converted: { amount: string; currency: string }; rate: string; rate_date: string; inverse: boolean }
+type Conversion = { converted: { amount: string; currency: string }; rate: string; rate_date: string; inverse: boolean; referential: boolean }
+type ImportResult = { imported: Rate[]; skipped: Array<{ from_currency: string; to_currency: string; reason: string }>; is_fake: boolean }
 const CURRENCIES = ['PEN', 'USD', 'EUR']
 
 /** Configuración → Monedas y tipos de cambio (CFG-7). */
@@ -24,6 +25,8 @@ export function MoneyScreen() {
   const [rows, setRows] = useState<Rate[] | null>(null)
   const [loadError, setLoadError] = useState(false)
   const [adding, setAdding] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [imported, setImported] = useState<ImportResult | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -35,14 +38,37 @@ export function MoneyScreen() {
   }, [])
   useEffect(() => { void load() }, [load])
 
+  // CFG-7 · Trae los tipos del día desde la fuente configurada; lo ya publicado se omite.
+  async function importToday() {
+    setImporting(true)
+    try {
+      const r = (await api.post<{ data: ImportResult }>('/exchange-rates/import', { date: localToday() })).data
+      setImported(r)
+      toast(t('fx.imported', { n: r.imported.length }))
+      await load()
+    } catch (err) {
+      toast(formErrors(err, t).general ?? t('fx.import_error'), 'error')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   return (
     <>
       <PageHeader title={t('fx.title')} sub={t('fx.sub')} actions={<>
         <Link className="btn btn-sec" href="/configuracion">{t('cfg.back')}</Link>
+        {can('settings.exchange_rates.create') && <button type="button" className="btn btn-sec" disabled={importing} onClick={() => void importToday()}><Icon name="download" /> {t('fx.import')}</button>}
         {can('settings.exchange_rates.create') && !adding && <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}><Icon name="plus" /> {t('fx.new')}</button>}
       </>} />
       <main className="main" id="contenido" tabIndex={-1}>
         <div className="nota">{t('fx.help')}</div>
+        {imported && (
+          <div className="nota" role="status">
+            {t('fx.import_summary', { imported: imported.imported.length, skipped: imported.skipped.length })}
+            {imported.skipped.length > 0 && <span className="sub2">{imported.skipped.map((x) => t(`fx.skip_${x.reason}`, { pair: `${x.from_currency} → ${x.to_currency}` })).join(' · ')}</span>}
+            {imported.is_fake && <span className="sub2">{t('fx.import_fake')}</span>}
+          </div>
+        )}
         <div className="grid-2">
           <section className="card">
             {adding && <NewRate onCancel={() => setAdding(false)} onDone={async () => { setAdding(false); toast(t('fx.created')); await load() }} />}
@@ -129,7 +155,7 @@ function Converter() {
         <div className="mb-2"><label className="form-label" htmlFor="cv-date">{t('fx.date')}</label><input id="cv-date" type="date" className="form-control" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></div>
         <button type="submit" className="btn btn-sec btn-sm">{t('fx.convert')}</button>
       </form>
-      {result && <p className="mt-2"><b>{money(result.converted)}</b><span className="sub2">{t('fx.result', { amount: money(result.converted), rate: result.rate, date: formatDate(locale, result.rate_date) })} {result.inverse ? t('fx.inverse') : ''}</span></p>}
+      {result && <p className="mt-2"><b>{money(result.converted)}</b><span className="sub2">{t('fx.result', { amount: money(result.converted), rate: result.rate, date: formatDate(locale, result.rate_date) })} {result.inverse ? t('fx.inverse') : ''} {result.referential ? t('fx.referential') : ''}</span></p>}
       {error && <div className="invalid-feedback" role="alert">{error}</div>}
     </section>
   )

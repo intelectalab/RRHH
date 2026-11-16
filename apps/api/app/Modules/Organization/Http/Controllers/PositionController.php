@@ -2,6 +2,7 @@
 
 namespace App\Modules\Organization\Http\Controllers;
 
+use App\Modules\Organization\Application\PositionOrgChart;
 use App\Modules\Organization\Application\PositionService;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionStatusEvent;
@@ -10,6 +11,7 @@ use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
 use App\Shared\Permissions\SensitiveFields;
 use App\Shared\Query\TableQuery;
+use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +39,43 @@ final class PositionController
         private readonly PositionService $positions,
         private readonly DataScope $scope,
         private readonly SensitiveFields $sensitive,
+        private readonly PositionOrgChart $chart,
     ) {}
+
+    /**
+     * POS-7 · Organigrama por posiciones a una fecha, con plazas vacantes y congeladas y, por rama, plazas
+     * ocupadas sobre aprobadas. El costo de la rama solo viaja con org.positions.budget.view.
+     */
+    public function orgChart(Request $request): JsonResponse
+    {
+        $filters = ['as_of', 'legal_entity_id', 'org_unit_id'];
+        $asOf = $request->query('as_of');
+        if ($asOf !== null && (! is_string($asOf) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $asOf) !== 1 || strtotime($asOf) === false)) {
+            throw new InvalidFilterException((string) trans('errors.invalid_filter'), $filters);
+        }
+        $ids = [];
+        foreach (['legal_entity_id', 'org_unit_id'] as $f) {
+            $v = $request->query($f);
+            if ($v !== null && $v !== '' && (! is_string($v) || preg_match('/^[0-9a-f-]{36}$/i', $v) !== 1)) {
+                throw new InvalidFilterException((string) trans('errors.invalid_filter'), $filters);
+            }
+            $ids[$f] = is_string($v) && $v !== '' ? $v : null;
+        }
+        $day = is_string($asOf) ? $asOf : EffectiveDated::day(now());
+        $userId = (string) $request->user()?->getAuthIdentifier();
+        $nodes = $this->chart->nodes($day, $this->scope->legalEntityIds($userId, 'org.positions.view'), $ids['legal_entity_id'], $ids['org_unit_id']);
+        $nodes = $this->sensitive->presentMany('PositionChartNode', $nodes, $this->permissions($request));
+        $totals = ['positions' => 0, 'approved_seats' => 0, 'occupied_seats' => 0, 'vacant_seats' => 0, 'frozen_seats' => 0];
+        foreach ($nodes as $n) {
+            if ($n['parent_id'] === null) {
+                foreach (array_keys($totals) as $k) {
+                    $totals[$k] += $n['branch'][$k];
+                }
+            }
+        }
+
+        return response()->json(['data' => $nodes, 'meta' => ['as_of' => $day, 'total' => count($nodes), 'totals' => $totals]]);
+    }
 
     public function index(Request $request): JsonResponse
     {

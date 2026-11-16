@@ -3,7 +3,8 @@
  * Funciones puras (sin DOM): las usan la vista en pantalla y la exportación a imagen y PDF.
  */
 
-export type ChartNode = { id: string; parent_id: string | null; title: string; subtitle?: string | null; detail?: string | null }
+/** tone: estado que el nodo dibuja aparte (POS-7: plaza vacante, en reclutamiento o congelada). */
+export type ChartNode = { id: string; parent_id: string | null; title: string; subtitle?: string | null; detail?: string | null; tone?: 'vacant' | 'recruiting' | 'frozen' }
 
 export type PlacedNode = ChartNode & { x: number; y: number; depth: number; childCount: number; collapsed: boolean }
 export type Edge = { from: string; to: string; path: string }

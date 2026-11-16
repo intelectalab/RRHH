@@ -1035,7 +1035,15 @@
     "result": "{amount} at {rate} from {date}",
     "inverse": "(inverse)",
     "save": "Publish",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "import": "Fetch today's rates",
+    "imported": "Rates imported: {n}",
+    "import_error": "Exchange rates could not be fetched.",
+    "import_summary": "Imported: {imported} · skipped: {skipped}",
+    "skip_already_published": "{pair}: already published today",
+    "skip_not_published": "{pair}: not published by the source",
+    "import_fake": "Test source: the values are not real.",
+    "referential": "(reference rate: no rate was published that day)"
   },
   "acct": {
     "title": "Account security",
@@ -2349,7 +2357,18 @@
     "tab_employees": "Employees",
     "tab_requests": "Data changes",
     "tab_movements": "Movements",
-    "tab_contracts": "Expiring contracts"
+    "tab_contracts": "Expiring contracts",
+    "view_positions": "Positions",
+    "chart_heading_positions": "Org chart by positions as of {date}",
+    "chart_sub_positions": "Positions: {n}",
+    "chart_empty_positions_title": "No positions on that date yet",
+    "chart_empty_positions_text": "Approved positions show here with their incumbent, or as vacant or frozen.",
+    "go_positions": "Go to positions",
+    "chart_free_seats": "{n} free seat(s)",
+    "chart_state_vacant": "Vacant",
+    "chart_state_recruiting": "Recruiting",
+    "chart_state_frozen": "Frozen",
+    "chart_branch": "Branch: {occupied} of {approved} filled"
   },
   "pos": {
     "sub": "Positions: concrete seats in the structure, with their job, unit, manager and occupants",
@@ -2559,7 +2578,14 @@
     "budget_saved": "Budget saved.",
     "budget_help": "Recording a new budget closes the unit's current one the day before.",
     "monthly_cost": "Budgeted monthly cost",
-    "notes": "Notes"
+    "notes": "Notes",
+    "report_currency": "Consolidate in",
+    "report_currency_none": "Do not consolidate",
+    "consolidated": "Consolidated: projected cost {projected} · budgeted {budgeted}",
+    "consolidated_no_rates": "All amounts are already in {currency}.",
+    "rate_applied": "{from} → {to}: {rate} on {date}",
+    "rate_referential": "{from} → {to}: {rate} on {date} (reference)",
+    "consolidate_error": "Could not consolidate in that currency."
   },
   "emp": {
     "title": "Employee",

@@ -130,6 +130,7 @@ final class PositionService
                 'is_critical' => $p->is_critical,
                 'fte' => (float) $p->fte,
                 'is_shared' => $p->is_shared,
+                'is_implicit' => (bool) $p->is_implicit,
                 'seats' => $p->seats,
                 'occupied_seats' => count($current),
                 'occupants' => $current,

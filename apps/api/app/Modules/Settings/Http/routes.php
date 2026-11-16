@@ -29,6 +29,7 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/exchange-rates', [ExchangeRateController::class, 'index'])->middleware('permission:settings.exchange_rates.view');
     Route::post('/exchange-rates', [ExchangeRateController::class, 'store'])->middleware('permission:settings.exchange_rates.create');
     Route::get('/exchange-rates/convert', [ExchangeRateController::class, 'convert'])->middleware('permission:settings.exchange_rates.view');
+    Route::post('/exchange-rates/import', [ExchangeRateController::class, 'import'])->middleware('permission:settings.exchange_rates.create');
 
     // CFG-10 · Catálogos: leerlos basta con la sesión (los usan los formularios); editarlos exige permiso.
     Route::get('/catalogs', [CatalogController::class, 'index']);

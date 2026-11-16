@@ -245,6 +245,22 @@ final class HeadcountService
         return $c === null || $c['projected'] === null || $c['currency'] === null ? null : ['amount' => $c['projected'], 'currency' => $c['currency']];
     }
 
+    /**
+     * POS-7 · Costo proyectado mensual de varias plazas (RN-POS-07), o null si no se puede estimar.
+     *
+     * @param  array<int, Position>  $positions
+     * @return array<string, array{amount: string, currency: string}|null>
+     */
+    public function projectedCosts(array $positions, string $date): array
+    {
+        $out = [];
+        foreach ($this->costs($positions, $date) as $id => $c) {
+            $out[(string) $id] = $c['projected'] === null || $c['currency'] === null ? null : ['amount' => $c['projected'], 'currency' => $c['currency']];
+        }
+
+        return $out;
+    }
+
     // ------------------------------------------------------------------ Tablero
 
     /**
