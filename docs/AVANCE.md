@@ -291,10 +291,10 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PRV-3 | Exportación contable configurable | PRV | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRV-4 | Reporte de costo laboral | PRV | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRV-5 | Simulador público de costo laboral | PRV | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
-| LIQ-1 | Cálculo de la liquidación | LIQ | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| LIQ-2 | Simulador de liquidación | LIQ | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| LIQ-3 | Aprobación, pago y plazo de la liquidación | LIQ | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| LIQ-4 | Documentos de cese | LIQ | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| LIQ-1 | Cálculo de la liquidación | LIQ | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Cálculo de la liquidación: truncos, vacaciones no gozadas y vencidas, indemnización con tope del régimen, descuentos con tope y ajuste final de quinta; explicación por línea; caso dorado LIQ-001. |
+| LIQ-2 | Simulador de liquidación | LIQ | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Simulador de liquidación sin guardar con una o dos fechas de cese y comparación del neto. |
+| LIQ-3 | Aprobación, pago y plazo de la liquidación | LIQ | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Aprobación por flujo con segregación, devolución, plazo de pago como parámetro con aviso, pago y anulación. |
+| LIQ-4 | Documentos de cese | LIQ | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Hoja de liquidación, certificado de trabajo, carta de liberación de CTS y constancia de cese con firma y entrega al portal; Nómina → Liquidaciones. |
 | LOC-1 | Registro de prestadores | LOC | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | LOC-2 | Recibos por honorarios | LOC | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | LOC-3 | Retención de cuarta categoría y pago | LOC | Fase 3 · Nómina Perú | Task | — | pendiente | — |  |
