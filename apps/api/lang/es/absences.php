@@ -93,4 +93,21 @@ return [
         'closed' => 'La ausencia está cerrada: no se registra el certificado.',
         'forbidden' => 'Registrar el certificado exige permiso para ver datos de salud.',
     ],
+    'summary' => [
+        'invalid_date' => 'Usa una fecha válida (AAAA-MM-DD).',
+        'to_before_from' => 'La fecha final no puede ser anterior a la inicial.',
+        'too_long' => 'El periodo puede tener hasta :days días.',
+        'confidential' => 'Ausencia justificada (confidencial)',
+        'effects' => ['paid' => 'pagada', 'unpaid' => 'sin goce de haber', 'employer_paid' => 'a cargo del empleador', 'subsidy' => 'subsidiada'],
+        'days' => [
+            'outside_employment' => 'Fuera de la relación laboral.',
+            'rest_day' => 'Descanso semanal.',
+            'holiday' => 'Feriado.',
+            'worked' => 'Día laborable sin ausencias.',
+            'remote_agreement' => 'Laborado en remoto según el acuerdo de teletrabajo.',
+            'remote_absence' => 'Laborado en remoto (trabajo remoto aprobado).',
+            'absence' => ':type (:effect).',
+            'hours' => 'Con :hours h de :type (:effect).',
+        ],
+    ],
 ];

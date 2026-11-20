@@ -2,6 +2,7 @@
 
 use App\Modules\Absences\Http\Controllers\AbsenceRequestController;
 use App\Modules\Absences\Http\Controllers\AbsenceSubsidyController;
+use App\Modules\Absences\Http\Controllers\AbsenceSummaryController;
 use App\Modules\Absences\Http\Controllers\AbsenceTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,4 +37,8 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/absence-subsidies/{id}/approve', [AbsenceSubsidyController::class, 'approve'])->middleware('permission:time.absences.manage_subsidy');
     Route::post('/absence-subsidies/{id}/reject', [AbsenceSubsidyController::class, 'reject'])->middleware('permission:time.absences.manage_subsidy');
     Route::post('/absence-subsidies/{id}/reimburse', [AbsenceSubsidyController::class, 'reimburse'])->middleware('permission:time.absences.manage_subsidy');
+
+    // AUS-5 · AUS-6 · Resumen de ausencias del periodo (incidencias para planilla) y su cierre.
+    Route::get('/employments/{employment_id}/absence-summary', [AbsenceSummaryController::class, 'show'])->middleware('permission:time.absences.view');
+    Route::post('/absence-summaries/close', [AbsenceSummaryController::class, 'close'])->middleware('permission:time.absences.create_for_others');
 });

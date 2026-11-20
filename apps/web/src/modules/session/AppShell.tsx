@@ -54,6 +54,7 @@ const MENU: NavLink[] = [
   { href: '/tiempo/ausencias', key: 'shell.modules_absences', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
   { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
   { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
+  { href: '/tiempo/resumen-periodo', key: 'shell.modules_period_summary', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.create_for_others') },
 ]
 
 const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'imports.setup.use', 'settings.organization.view']

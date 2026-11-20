@@ -153,7 +153,8 @@
     "modules_exports": "My exports",
     "support_session": "GestiaHR support session · {agent} · until {until}",
     "support_no_sensitive": "no access to sensitive data",
-    "modules_remote_work": "Remote work"
+    "modules_remote_work": "Remote work",
+    "modules_period_summary": "Period summary"
   },
   "home": {
     "title": "Hello, {name}",
@@ -5004,5 +5005,42 @@
     "change": "Change PIN",
     "saved": "PIN saved on this phone.",
     "forgotten": "This phone no longer signs in with a PIN."
+  },
+  "aps": {
+    "title": "Period summary",
+    "sub": "What payroll will take from absences, with each day explained.",
+    "employee": "Employee",
+    "choose": "Choose…",
+    "from": "From",
+    "to": "To",
+    "show": "Show summary",
+    "error": "The summary could not be loaded.",
+    "empty_title": "Choose a person and a period",
+    "empty_text": "You will see each day of the period explained and the totals by absence type.",
+    "confirm_close": "Close the period? The summary will be frozen and any later change will show as a difference.",
+    "closed": "Period closed.",
+    "unchanged": "The period was already closed with no changes.",
+    "changed_after_close": "The period was closed and {n} days have changed since.",
+    "closed_no_changes": "Period closed, no changes since closing.",
+    "totals": "Totals",
+    "close": "Close period",
+    "totals_line": "Worked: {worked} (remote: {remote}) · Absence: {absence} · Rest: {rest} · Holidays: {holidays}",
+    "col_type": "Type",
+    "col_days": "Days",
+    "col_hours": "Hours",
+    "col_effect": "Effect",
+    "col_concept": "Payroll concept",
+    "no_absences": "No absences in the period.",
+    "effect_line": "Paid {paid} · unpaid {unpaid} · employer {employer} · subsidy {subsidy}",
+    "days": "Day by day",
+    "col_date": "Date",
+    "col_kind": "Day",
+    "col_explanation": "Explanation",
+    "kind_outside_employment": "Outside employment",
+    "kind_rest_day": "Rest day",
+    "kind_holiday": "Holiday",
+    "kind_worked": "Worked",
+    "kind_remote": "Remote",
+    "kind_absence": "Absence"
   }
 }

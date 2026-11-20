@@ -887,6 +887,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/absences/{id}/medical-certificate` | `time.absences.medical_certificate.view` | 2 |
 | PUT | `/absences/{id}/medical-certificate` | `time.absences.create_for_others` | 2 |
 | GET | `/employments/{employment_id}/medical-leave-summary` | `time.absences.manage_subsidy` | 2 |
+| GET | `/employments/{employment_id}/absence-summary` | `time.absences.view` | 2 |
+| POST | `/absence-summaries/close` | `time.absences.create_for_others` | 2 |
 | GET | `/absence-subsidies` | `time.absences.manage_subsidy` | 2 |
 | GET | `/absence-subsidies/{id}` | `time.absences.manage_subsidy` | 2 |
 | POST | `/absence-subsidies/{id}/file` | `time.absences.manage_subsidy` | 2 |

@@ -153,7 +153,8 @@
     "modules_exports": "Mis exportaciones",
     "support_session": "Sesión de soporte de GestiaHR · {agent} · hasta {until}",
     "support_no_sensitive": "sin acceso a datos sensibles",
-    "modules_remote_work": "Teletrabajo"
+    "modules_remote_work": "Teletrabajo",
+    "modules_period_summary": "Resumen del periodo"
   },
   "home": {
     "title": "Hola, {name}",
@@ -5004,5 +5005,42 @@
     "change": "Cambiar PIN",
     "saved": "PIN guardado en este teléfono.",
     "forgotten": "Este teléfono ya no entra con PIN."
+  },
+  "aps": {
+    "title": "Resumen del periodo",
+    "sub": "Lo que la planilla tomará de ausencias, con cada día explicado.",
+    "employee": "Colaborador",
+    "choose": "Elige…",
+    "from": "Desde",
+    "to": "Hasta",
+    "show": "Ver resumen",
+    "error": "No se pudo cargar el resumen.",
+    "empty_title": "Elige a una persona y un periodo",
+    "empty_text": "Verás cada día del periodo explicado y los totales por tipo de ausencia.",
+    "confirm_close": "¿Cerrar el periodo? El resumen quedará congelado y un cambio posterior se mostrará como diferencia.",
+    "closed": "Periodo cerrado.",
+    "unchanged": "El periodo ya estaba cerrado sin cambios.",
+    "changed_after_close": "El periodo se cerró y desde entonces cambiaron {n} días.",
+    "closed_no_changes": "Periodo cerrado, sin cambios desde el cierre.",
+    "totals": "Totales",
+    "close": "Cerrar periodo",
+    "totals_line": "Laborados: {worked} (en remoto: {remote}) · Ausencia: {absence} · Descanso: {rest} · Feriados: {holidays}",
+    "col_type": "Tipo",
+    "col_days": "Días",
+    "col_hours": "Horas",
+    "col_effect": "Efecto",
+    "col_concept": "Concepto de planilla",
+    "no_absences": "Sin ausencias en el periodo.",
+    "effect_line": "Pagados {paid} · sin goce {unpaid} · empleador {employer} · subsidio {subsidy}",
+    "days": "Día por día",
+    "col_date": "Fecha",
+    "col_kind": "Día",
+    "col_explanation": "Explicación",
+    "kind_outside_employment": "Fuera de la relación",
+    "kind_rest_day": "Descanso",
+    "kind_holiday": "Feriado",
+    "kind_worked": "Laborado",
+    "kind_remote": "En remoto",
+    "kind_absence": "Ausencia"
   }
 }

@@ -93,4 +93,21 @@ return [
         'closed' => 'A ausência está encerrada: o atestado não pode ser registrado.',
         'forbidden' => 'Registrar o atestado exige permissão para ver dados de saúde.',
     ],
+    'summary' => [
+        'invalid_date' => 'Use uma data válida (AAAA-MM-DD).',
+        'to_before_from' => 'A data final não pode ser anterior à inicial.',
+        'too_long' => 'O período pode ter até :days dias.',
+        'confidential' => 'Ausência justificada (confidencial)',
+        'effects' => ['paid' => 'paga', 'unpaid' => 'sem remuneração', 'employer_paid' => 'a cargo do empregador', 'subsidy' => 'subsidiada'],
+        'days' => [
+            'outside_employment' => 'Fora do vínculo de trabalho.',
+            'rest_day' => 'Descanso semanal.',
+            'holiday' => 'Feriado.',
+            'worked' => 'Dia útil sem ausências.',
+            'remote_agreement' => 'Trabalhado remotamente conforme o acordo de teletrabalho.',
+            'remote_absence' => 'Trabalhado remotamente (trabalho remoto aprovado).',
+            'absence' => ':type (:effect).',
+            'hours' => 'Com :hours h de :type (:effect).',
+        ],
+    ],
 ];
