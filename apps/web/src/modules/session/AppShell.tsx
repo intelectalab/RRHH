@@ -47,6 +47,7 @@ const MENU: NavLink[] = [
   { href: '/documentos/vencimientos', key: 'shell.modules_documents', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
   { href: '/documentos/solicitudes', key: 'shell.modules_document_requests', group: 'people', icon: 'inbox', module: 'core', visible: (can) => can('documents.documents.request') },
   { href: '/documentos/plantillas', key: 'shell.modules_document_templates', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.templates.view') },
+  { href: '/personas/teletrabajo', key: 'shell.modules_remote_work', group: 'people', icon: 'home', module: 'core', visible: (can) => can('contracts.remote_work.create') || can('contracts.remote_work.decide') },
   { href: '/personas/constancias', key: 'shell.modules_certificates', group: 'people', icon: 'file', module: 'core', visible: (can) => can('people.certificates.issue') },
   { href: '/personas/solicitudes', key: 'shell.modules_hr_requests', group: 'people', icon: 'inbox', module: 'core', visible: (can) => can('helpdesk.tickets.update') },
   { href: '/calendario', key: 'shell.modules_calendar', group: 'time', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },

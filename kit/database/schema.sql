@@ -2977,17 +2977,32 @@ CREATE TABLE headcount_scenarios (
   kind text NOT NULL CHECK (kind IN ('current','conservative','growth','custom')),
   is_baseline boolean NOT NULL DEFAULT false,
   assumptions jsonb,
+  legal_entity_id uuid,
+  base_as_of date NOT NULL,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','in_review','approved','applied','archived')),
+  created_by_user_id uuid,
+  approved_by_user_id uuid,
+  approved_at timestamptz,
+  applied_at timestamptz,
+  applied_summary jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_headcount_scenarios_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_headcount_scenarios_headcount_plan_id FOREIGN KEY (tenant_id, headcount_plan_id) REFERENCES headcount_plans (tenant_id, id)
+  CONSTRAINT fk_headcount_scenarios_headcount_plan_id FOREIGN KEY (tenant_id, headcount_plan_id) REFERENCES headcount_plans (tenant_id, id),
+  CONSTRAINT fk_headcount_scenarios_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_headcount_scenarios_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_headcount_scenarios_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE headcount_scenarios IS 'Escenarios de un plan: actual, conservador, crecimiento o personalizado.';
+COMMENT ON TABLE headcount_scenarios IS 'Escenarios de un plan: actual, conservador, crecimiento o personalizado (POS-5). Copian la dotación vigente a base_as_of (líneas «baseline») y suman, congelan o quitan plazas sin tocar las posiciones reales (RN-POS-08) hasta aplicarse con aprobación: aplicar crea solicitudes de posición en borrador para lo agregado y congela o cierra las plazas marcadas (applied_summary).';
 CREATE INDEX ix_headcount_scenarios_headcount_plan_id ON headcount_scenarios (tenant_id, headcount_plan_id);
+CREATE INDEX ix_headcount_scenarios_legal_entity_id ON headcount_scenarios (tenant_id, legal_entity_id);
+CREATE INDEX ix_headcount_scenarios_created_by_user_id ON headcount_scenarios (tenant_id, created_by_user_id);
+CREATE INDEX ix_headcount_scenarios_approved_by_user_id ON headcount_scenarios (tenant_id, approved_by_user_id);
 ALTER TABLE headcount_scenarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE headcount_scenarios FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON headcount_scenarios USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
-CREATE TRIGGER trg_headcount_scenarios_touch BEFORE UPDATE ON headcount_scenarios FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_headcount_scenarios_touch BEFORE UPDATE ON headcount_scenarios FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE headcount_plan_lines (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -3001,19 +3016,26 @@ CREATE TABLE headcount_plan_lines (
   projected_cost numeric(14,2),  -- SENSIBLE
   currency char(3),
   notes text,
+  position_id uuid,
+  change text NOT NULL DEFAULT 'add' CHECK (change IN ('baseline','add','freeze','remove')),
+  title text,
+  position_request_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_headcount_plan_lines_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_headcount_plan_lines_headcount_scenario_id FOREIGN KEY (tenant_id, headcount_scenario_id) REFERENCES headcount_scenarios (tenant_id, id),
   CONSTRAINT fk_headcount_plan_lines_org_unit_id FOREIGN KEY (tenant_id, org_unit_id) REFERENCES org_units (tenant_id, id),
   CONSTRAINT fk_headcount_plan_lines_job_profile_id FOREIGN KEY (tenant_id, job_profile_id) REFERENCES job_profiles (tenant_id, id),
-  CONSTRAINT fk_headcount_plan_lines_site_id FOREIGN KEY (tenant_id, site_id) REFERENCES sites (tenant_id, id)
+  CONSTRAINT fk_headcount_plan_lines_site_id FOREIGN KEY (tenant_id, site_id) REFERENCES sites (tenant_id, id),
+  CONSTRAINT fk_headcount_plan_lines_position_id FOREIGN KEY (tenant_id, position_id) REFERENCES positions (tenant_id, id)
 );
-COMMENT ON TABLE headcount_plan_lines IS 'Dotación planificada por unidad y puesto dentro de un escenario, con costo proyectado.';
+COMMENT ON TABLE headcount_plan_lines IS 'Dotación planificada por unidad y puesto dentro de un escenario, con costo proyectado. change: baseline (copia de una posición real), add (plaza nueva), freeze (congelar la posición real) o remove (cerrarla); position_request_id: solicitud creada al aplicar.';
 CREATE INDEX ix_headcount_plan_lines_headcount_scenario_id ON headcount_plan_lines (tenant_id, headcount_scenario_id);
 CREATE INDEX ix_headcount_plan_lines_org_unit_id ON headcount_plan_lines (tenant_id, org_unit_id);
 CREATE INDEX ix_headcount_plan_lines_job_profile_id ON headcount_plan_lines (tenant_id, job_profile_id);
 CREATE INDEX ix_headcount_plan_lines_site_id ON headcount_plan_lines (tenant_id, site_id);
+CREATE INDEX ix_headcount_plan_lines_position_id ON headcount_plan_lines (tenant_id, position_id);
+CREATE INDEX ix_headcount_plan_lines_position_request_id ON headcount_plan_lines (tenant_id, position_request_id);
 ALTER TABLE headcount_plan_lines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE headcount_plan_lines FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON headcount_plan_lines USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -3851,19 +3873,33 @@ CREATE TABLE remote_work_agreements (
   payroll_concept_id uuid,
   requested_on date,
   responded_on date,
-  status text NOT NULL DEFAULT 'requested' CHECK (status IN ('requested','approved','rejected','active','ended')),
+  status text NOT NULL DEFAULT 'requested' CHECK (status IN ('requested','approved','rejected','pending_signature','active','ended')),
   document_id uuid,
+  request_reason text,
+  requested_by text NOT NULL DEFAULT 'employee' CHECK (requested_by IN ('employee','employer')),
+  requested_by_user_id uuid,
+  response_due_on date,
+  decided_by_user_id uuid,
+  decision_reason text,
+  signed_at timestamptz,
+  signature_origin text CHECK (signature_origin IN ('physical_scan','electronic')),
+  end_reason text,
+  due_reminder_sent_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_remote_work_agreements_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_remote_work_agreements_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id)
+  CONSTRAINT fk_remote_work_agreements_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_remote_work_agreements_requested_by_user_id FOREIGN KEY (tenant_id, requested_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_remote_work_agreements_decided_by_user_id FOREIGN KEY (tenant_id, decided_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE remote_work_agreements IS 'Acuerdo de teletrabajo con su contenido mínimo (E-20, Ley 31572).';
+COMMENT ON TABLE remote_work_agreements IS 'Acuerdo de teletrabajo con su contenido mínimo (E-20, Ley 31572; CON-6). Nace como solicitud de cambio de modalidad con su plazo de respuesta (response_due_on, parámetro); aprobada, se emite solo con el contenido mínimo completo (RN-CON-10), se registra firmada y queda vigente hasta terminarse.';
 CREATE INDEX ix_remote_work_agreements_employment_id ON remote_work_agreements (tenant_id, employment_id);
 CREATE INDEX ix_remote_work_agreements_payroll_concept_id ON remote_work_agreements (tenant_id, payroll_concept_id);
 CREATE INDEX ix_remote_work_agreements_document_id ON remote_work_agreements (tenant_id, document_id);
+CREATE INDEX ix_remote_work_agreements_requested_by_user_id ON remote_work_agreements (tenant_id, requested_by_user_id);
+CREATE INDEX ix_remote_work_agreements_decided_by_user_id ON remote_work_agreements (tenant_id, decided_by_user_id);
 ALTER TABLE remote_work_agreements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE remote_work_agreements FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON remote_work_agreements USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -14409,6 +14445,7 @@ ALTER TABLE org_unit_versions ADD CONSTRAINT fk_org_unit_versions_cost_center_id
 ALTER TABLE positions ADD CONSTRAINT fk_positions_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_headcount_plan_line_id FOREIGN KEY (tenant_id, headcount_plan_line_id) REFERENCES headcount_plan_lines (tenant_id, id);
 ALTER TABLE positions ADD CONSTRAINT fk_positions_position_request_id FOREIGN KEY (tenant_id, position_request_id) REFERENCES position_requests (tenant_id, id);
+ALTER TABLE headcount_plan_lines ADD CONSTRAINT fk_headcount_plan_lines_position_request_id FOREIGN KEY (tenant_id, position_request_id) REFERENCES position_requests (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_salary_band_id FOREIGN KEY (tenant_id, salary_band_id) REFERENCES salary_bands (tenant_id, id);
 ALTER TABLE position_requests ADD CONSTRAINT fk_position_requests_replaces_employment_id FOREIGN KEY (tenant_id, replaces_employment_id) REFERENCES employments (tenant_id, id);
 ALTER TABLE person_bank_accounts ADD CONSTRAINT fk_person_bank_accounts_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id);
@@ -15127,6 +15164,11 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('contracts.contract_types.view', 'core', 'contract_types', 'view', 'action', false, 'Ver tipos de contrato y sus topes'),
   ('contracts.contract_types.create', 'core', 'contract_types', 'create', 'action', false, 'Crear tipos de contrato propios de la organización'),
   ('contracts.contract_types.update', 'core', 'contract_types', 'update', 'action', false, 'Administrar tipos de contrato y sus topes'),
+  ('contracts.remote_work.view', 'core', 'remote_work', 'view', 'action', false, 'Ver solicitudes y acuerdos de teletrabajo'),
+  ('contracts.remote_work.create', 'core', 'remote_work', 'create', 'action', false, 'Registrar solicitudes de teletrabajo'),
+  ('contracts.remote_work.update', 'core', 'remote_work', 'update', 'action', false, 'Completar el contenido del acuerdo de teletrabajo'),
+  ('contracts.remote_work.decide', 'core', 'remote_work', 'decide', 'action', false, 'Aprobar o rechazar solicitudes de teletrabajo'),
+  ('contracts.remote_work.issue', 'core', 'remote_work', 'issue', 'action', false, 'Emitir, registrar firmado y terminar acuerdos de teletrabajo'),
   ('documents.documents.view', 'core', 'documents', 'view', 'action', false, 'Ver documentos'),
   ('documents.documents.archive', 'core', 'documents', 'archive', 'action', false, 'Archivar documentos'),
   ('documents.documents.create', 'core', 'documents', 'create', 'action', false, 'Crear documentos'),
@@ -16055,6 +16097,11 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('admin_empresa', 'contracts.contract_types.view', 'organization'),
   ('admin_empresa', 'contracts.contract_types.create', 'organization'),
   ('admin_empresa', 'contracts.contract_types.update', 'organization'),
+  ('admin_empresa', 'contracts.remote_work.view', 'organization'),
+  ('admin_empresa', 'contracts.remote_work.create', 'organization'),
+  ('admin_empresa', 'contracts.remote_work.update', 'organization'),
+  ('admin_empresa', 'contracts.remote_work.decide', 'organization'),
+  ('admin_empresa', 'contracts.remote_work.issue', 'organization'),
   ('admin_empresa', 'documents.documents.view', 'organization'),
   ('admin_empresa', 'documents.documents.archive', 'organization'),
   ('admin_empresa', 'documents.documents.create', 'organization'),
@@ -16828,6 +16875,11 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('rrhh', 'contracts.addenda.create', 'organization'),
   ('rrhh', 'contracts.addenda.issue', 'organization'),
   ('rrhh', 'contracts.contract_types.view', 'organization'),
+  ('rrhh', 'contracts.remote_work.view', 'organization'),
+  ('rrhh', 'contracts.remote_work.create', 'organization'),
+  ('rrhh', 'contracts.remote_work.update', 'organization'),
+  ('rrhh', 'contracts.remote_work.decide', 'organization'),
+  ('rrhh', 'contracts.remote_work.issue', 'organization'),
   ('rrhh', 'documents.documents.view', 'organization'),
   ('rrhh', 'documents.documents.archive', 'organization'),
   ('rrhh', 'documents.documents.create', 'organization'),
@@ -17698,6 +17750,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'people.assignments.propose', 'team'),
   ('manager', 'contracts.contracts.view', 'team'),
   ('manager', 'contracts.addenda.view', 'team'),
+  ('manager', 'contracts.remote_work.view', 'own'),
   ('manager', 'documents.documents.view', 'team'),
   ('manager', 'documents.signature_requests.view', 'own'),
   ('manager', 'documents.signature_requests.decline', 'own'),
@@ -17907,6 +17960,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('empleado', 'people.assignments.view', 'own'),
   ('empleado', 'contracts.contracts.view', 'own'),
   ('empleado', 'contracts.addenda.view', 'own'),
+  ('empleado', 'contracts.remote_work.view', 'own'),
   ('empleado', 'documents.documents.view', 'own'),
   ('empleado', 'documents.documents.create', 'own'),
   ('empleado', 'documents.documents.new_version', 'own'),
@@ -18068,6 +18122,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('auditor', 'contracts.contracts.view', 'organization'),
   ('auditor', 'contracts.addenda.view', 'organization'),
   ('auditor', 'contracts.contract_types.view', 'organization'),
+  ('auditor', 'contracts.remote_work.view', 'organization'),
   ('auditor', 'documents.documents.view', 'organization'),
   ('auditor', 'documents.templates.view', 'organization'),
   ('auditor', 'documents.signature_requests.view', 'organization'),
@@ -18541,6 +18596,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('posiciones.factor_carga_pct', 'core', 'Cargas del empleador para el costo proyectado (%)', 'Porcentaje que se suma al sueldo vigente o al punto medio de la banda para estimar el costo mensual de una posición (aportes del empleador, gratificaciones, CTS). Es una estimación de la organización, por validar con planilla; 0: el costo proyectado es solo el sueldo (RN-POS-07).', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 200}'::jsonb),
   ('posiciones.contratar_solo_con_posicion', 'core', 'Contratar solo contra posición aprobada', 'POS-6 · RN-POS-01 · Activa: un ingreso sin una posición aprobada y libre se rechaza. Desactivada: el ingreso sin posición crea una posición implícita para la persona, así la dotación siempre cuenta plazas.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('contratos.alerta_vencimiento_dias', 'core', 'Aviso de vencimiento de contrato', 'Días de anticipación con que se avisa el vencimiento.', 'list', '[60, 30, 15]'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('teletrabajo.aviso_respuesta_dias', 'core', 'Aviso antes del plazo de respuesta a una solicitud de teletrabajo (días)', 'CON-6: días antes de que venza el plazo legal de respuesta (parámetro legal teletrabajo_respuesta_dias_habiles) en que se avisa a RRHH de una solicitud de teletrabajo sin responder. 0: el mismo día del vencimiento.', 'integer', '2'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0, "max": 10}'::jsonb),
   ('contratos.alerta_tope_acumulado_dias', 'core', 'Aviso de tope acumulado', 'Días de anticipación con que se avisa que un contrato a modalidad se acerca a su plazo máximo.', 'integer', '90'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('documentos.firma_nivel_defecto', 'core', 'Nivel de firma por defecto', 'Nivel de firma electrónica para documentos laborales.', 'select', '"simple"'::jsonb, ARRAY['organization','legal_entity'], '["simple", "advanced", "digital_certificate"]'::jsonb),
   ('documentos.firma_otp_obligatorio', 'core', 'OTP al firmar', 'Exige clave temporal como parte de la evidencia de firma.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),

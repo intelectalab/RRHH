@@ -102,6 +102,8 @@ return [
             'support_max_session_minutes' => 'Duração máxima de uma sessão de suporte em minutos (RN-SAS-08).',
             'backups_retention_days' => 'Dias que cada cópia é mantida.',
             'backups_test_restore_every_days' => 'A cada quantos dias se testa uma restauração isolada.',
+            'dashboard_report_currency' => 'Moeda em que o painel do negócio consolida as receitas.',
+            'dashboard_exchange_rates' => 'Taxas de câmbio do painel do negócio: unidades da moeda de relatório por unidade de cada moeda.',
         ],
     ],
     'notices' => [
@@ -111,5 +113,26 @@ return [
     ],
     'health' => [
         'retry_failed' => 'Não foi possível tentar o trabalho novamente.',
+    ],
+    'metrics' => [
+        'definitions' => [
+            'tenants_active' => 'Organizações em status ativo.',
+            'tenants_trial' => 'Organizações em período de teste.',
+            'tenants_suspended' => 'Organizações suspensas, bloqueadas ou em carência.',
+            'tenants_new' => 'Organizações criadas dentro do período.',
+            'users_active' => 'Usuários ativos de todas as organizações (sem o console).',
+            'employees_managed' => 'Colaboradores da última medição de consumo de cada organização.',
+            'storage_mb' => 'Armazenamento da última medição de cada organização, em MB.',
+            'mrr' => 'Receita recorrente mensal: preço das assinaturas ativas ou com pagamento pendente (a anual dividida por doze), por moeda.',
+            'arr' => 'Receita recorrente anual: a mensal vezes doze.',
+            'consolidated' => 'Receitas convertidas para a moeda de relatório com as taxas de câmbio da configuração global; as moedas sem taxa são listadas à parte.',
+            'trials_started' => 'Assinaturas com teste criadas dentro do período.',
+            'conversions' => 'Testes convertidos em assinatura paga dentro do período (auditoria do console).',
+            'conversion_rate_pct' => 'Conversões sobre testes iniciados no período, em porcentagem.',
+            'cancellations' => 'Assinaturas canceladas dentro do período.',
+            'modules' => 'Módulos ativos em mais organizações.',
+            'incidents_open' => 'Incidentes da plataforma não resolvidos.',
+            'incidents_in_period' => 'Incidentes que começaram dentro do período.',
+        ],
     ],
 ];

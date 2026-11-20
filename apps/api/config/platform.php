@@ -51,6 +51,10 @@ return [
         // SAS-12 · Días que se conserva cada copia y cada cuántos días se prueba una restauración en aislado.
         'backups.retention_days' => 30,
         'backups.test_restore_every_days' => 7,
+        // SAS-10 · Moneda en que el tablero consolida los ingresos y tipos de cambio que registra la consola (moneda => unidades
+        // de la moneda de reporte); una moneda sin tipo se informa aparte, nunca se convierte con un valor inventado.
+        'dashboard.report_currency' => 'PEN',
+        'dashboard.exchange_rates' => [],
     ],
 
     'roles' => [

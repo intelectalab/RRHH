@@ -138,6 +138,10 @@ return [
             'in_app' => ['subject' => 'Tu {certificate} no se emitió', 'body' => 'Recursos Humanos no emitió tu {certificate}: {reason}'],
             'email' => ['subject' => 'Tu {certificate} no se emitió', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos no emitió tu {certificate}: {reason}\n\nRevisa tus solicitudes aquí: {link}"],
         ],
+        'remote_work.response_due' => [
+            'in_app' => ['subject' => 'Responde la solicitud de teletrabajo de {employee}', 'body' => 'El plazo para responder la solicitud de teletrabajo de {employee} vence el {due_on}.'],
+            'email' => ['subject' => 'La solicitud de teletrabajo de {employee} vence el {due_on}', 'body' => "Hola {name}:\n\nEn {organization}, el plazo para responder la solicitud de teletrabajo de {employee} vence el {due_on}.\n\nRespóndela aquí: {link}"],
+        ],
         'help.article_review_due' => [
             'in_app' => ['subject' => 'Revisa «{title}»', 'body' => 'El artículo «{title}» de la ayuda de tu organización tiene revisión el {review_on}. Quedó marcado por revisar y sigue visible.'],
             'email' => ['subject' => 'Toca revisar «{title}»', 'body' => "Hola {name}:\n\nEn {organization}, el artículo «{title}» de la ayuda tiene revisión el {review_on}. Sigue visible para su audiencia mientras lo revisas.\n\nRevísalo aquí: {link}"],

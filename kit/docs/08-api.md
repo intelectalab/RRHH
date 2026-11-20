@@ -530,6 +530,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/headcount-plans` | `org.headcount_plans.{view,create}` | 1 |
 | GET, PATCH | `/headcount-plans/{id}` | `org.headcount_plans.{view,update}` | 1 |
 | POST | `/headcount-plans/{id}/{submit,approve,close}` | `org.headcount_plans.{submit,approve,close}` | 1 |
+| GET, POST | `/headcount-scenarios` | `org.headcount_plans.{view,create}` | 1 |
+| GET, PATCH | `/headcount-scenarios/{id}` | `org.headcount_plans.{view,update}` | 1 |
 | GET | `/headcount` | `org.positions.view` | 1 |
 | GET | `/positions/org-chart` | `org.positions.view` | 1 |
 | POST | `/positions/{id}/reject` | `org.positions.approve` | 1 |
@@ -549,6 +551,14 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/headcount-budgets` | `org.headcount_plans.create` | 1 |
 | GET | `/headcount-budgets/{id}` | `org.headcount_plans.view` | 1 |
 | PATCH | `/headcount-budgets/{id}` | `org.headcount_plans.update` | 1 |
+| GET | `/headcount-scenarios/compare` | `org.headcount_plans.view` | 1 |
+| POST | `/headcount-scenarios/{id}/lines` | `org.headcount_plans.update` | 1 |
+| PATCH | `/headcount-scenario-lines/{id}` | `org.headcount_plans.update` | 1 |
+| POST | `/headcount-scenarios/{id}/submit` | `org.headcount_plans.submit` | 1 |
+| POST | `/headcount-scenarios/{id}/approve` | `org.headcount_plans.approve` | 1 |
+| POST | `/headcount-scenarios/{id}/return` | `org.headcount_plans.approve` | 1 |
+| POST | `/headcount-scenarios/{id}/apply` | `org.headcount_plans.approve` | 1 |
+| POST | `/headcount-scenarios/{id}/archive` | `org.headcount_plans.close` | 1 |
 | GET | `/headcount/positions` | `org.positions.view` | 1 |
 
 **COL · Colaboradores**
@@ -642,6 +652,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/contracts/{id}` | `contracts.contracts.{view,update}` | 1 |
 | GET, POST | `/contract-addenda` | `contracts.addenda.{view,create}` | 1 |
 | GET | `/contract-addenda/{id}` | `contracts.addenda.view` | 1 |
+| GET, POST | `/remote-work-agreements` | `contracts.remote_work.{view,create}` | 1 |
+| GET, PATCH | `/remote-work-agreements/{id}` | `contracts.remote_work.{view,update}` | 1 |
 | POST | `/contracts/{id}/submit` | `contracts.contracts.create` | 1 |
 | POST | `/contracts/{id}/approve` | `contracts.contracts.approve` | 1 |
 | POST | `/contracts/{id}/return` | `contracts.contracts.approve` | 1 |
@@ -657,6 +669,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/contract-addenda/{id}/register-signature` | `contracts.addenda.issue` | 1 |
 | POST | `/contract-addenda/{id}/cancel` | `contracts.addenda.cancel` | 1 |
 | GET | `/contract-addenda/{id}/document` | `contracts.addenda.view` | 1 |
+| POST | `/remote-work-agreements/{id}/approve` | `contracts.remote_work.decide` | 1 |
+| POST | `/remote-work-agreements/{id}/reject` | `contracts.remote_work.decide` | 1 |
+| POST | `/remote-work-agreements/{id}/issue` | `contracts.remote_work.issue` | 1 |
+| POST | `/remote-work-agreements/{id}/register-signature` | `contracts.remote_work.issue` | 1 |
+| POST | `/remote-work-agreements/{id}/end` | `contracts.remote_work.issue` | 1 |
+| GET | `/remote-work-agreements/{id}/document` | `contracts.remote_work.view` | 1 |
 
 **DOC · Documentos y firma**
 

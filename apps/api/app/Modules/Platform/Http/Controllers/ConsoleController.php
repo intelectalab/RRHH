@@ -2,20 +2,44 @@
 
 namespace App\Modules\Platform\Http\Controllers;
 
+use App\Modules\Platform\Application\Console\BusinessMetrics;
 use App\Modules\Platform\Application\Console\ConsoleDashboard;
+use App\Shared\Exceptions\InvalidFilterException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * SAS-1 · Tablero y auditoría propia de la consola.
  */
 final class ConsoleController
 {
-    public function __construct(private readonly ConsoleDashboard $dashboard) {}
+    public function __construct(
+        private readonly ConsoleDashboard $dashboard,
+        private readonly BusinessMetrics $metrics,
+    ) {}
 
-    public function metrics(): JsonResponse
+    /** SAS-10 · Tablero del negocio SaaS por periodo y plan. */
+    public function metrics(Request $request): JsonResponse
     {
-        return response()->json(['data' => $this->dashboard->metrics()]);
+        $date = fn (string $key): ?string => is_string($request->query($key)) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $request->query($key)) === 1
+            && strtotime((string) $request->query($key)) !== false ? (string) $request->query($key) : null;
+        foreach (['from', 'to'] as $key) {
+            if ($request->query($key) !== null && $date($key) === null) {
+                throw new InvalidFilterException((string) trans('errors.invalid_filter'), [$key]);
+            }
+        }
+        $to = $date('to') ?? now()->toDateString();
+        $from = $date('from') ?? now()->subDays(30)->toDateString();
+        $plan = $request->query('plan_id');
+        if ($plan !== null && (! is_string($plan) || preg_match('/^[0-9a-f-]{36}$/i', $plan) !== 1 || ! DB::table('plans')->where('id', $plan)->exists())) {
+            throw new InvalidFilterException((string) trans('errors.invalid_filter'), ['plan_id']);
+        }
+        if ($from > $to) {
+            throw new InvalidFilterException((string) trans('errors.invalid_filter'), ['from', 'to']);
+        }
+
+        return response()->json(['data' => $this->metrics->compute($from, $to, is_string($plan) ? $plan : null)]);
     }
 
     public function auditEvents(Request $request): JsonResponse

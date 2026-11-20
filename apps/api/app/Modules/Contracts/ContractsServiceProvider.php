@@ -4,6 +4,7 @@ namespace App\Modules\Contracts;
 
 use App\Modules\Contracts\Application\ContractTypeCatalog;
 use App\Modules\Contracts\Console\ApplyDueContracts;
+use App\Modules\Contracts\Console\RemindRemoteWorkResponses;
 use App\Modules\Contracts\Infrastructure\Calendar\ContractCalendarSource;
 use App\Modules\Contracts\Infrastructure\Home\ContractDatesCard;
 use App\Modules\Contracts\Infrastructure\Setup\ContractTypesPackComponent;
@@ -41,11 +42,13 @@ final class ContractsServiceProvider extends ServiceProvider
         $this->app->make(TeamDateRegistry::class)->register(ContractTeamDates::expiry());
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ApplyDueContracts::class]);
+            $this->commands([ApplyDueContracts::class, RemindRemoteWorkResponses::class]);
             $this->app->booted(function (): void {
                 // CON-2 · CON-4 · Después de los ceses (00:10) y de los ingresos (00:15): inicio, vencimiento, aviso de prueba
                 // y avisos de vencimiento y de tope acumulado.
                 $this->app->make(Schedule::class)->command('contracts:apply-due')->dailyAt('00:25')->withoutOverlapping();
+                // CON-6 · Solicitudes de teletrabajo por vencer.
+                $this->app->make(Schedule::class)->command('remote-work:remind-responses')->dailyAt('07:35')->withoutOverlapping();
             });
         }
     }

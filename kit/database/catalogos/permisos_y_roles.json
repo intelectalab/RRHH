@@ -42,7 +42,7 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 917,
+    "permisos": 922,
     "permisos_por_campo": 28,
     "sensibles": 108,
     "fuera_del_contrato_api": 141,
@@ -2748,6 +2748,66 @@
       "en_contrato_api": true,
       "ambito": "organizacion",
       "descripcion": "Administrar tipos de contrato y sus topes"
+    },
+    {
+      "codigo": "contracts.remote_work.view",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "remote_work",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver solicitudes y acuerdos de teletrabajo"
+    },
+    {
+      "codigo": "contracts.remote_work.create",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "remote_work",
+      "accion": "create",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Registrar solicitudes de teletrabajo"
+    },
+    {
+      "codigo": "contracts.remote_work.update",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "remote_work",
+      "accion": "update",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Completar el contenido del acuerdo de teletrabajo"
+    },
+    {
+      "codigo": "contracts.remote_work.decide",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "remote_work",
+      "accion": "decide",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Aprobar o rechazar solicitudes de teletrabajo"
+    },
+    {
+      "codigo": "contracts.remote_work.issue",
+      "epica": "CON",
+      "modulo": "core",
+      "recurso": "remote_work",
+      "accion": "issue",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Emitir, registrar firmado y terminar acuerdos de teletrabajo"
     },
     {
       "codigo": "documents.documents.view",
@@ -12008,6 +12068,26 @@
           "alcance": "organization"
         },
         {
+          "codigo": "contracts.remote_work.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.create",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.decide",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.issue",
+          "alcance": "organization"
+        },
+        {
           "codigo": "documents.documents.view",
           "alcance": "organization"
         },
@@ -15102,6 +15182,26 @@
         },
         {
           "codigo": "contracts.contract_types.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.create",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.decide",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.issue",
           "alcance": "organization"
         },
         {
@@ -18600,6 +18700,10 @@
           "alcance": "team"
         },
         {
+          "codigo": "contracts.remote_work.view",
+          "alcance": "own"
+        },
+        {
           "codigo": "documents.documents.view",
           "alcance": "team"
         },
@@ -19441,6 +19545,10 @@
           "alcance": "own"
         },
         {
+          "codigo": "contracts.remote_work.view",
+          "alcance": "own"
+        },
+        {
           "codigo": "documents.documents.view",
           "alcance": "own"
         },
@@ -20087,6 +20195,10 @@
         },
         {
           "codigo": "contracts.contract_types.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "contracts.remote_work.view",
           "alcance": "organization"
         },
         {

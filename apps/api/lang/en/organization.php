@@ -137,4 +137,13 @@ return [
             'none' => 'No cost: no occupant, salary band or budgeted cost.',
         ],
     ],
+    'scenarios' => [
+        'entity_required' => 'Choose a company within your scope for the scenario.',
+        'unit_other_entity' => 'The unit belongs to a different company than the scenario.',
+        'change_not_allowed' => 'That change does not apply to this line: a real position is kept, frozen or removed; a new seat is added or removed.',
+        'reason_required' => 'Enter the reason for returning the scenario.',
+        'not_editable' => 'Only a draft scenario can be edited.',
+        'applied_reason' => 'Applying scenario “:name”.',
+        'plan_name' => 'Headcount planning :year',
+    ],
 ];

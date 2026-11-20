@@ -449,6 +449,11 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 | `contracts.contract_types.view` | Ver tipos de contrato y sus topes |  | ✓ | ✓ | ✓ |  |  |  | ✓ |  |  |  |
 | `contracts.contract_types.create` | Crear tipos de contrato propios de la organización |  | ✓ |  |  |  |  |  |  |  |  |  |
 | `contracts.contract_types.update` | Administrar tipos de contrato y sus topes |  | ✓ |  |  |  |  |  |  |  |  |  |
+| `contracts.remote_work.view` | Ver solicitudes y acuerdos de teletrabajo |  | ✓ | ✓ |  |  | ○ | ○ | ✓ |  |  |  |
+| `contracts.remote_work.create` | Registrar solicitudes de teletrabajo |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `contracts.remote_work.update` | Completar el contenido del acuerdo de teletrabajo |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `contracts.remote_work.decide` | Aprobar o rechazar solicitudes de teletrabajo |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `contracts.remote_work.issue` | Emitir, registrar firmado y terminar acuerdos de teletrabajo |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
 
 #### DOC · Gestión documental, plantillas y firma
 

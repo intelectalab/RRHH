@@ -139,6 +139,7 @@ return [
     'Position' => ['budget' => ['org.positions.budget.view', 'salary']],
     // POS-3 · POS-4 (respuestas de /position-requests y /headcount*, esquema genérico en el contrato).
     'PositionRequest' => ['estimated_cost' => ['org.positions.budget.view', 'salary']],
+    'HeadcountScenario' => ['projected_cost' => ['org.positions.budget.view', 'salary']],
     'HeadcountBudget' => ['monthly_cost' => ['org.positions.budget.view', 'salary']],
     'HeadcountUnit' => [
         'projected_cost' => ['org.positions.budget.view', 'salary'],

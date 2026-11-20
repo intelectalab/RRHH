@@ -28,6 +28,8 @@ final class GlobalSettings
         'support.max_session_minutes' => ['type' => 'integer', 'rules' => ['integer', 'min:5', 'max:480']],
         'backups.retention_days' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:3650']],
         'backups.test_restore_every_days' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:90']],
+        'dashboard.report_currency' => ['type' => 'string', 'rules' => ['string', 'size:3'], 'item' => 'currency'],
+        'dashboard.exchange_rates' => ['type' => 'map', 'rules' => ['array'], 'item' => 'rates'],
     ];
 
     public function __construct(
@@ -124,6 +126,25 @@ final class GlobalSettings
                 }
 
                 return $value;
+            case 'currency':
+                $code = strtoupper((string) $value);
+                if (! DB::table('currencies')->where('code', $code)->exists()) {
+                    $fail();
+                }
+
+                return $code;
+            case 'rates':
+                // SAS-10 · Moneda => unidades de la moneda de reporte por una unidad (decimal positivo, como texto).
+                $currencies = DB::table('currencies')->pluck('code')->map(fn ($c): string => (string) $c)->all();
+                $out = [];
+                foreach ((array) $value as $currency => $rate) {
+                    if (! in_array($currency, $currencies, true) || ! is_numeric($rate) || (float) $rate <= 0) {
+                        $fail();
+                    }
+                    $out[(string) $currency] = (string) $rate;
+                }
+
+                return $out === [] ? (object) [] : $out;
             case 'parameter':
                 $codes = DB::table('parameter_definitions')->pluck('code')->map(fn ($c): string => (string) $c)->all();
                 if (array_diff(array_keys((array) $value), $codes) !== []) {

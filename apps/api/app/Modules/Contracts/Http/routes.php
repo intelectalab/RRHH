@@ -3,6 +3,7 @@
 use App\Modules\Contracts\Http\Controllers\ContractAddendumController;
 use App\Modules\Contracts\Http\Controllers\ContractController;
 use App\Modules\Contracts\Http\Controllers\ContractTypeController;
+use App\Modules\Contracts\Http\Controllers\RemoteWorkController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -37,4 +38,16 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/contract-addenda/{id}/register-signature', [ContractAddendumController::class, 'registerSignature'])->middleware('permission:contracts.addenda.issue');
     Route::post('/contract-addenda/{id}/cancel', [ContractAddendumController::class, 'cancel'])->middleware('permission:contracts.addenda.cancel');
     Route::get('/contract-addenda/{id}/document', [ContractAddendumController::class, 'document'])->middleware('permission:contracts.addenda.view');
+
+    // CON-6 · Teletrabajo: solicitud con plazo de respuesta y acuerdo con su contenido mínimo (RN-CON-10).
+    Route::get('/remote-work-agreements', [RemoteWorkController::class, 'index'])->middleware('permission:contracts.remote_work.view');
+    Route::post('/remote-work-agreements', [RemoteWorkController::class, 'store'])->middleware('permission:contracts.remote_work.create');
+    Route::get('/remote-work-agreements/{id}', [RemoteWorkController::class, 'show'])->middleware('permission:contracts.remote_work.view');
+    Route::patch('/remote-work-agreements/{id}', [RemoteWorkController::class, 'update'])->middleware('permission:contracts.remote_work.update');
+    Route::post('/remote-work-agreements/{id}/approve', [RemoteWorkController::class, 'approve'])->middleware('permission:contracts.remote_work.decide');
+    Route::post('/remote-work-agreements/{id}/reject', [RemoteWorkController::class, 'reject'])->middleware('permission:contracts.remote_work.decide');
+    Route::post('/remote-work-agreements/{id}/issue', [RemoteWorkController::class, 'issue'])->middleware('permission:contracts.remote_work.issue');
+    Route::post('/remote-work-agreements/{id}/register-signature', [RemoteWorkController::class, 'registerSignature'])->middleware('permission:contracts.remote_work.issue');
+    Route::post('/remote-work-agreements/{id}/end', [RemoteWorkController::class, 'end'])->middleware('permission:contracts.remote_work.issue');
+    Route::get('/remote-work-agreements/{id}/document', [RemoteWorkController::class, 'document'])->middleware('permission:contracts.remote_work.view');
 });

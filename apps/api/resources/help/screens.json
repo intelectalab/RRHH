@@ -211,6 +211,18 @@
       "permissions": [
         "help.org_articles.view"
       ]
+    },
+    "org.scenarios": {
+      "module": "core",
+      "permissions": [
+        "org.headcount_plans.view"
+      ]
+    },
+    "people.remote_work": {
+      "module": "core",
+      "permissions": [
+        "contracts.remote_work.view"
+      ]
     }
   }
 }

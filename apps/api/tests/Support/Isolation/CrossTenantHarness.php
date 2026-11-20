@@ -36,6 +36,7 @@ use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Modules\Organization\Infrastructure\Models\DirectoryEmployment;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
 use App\Modules\Organization\Infrastructure\Models\HeadcountBudget;
+use App\Modules\Organization\Infrastructure\Models\HeadcountPlanLine;
 use App\Modules\Organization\Infrastructure\Models\JobProfile;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Modules\Organization\Infrastructure\Models\OrgUnit;
@@ -161,6 +162,8 @@ final class CrossTenantHarness
         '/position-requests/{id}/submit' => PositionRequest::class,
         '/position-requests/{id}/cancel' => PositionRequest::class,
         '/headcount-budgets/{id}' => HeadcountBudget::class,
+        // POS-5 · Línea de un escenario de A (la ruta no tiene GET propio).
+        '/headcount-scenario-lines/{id}' => HeadcountPlanLine::class,
         '/positions/{id}/reject' => Position::class,
         '/positions/{id}/open-recruitment' => Position::class,
         '/positions/{id}/cancel-recruitment' => Position::class,

@@ -862,6 +862,22 @@
       "opciones": null
     },
     {
+      "codigo": "teletrabajo.aviso_respuesta_dias",
+      "modulo": "core",
+      "nombre": "Aviso antes del plazo de respuesta a una solicitud de teletrabajo (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 2,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "CON-6: días antes de que venza el plazo legal de respuesta (parámetro legal teletrabajo_respuesta_dias_habiles) en que se avisa a RRHH de una solicitud de teletrabajo sin responder. 0: el mismo día del vencimiento.",
+      "opciones": {
+        "min": 0,
+        "max": 10
+      }
+    },
+    {
       "codigo": "contratos.alerta_tope_acumulado_dias",
       "modulo": "core",
       "nombre": "Aviso de tope acumulado",
