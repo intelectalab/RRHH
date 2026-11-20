@@ -3,7 +3,7 @@
 Ayuda disponible en todos los roles y pantallas: guías del producto, ayuda contextual, políticas de la propia organización, buscador y derivación a RRHH o a soporte.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 7 (6 historias y 1 tareas); 7 del MVP. **Operaciones de API:** 24.
+- **Actividades:** 7 (6 historias y 1 tareas); 7 del MVP. **Operaciones de API:** 25.
 - **Especificación:** `kit/docs/modulos/M-AYU.md`.
 
 ## Prompt para una sesión nueva de Claude Code

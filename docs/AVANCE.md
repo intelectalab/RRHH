@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-19** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 143 | 0 | 59,3 % |
-| Backlog completo | 512 | 143 | 0 | 27,9 % |
+| Primer corte comercial (MVP) | 241 | 147 | 0 | 61,0 % |
+| Backlog completo | 512 | 147 | 0 | 28,7 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -178,10 +178,10 @@ Actualizado el **2026-11-19** con `python3 scripts/gen_avance.py` desde `kit/bac
 | AYU-1 | Contenido de ayuda del producto con versiones | AYU | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Ayuda del producto en la consola con versiones inmutables por idioma, módulo, roles y pantallas; 44 artículos es/en/pt cargados por migración y help:sync-bundled sin pisar lo editado. |
 | AYU-2 | Centro de ayuda para todos los roles | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Botón de ayuda en todas las pantallas y el portal; pestañas Esta pantalla y Guías con búsqueda; filtra por módulo activo, rol y pantallas permitidas; búsquedas sin resultado anónimas. |
 | AYU-3 | Ayuda contextual por pantalla | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Clave de ayuda por pantalla (API y web sincronizadas por prueba), ayudas de campo versionadas y estados vacíos que enlazan a la ayuda. |
-| AYU-4 | Artículos y políticas de la organización | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| AYU-5 | Buscador de ayuda y valoración de artículos | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| AYU-6 | Derivar la consulta a RRHH o a soporte | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
-| AYU-7 | Recorridos guiados y novedades de versión | AYU | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| AYU-4 | Artículos y políticas de la organización | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-19 | Artículos y políticas propias con audiencia (roles, empresas, sedes), responsable, versiones inmutables y revisión periódica con aviso; Configuración → Ayuda de tu organización. |
+| AYU-5 | Buscador de ayuda y valoración de artículos | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-19 | Búsqueda de texto completo en ayuda del producto y de la organización; «¿Te sirvió?»; uso de la ayuda con búsquedas sin resultado, sin datos de la persona. |
+| AYU-6 | Derivar la consulta a RRHH o a soporte | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-19 | «Mis consultas» deriva la duda a RRHH como solicitud con pregunta, pantalla y artículos vistos; el administrador escribe al soporte de GestiaHR. |
+| AYU-7 | Recorridos guiados y novedades de versión | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-19 | Recorrido de primer ingreso por rol (saltable y reabrible) y novedades de versión solo de módulos contratados. |
 | ASI-1 | Registro de marcaciones inalterable | ASI | Fase 2 · Tiempo | Task | — | pendiente | — |  |
 | ASI-2 | Marcación web | ASI | Fase 2 · Tiempo | Story | — | pendiente | — |  |
 | ASI-3 | Marcación desde la app con selfie y geocerca | ASI | Fase 2 · Tiempo | Story | — | pendiente | — |  |
