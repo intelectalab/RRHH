@@ -27,7 +27,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-06, D-15, D-27, D-36. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: D-36. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -56,7 +56,4 @@ Deben estar integradas antes de las actividades que las piden:
 
 | Código | Decisión | Cerrar antes de | Recomendación del kit |
 |---|---|---|---|
-| D-06 | Regímenes laborales del primer lanzamiento | Fase 3 | general + microempresa + pequeña empresa + modalidades formativas primero; construcción civil y agrario después. El motor admite todos; lo que se decide es el contenido del paquete y sus casos dorados. |
-| D-15 | Validación legal de plazos, retenciones y rol de encargado | Fase 1 (y antes de cada fase con norma) | (a). Cada valor entra como parámetro con estado «por validar» y no puede usarse en producción hasta que lo valide el responsable (D-27). |
-| D-27 | Responsable y proceso de actualización de parámetros legales | Fase 3 | (c): parámetros legales nacionales mantenidos por la plataforma con un responsable nombrado, doble revisión, fuente normativa obligatoria y aviso a las organizaciones; parámetros de política propia mantenidos por la organización. Definir quién es el especialista que valida y mantiene los casos dorados. |
 | D-36 | Qué fuente secundaria basta para marcar un parámetro legal como verificado | Fase 3 | (b) antes de producción: el cierre de planilla debería exigir verificación de especialista, no de fuente secundaria (RN-PAR-03). |

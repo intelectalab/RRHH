@@ -32,7 +32,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: A-10, A-14, D-06, D-07. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: A-10. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -67,6 +67,3 @@ Deben estar integradas antes de las actividades que las piden:
 | Código | Decisión | Cerrar antes de | Recomendación del kit |
 |---|---|---|---|
 | A-10 | Cifrado de campo para sueldos | Fase 1 | (b). La planilla, las provisiones y la analítica necesitan sumar en la base; el control efectivo es el permiso por campo y el registro de accesos. Documento de identidad, cuenta bancaria, salud y denuncias sí van cifrados a nivel de campo. |
-| A-14 | Lenguaje de fórmulas del motor de nómina | Fase 3 | (a). Los conceptos son datos con vigencia que RRHH puede crear; (b) impide conceptos personalizados y obliga a desplegar por cada cambio normativo. Mantener la gramática pequeña y sin efectos secundarios. |
-| D-06 | Regímenes laborales del primer lanzamiento | Fase 3 | general + microempresa + pequeña empresa + modalidades formativas primero; construcción civil y agrario después. El motor admite todos; lo que se decide es el contenido del paquete y sus casos dorados. |
-| D-07 | Reapertura de planilla cerrada y retroactivos | Fase 3 | (b). Tras declarar o pagar, solo ajustes en el siguiente periodo y archivo rectificatorio. |

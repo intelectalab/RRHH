@@ -30,7 +30,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-09, D-12, D-30, D-35. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: D-35. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -63,7 +63,4 @@ Deben estar integradas antes de las actividades que las piden:
 
 | Código | Decisión | Cerrar antes de | Recomendación del kit |
 |---|---|---|---|
-| D-09 | Presentación ante SUNAT y AFPnet | Fase 3 | (a). El sistema registra la constancia de presentación que carga el usuario. |
-| D-12 | Bancos, billeteras y ERP del primer lanzamiento | Fase 3 | empezar por archivo (no por conexión en línea) para los bancos con más clientes del mercado objetivo y un formato contable genérico (CSV configurable). El negocio entrega la lista priorizada. |
-| D-30 | Ubicación de los códigos SUNAT derivables (perfil T-Registro) | Fase 3 | (a). Lo declarado es lo que dispara la novedad de modificación; `has_risk_insurance` queda como indicador derivado. Detalle en `18-localizacion-peru-detalle-tecnico.md` §0.2. |
 | D-35 | Enumerados ampliados de documento, derechohabiente y novedad del registro laboral | Fase 3 | (a) mientras Perú sea el único paquete; revisar al diseñar el segundo país. |

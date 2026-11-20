@@ -25,7 +25,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-06. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: ninguna asignada. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -47,9 +47,3 @@ cumplidos uno por uno y lo que quedó fuera. Al final, dime qué actividades que
 Deben estar integradas antes de las actividades que las piden:
 
 `AUS-6`, `COL-6`, `COL-8`, `PAR-5`, `PER-4`, `PER-8`, `VAC-6`
-
-## Decisiones abiertas
-
-| Código | Decisión | Cerrar antes de | Recomendación del kit |
-|---|---|---|---|
-| D-06 | Regímenes laborales del primer lanzamiento | Fase 3 | general + microempresa + pequeña empresa + modalidades formativas primero; construcción civil y agrario después. El motor admite todos; lo que se decide es el contenido del paquete y sus casos dorados. |

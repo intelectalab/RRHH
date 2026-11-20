@@ -25,7 +25,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-10. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: ninguna asignada. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -48,9 +48,3 @@ cumplidos uno por uno y lo que quedó fuera. Al final, dime qué actividades que
 Deben estar integradas antes de las actividades que las piden:
 
 `CFG-3`, `COL-2`, `DOC-4`, `DOC-6`, `HIS-1`, `NOT-1`
-
-## Decisiones abiertas
-
-| Código | Decisión | Cerrar antes de | Recomendación del kit |
-|---|---|---|---|
-| D-10 | Firma electrónica: validez por tipo de documento | Fase 1 | (c): evidencia propia por defecto (boletas, constancias, políticas, EPP) y proveedor con certificado donde legal lo indique. Qué documento exige qué nivel lo define el área legal (D-15). |

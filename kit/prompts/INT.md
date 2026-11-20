@@ -26,7 +26,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-12. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: ninguna asignada. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -50,9 +50,3 @@ cumplidos uno por uno y lo que quedó fuera. Al final, dime qué actividades que
 Deben estar integradas antes de las actividades que las piden:
 
 `ASI-7`, `ATS-6`, `DEC-5`, `ENT-1`, `FBK-1`, `LMS-6`, `PLT-13`, `PRV-3`, `SEG-6`, `SEG-11`
-
-## Decisiones abiertas
-
-| Código | Decisión | Cerrar antes de | Recomendación del kit |
-|---|---|---|---|
-| D-12 | Bancos, billeteras y ERP del primer lanzamiento | Fase 3 | empezar por archivo (no por conexión en línea) para los bancos con más clientes del mercado objetivo y un formato contable genérico (CSV configurable). El negocio entrega la lista priorizada. |

@@ -31,7 +31,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: A-05, A-10, D-14, D-17, D-30, D-35. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: A-05, A-10, D-14, D-17, D-35. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -69,5 +69,4 @@ Deben estar integradas antes de las actividades que las piden:
 | A-10 | Cifrado de campo para sueldos | Fase 1 | (b). La planilla, las provisiones y la analítica necesitan sumar en la base; el control efectivo es el permiso por campo y el registro de accesos. Documento de identidad, cuenta bancaria, salud y denuncias sí van cifrados a nivel de campo. |
 | D-14 | Privacidad: qué va en la base y qué en el módulo de cumplimiento | Fase 1 | (c). Base: avisos, consentimientos, derechos del titular, registro de accesos, retención. Módulo: inventario de tratamientos, evaluaciones de impacto, registro de incidentes con seguimiento, informes. |
 | D-17 | Eventos públicos: `employee.created` frente a `employee.hired` | Fase 1 | (c), porque el pedido original nombra ambos y las integraciones suelen esperar `employee.created`. Si se necesita reaccionar al pre-ingreso, usar `offer.accepted`. |
-| D-30 | Ubicación de los códigos SUNAT derivables (perfil T-Registro) | Fase 3 | (a). Lo declarado es lo que dispara la novedad de modificación; `has_risk_insurance` queda como indicador derivado. Detalle en `18-localizacion-peru-detalle-tecnico.md` §0.2. |
 | D-35 | Enumerados ampliados de documento, derechohabiente y novedad del registro laboral | Fase 3 | (a) mientras Perú sea el único paquete; revisar al diseñar el segundo país. |

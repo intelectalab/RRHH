@@ -24,7 +24,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-15. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: ninguna asignada. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -45,9 +45,3 @@ cumplidos uno por uno y lo que quedó fuera. Al final, dime qué actividades que
 Deben estar integradas antes de las actividades que las piden:
 
 `BSO-2`, `BSO-5`, `COL-11`, `DOC-6`, `WFL-2`
-
-## Decisiones abiertas
-
-| Código | Decisión | Cerrar antes de | Recomendación del kit |
-|---|---|---|---|
-| D-15 | Validación legal de plazos, retenciones y rol de encargado | Fase 1 (y antes de cada fase con norma) | (a). Cada valor entra como parámetro con estado «por validar» y no puede usarse en producción hasta que lo valide el responsable (D-27). |

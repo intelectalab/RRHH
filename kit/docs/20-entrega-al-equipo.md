@@ -69,10 +69,10 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 35 | Sí | D-39, D-40, D-41 |
 | 1 | [ORG](../prompts/ORG.md) · Estructura organizacional | Core HR | 7 | 0 | 7 | 64 | — | — |
 | 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 47 | — | D-05 |
-| 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 63 | — | A-05, A-10, D-14, D-17, D-30, D-35 |
+| 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 63 | — | A-05, A-10, D-14, D-17, D-35 |
 | 1 | [HIS](../prompts/HIS.md) · Historia con vigencia | Core HR | 3 | 3 | 6 | 19 | — | — |
-| 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 36 | — | D-10 |
-| 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 45 | — | A-11, D-10 |
+| 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 36 | — | — |
+| 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 45 | — | A-11 |
 | 1 | [ESS](../prompts/ESS.md) · Portal del colaborador | Core HR | 5 | 1 | 6 | 33 | — | A-12, D-23 |
 | 1 | [MSS](../prompts/MSS.md) · Portal del manager | Core HR | 4 | 0 | 4 | 4 | — | — |
 | 1 | [IMP](../prompts/IMP.md) · Importador y puesta en marcha | Core HR | 4 | 3 | 7 | 20 | — | — |
@@ -83,16 +83,16 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 28 | — | — |
 | 2 | [BHO](../prompts/BHO.md) · Horas extra y bolsa de horas | Asistencia y turnos | 3 | 2 | 0 | 8 | — | — |
 | 2 | [TSH](../prompts/TSH.md) · Hojas de tiempo por proyecto | Hojas de tiempo | 4 | 0 | 0 | 12 | — | — |
-| 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 15 | Sí | A-10, A-14, D-06, D-07 |
-| 3 | [CPT](../prompts/CPT.md) · Conceptos y fórmulas | Nómina Perú | 5 | 2 | 7 | 7 | Sí | A-14 |
-| 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 8 | Sí | D-06, D-15, D-27, D-36 |
-| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 19 | Sí | D-07 |
-| 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 6 | — | A-11, D-10 |
-| 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 6 | Sí | D-06 |
-| 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | D-25 |
-| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 32 | — | D-09, D-12, D-30, D-35 |
-| 3 | [PRV](../prompts/PRV.md) · Provisiones y asientos contables | Nómina Perú | 4 | 1 | 0 | 6 | — | D-12 |
-| 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 9 | Sí | D-15 |
+| 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 15 | Sí | A-10 |
+| 3 | [CPT](../prompts/CPT.md) · Conceptos y fórmulas | Nómina Perú | 5 | 2 | 7 | 7 | Sí | — |
+| 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 8 | Sí | D-36 |
+| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 19 | Sí | — |
+| 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 6 | — | A-11 |
+| 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 6 | Sí | — |
+| 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
+| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 32 | — | D-35 |
+| 3 | [PRV](../prompts/PRV.md) · Provisiones y asientos contables | Nómina Perú | 4 | 1 | 0 | 6 | — | — |
+| 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 9 | Sí | — |
 | 3 | [LOC](../prompts/LOC.md) · Locadores y cuarta categoría | Locadores | 3 | 1 | 0 | 12 | — | — |
 | 4 | [ATS](../prompts/ATS.md) · Reclutamiento, portal de empleos y base de talento | Reclutamiento | 9 | 0 | 0 | 30 | — | D-05 |
 | 4 | [ENT](../prompts/ENT.md) · Entrevistas y ofertas | Reclutamiento | 6 | 0 | 0 | 19 | — | — |
@@ -110,7 +110,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 6 | [REC](../prompts/REC.md) · Reconocimientos | Clima y encuestas | 4 | 0 | 0 | 4 | — | — |
 | 6 | [CIN](../prompts/CIN.md) · Comunicación interna | Clima y encuestas | 4 | 0 | 0 | 7 | — | — |
 | 6 | [HSD](../prompts/HSD.md) · Mesa de ayuda y base de conocimiento | Mesa de ayuda | 7 | 0 | 0 | 0 | — | — |
-| 7 | [SST](../prompts/SST.md) · Seguridad y salud en el trabajo | Seguridad y salud | 10 | 1 | 0 | 54 | — | D-15, D-33 |
+| 7 | [SST](../prompts/SST.md) · Seguridad y salud en el trabajo | Seguridad y salud | 10 | 1 | 0 | 54 | — | D-33 |
 | 7 | [DEN](../prompts/DEN.md) · Canal de denuncias y hostigamiento | Denuncias | 7 | 1 | 0 | 20 | — | D-26, D-31, D-32 |
 | 7 | [DIS](../prompts/DIS.md) · Casos disciplinarios | Denuncias | 4 | 0 | 0 | 8 | — | — |
 | 7 | [ACT](../prompts/ACT.md) · Activos, EPP y uniformes | Activos y EPP | 6 | 0 | 0 | 13 | — | — |
@@ -123,12 +123,12 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 8 | [ALE](../prompts/ALE.md) · Alertas explicadas | Analítica y reportes | 3 | 1 | 0 | 12 | — | D-20 |
 | 8 | [IAR](../prompts/IAR.md) · Asistente de IA y gobierno | Asistente de IA | 7 | 5 | 5 | 12 | — | A-09, D-21, D-38 |
 | 9 | [API](../prompts/API.md) · API pública, webhooks y MCP | API e integraciones | 3 | 2 | 0 | 14 | — | D-17, D-18, D-19, D-21 |
-| 9 | [INT](../prompts/INT.md) · Integraciones | API e integraciones | 7 | 0 | 0 | 9 | — | D-12 |
+| 9 | [INT](../prompts/INT.md) · Integraciones | API e integraciones | 7 | 0 | 0 | 9 | — | — |
 | 9 | [WHA](../prompts/WHA.md) · Autoservicio por WhatsApp | WhatsApp | 4 | 1 | 0 | 3 | — | D-11 |
-| 9 | [PAI](../prompts/PAI.md) · Paquetes de país | — | 1 | 3 | 0 | 3 | Sí | D-27, D-37 |
+| 9 | [PAI](../prompts/PAI.md) · Paquetes de país | — | 1 | 3 | 0 | 3 | Sí | D-37 |
 | 9 | [WLB](../prompts/WLB.md) · Marca blanca | Marca blanca | 3 | 1 | 0 | 2 | — | D-40 |
 | 9 | [EST](../prompts/EST.md) · Modo estudio contable | Estudio contable | 5 | 0 | 0 | 4 | — | D-28 |
-| T | [QA](../prompts/QA.md) · Calidad, seguridad y salida a producción | — | 0 | 17 | 3 | 0 | — | A-06, A-13, D-15, D-22, D-24 |
+| T | [QA](../prompts/QA.md) · Calidad, seguridad y salida a producción | — | 0 | 17 | 3 | 0 | — | A-06, A-13, D-22, D-24 |
 
 ## 6. Lo que el kit ya trae construido
 
@@ -162,24 +162,15 @@ El MVP puede empezar con todas: se aplica la recomendación detrás de un parám
 | A-11 | Generación de PDF | Fase 1 | (a) tras el puerto `PdfRenderer`: misma maquetación que la vista previa y buen soporte tipográfico. El servicio corre sin red y sin acceso a datos. |
 | A-12 | App móvil: web instalable o nativa | Fase 2 | (c). La API ya lo permite; la PWA cubre los flujos del colaborador. |
 | A-13 | Objetivos de recuperación y restauración por organización | Fase 0 (salida a producción) | recuperación a un punto en el tiempo + (b) mediante exportación e importación por `tenant_id` desde un entorno aislado. (c) se cubre con papelera e historia con vigencia. |
-| A-14 | Lenguaje de fórmulas del motor de nómina | Fase 3 | (a). Los conceptos son datos con vigencia que RRHH puede crear; (b) impide conceptos personalizados y obliga a desplegar por cada cambio normativo. Mantener la gramática pequeña y sin efectos secundarios. |
 | D-05 | Política «no contratar sin posición aprobada» | Fase 1 | (b), apagada por defecto para organizaciones pequeñas; cuando está apagada, el alta crea la posición de forma implícita para que el organigrama por posiciones siga funcionando. |
-| D-06 | Regímenes laborales del primer lanzamiento | Fase 3 | general + microempresa + pequeña empresa + modalidades formativas primero; construcción civil y agrario después. El motor admite todos; lo que se decide es el contenido del paquete y sus casos dorados. |
-| D-07 | Reapertura de planilla cerrada y retroactivos | Fase 3 | (b). Tras declarar o pagar, solo ajustes en el siguiente periodo y archivo rectificatorio. |
-| D-09 | Presentación ante SUNAT y AFPnet | Fase 3 | (a). El sistema registra la constancia de presentación que carga el usuario. |
-| D-10 | Firma electrónica: validez por tipo de documento | Fase 1 | (c): evidencia propia por defecto (boletas, constancias, políticas, EPP) y proveedor con certificado donde legal lo indique. Qué documento exige qué nivel lo define el área legal (D-15). |
 | D-11 | Proveedor de WhatsApp y alcance del autoservicio | Segunda ola (notificaciones: fase 0) | notificaciones desde la fase 0 tras el puerto; autoservicio (b) en la fase 9. Elegir proveedor según requisitos de plantilla, alojamiento de datos y condiciones. |
-| D-12 | Bancos, billeteras y ERP del primer lanzamiento | Fase 3 | empezar por archivo (no por conexión en línea) para los bancos con más clientes del mercado objetivo y un formato contable genérico (CSV configurable). El negocio entrega la lista priorizada. |
 | D-14 | Privacidad: qué va en la base y qué en el módulo de cumplimiento | Fase 1 | (c). Base: avisos, consentimientos, derechos del titular, registro de accesos, retención. Módulo: inventario de tratamientos, evaluaciones de impacto, registro de incidentes con seguimiento, informes. |
-| D-15 | Validación legal de plazos, retenciones y rol de encargado | Fase 1 (y antes de cada fase con norma) | (a). Cada valor entra como parámetro con estado «por validar» y no puede usarse en producción hasta que lo valide el responsable (D-27). |
 | D-17 | Eventos públicos: `employee.created` frente a `employee.hired` | Fase 1 | (c), porque el pedido original nombra ambos y las integraciones suelen esperar `employee.created`. Si se necesita reaccionar al pre-ingreso, usar `offer.accepted`. |
 | D-19 | Límites de uso de API por plan | Fase 9 | por plan, como parámetros de plataforma, con límites más estrictos en rutas públicas, autenticación e IA. |
 | D-21 | Herramientas del servidor MCP | Fase 9 | (b), lista cerrada y versionada; nada de alto impacto. |
 | D-22 | Presupuestos de rendimiento | Fase 1 | fijarlos como umbrales de la prueba de carga (`11` §11) antes de construir la fase 1, para que el diseño de índices y proyecciones se mida contra ellos. |
 | D-23 | Acceso del colaborador tras el cese | Fase 1 | (b), con duración configurable por organización; no cuenta para el límite del plan. |
 | D-24 | Certificaciones de seguridad objetivo | Fase 0 (salida a producción) | diseñar los controles desde la fase 0 conforme a `12` y decidir el calendario de certificación con el negocio. |
-| D-27 | Responsable y proceso de actualización de parámetros legales | Fase 3 | (c): parámetros legales nacionales mantenidos por la plataforma con un responsable nombrado, doble revisión, fuente normativa obligatoria y aviso a las organizaciones; parámetros de política propia mantenidos por la organización. Definir quién es el especialista que valida y mantiene los casos dorados. |
-| D-30 | Ubicación de los códigos SUNAT derivables (perfil T-Registro) | Fase 3 | (a). Lo declarado es lo que dispara la novedad de modificación; `has_risk_insurance` queda como indicador derivado. Detalle en `18-localizacion-peru-detalle-tecnico.md` §0.2. |
 | D-34 | Sello de tiempo externo y forma canónica del libro de cumplimiento | Fase 7 | RFC 8785 en la aplicación, ancla diaria y al exportar, proveedor detrás de un adaptador con implementación falsa. Sin proveedor, el libro prueba orden e integridad, no fecha cierta ante terceros. |
 | D-35 | Enumerados ampliados de documento, derechohabiente y novedad del registro laboral | Fase 3 | (a) mientras Perú sea el único paquete; revisar al diseñar el segundo país. |
 | D-36 | Qué fuente secundaria basta para marcar un parámetro legal como verificado | Fase 3 | (b) antes de producción: el cierre de planilla debería exigir verificación de especialista, no de fuente secundaria (RN-PAR-03). |

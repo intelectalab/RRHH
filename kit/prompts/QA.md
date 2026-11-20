@@ -36,7 +36,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: A-06, A-13, D-15, D-22, D-24. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: A-06, A-13, D-22, D-24. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -77,6 +77,5 @@ Deben estar integradas antes de las actividades que las piden:
 |---|---|---|---|
 | A-06 | Particionado de tablas grandes | Fase 2 | (a). Particionar después, con datos, es mucho más costoso; además facilita la retención (se descartan particiones). |
 | A-13 | Objetivos de recuperación y restauración por organización | Fase 0 (salida a producción) | recuperación a un punto en el tiempo + (b) mediante exportación e importación por `tenant_id` desde un entorno aislado. (c) se cubre con papelera e historia con vigencia. |
-| D-15 | Validación legal de plazos, retenciones y rol de encargado | Fase 1 (y antes de cada fase con norma) | (a). Cada valor entra como parámetro con estado «por validar» y no puede usarse en producción hasta que lo valide el responsable (D-27). |
 | D-22 | Presupuestos de rendimiento | Fase 1 | fijarlos como umbrales de la prueba de carga (`11` §11) antes de construir la fase 1, para que el diseño de índices y proyecciones se mida contra ellos. |
 | D-24 | Certificaciones de seguridad objetivo | Fase 0 (salida a producción) | diseñar los controles desde la fase 0 conforme a `12` y decidir el calendario de certificación con el negocio. |

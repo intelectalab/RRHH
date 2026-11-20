@@ -24,22 +24,22 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 | A-11 | Generación de PDF | Fase 1 |
 | A-12 | App móvil: web instalable o nativa | Fase 2 |
 | A-13 | Objetivos de recuperación y restauración por organización | Fase 0 (salida a producción) |
-| A-14 | Lenguaje de fórmulas del motor de nómina | Fase 3 |
+| A-14 | Lenguaje de fórmulas del motor de nómina | Cerrada el 2026-11-20 (ADR 0015) |
 | D-01 | Composición de planes y módulos | Cerrada el 2026-11-05 (ADR 0008) |
 | D-02 | Nombre y marca definitivos | Cerrada el 2026-11-05 (ADR 0014) |
 | D-03 | Qué cuenta para el límite de colaboradores | Cerrada el 2026-11-05 (ADR 0009) |
 | D-04 | Cobro de la suscripción | Cerrada el 2026-11-05 (ADR 0010) |
 | D-05 | Política «no contratar sin posición aprobada» | Fase 1 |
-| D-06 | Regímenes laborales del primer lanzamiento | Fase 3 |
-| D-07 | Reapertura de planilla cerrada y retroactivos | Fase 3 |
+| D-06 | Regímenes laborales del primer lanzamiento | Cerrada el 2026-11-20 (ADR 0016) |
+| D-07 | Reapertura de planilla cerrada y retroactivos | Cerrada el 2026-11-20 (ADR 0017) |
 | D-08 | MFA obligatorio: para quién | Cerrada el 2026-11-05 (ADR 0011) |
-| D-09 | Presentación ante SUNAT y AFPnet | Fase 3 |
-| D-10 | Firma electrónica: validez por tipo de documento | Fase 1 |
+| D-09 | Presentación ante SUNAT y AFPnet | Cerrada el 2026-11-20 (ADR 0018) |
+| D-10 | Firma electrónica: validez por tipo de documento | Cerrada el 2026-11-20 (ADR 0019) |
 | D-11 | Proveedor de WhatsApp y alcance del autoservicio | Segunda ola (notificaciones: fase 0) |
-| D-12 | Bancos, billeteras y ERP del primer lanzamiento | Fase 3 |
+| D-12 | Bancos, billeteras y ERP del primer lanzamiento | Cerrada el 2026-11-20 (ADR 0020) |
 | D-13 | Datos al desactivar un módulo o dar de baja una organización | Cerrada el 2026-11-05 (ADR 0012) |
 | D-14 | Privacidad: qué va en la base y qué en el módulo de cumplimiento | Fase 1 |
-| D-15 | Validación legal de plazos, retenciones y rol de encargado | Fase 1 (y antes de cada fase con norma) |
+| D-15 | Validación legal de plazos, retenciones y rol de encargado | Cerrada el 2026-11-20 (ADR 0021) |
 | D-16 | Biometría y reconocimiento facial en marcación | Fase 2 |
 | D-17 | Eventos públicos: `employee.created` frente a `employee.hired` | Fase 1 |
 | D-18 | Política de versiones y retirada de la API | Fase 9 |
@@ -49,12 +49,12 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 | D-22 | Presupuestos de rendimiento | Fase 1 |
 | D-23 | Acceso del colaborador tras el cese | Fase 1 |
 | D-24 | Certificaciones de seguridad objetivo | Fase 0 (salida a producción) |
-| D-25 | Adelanto de sueldo: quién financia y con qué tope | Fase 3 |
+| D-25 | Adelanto de sueldo: quién financia y con qué tope | Cerrada el 2026-11-20 (ADR 0022) |
 | D-26 | Anonimato: umbral mínimo y denuncias anónimas | Fase 6 (encuestas) y fase 7 (denuncias) |
-| D-27 | Responsable y proceso de actualización de parámetros legales | Fase 3 |
+| D-27 | Responsable y proceso de actualización de parámetros legales | Cerrada el 2026-11-20 (ADR 0023) |
 | D-28 | Modo estudio contable: propiedad de los datos y permisos del socio | Fase 9 |
 | D-29 | Idioma de los códigos de permiso | Cerrada el 2026-11-05 (ADR 0002) |
-| D-30 | Ubicación de los códigos SUNAT derivables (perfil T-Registro) | Fase 3 |
+| D-30 | Ubicación de los códigos SUNAT derivables (perfil T-Registro) | Cerrada el 2026-11-20 (ADR 0024) |
 | D-31 | Hora en los plazos y en el libro de una denuncia | Fase 7 |
 | D-32 | Bitácora del caso de denuncia: `complaint_events` frente al libro encadenado | Fase 7 |
 | D-33 | Comités por razón social o por centro de trabajo, y paridad | Fase 7 |
@@ -151,6 +151,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 ---
 
 ## Producto, negocio y legal
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0015`.
 
 ### D-01 · Composición de planes y módulos
 - **Opciones**: (a) planes cerrados por tamaño; (b) base + módulos sueltos; (c) planes con módulos incluidos y complementos.
@@ -186,11 +187,13 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: general; microempresa; pequeña empresa; construcción civil; agrario; modalidades formativas.
 - **Recomendación**: general + microempresa + pequeña empresa + modalidades formativas primero; construcción civil y agrario después. El motor admite todos; lo que se decide es el contenido del paquete y sus casos dorados.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0016`.
 
 ### D-07 · Reapertura de planilla cerrada y retroactivos
 - **Opciones**: (a) nunca reabrir: todo ajuste va al siguiente periodo; (b) reabrir con permiso especial mientras no se haya declarado ni pagado; (c) reabrir siempre con rectificatoria.
 - **Recomendación**: (b). Tras declarar o pagar, solo ajustes en el siguiente periodo y archivo rectificatorio.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0017`.
 
 ### D-08 · MFA obligatorio
 - **Opciones**: (a) opcional; (b) obligatorio para roles con datos sensibles; (c) obligatorio para todos.
@@ -202,11 +205,13 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: (a) generar y validar archivos; la empresa presenta; (b) presentación automatizada.
 - **Recomendación**: (a). El sistema registra la constancia de presentación que carga el usuario.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0018`.
 
 ### D-10 · Firma electrónica: validez por tipo de documento
 - **Opciones**: (a) firma con evidencia propia para todo; (b) firma con certificado por proveedor para todo; (c) por tipo de documento.
 - **Recomendación**: (c): evidencia propia por defecto (boletas, constancias, políticas, EPP) y proveedor con certificado donde legal lo indique. Qué documento exige qué nivel lo define el área legal (D-15).
 - **Cerrar antes de**: fase 1.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0019`.
 
 ### D-11 · WhatsApp
 - **Opciones**: proveedor (API oficial directa o intermediario); alcance: (a) solo notificaciones; (b) autoservicio completo (boletas, vacaciones, constancias, marcación).
@@ -218,6 +223,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: lista de bancos para archivo de pago de sueldos y CTS; billeteras; ERP o formato contable.
 - **Recomendación**: empezar por archivo (no por conexión en línea) para los bancos con más clientes del mercado objetivo y un formato contable genérico (CSV configurable). El negocio entrega la lista priorizada.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0020`.
 
 ### D-13 · Datos al desactivar un módulo o dar de baja una organización
 - **Opciones**: módulo: (a) solo lectura indefinida; (b) solo lectura durante un periodo y luego archivo. Organización: periodo de gracia y forma de entrega de los datos.
@@ -236,6 +242,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Recomendación**: (a). Cada valor entra como parámetro con estado «por validar» y no puede usarse en producción hasta que lo valide el responsable (D-27).
 - **Cerrar antes de**: fase 1 para privacidad y firma; fase 2 para asistencia; fase 3 para planilla; fase 7 para SST, hostigamiento y cumplimiento.
 - **Lista de trabajo**: `docs/19-parametros-legales-por-validar.md` enumera los parámetros sin valor verificado y marca los que bloquean el primer corte comercial (QA-17).
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0021`.
 
 ### D-16 · Biometría y reconocimiento facial
 - **Opciones**: (a) sin reconocimiento facial: selfie como evidencia; (b) detección de vida por proveedor; (c) reconocimiento facial completo.
@@ -286,6 +293,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: (a) lo financia la empresa cliente; (b) un tercero financiero; tope sobre lo devengado; canal de pago (banco, billetera).
 - **Recomendación**: (a) al inicio: adelanto sobre lo ya devengado, tope por política de la organización como parámetro, descuento automático en el periodo. (b) implica regulación financiera y debe evaluarse aparte.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0022`.
 
 ### D-26 · Anonimato
 - **Opciones**: umbral mínimo de respuestas por segmento (valor por defecto y mínimo permitido); si las denuncias anónimas se admiten para todos los tipos de caso.
@@ -296,6 +304,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: (a) la plataforma mantiene los parámetros del paquete y las organizaciones los reciben; (b) cada organización los mantiene; (c) mixto.
 - **Recomendación**: (c): parámetros legales nacionales mantenidos por la plataforma con un responsable nombrado, doble revisión, fuente normativa obligatoria y aviso a las organizaciones; parámetros de política propia mantenidos por la organización. Definir quién es el especialista que valida y mantiene los casos dorados.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0023`.
 
 ### D-28 · Modo estudio contable
 - **Opciones**: (a) cada cliente del estudio es una organización propia y el estudio accede como socio; (b) el estudio es una organización y sus clientes son razones sociales.
@@ -315,6 +324,7 @@ Decisiones que el negocio o el área de desarrollo deben cerrar. Mientras una de
 - **Opciones**: (a) guardar lo declarado y conciliarlo con lo derivado (aplicado); (b) derivar siempre y no guardar; (c) llevar los códigos a los catálogos del núcleo (`contract_types`, `health_providers`).
 - **Recomendación**: (a). Lo declarado es lo que dispara la novedad de modificación; `has_risk_insurance` queda como indicador derivado. Detalle en `18-localizacion-peru-detalle-tecnico.md` §0.2.
 - **Cerrar antes de**: fase 3.
+- **Cerrada el 2026-11-20**: se eligió la recomendación. Ver `adr/0024`.
 
 ### D-31 · Hora en los plazos y en el libro de una denuncia
 - **Qué**: la tabla `complaints` no guarda marcas de hora (C-06). El documento 18 proponía `received_at`; no se añadió. El disparador del libro trunca a día `occurred_at` y `recorded_at` de los asientos cuyo sujeto es una denuncia, y los plazos de hostigamiento se computan por día.

@@ -24,7 +24,7 @@ Trabaja las actividades en este orden, cada una con /historia <clave>, en su pro
 Antes de cada actividad comprueba que sus dependencias ya estén en main
 (git log --oneline --grep "\[<clave>\]"). Si falta alguna, sáltala, anótala y sigue con la
 siguiente que esté libre.
-Decisiones abiertas que pueden tocarla: D-25. Si una actividad depende de una de ellas,
+Decisiones abiertas que pueden tocarla: ninguna asignada. Si una actividad depende de una de ellas,
 aplica la recomendación de kit/docs/13 detrás de un parámetro o interfaz y dilo en el pull request;
 si la recomendación no alcanza, detente y pregunta.
 Al terminar cada actividad: make test lint en verde, /revisar, y un resumen con los criterios
@@ -46,9 +46,3 @@ cumplidos uno por uno y lo que quedó fuera. Al final, dime qué actividades que
 Deben estar integradas antes de las actividades que las piden:
 
 `ASI-8`, `DOC-6`, `ESS-5`, `LIQ-1`, `PER-2`, `PLT-13`, `WFL-2`
-
-## Decisiones abiertas
-
-| Código | Decisión | Cerrar antes de | Recomendación del kit |
-|---|---|---|---|
-| D-25 | Adelanto de sueldo: quién financia y con qué tope | Fase 3 | (a) al inicio: adelanto sobre lo ya devengado, tope por política de la organización como parámetro, descuento automático en el periodo. (b) implica regulación financiera y debe evaluarse aparte. |

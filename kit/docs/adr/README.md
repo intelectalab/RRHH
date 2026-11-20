@@ -42,5 +42,15 @@ A-06 (particionado) se cierra antes de la fase 2, pero la parte de auditoría ya
 | [0012](0012-datos-al-desactivar-o-dar-de-baja.md) | Datos al apagar un módulo o dar de baja una organización | Aceptada | D-13 |
 | [0013](0013-catalogo-inicial-de-planes.md) | Catálogo inicial de planes y complementos, sin montos | Aceptada | D-01, D-03 |
 | [0014](0014-nombre-y-marca.md) | Nombre GestiaHR y logo provisional | Aceptada | D-02 |
+| [0015](0015-lenguaje-de-formulas-de-nomina.md) | Lenguaje de fórmulas propio del motor de nómina | Aceptada | A-14 |
+| [0016](0016-regimenes-del-primer-lanzamiento.md) | Regímenes del primer lanzamiento: general, micro, pequeña y formativas | Aceptada | D-06 |
+| [0017](0017-reapertura-de-planilla-y-retroactivos.md) | Tras declarar o pagar, solo ajustes en el periodo siguiente | Aceptada | D-07 |
+| [0018](0018-presentacion-ante-sunat-y-afpnet.md) | Se generan y validan los archivos; la empresa los presenta | Aceptada | D-09 |
+| [0019](0019-firma-electronica-por-tipo-de-documento.md) | Firma con evidencia propia por defecto y proveedor con certificado donde legal lo indique | Aceptada | D-10 |
+| [0020](0020-bancos-y-erp-del-primer-lanzamiento.md) | Bancos por archivo y formato contable genérico | Aceptada | D-12 |
+| [0021](0021-validacion-legal.md) | Todo valor legal entra «por validar» hasta que lo valida el responsable | Aceptada | D-15 |
+| [0022](0022-adelanto-de-sueldo.md) | Adelanto solo sobre lo devengado, con tope de la organización | Aceptada | D-25 |
+| [0023](0023-actualizacion-de-parametros-legales.md) | Parámetros legales mantenidos por la plataforma con responsable y doble revisión | Aceptada | D-27 |
+| [0024](0024-codigos-sunat-derivables.md) | Lo declarado dispara la novedad; códigos derivados como indicador | Aceptada | D-30 |
 
 Las decisiones aceptadas con un pendiente no bloquean el desarrollo: el código usa un parámetro o un adaptador y el valor se completa antes de la salida a producción.
