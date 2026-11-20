@@ -16,8 +16,8 @@
   tenant_id => tenants ; from_status ; to_status text! ; reason ; platform_user_id ?=> platform_users ; occurred_at ts=now
 
 #E SAS | Consola SaaS: organizaciones, planes, módulos, límites, feature flags, soporte y salud
-@modules P cat main | Módulos comerciales que una organización puede contratar; agrupan épicas del backlog.
-  code ; name ; phase smallint! ; is_core ; epic_codes text[]! ; description ; uniq code
+@modules P cat main | Módulos comerciales que una organización puede contratar; agrupan épicas del backlog. is_published: el módulo está a la venta (WEB-2: el sitio lo muestra «Disponible»; si no, «Próximamente» con lista de espera); lo cambia la consola.
+  code ; name ; phase smallint! ; is_core ; epic_codes text[]! ; description ; is_published bool=f ; published_at ; uniq code
 @module_dependencies P cat | Dependencias entre módulos comerciales (un módulo no se activa sin sus requisitos).
   module_code ~> modules.code ; depends_on_code ~> modules.code ; is_required bool=t ; uniq module_code, depends_on_code
 @plans P main soft lock | Planes comerciales definidos por el superadministrador (nombres libres, duplicables).

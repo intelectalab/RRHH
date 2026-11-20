@@ -157,4 +157,17 @@ return [
             'incidents_in_period' => 'Incidentes que começaram dentro do período.',
         ],
     ],
+    'web' => [
+        'unknown_addon' => 'Complemento inexistente: :codes.',
+        'notices' => [
+            'cycle_unavailable' => 'Este plano não é oferecido com esse ciclo de pagamento; consulte o preço.',
+            'exceeds_limit' => 'O plano admite até :limit colaboradores; um plano maior é mais adequado.',
+            'already_included' => ':addon já vem no plano.',
+            'waitlist' => ':addon está em breve: avisaremos quando sair e não é cobrado.',
+            'requirement_added' => ':addon exige :required; adicionamos à sua seleção.',
+            'requirement_missing' => ':addon exige :module, que ainda não é oferecido como complemento.',
+            'price_on_request' => 'Algum preço ainda não foi publicado: consulte-nos.',
+            'tax_pending' => 'O imposto é confirmado ao emitir a nota fiscal.',
+        ],
+    ],
 ];

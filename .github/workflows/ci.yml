@@ -58,6 +58,15 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
+      # WEB-1 · Sitio comercial gestiahr.com (aplicación aparte)
+      - name: Install Site dependencies
+        working-directory: apps/site
+        run: npm ci
+
+      - name: Lint, typecheck y build del sitio
+        working-directory: apps/site
+        run: npm run lint && npm run typecheck && npm run build
+
   contracts-sync:
     name: OpenAPI Contracts & Types Sync
     runs-on: ubuntu-latest
@@ -186,6 +195,10 @@ jobs:
       - name: Run Frontend Tests
         working-directory: apps/web
         run: npm test
+
+      - name: Run Site Tests
+        working-directory: apps/site
+        run: npm ci && npm test
 
       - name: Upload Test Coverage Artifact
         uses: actions/upload-artifact@v4

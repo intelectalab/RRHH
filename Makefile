@@ -2,7 +2,7 @@ DOCKER_COMPOSE = docker compose
 
 KIT_PSQL = $(DOCKER_COMPOSE) exec -T postgres psql -v ON_ERROR_STOP=1 -U ayni
 
-.PHONY: kit-db kit-isolation kit-check backlog sitio up down restart ps logs api web horizon api-install web-install migrate seed db-reset test test-api test-web test-golden test-isolation test-e2e lint lint-api lint-web contracts openapi
+.PHONY: kit-db kit-isolation kit-check backlog sitio up down restart ps logs api web site horizon api-install web-install site-install migrate seed db-reset test test-api test-web test-golden test-isolation test-e2e lint lint-api lint-web lint-site test-site contracts openapi
 
 up:
 	$(DOCKER_COMPOSE) up -d
@@ -25,6 +25,9 @@ api-install:
 web-install:
 	$(DOCKER_COMPOSE) run --rm web npm install
 
+site-install:
+	$(DOCKER_COMPOSE) run --rm site npm install
+
 migrate:
 	$(DOCKER_COMPOSE) run --rm api php artisan migrate
 
@@ -40,16 +43,23 @@ api:
 web:
 	$(DOCKER_COMPOSE) up web
 
+# WEB-1 · sitio comercial gestiahr.com en :3001 (aplicación aparte)
+site:
+	$(DOCKER_COMPOSE) up site
+
 horizon:
 	$(DOCKER_COMPOSE) up horizon
 
-test: test-api test-web
+test: test-api test-web test-site
 
 test-api:
 	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest $(if $(F),--filter $(F),)
 
 test-web:
 	$(DOCKER_COMPOSE) run --rm web npm test
+
+test-site:
+	$(DOCKER_COMPOSE) run --rm site npm test
 
 test-golden:
 	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest --group=golden
@@ -61,7 +71,7 @@ test-isolation:
 test-e2e:
 	$(DOCKER_COMPOSE) run --rm web npm run test:e2e
 
-lint: lint-api lint-web
+lint: lint-api lint-web lint-site
 
 lint-api:
 	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pint --test
@@ -70,6 +80,10 @@ lint-api:
 lint-web:
 	$(DOCKER_COMPOSE) run --rm web npm run lint
 	$(DOCKER_COMPOSE) run --rm web npx tsc --noEmit
+
+lint-site:
+	$(DOCKER_COMPOSE) run --rm site npm run lint
+	$(DOCKER_COMPOSE) run --rm site npx tsc --noEmit
 
 contracts:
 	$(DOCKER_COMPOSE) run --rm web npm run contracts

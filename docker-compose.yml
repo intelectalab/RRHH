@@ -165,6 +165,29 @@ services:
     networks:
       - ayni-network
 
+  # WEB-1 · Sitio comercial gestiahr.com: aplicación aparte; solo usa la API pública (/api/v1/public/*).
+  site:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    container_name: aynihr-site
+    restart: unless-stopped
+    working_dir: /app
+    command: ["npm", "run", "dev"]
+    environment:
+      NODE_ENV: development
+      SITE_ENV: development
+      SITE_API_URL: http://api:8000/api
+      PORT: 3001
+    volumes:
+      - ./apps/site:/app
+    ports:
+      - "${FORWARD_SITE_PORT:-3001}:3001"
+    depends_on:
+      - api
+    networks:
+      - ayni-network
+
   horizon:
     build:
       context: .

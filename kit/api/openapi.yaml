@@ -29333,6 +29333,92 @@ paths:
       x-phase: 0
       x-permission: platform.metrics.view
       operationId: getPlatformMetrics
+  /platform/modules:
+    get:
+      summary: 'Consola SaaS: módulos comerciales con sus dependencias y si están a la venta (publicados) en el sitio'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: platform.plans.view
+      operationId: getPlatformModules
+  /platform/modules/{code}/publish:
+    post:
+      summary: 'Consola SaaS: poner un módulo a la venta; el sitio deja de mostrarlo en «Próximamente» (WEB-2)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: platform.plans.activate
+      operationId: postPlatformModulesCodePublish
+  /platform/modules/{code}/unpublish:
+    post:
+      summary: 'Consola SaaS: retirar un módulo de la venta; el sitio lo vuelve a mostrar en «Próximamente»'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: platform.plans.activate
+      operationId: postPlatformModulesCodeUnpublish
   /platform/notices:
     get:
       summary: 'Consola SaaS: avisos de la plataforma (vigentes, programados, vencidos y cancelados)'
@@ -34494,6 +34580,50 @@ paths:
       x-phase: 0
       x-permission: public
       operationId: postPublicLeads
+      security: []
+  /public/quote:
+    get:
+      summary: 'Sitio: cotización de un plan con complementos para cierta cantidad de colaboradores (WEB-4): subtotal, impuesto
+        vigente y total desde los precios de la consola; agrega o avisa los módulos requeridos y no cobra lo que está en «Próximamente»'
+      parameters:
+      - name: plan
+        in: query
+        required: true
+        description: Código del plan público
+        schema:
+          type: string
+      - name: employees
+        in: query
+        required: true
+        description: Cantidad de colaboradores (entero de 1 en adelante)
+        schema:
+          type: string
+      - name: cycle
+        in: query
+        required: false
+        description: monthly o annual; por defecto, el ciclo del plan
+        schema:
+          type: string
+      - name: addons
+        in: query
+        required: false
+        description: Códigos de complementos separados por coma
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '422': *id006
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: public
+      operationId: getPublicQuote
       security: []
   /public/ruc/{ruc}:
     get:

@@ -30,6 +30,9 @@ final class ResolveTenantContext
         'api/v1/health',
         // SAS-1: la consola opera fuera de toda organización (desde un host de organización responde 404).
         'api/v1/platform/',
+        // WEB-2 · WEB-4: catálogo y cotización del sitio comercial, de la plataforma y sin organización.
+        'api/v1/public/catalog',
+        'api/v1/public/quote',
         'api/documentation',
         'docs',
         'up',
