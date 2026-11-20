@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { api } from '@/lib/api'
+import { api, ApiRequestError } from '@/lib/api'
 import { formatDate } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
@@ -79,7 +79,17 @@ export function PayrollPeriodsScreen() {
       reason = window.prompt(t('per.reason'))
       if (!reason) return
     }
-    void run(() => api.post(`/payroll-periods/${p.id}/${action}`, reason ? { reason } : {}), 'per.done')
+    void run(async () => {
+      try {
+        return await api.post(`/payroll-periods/${p.id}/${action}`, reason ? { reason } : {})
+      } catch (e) {
+        // PER-8 · Con anomalías abiertas el envío pide confirmarlas expresamente (el servidor lo exige).
+        if (action === 'submit' && e instanceof ApiRequestError && e.code === 'anomalies_pending' && window.confirm(`${e.message}\n${t('per.confirm_anomalies')}`)) {
+          return api.post(`/payroll-periods/${p.id}/submit`, { confirm_anomalies: true })
+        }
+        throw e
+      }
+    }, 'per.done')
   }
 
   const addIncident = (e: FormEvent<HTMLFormElement>) => {

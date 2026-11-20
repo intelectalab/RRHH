@@ -36,6 +36,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $reopen_reason
  * @property CarbonInterface|null $time_consumed_at
  * @property string|null $time_consumed_by_user_id
+ * @property string|null $complements_period_id
+ * @property CarbonInterface|null $paid_at
+ * @property string|null $paid_by_user_id
+ * @property string|null $payment_method
  * @property int $lock_version
  */
 class PayrollPeriod extends Model
@@ -56,7 +60,7 @@ class PayrollPeriod extends Model
     protected $casts = [
         'period_year' => 'integer', 'period_number' => 'integer', 'starts_on' => 'date', 'ends_on' => 'date', 'payment_date' => 'date',
         'attendance_from' => 'date', 'attendance_to' => 'date', 'closed_at' => 'datetime', 'submitted_at' => 'datetime',
-        'approved_at' => 'datetime', 'time_consumed_at' => 'datetime', 'lock_version' => 'integer',
+        'approved_at' => 'datetime', 'time_consumed_at' => 'datetime', 'paid_at' => 'datetime', 'lock_version' => 'integer',
     ];
 
     public function day(string $attribute): ?string

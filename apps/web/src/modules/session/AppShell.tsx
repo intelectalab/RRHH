@@ -63,6 +63,8 @@ const MENU: NavLink[] = [
   { href: '/nomina/conceptos', key: 'shell.modules_payroll_concepts', group: 'payroll', icon: 'sliders', module: 'payroll', visible: (can) => can('payroll.concepts.view') },
   { href: '/nomina/parametros', key: 'shell.modules_legal_parameters', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.legal_parameters.view') },
   { href: '/nomina/calculos', key: 'shell.modules_payroll_runs', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.view') },
+  { href: '/nomina/revision', key: 'shell.modules_payroll_review', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.results.view') },
+  { href: '/nomina/pagos', key: 'shell.modules_payroll_payments', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.mark_paid') },
   { href: '/nomina/micro-pequena-empresa', key: 'shell.modules_small_business', group: 'payroll', icon: 'building', module: 'payroll', visible: (can) => can('payroll.entity_annual_figures.view') },
 ]
 

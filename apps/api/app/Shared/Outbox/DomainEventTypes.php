@@ -132,6 +132,12 @@ final class DomainEventTypes
 
     public const PAYROLL_CLOSED = 'payroll.closed.v1';
 
+    // PER-10 · RN-PER-12 · Pago del periodo registrado (lotes confirmados).
+    public const PAYROLL_PAID = 'payroll.paid.v1';
+
+    // PER-7 · Anomalías detectadas al comparar el cálculo con el periodo anterior.
+    public const PAYROLL_ANOMALY_DETECTED = 'payroll.anomaly_detected.v1';
+
     // NOM-8 · Corrida de cálculo en cola: la procesa el consumidor por relación, con avance y reanudación.
     public const PAYROLL_RUN_REQUESTED = 'payroll.run_requested.v1';
 
@@ -537,6 +543,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['payroll_run_id', 'closed_at'],
             'description' => 'Periodo de nómina cerrado definitivamente',
+        ],
+        self::PAYROLL_PAID => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'paid_at', 'batches'],
+            'description' => 'Pago del periodo de planilla registrado con sus lotes confirmados',
+        ],
+        self::PAYROLL_ANOMALY_DETECTED => [
+            'version' => 1,
+            'required_fields' => ['payroll_run_id', 'period_id', 'count', 'critical'],
+            'description' => 'Anomalías detectadas en el cálculo frente al periodo anterior',
         ],
         self::PAYSLIP_PUBLISHED => [
             'version' => 1,

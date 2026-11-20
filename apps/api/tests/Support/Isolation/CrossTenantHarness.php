@@ -47,9 +47,12 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
 use App\Modules\Payroll\Infrastructure\Models\AccountingAccount;
+use App\Modules\Payroll\Infrastructure\Models\PayrollPaymentBatch;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRun;
+use App\Modules\Payroll\Infrastructure\Models\PayrollRunAnomaly;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
+use App\Modules\Payroll\Infrastructure\Models\PayrollVarianceThreshold;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -166,6 +169,15 @@ final class CrossTenantHarness
         '/payroll-runs/{id}/employments' => PayrollRun::class,
         '/payroll-run-employments/{id}/lines' => PayrollRunEmployment::class,
         '/payroll-run-lines/{id}/explanation' => PayrollRunLine::class,
+        // PER-7 · PER-10 · Anomalías, umbrales y lotes de pago de A.
+        '/payroll-run-anomalies/{id}/review' => PayrollRunAnomaly::class,
+        '/payroll-run-anomalies/{id}/dismiss' => PayrollRunAnomaly::class,
+        '/payroll-variance-thresholds/{id}' => PayrollVarianceThreshold::class,
+        '/payroll-payment-batches/{id}' => PayrollPaymentBatch::class,
+        '/payroll-payment-batches/{id}/generate' => PayrollPaymentBatch::class,
+        '/payroll-payment-batches/{id}/file' => PayrollPaymentBatch::class,
+        '/payroll-payment-batches/{id}/confirm' => PayrollPaymentBatch::class,
+        '/payroll-payment-batches/{id}/cancel' => PayrollPaymentBatch::class,
         // CPT-4 · Editar una cuenta contable de A.
         '/accounting-accounts/{id}' => AccountingAccount::class,
         '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,

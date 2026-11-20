@@ -8,10 +8,12 @@ use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
 use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
+use App\Modules\Payroll\Infrastructure\Workflow\PayrollPeriodOutcome;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Payroll\ConceptAccounts;
 use App\Shared\Setup\CountryPackRegistry;
+use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -41,5 +43,7 @@ final class PayrollServiceProvider extends ServiceProvider
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(ProcessPayrollRun::class));
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));
+        // PER-8 · Aprobación del periodo por el flujo configurado (WFL-2).
+        $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(PayrollPeriodOutcome::class));
     }
 }

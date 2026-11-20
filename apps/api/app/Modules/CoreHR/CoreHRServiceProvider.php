@@ -20,6 +20,7 @@ use App\Modules\CoreHR\Infrastructure\Imports\CompensationHistoryImporter;
 use App\Modules\CoreHR\Infrastructure\Imports\EmployeesImporter;
 use App\Modules\CoreHR\Infrastructure\Labor\AssignmentChangesAdapter;
 use App\Modules\CoreHR\Infrastructure\Labor\MasterDataAdapter;
+use App\Modules\CoreHR\Infrastructure\Labor\PaymentAccountsAdapter;
 use App\Modules\CoreHR\Infrastructure\SelfService\ProfileHomeCard;
 use App\Modules\CoreHR\Infrastructure\Setup\TerminationReasonsPackComponent;
 use App\Modules\CoreHR\Infrastructure\Team\CelebrationTeamDates;
@@ -31,6 +32,7 @@ use App\Shared\Home\HomeRegistry;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Labor\AssignmentChanges;
 use App\Shared\Labor\MasterData;
+use App\Shared\Labor\PaymentAccounts;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Team\TeamDateRegistry;
@@ -51,6 +53,8 @@ final class CoreHRServiceProvider extends ServiceProvider
         $this->app->bind(AssignmentChanges::class, AssignmentChangesAdapter::class);
         // HIS-6 · Servicio único de datos maestros vigentes a una fecha para los demás módulos.
         $this->app->bind(MasterData::class, MasterDataAdapter::class);
+        // PER-10 · Cuenta de pago vigente para el lote de pago de la planilla.
+        $this->app->bind(PaymentAccounts::class, PaymentAccountsAdapter::class);
     }
 
     public function boot(): void

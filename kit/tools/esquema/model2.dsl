@@ -277,6 +277,7 @@
   closed_by_user_id ?-> users ; uniq payroll_group_id, kind, period_year, period_number
   opened_by_user_id ?-> users ; submitted_by_user_id ?-> users ; submitted_at ; approved_by_user_id ?-> users ; approved_at
   return_reason ; reopen_reason ; time_consumed_at ; time_consumed_by_user_id ?-> users
+  complements_period_id ?-> payroll_periods ; paid_at ; paid_by_user_id ?-> users ; payment_method
 @payroll_incidents main soft lock | Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).
   payroll_period_id -> payroll_periods ; employment_id -> employments ; payroll_concept_id -> payroll_concepts
   quantity numeric(12,4) ; rate numeric(14,6) ; amount money ; currency cur?
@@ -308,11 +309,15 @@
   payroll_run_id -> payroll_runs ; employment_id ?-> employments ; rule_code text! ; severity enum(info,warning,critical)!
   explanation text! ; previous_value numeric(14,2) ; current_value numeric(14,2) ; variation_pct numeric(9,4)
   status enum(open,reviewed,dismissed)=open ; reviewed_by_user_id ?-> users ; review_note
+  payroll_concept_id ?-> payroll_concepts ; causes j ; reviewed_at ; idx payroll_run_id, status
+@payroll_variance_thresholds soft lock | PER-7 · RN-PER-05 · Umbral de variación (%) contra el periodo anterior por empresa y concepto; sin concepto aplica al neto. Sin fila rige el parámetro nomina.variacion_neto_alerta_pct.
+  legal_entity_id ?-> legal_entities ; payroll_concept_id ?-> payroll_concepts ; threshold_pct numeric(7,2)! ; uniq legal_entity_id, payroll_concept_id
 @payroll_payment_batches lock | Lote de pago (archivo bancario o billetera) de haberes, adelantos, CTS, liquidaciones, locadores o gastos.
   payroll_period_id ?-> payroll_periods ; legal_entity_id -> legal_entities
   kind enum(salary,advance,cts,settlement,contractor,profit_sharing,expense)! ; channel enum(bank_file,wallet,cash,check)!
   bank_code ; status enum(draft,generated,sent,confirmed,rejected,cancelled)=draft ; total_amount money ; currency cur
   file_id ?-> stored_files ; payment_date date ; external_reference
+  file_format ; generated_by_user_id ?-> users ; generated_at ; confirmed_by_user_id ?-> users ; confirmed_at ; cancel_reason ; items_count integer=0
 @payroll_payment_items sens | Pago individual dentro de un lote.
   payroll_payment_batch_id -> payroll_payment_batches ; employment_id ?-> employments
   person_bank_account_id ?-> person_bank_accounts ; amount money! #S ; currency cur

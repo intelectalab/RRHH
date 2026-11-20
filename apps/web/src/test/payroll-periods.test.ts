@@ -8,8 +8,8 @@ describe('PER-1 a PER-3 · periodos de planilla', () => {
     expect(periodCode({ period_year: 2026, period_number: 11 })).toBe('2026-11')
   })
 
-  it('pide motivo al devolver, reabrir y volver a calcular', () => {
-    expect(NEEDS_REASON).toEqual(['reject', 'reopen', 'reopen-calculation'])
+  it('pide motivo al devolver, reabrir, volver a calcular y abrir la complementaria', () => {
+    expect(NEEDS_REASON).toEqual(['reject', 'reopen', 'reopen-calculation', 'complementary'])
   })
 
   it('las incidencias de otros módulos no se editan en planilla (RN-PER-09)', () => {

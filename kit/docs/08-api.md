@@ -1069,6 +1069,20 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/payroll-periods/{id}/consume-time` | `payroll.incidents.create` | 3 |
 | GET | `/payroll-periods/{id}/time-summary` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/variance` | `payroll.periods.view` | 3 |
+| GET | `/payroll-periods/{id}/anomalies` | `payroll.periods.view` | 3 |
+| POST | `/payroll-run-anomalies/{id}/review` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-run-anomalies/{id}/dismiss` | `payroll.periods.calculate` | 3 |
+| GET | `/payroll-variance-thresholds` | `payroll.periods.view` | 3 |
+| POST | `/payroll-variance-thresholds` | `payroll.periods.calculate` | 3 |
+| DELETE | `/payroll-variance-thresholds/{id}` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-periods/{id}/complementary` | `payroll.periods.create` | 3 |
+| GET | `/payroll-periods/{id}/payment-batches` | `payroll.periods.view` | 3 |
+| POST | `/payroll-periods/{id}/payment-batches` | `payroll.periods.mark_paid` | 3 |
+| GET | `/payroll-payment-batches/{id}` | `payroll.periods.view` | 3 |
+| POST | `/payroll-payment-batches/{id}/generate` | `payroll.periods.mark_paid` | 3 |
+| GET | `/payroll-payment-batches/{id}/file` | `payroll.periods.mark_paid` | 3 |
+| POST | `/payroll-payment-batches/{id}/confirm` | `payroll.periods.mark_paid` | 3 |
+| POST | `/payroll-payment-batches/{id}/cancel` | `payroll.periods.mark_paid` | 3 |
 
 **BOL · Boletas**
 

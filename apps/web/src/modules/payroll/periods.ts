@@ -1,7 +1,7 @@
 /** PER-1 a PER-3 · Tipos y presentación de periodos, incidencias y corte de tiempo (el servidor decide todo). */
 
 export type PeriodStatus = 'open' | 'incidents_closed' | 'calculated' | 'in_review' | 'approved' | 'closed' | 'paid' | 'accounted'
-export type PeriodAction = 'close-incidents' | 'reopen-incidents' | 'submit' | 'approve' | 'reject' | 'close' | 'reopen' | 'reopen-calculation'
+export type PeriodAction = 'close-incidents' | 'reopen-incidents' | 'calculate' | 'simulate' | 'submit' | 'approve' | 'reject' | 'close' | 'reopen' | 'reopen-calculation' | 'complementary' | 'mark-paid'
 
 export type PayrollGroup = { id: string; code: string; name: string; legal_entity_id: string; legal_entity_name?: string; currency: string; payment_day?: number; cutoff_day?: number; status: string }
 
@@ -21,6 +21,9 @@ export type PayrollPeriod = {
   time_consumed_at?: string
   return_reason?: string
   reopen_reason?: string
+  complements_period_id?: string
+  paid_at?: string
+  payment_method?: string
   counts?: { incidents: Record<'pending' | 'approved' | 'applied' | 'rejected', number> }
   allowed_actions: PeriodAction[]
 }
@@ -56,7 +59,7 @@ export const PERIOD_TONE: Record<PeriodStatus, string> = {
 }
 
 /** Acciones que piden motivo (devolver, reabrir y volver a calcular). */
-export const NEEDS_REASON: PeriodAction[] = ['reject', 'reopen', 'reopen-calculation']
+export const NEEDS_REASON: PeriodAction[] = ['reject', 'reopen', 'reopen-calculation', 'complementary']
 
 /** Etiqueta corta del periodo: «2026-11» o «2026-11 · Gratificación». */
 export function periodCode(p: Pick<PayrollPeriod, 'period_year' | 'period_number'>): string {

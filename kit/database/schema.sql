@@ -6665,6 +6665,10 @@ CREATE TABLE payroll_periods (
   reopen_reason text,
   time_consumed_at timestamptz,
   time_consumed_by_user_id uuid,
+  complements_period_id uuid,
+  paid_at timestamptz,
+  paid_by_user_id uuid,
+  payment_method text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -6676,7 +6680,9 @@ CREATE TABLE payroll_periods (
   CONSTRAINT fk_payroll_periods_opened_by_user_id FOREIGN KEY (tenant_id, opened_by_user_id) REFERENCES users (tenant_id, id),
   CONSTRAINT fk_payroll_periods_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
   CONSTRAINT fk_payroll_periods_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id),
-  CONSTRAINT fk_payroll_periods_time_consumed_by_user_id FOREIGN KEY (tenant_id, time_consumed_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_payroll_periods_time_consumed_by_user_id FOREIGN KEY (tenant_id, time_consumed_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_complements_period_id FOREIGN KEY (tenant_id, complements_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_paid_by_user_id FOREIGN KEY (tenant_id, paid_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_periods IS 'Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.';
 CREATE INDEX ix_payroll_periods_closed_by_user_id ON payroll_periods (tenant_id, closed_by_user_id);
@@ -6684,6 +6690,8 @@ CREATE INDEX ix_payroll_periods_opened_by_user_id ON payroll_periods (tenant_id,
 CREATE INDEX ix_payroll_periods_submitted_by_user_id ON payroll_periods (tenant_id, submitted_by_user_id);
 CREATE INDEX ix_payroll_periods_approved_by_user_id ON payroll_periods (tenant_id, approved_by_user_id);
 CREATE INDEX ix_payroll_periods_time_consumed_by_user_id ON payroll_periods (tenant_id, time_consumed_by_user_id);
+CREATE INDEX ix_payroll_periods_complements_period_id ON payroll_periods (tenant_id, complements_period_id);
+CREATE INDEX ix_payroll_periods_paid_by_user_id ON payroll_periods (tenant_id, paid_by_user_id);
 CREATE INDEX ix_payroll_periods_payroll_group_id_statutory_period_code ON payroll_periods (tenant_id, payroll_group_id, statutory_period_code);
 ALTER TABLE payroll_periods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_periods FORCE ROW LEVEL SECURITY;
@@ -6883,22 +6891,49 @@ CREATE TABLE payroll_run_anomalies (
   status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','reviewed','dismissed')),
   reviewed_by_user_id uuid,
   review_note text,
+  payroll_concept_id uuid,
+  causes jsonb,
+  reviewed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_payroll_run_anomalies_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_payroll_run_anomalies_payroll_run_id FOREIGN KEY (tenant_id, payroll_run_id) REFERENCES payroll_runs (tenant_id, id),
   CONSTRAINT fk_payroll_run_anomalies_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
-  CONSTRAINT fk_payroll_run_anomalies_reviewed_by_user_id FOREIGN KEY (tenant_id, reviewed_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_payroll_run_anomalies_reviewed_by_user_id FOREIGN KEY (tenant_id, reviewed_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_run_anomalies_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id)
 );
 COMMENT ON TABLE payroll_run_anomalies IS 'Anomalía detectada al comparar con el periodo anterior, siempre con explicación (p. ej. «el neto cayó 32 %»).';
-CREATE INDEX ix_payroll_run_anomalies_payroll_run_id ON payroll_run_anomalies (tenant_id, payroll_run_id);
 CREATE INDEX ix_payroll_run_anomalies_employment_id ON payroll_run_anomalies (tenant_id, employment_id);
 CREATE INDEX ix_payroll_run_anomalies_reviewed_by_user_id ON payroll_run_anomalies (tenant_id, reviewed_by_user_id);
+CREATE INDEX ix_payroll_run_anomalies_payroll_concept_id ON payroll_run_anomalies (tenant_id, payroll_concept_id);
+CREATE INDEX ix_payroll_run_anomalies_payroll_run_id_status ON payroll_run_anomalies (tenant_id, payroll_run_id, status);
 ALTER TABLE payroll_run_anomalies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_run_anomalies FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_run_anomalies USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_run_anomalies_touch BEFORE UPDATE ON payroll_run_anomalies FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE payroll_variance_thresholds (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  legal_entity_id uuid,
+  payroll_concept_id uuid,
+  threshold_pct numeric(7,2) NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_payroll_variance_thresholds_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_payroll_variance_thresholds_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_payroll_variance_thresholds_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id)
+);
+COMMENT ON TABLE payroll_variance_thresholds IS 'PER-7 · RN-PER-05 · Umbral de variación (%) contra el periodo anterior por empresa y concepto; sin concepto aplica al neto. Sin fila rige el parámetro nomina.variacion_neto_alerta_pct.';
+CREATE UNIQUE INDEX uq_payroll_variance_thresholds_legal_entity_id_payroll_85803080 ON payroll_variance_thresholds (tenant_id, legal_entity_id, payroll_concept_id) WHERE deleted_at IS NULL;
+CREATE INDEX ix_payroll_variance_thresholds_payroll_concept_id ON payroll_variance_thresholds (tenant_id, payroll_concept_id);
+ALTER TABLE payroll_variance_thresholds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_variance_thresholds FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_variance_thresholds USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_variance_thresholds_touch BEFORE UPDATE ON payroll_variance_thresholds FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE payroll_payment_batches (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -6914,18 +6949,29 @@ CREATE TABLE payroll_payment_batches (
   file_id uuid,
   payment_date date,
   external_reference text,
+  file_format text,
+  generated_by_user_id uuid,
+  generated_at timestamptz,
+  confirmed_by_user_id uuid,
+  confirmed_at timestamptz,
+  cancel_reason text,
+  items_count integer NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_payroll_payment_batches_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_payroll_payment_batches_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
   CONSTRAINT fk_payroll_payment_batches_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
-  CONSTRAINT fk_payroll_payment_batches_file_id FOREIGN KEY (tenant_id, file_id) REFERENCES stored_files (tenant_id, id)
+  CONSTRAINT fk_payroll_payment_batches_file_id FOREIGN KEY (tenant_id, file_id) REFERENCES stored_files (tenant_id, id),
+  CONSTRAINT fk_payroll_payment_batches_generated_by_user_id FOREIGN KEY (tenant_id, generated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_payment_batches_confirmed_by_user_id FOREIGN KEY (tenant_id, confirmed_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_payment_batches IS 'Lote de pago (archivo bancario o billetera) de haberes, adelantos, CTS, liquidaciones, locadores o gastos.';
 CREATE INDEX ix_payroll_payment_batches_payroll_period_id ON payroll_payment_batches (tenant_id, payroll_period_id);
 CREATE INDEX ix_payroll_payment_batches_legal_entity_id ON payroll_payment_batches (tenant_id, legal_entity_id);
 CREATE INDEX ix_payroll_payment_batches_file_id ON payroll_payment_batches (tenant_id, file_id);
+CREATE INDEX ix_payroll_payment_batches_generated_by_user_id ON payroll_payment_batches (tenant_id, generated_by_user_id);
+CREATE INDEX ix_payroll_payment_batches_confirmed_by_user_id ON payroll_payment_batches (tenant_id, confirmed_by_user_id);
 ALTER TABLE payroll_payment_batches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_payment_batches FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_payment_batches USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);

@@ -8,9 +8,11 @@ use App\Modules\Payroll\Infrastructure\Models\PayrollIncident;
 use App\Modules\Payroll\Infrastructure\Models\PayrollPeriod;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
+use App\Shared\Exceptions\BusinessRuleViolatedException;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Workflow\ApprovalRequests;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -30,7 +32,13 @@ use Illuminate\Support\Facades\DB;
 final class PayrollPeriods
 {
     /** Acciones que ya tienen ruta; el resto de la máquina llega con PER-4 y PER-10. */
-    public const ROUTED_ACTIONS = ['close-incidents', 'reopen-incidents', 'calculate', 'submit', 'approve', 'reject', 'close', 'reopen', 'reopen-calculation'];
+    public const ROUTED_ACTIONS = ['close-incidents', 'reopen-incidents', 'calculate', 'submit', 'approve', 'reject', 'close', 'reopen', 'reopen-calculation', 'mark-paid'];
+
+    /** PER-8 · Tipo de trámite del flujo de aprobación de un periodo (WFL). */
+    public const SUBJECT_TYPE = 'payroll_period';
+
+    /** PER-7 · Estados en que se puede simular (la simulación no cambia el periodo). */
+    public const SIMULATABLE = ['open', 'incidents_closed', 'calculated', 'in_review'];
 
     /** Estados en que se reciben y corrigen incidencias (se bloquean desde el envío a aprobación). */
     public const EDITABLE_STATUSES = ['open', 'calculated'];
@@ -42,6 +50,8 @@ final class PayrollPeriods
         private readonly AuditLogger $audit,
         private readonly OutboxService $outbox,
         private readonly PayrollRuns $runs,
+        private readonly PayrollReview $review,
+        private readonly ApprovalRequests $approvals,
     ) {}
 
     /**
@@ -243,21 +253,37 @@ final class PayrollPeriods
         $before = $p->status;
         $changes = ['status' => $next];
         $event = null;
+        $fromFlow = ($input['_from_flow'] ?? false) === true;
+        $run = $this->lastRun($p);
+        $startFlow = false;
         switch ($action) {
             case 'submit':
                 $this->assertNoErrors($p);
                 if (DB::table('payroll_runs')->where('payroll_period_id', $p->id)->whereIn('status', ['queued', 'running'])->whereIn('kind', ['calculation', 'recalculation'])->exists()) {
                     throw new AyniException('run_in_progress', 409, (string) trans('payroll.periods.run_in_progress'));
                 }
+                // RN-PER-06 · Con anomalías sin revisar, el envío advierte y exige confirmación expresa.
+                $open = $this->review->openCounts($p->id);
+                if ($open['open'] > 0 && ($input['confirm_anomalies'] ?? false) !== true) {
+                    throw new AyniException('anomalies_pending', 409, (string) trans('payroll.periods.anomalies_pending', ['count' => $open['open']]));
+                }
                 $changes += ['submitted_by_user_id' => $userId, 'submitted_at' => now(), 'return_reason' => null];
                 $event = [DomainEventTypes::PAYROLL_SUBMITTED, ['period_id' => $p->id]];
+                $startFlow = $this->hasFlow();
                 break;
             case 'approve':
+                // PER-8 · Con flujo de aprobación configurado, se aprueba desde Aprobaciones.
+                if (! $fromFlow && $this->runningApproval($p->id) !== null) {
+                    throw new AyniException('managed_by_flow', 409, (string) trans('payroll.periods.managed_by_flow'));
+                }
                 $this->assertSegregation($p, $userId);
                 $changes += ['approved_by_user_id' => $userId, 'approved_at' => now()];
-                $event = [DomainEventTypes::PAYROLL_APPROVED, ['payroll_run_id' => $this->lastRun($p), 'approved_by' => $userId, 'period_id' => $p->id]];
+                $event = [DomainEventTypes::PAYROLL_APPROVED, ['payroll_run_id' => $run, 'approved_by' => $userId, 'period_id' => $p->id]];
                 break;
             case 'reject':
+                if (! $fromFlow && $this->runningApproval($p->id) !== null) {
+                    throw new AyniException('managed_by_flow', 409, (string) trans('payroll.periods.managed_by_flow'));
+                }
                 $changes += ['return_reason' => $reason, 'submitted_at' => null, 'submitted_by_user_id' => null];
                 $event = [DomainEventTypes::PAYROLL_RETURNED, ['period_id' => $p->id, 'reason' => $reason]];
                 break;
@@ -270,25 +296,63 @@ final class PayrollPeriods
                 if ($previous !== null && ! in_array($previous->status, self::CLOSED, true)) {
                     throw new AyniException('previous_period_open', 409, (string) trans('payroll.periods.previous_not_closed', ['code' => $this->label($previous)]));
                 }
+                // PER-8 · No se cierra con anomalías críticas sin revisar ni con parámetros «por validar» sin confirmar (RN-PAR-03).
+                if ($this->review->openCounts($p->id)['critical'] > 0) {
+                    throw new AyniException('critical_anomalies', 409, (string) trans('payroll.periods.critical_anomalies'));
+                }
+                $pending = $this->unconfirmedParameters($run);
+                if ($pending !== []) {
+                    throw new AyniException('parameters_unconfirmed', 409, (string) trans('payroll.periods.parameters_unconfirmed', ['codes' => implode(', ', $pending)]));
+                }
                 $changes += ['closed_at' => now(), 'closed_by_user_id' => $userId];
-                $event = [DomainEventTypes::PAYROLL_CLOSED, ['payroll_run_id' => $this->lastRun($p), 'closed_at' => now()->toIso8601String(), 'period_id' => $p->id]];
+                $event = [DomainEventTypes::PAYROLL_CLOSED, ['payroll_run_id' => $run, 'closed_at' => now()->toIso8601String(), 'period_id' => $p->id]];
                 break;
             case 'reopen':
                 $this->assertNotDeclared($p);
+                if (DB::table('payroll_payment_batches')->where('payroll_period_id', $p->id)->where('status', '<>', 'cancelled')->exists()) {
+                    throw new AyniException('payment_batches_exist', 409, (string) trans('payroll.periods.payment_batches_exist'));
+                }
                 $changes += ['closed_at' => null, 'closed_by_user_id' => null, 'approved_at' => null, 'approved_by_user_id' => null,
                     'submitted_at' => null, 'submitted_by_user_id' => null, 'reopen_reason' => $reason];
                 $event = [DomainEventTypes::PAYROLL_REOPENED, ['period_id' => $p->id, 'reason' => $reason]];
                 break;
+            case 'mark-paid':
+                // RN-PER-12 · Se registra el pago con sus lotes confirmados (conciliados).
+                $batches = DB::table('payroll_payment_batches')->where('payroll_period_id', $p->id)->where('status', '<>', 'cancelled')->get(['id', 'status', 'channel']);
+                if ($batches->isEmpty() || $batches->contains(fn ($b) => $b->status !== 'confirmed')) {
+                    throw new AyniException('payment_not_confirmed', 409, (string) trans('payroll.payments.not_confirmed'));
+                }
+                $paidAt = now();
+                $changes += ['paid_at' => $paidAt, 'paid_by_user_id' => $userId, 'payment_method' => $batches->pluck('channel')->unique()->sort()->implode(',')];
+                $event = [DomainEventTypes::PAYROLL_PAID, ['period_id' => $p->id, 'paid_at' => $paidAt->toIso8601String(), 'batches' => $batches->pluck('id')->map(fn ($v) => (string) $v)->all()]];
+                break;
         }
 
-        return DB::transaction(function () use ($p, $action, $changes, $before, $reason, $event): PayrollPeriod {
+        return DB::transaction(function () use ($p, $action, $changes, $before, $reason, $event, $run, $startFlow, $userId): PayrollPeriod {
             $p->fill($changes)->save();
             if ($action === 'close') {
-                // RN-PER-03: cerrado, lo aprobado queda aplicado y ya no se modifica.
+                // RN-PER-03: cerrado, lo aprobado queda aplicado y ya no se modifica; la corrida queda congelada.
                 PayrollIncident::query()->where('payroll_period_id', $p->id)->where('status', 'approved')->update(['status' => 'applied', 'updated_at' => now()]);
+                if ($run !== null) {
+                    DB::table('payroll_runs')->where('id', $run)->update(['status' => 'closed', 'closed_at' => now(), 'updated_at' => now()]);
+                }
+            }
+            if ($action === 'approve' && $run !== null) {
+                DB::table('payroll_runs')->where('id', $run)->where('status', 'completed')->update(['status' => 'approved', 'approved_by_user_id' => $userId, 'updated_at' => now()]);
+            }
+            if (in_array($action, ['reject', 'reopen-calculation'], true) && $run !== null) {
+                DB::table('payroll_runs')->where('id', $run)->where('status', 'approved')->update(['status' => 'completed', 'approved_by_user_id' => null, 'updated_at' => now()]);
             }
             if ($action === 'reopen') {
                 PayrollIncident::query()->where('payroll_period_id', $p->id)->where('status', 'applied')->update(['status' => 'approved', 'updated_at' => now()]);
+            }
+            if ($startFlow && $userId !== null) {
+                $legalEntity = PayrollGroup::query()->whereKey($p->payroll_group_id)->value('legal_entity_id');
+                try {
+                    $this->approvals->start(self::SUBJECT_TYPE, $p->id, $userId, ['legal_entity_id' => $legalEntity, 'kind' => $p->kind]);
+                } catch (BusinessRuleViolatedException) {
+                    // Ningún flujo aplica a este periodo (condiciones): se aprueba directamente.
+                }
             }
             $this->audit->record('payroll_period.'.str_replace('-', '_', $action), 'payroll_period', $p->id, ['status' => $before], ['status' => $p->status], $reason);
             if ($event !== null) {
@@ -297,6 +361,120 @@ final class PayrollPeriods
 
             return $p;
         });
+    }
+
+    /**
+     * PER-7 · Simular el periodo: abre una corrida de simulación en segundo plano con la población, incidencias y
+     * cortes vigentes. No cambia el estado del periodo ni sus incidencias, ni escribe el libro de quinta; al terminar
+     * deja la comparación con el periodo anterior y sus anomalías.
+     *
+     * @param  array{employment_ids?: list<string>|null, org_unit_id?: string|null}  $scope
+     */
+    public function simulate(PayrollPeriod $p, ?string $userId, array $scope = []): string
+    {
+        if (! in_array($p->status, self::SIMULATABLE, true)) {
+            throw new AyniException('invalid_transition', 409, (string) trans('payroll.periods.not_simulatable'));
+        }
+
+        return $this->runs->open($p->id, $scope, 'simulation', $userId);
+    }
+
+    /**
+     * PER-9 · ADR 0017 · Planilla complementaria de un periodo cerrado (también declarado o pagado): un periodo
+     * «special» del mismo grupo y mes tributario para pagos fuera del periodo regular. El resultado original no se
+     * toca: lo que se pague va en la complementaria.
+     *
+     * @param  array{payment_date?: string|null, starts_on?: string|null, ends_on?: string|null}  $data
+     */
+    public function complementary(PayrollPeriod $original, ?string $userId, array $data): PayrollPeriod
+    {
+        if (! in_array($original->status, self::CLOSED, true)) {
+            throw new AyniException('invalid_transition', 409, (string) trans('payroll.periods.complementary_needs_closed'));
+        }
+        $starts = (string) ($data['starts_on'] ?? $original->day('starts_on'));
+        $ends = (string) ($data['ends_on'] ?? $original->day('ends_on'));
+        if ($ends < $starts) {
+            throw new AyniException('validation_failed', 422, (string) trans('payroll.periods.dates_order'),
+                [['field' => 'ends_on', 'rule' => 'after_or_equal', 'message' => (string) trans('payroll.periods.dates_order')]]);
+        }
+
+        return DB::transaction(function () use ($original, $userId, $data, $starts, $ends): PayrollPeriod {
+            DB::table('payroll_periods')->where('id', $original->id)->lockForUpdate()->first(['id']);
+            $number = (int) PayrollPeriod::query()->where('payroll_group_id', $original->payroll_group_id)->where('kind', 'special')
+                ->where('period_year', $original->period_year)->max('period_number') + 1;
+            $p = PayrollPeriod::query()->create([
+                'payroll_group_id' => $original->payroll_group_id, 'kind' => 'special', 'period_year' => $original->period_year, 'period_number' => $number,
+                'starts_on' => $starts, 'ends_on' => $ends, 'payment_date' => $data['payment_date'] ?? $original->day('payment_date'),
+                'attendance_from' => $starts, 'attendance_to' => $ends, 'statutory_period_code' => $original->statutory_period_code,
+                'opened_by_user_id' => $userId, 'complements_period_id' => $original->id,
+            ]);
+            $this->audit->record('payroll_period.complementary_opened', 'payroll_period', $p->id, null, [
+                'complements_period_id' => $original->id, 'period' => $p->period_year.'-'.$p->period_number, 'starts_on' => $starts, 'ends_on' => $ends,
+            ]);
+            $this->outbox->record(DomainEventTypes::PAYROLL_PERIOD_OPENED, 'payroll_period', $p->id, ['period_id' => $p->id, 'payroll_group_id' => $p->payroll_group_id]);
+
+            return $p;
+        });
+    }
+
+    /** PER-8 · El flujo de aprobación aprobó el periodo: lo aprueba quien decidió (con la segregación de funciones). */
+    public function approvedByFlow(string $periodId, ?string $deciderUserId): void
+    {
+        $p = PayrollPeriod::query()->find($periodId);
+        if ($p instanceof PayrollPeriod && $p->status === 'in_review') {
+            $this->transition($p, 'approve', $deciderUserId, ['_from_flow' => true]);
+        }
+    }
+
+    /** PER-8 · El flujo devolvió o se canceló: el periodo vuelve a «calculado» con el motivo. */
+    public function rejectedByFlow(string $periodId, ?string $reason): void
+    {
+        $p = PayrollPeriod::query()->find($periodId);
+        if ($p instanceof PayrollPeriod && $p->status === 'in_review') {
+            $this->transition($p, 'reject', null, ['_from_flow' => true, 'reason' => $reason ?? (string) trans('payroll.periods.flow_rejected')]);
+        }
+    }
+
+    /** Aprobación en curso del periodo (WFL), si la hay. */
+    public function runningApproval(string $periodId): ?string
+    {
+        $id = DB::table('workflow_instances')->where('subject_type', self::SUBJECT_TYPE)->where('subject_id', $periodId)
+            ->whereIn('status', ['pending', 'running', 'escalated'])->orderByDesc('started_at')->value('id');
+
+        return $id === null ? null : (string) $id;
+    }
+
+    private function hasFlow(): bool
+    {
+        return DB::table('workflow_definitions')->where('kind', 'approval')->where('subject_type', self::SUBJECT_TYPE)
+            ->where('status', 'active')->whereNotNull('current_version_id')->whereNull('deleted_at')->exists();
+    }
+
+    /**
+     * RN-PAR-03 · Parámetros «por validar» que usó la corrida y que la organización aún no confirmó.
+     *
+     * @return list<string>
+     */
+    private function unconfirmedParameters(?string $runId): array
+    {
+        if ($runId === null) {
+            return [];
+        }
+        $snapshot = json_decode((string) DB::table('payroll_runs')->where('id', $runId)->value('parameters_snapshot'), true);
+        $pending = [];
+        foreach (is_array($snapshot) ? $snapshot : [] as $param) {
+            if (is_array($param) && ($param['pending_validation'] ?? false) === true && ($param['origin'] ?? '') !== 'organization') {
+                $pending[(string) $param['code']] = true;
+            }
+        }
+        if ($pending === []) {
+            return [];
+        }
+        $confirmed = DB::table('legal_parameter_confirmations')->whereIn('parameter_code', array_keys($pending))->pluck('parameter_code')->map(fn ($v) => (string) $v)->all();
+        $missing = array_values(array_diff(array_keys($pending), $confirmed));
+        sort($missing);
+
+        return $missing;
     }
 
     /**
@@ -347,9 +525,13 @@ final class PayrollPeriods
             'submitted_at' => $p->submitted_at?->toIso8601String(), 'approved_at' => $p->approved_at?->toIso8601String(),
             'closed_at' => $p->closed_at?->toIso8601String(), 'time_consumed_at' => $p->time_consumed_at?->toIso8601String(),
             'return_reason' => $p->return_reason, 'reopen_reason' => $p->reopen_reason,
-            'counts' => ['incidents' => collect(['pending', 'approved', 'applied', 'rejected'])->mapWithKeys(fn ($k) => [$k => (int) ($counts[$k] ?? 0)])->all()],
-            'allowed_actions' => array_values(array_intersect($this->machine->allowedActions($p->status), self::ROUTED_ACTIONS)),
+            'counts' => ['incidents' => collect(['pending', 'approved', 'applied', 'rejected'])->mapWithKeys(fn ($k) => [$k => (int) ($counts[$k] ?? 0)])->all(),
+                'anomalies' => $this->review->openCounts($p->id)],
+            'allowed_actions' => array_merge(array_intersect($this->machine->allowedActions($p->status), self::ROUTED_ACTIONS),
+                in_array($p->status, self::SIMULATABLE, true) ? ['simulate'] : [], in_array($p->status, self::CLOSED, true) ? ['complementary'] : []),
             'last_run' => $this->lastRunSummary($p),
+            'complements_period_id' => $p->complements_period_id, 'paid_at' => $p->paid_at?->toIso8601String(), 'payment_method' => $p->payment_method,
+            'approval' => ($approval = $this->runningApproval($p->id)) === null ? null : $this->approvals->summary($approval),
         ], fn ($v) => $v !== null);
     }
 

@@ -192,6 +192,38 @@ final class PayrollPeriodController
         return $this->act($request, $id, 'submit', 'payroll.periods.submit');
     }
 
+    /** PER-7 · Simular el periodo sin cambiar su estado: corrida de simulación en segundo plano. */
+    public function simulate(Request $request, string $id): JsonResponse
+    {
+        $p = $this->find($request, $id, 'payroll.periods.simulate');
+        $data = $request->validate([
+            'employment_ids' => ['sometimes', 'nullable', 'array', 'max:5000'], 'employment_ids.*' => ['uuid'],
+            'org_unit_id' => ['sometimes', 'nullable', 'uuid'],
+        ]);
+        $runId = $this->periods->simulate($p, $this->userId($request), ['employment_ids' => $data['employment_ids'] ?? null, 'org_unit_id' => $data['org_unit_id'] ?? null]);
+
+        return response()->json(['data' => $this->periods->present($p) + ['simulation_run_id' => $runId]]);
+    }
+
+    /** PER-9 · Planilla complementaria de un periodo cerrado. */
+    public function complementary(Request $request, string $id): JsonResponse
+    {
+        $p = $this->find($request, $id, 'payroll.periods.create');
+        $data = $request->validate([
+            'payment_date' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'starts_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'ends_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+        ]);
+
+        return response()->json(['data' => $this->periods->present($this->periods->complementary($p, $this->userId($request), $data))], 201);
+    }
+
+    /** PER-10 · RN-PER-12 · Registrar el pago del periodo con sus lotes confirmados. */
+    public function markPaid(Request $request, string $id): JsonResponse
+    {
+        return $this->act($request, $id, 'mark-paid', 'payroll.periods.mark_paid');
+    }
+
     public function approve(Request $request, string $id): JsonResponse
     {
         return $this->act($request, $id, 'approve', 'payroll.periods.approve');
@@ -239,8 +271,10 @@ final class PayrollPeriodController
     private function act(Request $request, string $id, string $action, string $permission): JsonResponse
     {
         $p = $this->find($request, $id, $permission);
-        $input = $request->validate(['reason' => ['sometimes', 'nullable', 'string', 'max:1000'], 'comment' => ['sometimes', 'nullable', 'string', 'max:1000']]);
+        $input = $request->validate(['reason' => ['sometimes', 'nullable', 'string', 'max:1000'], 'comment' => ['sometimes', 'nullable', 'string', 'max:1000'],
+            'confirm_anomalies' => ['sometimes', 'boolean']]);
         $input['reason'] ??= $input['comment'] ?? null;
+        $input['confirm_anomalies'] = (bool) ($input['confirm_anomalies'] ?? false);
 
         return response()->json(['data' => $this->periods->present($this->periods->transition($p, $action, $this->userId($request), $input))]);
     }

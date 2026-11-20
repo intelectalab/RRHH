@@ -295,6 +295,18 @@
       "permissions": [
         "payroll.entity_annual_figures.view"
       ]
+    },
+    "payroll.review": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.results.view"
+      ]
+    },
+    "payroll.payments": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.periods.mark_paid"
+      ]
     }
   }
 }

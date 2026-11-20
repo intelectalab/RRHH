@@ -16,5 +16,7 @@ return [
         'compensation_change' => ['bulk_safe' => false],
         // ESS-4 · Constancias que no se emiten solas (constancias.emision_automatica).
         'certificate_request' => ['bulk_safe' => true],
+        // PER-8 · Aprobación del periodo de planilla (nunca en masa: se revisa el resumen y las anomalías).
+        'payroll_period' => ['bulk_safe' => false],
     ],
 ];

@@ -34,6 +34,7 @@ final class PayrollRuns
         private readonly PayrollEngine $engine,
         private readonly OutboxService $outbox,
         private readonly AuditLogger $audit,
+        private readonly PayrollReview $review,
     ) {}
 
     /**
@@ -387,6 +388,8 @@ final class PayrollRuns
                 $this->outbox->record(DomainEventTypes::PAYROLL_CALCULATED, 'payroll_run', $runId, ['payroll_run_id' => $runId, 'total_net' => $totals['net'], 'currency' => $currency]);
             }
         });
+        // PER-7 · Comparación con el periodo anterior y anomalías explicadas (también en las simulaciones).
+        $this->review->detect($runId);
     }
 
     /**

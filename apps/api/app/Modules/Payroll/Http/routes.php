@@ -5,6 +5,7 @@ use App\Modules\Payroll\Http\Controllers\PayrollConceptController;
 use App\Modules\Payroll\Http\Controllers\PayrollEngineController;
 use App\Modules\Payroll\Http\Controllers\PayrollIncidentController;
 use App\Modules\Payroll\Http\Controllers\PayrollPeriodController;
+use App\Modules\Payroll\Http\Controllers\PayrollReviewController;
 use App\Modules\Payroll\Http\Controllers\PayrollRunController;
 use App\Modules\Payroll\Http\Controllers\SmallBusinessController;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,27 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     // PER-3 · Consumo de ausencias y vacaciones con corte registrado.
     Route::post('/payroll-periods/{id}/consume-time', [PayrollPeriodController::class, 'consumeTime'])->middleware('permission:payroll.incidents.create');
     Route::get('/payroll-periods/{id}/time-summary', [PayrollPeriodController::class, 'timeSummary'])->middleware('permission:payroll.periods.view');
+
+    // PER-7 · Simulación, comparación con el periodo anterior, anomalías explicadas y umbrales de variación.
+    Route::post('/payroll-periods/{id}/simulate', [PayrollPeriodController::class, 'simulate'])->middleware('permission:payroll.periods.simulate');
+    Route::get('/payroll-periods/{id}/variance', [PayrollReviewController::class, 'variance'])->middleware('permission:payroll.periods.view');
+    Route::get('/payroll-periods/{id}/anomalies', [PayrollReviewController::class, 'anomalies'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-run-anomalies/{id}/review', [PayrollReviewController::class, 'reviewAnomaly'])->middleware('permission:payroll.periods.calculate');
+    Route::post('/payroll-run-anomalies/{id}/dismiss', [PayrollReviewController::class, 'dismissAnomaly'])->middleware('permission:payroll.periods.calculate');
+    Route::get('/payroll-variance-thresholds', [PayrollReviewController::class, 'thresholds'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-variance-thresholds', [PayrollReviewController::class, 'storeThreshold'])->middleware('permission:payroll.periods.calculate');
+    Route::delete('/payroll-variance-thresholds/{id}', [PayrollReviewController::class, 'destroyThreshold'])->middleware('permission:payroll.periods.calculate');
+    // PER-9 · Planilla complementaria de un periodo cerrado.
+    Route::post('/payroll-periods/{id}/complementary', [PayrollPeriodController::class, 'complementary'])->middleware('permission:payroll.periods.create');
+    // PER-10 · Lotes de pago por banco, archivo bancario, confirmación y registro del pago del periodo.
+    Route::get('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'batches'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'prepareBatches'])->middleware('permission:payroll.periods.mark_paid');
+    Route::post('/payroll-periods/{id}/mark-paid', [PayrollPeriodController::class, 'markPaid'])->middleware('permission:payroll.periods.mark_paid');
+    Route::get('/payroll-payment-batches/{id}', [PayrollReviewController::class, 'batch'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-payment-batches/{id}/generate', [PayrollReviewController::class, 'generateBatch'])->middleware('permission:payroll.periods.mark_paid');
+    Route::get('/payroll-payment-batches/{id}/file', [PayrollReviewController::class, 'downloadBatch'])->middleware('permission:payroll.periods.mark_paid');
+    Route::post('/payroll-payment-batches/{id}/confirm', [PayrollReviewController::class, 'confirmBatch'])->middleware('permission:payroll.periods.mark_paid');
+    Route::post('/payroll-payment-batches/{id}/cancel', [PayrollReviewController::class, 'cancelBatch'])->middleware('permission:payroll.periods.mark_paid');
     // CPT-1 a CPT-4 · Conceptos: catálogo con versiones, borrador, revisión, probador, publicación, retiro,
     // duplicado, afectaciones por base y contabilización por concepto.
     Route::get('/payroll-concepts', [PayrollConceptController::class, 'index'])->middleware('permission:payroll.concepts.view');
