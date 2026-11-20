@@ -369,3 +369,15 @@ test('SAS-13 · registros por separado: auditoría con filtros, actividad de una
     expect(collect($logs->json('data'))->pluck('message')->all())->toBe(['Fallo de integración']);
     @unlink($log);
 });
+
+test('SAS-8 · regla 1: el rol de la aplicación no ve las sesiones de soporte de otra organización', function (): void {
+    $created = sxConsole($this->support, 'POST', '/support-sessions', ['tenant_id' => SX_TENANT, 'target_user_id' => $this->hr->id, 'reason' => 'Prueba de aislamiento entre organizaciones'])->assertCreated();
+    $id = (string) $created->json('data.id');
+    $other = 'cccccccc-a1a1-4000-8000-0000000000b9';
+    DB::table('tenants')->insertOrIgnore(['id' => $other, 'slug' => 'sx-otra', 'name' => 'Otra Organización', 'status' => 'active', 'country_code' => 'PE', 'default_currency' => 'PEN']);
+
+    expect(TenancyScope::runAs($other, fn () => DB::table('support_sessions')->where('id', $id)->count()))->toBe(0)
+        ->and(TenancyScope::runAs(SX_TENANT, fn () => DB::table('support_sessions')->where('id', $id)->count()))->toBe(1)
+        // La consola la sigue viendo con el rol de plataforma.
+        ->and(sxConsole($this->support, 'GET', '/support-sessions/'.$id)->json('data.tenant_id'))->toBe(SX_TENANT);
+});

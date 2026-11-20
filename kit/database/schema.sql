@@ -731,7 +731,7 @@ CREATE TRIGGER trg_support_access_grants_touch BEFORE UPDATE ON support_access_g
 
 CREATE TABLE support_sessions (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
-  tenant_id uuid NOT NULL,
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
   platform_user_id uuid NOT NULL,
   agent_name text NOT NULL,
   target_user_id uuid NOT NULL,
@@ -749,15 +749,18 @@ CREATE TABLE support_sessions (
   ended_by_platform_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
-  CONSTRAINT fk_support_sessions_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
+  CONSTRAINT uq_support_sessions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_support_sessions_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id),
   CONSTRAINT fk_support_sessions_ended_by_platform_user_id FOREIGN KEY (ended_by_platform_user_id) REFERENCES platform_users (id)
 );
 COMMENT ON TABLE support_sessions IS 'Sesiones de soporte con suplantación (SAS-8, RN-SAS-08): motivo, usuario suplantado, vencimiento propio, ingreso por enlace de un solo uso y marca «soporte» en la auditoría de la organización. Sin campos sensibles salvo autorización «full» vigente del cliente.';
-CREATE INDEX ix_support_sessions_platform_user_id ON support_sessions (platform_user_id);
-CREATE INDEX ix_support_sessions_ended_by_platform_user_id ON support_sessions (ended_by_platform_user_id);
-CREATE INDEX ix_support_sessions_tenant_id_expires_at ON support_sessions (tenant_id, expires_at);
-CREATE INDEX ix_support_sessions_user_session_id ON support_sessions (user_session_id);
+CREATE INDEX ix_support_sessions_platform_user_id ON support_sessions (tenant_id, platform_user_id);
+CREATE INDEX ix_support_sessions_ended_by_platform_user_id ON support_sessions (tenant_id, ended_by_platform_user_id);
+CREATE INDEX ix_support_sessions_expires_at ON support_sessions (tenant_id, expires_at);
+CREATE INDEX ix_support_sessions_user_session_id ON support_sessions (tenant_id, user_session_id);
+ALTER TABLE support_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE support_sessions FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON support_sessions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_support_sessions_touch BEFORE UPDATE ON support_sessions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE backup_runs (
@@ -19069,9 +19072,9 @@ GRANT EXECUTE ON FUNCTION seed_tenant_defaults(uuid) TO gestia_platform;
 -- gestia_app: aplicación de las organizaciones. Todas las tablas de organización, siempre bajo RLS.
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_app;
 -- Catálogos de plataforma: solo lectura para la aplicación.
-REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
+REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, platform_notices, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_notices, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_sessions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 

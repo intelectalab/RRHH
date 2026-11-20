@@ -69,7 +69,6 @@ final class DatabaseConventionsChecker
         'subscription_addons',
         'subscriptions',
         'support_ticket_messages',
-        'support_sessions',
         'support_tickets',
         'system_role_permissions',
         'system_roles',

@@ -10,6 +10,7 @@ use App\Shared\Exceptions\AyniException;
 use App\Shared\Exceptions\InvalidTransitionException;
 use App\Shared\Security\SupportContext;
 use App\Shared\Settings\ParameterResolver;
+use App\Shared\Tenancy\CrossTenantMaintenance;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ final class SupportSessions
         private readonly ConsoleAudit $consoleAudit,
         private readonly PlatformSettings $settings,
         private readonly SupportContext $support,
+        private readonly CrossTenantMaintenance $cross,
     ) {}
 
     public function maxMinutes(): int
@@ -52,8 +54,8 @@ final class SupportSessions
             ->when($status === 'expired', fn ($q) => $q->whereIn('s.status', self::ACTIVE_STATES)->where('s.expires_at', '<=', now()))
             ->when($status !== null && $status !== 'expired' && in_array($status, self::ACTIVE_STATES, true), fn ($q) => $q->where('s.status', $status)->where('s.expires_at', '>', now()))
             ->when($status === 'ended', fn ($q) => $q->whereIn('s.status', ['ended', 'expired']));
-        $total = (clone $query)->count();
-        $rows = $query->orderByDesc('s.created_at')->forPage($page, $perPage)->get();
+        // support_sessions tiene RLS por organización: la consola la lee con el rol de plataforma (regla 1).
+        [$total, $rows] = $this->cross->readAcrossTenants(fn (): array => [(clone $query)->count(), $query->orderByDesc('s.created_at')->forPage($page, $perPage)->get()]);
 
         return ['data' => $rows->map(fn ($r): array => $this->present($r))->values()->all(), 'meta' => ['page' => $page, 'per_page' => $perPage, 'total' => $total]];
     }
@@ -131,7 +133,7 @@ final class SupportSessions
         $token = Str::random(48);
         $id = (string) Str::uuid();
         $expires = now()->addMinutes($minutes);
-        DB::table('support_sessions')->insert([
+        TenancyScope::runAs($tenantId, fn () => DB::table('support_sessions')->insert([
             'id' => $id,
             'tenant_id' => $tenantId,
             'platform_user_id' => $actorId,
@@ -144,7 +146,7 @@ final class SupportSessions
             'support_access_grant_id' => $grant?->id,
             'entry_token_hash' => hash('sha256', $token),
             'expires_at' => $expires,
-        ]);
+        ]));
         $this->consoleAudit->record('support_session.created', $actor, 'support_session', $id, null, [
             'reason' => $input['reason'], 'ticket_reference' => $input['ticket_reference'] ?? null,
             'target_user_id' => $input['target_user_id'], 'expires_at' => $expires->toIso8601String(),
@@ -163,11 +165,11 @@ final class SupportSessions
         if (! in_array((string) $row->status, self::ACTIVE_STATES, true)) {
             throw new InvalidTransitionException((string) $row->status);
         }
-        DB::table('support_sessions')->where('id', $id)->update([
-            'status' => 'ended', 'ended_at' => now(), 'ended_by_platform_user_id' => $actor->id, 'entry_token_hash' => null,
-        ]);
         $tenantId = (string) $row->tenant_id;
-        TenancyScope::runAs($tenantId, function () use ($row, $actor, $reason): void {
+        TenancyScope::runAs($tenantId, function () use ($row, $actor, $reason, $id): void {
+            DB::table('support_sessions')->where('id', $id)->update([
+                'status' => 'ended', 'ended_at' => now(), 'ended_by_platform_user_id' => $actor->id, 'entry_token_hash' => null,
+            ]);
             if ($row->user_session_id !== null) {
                 DB::table('user_sessions')->where('id', $row->user_session_id)->whereNull('revoked_at')->update(['revoked_at' => now()]);
             }
@@ -228,7 +230,7 @@ final class SupportSessions
 
     private function find(string $id): \stdClass
     {
-        $row = TenancyScope::isValidUuid($id) ? $this->base()->where('s.id', $id)->first() : null;
+        $row = TenancyScope::isValidUuid($id) ? $this->cross->readAcrossTenants(fn () => $this->base()->where('s.id', $id)->first()) : null;
         if (! $row instanceof \stdClass) {
             throw new AyniException('not_found', 404);
         }

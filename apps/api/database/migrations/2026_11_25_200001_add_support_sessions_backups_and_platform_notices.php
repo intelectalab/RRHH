@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * SAS-8 · SAS-9 · SAS-12 · SAS-13 · Consola: soporte auditado, monitoreo, copias y configuración global.
  *
- * - support_sessions (plataforma): sesión de soporte con motivo, usuario suplantado, vencimiento y enlace de un solo uso.
+ * - support_sessions (con RLS por organización): sesión de soporte con motivo, usuario suplantado, vencimiento y enlace de un solo uso.
  * - support_access_grants: la autorización del cliente puede ser para cualquier agente (platform_user_id opcional)
  *   y registra quién la revocó.
  * - backup_restores: restauración de prueba programada (kind), autor opcional (la programada no tiene), fecha de
@@ -46,16 +46,31 @@ return new class extends Migration
               created_at timestamptz NOT NULL DEFAULT now(),
               updated_at timestamptz NOT NULL DEFAULT now(),
               CONSTRAINT fk_support_sessions_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
+              CONSTRAINT uq_support_sessions_tenant_id UNIQUE (tenant_id, id),
               CONSTRAINT fk_support_sessions_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id),
               CONSTRAINT fk_support_sessions_ended_by_platform_user_id FOREIGN KEY (ended_by_platform_user_id) REFERENCES platform_users (id)
             );
             COMMENT ON TABLE support_sessions IS 'Sesiones de soporte con suplantación (SAS-8, RN-SAS-08): motivo, usuario suplantado, vencimiento propio, ingreso por enlace de un solo uso y marca «soporte» en la auditoría de la organización. Sin campos sensibles salvo autorización «full» vigente del cliente.';
             ALTER TABLE support_sessions ADD COLUMN IF NOT EXISTS agent_name text NOT NULL DEFAULT '';
             ALTER TABLE support_sessions ALTER COLUMN agent_name DROP DEFAULT;
-            CREATE INDEX IF NOT EXISTS ix_support_sessions_platform_user_id ON support_sessions (platform_user_id);
-            CREATE INDEX IF NOT EXISTS ix_support_sessions_ended_by_platform_user_id ON support_sessions (ended_by_platform_user_id);
-            CREATE INDEX IF NOT EXISTS ix_support_sessions_tenant_id_expires_at ON support_sessions (tenant_id, expires_at);
-            CREATE INDEX IF NOT EXISTS ix_support_sessions_user_session_id ON support_sessions (user_session_id);
+            DO $$ BEGIN
+              IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_support_sessions_tenant_id') THEN
+                ALTER TABLE support_sessions ADD CONSTRAINT uq_support_sessions_tenant_id UNIQUE (tenant_id, id);
+              END IF;
+            END $$;
+            DROP INDEX IF EXISTS ix_support_sessions_platform_user_id;
+            DROP INDEX IF EXISTS ix_support_sessions_ended_by_platform_user_id;
+            DROP INDEX IF EXISTS ix_support_sessions_tenant_id_expires_at;
+            DROP INDEX IF EXISTS ix_support_sessions_user_session_id;
+            CREATE INDEX IF NOT EXISTS ix_support_sessions_platform_user_id ON support_sessions (tenant_id, platform_user_id);
+            CREATE INDEX IF NOT EXISTS ix_support_sessions_ended_by_platform_user_id ON support_sessions (tenant_id, ended_by_platform_user_id);
+            CREATE INDEX IF NOT EXISTS ix_support_sessions_expires_at ON support_sessions (tenant_id, expires_at);
+            CREATE INDEX IF NOT EXISTS ix_support_sessions_user_session_id ON support_sessions (tenant_id, user_session_id);
+            -- Regla 1: la aplicación solo ve las sesiones de soporte de la organización activa (gestia_platform, BYPASSRLS, ve todas).
+            ALTER TABLE support_sessions ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE support_sessions FORCE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS tenant_isolation ON support_sessions;
+            CREATE POLICY tenant_isolation ON support_sessions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
             DROP TRIGGER IF EXISTS trg_support_sessions_touch ON support_sessions;
             CREATE TRIGGER trg_support_sessions_touch BEFORE UPDATE ON support_sessions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
@@ -95,7 +110,11 @@ return new class extends Migration
             DROP TRIGGER IF EXISTS trg_platform_notices_touch ON platform_notices;
             CREATE TRIGGER trg_platform_notices_touch BEFORE UPDATE ON platform_notices FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
-            GRANT SELECT, INSERT, UPDATE, DELETE ON support_sessions, platform_notices TO gestia_app, gestia_platform;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON support_sessions, platform_notices TO gestia_platform;
+            GRANT SELECT, INSERT, UPDATE, DELETE ON support_sessions TO gestia_app;
+            -- Avisos: catálogo de la plataforma, solo lectura para la aplicación.
+            GRANT SELECT ON platform_notices TO gestia_app;
+            REVOKE INSERT, UPDATE, DELETE ON platform_notices FROM gestia_app;
 
             INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive, description) VALUES
               ('platform.settings.view', 'base', 'settings', 'view', 'action', false, 'Ver configuraciones globales y avisos de la plataforma'),
