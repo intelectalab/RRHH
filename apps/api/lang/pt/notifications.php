@@ -221,4 +221,6 @@ return [
         'nothing_to_clear' => 'Este envio não tem um endereço devolvido para reativar.',
         'invalid_signature' => 'A assinatura do provedor não é válida.',
     ],
+    // NOT-4 · El aviso push solo invita a abrir la aplicación (RN-NOT-02).
+    'push' => ['title' => 'Novidade em :organization', 'body' => 'Você tem um aviso novo. Abra-o no GestiaHR.'],
 ];

@@ -3,6 +3,7 @@
 namespace App\Modules\Notifications\Infrastructure\Subscribers;
 
 use App\Modules\Notifications\Application\Email\EmailSenderSettings;
+use App\Modules\Notifications\Application\Push\PushDevices;
 use App\Modules\Notifications\Application\TemplateRenderer;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Shared\Integrations\IntegrationManager;
@@ -27,6 +28,7 @@ final class DeliverNotification implements DomainEventSubscriber
         private readonly IntegrationManager $integrations,
         private readonly TemplateRenderer $renderer,
         private readonly EmailSenderSettings $sender,
+        private readonly PushDevices $push,
     ) {}
 
     public function consumerName(): string
@@ -47,6 +49,12 @@ final class DeliverNotification implements DomainEventSubscriber
             /** @var NotificationDelivery|null $delivery */
             $delivery = NotificationDelivery::query()->whereKey($payload['delivery_id'])->lockForUpdate()->first();
             if ($delivery === null || ! in_array($delivery->status, ['queued', 'failed'], true)) {
+                return;
+            }
+
+            if ($delivery->channel === 'push') {
+                $this->deliverPush($delivery, $payload);
+
                 return;
             }
 
@@ -71,5 +79,31 @@ final class DeliverNotification implements DomainEventSubscriber
                 throw $e;
             }
         });
+    }
+
+    /**
+     * NOT-4 · El aviso push solo invita a abrir la aplicación en la pantalla del aviso: ni nombres ni montos.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    private function deliverPush(NotificationDelivery $delivery, array $payload): void
+    {
+        $locale = (string) ($payload['locale'] ?? 'es');
+        $variables = (array) ($payload['variables'] ?? []);
+        $message = [
+            'title' => (string) trans('notifications.push.title', ['organization' => (string) ($variables['organization'] ?? '')], $locale),
+            'body' => (string) trans('notifications.push.body', [], $locale),
+            'url' => (string) ($payload['link'] ?? '/'),
+            'tag' => (string) ($payload['category'] ?? 'notification'),
+        ];
+        try {
+            $result = $this->push->deliver(FieldCipher::decrypt((string) $delivery->recipient_address_enc), $message);
+            $delivery->forceFill(['status' => $result['status'], 'provider' => $result['provider'], 'error' => $result['error'], 'attempts' => $delivery->attempts + 1]
+                + ($result['status'] === 'sent' ? ['sent_at' => now()] : []))->save();
+        } catch (Throwable $e) {
+            $delivery->forceFill(['status' => 'failed', 'attempts' => $delivery->attempts + 1, 'error' => mb_substr($e->getMessage(), 0, 500)])->save();
+
+            throw $e;
+        }
     }
 }

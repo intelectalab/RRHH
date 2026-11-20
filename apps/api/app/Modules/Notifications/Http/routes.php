@@ -5,6 +5,7 @@ use App\Modules\Notifications\Http\Controllers\EmailSenderController;
 use App\Modules\Notifications\Http\Controllers\EmailWebhookController;
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Notifications\Http\Controllers\PreferenceController;
+use App\Modules\Notifications\Http\Controllers\PushDeviceController;
 use App\Modules\Notifications\Http\Controllers\TemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,11 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/notifications/read', [NotificationController::class, 'read']);
     Route::get('/notification-preferences', [PreferenceController::class, 'show']);
     Route::put('/notification-preferences', [PreferenceController::class, 'update']);
+    // NOT-4 · Push: cada usuario registra y quita sus propios dispositivos.
+    Route::get('/push/config', [PushDeviceController::class, 'config']);
+    Route::get('/push-devices', [PushDeviceController::class, 'index']);
+    Route::post('/push-devices', [PushDeviceController::class, 'store']);
+    Route::post('/push-devices/{id}/revoke', [PushDeviceController::class, 'revoke']);
 
     Route::get('/notification-templates', [TemplateController::class, 'index'])->middleware('permission:notifications.templates.view');
     Route::post('/notification-templates', [TemplateController::class, 'store'])->middleware('permission:notifications.templates.create');

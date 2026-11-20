@@ -3,6 +3,8 @@ import type { StatusTone } from '@/ui/components/Status'
 /** COL-2 · COL-9 · Relación laboral tal como la devuelve /employments (los campos sensibles pueden faltar). */
 export type Employment = {
   id: string
+  /** CFG-5 · Valores de los campos personalizados visibles para quien consulta. */
+  custom_fields?: Record<string, unknown>
   person_id: string
   person_name: string | null
   document_number_masked: string | null

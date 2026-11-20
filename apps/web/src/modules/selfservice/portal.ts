@@ -15,6 +15,45 @@ export const PORTAL_NAV: ReadonlyArray<{ href: string; key: string; icon: 'home'
 
 export type PortalNavItem = (typeof PORTAL_NAV)[number]
 
+/** ESS-6 · Destinos que caben en la barra inferior; con más, los últimos van a «Más» (sin desplazamiento a 360 px). */
+export const PORTAL_NAV_MAX = 5
+
+/** Reparte los destinos: los que van en la barra y los que se abren desde «Más». */
+export function splitNav<T>(items: readonly T[], max: number = PORTAL_NAV_MAX): { bar: T[]; more: T[] } {
+  if (items.length <= max) return { bar: [...items], more: [] }
+  return { bar: items.slice(0, max - 1), more: items.slice(max - 1) }
+}
+
+/**
+ * ESS-6 · Acciones del colaborador a un toque en su inicio. Es el punto de extensión del portal: cada
+ * módulo suma la suya cuando se activa (marcar asistencia, ver boletas, responder encuestas…), atada a la
+ * tarjeta que su módulo registra en el inicio (HomeCardRegistry): sin esa tarjeta, la acción no aparece.
+ * `create` abre directamente el formulario de la pantalla (UI-8, `?crear=`).
+ */
+export type PortalAction = {
+  key: string
+  card: HomeCard['key']
+  href: string
+  icon: 'home' | 'calendar' | 'file' | 'user' | 'inbox' | 'checkSquare'
+  permission: string | null
+  /** false: también se ofrece en modo solo lectura (no escribe nada). */
+  writes: boolean
+}
+
+export const PORTAL_ACTIONS: readonly PortalAction[] = [
+  { key: 'portal.request_vacation', card: 'vacations', href: '/tiempo/vacaciones?crear=vacation_request', icon: 'calendar', permission: 'time.vacation_requests.create', writes: true },
+  { key: 'portal.request_absence', card: 'absences', href: '/tiempo/ausencias?crear=absence', icon: 'file', permission: 'time.absences.create', writes: true },
+  { key: 'portal.my_profile', card: 'profile', href: '/mi/perfil', icon: 'user', permission: null, writes: false },
+  { key: 'portal.request_certificate', card: 'certificates', href: '/mi/solicitudes', icon: 'file', permission: null, writes: false },
+  { key: 'portal.request_hr', card: 'hr_requests', href: '/mi/solicitudes', icon: 'checkSquare', permission: null, writes: true },
+]
+
+/** Acciones visibles: su tarjeta está en el inicio, hay permiso y, si escribe, la relación no es de solo lectura. */
+export function portalActions(cards: readonly HomeCard[], can: (p: string) => boolean, readOnly: boolean, actions: readonly PortalAction[] = PORTAL_ACTIONS): PortalAction[] {
+  const present = new Set(cards.map((c) => c.key))
+  return actions.filter((a) => present.has(a.card) && (a.permission === null || can(a.permission)) && !(a.writes && readOnly))
+}
+
 /** Destinos visibles: módulo contratado y permiso (el servidor vuelve a validar al entrar). */
 export function portalNav(modules: readonly string[], can: (p: string) => boolean): PortalNavItem[] {
   return PORTAL_NAV.filter((n) => modules.includes(n.module) && allowed(n.permission, can))

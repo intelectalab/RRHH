@@ -4,6 +4,9 @@ namespace App\Modules\CoreHR\Infrastructure\Exports;
 
 use App\Modules\CoreHR\Application\EmploymentPresenter;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
+use App\Shared\CustomFields\CustomFieldValues;
+use App\Shared\CustomFields\HasCustomFields;
+use App\Shared\Exports\ExportRegistry;
 use App\Shared\Exports\ExportSource;
 use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\EffectivePermissions;
@@ -14,12 +17,18 @@ use Illuminate\Support\Facades\DB;
  * COL-9 · Listado de colaboradores exportable: mismas columnas visibles, filtros y alcance que
  * Personas → Colaboradores. No incluye datos personales ni sueldo.
  */
-final class EmploymentsExportSource implements ExportSource
+final class EmploymentsExportSource implements ExportSource, HasCustomFields
 {
     public function __construct(
         private readonly DataScope $scope,
         private readonly EmploymentPresenter $presenter,
+        private readonly CustomFieldValues $customFields,
     ) {}
+
+    public function customFieldEntity(): string
+    {
+        return 'employment';
+    }
 
     public function resource(): string
     {
@@ -58,19 +67,31 @@ final class EmploymentsExportSource implements ExportSource
                 $query->where('ca.'.$f, $filters[$f]);
             }
         }
+        // CFG-5: los filtros custom.clave y las columnas de campos personalizados, con sus permisos.
+        $this->customFields->applyFilterValues($query, 'employment', 'employments.id', $filters, $permissions);
+        $visible = $this->customFields->visible('employment', $permissions);
+        $customKeys = $visible->pluck('key')->map(fn ($k) => (string) $k)->values()->all();
+        $sensitive = $visible->filter(fn ($d) => (bool) $d->is_sensitive)->pluck('key')->map(fn ($k) => 'custom.'.$k)->values()->all();
         $employments = $query->limit($limit + 1)->get();
         $truncated = $employments->count() > $limit;
+        $page = $employments->take($limit)->all();
+        $custom = $customKeys === [] ? [] : $this->customFields->readMany('employment', array_map(fn (Employment $e) => (string) $e->id, $page), $permissions, 'export');
         $rows = [];
-        foreach ($this->presenter->presentMany($employments->take($limit)->all()) as $e) {
-            $rows[] = array_map(fn ($v) => (string) ($v ?? ''), [
+        foreach ($this->presenter->presentMany($page) as $e) {
+            $row = array_map(fn ($v) => (string) ($v ?? ''), [
                 $e['employee_code'], $e['person_name'], $e['legal_entity_name'], $e['job_profile_name'], $e['position_title'],
                 $e['org_unit_name'], $e['site_name'], $e['manager_name'], $e['hire_date'], $e['status'],
             ]);
+            foreach ($customKeys as $key) {
+                $row[] = ExportRegistry::cell($custom[(string) $e['id']][$key] ?? null);
+            }
+            $rows[] = $row;
         }
 
         return [
-            'columns' => ['employee_code', 'person_name', 'legal_entity_name', 'job_profile_name', 'position_title', 'org_unit_name', 'site_name', 'manager_name', 'hire_date', 'status'],
-            'rows' => $rows, 'sensitive' => [], 'truncated' => $truncated,
+            'columns' => array_merge(['employee_code', 'person_name', 'legal_entity_name', 'job_profile_name', 'position_title', 'org_unit_name', 'site_name', 'manager_name', 'hire_date', 'status'],
+                array_map(fn ($k) => 'custom.'.$k, $customKeys)),
+            'rows' => $rows, 'sensitive' => $sensitive, 'truncated' => $truncated,
         ];
     }
 }

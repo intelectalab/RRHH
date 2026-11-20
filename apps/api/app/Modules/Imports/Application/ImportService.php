@@ -611,6 +611,12 @@ final class ImportService
     {
         $k = "imports.columns.{$entity}.{$key}";
         $label = (string) trans($k, [], $locale);
+        if ($label === $k && str_starts_with($key, 'custom.')) {
+            // CFG-5: la columna de un campo personalizado lleva la etiqueta que le puso la organización.
+            $custom = DB::table('custom_field_definitions')->where('key', substr($key, 7))->whereNull('deleted_at')->value('label');
+
+            return is_string($custom) ? $custom : $key;
+        }
 
         return $label === $k ? $key : $label;
     }

@@ -221,4 +221,6 @@ return [
         'nothing_to_clear' => 'This delivery has no bounced address to reactivate.',
         'invalid_signature' => 'The provider signature is not valid.',
     ],
+    // NOT-4 · El aviso push solo invita a abrir la aplicación (RN-NOT-02).
+    'push' => ['title' => 'New in :organization', 'body' => 'You have a new notice. Open it in GestiaHR.'],
 ];

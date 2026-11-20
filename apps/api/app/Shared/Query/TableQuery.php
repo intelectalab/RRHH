@@ -2,8 +2,10 @@
 
 namespace App\Shared\Query;
 
+use App\Shared\CustomFields\CustomFieldValues;
 use App\Shared\Pagination\CursorPaginator;
 use App\Shared\Pagination\PaginationParams;
+use App\Shared\Permissions\EffectivePermissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -19,6 +21,9 @@ use Illuminate\Http\Request;
  */
 final class TableQuery
 {
+    /** @var array{entity: string, id_column: string, permissions: EffectivePermissions|null}|null */
+    private ?array $custom = null;
+
     /**
      * @param  array<string, string>  $sorts  campo público => columna
      * @param  array<int, string>  $filters  filtros admitidos en filter[...]
@@ -27,6 +32,18 @@ final class TableQuery
         private readonly array $sorts,
         private readonly array $filters = [],
     ) {}
+
+    /**
+     * CFG-5 · El listado admite además filter[custom.clave] de los campos personalizados de la entidad
+     * que el usuario puede ver; se aplican aquí, sin código del módulo.
+     */
+    public function withCustomFields(string $entity, string $idColumn, ?EffectivePermissions $permissions): self
+    {
+        $copy = clone $this;
+        $copy->custom = ['entity' => $entity, 'id_column' => $idColumn, 'permissions' => $permissions];
+
+        return $copy;
+    }
 
     /**
      * Valor de un filtro declarado: filter[x] o, por compatibilidad, ?x=.
@@ -47,7 +64,15 @@ final class TableQuery
      */
     public function page(Builder $query, Request $request, string $defaultSort): array
     {
-        (new QuerySpecification($this->filters, array_keys($this->sorts)))->validate($request);
+        $filters = $this->filters;
+        if ($this->custom !== null) {
+            $fields = app(CustomFieldValues::class);
+            $filters = array_merge($filters, $fields->filterKeys($this->custom['entity'], $this->custom['permissions']));
+            (new QuerySpecification($filters, array_keys($this->sorts)))->validate($request);
+            $fields->applyFilters($query, $this->custom['entity'], $this->custom['id_column'], $request, $this->custom['permissions']);
+        } else {
+            (new QuerySpecification($filters, array_keys($this->sorts)))->validate($request);
+        }
         $params = PaginationParams::fromRequest($request);
 
         if ($params->cursor !== null) {

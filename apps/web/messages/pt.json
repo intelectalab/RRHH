@@ -1039,7 +1039,8 @@
     "no": "Não",
     "save": "Salvar",
     "cancel": "Cancelar",
-    "pick": "Escolha…"
+    "pick": "Escolha…",
+    "entity_employment": "Colaboradores"
   },
   "fx": {
     "title": "Moedas e câmbio",
@@ -4104,7 +4105,8 @@
     "no_certificates": "Você ainda não pediu declarações.",
     "card_hr_requests": "Solicitações ao RH",
     "waiting_your_reply": "{n} aguardam sua resposta",
-    "no_hr_requests": "Você não tem solicitações abertas."
+    "no_hr_requests": "Você não tem solicitações abertas.",
+    "nav_more": "Mais"
   },
   "home_board": {
     "card_pending_approvals": "Aprovações pendentes",
@@ -4962,5 +4964,39 @@
     "done_issue": "Acordo emitido",
     "done_register-signature": "Acordo vigente",
     "done_end": "Acordo encerrado"
+  },
+  "push": {
+    "title": "Notificações push",
+    "text": "Receba neste celular ou navegador um aviso que convida a abrir o GestiaHR; não mostra nomes nem valores. Você pode desligá-lo por tipo de aviso na tabela.",
+    "enable": "Ativar neste dispositivo",
+    "enabled": "Notificações push ativadas neste dispositivo.",
+    "removed": "Dispositivo removido: não receberá mais notificações push.",
+    "remove": "Remover",
+    "denied": "O navegador não permitiu mostrar notificações.",
+    "error": "Não foi possível ativar push neste dispositivo.",
+    "unavailable": "As notificações push ainda não estão disponíveis neste ambiente.",
+    "unsupported": "Este navegador não aceita notificações push. Instale o aplicativo ou use outro navegador.",
+    "devices": "Dispositivos com notificações push",
+    "this_phone": "Celular",
+    "this_browser": "Navegador",
+    "since": "desde {date}"
+  },
+  "pin": {
+    "title": "Entre com seu PIN",
+    "hello": "Olá, {name}",
+    "text": "Este celular lembra sua conta. Digite seu PIN para entrar.",
+    "label": "PIN",
+    "enter": "Entrar",
+    "other": "Entrar com senha ou código",
+    "forget": "Esquecer este celular",
+    "setup_title": "Reingresso rápido com PIN",
+    "setup_text": "Entre no GestiaHR neste celular com um PIN de 4 a 8 dígitos por {days} dias, sem digitar sua senha.",
+    "setup_active": "Este celular já entra com PIN. Você pode trocá-lo ou esquecê-lo.",
+    "new": "PIN novo",
+    "confirm": "Repita o PIN",
+    "activate": "Ativar PIN",
+    "change": "Trocar PIN",
+    "saved": "PIN salvo neste celular.",
+    "forgotten": "Este celular não entra mais com PIN."
   }
 }

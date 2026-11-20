@@ -58,4 +58,10 @@ return [
         'device_label' => 'Sesión de soporte de GestiaHR',
         'grant_not_active' => 'La autorización ya no está vigente.',
     ],
+    'quick_unlock' => [
+        'disabled' => 'El reingreso con PIN está desactivado en tu organización.',
+        'unavailable' => 'Este teléfono ya no tiene reingreso con PIN. Ingresa con tu clave o un código.',
+        'wrong_pin' => 'El PIN no es correcto.',
+        'weak_pin' => 'Usa de 4 a 8 dígitos, sin repetir un mismo número ni seguir una escalera.',
+    ],
 ];

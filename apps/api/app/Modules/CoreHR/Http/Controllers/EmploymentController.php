@@ -10,6 +10,7 @@ use App\Modules\CoreHR\Application\TerminationService;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Shared\Audit\ActivityLogger;
 use App\Shared\Audit\AuditLogger;
+use App\Shared\CustomFields\CustomFieldValues;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Exceptions\InvalidFilterException;
 use App\Shared\Labor\ContractTypeSource;
@@ -53,6 +54,7 @@ final class EmploymentController
         private readonly SensitiveFields $sensitive,
         private readonly ParameterResolver $parameters,
         private readonly AuditLogger $audit,
+        private readonly CustomFieldValues $customFields,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -60,10 +62,14 @@ final class EmploymentController
         $permissions = $this->permissions($request);
         $this->sensitive->guardQuery(self::SCHEMA, $request, $permissions);
         $query = $this->filtered($request);
-        $page = (new TableQuery(self::SORTS, self::FILTERS))->page($query, $request, 'person_name');
+        $page = (new TableQuery(self::SORTS, self::FILTERS))->withCustomFields('employment', 'employments.id', $permissions)->page($query, $request, 'person_name');
+        // CFG-5: los campos personalizados viajan como columnas de la tabla, con sus permisos por campo.
+        $custom = $this->customFields->readMany('employment', $page['ids'], $permissions);
+        $rows = array_map(fn (array $row) => $row + ['custom_fields' => (object) ($custom[(string) $row['id']] ?? [])],
+            $this->sensitive->presentMany(self::SCHEMA, $this->presenter->presentMany($this->ordered($page['ids'])), $permissions));
 
         return response()->json([
-            'data' => $this->sensitive->presentMany(self::SCHEMA, $this->presenter->presentMany($this->ordered($page['ids'])), $permissions),
+            'data' => $rows,
             'meta' => $page['meta'],
         ]);
     }
@@ -80,8 +86,14 @@ final class EmploymentController
     {
         $input = $request->validate($this->rules());
         $this->guardEntityInScope($request, (string) $input['legal_entity_id']);
+        $custom = $this->customFields->validate('employment', $this->customInput($request), true, $this->permissions($request));
         app(ContractTypeSource::class)->ensureCountryTypes();
-        $employment = $this->employments->hire($input, $this->userId($request), $this->permissions($request)->has('people.employments.salary.edit'));
+        $employment = DB::transaction(function () use ($input, $request, $custom): Employment {
+            $employment = $this->employments->hire($input, $this->userId($request), $this->permissions($request)->has('people.employments.salary.edit'));
+            $this->customFields->save('employment', $employment->id, $custom);
+
+            return $employment;
+        });
 
         return $this->respond($request, $employment, 201);
     }
@@ -105,16 +117,22 @@ final class EmploymentController
             'work_phone' => ['sometimes', 'nullable', 'string', 'max:30'],
             'work_phone_ext' => ['sometimes', 'nullable', 'string', 'max:10'],
         ]);
+        $custom = $this->customFields->validate('employment', $this->customInput($request), false, $this->permissions($request));
         $ifMatch = trim((string) $request->header('If-Match', ''), ' "W/');
         if ($ifMatch !== '' && (int) $ifMatch !== $employment->lock_version) {
             throw new AyniException('conflict', 409, (string) trans('people.version_conflict'));
         }
         $before = array_intersect_key($employment->toArray(), $input);
+        if ($custom !== []) {
+            $before['custom_fields'] = array_intersect_key($this->customFields->read('employment', $employment->id, $this->permissions($request), 'audit'), $custom);
+            $input['custom_fields'] = $custom;
+        }
         if (isset($input['work_email']) && is_string($input['work_email'])) {
             $input['work_email'] = mb_strtolower($input['work_email']);
         }
         DB::transaction(function () use ($employment, $input, $before): void {
-            $employment->fill($input);
+            $this->customFields->save('employment', $employment->id, (array) ($input['custom_fields'] ?? []));
+            $employment->fill(array_diff_key($input, ['custom_fields' => true]));
             $employment->lock_version++;
             $employment->save();
             $this->audit->record('employment.updated', 'employment', $employment->id, $before, $input);
@@ -388,6 +406,19 @@ final class EmploymentController
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function customInput(Request $request): array
+    {
+        $value = $request->input('custom_fields', []);
+        if (! is_array($value)) {
+            throw ValidationException::withMessages(['custom_fields' => [(string) trans('settings.invalid_value')]]);
+        }
+
+        return $value;
+    }
+
     private function permissions(Request $request): EffectivePermissions
     {
         $p = $request->attributes->get('effective_permissions');
@@ -434,6 +465,7 @@ final class EmploymentController
         $data['termination'] = $this->terminations->current($employment, $this->permissions($request)->has('people.employments.terminate'));
         $data['other_employments'] = $this->otherEmployments($request, $employment);
         $data = $this->sensitive->present(self::SCHEMA, $data, $this->permissions($request), 'api', $employment->person_id);
+        $data['custom_fields'] = (object) $this->customFields->read('employment', $employment->id, $this->permissions($request));
 
         return response()->json(['data' => $data], $status)->header('ETag', '"'.$employment->lock_version.'"');
     }

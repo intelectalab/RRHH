@@ -12,7 +12,8 @@ final class ImportRegistry
 
     public function register(Importer $importer): void
     {
-        $this->importers[$importer->entity()] = $importer;
+        // CFG-5: los importadores con campos personalizados los manejan con el tratamiento común.
+        $this->importers[$importer->entity()] = CustomFieldsImporter::wrap($importer);
     }
 
     public function get(string $entity): ?Importer

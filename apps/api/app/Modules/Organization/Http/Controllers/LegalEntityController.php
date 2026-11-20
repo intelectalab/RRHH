@@ -50,13 +50,14 @@ final class LegalEntityController
         $page = (new TableQuery(
             ['name' => 'legal_name', 'tax_id' => 'tax_id', 'country' => 'country_code', 'status' => 'status', 'created_at' => 'created_at'],
             ['status', 'country'],
-        ))->page($query, $request, 'name');
+        ))->withCustomFields('legal_entity', 'legal_entities.id', $this->permissions($request))->page($query, $request, 'name');
         $ids = $page['ids'];
         $models = LegalEntity::query()->whereIn('id', $ids)->get()->keyBy('id');
+        $custom = $this->customFields->readMany('legal_entity', $ids, $this->permissions($request));
 
         return response()->json([
             'data' => array_values(array_map(
-                fn (LegalEntity $e) => $this->entities->present($e),
+                fn (LegalEntity $e) => $this->entities->present($e) + ['custom_fields' => (object) ($custom[$e->id] ?? [])],
                 array_filter(array_map(fn ($id) => $models->get($id), $ids), fn ($e) => $e instanceof LegalEntity),
             )),
             'meta' => $page['meta'],

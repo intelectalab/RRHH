@@ -33,6 +33,7 @@ use App\Modules\Imports\Infrastructure\Models\SetupChecklistItem;
 use App\Modules\Imports\Infrastructure\Models\TenantCountryPack;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
+use App\Modules\Notifications\Infrastructure\Models\PushDevice;
 use App\Modules\Organization\Infrastructure\Models\DirectoryEmployment;
 use App\Modules\Organization\Infrastructure\Models\EmploymentCostDistribution;
 use App\Modules\Organization\Infrastructure\Models\HeadcountBudget;
@@ -80,6 +81,8 @@ final class CrossTenantHarness
         '/notifications' => Notification::class,
         '/trash/{id}/restore' => User::class,
         '/me/sessions/{id}/revoke' => User::class,
+        // NOT-4: quitar un dispositivo push de A.
+        '/push-devices/{id}/revoke' => PushDevice::class,
         'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,

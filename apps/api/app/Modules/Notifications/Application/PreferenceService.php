@@ -2,6 +2,7 @@
 
 namespace App\Modules\Notifications\Application;
 
+use App\Modules\Notifications\Application\Push\PushDevices;
 use App\Modules\Notifications\Infrastructure\Models\NotificationPreference;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -11,7 +12,10 @@ use Illuminate\Validation\ValidationException;
  */
 final class PreferenceService
 {
-    public function __construct(private readonly NotificationCatalog $catalog) {}
+    public function __construct(
+        private readonly NotificationCatalog $catalog,
+        private readonly PushDevices $push,
+    ) {}
 
     /**
      * @return array<int, array{category: string, mandatory: bool, urgent: bool, channels: array<string, array{enabled: bool, locked: bool}>}>
@@ -20,14 +24,18 @@ final class PreferenceService
     {
         $saved = NotificationPreference::query()->where('user_id', $userId)->get()->keyBy(fn ($p) => $p->category.'|'.$p->channel);
         $out = [];
+        // NOT-4: push vale para todos los avisos de quien registró un dispositivo, salvo los que apague.
+        $hasPush = in_array('push', $this->catalog->channels(), true) && $this->push->hasActive($userId);
         foreach ($this->catalog->categories() as $code => $cat) {
             $mandatory = $this->catalog->isMandatory($code);
             $channels = [];
             foreach ($this->catalog->channels() as $channel) {
                 $locked = $mandatory && $channel === 'in_app';
                 $row = $saved->get($code.'|'.$channel);
-                $default = in_array($channel, $cat['channels'], true);
-                $channels[$channel] = ['enabled' => $locked || ($row instanceof NotificationPreference ? $row->enabled : $default), 'locked' => $locked];
+                $default = $channel === 'push' ? $hasPush : in_array($channel, $cat['channels'], true);
+                $enabled = $locked || ($row instanceof NotificationPreference ? $row->enabled : $default);
+                // Sin dispositivo no hay a dónde enviar push, aunque el tipo quede marcado.
+                $channels[$channel] = ['enabled' => $channel === 'push' ? $enabled && $hasPush : $enabled, 'locked' => $locked];
             }
             $out[] = ['category' => $code, 'mandatory' => $mandatory, 'urgent' => (bool) $cat['urgent'], 'channels' => $channels];
         }

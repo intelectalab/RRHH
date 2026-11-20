@@ -4,6 +4,7 @@ namespace App\Modules\Organization\Infrastructure\Exports;
 
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
 use App\Shared\CustomFields\CustomFieldValues;
+use App\Shared\CustomFields\HasCustomFields;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Exports\ExportSource;
 use App\Shared\Permissions\DataScope;
@@ -14,12 +15,17 @@ use Illuminate\Http\Request;
  * SEG-12 · Listado de empresas exportable: alcance de empresa en la consulta (igual que
  * GET /legal-entities) y campos personalizados sensibles solo con su permiso.
  */
-final class LegalEntitiesExportSource implements ExportSource
+final class LegalEntitiesExportSource implements ExportSource, HasCustomFields
 {
     public function __construct(
         private readonly DataScope $scope,
         private readonly CustomFieldValues $customFields,
     ) {}
+
+    public function customFieldEntity(): string
+    {
+        return 'legal_entity';
+    }
 
     public function resource(): string
     {
@@ -49,6 +55,7 @@ final class LegalEntitiesExportSource implements ExportSource
             $q = addcslashes($filters['q'], '%_\\');
             $query->where(fn ($w) => $w->where('legal_name', 'ilike', '%'.$q.'%')->orWhere('tax_id', 'like', $q.'%'));
         }
+        $this->customFields->applyFilterValues($query, 'legal_entity', 'legal_entities.id', $filters, $permissions);
         $entities = $query->limit($limit + 1)->get();
         $truncated = $entities->count() > $limit;
         $entities = $entities->take($limit);

@@ -11,6 +11,7 @@ import { Modal } from '@/ui/components/Modal'
 import { Notice } from '@/ui/components/Notice'
 import { ErrorState } from '@/ui/components/States'
 import { ChangeRequestPanel } from './ChangeRequestPanel'
+import { CustomFieldsCard } from './CustomFieldsCard'
 import { MARITAL, type Address, type EmergencyContact, type PersonData, type ProfileTabContext, type SensitiveData } from './types'
 
 type Editing =
@@ -283,6 +284,7 @@ export function InfoTab({ header, reload, toast }: ProfileTabContext) {
           </form>
         </Modal>
       )}
+      <CustomFieldsCard employmentId={header.id} toast={toast} />
     </>
   )
 }

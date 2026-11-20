@@ -3,7 +3,7 @@
 Autoservicio del colaborador: inicio personalizado, perfil, documentos, firma, constancias y solicitudes.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 29.
+- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 33.
 - **Especificación:** `kit/docs/modulos/M-ESS.md`.
 
 ## Prompt para una sesión nueva de Claude Code

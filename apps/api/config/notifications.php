@@ -10,8 +10,12 @@
  * RN-NOT-02: los textos para canales externos no llevan sueldos, salud ni denuncias: solo el aviso y el enlace.
  */
 return [
-    // Canales que hoy tienen adaptador. Push, SMS y WhatsApp se suman con NOT-4 y NOT-5.
-    'channels' => ['in_app', 'email'],
+    // Canales con adaptador en el motor de avisos. Push (NOT-4) sale solo a quien registró un dispositivo
+    // y no lo apagó en sus preferencias; SMS y WhatsApp sirven al aviso corto sin correo (NOT-5).
+    'channels' => ['in_app', 'email', 'push'],
+
+    // NOT-4 · Web Push: clave pública VAPID (la privada vive solo en el proveedor real).
+    'push' => ['vapid_public_key' => env('PUSH_VAPID_PUBLIC_KEY')],
 
     'categories' => [
         'approval.pending' => ['variables' => ['requester', 'type', 'level'], 'link' => '/aprobaciones?id={approval_request_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],

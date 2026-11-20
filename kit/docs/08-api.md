@@ -393,6 +393,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/notifications/read` | sesión | 0 |
 | GET | `/notification-preferences` | sesión | 0 |
 | PUT | `/notification-preferences` | sesión | 0 |
+| GET | `/push/config` | sesión | 0 |
+| GET | `/push-devices` | sesión | 0 |
+| POST | `/push-devices` | sesión | 0 |
+| POST | `/push-devices/{id}/revoke` | sesión | 0 |
 | GET | `/notification-deliveries` | `notifications.deliveries.view` | 0 |
 | POST | `/notification-templates/{id}/request-approval` | `notifications.templates.update` | 0 |
 | POST | `/webhooks/email` | público | 0 |
@@ -743,6 +747,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | PATCH | `/ticket-categories/{id}` | `helpdesk.settings.update` | 1 |
 | POST | `/tickets/{id}/messages` | `helpdesk.tickets.create` | 1 |
 | GET | `/tickets/{id}/messages/{message_id}/file` | `helpdesk.tickets.view` | 1 |
+| GET | `/auth/quick-unlock` | público | 1 |
+| POST | `/auth/quick-unlock/sign-in` | público | 1 |
+| POST | `/auth/quick-unlock/forget` | público | 1 |
+| POST | `/me/quick-unlock` | sesión | 1 |
 | GET | `/me/employment` | sesión | 1 |
 | GET | `/me/home` | sesión | 1 |
 

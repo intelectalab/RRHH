@@ -11,6 +11,7 @@ use App\Shared\Integrations\Fake\FakeBiometricAdapter;
 use App\Shared\Integrations\Fake\FakeEmailAdapter;
 use App\Shared\Integrations\Fake\FakeExchangeRatesAdapter;
 use App\Shared\Integrations\Fake\FakeMessagingAdapter;
+use App\Shared\Integrations\Fake\FakePushAdapter;
 use App\Shared\Integrations\Fake\FakeSignatureAdapter;
 use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Integrations\Ports\AiPort;
@@ -20,6 +21,7 @@ use App\Shared\Integrations\Ports\BiometricPort;
 use App\Shared\Integrations\Ports\EmailPort;
 use App\Shared\Integrations\Ports\ExchangeRatesPort;
 use App\Shared\Integrations\Ports\MessagingPort;
+use App\Shared\Integrations\Ports\PushPort;
 use App\Shared\Integrations\Ports\SignaturePort;
 use RuntimeException;
 
@@ -43,6 +45,8 @@ final class IntegrationManager
     private ?ExchangeRatesPort $exchangeRatesAdapter = null;
 
     private ?BackupStoragePort $backupsAdapter = null;
+
+    private ?PushPort $pushAdapter = null;
 
     public function __construct(
         private readonly IntegrationCallRecorder $recorder,
@@ -200,6 +204,27 @@ final class IntegrationManager
         throw new RuntimeException('No live Backup storage provider configured for production.');
     }
 
+    /** NOT-4 · Push web (sin proveedor real todavía: la falsa fuera de producción). */
+    public function push(): PushPort
+    {
+        if ($this->pushAdapter !== null) {
+            return $this->pushAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->pushAdapter = new FakePushAdapter($this->recorder);
+
+            return $this->pushAdapter;
+        }
+
+        throw new RuntimeException('No live Push provider configured for production.');
+    }
+
+    public function setPushAdapter(PushPort $adapter): void
+    {
+        $this->pushAdapter = $adapter;
+    }
+
     public function setBackupsAdapter(BackupStoragePort $adapter): void
     {
         $this->backupsAdapter = $adapter;
@@ -216,7 +241,7 @@ final class IntegrationManager
         $out = [];
         foreach (['email' => fn () => $this->email(), 'messaging' => fn () => $this->messaging(), 'signature' => fn () => $this->signature(),
             'banking' => fn () => $this->banking(), 'biometric' => fn () => $this->biometric(), 'ai' => fn () => $this->ai(),
-            'exchange_rates' => fn () => $this->exchangeRates(), 'backups' => fn () => $this->backups()] as $port => $resolve) {
+            'exchange_rates' => fn () => $this->exchangeRates(), 'backups' => fn () => $this->backups(), 'push' => fn () => $this->push()] as $port => $resolve) {
             try {
                 $adapter = $resolve();
                 $out[] = ['port' => $port, 'provider' => $adapter->providerName(), 'fake' => $adapter->isFake()];

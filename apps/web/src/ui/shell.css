@@ -837,6 +837,15 @@ button.portal-link { background: none; border: 0; padding: 0; text-align: start;
 .ticket-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 @media (max-width: 380px) { .portal-nav-i span { font-size: 10px; } }
 
+/* ESS-6 · «Más» de la barra inferior y reingreso con PIN */
+.portal-nav-more { flex: 1 1 0; min-width: 0; display: flex; position: relative; }
+button.portal-nav-i { background: none; border: 0; font: inherit; cursor: pointer; width: 100%; }
+.portal-nav-sheet { position: absolute; right: 8px; bottom: calc(100% + 8px); min-width: 200px; max-width: calc(100vw - 16px); list-style: none; margin: 0; padding: 6px; background: var(--sup); border: 1px solid var(--bd); border-radius: var(--r); box-shadow: var(--sombra-2); }
+.portal-nav-sheet a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; border-radius: var(--r); color: var(--tx); }
+.portal-nav-sheet a:hover, .portal-nav-sheet a.on { background: var(--pe-50); text-decoration: none; }
+.pin-form { display: grid; gap: 12px; max-width: 320px; }
+.pin-input { font-size: 28px; letter-spacing: .5em; text-align: center; font-variant-numeric: tabular-nums; }
+
 /* UI-2 · grupos de la barra lateral */
 .side-grupo { display: contents; }
 /* UI-8 · botón «+ Crear» de la barra superior */

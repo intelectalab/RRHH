@@ -6,6 +6,7 @@ import { formErrors } from '@/lib/errors'
 import { relativeTime } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
+import { QuickUnlockSetup } from '@/modules/identity/QuickUnlock'
 import { MfaCard } from './MfaCard'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { ErrorState } from '@/ui/components/States'
@@ -109,6 +110,7 @@ export function AccountSecurityScreen() {
             </form>
           </section>
           <MfaCard onToast={(text) => toast(text)} />
+          <QuickUnlockSetup toast={toast} />
           </div>
         </div>
       </main>

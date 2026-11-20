@@ -7,6 +7,7 @@ use App\Modules\Identity\Http\Controllers\MeController;
 use App\Modules\Identity\Http\Controllers\MePreferencesController;
 use App\Modules\Identity\Http\Controllers\MfaController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
+use App\Modules\Identity\Http\Controllers\QuickUnlockController;
 use App\Modules\Identity\Http\Controllers\RoleController;
 use App\Modules\Identity\Http\Controllers\SupportAccessController;
 use App\Modules\Identity\Http\Controllers\UserController;
@@ -29,6 +30,10 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::post('/auth/otp/verify', [CodeSignInController::class, 'verify'])->middleware('throttle:ayni-login');
     Route::post('/auth/activation/code', [CodeSignInController::class, 'activate'])->middleware('throttle:ayni-login');
     // SAS-8 · Enlace de un solo uso de una sesión de soporte creada en la consola.
+    // ESS-6 · Reingreso rápido con PIN (el teléfono guarda la cookie del dispositivo).
+    Route::get('/auth/quick-unlock', [QuickUnlockController::class, 'status']);
+    Route::post('/auth/quick-unlock/sign-in', [QuickUnlockController::class, 'signIn'])->middleware('throttle:ayni-login');
+    Route::post('/auth/quick-unlock/forget', [QuickUnlockController::class, 'forget']);
     Route::post('/auth/support/enter', [SupportAccessController::class, 'enter'])->middleware('throttle:ayni-login');
 
     Route::middleware('auth:ayni')->group(function (): void {
@@ -37,6 +42,7 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::patch('/me/preferences', MePreferencesController::class);
         Route::get('/search', SearchController::class);
         Route::get('/me/sessions', [AccountSecurityController::class, 'sessions']);
+        Route::post('/me/quick-unlock', [QuickUnlockController::class, 'enroll'])->middleware('throttle:ayni-login');
         Route::post('/me/sessions/{id}/revoke', [AccountSecurityController::class, 'revokeSession']);
         Route::post('/me/password', [AccountSecurityController::class, 'changePassword'])->middleware('throttle:ayni-login');
         Route::post('/auth/mfa/verify', [MfaController::class, 'verify'])->middleware('throttle:ayni-login');
