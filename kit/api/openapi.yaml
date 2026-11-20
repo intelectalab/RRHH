@@ -44316,6 +44316,276 @@ paths:
       x-phase: 0
       x-permission: identity.users.suspend
       operationId: postUsersIdSuspend
+  /vacation-accumulation-alerts:
+    get:
+      summary: 'Trabajadores con vacaciones acumuladas (RN-VAC-09, RN-VAC-10): periodos con saldo, desde cuándo, vencidos
+        y por vencer (vacaciones.aviso_vencimiento_dias), con explicación; alcance del usuario'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.view
+      operationId: getVacationAccumulationAlerts
+  /vacation-agreements:
+    get:
+      summary: Listar VacationAgreement
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Sort'
+      - $ref: '#/components/parameters/Filter'
+      - $ref: '#/components/parameters/Q'
+      - $ref: '#/components/parameters/AsOf'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VacationAgreement'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.view
+      operationId: getVacationAgreements
+    post:
+      summary: Crear un acuerdo de fraccionamiento, adelanto o venta (employment_id, kind, days, period_id, effective_on,
+        notes). Adelanto y venta exigen que la política los permita y el tope legal validado (422 legal_parameter_pending);
+        la venta, días ganados disponibles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.adjust
+      operationId: postVacationAgreements
+  /vacation-agreements/{id}:
+    get:
+      summary: Ver VacationAgreement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/AsOf'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VacationAgreement'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.view
+      operationId: getVacationAgreementsId
+  /vacation-agreements/{id}/cancel:
+    post:
+      summary: Anular el acuerdo antes de firmarse (reason)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.adjust
+      operationId: postVacationAgreementsIdCancel
+  /vacation-agreements/{id}/document:
+    get:
+      summary: Descargar el documento vigente del acuerdo (generado o firmado)
+      responses:
+        '200':
+          description: Archivo
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.view
+      operationId: getVacationAgreementsIdDocument
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /vacation-agreements/{id}/issue:
+    post:
+      summary: Emitir el acuerdo en PDF al legajo (o volver a emitirlo como versión nueva)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.adjust
+      operationId: postVacationAgreementsIdIssue
+  /vacation-agreements/{id}/register-signature:
+    post:
+      summary: 'Registrar el ejemplar firmado (multipart: file, signed_on): el acuerdo queda vigente; la venta descuenta el
+        saldo («sold») y deja el concepto de planilla'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              - signed_on
+              properties:
+                file:
+                  type: string
+                  format: binary
+                signed_on:
+                  type: string
+                  format: date
+                origin:
+                  type: string
+                  enum:
+                  - physical_scan
+                  - electronic
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_balances.adjust
+      operationId: postVacationAgreementsIdRegisterSignature
   /vacation-balances:
     get:
       summary: Listar VacationBalance
@@ -45025,6 +45295,372 @@ paths:
       x-phase: 2
       x-permission: time.vacation_requests.submit
       operationId: postVacationRequestsIdSubmit
+  /vacation-schedule-lines/{id}/confirm:
+    post:
+      summary: El trabajador confirma las fechas propuestas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.create
+      operationId: postVacationScheduleLinesIdConfirm
+  /vacation-schedule-lines/{id}/decline:
+    post:
+      summary: El trabajador declina las fechas propuestas con su motivo (note)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.create
+      operationId: postVacationScheduleLinesIdDecline
+  /vacation-schedule-lines/{id}/withdraw:
+    post:
+      summary: Retirar una propuesta antes de convertirla
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.schedule
+      operationId: postVacationScheduleLinesIdWithdraw
+  /vacation-schedules:
+    get:
+      summary: Listar VacationSchedule
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Sort'
+      - $ref: '#/components/parameters/Filter'
+      - $ref: '#/components/parameters/Q'
+      - $ref: '#/components/parameters/AsOf'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VacationSchedule'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.view
+      operationId: getVacationSchedules
+    post:
+      summary: Abrir la campaña del rol anual de una empresa y un año (legal_entity_id, year, name); 409 si ya existe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.schedule
+      operationId: postVacationSchedules
+  /vacation-schedules/{id}:
+    get:
+      summary: Ver VacationSchedule
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/AsOf'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VacationSchedule'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.view
+      operationId: getVacationSchedulesId
+  /vacation-schedules/{id}/close:
+    post:
+      summary: 'Cerrar la campaña del rol anual: no recibe más propuestas'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.schedule
+      operationId: postVacationSchedulesIdClose
+  /vacation-schedules/{id}/convert:
+    post:
+      summary: Convertir las fechas confirmadas en solicitudes aprobadas (registradas por RRHH con las reglas del libro);
+        devuelve las convertidas y las que no procedieron con su motivo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.validate
+      operationId: postVacationSchedulesIdConvert
+  /vacation-schedules/{id}/lines:
+    get:
+      summary: Fechas propuestas del rol anual con su estado, con el alcance del usuario (el trabajador ve las suyas)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.view
+      operationId: getVacationSchedulesIdLines
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: Proponer fechas a un trabajador de la empresa (employment_id, starts_on, ends_on); devuelve los días según
+        la política y avisos (saldo que aún no alcanza, fraccionamiento). 409 si la campaña está cerrada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.schedule
+      operationId: postVacationSchedulesIdLines
+  /vacation-schedules/{id}/reopen:
+    post:
+      summary: Reabrir la campaña del rol anual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - VAC
+      x-phase: 2
+      x-permission: time.vacation_requests.schedule
+      operationId: postVacationSchedulesIdReopen
   /visual-flows:
     get:
       summary: Listar VisualFlow
@@ -57276,6 +57912,78 @@ components:
         mfa_enabled: *id1039
         role_ids: *id1040
         role_assignments: *id1041
+    VacationAgreement:
+      type: object
+      required:
+      - id
+      - employment_id
+      - kind
+      - status
+      - effective_on
+      - allowed_actions
+      properties:
+        id:
+          type: string
+          description: Identificador opaco
+        employment_id:
+          type: string
+          description: Identificador opaco
+        person_name:
+          type: string
+          nullable: true
+        kind:
+          type: string
+          enum:
+          - fractionation
+          - advance
+          - sale
+        status:
+          type: string
+          enum:
+          - draft
+          - issued
+          - active
+          - cancelled
+        days:
+          type: string
+          nullable: true
+        period_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        effective_on:
+          type: string
+          format: date
+        document_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        signed_at:
+          type: string
+          format: date
+          nullable: true
+        payroll_concept_code:
+          type: string
+          nullable: true
+        ledger_entry_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        cancel_reason:
+          type: string
+          nullable: true
+        allowed_actions:
+          type: array
+          items: *id009
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     VacationBalance:
       type: object
       required:
@@ -57543,6 +58251,48 @@ components:
         exception_reason: *id1051
         started_at: *id1052
         completed_at: *id1053
+    VacationSchedule:
+      type: object
+      required:
+      - id
+      - legal_entity_id
+      - year
+      - name
+      - status
+      - allowed_actions
+      properties:
+        id:
+          type: string
+          description: Identificador opaco
+        legal_entity_id:
+          type: string
+          description: Identificador opaco
+        year:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - open
+          - closed
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+        counts:
+          type: object
+          additionalProperties: true
+          nullable: true
+        allowed_actions:
+          type: array
+          items: *id009
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     VisualFlow:
       type: object
       required:

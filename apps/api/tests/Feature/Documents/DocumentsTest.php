@@ -24,6 +24,7 @@ use App\Shared\Outbox\OutboxService;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Vigencia\EffectiveDated;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
@@ -375,7 +376,12 @@ test('DOC-1 · archivar no borra; lo subido por error va a la papelera y se rest
     docCall($this->admin, 'post', '/trash/'.$id.'/restore')->assertOk();
     docCall($this->admin, 'get', '/documents/'.$id)->assertOk();
 
-    // Sin valor validado de conservación, nada se depura aunque venza el plazo de la papelera.
+    // Sin valor validado de conservación (aquí se vuelve a dejar «por validar»), nada se depura aunque venza el plazo.
+    TenancyScope::clear();
+    $current = DB::table('legal_parameters')->where('country_code', 'PE')->where('code', 'legajo_conservacion_anios')->whereNull('valid_to')->first();
+    app(EffectiveDated::class)->change('legal_parameters', ['country_code' => 'PE', 'labor_regime_code' => null, 'code' => 'legajo_conservacion_anios'], [
+        'name' => $current->name, 'unit' => $current->unit, 'value_numeric' => null, 'verified' => false, 'legal_source' => 'Prueba',
+    ], (string) $current->valid_from, EffectiveDated::SAME_DAY_REPLACE);
     TenancyScope::runAs(DOC_TENANT, function () use ($id): void {
         DB::table('documents')->where('id', $id)->update(['deleted_at' => now()->subYears(30)]);
         $source = app(DocumentTrashSource::class);

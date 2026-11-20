@@ -37,6 +37,8 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/documentos/solicitudes', key: 'documents.requests' },
   { route: '/documentos/plantillas', key: 'documents.templates' },
   { route: '/tiempo/vacaciones', key: 'time.vacations' },
+  { route: '/tiempo/vacaciones/programacion', key: 'time.vacation_planning' },
+  { route: '/tiempo/vacaciones/acuerdos', key: 'time.vacation_agreements' },
   { route: '/tiempo/ausencias', key: 'time.absences' },
   { route: '/tiempo/subsidios', key: 'time.subsidies' },
   { route: '/tiempo/resumen-periodo', key: 'time.period_summary' },

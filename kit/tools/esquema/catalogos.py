@@ -243,6 +243,7 @@ PARAMS = [
  ('vacaciones.valida_rrhh', 'time_off', 'Validación de RRHH', 'boolean', False, [O, E], 'Tras el jefe, RRHH valida la solicitud.', None),
  ('vacaciones.maximo_ausentes_simultaneos', 'time_off', 'Máximo de ausentes simultáneos por unidad', 'integer', 0, [O, E], 'VAC-4 · Si más personas de una misma unidad estarán ausentes el mismo día (vacaciones y ausencias aprobadas o pendientes), el calendario del equipo y la aprobación lo alertan. 0 = sin límite.', None),
  ('vacaciones.alerta_acumulacion_dias', 'time_off', 'Aviso de vacaciones acumuladas', 'integer', 30, [O, E], 'Saldo desde el que se alerta acumulación.', None),
+ ('vacaciones.aviso_vencimiento_dias', 'time_off', 'Aviso de periodos por vencer', 'integer', 60, [O, E], 'VAC-5 · Días de anticipación con que se alerta al jefe y a RRHH que un periodo vacacional ganado vence sin gozarse (fecha límite de goce). Política de la organización, no valor legal.', None),
  ('ausencias.dias_descanso_semanal', 'time_off', 'Días de descanso semanal (cómputo en días hábiles)', 'list', ['saturday', 'sunday'], [O, E, S], 'AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
  ('horas_extra.requiere_autorizacion', 'attendance', 'Autorización previa', 'boolean', True, [O, E, S, U], 'El sobretiempo solo se reconoce si fue autorizado.', None),
  ('horas_extra.compensacion', 'attendance', 'Compensación del sobretiempo', 'select', 'pay', [O, E], 'Pago, bolsa de horas o a elección.', ['pay', 'time_bank', 'choice']),
@@ -338,7 +339,7 @@ LEGAL_PE = [
  lp('utilidades_pct_comercio_restaurantes', 'Participación en utilidades: comercio y restaurantes', 'percent', 8, True, 'DL 892', 'Fuente secundaria.'),
  lp('utilidades_pct_otras_actividades', 'Participación en utilidades: otras actividades', 'percent', 5, True, 'DL 892', 'Fuente secundaria.'),
  lp('utilidades_pct_otros_sectores', 'Participación en utilidades: demás sectores de la norma', 'scale', None, False, 'DL 892', 'La norma tiene más sectores que los citados; verificar.'),
- lp('vacaciones_dias', 'Días de vacaciones por año', 'days', None, False, 'DL 713', 'Régimen general. No consta en la investigación; se espera 30 días, por confirmar.', regime='pe_general'),
+ lp('vacaciones_dias', 'Días de vacaciones por año', 'days', 30, True, 'DL 713 art. 10', 'Régimen general: 30 días calendario por año completo de servicios.'+' Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción.', regime='pe_general'),
  lp('vacaciones_dias', 'Días de vacaciones por año', 'days', 15, True, 'DS 013-2013-PRODUCE', regime='pe_micro'),
  lp('vacaciones_dias', 'Días de vacaciones por año', 'days', 15, True, 'DS 013-2013-PRODUCE', regime='pe_pequena'),
  # VAC-1 · VAC-2: plazo de goce, récord y límites de venta, fraccionamiento y adelanto (RN-VAC-04, 05, 09).
@@ -372,7 +373,7 @@ LEGAL_PE = [
  lp('liquidacion_plazo_pago_horas', 'Plazo de pago de la liquidación', 'hours', None, False, 'DS 001-97-TR', 'Las 48 horas no fueron verificadas.'),
  lp('asistencia_conservacion_anios', 'Conservación del registro de asistencia', 'years', 5, True, 'DS 004-2006-TR'),
  lp('boletas_conservacion_anios', 'Conservación de documentos de pago', 'years', None, False, 'DL 1310', 'Citado de memoria en la investigación; validar con el texto vigente.'),
- lp('legajo_conservacion_anios', 'Conservación del legajo después del cese', 'years', None, False, 'Por definir (normas de conservación de documentos laborales)', 'DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura.'),
+ lp('legajo_conservacion_anios', 'Conservación del legajo después del cese', 'years', 5, True, 'DS 001-98-TR art. 21 (conservación de planillas y boletas por 5 años)', 'DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera.'+' Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción.'),
  lp('sst_conservacion_accidentes_anios', 'Conservación: accidentes e incidentes peligrosos', 'years', 10, True, 'DS 005-2012-TR'),
  lp('sst_conservacion_enfermedades_anios', 'Conservación: enfermedades ocupacionales', 'years', 20, True, 'DS 005-2012-TR'),
  lp('sst_conservacion_otros_anios', 'Conservación: demás registros de SST', 'years', 5, True, 'DS 005-2012-TR'),
@@ -398,7 +399,7 @@ LEGAL_PE = [
  lp('licencia_paternidad_dias_prematuro_multiple', 'Licencia por paternidad: duración por parto prematuro o múltiple', 'days', None, False, 'Ley 29409 modificada por Ley 30807', 'Duración total (no se suma a la general); por confirmar.'),
  lp('licencia_paternidad_dias_complicaciones', 'Licencia por paternidad: duración por enfermedad grave, discapacidad del hijo o complicaciones de la madre', 'days', None, False, 'Ley 29409 modificada por Ley 30807', 'Duración total (no se suma a la general); por confirmar.'),
  # AUS-3 · Descansos médicos: días del año a cargo del empleador antes del subsidio (RN-AUS-03) y plazo del reembolso.
- lp('descanso_medico_dias_cargo_empleador', 'Días de incapacidad temporal del año a cargo del empleador antes del subsidio', 'days', None, False, 'Ley 26790 art. 12 · DS 009-97-SA', 'Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario.'),
+ lp('descanso_medico_dias_cargo_empleador', 'Días de incapacidad temporal del año a cargo del empleador antes del subsidio', 'days', 20, True, 'Ley 26790 art. 12 · DS 009-97-SA', 'Primeros 20 días de incapacidad temporal del año calendario a cargo del empleador; desde el día 21 corre el subsidio de EsSalud.'+' Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción.'),
  lp('subsidio_reembolso_plazo_meses', 'Plazo para solicitar el reembolso de un subsidio a la seguridad social', 'months', None, False, 'Ley 26790 · Acuerdo de EsSalud', 'Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso).'),
  # SAS-11 · ADR 0010 · Impuesto del comprobante del SaaS: tasa con vigencia, por validar con el contador (incluye o no el IPM).
  lp('igv_tasa_pct', 'Tasa del impuesto general a las ventas del comprobante del SaaS (%)', 'percent', None, False, 'TUO de la Ley del IGV (DS 055-99-EF) art. 17', 'SAS-11: tasa total que se aplica al emitir el comprobante del SaaS a una organización peruana. Por confirmar con el contador (IGV más IPM) antes del primer cobro real; sin valor validado no se emite ningún comprobante.'),

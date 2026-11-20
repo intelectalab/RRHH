@@ -865,6 +865,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/vacation-requests` | `time.vacation_requests.{view,create}` | 2 |
 | GET, PATCH | `/vacation-requests/{id}` | `time.vacation_requests.{view,update}` | 2 |
 | POST | `/vacation-requests/{id}/{submit,cancel}` | `time.vacation_requests.{submit,cancel}` | 2 |
+| GET | `/vacation-schedules` | `time.vacation_requests.view` | 2 |
+| GET | `/vacation-schedules/{id}` | `time.vacation_requests.view` | 2 |
+| GET | `/vacation-agreements` | `time.vacation_balances.view` | 2 |
+| GET | `/vacation-agreements/{id}` | `time.vacation_balances.view` | 2 |
 | POST | `/vacation-policies` | `time.vacation_policies.update` | 2 |
 | PATCH | `/vacation-policies/{id}` | `time.vacation_policies.update` | 2 |
 | POST | `/vacation-policies/{id}/archive` | `time.vacation_policies.update` | 2 |
@@ -876,6 +880,21 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/vacation-requests/{id}/register` | `time.vacation_requests.validate` | 2 |
 | GET | `/vacation-requests/{id}/overlaps` | `time.vacation_requests.view` | 2 |
 | GET | `/team-calendar` | `time.vacation_requests.view` | 2 |
+| POST | `/vacation-schedules` | `time.vacation_requests.schedule` | 2 |
+| POST | `/vacation-schedules/{id}/close` | `time.vacation_requests.schedule` | 2 |
+| POST | `/vacation-schedules/{id}/reopen` | `time.vacation_requests.schedule` | 2 |
+| GET | `/vacation-schedules/{id}/lines` | `time.vacation_requests.view` | 2 |
+| POST | `/vacation-schedules/{id}/lines` | `time.vacation_requests.schedule` | 2 |
+| POST | `/vacation-schedules/{id}/convert` | `time.vacation_requests.validate` | 2 |
+| POST | `/vacation-schedule-lines/{id}/confirm` | `time.vacation_requests.create` | 2 |
+| POST | `/vacation-schedule-lines/{id}/decline` | `time.vacation_requests.create` | 2 |
+| POST | `/vacation-schedule-lines/{id}/withdraw` | `time.vacation_requests.schedule` | 2 |
+| GET | `/vacation-accumulation-alerts` | `time.vacation_balances.view` | 2 |
+| POST | `/vacation-agreements` | `time.vacation_balances.adjust` | 2 |
+| POST | `/vacation-agreements/{id}/issue` | `time.vacation_balances.adjust` | 2 |
+| POST | `/vacation-agreements/{id}/register-signature` | `time.vacation_balances.adjust` | 2 |
+| POST | `/vacation-agreements/{id}/cancel` | `time.vacation_balances.adjust` | 2 |
+| GET | `/vacation-agreements/{id}/document` | `time.vacation_balances.view` | 2 |
 
 **AUS · Ausencias y permisos**
 

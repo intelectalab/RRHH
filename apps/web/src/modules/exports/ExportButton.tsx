@@ -16,7 +16,7 @@ type ExportJob = Schema<'ExportJob'>
  * llega como aviso con enlace a «Mis exportaciones».
  */
 export function ExportButton({ resource, filters = {}, onError, onQueued }: {
-  resource: 'users' | 'legal_entities' | 'employments'
+  resource: 'users' | 'legal_entities' | 'employments' | 'vacation_schedule'
   filters?: Record<string, string>
   onError?: (message: string) => void
   onQueued?: (message: string) => void

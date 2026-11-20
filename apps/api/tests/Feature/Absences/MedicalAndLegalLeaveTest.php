@@ -259,6 +259,12 @@ test('AUS-3 · el reembolso se sigue por acciones: presentar, observar, volver a
 });
 
 test('AUS-3 · sin umbral validado todo queda a cargo del empleador y se avisa; la maternidad es subsidio completo', function (): void {
+    // El umbral se aprobó (20 días, ADR 0021); aquí se prueba el caso en que vuelve a quedar «por validar».
+    TenancyScope::clear();
+    $current = DB::table('legal_parameters')->where('country_code', 'PE')->where('code', 'descanso_medico_dias_cargo_empleador')->whereNull('valid_to')->first();
+    app(EffectiveDated::class)->change('legal_parameters', ['country_code' => 'PE', 'labor_regime_code' => null, 'code' => 'descanso_medico_dias_cargo_empleador'], [
+        'name' => $current->name, 'unit' => $current->unit, 'value_numeric' => null, 'verified' => false, 'legal_source' => 'Prueba',
+    ], (string) $current->valid_from, EffectiveDated::SAME_DAY_REPLACE);
     $sim = mlvCall($this->hr, 'POST', '/absences/simulate', ['employment_id' => $this->emp, 'absence_type_id' => $this->types['descanso_medico'], 'starts_on' => '2026-03-02', 'ends_on' => '2026-03-29']);
     $sim->assertOk();
     expect($sim->json('data.subsidy'))->toMatchArray(['threshold_days' => null, 'pending_validation' => true, 'employer_paid_days' => '28', 'subsidized_days' => '0'])

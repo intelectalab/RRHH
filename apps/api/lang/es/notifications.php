@@ -142,6 +142,10 @@ return [
             'in_app' => ['subject' => 'Tu {certificate} no se emitió', 'body' => 'Recursos Humanos no emitió tu {certificate}: {reason}'],
             'email' => ['subject' => 'Tu {certificate} no se emitió', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos no emitió tu {certificate}: {reason}\n\nRevisa tus solicitudes aquí: {link}"],
         ],
+        'vacations.accumulation' => [
+            'in_app' => ['subject' => 'Vacaciones acumuladas de {employee}', 'body' => '{explanation}'],
+            'email' => ['subject' => 'Vacaciones acumuladas de {employee}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} tiene vacaciones por gozar: {explanation}\n\nRevísalo aquí: {link}"],
+        ],
         'remote_work.response_due' => [
             'in_app' => ['subject' => 'Responde la solicitud de teletrabajo de {employee}', 'body' => 'El plazo para responder la solicitud de teletrabajo de {employee} vence el {due_on}.'],
             'email' => ['subject' => 'La solicitud de teletrabajo de {employee} vence el {due_on}', 'body' => "Hola {name}:\n\nEn {organization}, el plazo para responder la solicitud de teletrabajo de {employee} vence el {due_on}.\n\nRespóndela aquí: {link}"],

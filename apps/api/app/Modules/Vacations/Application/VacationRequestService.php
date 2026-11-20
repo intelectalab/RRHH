@@ -3,6 +3,7 @@
 namespace App\Modules\Vacations\Application;
 
 use App\Modules\Vacations\Domain\VacationRequestStateMachine;
+use App\Modules\Vacations\Infrastructure\Models\VacationAgreement;
 use App\Modules\Vacations\Infrastructure\Models\VacationRequest;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
@@ -170,6 +171,12 @@ final class VacationRequestService
         // RN-VAC-05 · Fraccionamiento mínimo: el de la política se exige; el legal por validar solo avisa.
         $ownMin = $rules['min_days_per_request'] ?? null;
         $legalMin = $legal['min_fraction_days'] ?? null;
+        // VAC-6 · Con un acuerdo de fraccionamiento firmado y vigente, el mínimo de la política no se exige: rige el
+        // bloque mínimo legal (o solo se avisa mientras está por validar).
+        if (VacationAgreement::query()->where('employment_id', $employmentId)->where('kind', 'fractionation')->where('status', 'active')
+            ->where('effective_on', '<=', $startsOn)->exists()) {
+            $ownMin = null;
+        }
         if (is_string($ownMin) || is_numeric($ownMin)) {
             if ($days->isPositive() && $days->isLessThan((string) $ownMin)) {
                 $this->exceptionOrIssue($role, $exception, 'below_min_fraction', (string) trans('vacations.requests.below_min_fraction', ['days' => self::number((string) $ownMin)]), $issue, $warnings);

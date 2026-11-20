@@ -3,6 +3,10 @@
 // SEG-12 · List exports.
 return [
     'columns' => [
+        'year' => 'Year',
+        'starts_on' => 'From',
+        'ends_on' => 'To',
+        'days' => 'Days',
         'employee_code' => 'Code',
         'person_name' => 'Employee',
         'legal_entity_name' => 'Company',

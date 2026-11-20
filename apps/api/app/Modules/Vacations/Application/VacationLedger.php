@@ -184,6 +184,56 @@ final class VacationLedger implements VacationBalances
     }
 
     /**
+     * VAC-6 · Venta de días firmada: descuenta del saldo ganado (del periodo indicado o del más antiguo) con
+     * movimientos «sold». Idempotente por acuerdo. Devuelve los movimientos creados.
+     *
+     * @return list<string>
+     */
+    public function sell(string $employmentId, string $agreementId, string $days, string $effectiveOn, ?string $periodId, string $reason, ?string $userId): array
+    {
+        $requested = BigDecimal::of($days);
+
+        return DB::transaction(function () use ($employmentId, $agreementId, $requested, $effectiveOn, $periodId, $reason, $userId): array {
+            $this->accrual->sync($employmentId);
+            DB::table('employments')->where('id', $employmentId)->lockForUpdate()->first(['id']);
+            $existing = array_values(VacationLedgerEntry::query()->where('idempotency_key', 'like', 'sale:'.$agreementId.':%')->pluck('id')->map(fn ($id): string => (string) $id)->all());
+            if ($existing !== []) {
+                return $existing;
+            }
+            $periods = VacationAccrualPeriod::query()->where('employment_id', $employmentId)->whereIn('status', ['earned', 'overdue'])
+                ->when($periodId !== null, fn ($q) => $q->whereKey($periodId))->orderBy('period_start')->get();
+            $plan = [];
+            $remaining = $requested;
+            foreach ($periods as $p) {
+                if (! $remaining->isPositive()) {
+                    break;
+                }
+                $free = $this->accrual->availableInPeriod($p->id);
+                if (! $free->isPositive()) {
+                    continue;
+                }
+                $take = BigDecimal::min($free, $remaining);
+                $plan[] = [$p->id, $take];
+                $remaining = $remaining->minus($take);
+            }
+            if ($remaining->isPositive()) {
+                throw new AyniException('insufficient_balance', 422, (string) trans('vacations.agreements.insufficient_balance', ['days' => (string) $requested->toScale(2)]));
+            }
+            $ids = [];
+            foreach ($plan as [$pid, $take]) {
+                $entry = VacationLedgerEntry::query()->create([
+                    'employment_id' => $employmentId, 'vacation_accrual_period_id' => $pid, 'entry_type' => LedgerEntryType::SOLD,
+                    'days' => (string) $take->negated()->toScale(2), 'effective_on' => $effectiveOn, 'reason' => $reason,
+                    'created_by_user_id' => $userId, 'idempotency_key' => 'sale:'.$agreementId.':'.$pid,
+                ]);
+                $ids[] = (string) $entry->id;
+            }
+
+            return $ids;
+        });
+    }
+
+    /**
      * RN-VAC-13 · Ajuste manual con motivo y sustento: queda como movimiento auditable y emite
      * leave.balance_adjusted. Sin periodo, el ajuste va al saldo general de la relación.
      */
