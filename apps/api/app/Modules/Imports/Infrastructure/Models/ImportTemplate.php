@@ -14,7 +14,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $tenant_id
  * @property string $entity
  * @property string|null $name
- * @property array<string, string> $column_mapping
+ * @property array<string, mixed> $column_mapping
+ * @property string|null $source_code IMP-7 · código del perfil de origen (null en un mapeo guardado común)
+ * @property int $version
+ * @property array<string, array<string, string>>|null $value_maps
+ * @property array<string, string>|null $default_values
+ * @property string|null $description
+ * @property string|null $created_by_user_id
  */
 class ImportTemplate extends Model
 {
@@ -26,5 +32,5 @@ class ImportTemplate extends Model
 
     protected $guarded = ['id', 'tenant_id'];
 
-    protected $casts = ['column_mapping' => 'array', 'is_system' => 'boolean'];
+    protected $casts = ['column_mapping' => 'array', 'value_maps' => 'array', 'default_values' => 'array', 'is_system' => 'boolean', 'version' => 'integer'];
 }

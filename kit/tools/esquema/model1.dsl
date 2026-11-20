@@ -587,6 +587,7 @@
 @import_templates soft | Plantilla de mapeo de columnas para el importador.
   entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   name ; column_mapping j! ; is_system
+  source_code ; version integer=1 ; value_maps j ; default_values j ; description ; created_by_user_id ?-> users ; uniq source_code, entity, version
 @import_jobs main lock | Importación masiva por etapas: subir, mapear, validar, previsualizar e importar (nunca directo).
   entity enum(legal_entities,employees,contracts,vacation_balances,salaries,attendance,concepts,history,org_structure,dependents,positions,job_profiles)!
   import_template_id ?-> import_templates ; stored_file_id -> stored_files

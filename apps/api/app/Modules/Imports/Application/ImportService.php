@@ -49,6 +49,7 @@ final class ImportService
         private readonly AuditLogger $audit,
         private readonly OutboxWriter $outbox,
         private readonly ParameterResolver $parameters,
+        private readonly SourceProfiles $profiles,
     ) {}
 
     /**
@@ -183,6 +184,17 @@ final class ImportService
             }
         }
 
+        // IMP-7 · Si el archivo viene de un sistema conocido, su perfil completa lo que falte.
+        $best = $this->profiles->detect($job->entity, $headers)[0] ?? null;
+        if ($best !== null) {
+            $profile = $this->profiles->find($best['code'], $job->entity);
+            foreach ($profile === null ? [] : SourceProfiles::mappingFor($profile, $headers) as $key => $header) {
+                if (! isset($suggested[$key]) && in_array($key, $keys, true) && ! in_array($header, $suggested, true)) {
+                    $suggested[$key] = $header;
+                }
+            }
+        }
+
         $normalized = [];
         foreach ($headers as $header) {
             $normalized[ImportValues::normalizeHeader($header)] = $header;
@@ -212,10 +224,16 @@ final class ImportService
      *
      * @param  array<mixed>  $mapping
      */
-    public function map(ImportJob $job, array $mapping, ?string $saveAs, EffectivePermissions $permissions, string $locale): ImportJob
+    public function map(ImportJob $job, array $mapping, ?string $saveAs, EffectivePermissions $permissions, string $locale, ?string $profileCode = null): ImportJob
     {
         $importer = $this->importer($job->entity, $permissions, $locale);
         $next = $this->machine->getNextState($job->status, 'map');
+        // IMP-7 · Con un perfil de origen, el mapeo sale del perfil; lo que se indique a mano lo corrige.
+        $profile = null;
+        if ($profileCode !== null && trim($profileCode) !== '') {
+            $profile = $this->profiles->require(trim($profileCode), $job->entity, $locale);
+            $mapping = array_merge(SourceProfiles::mappingFor($profile, $job->headers ?? []), array_filter($mapping, fn ($h) => $h !== null && $h !== ''));
+        }
         $columns = [];
         foreach ($importer->columns() as $column) {
             $columns[$column->key] = $column;
@@ -256,7 +274,7 @@ final class ImportService
             }
         }
         foreach ($columns as $key => $column) {
-            if ($column->required && ! isset($clean[$key]) && ! in_array($key, $ignored, true)) {
+            if ($column->required && ! isset($clean[$key]) && ! in_array($key, $ignored, true) && ! isset($profile['defaults'][$key])) {
                 $errors['mapping.'.$key][] = (string) trans('imports.mapping.missing_required', ['column' => $this->columnLabel($job->entity, $key, $locale)], $locale);
             }
         }
@@ -264,9 +282,17 @@ final class ImportService
             throw ValidationException::withMessages($errors);
         }
 
-        return DB::transaction(function () use ($job, $clean, $ignored, $next, $saveAs, $locale): ImportJob {
+        return DB::transaction(function () use ($job, $clean, $ignored, $next, $saveAs, $locale, $profile): ImportJob {
             $summary = $job->summary ?? [];
             $summary['ignored_columns'] = $ignored;
+            unset($summary['profile']);
+            if ($profile !== null) {
+                // La versión exacta con que se tradujo el archivo queda en la importación.
+                $summary['profile'] = [
+                    'code' => $profile['code'], 'name' => $profile['name'], 'version' => $profile['version'], 'origin' => $profile['origin'],
+                    'to_validate' => $profile['to_validate'], 'value_maps' => $profile['value_maps'], 'defaults' => $profile['defaults'],
+                ];
+            }
             $summary['warnings'] = array_values(array_filter($summary['warnings'] ?? [], fn ($w) => ($w['code'] ?? '') !== 'sensitive_ignored'));
             foreach ($ignored as $key) {
                 $summary['warnings'][] = ['code' => 'sensitive_ignored', 'column' => $key,
@@ -302,15 +328,21 @@ final class ImportService
         $index = array_flip($job->headers ?? []);
         $context = new ImportContext($job->tenant_id, $job->id, $job->created_by_user_id, $locale);
         $required = array_map(fn ($c) => $c->key, array_filter($importer->columns(), fn ($c) => $c->required));
+        $examples = [];
+        foreach ($importer->columns() as $c) {
+            $examples[$c->key] = $c->example;
+        }
+        $profile = is_array($job->summary['profile'] ?? null) ? $job->summary['profile'] : null;
 
         $valid = 0;
         $invalid = 0;
         $seen = [];
         ImportJobRow::query()->where('import_job_id', $job->id)
-            ->chunkById(self::ROW_CHUNK, function ($rows) use ($importer, $mapping, $index, $context, $required, $locale, &$valid, &$invalid, &$seen): void {
+            ->chunkById(self::ROW_CHUNK, function ($rows) use ($importer, $mapping, $index, $context, $required, $locale, $profile, $examples, &$valid, &$invalid, &$seen): void {
                 foreach ($rows as $row) {
                     /** @var ImportJobRow $row */
-                    $data = self::rowData($row->raw_data, $mapping, $index);
+                    $raw = self::rowData($row->raw_data, $mapping, $index);
+                    $data = $profile === null ? $raw : SourceProfiles::translate($raw, $profile);
                     $check = new RowCheck;
                     foreach ($required as $key) {
                         if (($data[$key] ?? '') === '') {
@@ -333,8 +365,8 @@ final class ImportService
                     $row->forceFill([
                         'status' => $ok ? 'valid' : 'invalid',
                         'parsed_data' => $ok ? $check->parsed : null,
-                        'errors' => $check->errors === [] ? null : $check->errors,
-                        'warnings' => $check->warnings === [] ? null : $check->warnings,
+                        'errors' => $check->errors === [] ? null : $this->explain($check->errors, $raw, $mapping, $examples, $locale),
+                        'warnings' => $check->warnings === [] ? null : $this->explain($check->warnings, $raw, $mapping, $examples, $locale),
                     ])->save();
                 }
             }, 'row_number');
@@ -488,7 +520,10 @@ final class ImportService
             ->chunkById(self::ROW_CHUNK, function ($rows) use ($out, $headers): void {
                 foreach ($rows as $row) {
                     /** @var ImportJobRow $row */
-                    $reasons = array_map(fn ($e) => ($e['column'] !== null ? $e['column'].': ' : '').$e['message'], $row->errors ?? []);
+                    /** @var array<int, array<string, mixed>> $problems */
+                    $problems = $row->errors ?? [];
+                    $reasons = array_map(fn (array $e) => (is_string($e['column'] ?? null) ? $e['column'].': ' : '').(string) ($e['message'] ?? '')
+                        .(is_string($e['expected'] ?? null) ? ' ('.$e['expected'].')' : ''), $problems);
                     $cells = array_slice(array_pad($row->raw_data, count($headers), ''), 0, count($headers));
                     fputcsv($out, array_map([self::class, 'safeCell'], array_merge([(string) $row->row_number], $cells, [implode(' · ', $reasons)])), ',', '"', '');
                 }
@@ -551,6 +586,7 @@ final class ImportService
             'headers' => $job->headers ?? [],
             'mapping' => (object) ($job->column_mapping ?? []),
             'suggested_mapping' => (object) (in_array($job->status, ['uploaded', 'mapped'], true) ? $this->suggestedMapping($job) : []),
+            'suggested_profiles' => in_array($job->status, ['uploaded', 'mapped'], true) ? $this->profiles->detect($job->entity, $job->headers ?? []) : [],
             'status' => $job->status,
             'total_rows' => $job->total_rows,
             'valid_rows' => $job->valid_rows,
@@ -605,6 +641,33 @@ final class ImportService
     private function maxRows(): int
     {
         return max(1, (int) ($this->parameters->value('importacion.max_filas') ?? 50000));
+    }
+
+    /**
+     * IMP-7 · Cada problema de una fila dice el campo, la cabecera del archivo, el valor recibido y la
+     * corrección esperada (un ejemplo del formato que acepta la columna).
+     *
+     * @param  array<int, array{column: string|null, code: string, message: string}>  $issues
+     * @param  array<string, string>  $raw
+     * @param  array<string, string>  $mapping
+     * @param  array<string, string>  $examples
+     * @return array<int, array<string, mixed>>
+     */
+    private function explain(array $issues, array $raw, array $mapping, array $examples, string $locale): array
+    {
+        return array_map(function (array $issue) use ($raw, $mapping, $examples, $locale): array {
+            $key = $issue['column'];
+            if ($key === null) {
+                return $issue;
+            }
+            $example = $examples[$key] ?? '';
+
+            return $issue + [
+                'header' => $mapping[$key] ?? null,
+                'value' => $raw[$key] ?? null,
+                'expected' => $example === '' ? null : (string) trans('imports.expected', ['example' => $example], $locale),
+            ];
+        }, $issues);
     }
 
     private function columnLabel(string $entity, string $key, string $locale): string

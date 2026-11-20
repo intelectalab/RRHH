@@ -90,8 +90,9 @@ final class ImportController
             throw ValidationException::withMessages(['mapping' => [(string) trans('imports.mapping.invalid', [], $this->locale($request))]]);
         }
         $saveAs = $request->input('save_as');
+        $profile = $request->input('profile_code');
 
-        return $this->respond($this->imports->map($job, $mapping, is_string($saveAs) ? $saveAs : null, $this->permissions($request), $this->locale($request)));
+        return $this->respond($this->imports->map($job, $mapping, is_string($saveAs) ? $saveAs : null, $this->permissions($request), $this->locale($request), is_string($profile) ? $profile : null));
     }
 
     public function validate(Request $request, string $id): JsonResponse

@@ -2371,7 +2371,13 @@
     "keep": "No, keep them",
     "revert_yes": "Yes, undo",
     "reverted": "Import undone",
-    "cancelled": "Import discarded"
+    "cancelled": "Import discarded",
+    "profile": "Source system",
+    "profile_none": "None: map by hand",
+    "profile_option": "{name} · version {version} ({score} % match)",
+    "profile_help": "If the file comes from another system, its profile translates columns and codes; what you choose below overrides it.",
+    "profile_to_validate": "Reference profile pending validation: check the preview.",
+    "problem_value": "Value received: «{value}»."
   },
   "table": {
     "views": "Saved view",

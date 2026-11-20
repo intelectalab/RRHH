@@ -1,11 +1,15 @@
 <?php
 
 use App\Modules\Imports\Http\Controllers\ImportController;
+use App\Modules\Imports\Http\Controllers\ImportProfileController;
 use App\Modules\Imports\Http\Controllers\SetupController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
     Route::get('/import-types', [ImportController::class, 'types'])->middleware('permission:imports.imports.view');
+    // IMP-7 · Perfiles de origen (exportaciones de otros sistemas de RRHH y planilla).
+    Route::get('/import-profiles', [ImportProfileController::class, 'index'])->middleware('permission:imports.imports.view');
+    Route::post('/import-profiles', [ImportProfileController::class, 'store'])->middleware('permission:imports.imports.map');
     Route::get('/imports', [ImportController::class, 'index'])->middleware('permission:imports.imports.view');
     Route::post('/imports', [ImportController::class, 'store'])->middleware('permission:imports.imports.create');
     Route::get('/imports/{id}', [ImportController::class, 'show'])->middleware('permission:imports.imports.view');

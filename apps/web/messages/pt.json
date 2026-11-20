@@ -2371,7 +2371,13 @@
     "keep": "Não, manter",
     "revert_yes": "Sim, desfazer",
     "reverted": "Importação desfeita",
-    "cancelled": "Importação descartada"
+    "cancelled": "Importação descartada",
+    "profile": "Sistema de origem",
+    "profile_none": "Nenhum: mapear à mão",
+    "profile_option": "{name} · versão {version} ({score} % de coincidência)",
+    "profile_help": "Se o arquivo vem de outro sistema, seu perfil traduz as colunas e os códigos; o que você escolher abaixo o corrige.",
+    "profile_to_validate": "Perfil de referência a validar: revise a prévia.",
+    "problem_value": "Valor recebido: «{value}»."
   },
   "table": {
     "views": "Visão salva",

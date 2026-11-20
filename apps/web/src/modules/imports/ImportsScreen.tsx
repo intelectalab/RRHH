@@ -16,7 +16,9 @@ import { useToast } from '@/ui/components/Toast'
 type ImportJob = Schema<'ImportJob'>
 type Column = { key: string; label: string; required: boolean; example: string; sensitive: boolean; allowed: boolean }
 type ImportType = { entity: string; label: string; columns: Column[]; error_policy: 'only_valid' | 'fix_all' }
-type Problem = { column: string | null; code: string; message: string }
+type Problem = { column: string | null; code: string; message: string; header?: string | null; value?: string | null; expected?: string | null }
+/** IMP-7 · Perfil de otro sistema que reconoce las cabeceras del archivo. */
+type ProfileMatch = { code: string; name: string; version: number; score: number; to_validate: boolean }
 type Row = { row_number: number; status: string; values: Record<string, string>; errors: Problem[]; warnings: Problem[]; entity_id: string | null }
 type RowsPage = { data: Row[]; meta: { page: number; per_page: number; total: number; counts: Record<string, number> } }
 
@@ -246,6 +248,8 @@ function MapStep({ job, type, onJob, onCancelled }: { job: ImportJob; type: Impo
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [general, setGeneral] = useState<string | null>(null)
   const headers = job.headers ?? []
+  const profiles = (job.suggested_profiles ?? []) as unknown as ProfileMatch[]
+  const [profile, setProfile] = useState<string>(profiles[0]?.code ?? '')
 
   async function next() {
     setBusy(true)
@@ -253,7 +257,7 @@ function MapStep({ job, type, onJob, onCancelled }: { job: ImportJob; type: Impo
     setGeneral(null)
     try {
       const clean = Object.fromEntries(Object.entries(mapping).filter(([, v]) => v !== ''))
-      await api.post(`/imports/${job.id}/map`, { mapping: clean, ...(saveAs.trim() ? { save_as: saveAs.trim() } : {}) })
+      await api.post(`/imports/${job.id}/map`, { mapping: clean, ...(profile ? { profile_code: profile } : {}), ...(saveAs.trim() ? { save_as: saveAs.trim() } : {}) })
       // Mapear y validar van seguidos: la validación arma la vista previa (RN-IMP-01).
       onJob((await api.post<{ data: ImportJob }>(`/imports/${job.id}/validate`)).data)
     } catch (e) {
@@ -269,6 +273,16 @@ function MapStep({ job, type, onJob, onCancelled }: { job: ImportJob; type: Impo
     <>
       <Warnings job={job} />
       <p>{t('imp.map_help', { n: job.total_rows ?? 0 })}</p>
+      {profiles.length > 0 && (
+        <div className="mb-3" style={{ maxWidth: 480 }}>
+          <label className="form-label" htmlFor="imp-profile">{t('imp.profile')}</label>
+          <select id="imp-profile" className="form-select" value={profile} onChange={(e) => setProfile(e.target.value)}>
+            <option value="">{t('imp.profile_none')}</option>
+            {profiles.map((p) => <option key={p.code} value={p.code}>{t('imp.profile_option', { name: p.name, version: p.version, score: Math.round(p.score * 100) })}</option>)}
+          </select>
+          <span className="sub2">{t('imp.profile_help')}{profiles.find((p) => p.code === profile)?.to_validate ? ` ${t('imp.profile_to_validate')}` : ''}</span>
+        </div>
+      )}
       <div className="imp-mapa">
         {type?.columns.map((c) => {
           const err = errors[`mapping.${c.key}`]
@@ -402,7 +416,7 @@ function ReviewStep({ job, type, onJob, onCancelled }: { job: ImportJob; type: I
                 <td>{r.row_number}</td>
                 {columns.map((c) => <td key={c.key}>{r.values[c.key] ?? ''}</td>)}
                 <td><span className={`st ${ROW_TONE[r.status] ?? 'gr'}`}>{t(`imp.row_${r.status}`)}</span></td>
-                <td>{[...r.errors, ...r.warnings].map((p, i) => <span key={i} className={`sub2${r.errors.includes(p) ? ' imp-err' : ''}`}>{p.message}</span>)}</td>
+                <td>{[...r.errors, ...r.warnings].map((p, i) => <span key={i} className={`sub2${r.errors.includes(p) ? ' imp-err' : ''}`}>{p.message}{p.value ? ` ${t('imp.problem_value', { value: p.value })}` : ''}{p.expected ? ` ${p.expected}` : ''}</span>)}</td>
               </tr>
             ))}
           </tbody>

@@ -189,4 +189,11 @@ return [
         'org_units' => 'outras unidades',
         'direct_reports' => 'a equipe de outros colaboradores',
     ],
+    // IMP-7 · Perfiles de origen.
+    'expected' => 'Espera-se um valor como «:example».',
+    'profiles' => [
+        'code_invalid' => 'O código do perfil usa letras minúsculas, números, hífen ou sublinhado (2 a 60).',
+        'columns_required' => 'Indique ao menos uma coluna com os cabeçalhos do arquivo de origem.',
+        'unknown' => 'O perfil de origem não existe para este tipo de dados.',
+    ],
 ];

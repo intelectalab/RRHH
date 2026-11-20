@@ -7641,6 +7641,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/import-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Perfiles de origen vigentes (IMP-7): por tipo de datos, cabeceras que reconoce cada columna, equivalencias de códigos, valores por defecto, versión, si es del paquete del país o de la organización, si está «por validar» y su historia de versiones; ?filter[entity]=&filter[code]= */
+        get: operations["getImportProfiles"];
+        put?: never;
+        /** Agregar o corregir un perfil de origen como configuración: guarda una versión nueva (code, entity, name, columns, value_maps, defaults) sin tocar las anteriores; luego se usa con profile_code al mapear */
+        post: operations["postImportProfiles"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/import-types": {
         parameters: {
             query?: never;
@@ -21509,6 +21527,9 @@ export interface components {
             suggested_mapping?: {
                 [key: string]: unknown;
             } | null;
+            suggested_profiles?: {
+                [key: string]: unknown;
+            }[] | null;
             /** @enum {string} */
             status: "uploaded" | "mapped" | "validated" | "with_errors" | "importing" | "completed" | "failed" | "cancelled" | "reverted";
             total_rows?: number | null;
@@ -21548,6 +21569,9 @@ export interface components {
             suggested_mapping?: {
                 [key: string]: unknown;
             } | null;
+            suggested_profiles?: {
+                [key: string]: unknown;
+            }[] | null;
             total_rows?: number | null;
             valid_rows?: number | null;
             error_rows?: number | null;
@@ -44084,6 +44108,66 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    getImportProfiles: {
+        parameters: {
+            query?: {
+                /** @description Tipo de datos (employees, org_structure, salaries…) */
+                "filter[entity]"?: string;
+                /** @description Código del perfil */
+                "filter[code]"?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postImportProfiles: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getImportTypes: {

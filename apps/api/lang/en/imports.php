@@ -189,4 +189,11 @@ return [
         'org_units' => 'other units',
         'direct_reports' => 'other employees’ teams',
     ],
+    // IMP-7 · Perfiles de origen.
+    'expected' => 'Expected a value like «:example».',
+    'profiles' => [
+        'code_invalid' => 'The profile code uses lowercase letters, numbers, hyphen or underscore (2 to 60).',
+        'columns_required' => 'Enter at least one column with the headers of the source file.',
+        'unknown' => 'The source profile does not exist for this type of data.',
+    ],
 ];

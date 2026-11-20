@@ -4408,12 +4408,21 @@ CREATE TABLE import_templates (
   name text NOT NULL,
   column_mapping jsonb NOT NULL,
   is_system boolean NOT NULL DEFAULT false,
+  source_code text,
+  version integer NOT NULL DEFAULT 1,
+  value_maps jsonb,
+  default_values jsonb,
+  description text,
+  created_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
-  CONSTRAINT uq_import_templates_tenant_id UNIQUE (tenant_id, id)
+  CONSTRAINT uq_import_templates_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_import_templates_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE import_templates IS 'Plantilla de mapeo de columnas para el importador.';
+CREATE UNIQUE INDEX uq_import_templates_source_code_entity_version ON import_templates (tenant_id, source_code, entity, version) WHERE deleted_at IS NULL;
+CREATE INDEX ix_import_templates_created_by_user_id ON import_templates (tenant_id, created_by_user_id);
 ALTER TABLE import_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE import_templates FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON import_templates USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
