@@ -116,10 +116,17 @@
   --aviso-tx: #FFFFFF;
   --sombra-panel: -8px 0 24px rgba(16, 35, 61, 0.14);
   --sombra-boton: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+  /* UI-12 · Series de gráficos (paleta categórica validada: CVD y contraste; los gráficos llevan tabla y etiquetas). */
+  --chart-1: #2a78d6; --chart-2: #eb6834; --chart-3: #1baf7a; --chart-4: #eda100; --chart-5: #e87ba4; --chart-6: #008300;
+  --chart-grid: #E3E8EF;
+  --heat-0: #EEF4FC; --heat-1: #b7d3f6; --heat-2: #6da7ec; --heat-3: #2a78d6; --heat-4: #184f95; --heat-ink: #FFFFFF; --heat-ink-low: #15202E;
   color-scheme: light;
 }
 
 [data-theme="dark"] {
+  --chart-1: #3987e5; --chart-2: #d95926; --chart-3: #199e70; --chart-4: #c98500; --chart-5: #d55181; --chart-6: #008300;
+  --chart-grid: #26364F;
+  --heat-0: #1A2A42; --heat-1: #184f95; --heat-2: #256abf; --heat-3: #5598e7; --heat-4: #9ec5f4; --heat-ink: #0B1524; --heat-ink-low: #FFFFFF;
   --pe-800: #B5D6FA;
   --pe-700: #93C3F6;
   --pe-600: #6FB1F2;             /* --accent */

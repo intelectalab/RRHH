@@ -25,6 +25,12 @@
         "workflow.tasks.view"
       ]
     },
+    "exports": {
+      "module": "base",
+      "permissions": [
+        "reports.exports.view"
+      ]
+    },
     "calendar": {
       "module": "base",
       "permissions": [

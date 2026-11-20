@@ -124,7 +124,7 @@ export function CompaniesScreen() {
           columns={columns}
           filters={tableFilters}
           bulkActions={bulkActions}
-          toolbar={(state) => <ExportButton resource="legal_entities" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} />}
+          toolbar={(state) => <ExportButton resource="legal_entities" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} onQueued={(m) => toast(m)} />}
           empty={(
             <EmptyState title={t('org.empty_title')} text={t('org.empty_text')} action={can('org.legal_entities.create') && (
               <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('org.new')}</button>

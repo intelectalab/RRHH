@@ -7,7 +7,9 @@ import { formErrors } from '@/lib/errors'
 import { formatDate } from '@/lib/format'
 import { useT } from '@/lib/useT'
 import { useSession } from '@/modules/session/SessionProvider'
+import { Disclosure } from '@/ui/components/Disclosure'
 import { Icon } from '@/ui/components/Icon'
+import { Kanban, type KanbanCard } from '@/ui/components/Kanban'
 import { PageHeader } from '@/ui/components/PageHeader'
 import { SidePanel } from '@/ui/components/SidePanel'
 import { EmptyState, ErrorState } from '@/ui/components/States'
@@ -19,6 +21,15 @@ import { useQuickCreateRequest } from '@/modules/session/quickCreateRegistry'
 type Task = Schema<'Task'> & { mine?: boolean; version?: number }
 type Option = { id: string; name: string }
 type Filter = 'open' | 'overdue' | 'done' | 'all'
+type Layout = 'list' | 'board'
+
+/** UI-12 · Columnas del tablero y la acción real que dispara soltar una tarjeta en cada una (máquina ME de tareas). */
+export const BOARD_COLUMNS = ['pending', 'in_progress', 'done'] as const
+export function boardAction(from: string, to: string, allowed: readonly string[] = []): 'start' | 'complete' | null {
+  if (to === 'in_progress' && from === 'pending' && allowed.includes('start')) return 'start'
+  if (to === 'done' && (from === 'pending' || from === 'in_progress') && allowed.includes('complete')) return 'complete'
+  return null
+}
 
 const PRIORITY_TONE: Record<string, string> = { low: 'gr', normal: 'gr', high: 'wa', urgent: 'er' }
 
@@ -34,13 +45,15 @@ export function TasksScreen() {
   const [rows, setRows] = useState<Task[] | null>(null)
   const [loadError, setLoadError] = useState(false)
   const [editing, setEditing] = useState<Task | 'new' | null>(null)
+  const [layout, setLayout] = useState<Layout>('list')
   useQuickCreateRequest('task', () => setEditing('new'), can('workflow.tasks.create'))
 
   const load = useCallback(async () => {
     const q = new URLSearchParams({ per_page: '100' })
     if (mine) q.set('filter[assigned]', 'me')
-    if (filter === 'overdue') q.set('filter[overdue]', '1')
-    else if (filter !== 'all') q.set('filter[status]', filter)
+    // El tablero muestra todas (pendientes, en curso y hechas); la lista aplica el filtro elegido.
+    if (layout === 'list' && filter === 'overdue') q.set('filter[overdue]', '1')
+    else if (layout === 'list' && filter !== 'all') q.set('filter[status]', filter)
     try {
       const res = await api.get<{ data: Task[] }>(`/tasks?${q.toString()}`)
       setRows(res.data)
@@ -48,7 +61,7 @@ export function TasksScreen() {
     } catch {
       setLoadError(true)
     }
-  }, [mine, filter])
+  }, [mine, filter, layout])
 
   useEffect(() => { setRows(null); void load() }, [load])
 
@@ -68,6 +81,31 @@ export function TasksScreen() {
       await load()
     } catch (e) {
       toast(e instanceof ApiRequestError ? e.message : t('auth.generic_error'), 'error')
+    }
+  }
+
+  const canComplete = can('workflow.tasks.complete')
+  const cards: KanbanCard[] = (rows ?? []).filter((r) => (BOARD_COLUMNS as readonly string[]).includes(r.status)).map((r) => ({
+    id: r.id,
+    column: r.status,
+    title: r.title,
+    meta: [r.assignee_name, r.due_on ? formatDate(locale, r.due_on) : null, r.overdue ? t('tasks.overdue') : null].filter(Boolean).join(' · '),
+  }))
+  async function moveCard(card: KanbanCard, to: string): Promise<string> {
+    const row = rows?.find((r) => r.id === card.id)
+    const action = row ? boardAction(row.status, to, row.allowed_actions ?? []) : null
+    if (!row || !action) throw new Error(t('tasks.move_not_allowed'))
+    try {
+      await api.post(`/tasks/${row.id}/${action}`, {})
+      const text = t(action === 'start' ? 'tasks.started' : 'tasks.completed')
+      toast(text)
+      notifyInboxChanged()
+      await load()
+      return text
+    } catch (e) {
+      const text = e instanceof ApiRequestError ? e.message : t('auth.generic_error')
+      toast(text, 'error')
+      throw new Error(text)
     }
   }
 
@@ -91,13 +129,34 @@ export function TasksScreen() {
               <button type="button" className={!mine ? 'on' : undefined} aria-pressed={!mine} onClick={() => setMine(false)}>{t('tasks.tab_all')}</button>
             </div>
           )}
-          <div className="seg" role="group" aria-label={t('tasks.col_status')}>
+          <div className="seg" role="group" aria-label={t('tasks.layout')}>
+            {(['list', 'board'] as const).map((l) => (
+              <button key={l} type="button" className={layout === l ? 'on' : undefined} aria-pressed={layout === l} onClick={() => setLayout(l)}>{t(`tasks.layout_${l}`)}</button>
+            ))}
+          </div>
+          {layout === 'list' && <div className="seg" role="group" aria-label={t('tasks.col_status')}>
             {(['open', 'overdue', 'done', 'all'] as const).map((f) => (
               <button key={f} type="button" className={filter === f ? 'on' : undefined} aria-pressed={filter === f} onClick={() => setFilter(f)}>{t(`tasks.filter_${f}`)}</button>
             ))}
-          </div>
+          </div>}
         </div>
-        <section className="card">
+        {layout === 'board' && (
+          <section className="card">
+            {loadError && <ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} />}
+            {!loadError && rows === null && <div style={{ padding: 16 }} aria-busy="true"><span className="esq" style={{ width: '60%' }} /></div>}
+            {rows && (
+              <Kanban
+                columns={BOARD_COLUMNS.map((c) => ({ id: c, title: t(`tasks.status_${c}`) }))}
+                cards={cards}
+                canMove={(card, to) => canComplete && boardAction(card.column, to, rows.find((r) => r.id === card.id)?.allowed_actions ?? []) !== null}
+                onMove={moveCard}
+                labels={{ moveTo: t('tasks.move_to'), moving: t('tasks.moving') }}
+                emptyText={t('tasks.board_empty')}
+              />
+            )}
+          </section>
+        )}
+        {layout === 'list' && <section className="card">
           <div className="tabla-wrap">
             <table className="table">
               <thead><tr><th>{t('tasks.col_title')}</th><th>{t('tasks.col_assignee')}</th><th>{t('tasks.col_due')}</th><th>{t('tasks.col_priority')}</th><th>{t('tasks.col_status')}</th><th /></tr></thead>
@@ -123,7 +182,7 @@ export function TasksScreen() {
               </tbody>
             </table>
           </div>
-        </section>
+        </section>}
       </main>
       {editing !== null && (
         <TaskPanel
@@ -230,7 +289,6 @@ function TaskPanel({ task, onClose, onSaved, onTransition }: { task: Task | null
       <form id="tarea" onSubmit={submit} noValidate>
         <fieldset disabled={!editable} style={{ border: 0, padding: 0, margin: 0 }}>
           {field('title', t('tasks.f_title'), <input id="t-title" className={`form-control${errors.title ? ' is-invalid' : ''}`} value={form.title} onChange={set('title')} required maxLength={200} />)}
-          {field('description', t('tasks.f_description'), <textarea id="t-description" className="form-control" rows={3} value={form.description} onChange={set('description')} />)}
           <div className="mb-3">
             <span className="form-label" id="t-to">{t('tasks.f_assign_to')}</span>
             <div className="seg" role="radiogroup" aria-labelledby="t-to">
@@ -253,12 +311,21 @@ function TaskPanel({ task, onClose, onSaved, onTransition }: { task: Task | null
               </select>
             ))}
           {field('due_on', t('tasks.f_due_on'), <input id="t-due_on" type="date" className={`form-control${errors.due_on ? ' is-invalid' : ''}`} value={form.due_on ?? ''} onChange={set('due_on')} />)}
-          {field('priority', t('tasks.f_priority'), (
-            <select id="t-priority" className="form-select" value={form.priority} onChange={set('priority')}>
-              {(['low', 'normal', 'high', 'urgent'] as const).map((p) => <option key={p} value={p}>{t(`tasks.priority_${p}`)}</option>)}
-            </select>
-          ))}
-          <CustomFieldsEditor fields={custom.fields} values={customValues} onChange={setCustomValues} errors={errors} />
+          {/* UI-10 · Lo esencial arriba (título, responsable y fecha); prioridad, descripción y campos propios, plegados. */}
+          <Disclosure
+            label={t('ui.more_options')}
+            summary={t('tasks.more_summary')}
+            defaultOpen={task !== null && (!!task.description || task.priority !== 'normal')}
+            forceOpen={['description', 'priority'].some((k) => errors[k]) || Object.keys(errors).some((k) => k.startsWith('custom'))}
+          >
+            {field('priority', t('tasks.f_priority'), (
+              <select id="t-priority" className="form-select" value={form.priority} onChange={set('priority')}>
+                {(['low', 'normal', 'high', 'urgent'] as const).map((p) => <option key={p} value={p}>{t(`tasks.priority_${p}`)}</option>)}
+              </select>
+            ))}
+            <CustomFieldsEditor fields={custom.fields} values={customValues} onChange={setCustomValues} errors={errors} />
+            {field('description', t('tasks.f_description'), <textarea id="t-description" className="form-control" rows={3} value={form.description} onChange={set('description')} />)}
+          </Disclosure>
         </fieldset>
         {task?.created_by_name && <p className="small text-secondary">{t('tasks.created_by', { name: task.created_by_name })}</p>}
         {error && <div className="invalid-feedback" role="alert">{error}</div>}

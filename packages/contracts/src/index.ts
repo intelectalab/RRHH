@@ -6180,7 +6180,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Descargar el archivo de una exportación propia (CSV); cuenta la descarga y la registra */
+        /** Descargar el archivo de una exportación propia (CSV, Excel o PDF); cuenta la descarga y la registra. Una exportación en cola o fallida responde 409 (UI-11) */
         get: operations["getExportsIdDownload"];
         put?: never;
         post?: never;
@@ -15934,6 +15934,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postTasksIdComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Empezar una tarea pendiente (pasa a en curso); la usa el tablero kanban de tareas al arrastrar la tarjeta */
+        post: operations["postTasksIdStart"];
         delete?: never;
         options?: never;
         head?: never;
@@ -39499,6 +39516,8 @@ export interface operations {
                 };
                 content: {
                     "text/csv": string;
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                    "application/pdf": string;
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -63501,6 +63520,42 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postTasksIdStart: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getTeamCalendar: {

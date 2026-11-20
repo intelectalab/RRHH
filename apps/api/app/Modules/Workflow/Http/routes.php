@@ -27,6 +27,8 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/tasks', [TaskController::class, 'store'])->middleware('permission:workflow.tasks.create');
     Route::get('/tasks/{id}', [TaskController::class, 'show'])->middleware('permission:workflow.tasks.view');
     Route::patch('/tasks/{id}', [TaskController::class, 'update'])->middleware('permission:workflow.tasks.update');
+    // UI-12 · El tablero de tareas pasa una tarjeta a «En curso» con esta acción.
+    Route::post('/tasks/{id}/start', [TaskController::class, 'start'])->middleware('permission:workflow.tasks.complete');
     Route::post('/tasks/{id}/complete', [TaskController::class, 'complete'])->middleware('permission:workflow.tasks.complete');
     Route::post('/tasks/{id}/cancel', [TaskController::class, 'cancel'])->middleware('permission:workflow.tasks.cancel');
 

@@ -51,7 +51,7 @@ final class TaskService
             'related_type' => $task->subject_type ?? ($task->related_employment_id !== null ? 'employment' : null),
             'related_id' => $task->subject_id ?? $task->related_employment_id,
             'completed_at' => $task->completed_at?->toIso8601String(),
-            'allowed_actions' => array_values(array_intersect($this->machine->allowedActions($task->status), ['complete', 'cancel'])),
+            'allowed_actions' => array_values(array_intersect($this->machine->allowedActions($task->status), ['start', 'complete', 'cancel'])),
             'mine' => $viewerId !== null && $this->isAssignee($task, $viewerId),
             'version' => $task->lock_version,
             'created_at' => $task->created_at?->toIso8601String(),

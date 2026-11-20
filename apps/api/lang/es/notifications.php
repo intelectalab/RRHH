@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} tiene {days} días de subsidio por tramitar', 'body' => 'El descanso de {employee} pasa a subsidio desde el {starts_on} ({days} días). Presenta la solicitud de reembolso y registra su seguimiento.'],
             'email' => ['subject' => '{employee} tiene {days} días de subsidio por tramitar', 'body' => "Hola {name}:\n\nEn {organization}, el descanso de {employee} pasa a subsidio desde el {starts_on} ({days} días). Presenta la solicitud de reembolso y registra su seguimiento aquí: {link}"],
         ],
+        'exports.ready' => [
+            'in_app' => ['subject' => 'Tu exportación de {resource} está lista', 'body' => 'El archivo de {resource} ({rows} filas) ya se puede descargar.'],
+            'email' => ['subject' => 'Tu exportación de {resource} está lista', 'body' => "Hola {name}:\n\nEn {organization}, el archivo de {resource} ({rows} filas) ya se puede descargar aquí: {link}"],
+        ],
+        'exports.failed' => [
+            'in_app' => ['subject' => 'No se pudo generar la exportación de {resource}', 'body' => 'La exportación de {resource} no se completó. Vuelve a pedirla; si se repite, avisa a soporte.'],
+            'email' => ['subject' => 'No se pudo generar la exportación de {resource}', 'body' => "Hola {name}:\n\nEn {organization}, la exportación de {resource} no se completó. Vuelve a pedirla aquí: {link}"],
+        ],
         'team.birthday' => [
             'in_app' => ['subject' => 'Cumpleaños de {employee}', 'body' => 'El {date} es el cumpleaños de {employee}, de tu equipo.'],
             'email' => ['subject' => 'Cumpleaños de {employee}', 'body' => "Hola {name}:\n\nEn {organization}, el {date} es el cumpleaños de {employee}, de tu equipo.\n\nMira las fechas de tu equipo aquí: {link}"],

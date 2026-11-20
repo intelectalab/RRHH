@@ -9,6 +9,7 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/notificaciones', key: 'notifications' },
   { route: '/aprobaciones', key: 'approvals' },
   { route: '/tareas', key: 'tasks' },
+  { route: '/exportaciones', key: 'exports' },
   { route: '/calendario', key: 'calendar' },
   { route: '/cuenta/seguridad', key: 'account.security' },
   { route: '/cuenta/notificaciones', key: 'account.notifications' },

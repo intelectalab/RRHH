@@ -15793,7 +15793,8 @@ paths:
       operationId: getExportsId
   /exports/{id}/download:
     get:
-      summary: Descargar el archivo de una exportación propia (CSV); cuenta la descarga y la registra
+      summary: Descargar el archivo de una exportación propia (CSV, Excel o PDF); cuenta la descarga y la registra. Una exportación
+        en cola o fallida responde 409 (UI-11)
       responses:
         '200':
           description: Archivo
@@ -15801,6 +15802,14 @@ paths:
             text/csv:
               schema:
                 type: string
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
         '401': *id001
         '403': *id002
         '404': *id004
@@ -39620,6 +39629,41 @@ paths:
       x-phase: 0
       x-permission: workflow.tasks.complete
       operationId: postTasksIdComplete
+  /tasks/{id}/start:
+    post:
+      summary: Empezar una tarea pendiente (pasa a en curso); la usa el tablero kanban de tareas al arrastrar la tarjeta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - WFL
+      x-phase: 0
+      x-permission: workflow.tasks.complete
+      operationId: postTasksIdStart
   /team-calendar:
     get:
       summary: 'Calendario de ausencias del equipo (VAC-4): vacaciones y ausencias aprobadas y en trámite por persona y día,

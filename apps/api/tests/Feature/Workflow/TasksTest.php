@@ -131,3 +131,22 @@ test('las tareas vencidas se resaltan y se avisan una sola vez', function (): vo
     TenancyScope::runAs(TSK_TENANT, fn () => $service->notifyOverdue());
     TenancyScope::runAs(TSK_TENANT, fn () => expect(DB::table('outbox_events')->where('aggregate_id', $id)->where('event_type', 'task.overdue.v1')->count())->toBe(1));
 });
+
+test('UI-12 · empezar una tarea la pasa a en curso (tablero kanban); otra vez responde 409', function (): void {
+    $task = tskCall($this->hr, 'POST', '/tasks', ['title' => 'Revisar contratos', 'assignee_user_id' => $this->hr2->id])->assertCreated();
+    expect($task->json('data.allowed_actions'))->toContain('start');
+
+    $started = tskCall($this->hr2, 'POST', '/tasks/'.$task->json('data.id').'/start', []);
+    $started->assertOk()->assertJsonPath('data.status', 'in_progress');
+    expect($started->json('data.allowed_actions'))->not->toContain('start')->toContain('complete');
+    $this->assertMatchesOpenApi($started, 'post', '/tasks/{id}/start', 200);
+
+    $again = tskCall($this->hr2, 'POST', '/tasks/'.$task->json('data.id').'/start', []);
+    $again->assertStatus(409)->assertJsonPath('error.code', 'invalid_transition');
+    $this->assertMatchesOpenApi($again, 'post', '/tasks/{id}/start', 409);
+
+    $denied = tskCall($this->employee, 'POST', '/tasks/'.$task->json('data.id').'/start', []);
+    expect($denied->status())->toBeIn([403, 404]);
+
+    TenancyScope::runAs(TSK_TENANT, fn () => expect(DB::table('audit_events')->where('entity_id', $task->json('data.id'))->where('action', 'task.start')->count())->toBe(1));
+});

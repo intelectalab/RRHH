@@ -37,6 +37,9 @@ return [
         // COL-8 · RN-COL-11: se registró o cambió la cuenta de pago del titular (solo los últimos dígitos).
         'people.bank_account_requested' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'people.bank_account_changed' => ['variables' => ['last4'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // UI-11 · Exportación grande generada en segundo plano: lista para descargar o fallida (a quien la pidió).
+        'exports.ready' => ['variables' => ['resource', 'rows'], 'link' => '/exportaciones', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],
+        'exports.failed' => ['variables' => ['resource'], 'link' => '/exportaciones', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],
         // MSS-4 · Cumpleaños y aniversario de ingreso de alguien del equipo (al jefe; solo el día, nunca la edad).
         'team.birthday' => ['variables' => ['employee', 'date'], 'link' => '/mi-equipo/fechas', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],
         'team.anniversary' => ['variables' => ['employee', 'date', 'years'], 'link' => '/mi-equipo/fechas', 'channels' => ['in_app'], 'mandatory' => false, 'urgent' => false],

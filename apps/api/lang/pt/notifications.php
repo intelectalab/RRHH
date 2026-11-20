@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => 'O afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e registre o acompanhamento.'],
             'email' => ['subject' => '{employee} tem {days} dias de subsídio para solicitar', 'body' => "Olá {name}:\n\nEm {organization}, o afastamento de {employee} passa a subsídio a partir de {starts_on} ({days} dias). Apresente o pedido de reembolso e acompanhe aqui: {link}"],
         ],
+        'exports.ready' => [
+            'in_app' => ['subject' => 'Sua exportação de {resource} está pronta', 'body' => 'O arquivo de {resource} ({rows} linhas) já pode ser baixado.'],
+            'email' => ['subject' => 'Sua exportação de {resource} está pronta', 'body' => "Olá {name}:\n\nEm {organization}, o arquivo de {resource} ({rows} linhas) já pode ser baixado aqui: {link}"],
+        ],
+        'exports.failed' => [
+            'in_app' => ['subject' => 'Não foi possível gerar a exportação de {resource}', 'body' => 'A exportação de {resource} não foi concluída. Peça novamente; se continuar, avise o suporte.'],
+            'email' => ['subject' => 'Não foi possível gerar a exportação de {resource}', 'body' => "Olá {name}:\n\nEm {organization}, a exportação de {resource} não foi concluída. Peça novamente aqui: {link}"],
+        ],
         'team.birthday' => [
             'in_app' => ['subject' => 'Aniversário de {employee}', 'body' => 'Em {date} é o aniversário de {employee}, da sua equipe.'],
             'email' => ['subject' => 'Aniversário de {employee}', 'body' => "Olá {name}:\n\nEm {organization}, {date} é o aniversário de {employee}, da sua equipe.\n\nVeja as datas da sua equipe aqui: {link}"],

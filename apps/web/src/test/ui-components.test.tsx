@@ -147,7 +147,7 @@ describe('UI-3 · el catálogo muestra todos los componentes de la historia', ()
     const components = readdirSync(resolve(__dirname, '../ui/components'))
       .map((f) => f.replace('.tsx', ''))
       .filter((c) => !['BrandMark', 'BrandName', 'Icon', 'PageHeader', 'QrCode', 'Toast'].includes(c))
-    const imported: Record<string, string> = { Status: 'StatusBadge', States: 'EmptyState', Skeleton: 'SkeletonText' }
+    const imported: Record<string, string> = { Status: 'StatusBadge', States: 'EmptyState', Skeleton: 'SkeletonText', Charts: 'BarChart' }
     for (const c of components) expect(catalog, c).toContain(`<${imported[c] ?? c}`)
   })
 })

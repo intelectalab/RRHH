@@ -96,6 +96,7 @@ export function EmployeesScreen() {
               resource="employments"
               filters={{ q: state.q.trim(), ...Object.fromEntries(Object.entries(state.filters).filter(([k]) => ['status', 'org_unit_id', 'site_id', 'job_profile_id'].includes(k))) }}
               onError={(m) => toast(m, 'error')}
+              onQueued={(m) => toast(m)}
             />
           )}
           empty={<EmptyState title={t('emp.empty_title')} text={t('emp.empty_text')} action={newHire} />}

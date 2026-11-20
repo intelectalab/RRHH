@@ -284,6 +284,21 @@
       "opciones": null
     },
     {
+      "codigo": "exportaciones.umbral_segundo_plano",
+      "modulo": "base",
+      "nombre": "Filas para exportar en segundo plano",
+      "tipo": "integer",
+      "valor_por_defecto": 1000,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "UI-11 · RN-UI-08: una exportación con más filas que este número se genera en segundo plano y avisa con un enlace cuando está lista; las más chicas se descargan al instante.",
+      "opciones": {
+        "min": 100,
+        "max": 50000
+      }
+    },
+    {
       "codigo": "seguridad.registrar_acceso_sensible",
       "modulo": "base",
       "nombre": "Registrar accesos a datos sensibles",

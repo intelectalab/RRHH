@@ -5,7 +5,12 @@ import { useT } from '@/lib/useT'
 import { searchActiveUsers } from '@/modules/identity/peopleSearch'
 import { useSession } from '@/modules/session/SessionProvider'
 import { Button } from '@/ui/components/Button'
+import { Calendar, type CalendarItem } from '@/ui/components/Calendar'
 import { Card } from '@/ui/components/Card'
+import { BarChart, DonutChart, Heatmap, LineChart } from '@/ui/components/Charts'
+import { addDaysIso } from '@/ui/chartMath'
+import { Disclosure } from '@/ui/components/Disclosure'
+import { Kanban, type KanbanCard } from '@/ui/components/Kanban'
 import { DataTable } from '@/ui/components/DataTable'
 import { FileUploader } from '@/ui/components/FileUploader'
 import { Icon } from '@/ui/components/Icon'
@@ -22,8 +27,9 @@ import { Tabs } from '@/ui/components/Tabs'
 import { Timeline } from '@/ui/components/Timeline'
 import { useToast } from '@/ui/components/Toast'
 import { Tooltip } from '@/ui/components/Tooltip'
+import { Tree, type TreeNode } from '@/ui/components/Tree'
 
-const SECTIONS = ['buttons', 'cards', 'tabs', 'overlays', 'timeline', 'status', 'notices', 'tooltips', 'menus', 'people', 'files', 'skeletons', 'states', 'tables'] as const
+const SECTIONS = ['buttons', 'cards', 'tabs', 'overlays', 'timeline', 'status', 'notices', 'tooltips', 'menus', 'people', 'files', 'skeletons', 'states', 'tables', 'disclosure', 'charts', 'kanban', 'calendar', 'tree'] as const
 type CatalogUser = { id: string; display_name: string; status: string; last_login_at?: string | null }
 type Section = (typeof SECTIONS)[number]
 
@@ -42,7 +48,7 @@ function Estado({ label, children }: { label: string; children: ReactNode }) {
  * componente real con sus estados; todo control del catálogo hace algo (abre, cierra, cambia, avisa).
  */
 export function ComponentCatalog() {
-  const { t } = useT()
+  const { t, locale } = useT()
   const { can } = useSession()
   const { toast, node: toastNode } = useToast()
   const [busy, setBusy] = useState(false)
@@ -57,6 +63,26 @@ export function ComponentCatalog() {
 
   const s = (key: string) => t(`uicat.${key}`)
   const did = (what: string) => toast(t('uicat.did', { what }))
+  const [cards, setCards] = useState<KanbanCard[]>([
+    { id: 'k1', column: 'todo', title: s('demo_card1') },
+    { id: 'k2', column: 'todo', title: s('demo_card2') },
+    { id: 'k3', column: 'doing', title: s('demo_card3') },
+  ])
+  const today = new Date().toISOString().slice(0, 10)
+  const [calItems, setCalItems] = useState<CalendarItem[]>([
+    { key: 'c1', title: s('demo_event1'), starts_on: today, ends_on: today, dot: 'tasks', movable: true },
+    { key: 'c2', title: s('demo_event2'), starts_on: addDaysIso(today, 3), ends_on: addDaysIso(today, 3), dot: 'holidays' },
+  ])
+  const [treeSel, setTreeSel] = useState<string | null>(null)
+  const chartLabels = { category: s('chart_category'), showTable: t('ui.chart_show_table'), hideTable: t('ui.chart_hide_table') }
+  const months = [0, 1, 2, 3, 4, 5].map((m) => new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, m, 1))))
+  const weekdayNames = [5, 6, 7, 8, 9].map((d) => new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, 0, d))))
+  const tree: TreeNode[] = [
+    { id: 'g', text: s('demo_unit_gm'), label: s('demo_unit_gm'), children: [
+      { id: 'c', text: s('demo_unit_sales'), label: s('demo_unit_sales'), meta: '12', children: [{ id: 'v', text: s('demo_unit_team'), label: s('demo_unit_team'), meta: '9' }] },
+      { id: 'o', text: s('demo_unit_ops'), label: s('demo_unit_ops'), meta: '20' },
+    ] },
+  ]
 
   function runLoading() {
     setBusy(true)
@@ -309,6 +335,55 @@ export function ComponentCatalog() {
                 empty={<EmptyState title={s('empty_title')} text={s('empty_text')} />}
               />
             ) : <Notice tone="info">{s('tables_no_access')}</Notice>)}
+
+            {section('disclosure', (
+              <Card>
+                <label className="form-label" htmlFor="cat-pl-nombre">{s('panel_field')}</label>
+                <input id="cat-pl-nombre" className="form-control mb-3" />
+                <Disclosure label={t('ui.more_options')} summary={s('disclosure_summary')}>
+                  <label className="form-label" htmlFor="cat-pl-nota">{s('disclosure_field')}</label>
+                  <textarea id="cat-pl-nota" className="form-control" rows={2} />
+                </Disclosure>
+              </Card>
+            ))}
+
+            {section('charts', (
+              <div className="cat-graficos">
+                <Card><BarChart title={s('chart_bar')} categories={[s('demo_site1'), s('demo_site2'), s('demo_site3')]} series={[{ name: s('chart_filled'), values: [42, 18, 11] }, { name: s('chart_vacant'), values: [5, 3, 4] }]} labels={chartLabels} /></Card>
+                <Card><LineChart title={s('chart_line')} categories={months} series={[{ name: s('chart_hires'), values: [4, 6, 3, 8, 5, 7] }, { name: s('chart_exits'), values: [2, 1, 3, 2, 4, 1] }]} labels={chartLabels} /></Card>
+                <Card><DonutChart title={s('chart_donut')} centerLabel={s('chart_people')} slices={[{ name: s('demo_kind1'), value: 64 }, { name: s('demo_kind2'), value: 9 }, { name: s('demo_kind3'), value: 5 }]} labels={chartLabels} /></Card>
+                <Card><Heatmap title={s('chart_heat')} rows={[s('demo_unit_sales'), s('demo_unit_ops'), s('demo_unit_fin')]} columns={weekdayNames} values={[[2, 0, 1, 3, 5], [1, 1, 0, 2, 4], [0, 0, 1, 0, 2]]} labels={chartLabels} /></Card>
+              </div>
+            ))}
+
+            {section('kanban', (
+              <Kanban
+                columns={[{ id: 'todo', title: s('kanban_todo') }, { id: 'doing', title: s('kanban_doing') }, { id: 'done', title: s('kanban_done') }]}
+                cards={cards}
+                canMove={(card, to) => !(card.column === 'done' && to !== 'done')}
+                onMove={async (card, to) => { setCards((cs) => cs.map((c) => (c.id === card.id ? { ...c, column: to } : c))); const text = t('uicat.did', { what: card.title }); toast(text); return text }}
+                labels={{ moveTo: s('kanban_move_to'), moving: s('kanban_moving') }}
+                emptyText={s('kanban_empty')}
+              />
+            ))}
+
+            {section('calendar', (
+              <Card>
+                <Calendar
+                  view="week"
+                  anchor={today}
+                  today={today}
+                  locale={locale}
+                  items={calItems}
+                  onMove={async (item, day) => { setCalItems((xs) => xs.map((x) => (x.key === item.key ? { ...x, starts_on: day, ends_on: day } : x))); const text = t('uicat.did', { what: item.title }); toast(text); return text }}
+                  labels={{ move: s('cal_move'), moveTitle: s('cal_move'), moveField: s('cal_new_day'), save: s('btn_save'), cancel: s('btn_cancel') }}
+                />
+              </Card>
+            ))}
+
+            {section('tree', (
+              <Card><Tree nodes={tree} label={s('sec_tree')} defaultOpen={['g']} selected={treeSel} onSelect={(n) => { setTreeSel(n.id); did(n.text) }} /></Card>
+            ))}
           </div>
         </div>
       </main>

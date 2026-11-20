@@ -82,6 +82,14 @@ return [
             'in_app' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "{employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it."],
             'email' => ['subject' => '{employee} has {days} subsidy days to file', 'body' => "Hi {name}:\n\nAt {organization}, {employee}'s leave becomes subsidized from {starts_on} ({days} days). File the reimbursement claim and track it here: {link}"],
         ],
+        'exports.ready' => [
+            'in_app' => ['subject' => 'Your {resource} export is ready', 'body' => 'The {resource} file ({rows} rows) is ready to download.'],
+            'email' => ['subject' => 'Your {resource} export is ready', 'body' => "Hi {name},\n\nIn {organization}, the {resource} file ({rows} rows) is ready to download here: {link}"],
+        ],
+        'exports.failed' => [
+            'in_app' => ['subject' => 'The {resource} export could not be generated', 'body' => 'The {resource} export did not finish. Request it again; if it keeps failing, contact support.'],
+            'email' => ['subject' => 'The {resource} export could not be generated', 'body' => "Hi {name},\n\nIn {organization}, the {resource} export did not finish. Request it again here: {link}"],
+        ],
         'team.birthday' => [
             'in_app' => ['subject' => '{employee}\'s birthday', 'body' => '{date} is the birthday of {employee}, from your team.'],
             'email' => ['subject' => '{employee}\'s birthday', 'body' => "Hello {name}:\n\nIn {organization}, {date} is the birthday of {employee}, from your team.\n\nSee your team's dates here: {link}"],

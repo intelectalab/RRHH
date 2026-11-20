@@ -25,6 +25,7 @@ return [
     'pantalla-pendientes' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['inbox']],
     'pantalla-avisos' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['notifications']],
     'pantalla-aprobaciones' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['approvals']],
+    'pantalla-exportaciones' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['exports']],
     'pantalla-tareas' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['tasks']],
     'pantalla-calendario' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['calendar']],
     'pantalla-seguridad-cuenta' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.security']],

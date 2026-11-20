@@ -868,3 +868,72 @@ button.portal-link { background: none; border: 0; padding: 0; text-align: start;
 .setup-texto { flex: 1 1 auto; min-width: 0; }
 .setup-acciones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 @media (max-width: 599px) { .setup-paso { flex-wrap: wrap; } .setup-acciones { width: 100%; justify-content: flex-start; padding-left: 40px; } }
+
+/* UI-10 · Divulgación progresiva: lo avanzado plegado con su resumen. */
+.plegable { border-top: 1px solid var(--bd); margin: 4px 0 12px; padding-top: 8px; }
+.plegable-btn { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; width: 100%; background: none; border: 0; padding: 6px 0; font: inherit; font-weight: 700; color: var(--pe-700); cursor: pointer; text-align: left; }
+.plegable-btn:focus-visible { outline: 2px solid var(--pe-500); outline-offset: 2px; border-radius: 4px; }
+.plegable-resumen { font-weight: 400; color: var(--tx2); font-size: var(--fs-s); }
+.plegable-c { padding-top: 8px; }
+
+/* UI-12 · Gráficos: SVG con el tema; números en tinta de texto, nunca en el color de la serie. */
+.chart { margin: 0; min-width: 0; }
+.chart-t { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 6px; }
+.chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart-svg-dona { max-width: 220px; }
+.chart-eje text, .chart-cat { font-size: 11px; fill: var(--tx2); color: var(--tx2); }
+.chart-total { font-size: 22px; font-weight: 800; fill: var(--tx); }
+.chart-marca:focus { outline: none; }
+.chart-marca:focus-visible { stroke: var(--tx); stroke-width: 2px; }
+.chart-leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; list-style: none; margin: 0 0 6px; padding: 0; font-size: var(--fs-s); color: var(--tx); }
+.chart-leyenda li { display: inline-flex; align-items: center; gap: 6px; }
+.chart-leyenda-col { flex-direction: column; justify-content: center; }
+.chart-muestra { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.chart-dona { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.chart-calor { display: grid; gap: 2px; font-size: var(--fs-s); }
+.chart-calor-fila { align-self: center; padding-right: 8px; }
+.chart-celda { text-align: center; padding: 6px 2px; border-radius: 4px; color: var(--tx); background: var(--heat-0); }
+.chart-celda.nivel-1 { background: var(--heat-1); }
+.chart-celda.nivel-2 { background: var(--heat-2); color: var(--heat-ink-low, var(--heat-ink)); }
+.chart-celda.nivel-3 { background: var(--heat-3); color: var(--heat-ink); }
+.chart-celda.nivel-4 { background: var(--heat-4); color: var(--heat-ink); }
+.hc-graficos, .cat-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+/* UI-12 · Tablero kanban: columnas con desplazamiento horizontal en el móvil; arrastre por puntero. */
+.kanban-cols { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 12px; overflow-x: auto; padding: 12px; }
+.kanban-col { background: var(--sup2); border: 1px solid var(--bd); border-radius: var(--r); padding: 8px; min-height: 140px; }
+.kanban-col.destino { border-style: dashed; border-color: var(--pe-500); }
+.kanban-col.encima { background: var(--pe-50); }
+.kanban-t { font-size: var(--fs-s); font-weight: 700; margin: 2px 4px 8px; display: flex; gap: 6px; align-items: center; }
+.kanban-n { color: var(--tx2); font-weight: 400; }
+.kanban-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.kanban-vacio { color: var(--tx3); font-size: var(--fs-s); padding: 8px 4px; }
+.kanban-card { display: flex; gap: 6px; align-items: flex-start; background: var(--sup); border: 1px solid var(--control-bd); border-radius: var(--r); padding: 8px 10px; }
+.kanban-card.movible { cursor: grab; touch-action: none; }
+.kanban-card.arrastrando { opacity: .55; cursor: grabbing; }
+.kanban-card[aria-busy="true"] { opacity: .7; }
+.kanban-card-c { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* UI-12 · Calendario: semana, agenda y arrastre a otro día. */
+.cal-semana .cal-dia { min-height: 200px; }
+.cal-item-wrap { display: flex; align-items: center; min-width: 0; }
+.cal-item-wrap > .cal-item { flex: 1 1 auto; }
+.cal-item.movible { cursor: grab; touch-action: none; }
+.cal-item.arrastrando { opacity: .5; }
+.cal-mover { background: none; border: 0; padding: 0 4px; color: var(--tx2); cursor: pointer; line-height: 1; border-radius: 4px; }
+.cal-mover:focus-visible { outline: 2px solid var(--pe-500); }
+.cal-dia.encima, .cal-lista > li[data-drop]:hover { background: var(--pe-50); }
+.cal-dia[data-drop] { outline: 1px dashed var(--pe-500); outline-offset: -3px; }
+.cal-lista.cal-agenda { display: block; list-style: none; margin: 0; padding: 0; }
+.cal-lista.cal-agenda > li { padding: 12px 16px; border-bottom: 1px solid var(--bd); }
+.cal-lista.cal-agenda h3 { font-size: var(--fs-s); font-weight: 700; color: var(--tx2); margin: 0 0 6px; text-transform: capitalize; }
+
+/* UI-12 · Árbol jerárquico. */
+.arbol, .arbol-grupo { list-style: none; margin: 0; padding: 0; }
+.arbol [role="treeitem"]:focus { outline: none; }
+.arbol [role="treeitem"]:focus-visible > .arbol-fila { outline: 2px solid var(--pe-500); outline-offset: -2px; }
+.arbol-fila { display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 6px; }
+.arbol-fila.sel { background: var(--pe-50); font-weight: 700; }
+.arbol-flecha { width: 22px; height: 22px; flex: none; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--tx2); cursor: pointer; padding: 0; }
+.arbol-nombre { flex: 1 1 auto; cursor: pointer; min-width: 0; }
+.arbol-meta { color: var(--tx2); font-size: var(--fs-s); }

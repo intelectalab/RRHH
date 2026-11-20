@@ -136,7 +136,7 @@ export function UsersScreen() {
           columns={columns}
           filters={tableFilters}
           bulkActions={bulkActions}
-          toolbar={(state) => <ExportButton resource="users" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} />}
+          toolbar={(state) => <ExportButton resource="users" filters={{ q: state.q.trim(), status: state.filters.status ?? '' }} onError={(m) => toast(m, 'error')} onQueued={(m) => toast(m)} />}
           empty={(
             <EmptyState title={t('users.empty_title')} text={t('users.empty_text')} action={can('identity.users.create') && (
               <button type="button" className="btn btn-primary btn-sm" onClick={() => setCreating(true)}><Icon name="plus" /> {t('users.new')}</button>

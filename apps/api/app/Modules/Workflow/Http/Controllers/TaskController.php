@@ -91,6 +91,14 @@ final class TaskController
         return $this->respond($request, $task);
     }
 
+    /** UI-12 · Empezar una tarea pendiente (el tablero la pasa a «En curso»). */
+    public function start(Request $request, string $id): JsonResponse
+    {
+        $task = $this->find($request, $id, 'workflow.tasks.complete');
+
+        return $this->respond($request, $this->tasks->transition($task, 'start', null));
+    }
+
     public function complete(Request $request, string $id): JsonResponse
     {
         $task = $this->find($request, $id, 'workflow.tasks.complete');

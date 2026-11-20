@@ -59,7 +59,7 @@ final class ExportController
         $name = str_replace('"', '', $file['name']);
 
         return response($file['contents'], 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => ExportService::mime(pathinfo($name, PATHINFO_EXTENSION)).(str_ends_with($name, '.csv') ? '; charset=UTF-8' : ''),
             'Content-Disposition' => 'attachment; filename="'.$name.'"',
             'Cache-Control' => 'no-store',
             'X-Content-Type-Options' => 'nosniff',

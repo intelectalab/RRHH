@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { BarChart, DonutChart } from '@/ui/components/Charts'
 import { api } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
 import { formatDate, formatNumber, localToday } from '@/lib/format'
@@ -147,6 +148,24 @@ export function HeadcountScreen() {
               </div>
             )}
             {canCost && board.load_factor_pct !== undefined && <p className="small text-secondary">{t('hc.load_factor', { pct: formatNumber(locale, board.load_factor_pct) })}</p>}
+            {/* UI-12 · Ocupación por unidad (las mismas cifras de la tabla, con su alternativa en tabla). */}
+            <div className="hc-graficos mb-3">
+              <BarChart
+                title={t('hc.chart_units')}
+                categories={board.units.slice(0, 12).map((u) => u.org_unit_name)}
+                series={[
+                  { name: t('hc.count_filled'), values: board.units.slice(0, 12).map((u) => u.counts.filled) },
+                  { name: t('hc.count_vacant'), values: board.units.slice(0, 12).map((u) => u.counts.vacant) },
+                ]}
+                labels={{ category: t('hc.chart_unit'), showTable: t('ui.chart_show_table'), hideTable: t('ui.chart_hide_table') }}
+              />
+              <DonutChart
+                title={t('hc.chart_status')}
+                centerLabel={t('hc.chart_positions')}
+                slices={(['filled', 'vacant', 'frozen'] as const).map((k) => ({ name: t(`hc.count_${k}`), value: board.totals[k] }))}
+                labels={{ category: t('hc.chart_status'), showTable: t('ui.chart_show_table'), hideTable: t('ui.chart_hide_table') }}
+              />
+            </div>
             <div className="tabla-wrap">
               <table className="table">
                 <caption className="visually-hidden">{t('hc.table_caption')}</caption>

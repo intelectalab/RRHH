@@ -6,6 +6,9 @@
 
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Modules\Reports\Infrastructure\Subscribers\RunExportJob;
+use App\Shared\Outbox\Models\OutboxEvent;
+use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -163,7 +166,7 @@ test('datos inválidos responden 422', function (): void {
 
     $badResource = expCall($user, 'post', '/exports', ['resource' => 'payslips', 'format' => 'csv'])->assertStatus(422);
     $this->assertMatchesOpenApi($badResource, 'post', '/exports', 422);
-    expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'xlsx'])->assertStatus(422)->assertJsonPath('error.code', 'validation_failed');
+    expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'docx'])->assertStatus(422)->assertJsonPath('error.code', 'validation_failed');
     expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'csv', 'filters' => ['salary' => '1']])->assertStatus(422);
 });
 
@@ -188,4 +191,101 @@ test('una exportación vencida no se descarga (409)', function (): void {
 
     $expired = expCall($user, 'get', '/exports/'.$id.'/download')->assertStatus(409)->assertJsonPath('error.code', 'export_expired');
     $this->assertMatchesOpenApi($expired, 'get', '/exports/{id}/download', 409);
+});
+
+/** UI-11 · Corre el evento de exportación en segundo plano como lo haría el despachador del outbox. */
+function expRunQueued(string $id): void
+{
+    TenancyScope::clear();
+    $event = TenancyScope::runAs(EXP_TENANT, fn () => OutboxEvent::query()->where('event_type', 'export.requested.v1')->where('aggregate_id', $id)->sole());
+    TenancyScope::clear();
+    app(RunExportJob::class)->handle($event);
+}
+
+function expThreshold(int $rows): void
+{
+    TenancyScope::runAs(EXP_TENANT, fn () => DB::table('tenant_settings')->insert([
+        'tenant_id' => EXP_TENANT, 'parameter_code' => 'exportaciones.umbral_segundo_plano', 'value' => (string) $rows, 'valid_from' => '2020-01-01',
+    ]));
+}
+
+test('UI-11 · exporta a Excel y a PDF con las mismas columnas y filas que CSV', function (): void {
+    $user = IdentityFixtures::userWithPermissions(EXP_TENANT, EXP_CAN);
+
+    $xlsx = expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'xlsx'])->assertCreated();
+    $this->assertMatchesOpenApi($xlsx, 'post', '/exports', 201);
+    expect($xlsx->json('data.status'))->toBe('completed')->and($xlsx->json('data.format'))->toBe('xlsx');
+    $file = expCall($user, 'get', '/exports/'.$xlsx->json('data.id').'/download')->assertOk();
+    expect((string) $file->headers->get('Content-Type'))->toContain('spreadsheetml');
+    $path = tempnam(sys_get_temp_dir(), 'x');
+    file_put_contents((string) $path, (string) $file->getContent());
+    $zip = new ZipArchive;
+    expect($zip->open((string) $path))->toBeTrue();
+    $sheet = (string) $zip->getFromName('xl/worksheets/sheet1.xml');
+    $zip->close();
+    @unlink((string) $path);
+    expect($sheet)->toContain('Razón social')->toContain('Andina S.A.C.')->not->toContain('MARGEN-SECRETO-42');
+
+    $pdf = expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'pdf'])->assertCreated();
+    $download = expCall($user, 'get', '/exports/'.$pdf->json('data.id').'/download')->assertOk();
+    $this->assertMatchesOpenApi($download, 'get', '/exports/{id}/download', 200);
+    expect((string) $download->headers->get('Content-Type'))->toContain('application/pdf')
+        ->and(str_starts_with((string) $download->getContent(), '%PDF'))->toBeTrue();
+});
+
+test('UI-11 · una exportación grande se genera en segundo plano y avisa con enlace; una entrega doble no duplica', function (): void {
+    $user = IdentityFixtures::userWithPermissions(EXP_TENANT, EXP_CAN);
+    expThreshold(2);
+
+    $queued = expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'csv'])->assertCreated();
+    $this->assertMatchesOpenApi($queued, 'post', '/exports', 201);
+    expect($queued->json('data.status'))->toBe('queued')->and($queued->json('data.download_url'))->toBeNull();
+    $id = (string) $queued->json('data.id');
+
+    $notReady = expCall($user, 'get', '/exports/'.$id.'/download')->assertStatus(409);
+    $this->assertMatchesOpenApi($notReady, 'get', '/exports/{id}/download', 409);
+
+    expRunQueued($id);
+    expRunQueued($id);
+
+    $shown = expCall($user, 'get', '/exports/'.$id)->assertOk();
+    expect($shown->json('data.status'))->toBe('completed')->and($shown->json('data.row_count'))->toBe(3);
+    $csv = (string) expCall($user, 'get', '/exports/'.$id.'/download')->assertOk()->getContent();
+    expect($csv)->toContain('Andina S.A.C.')->not->toContain('MARGEN-SECRETO-42');
+
+    TenancyScope::runAs(EXP_TENANT, function () use ($id, $user): void {
+        expect(DB::table('stored_files')->where('id', DB::table('export_jobs')->where('id', $id)->value('stored_file_id'))->count())->toBe(1)
+            ->and(DB::table('audit_events')->where('action', 'export.created')->where('entity_id', $id)->count())->toBe(1)
+            ->and(DB::table('notifications')->where('recipient_user_id', $user->id)->where('category', 'exports.ready')->count())->toBe(1);
+    });
+});
+
+test('UI-11 · en segundo plano se respeta el alcance de empresa y se vuelve a validar el permiso', function (): void {
+    $user = IdentityFixtures::userWithPermissions(EXP_TENANT, EXP_CAN, 'legal_entity');
+    $b = $this->entities['b'];
+    TenancyScope::runAs(EXP_TENANT, function () use ($user, $b): void {
+        $userRole = DB::table('user_roles')->where('user_id', $user->id)->value('id');
+        DB::table('user_role_scopes')->insert(['tenant_id' => EXP_TENANT, 'user_role_id' => $userRole, 'legal_entity_id' => $b]);
+    });
+    expThreshold(0);
+
+    $id = (string) expCall($user, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'csv'])->assertCreated()->json('data.id');
+    expRunQueued($id);
+    $csv = (string) expCall($user, 'get', '/exports/'.$id.'/download')->assertOk()->getContent();
+    expect($csv)->toContain('Borde S.A.C.')->not->toContain('Andina S.A.C.');
+
+    // Si pierde el permiso del listado antes de que corra, la exportación falla sin datos y se avisa.
+    $other = IdentityFixtures::userWithPermissions(EXP_TENANT, EXP_CAN);
+    $second = (string) expCall($other, 'post', '/exports', ['resource' => 'legal_entities', 'format' => 'xlsx'])->assertCreated()->json('data.id');
+    TenancyScope::runAs(EXP_TENANT, function () use ($other): void {
+        $roles = DB::table('user_roles')->where('user_id', $other->id)->pluck('role_id');
+        DB::table('role_permissions')->whereIn('role_id', $roles)->where('permission_code', 'org.legal_entities.view')->delete();
+    });
+    app(PermissionResolver::class)->forget();
+    expRunQueued($second);
+    TenancyScope::runAs(EXP_TENANT, function () use ($second, $other): void {
+        $job = DB::table('export_jobs')->where('id', $second)->sole();
+        expect($job->status)->toBe('failed')->and($job->stored_file_id)->toBeNull()
+            ->and(DB::table('notifications')->where('recipient_user_id', $other->id)->where('category', 'exports.failed')->count())->toBe(1);
+    });
 });

@@ -350,6 +350,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/approval-requests/bulk-approve` | `workflow.approval_requests.approve` | 0 |
 | GET | `/workflows/catalog` | `workflow.workflows.view` | 0 |
 | POST | `/workflows/{id}/test` | `workflow.workflows.update` | 0 |
+| POST | `/tasks/{id}/start` | `workflow.tasks.complete` | 0 |
 
 **NOT · Notificaciones**
 

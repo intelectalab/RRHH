@@ -42,6 +42,7 @@ const MENU: NavLink[] = [
   { href: '/primeros-pasos', key: 'shell.modules_setup', group: 'home', icon: 'checkSquare', module: 'core', visible: (can) => can('imports.setup.use') },
   { href: '/aprobaciones', key: 'shell.modules_approvals', group: 'home', icon: 'inbox', module: 'base', visible: (can) => can('workflow.approval_requests.view'), count: 'approval' },
   { href: '/tareas', key: 'shell.modules_tasks', group: 'home', icon: 'checkSquare', module: 'base', visible: (can) => can('workflow.tasks.view'), count: 'task' },
+  { href: '/exportaciones', key: 'shell.modules_exports', group: 'home', icon: 'download', module: 'base', visible: (can) => can('reports.exports.view') },
   { href: '/documentos/vencimientos', key: 'shell.modules_documents', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.documents.view') },
   { href: '/documentos/solicitudes', key: 'shell.modules_document_requests', group: 'people', icon: 'inbox', module: 'core', visible: (can) => can('documents.documents.request') },
   { href: '/documentos/plantillas', key: 'shell.modules_document_templates', group: 'people', icon: 'file', module: 'core', visible: (can) => can('documents.templates.view') },
