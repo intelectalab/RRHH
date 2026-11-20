@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 200 | 0 | 83,0 % |
-| Backlog completo | 512 | 207 | 0 | 40,4 % |
+| Primer corte comercial (MVP) | 241 | 204 | 0 | 84,6 % |
+| Backlog completo | 512 | 211 | 0 | 41,2 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -253,10 +253,10 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PER-4 | Cálculo de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Cálculo del periodo completo o parcial con arrastre; el periodo pasa a calculado; 409 si hay una corrida en curso. |
 | PER-5 | Renta de quinta categoría | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Retención de quinta por proyección anual con libro de solo inserción, certificados previos, no domiciliado, exonerado y ajuste por cese; cuatro casos dorados. |
 | PER-6 | Aportes previsionales y de salud | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Aportes AFP (comisión por tipo y prima con tope), ONP y EsSalud salvo SIS con crédito por EPS; tasas por periodo. |
-| PER-7 | Simulación y detección de anomalías | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PER-8 | Revisión, aprobación y cierre | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PER-9 | Reapertura controlada y planilla complementaria | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PER-10 | Pago de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| PER-7 | Simulación y detección de anomalías | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Simulación sin guardar, comparación con el periodo anterior y anomalías explicadas con umbrales por empresa y concepto; Nómina → Revisión. |
+| PER-8 | Revisión, aprobación y cierre | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Envío con confirmación de anomalías, aprobación por flujo WFL o directa con segregación, cierre bloqueado por críticas o parámetros por validar. |
+| PER-9 | Reapertura controlada y planilla complementaria | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Planilla complementaria enlazada al periodo cerrado o pagado (ADR 0017); reapertura bloqueada con lotes de pago. |
+| PER-10 | Pago de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Lotes de pago por banco con las cuentas de haberes, archivo genérico por puerto (ADR 0020), confirmación idempotente, anulación con motivo y estado pagado; Nómina → Pagos. |
 | PER-11 | Libro de retenciones de quinta | PER | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
 | PER-12 | Importación de acumulados de planilla del ejercicio | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | PER-13 | Comparación con el sistema anterior durante la planilla en paralelo | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
