@@ -66,7 +66,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [WFL](../prompts/WFL.md) · Motor de aprobaciones y workflows | Plataforma base | 5 | 4 | 9 | 42 | — | — |
 | 0 | [NOT](../prompts/NOT.md) · Notificaciones y mensajería | Plataforma base | 2 | 4 | 6 | 19 | — | D-11 |
 | 0 | [CFG](../prompts/CFG.md) · Configuración, campos personalizados, i18n y multimoneda | Plataforma base | 5 | 5 | 10 | 30 | — | — |
-| 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 39 | Sí | D-39, D-40, D-41 |
+| 0 | [WEB](../prompts/WEB.md) · Sitio comercial gestiahr.com | — | 10 | 3 | 0 | 41 | Sí | D-39, D-40, D-41 |
 | 1 | [ORG](../prompts/ORG.md) · Estructura organizacional | Core HR | 7 | 0 | 7 | 64 | — | — |
 | 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 47 | — | D-05 |
 | 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 63 | — | A-05, A-10, D-14, D-17, D-35 |

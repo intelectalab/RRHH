@@ -3,7 +3,7 @@
 Sitio público de GestiaHR: inicio, páginas de producto, Suite, precios, registro de prueba y suscripción, demo, blog, SEO, chatbot comercial y su administración en la consola.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** —.
-- **Actividades:** 13 (10 historias y 3 tareas); 0 del MVP. **Operaciones de API:** 39.
+- **Actividades:** 13 (10 historias y 3 tareas); 0 del MVP. **Operaciones de API:** 41.
 - **Especificación:** `kit/docs/modulos/M-WEB.md`.
 - **Ya avanzado en el kit:** Sitio de referencia de 47 pantallas en `kit/docs/web/sitio/`, con SEO, textos legales y blog (`kit/tools/sitio/`).
 

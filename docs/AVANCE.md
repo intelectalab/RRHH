@@ -7,7 +7,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
 | Primer corte comercial (MVP) | 241 | 197 | 0 | 81,7 % |
-| Backlog completo | 512 | 201 | 0 | 39,3 % |
+| Backlog completo | 512 | 204 | 0 | 39,8 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -103,9 +103,9 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | WEB-2 | Catálogo de productos ligado a los módulos | WEB | Fase 0 · Cimientos | Task | — | hecha | 2026-11-20 | Catálogo público con productos según módulos publicados, planes con precio del catálogo y complementos; la consola publica o retira módulos (auditado). |
 | WEB-3 | Inicio, páginas de producto y página de la Suite | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | Inicio, cinco páginas de producto y /suite; precios leídos del catálogo, «Consultar» sin precio cargado, lista de espera en lo «Próximamente». |
 | WEB-4 | Precios, comparador y selector de módulos | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | /precios con comparador y selector de módulos; cotización en el servidor (requisitos, «Avísame» sin cobro, sin total mientras el IGV esté por validar). |
-| WEB-5 | Registro de prueba y suscripción en tres pasos | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
-| WEB-6 | Agendar demo, contacto y partners | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
-| WEB-7 | Lista de espera de lo que está en «Próximamente» | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
+| WEB-5 | Registro de prueba y suscripción en tres pasos | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | Registro de prueba en 3 pasos (código al correo, RUC y subdominio, plan desde /precios), alta de la organización en prueba sin pago, antiabuso e idempotencia. |
+| WEB-6 | Agendar demo, contacto y partners | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | Agenda de demo con confirmación, reprogramar o cancelar por enlace y recordatorio; formularios de contacto y partners. |
+| WEB-7 | Lista de espera de lo que está en «Próximamente» | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | Lista de espera de lo «Próximamente» con aviso único al publicar, vista en consola y enlace «Ingresar». |
 | WEB-8 | Blog, boletín y comentarios moderados | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
 | WEB-9 | SEO técnico y páginas por módulo e industria | WEB | Fase 0 · Cimientos | Task | — | pendiente | — |  |
 | WEB-10 | Chatbot comercial del sitio | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
