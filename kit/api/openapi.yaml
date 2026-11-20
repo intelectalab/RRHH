@@ -34015,6 +34015,24 @@ paths:
       x-phase: 0
       x-permission: platform.web_settings.update
       operationId: patchPlatformWebSettings
+  /platform/web-waitlist:
+    get:
+      summary: WEB-7 · Cuántas empresas esperan cada módulo en «Próximamente» y cuántas ya fueron avisadas
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: platform.web_leads.view
+      operationId: getPlatformWebWaitlist
   /position-options:
     get:
       summary: 'Opciones para el formulario de posiciones: puestos, empresas, unidades, sedes, centros de costo y posiciones
@@ -36406,7 +36424,8 @@ paths:
       security: []
   /public/demo-bookings:
     post:
-      summary: 'Sitio: agendar una demo'
+      summary: 'WEB-6 · Sitio: agendar una demo en un horario ofrecido; crea el lead con origen y consentimiento, confirma
+        por correo con el enlace para reprogramar o cancelar y devuelve manage_token. 409 si el horario ya no está libre'
       requestBody:
         required: true
         content:
@@ -36416,13 +36435,14 @@ paths:
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
-        '200':
-          description: Correcto
+        '201':
+          description: Creado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
         '400': *id003
+        '409': *id005
         '422': *id006
         '429': *id007
       tags:
@@ -36431,9 +36451,33 @@ paths:
       x-permission: public
       operationId: postPublicDemoBookings
       security: []
+  /public/demo-bookings/{token}:
+    get:
+      summary: 'WEB-6 · Sitio: ver la demo desde el enlace del correo (para reprogramar o cancelar)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '404': *id004
+      tags:
+      - WEB
+      x-phase: 0
+      x-permission: public
+      operationId: getPublicDemoBookingsToken
+      security: []
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
   /public/demo-bookings/{token}/cancel:
     post:
-      summary: 'Sitio: cancelar o reprogramar una demo desde el enlace del correo'
+      summary: 'WEB-6 · Sitio: cancelar (action=cancel) o reprogramar (action=reschedule con starts_at) una demo desde el
+        enlace del correo; 409 si ya pasó o se cerró, o si el horario nuevo no está libre'
       requestBody:
         required: true
         content:
@@ -36456,6 +36500,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '400': *id003
         '404': *id004
+        '409': *id005
         '422': *id006
         '429': *id007
       tags:
@@ -36466,7 +36511,16 @@ paths:
       security: []
   /public/demo-slots:
     get:
-      summary: 'Sitio: horarios libres para agendar una demo'
+      summary: 'WEB-6 · Sitio: horarios libres para agendar una demo desde ?from, dentro del horario de la consola y con la
+        anticipación mínima; nunca los ya tomados'
+      parameters:
+      - name: from
+        in: query
+        required: false
+        description: Primer día a mostrar (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
       responses:
         '200':
           description: Correcto
@@ -36474,6 +36528,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '422': *id006
       tags:
       - WEB
       x-phase: 0
@@ -36637,7 +36693,8 @@ paths:
       security: []
   /public/leads:
     post:
-      summary: 'Sitio: formulario de contacto, partner, boletín, calculadora o lista de espera (con consentimiento)'
+      summary: 'WEB-6 · WEB-7 · Sitio: formulario de contacto, partner, boletín, calculadora o lista de espera (module_code
+        de un módulo en «Próximamente»), con consentimiento, página de origen y campaña (RN-WEB-09); confirma por correo'
       requestBody:
         required: true
         content:
@@ -36647,8 +36704,8 @@ paths:
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
-        '200':
-          description: Correcto
+        '201':
+          description: Creado
           content:
             application/json:
               schema:
@@ -36708,7 +36765,8 @@ paths:
       security: []
   /public/ruc/{ruc}:
     get:
-      summary: 'Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado)'
+      summary: 'WEB-5 · Sitio: validar un RUC (dígito verificador y si ya tiene una organización en GestiaHR); la razón social
+        la escribe la persona'
       responses:
         '200':
           description: Correcto
@@ -36731,7 +36789,9 @@ paths:
           type: string
   /public/signups:
     post:
-      summary: 'Sitio: iniciar un registro de prueba o suscripción (paso cuenta)'
+      summary: 'WEB-5 · Sitio: iniciar un registro de prueba (paso cuenta: nombre, correo y consentimiento). Envía un código
+        de verificación por correo y devuelve el token del registro (solo su hash queda en base). Antiabuso: campo trampa
+        website, captcha_token por el puerto de captcha y límite por IP; con Idempotency-Key no crea otro registro'
       requestBody:
         required: true
         content:
@@ -36741,13 +36801,14 @@ paths:
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       responses:
-        '200':
-          description: Correcto
+        '201':
+          description: Creado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
         '400': *id003
+        '409': *id005
         '422': *id006
         '429': *id007
       tags:
@@ -36758,7 +36819,9 @@ paths:
       security: []
   /public/signups/{token}:
     patch:
-      summary: 'Sitio: guardar el paso empresa o plan de un registro en curso'
+      summary: 'WEB-5 · Sitio: confirmar el correo (verification_code), pedir otro código (resend_code), guardar la empresa
+        (company: ruc, company_name, employees_range, labor_regime, subdomain; RN-WEB-06) o el plan (plan, addons, billing_cycle).
+        409 si el registro ya terminó'
       requestBody:
         required: true
         content:
@@ -36774,6 +36837,7 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '400': *id003
         '404': *id004
+        '409': *id005
         '422': *id006
         '429': *id007
       tags:
@@ -36790,7 +36854,9 @@ paths:
           type: string
   /public/signups/{token}/complete:
     post:
-      summary: 'Sitio: completar el registro; crea la organización o inicia el pago'
+      summary: 'WEB-5 · Sitio: completar el registro: crea la organización con su empresa, subdominio, administrador (invitado
+        por correo a crear su contraseña), suscripción en prueba y módulos del plan, con el mismo servicio que la consola
+        (RN-WEB-05). Repetirlo devuelve la misma organización. Por ahora solo prueba (mode=trial)'
       requestBody:
         required: true
         content:

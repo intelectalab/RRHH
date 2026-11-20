@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CatalogNotice, Faq, PlanCard, StatusBadge, productText } from '@/components/Blocks'
+import { LeadForm } from '@/components/Forms'
 import { SiteShell } from '@/components/Shell'
 import { PRODUCT_COLOR, PRODUCT_SLUGS, addonForProduct, fetchCatalog, plansIncluding, productBySlug } from '@/lib/catalog'
 import { LOCALES, content, href, isLocale, type Locale } from '@/lib/i18n'
@@ -74,6 +75,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           <div className="wrap">
             <h2 className="h2">{t.product_page.waitlist_title}</h2>
             <p className="lead">{t.product_page.waitlist_text}</p>
+            <div className="narrow"><LeadForm lang={lang} t={t} kind="waitlist" modules={pending.map((m) => ({ code: m.code, name: m.name }))} /></div>
             <Link className="btn btn-line" href={`${href(lang, '/precios')}#armar`}>{t.product_page.see_pricing}</Link>
           </div>
         </section>

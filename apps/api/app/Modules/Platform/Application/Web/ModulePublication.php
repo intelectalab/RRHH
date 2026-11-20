@@ -13,7 +13,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ModulePublication
 {
-    public function __construct(private readonly ConsoleAudit $audit) {}
+    public function __construct(
+        private readonly ConsoleAudit $audit,
+        private readonly SiteLeads $leads,
+        private readonly WebMessages $messages,
+    ) {}
 
     /**
      * @return list<array{code: string, name: string, phase: int, is_core: bool, is_published: bool, published_at: string|null, depends_on: list<string>}>
@@ -45,6 +49,10 @@ final class ModulePublication
                 $this->audit->record($published ? 'module.published' : 'module.unpublished', $actor, 'module', (string) $module->id,
                     ['is_published' => (bool) $module->is_published], ['is_published' => $published]);
             });
+            // WEB-7 · RN-WEB-08: publicar avisa una sola vez a su lista de espera.
+            if ($published && $this->leads->notifyWaitlist($code) > 0) {
+                app()->terminating(fn () => $this->messages->deliver(100));
+            }
         }
 
         return collect($this->list())->firstWhere('code', $code) ?? [];

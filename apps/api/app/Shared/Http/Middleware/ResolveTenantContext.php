@@ -33,6 +33,13 @@ final class ResolveTenantContext
         // WEB-2 · WEB-4: catálogo y cotización del sitio comercial, de la plataforma y sin organización.
         'api/v1/public/catalog',
         'api/v1/public/quote',
+        // WEB-5 a WEB-7: registro, leads y demos del sitio, sin organización.
+        'api/v1/public/ruc/',
+        'api/v1/public/subdomains/',
+        'api/v1/public/signups',
+        'api/v1/public/leads',
+        'api/v1/public/demo-slots',
+        'api/v1/public/demo-bookings',
         'api/documentation',
         'docs',
         'up',

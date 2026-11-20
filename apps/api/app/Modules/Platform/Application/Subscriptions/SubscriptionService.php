@@ -83,7 +83,7 @@ final class SubscriptionService
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    public function create(array $input, PlatformUser $actor): array
+    public function create(array $input, ?PlatformUser $actor): array
     {
         $tenant = $this->tenants->find((string) $input['tenant_id']);
         if (in_array($tenant->status, ['cancelled', 'deleted'], true)) {
@@ -244,7 +244,7 @@ final class SubscriptionService
      *
      * @return array<string, mixed>
      */
-    public function addAddon(string $id, string $addonId, int $quantity, PlatformUser $actor): array
+    public function addAddon(string $id, string $addonId, int $quantity, ?PlatformUser $actor): array
     {
         $sub = $this->find($id);
         if ($sub->status === 'cancelled') {

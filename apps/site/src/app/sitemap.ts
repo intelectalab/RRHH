@@ -3,7 +3,7 @@ import { PRODUCT_SLUGS } from '@/lib/catalog'
 import { LOCALES, href } from '@/lib/i18n'
 import { siteUrl } from '@/lib/seo'
 
-const PAGES = ['/', '/suite', '/precios', ...PRODUCT_SLUGS.map((s) => `/${s}`)]
+const PAGES = ['/', '/suite', '/precios', '/demo', '/contacto', '/partners', ...PRODUCT_SLUGS.map((s) => `/${s}`)]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return PAGES.map((path) => ({

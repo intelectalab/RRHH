@@ -1,12 +1,12 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SiteShell } from '@/components/Shell'
+import { SignupFlow } from '@/components/SignupFlow'
 import { fetchCatalog } from '@/lib/catalog'
-import { content, href, isLocale, type Locale } from '@/lib/i18n'
+import { content, isLocale, type Locale } from '@/lib/i18n'
 
 /**
- * Destino del selector de precios (WEB-4). El registro en tres pasos es WEB-5: mientras tanto esta página recibe la
- * elección y no se indexa.
+ * WEB-5 · Registro de prueba en tres pasos. Recibe la elección hecha en /precios (plan, ciclo, complementos y lo que
+ * quedó en «Próximamente») y no se indexa.
  */
 export const dynamic = 'force-dynamic'
 
@@ -22,8 +22,15 @@ export default async function SignupPage({ params, searchParams }: { params: Pro
   const lang: Locale = isLocale(raw) ? raw : 'es'
   const t = content(lang)
   const catalog = await fetchCatalog()
-  const plan = catalog?.plans.find((p) => p.code === query.plan)
-  const addons = (query.complementos ?? '').split(',').filter(Boolean).map((c) => catalog?.addons.find((a) => a.code === c)?.name ?? c)
+  const plan = catalog?.plans.find((p) => p.code === query.plan) ?? null
+  const codes = (query.complementos ?? '').split(',').filter(Boolean)
+  const addons = codes.flatMap((c) => {
+    const addon = catalog?.addons.find((a) => a.code === c)
+    return addon ? [{ code: addon.code, name: addon.name }] : []
+  })
+  const modules = new Set((catalog?.modules ?? []).filter((m) => !m.published).map((m) => m.code))
+  const waitlist = (query.aviso ?? '').split(',').filter((c) => modules.has(c))
+  const cycle = query.ciclo === 'annual' ? 'annual' : plan?.billing_cycle ?? 'monthly'
 
   return (
     <SiteShell lang={lang} catalog={catalog} path="/registro">
@@ -34,17 +41,8 @@ export default async function SignupPage({ params, searchParams }: { params: Pro
         </div>
       </div>
       <section className="sec-sm">
-        <div className="wrap">
-          {plan && (
-            <div className="box">
-              <h2 className="h2">{t.signup.summary}</h2>
-              <ul className="pts">
-                <li>{plan.name}</li>
-                {addons.map((a) => <li key={a}>{a}</li>)}
-              </ul>
-            </div>
-          )}
-          <Link className="btn btn-line" href={href(lang, '/precios')}>{t.signup.back}</Link>
+        <div className="wrap narrow">
+          <SignupFlow lang={lang} t={t} choice={{ plan: plan?.code ?? null, planName: plan?.name ?? null, cycle, addons, waitlist }} />
         </div>
       </section>
     </SiteShell>
