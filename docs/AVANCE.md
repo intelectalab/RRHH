@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 195 | 0 | 80,9 % |
-| Backlog completo | 512 | 199 | 0 | 38,9 % |
+| Primer corte comercial (MVP) | 241 | 197 | 0 | 81,7 % |
+| Backlog completo | 512 | 201 | 0 | 39,3 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -238,8 +238,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | CPT-3 | Afectaciones de cada concepto | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Afectaciones por datos con sustento y naturaleza en la proyección; matriz conceptos × bases. |
 | CPT-4 | Contabilización por concepto | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Plan de cuentas de planilla y reglas contables por concepto (general, empresa, centro de costo o categoría; gana la más específica), ADR 0020. |
 | CPT-5 | Conceptos peruanos precargados | CPT | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Paquete country-pe 1.1.0 con conceptos peruanos precargados, fórmulas solo con parámetros y códigos de Tabla 22 «por validar». |
-| CPT-6 | Importación de conceptos e incidencias | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| CPT-7 | Códigos de la tabla de conceptos y naturaleza en la proyección de quinta | CPT | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
+| CPT-6 | Importación de conceptos e incidencias | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Importadores de conceptos (en borrador, validados con el motor) e incidencias del periodo con las reglas de PER-2; deshacer a la papelera mientras el periodo esté abierto. |
+| CPT-7 | Códigos de la tabla de conceptos y naturaleza en la proyección de quinta | CPT | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Tabla 22 SUNAT cotejada (45 códigos) cargada como tabla paramétrica; código inexistente se rechaza; afecto a quinta exige naturaleza en la proyección; EsSalud 0804 por confirmar. |
 | PAR-1 | Parámetros legales generales | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Catálogo de parámetros legales con historial y norma; valor propio solo si es más favorable; confirmación de lo «por validar» antes del cierre. |
 | PAR-2 | Tablas de AFP | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Tablas de AFP por periodo cargadas desde la consola o por CSV; el motor las usa. |
 | PAR-3 | Escala y deducciones de renta de quinta | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Escala y deducciones de renta de quinta con vigencia. |
