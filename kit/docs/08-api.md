@@ -942,6 +942,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/construction-assignments` | `payroll.construction_assignments.{view,create}` | 3 |
 | GET | `/construction-assignments/{id}` | `payroll.construction_assignments.view` | 3 |
 | POST | `/construction-assignments/{id}/cancel` | `payroll.construction_assignments.cancel` | 3 |
+| GET | `/employments/{employment_id}/payroll-regime` | `payroll.regimes.view` | 3 |
+| POST | `/employments/{employment_id}/payroll-regime` | `people.employments.update` | 3 |
+| POST | `/payroll-formulas/validate` | `payroll.concepts.test` | 3 |
+| GET | `/payroll-calculation-order` | `payroll.concepts.view` | 3 |
+| POST | `/payroll-test-bench` | `payroll.concepts.test` | 3 |
 
 **CPT · Conceptos y fórmulas**
 

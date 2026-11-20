@@ -5614,6 +5614,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{employment_id}/payroll-regime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-2 · Régimen laboral vigente a una fecha (as_of) con su origen (propio del trabajador o de la empresa), si el paquete del país lo soporta, e historia */
+        get: operations["getEmploymentsEmploymentIdPayrollRegime"];
+        put?: never;
+        /** NOM-2 · Cambiar el régimen laboral del trabajador desde una fecha efectiva (labor_regime_code, valid_from, reason): cierra el tramo vigente y abre otro; micro y pequeña empresa exigen la acreditación vigente de la empresa (RN-NOM-19) */
+        post: operations["postEmploymentsEmploymentIdPayrollRegime"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{employment_id}/pension-affiliations": {
         parameters: {
             query?: never;
@@ -10382,6 +10400,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-calculation-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-4 · Orden determinista de cálculo de los conceptos vigentes a la fecha con sus dependencias (opcional: régimen y tipo de proceso); 422 cycle con los conceptos del ciclo */
+        get: operations["getPayrollCalculationOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-concepts": {
         parameters: {
             query?: never;
@@ -10472,6 +10507,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPayrollConceptsIdTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-formulas/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-3 · Revisar una fórmula antes de guardarla (formula, concept_code?, as_of?): sintaxis, funciones, datos, conceptos, incidencias y parámetros existentes y que no forme un ciclo; devuelve valid, errors con posición, references y el orden resultante */
+        post: operations["postPayrollFormulasValidate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10789,6 +10841,23 @@ export interface paths {
         get: operations["getPayrollResultsId"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-test-bench": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-5 · Banco de pruebas: calcular una relación en un periodo (hasta 93 días) sin guardar nada, opcionalmente con datos e incidencias hipotéticos; devuelve contexto (tramos, días, ausencias), líneas con su traza (fórmula, datos, parámetros con vigencia) y totales. Montos, contexto y traza solo con payroll.results.view */
+        post: operations["postPayrollTestBench"];
         delete?: never;
         options?: never;
         head?: never;
@@ -39424,6 +39493,71 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    getEmploymentsEmploymentIdPayrollRegime: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postEmploymentsEmploymentIdPayrollRegime: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getEmploymentsEmploymentIdPensionAffiliations: {
         parameters: {
             query?: never;
@@ -50880,6 +51014,37 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getPayrollCalculationOrder: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia de los conceptos (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+                /** @description Solo los conceptos que aplican a ese régimen laboral */
+                regime?: string;
+                /** @description Solo los conceptos de ese tipo de proceso (regular, gratification, cts, profit_sharing, settlement, special) */
+                period_kind?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     getPayrollConcepts: {
         parameters: {
             query?: {
@@ -51132,6 +51297,38 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPayrollFormulasValidate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPayrollIncidents: {
@@ -51872,6 +52069,38 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    postPayrollTestBench: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPayslips: {

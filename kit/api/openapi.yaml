@@ -14261,6 +14261,75 @@ paths:
       x-phase: 2
       x-permission: time.absences.manage_subsidy
       operationId: getEmploymentsEmploymentIdMedicalLeaveSummary
+  /employments/{employment_id}/payroll-regime:
+    get:
+      summary: NOM-2 · Régimen laboral vigente a una fecha (as_of) con su origen (propio del trabajador o de la empresa),
+        si el paquete del país lo soporta, e historia
+      parameters:
+      - name: employment_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.regimes.view
+      operationId: getEmploymentsEmploymentIdPayrollRegime
+    post:
+      summary: 'NOM-2 · Cambiar el régimen laboral del trabajador desde una fecha efectiva (labor_regime_code, valid_from,
+        reason): cierra el tramo vigente y abre otro; micro y pequeña empresa exigen la acreditación vigente de la empresa
+        (RN-NOM-19)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: employment_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: people.employments.update
+      operationId: postEmploymentsEmploymentIdPayrollRegime
   /employments/{employment_id}/pension-affiliations:
     get:
       summary: Historia de la afiliación previsional (sistema, administradora, tipo de comisión) con vigencia; el código de
@@ -25625,6 +25694,46 @@ paths:
       x-phase: 5
       x-permission: compensation.pay_equity.view
       operationId: getPayEquityReport
+  /payroll-calculation-order:
+    get:
+      summary: 'NOM-4 · Orden determinista de cálculo de los conceptos vigentes a la fecha con sus dependencias (opcional:
+        régimen y tipo de proceso); 422 cycle con los conceptos del ciclo'
+      parameters:
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha de vigencia de los conceptos (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
+      - name: regime
+        in: query
+        required: false
+        description: Solo los conceptos que aplican a ese régimen laboral
+        schema:
+          type: string
+      - name: period_kind
+        in: query
+        required: false
+        description: Solo los conceptos de ese tipo de proceso (regular, gratification, cts, profit_sharing, settlement, special)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.concepts.view
+      operationId: getPayrollCalculationOrder
   /payroll-concepts:
     get:
       summary: Listar PayrollConcept
@@ -25882,6 +25991,36 @@ paths:
       x-phase: 3
       x-permission: payroll.concepts.test
       operationId: postPayrollConceptsIdTest
+  /payroll-formulas/validate:
+    post:
+      summary: 'NOM-3 · Revisar una fórmula antes de guardarla (formula, concept_code?, as_of?): sintaxis, funciones, datos,
+        conceptos, incidencias y parámetros existentes y que no forme un ciclo; devuelve valid, errors con posición, references
+        y el orden resultante'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.concepts.test
+      operationId: postPayrollFormulasValidate
   /payroll-incidents:
     get:
       summary: Listar PayrollIncident
@@ -26618,6 +26757,36 @@ paths:
       x-phase: 3
       x-permission: payroll.results.view
       operationId: getPayrollResultsId
+  /payroll-test-bench:
+    post:
+      summary: 'NOM-5 · Banco de pruebas: calcular una relación en un periodo (hasta 93 días) sin guardar nada, opcionalmente
+        con datos e incidencias hipotéticos; devuelve contexto (tramos, días, ausencias), líneas con su traza (fórmula, datos,
+        parámetros con vigencia) y totales. Montos, contexto y traza solo con payroll.results.view'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.concepts.test
+      operationId: postPayrollTestBench
   /payslips:
     get:
       summary: Listar Payslip

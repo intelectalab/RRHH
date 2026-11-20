@@ -1,0 +1,12 @@
+period: { from: "2026-03-01", to: "2026-03-31", kind: regular }
+employment:
+  hire_date: "2026-03-11"
+  regime: pe_general
+  compensations:
+    - { amount: "3100.00", valid_from: "2026-03-11" }
+incidents: {}
+variables:
+  dias_sin_goce: "2"
+concepts:
+  - { code: BASICO, kind: earning, formula: "sueldo_tramos", sort_order: 1 }
+  - { code: SIN_GOCE, kind: deduction, formula: "redondear(sueldo / dias_base * dias_sin_goce, 2)", sort_order: 2 }

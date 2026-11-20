@@ -1,0 +1,15 @@
+status: calculated
+segments:
+  - { from: "2026-03-01", to: "2026-03-15", days: 15 }
+  - { from: "2026-03-16", to: "2026-03-31", days: 15 }
+lines:
+  BASICO: "3300.00"
+  BONO: "250.00"
+  APORTE: "429.00"
+  CONTRIB: "297.00"
+totals:
+  earnings: "3550.00"
+  deductions: "429.00"
+  net: "3121.00"
+  employer_contributions: "297.00"
+  employer_cost: "3847.00"

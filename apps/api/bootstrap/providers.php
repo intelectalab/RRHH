@@ -12,6 +12,7 @@ use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\Imports\ImportsServiceProvider;
 use App\Modules\Notifications\NotificationsServiceProvider;
 use App\Modules\Organization\OrganizationServiceProvider;
+use App\Modules\Payroll\PayrollServiceProvider;
 use App\Modules\Platform\PlatformServiceProvider;
 use App\Modules\Reports\ReportsServiceProvider;
 use App\Modules\SelfService\SelfServiceServiceProvider;
@@ -40,4 +41,5 @@ return [
     HelpdeskServiceProvider::class,
     HelpCenterServiceProvider::class,
     DocumentsServiceProvider::class,
+    PayrollServiceProvider::class,
 ];

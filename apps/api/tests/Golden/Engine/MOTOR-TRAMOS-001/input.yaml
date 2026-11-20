@@ -1,0 +1,14 @@
+period: { from: "2026-03-01", to: "2026-03-31", kind: regular }
+employment:
+  hire_date: "2025-01-01"
+  regime: pe_general
+  compensations:
+    - { amount: "3000.00", valid_from: "2025-01-01", valid_to: "2026-03-15" }
+    - { amount: "3600.00", valid_from: "2026-03-16" }
+incidents:
+  BONO: { amount: "250.00" }
+concepts:
+  - { code: BASICO, kind: earning, formula: "sueldo_tramos", sort_order: 1 }
+  - { code: BONO, kind: earning, sort_order: 2 }
+  - { code: APORTE, kind: employee_contribution, formula: "redondear(concepto.BASICO * param.tasa_prueba_trabajador / 100, 2)", sort_order: 3 }
+  - { code: CONTRIB, kind: employer_contribution, formula: "concepto.BASICO * param.tasa_prueba_empleador / 100", sort_order: 4 }

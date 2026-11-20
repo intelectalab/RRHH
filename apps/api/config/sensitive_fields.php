@@ -91,6 +91,12 @@ return [
     ],
     'Offer' => ['salary' => ['recruiting.offers.amount.view', 'salary']],
     'PayrollPeriod' => ['totals' => ['payroll.results.view', 'salary']],
+    // NOM-5 · Banco de pruebas: montos, sueldo del contexto y traza solo con el permiso de resultados.
+    'PayrollTestBench' => [
+        'lines' => ['payroll.results.view', 'salary'],
+        'totals' => ['payroll.results.view', 'salary'],
+        'context' => ['payroll.results.view', 'salary'],
+    ],
     'PayrollResult' => [
         'earnings' => ['payroll.results.view', 'salary'],
         'deductions' => ['payroll.results.view', 'salary'],

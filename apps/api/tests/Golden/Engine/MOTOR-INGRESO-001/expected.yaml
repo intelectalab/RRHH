@@ -1,0 +1,12 @@
+status: calculated
+segments:
+  - { from: "2026-03-11", to: "2026-03-31", days: 21 }
+lines:
+  BASICO: "2170.00"
+  SIN_GOCE: "206.67"
+totals:
+  earnings: "2170.00"
+  deductions: "206.67"
+  net: "1963.33"
+  employer_contributions: "0.00"
+  employer_cost: "2170.00"

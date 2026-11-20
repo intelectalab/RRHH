@@ -143,6 +143,8 @@ final class CrossTenantHarness
         // COL-7: previsión, salud, coberturas y declaraciones de Vida Ley de una relación de A; pólizas y entidades de A.
         '/employments/{employment_id}/pension-affiliations' => PensionAffiliation::class,
         '/employments/{employment_id}/health-regimes' => HealthRegime::class,
+        // NOM-2 · El régimen de la relación vive en employment_labor_regimes (el mismo modelo de COL-7).
+        '/employments/{employment_id}/payroll-regime' => HealthRegime::class,
         '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,
         '/employments/{employment_id}/insurance-coverages/{id}/end' => InsuranceCoverage::class,
         '/employments/{employment_id}/life-insurance-declarations' => LifeInsuranceBeneficiary::class,
@@ -239,10 +241,12 @@ final class CrossTenantHarness
      * AYU-2 · AYU-3: la ayuda del producto es contenido de la plataforma, el mismo para todas las
      * organizaciones (help_articles no tiene tenant_id). Lo que cambia por organización es qué artículos se
      * ven (módulos contratados, roles y pantallas, RN-AYU-01), y eso se prueba en HelpCenterTest.
+     * NOM-2: los regímenes laborales son catálogo del país (labor_regimes sin tenant_id) con la estrategia
+     * del paquete; el régimen de cada relación sí se aísla (/employments/{employment_id}/payroll-regime).
      *
      * @var array<int, string>
      */
-    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete'];
+    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete', '/payroll-regimes', '/payroll-regimes/{id}'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];
