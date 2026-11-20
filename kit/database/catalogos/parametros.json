@@ -446,6 +446,21 @@
       }
     },
     {
+      "codigo": "automatizaciones.errores_seguidos",
+      "modulo": "base",
+      "nombre": "Fallas seguidas para avisar",
+      "tipo": "integer",
+      "valor_por_defecto": 3,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "WFL-7 · Ejecuciones fallidas seguidas de una regla a partir de las cuales se marca «con errores» y se avisa una vez a su responsable.",
+      "opciones": {
+        "min": 1,
+        "max": 50
+      }
+    },
+    {
       "codigo": "notificaciones.canales_activos",
       "modulo": "base",
       "nombre": "Canales de notificación",

@@ -38,6 +38,10 @@ return [
             'in_app' => ['subject' => '{title}', 'body' => '{message}'],
             'email' => ['subject' => '{title}', 'body' => "Olá {name},\n\n{message}\n\nMais detalhes aqui: {link}"],
         ],
+        'automation.failing' => [
+            'in_app' => ['subject' => 'Uma automação está falhando', 'body' => 'A regra “{rule}” falhou {count} vezes seguidas. Último erro: {error}'],
+            'email' => ['subject' => 'Uma automação está falhando', 'body' => "Olá {name},\n\nA regra de automação “{rule}”, da qual você é responsável, falhou {count} vezes seguidas.\n\nÚltimo erro: {error}\n\nRevise aqui: {link}"],
+        ],
         'automation.paused' => [
             'in_app' => ['subject' => 'Uma automação foi pausada', 'body' => 'A regra “{rule}” foi pausada porque foi executada muitas vezes seguidas. Revise-a antes de reativá-la.'],
             'email' => ['subject' => 'Uma automação foi pausada', 'body' => "Olá {name},\n\nA regra de automação “{rule}” foi pausada automaticamente porque foi executada muitas vezes em uma hora (possível loop). Revise-a antes de reativá-la.\n\nAbra aqui: {link}"],

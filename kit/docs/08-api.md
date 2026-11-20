@@ -369,12 +369,17 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/workflow-runs` | `workflow.runs.view` | 0 |
 | GET | `/workflow-runs/{id}` | `workflow.runs.view` | 0 |
 | POST | `/workflow-runs/{id}/{retry,cancel}` | `workflow.runs.{retry,cancel}` | 0 |
+| GET, POST | `/visual-flows` | `workflow.workflows.{view,create}` | 0 |
+| GET, PATCH | `/visual-flows/{id}` | `workflow.workflows.{view,update}` | 0 |
+| POST | `/visual-flows/{id}/{activate,pause,retire}` | `workflow.workflows.{activate,pause,retire}` | 0 |
 | GET, POST | `/tasks` | `workflow.tasks.{view,create}` | 0 |
 | GET, PATCH | `/tasks/{id}` | `workflow.tasks.{view,update}` | 0 |
 | POST | `/tasks/{id}/{complete,cancel}` | `workflow.tasks.{complete,cancel}` | 0 |
 | GET | `/inbox` | sesión | 0 |
 | POST | `/approval-requests/bulk-approve` | `workflow.approval_requests.approve` | 0 |
 | GET | `/workflows/catalog` | `workflow.workflows.view` | 0 |
+| POST | `/visual-flows/{id}/publish` | `workflow.workflows.activate` | 0 |
+| POST | `/visual-flows/{id}/test` | `workflow.workflows.update` | 0 |
 | POST | `/workflows/{id}/test` | `workflow.workflows.update` | 0 |
 | POST | `/tasks/{id}/start` | `workflow.tasks.complete` | 0 |
 

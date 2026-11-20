@@ -5,6 +5,7 @@ use App\Modules\Workflow\Http\Controllers\ApprovalRequestController;
 use App\Modules\Workflow\Http\Controllers\AutomationRuleController;
 use App\Modules\Workflow\Http\Controllers\AutomationRunController;
 use App\Modules\Workflow\Http\Controllers\TaskController;
+use App\Modules\Workflow\Http\Controllers\VisualFlowController;
 use App\Shared\Inbox\InboxController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,17 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/workflows/{id}/pause', [AutomationRuleController::class, 'pause'])->middleware('permission:workflow.workflows.pause');
     Route::post('/workflows/{id}/retire', [AutomationRuleController::class, 'retire'])->middleware('permission:workflow.workflows.retire');
     Route::post('/workflows/{id}/test', [AutomationRuleController::class, 'test'])->middleware('permission:workflow.workflows.update');
+
+    // WFL-6 · Constructor visual: borradores, prueba con datos de ejemplo y versiones publicadas.
+    Route::get('/visual-flows', [VisualFlowController::class, 'index'])->middleware('permission:workflow.workflows.view');
+    Route::post('/visual-flows', [VisualFlowController::class, 'store'])->middleware('permission:workflow.workflows.create');
+    Route::get('/visual-flows/{id}', [VisualFlowController::class, 'show'])->middleware('permission:workflow.workflows.view');
+    Route::patch('/visual-flows/{id}', [VisualFlowController::class, 'update'])->middleware('permission:workflow.workflows.update');
+    Route::post('/visual-flows/{id}/test', [VisualFlowController::class, 'test'])->middleware('permission:workflow.workflows.update');
+    Route::post('/visual-flows/{id}/publish', [VisualFlowController::class, 'publish'])->middleware('permission:workflow.workflows.activate');
+    Route::post('/visual-flows/{id}/activate', [VisualFlowController::class, 'activate'])->middleware('permission:workflow.workflows.activate');
+    Route::post('/visual-flows/{id}/pause', [VisualFlowController::class, 'pause'])->middleware('permission:workflow.workflows.pause');
+    Route::post('/visual-flows/{id}/retire', [VisualFlowController::class, 'retire'])->middleware('permission:workflow.workflows.retire');
 
     Route::get('/workflow-runs', [AutomationRunController::class, 'index'])->middleware('permission:workflow.runs.view');
     Route::get('/workflow-runs/{id}', [AutomationRunController::class, 'show'])->middleware('permission:workflow.runs.view');

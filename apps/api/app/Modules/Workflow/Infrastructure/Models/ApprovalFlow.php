@@ -4,6 +4,7 @@ namespace App\Modules\Workflow\Infrastructure\Models;
 
 use App\Modules\Workflow\Database\Factories\ApprovalFlowFactory;
 use App\Shared\Tenancy\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +42,14 @@ class ApprovalFlow extends Model
     protected $guarded = ['id', 'tenant_id', 'lock_version'];
 
     protected $casts = ['lock_version' => 'integer'];
+
+    /**
+     * WFL-6 · La misma tabla guarda los flujos del constructor visual (kind automation): aquí solo los de aprobación.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('approval_flow', fn (Builder $q) => $q->where('kind', 'approval'));
+    }
 
     /**
      * @return HasMany<ApprovalFlowVersion, $this>

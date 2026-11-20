@@ -79,6 +79,33 @@ final class RuleConditions
     }
 
     /**
+     * WFL-7 · Qué evaluó cada condición: campo, operador, valor esperado, valor del evento y resultado.
+     *
+     * @param  array<mixed>|null  $conditions
+     * @param  array<mixed>  $payload
+     * @return list<array{field: string, op: string, value: mixed, actual: mixed, result: bool}>
+     */
+    public static function explain(?array $conditions, array $payload): array
+    {
+        $out = [];
+        foreach (array_values((array) ($conditions['rules'] ?? [])) as $rule) {
+            if (! is_array($rule)) {
+                continue;
+            }
+            $actual = self::get($payload, (string) ($rule['field'] ?? ''));
+            $out[] = [
+                'field' => (string) ($rule['field'] ?? ''),
+                'op' => (string) ($rule['op'] ?? ''),
+                'value' => $rule['value'] ?? null,
+                'actual' => is_scalar($actual) || $actual === null ? $actual : '[…]',
+                'result' => self::compare($rule, $payload),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * Valor de una ruta con puntos dentro del payload (null si no existe).
      *
      * @param  array<mixed>  $payload

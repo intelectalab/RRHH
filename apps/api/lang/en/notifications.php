@@ -38,6 +38,10 @@ return [
             'in_app' => ['subject' => '{title}', 'body' => '{message}'],
             'email' => ['subject' => '{title}', 'body' => "Hi {name},\n\n{message}\n\nMore details here: {link}"],
         ],
+        'automation.failing' => [
+            'in_app' => ['subject' => 'An automation is failing', 'body' => 'The rule “{rule}” failed {count} times in a row. Last error: {error}'],
+            'email' => ['subject' => 'An automation is failing', 'body' => "Hi {name},\n\nThe automation rule “{rule}”, which you own, failed {count} times in a row.\n\nLast error: {error}\n\nReview it here: {link}"],
+        ],
         'automation.paused' => [
             'in_app' => ['subject' => 'An automation paused itself', 'body' => 'The rule “{rule}” was paused because it ran too many times in a row. Review it before turning it back on.'],
             'email' => ['subject' => 'An automation paused itself', 'body' => "Hi {name},\n\nThe automation rule “{rule}” paused itself because it ran too many times in one hour (possible loop). Review it before turning it back on.\n\nOpen it here: {link}"],

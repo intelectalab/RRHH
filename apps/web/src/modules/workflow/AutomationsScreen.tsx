@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import Link from 'next/link'
 import { api, ApiRequestError, type Schema } from '@/lib/api'
 import { formErrors } from '@/lib/errors'
 import { useT } from '@/lib/useT'
@@ -34,9 +35,12 @@ type Action = {
   subject_id_field?: string
   requester_field?: string
 }
-type Rule = Omit<Schema<'Workflow'>, 'conditions' | 'actions'> & { conditions: { match?: 'all' | 'any'; rules?: Condition[] }; actions: Action[] }
+type RuleStats = { runs: number; failed: number; succeeded: number; skipped: number; last_error: string | null }
+type Rule = Omit<Schema<'Workflow'>, 'conditions' | 'actions' | 'stats'> & { conditions: { match?: 'all' | 'any'; rules?: Condition[] }; actions: Action[]; stats: Partial<RuleStats> }
 type RunAction = { index: number; type: ActionType; status: 'succeeded' | 'failed' | 'not_run'; error?: string }
-type Run = Omit<Schema<'WorkflowRun'>, 'actions'> & { actions: RunAction[] }
+type RunCondition = { field: string; op: Op; value?: unknown; actual?: unknown; result: boolean }
+type RunStep = { node: string; kind: string; label?: string; status: string; branch?: 'yes' | 'no'; error?: string }
+type Run = Omit<Schema<'WorkflowRun'>, 'actions' | 'conditions' | 'path' | 'payload'> & { actions: RunAction[]; conditions: RunCondition[]; path: RunStep[]; payload: Record<string, unknown> }
 type Catalog = { triggers: Array<{ event: string; fields: string[] }>; operators: Op[]; actions: Array<{ type: ActionType }>; subject_types: string[] }
 type Option = { id: string; name: string }
 type Preview = { matches: boolean; actions: Array<{ index: number; type: ActionType; status: 'ready' | 'error'; error?: string; params?: Record<string, unknown> }> }
@@ -64,18 +68,20 @@ export function AutomationsScreen() {
   const [loadError, setLoadError] = useState(false)
   const [editing, setEditing] = useState<Rule | 'new' | null>(null)
   const [openRun, setOpenRun] = useState<string | null>(null)
+  const [onlyFailing, setOnlyFailing] = useState(false)
+  const [runRule, setRunRule] = useState<string>('')
 
   const load = useCallback(async () => {
     try {
-      const [r, c] = await Promise.all([api.get<{ data: Rule[] }>('/workflows?per_page=100'), api.get<{ data: Catalog }>('/workflows/catalog')])
+      const [r, c] = await Promise.all([api.get<{ data: Rule[] }>(`/workflows?per_page=100${onlyFailing ? '&filter[failing]=1' : ''}`), api.get<{ data: Catalog }>('/workflows/catalog')])
       setRules(r.data)
       setCatalog(c.data)
-      if (can('workflow.runs.view')) setRuns((await api.get<{ data: Run[] }>('/workflow-runs?per_page=50')).data)
+      if (can('workflow.runs.view')) setRuns((await api.get<{ data: Run[] }>(`/workflow-runs?per_page=50${runRule ? `&filter[workflow_id]=${runRule}` : ''}`)).data)
       setLoadError(false)
     } catch {
       setLoadError(true)
     }
-  }, [can])
+  }, [can, onlyFailing, runRule])
   useEffect(() => { void load() }, [load])
 
   async function act(rule: Rule, action: 'activate' | 'pause' | 'retire') {
@@ -121,27 +127,43 @@ export function AutomationsScreen() {
             ))}
           </div>
         )}
+        {view === 'rules' && (
+          <label className="form-check mb-2">
+            <input type="checkbox" className="form-check-input" checked={onlyFailing} onChange={(e) => setOnlyFailing(e.target.checked)} /> {t('auto.only_failing')}
+          </label>
+        )}
+        {view === 'runs' && rules && rules.length > 0 && (
+          <div className="mb-2" style={{ maxWidth: 360 }}>
+            <label className="form-label" htmlFor="runs-rule">{t('auto.col_rule')}</label>
+            <select id="runs-rule" className="form-select" value={runRule} onChange={(e) => setRunRule(e.target.value)}>
+              <option value="">{t('auto.all_rules')}</option>
+              {rules.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+            </select>
+          </div>
+        )}
         {view === 'rules' ? (
           <section className="card">
             <div className="tabla-wrap">
               <table className="table">
-                <thead><tr><th>{t('auto.col_name')}</th><th>{t('auto.col_when')}</th><th>{t('auto.col_then')}</th><th>{t('auto.col_last')}</th><th>{t('auto.col_status')}</th><th /></tr></thead>
+                <thead><tr><th>{t('auto.col_name')}</th><th>{t('auto.col_when')}</th><th>{t('auto.col_then')}</th><th>{t('auto.col_runs')}</th><th>{t('auto.col_last')}</th><th>{t('auto.col_status')}</th><th /></tr></thead>
                 <tbody>
-                  {loadError && <tr><td colSpan={6}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
-                  {!loadError && rules === null && [1, 2].map((i) => <tr key={i}><td colSpan={6}><span className="esq" style={{ width: `${30 + i * 20}%` }} /></td></tr>)}
-                  {rules?.length === 0 && <tr><td colSpan={6}><EmptyState title={t('auto.empty_title')} text={t('auto.empty_text')} action={canCreate && catalog && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('auto.new')}</button>} /></td></tr>}
+                  {loadError && <tr><td colSpan={7}><ErrorState text={t('common.load_error')} retryLabel={t('common.retry')} onRetry={() => void load()} /></td></tr>}
+                  {!loadError && rules === null && [1, 2].map((i) => <tr key={i}><td colSpan={7}><span className="esq" style={{ width: `${30 + i * 20}%` }} /></td></tr>)}
+                  {rules?.length === 0 && <tr><td colSpan={7}><EmptyState title={t('auto.empty_title')} text={t('auto.empty_text')} action={canCreate && catalog && <button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}><Icon name="plus" /> {t('auto.new')}</button>} /></td></tr>}
                   {rules?.map((r) => (
                     <tr key={r.id}>
                       <td><b>{r.name}</b>{(r.conditions.rules?.length ?? 0) > 0 && <span className="sub2">{t('auto.n_conditions', { n: r.conditions.rules?.length ?? 0 })}</span>}</td>
                       <td>{eventLabel(t, r.trigger_event)}</td>
-                      <td>{r.actions.map((a) => t(`auto.action_${a.type}`)).join(' → ')}</td>
-                      <td className="nowrap">{when(r.last_run_at)}</td>
-                      <td><span className={`st ${ruleTone(r.status)}`}>{t(`auto.status_${r.status}`)}</span></td>
+                      <td>{r.managed_by_flow ? t('auto.by_flow') : r.actions.map((a) => t(`auto.action_${a.type}`)).join(' → ')}{r.owner_name && <span className="sub2">{t('auto.owner', { name: r.owner_name })}</span>}</td>
+                      <td className="nowrap">{t('auto.runs_n', { n: r.stats.runs ?? 0 })}{(r.stats.failed ?? 0) > 0 && <span className="sub2">{t('auto.errors_n', { n: r.stats.failed ?? 0 })}</span>}</td>
+                      <td className="nowrap">{when(r.last_run_at)}<span className="sub2">{r.next_run_at ? t('auto.next_run', { at: when(r.next_run_at) }) : t('auto.next_on_event')}</span></td>
+                      <td><span className={`st ${ruleTone(r.status)}`}>{t(`auto.status_${r.status}`)}</span>{r.failing && <span className="st er" style={{ marginLeft: 4 }} title={r.stats.last_error ?? undefined}>{t('auto.failing')}</span>}{r.failing && r.stats.last_error && <span className="sub2">{r.stats.last_error}</span>}</td>
                       <td className="text-end nowrap">
-                        {can('workflow.workflows.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('common.edit')}</button>}
+                        {can('workflow.runs.view') && <button type="button" className="btn btn-ter btn-sm" onClick={() => { setRunRule(r.id); setView('runs') }}>{t('auto.see_runs')}</button>}
+                        {r.managed_by_flow ? <Link className="btn btn-ter btn-sm" href={`/configuracion/constructor/${r.managed_by_flow}`}>{t('auto.open_builder')}</Link> : can('workflow.workflows.update') && <button type="button" className="btn btn-ter btn-sm" onClick={() => setEditing(r)}>{t('common.edit')}</button>}
                         {can('workflow.workflows.activate') && r.allowed_actions.includes('activate') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(r, 'activate')}>{t('auto.activate')}</button>}
                         {can('workflow.workflows.pause') && r.allowed_actions.includes('pause') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(r, 'pause')}>{t('auto.pause')}</button>}
-                        {can('workflow.workflows.retire') && r.allowed_actions.includes('retire') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(r, 'retire')}>{t('auto.retire')}</button>}
+                        {can('workflow.workflows.retire') && !r.managed_by_flow && r.allowed_actions.includes('retire') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void act(r, 'retire')}>{t('auto.retire')}</button>}
                       </td>
                     </tr>
                   ))}
@@ -163,16 +185,24 @@ export function AutomationsScreen() {
                         <b>{r.workflow_name ?? '—'}</b>
                         {r.attempts > 1 && <span className="sub2">{t('auto.attempts', { n: r.attempts })}</span>}
                         {openRun === r.id && (
-                          <ol className="small" style={{ margin: '8px 0 0', paddingLeft: 18 }}>
-                            {r.actions.map((a) => <li key={a.index}>{t(`auto.action_${a.type}`)} · <span className={`st ${runTone(a.status === 'not_run' ? 'skipped' : a.status)}`}>{t(`auto.astatus_${a.status}`)}</span>{a.error && <span className="sub2">{a.error}</span>}</li>)}
-                          </ol>
+                          <div className="small run-detail">
+                            <p className="mb-1"><b>{t('auto.detail_trigger')}</b> {r.event_type ? eventLabel(t, r.event_type) : '—'}{Object.keys(r.payload ?? {}).length > 0 && <span className="sub2">{Object.entries(r.payload).filter(([, v]) => v === null || typeof v !== 'object').slice(0, 8).map(([k, v]) => `${k}: ${String(v ?? '—')}`).join(' · ')}</span>}</p>
+                            <p className="mb-1"><b>{t('auto.detail_conditions')}</b>{r.conditions.length === 0 && <> {t('auto.detail_no_conditions')}</>}</p>
+                            {r.conditions.length > 0 && <ul style={{ margin: 0, paddingLeft: 18 }}>{r.conditions.map((c, i) => <li key={i}>{c.field} {t(`auto.op_${c.op}`)} {Array.isArray(c.value) ? c.value.join(', ') : String(c.value ?? '')} · {t('auto.detail_actual', { value: String(c.actual ?? '—') })} <span className={`st ${c.result ? 'ok' : 'gr'}`}>{t(c.result ? 'auto.detail_met' : 'auto.detail_not_met')}</span></li>)}</ul>}
+                            <p className="mb-1 mt-2"><b>{t('auto.detail_did')}</b>{r.actions.length === 0 && r.path.length === 0 && <> {t('auto.detail_nothing')}</>}</p>
+                            <ol style={{ margin: 0, paddingLeft: 18 }}>
+                              {r.actions.map((a) => <li key={a.index}>{t(`auto.action_${a.type}`)} · <span className={`st ${runTone(a.status === 'not_run' ? 'skipped' : a.status)}`}>{t(`auto.astatus_${a.status}`)}</span>{a.error && <span className="sub2">{a.error}</span>}</li>)}
+                              {r.path.map((p, i) => <li key={`p${i}`}>{p.label || t(`vflow.kind_${p.kind}`)} · {t(`vflow.step_${p.status}`, { days: 0 })}{p.branch && <> → {t(`vflow.branch_${p.branch}`)}</>}{p.error && <span className="sub2">{p.error}</span>}</li>)}
+                            </ol>
+                            {r.resume_at && <p className="mb-0 mt-1">{t('auto.resume_at', { at: when(r.resume_at) })}</p>}
+                          </div>
                         )}
                       </td>
                       <td>{r.event_type ? eventLabel(t, r.event_type) : '—'}</td>
                       <td className="nowrap">{when(r.started_at)}</td>
                       <td><span className={`st ${runTone(r.status)}`}>{t(`auto.rstatus_${r.status}`)}</span>{r.error && <span className="sub2">{r.error}</span>}{r.next_retry_at && <span className="sub2">{t('auto.next_retry', { at: when(r.next_retry_at) })}</span>}</td>
                       <td className="text-end nowrap">
-                        {r.actions.length > 0 && <button type="button" className="btn btn-ter btn-sm" aria-expanded={openRun === r.id} onClick={() => setOpenRun(openRun === r.id ? null : r.id)}>{t(openRun === r.id ? 'auto.hide_detail' : 'auto.show_detail')}</button>}
+                        {<button type="button" className="btn btn-ter btn-sm" aria-expanded={openRun === r.id} onClick={() => setOpenRun(openRun === r.id ? null : r.id)}>{t(openRun === r.id ? 'auto.hide_detail' : 'auto.show_detail')}</button>}
                         {can('workflow.runs.retry') && r.allowed_actions.includes('retry') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void runAct(r, 'retry')}>{t('auto.retry')}</button>}
                         {can('workflow.runs.cancel') && r.allowed_actions.includes('cancel') && <button type="button" className="btn btn-ter btn-sm" onClick={() => void runAct(r, 'cancel')}>{t('auto.cancel_run')}</button>}
                       </td>

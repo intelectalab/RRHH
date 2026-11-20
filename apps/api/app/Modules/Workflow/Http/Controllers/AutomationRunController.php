@@ -88,6 +88,11 @@ final class AutomationRunController
             'attempts' => (int) ($log['attempts'] ?? 1),
             'next_retry_at' => $log['next_retry_at'] ?? null,
             'actions' => array_values((array) ($log['actions'] ?? [])),
+            // WFL-7 · Qué la disparó, qué condiciones evaluó y, en un flujo del constructor, por dónde pasó.
+            'payload' => (object) (array) ($log['payload'] ?? []),
+            'conditions' => array_values((array) ($log['conditions'] ?? [])),
+            'path' => array_values((array) ($log['path'] ?? [])),
+            'resume_at' => $log['resume_at'] ?? null,
             'started_at' => $run->started_at->toIso8601String(),
             'finished_at' => $run->finished_at?->toIso8601String(),
             'error' => $run->error,

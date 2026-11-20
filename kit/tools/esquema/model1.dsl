@@ -268,7 +268,7 @@
   from_user_id -> users ; to_user_id -> users ; subject_type ; starts_on date! ; ends_on date! ; reason ; revoked_at
 @automation_rules soft lock | Regla sin código CUANDO → SI → ENTONCES que reacciona a eventos de dominio.
   name ; trigger_event text! ; conditions j ; actions j! ; status enum(active,paused,draft)=draft
-  workflow_definition_id ?-> workflow_definitions ; schedule_cron ; last_run_at ; next_run_at
+  workflow_definition_id ?-> workflow_definitions ; schedule_cron ; last_run_at ; next_run_at ; owner_user_id ?-> users ; failing_since ts
 @automation_runs ao | Ejecuciones de reglas con su resultado y error (centro de automatizaciones).
   automation_rule_id -> automation_rules ; trigger_event_id uuid ; status enum(running,succeeded,failed,skipped,queued,waiting,cancelled)!
   started_at ts! ; finished_at ; log j ; error

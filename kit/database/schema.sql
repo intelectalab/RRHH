@@ -2101,15 +2101,19 @@ CREATE TABLE automation_rules (
   schedule_cron text,
   last_run_at timestamptz,
   next_run_at timestamptz,
+  owner_user_id uuid,
+  failing_since timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_automation_rules_tenant_id UNIQUE (tenant_id, id),
-  CONSTRAINT fk_automation_rules_workflow_definition_id FOREIGN KEY (tenant_id, workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id)
+  CONSTRAINT fk_automation_rules_workflow_definition_id FOREIGN KEY (tenant_id, workflow_definition_id) REFERENCES workflow_definitions (tenant_id, id),
+  CONSTRAINT fk_automation_rules_owner_user_id FOREIGN KEY (tenant_id, owner_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE automation_rules IS 'Regla sin código CUANDO → SI → ENTONCES que reacciona a eventos de dominio.';
 CREATE INDEX ix_automation_rules_workflow_definition_id ON automation_rules (tenant_id, workflow_definition_id);
+CREATE INDEX ix_automation_rules_owner_user_id ON automation_rules (tenant_id, owner_user_id);
 ALTER TABLE automation_rules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE automation_rules FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON automation_rules USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -18515,6 +18519,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('aprobaciones.permitir_masivas', 'base', 'Aprobaciones masivas', 'Permite aprobar varias solicitudes a la vez cuando el tipo lo admite.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('automatizaciones.max_ejecuciones_hora', 'base', 'Ejecuciones por hora de una regla', 'Ejecuciones de una misma regla en una hora a partir de las cuales se pausa sola y se avisa al administrador (protección contra bucles, RN-WFL-11).', 'integer', '100'::jsonb, ARRAY['organization'], '{"min": 10, "max": 10000}'::jsonb),
   ('automatizaciones.reintentos', 'base', 'Reintentos de una acción fallida', 'Veces que se reintenta automáticamente una ejecución fallida antes de dejarla para revisión manual (RN-WFL-10).', 'integer', '3'::jsonb, ARRAY['organization'], '{"min": 0, "max": 10}'::jsonb),
+  ('automatizaciones.errores_seguidos', 'base', 'Fallas seguidas para avisar', 'WFL-7 · Ejecuciones fallidas seguidas de una regla a partir de las cuales se marca «con errores» y se avisa una vez a su responsable.', 'integer', '3'::jsonb, ARRAY['organization'], '{"min": 1, "max": 50}'::jsonb),
   ('notificaciones.canales_activos', 'base', 'Canales de notificación', 'Canales habilitados para la organización.', 'list', '["in_app", "email"]'::jsonb, ARRAY['organization'], '["in_app", "email", "push", "whatsapp", "sms"]'::jsonb),
   ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),

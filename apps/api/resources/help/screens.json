@@ -211,6 +211,12 @@
       "permissions": [
         "help.org_articles.view"
       ]
+    },
+    "settings.flow_builder": {
+      "module": "base",
+      "permissions": [
+        "workflow.workflows.view"
+      ]
     }
   }
 }

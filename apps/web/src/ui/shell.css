@@ -938,3 +938,34 @@ button.portal-link { background: none; border: 0; padding: 0; text-align: start;
 .arbol-flecha { width: 22px; height: 22px; flex: none; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; color: var(--tx2); cursor: pointer; padding: 0; }
 .arbol-nombre { flex: 1 1 auto; cursor: pointer; min-width: 0; }
 .arbol-meta { color: var(--tx2); font-size: var(--fs-s); }
+
+/* WFL-6 · Constructor visual de flujos: lienzo con nodos y conexiones, panel de propiedades. */
+.vf-paleta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.vf-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.vf-canvas-card { padding: 0; overflow: hidden; }
+.vf-canvas { overflow: auto; max-height: 70vh; background-color: var(--sup2); background-image: radial-gradient(var(--bd) 1px, transparent 1px); background-size: 20px 20px; touch-action: none; }
+.vf-edges { position: absolute; inset: 0; pointer-events: none; }
+.vf-edge path { fill: none; stroke: var(--tx2); stroke-width: 2; }
+.vf-edge marker path, .vf-edges marker path { fill: var(--tx2); }
+.vf-edge.on path { stroke: var(--pe-500); stroke-width: 3; }
+.vf-edge text { fill: var(--tx2); font-size: 12px; text-anchor: middle; paint-order: stroke; stroke: var(--sup2); stroke-width: 4px; }
+.vf-node { position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 8px 12px; border-radius: var(--r); background: var(--sup); border: 1px solid var(--control-bd); border-left: 4px solid var(--tx2); cursor: grab; user-select: none; touch-action: none; overflow: hidden; }
+.vf-node b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vf-node:focus-visible { outline: 3px solid var(--pe-500); outline-offset: 2px; }
+.vf-node.sel { box-shadow: 0 0 0 2px var(--pe-500); }
+.vf-node.on { background: var(--pe-50); }
+.vf-node.bad { border-color: var(--er); }
+.vf-kind { font-size: var(--fs-s); color: var(--tx2); }
+.vf-warn { position: absolute; top: 6px; right: 8px; color: var(--er); }
+.vf-start { border-left-color: var(--ok); }
+.vf-end { border-left-color: var(--tx); }
+.vf-condition { border-left-color: var(--wa); }
+.vf-approval, .vf-action, .vf-notification { border-left-color: var(--pe-500); }
+.vf-wait { border-left-color: var(--wa); border-left-style: dashed; }
+.vf-props { padding: 16px; }
+.vf-h { font-size: var(--fs-s); font-weight: 700; margin: 16px 0 6px; }
+.vf-cond { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 6px; }
+.vf-issues { margin: 0; padding-left: 18px; font-size: var(--fs-s); color: var(--er); }
+.vf-path { margin: 8px 0 0; padding-left: 18px; }
+.run-detail { margin-top: 8px; }
+@media (max-width: 899px) { .vf-layout { grid-template-columns: 1fr; } .vf-cond { grid-template-columns: 1fr 1fr; } }

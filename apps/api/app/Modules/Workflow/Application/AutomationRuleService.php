@@ -6,6 +6,7 @@ use App\Modules\Workflow\Domain\Automation\RuleConditions;
 use App\Modules\Workflow\Domain\AutomationRuleStateMachine;
 use App\Modules\Workflow\Infrastructure\Models\AutomationRule;
 use App\Shared\Audit\AuditLogger;
+use App\Shared\Exceptions\AyniException;
 use App\Shared\Exceptions\BusinessRuleViolatedException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -28,9 +29,11 @@ final class AutomationRuleService
     /**
      * @param  array<string, mixed>  $input
      */
-    public function create(array $input): AutomationRule
+    public function create(array $input, ?string $userId = null): AutomationRule
     {
         $data = $this->validated($input, true);
+        // WFL-7 · Toda regla tiene un responsable: quien la crea, salvo que se indique otro usuario.
+        $data['owner_user_id'] ??= $userId;
 
         return DB::transaction(function () use ($data): AutomationRule {
             $rule = AutomationRule::create($data + ['status' => 'draft']);
@@ -45,6 +48,7 @@ final class AutomationRuleService
      */
     public function update(AutomationRule $rule, array $input): AutomationRule
     {
+        $this->assertNotManagedByFlow($rule, array_diff(array_keys($input), ['owner_user_id']) !== []);
         $changesBehaviour = (array_key_exists('trigger_event', $input) && $input['trigger_event'] !== $rule->trigger_event)
             || array_key_exists('conditions', $input) || array_key_exists('actions', $input);
         $data = $this->validated($input + ['trigger_event' => $rule->trigger_event], false);
@@ -64,6 +68,8 @@ final class AutomationRuleService
 
     public function transition(AutomationRule $rule, string $action): AutomationRule
     {
+        // Un flujo del constructor se pausa y reanuda también desde aquí; retirarlo es archivar el flujo.
+        $this->assertNotManagedByFlow($rule, $action === 'retire');
         $next = $this->machine->getNextState($rule->status, $action);
 
         return DB::transaction(function () use ($rule, $action, $next): AutomationRule {
@@ -72,12 +78,26 @@ final class AutomationRuleService
                 $rule->forceFill(['status' => 'paused'])->save();
                 $rule->delete();
             } else {
-                $rule->forceFill(['status' => $next])->save();
+                $rule->forceFill(['status' => $next] + ($next === 'active' ? ['failing_since' => null] : []))->save();
+            }
+            if ($rule->workflow_definition_id !== null) {
+                DB::table('workflow_definitions')->where('id', $rule->workflow_definition_id)->where('status', '!=', 'archived')
+                    ->update(['status' => $next === 'active' ? 'active' : 'inactive', 'updated_at' => now()]);
             }
             $this->audit->record("automation_rule.{$action}", 'automation_rule', $rule->id, $before, ['status' => $next]);
 
             return $rule;
         });
+    }
+
+    /**
+     * WFL-6 · El comportamiento de una regla creada por el constructor visual se edita en el constructor.
+     */
+    private function assertNotManagedByFlow(AutomationRule $rule, bool $changes): void
+    {
+        if ($changes && $rule->workflow_definition_id !== null) {
+            throw new AyniException('managed_by_flow', 409, (string) trans('workflow.flows.managed_by_flow'));
+        }
     }
 
     /**
@@ -93,11 +113,13 @@ final class AutomationRuleService
     }
 
     /**
+     * @param  array<string, mixed>|null  $stats
      * @return array<string, mixed>
      */
-    public function present(AutomationRule $rule): array
+    public function present(AutomationRule $rule, ?array $stats = null): array
     {
         $status = $rule->trashed() ? 'retired' : $rule->status;
+        $owner = $rule->owner_user_id === null ? null : DB::table('users')->where('id', $rule->owner_user_id)->value('display_name');
 
         return [
             'id' => $rule->id,
@@ -108,10 +130,46 @@ final class AutomationRuleService
             'status' => $status,
             'allowed_actions' => $rule->trashed() ? [] : $this->machine->allowedActions($rule->status),
             'last_run_at' => $rule->last_run_at?->toIso8601String(),
+            // WFL-7 · Las reglas reaccionan a eventos: no hay próxima ejecución programada salvo que la regla tenga horario.
+            'next_run_at' => $rule->next_run_at?->toIso8601String(),
+            'owner_user_id' => $rule->owner_user_id,
+            'owner_name' => is_string($owner) ? $owner : null,
+            'failing' => $rule->failing_since !== null,
+            'failing_since' => $rule->failing_since?->toIso8601String(),
+            'managed_by_flow' => $rule->workflow_definition_id,
+            'stats' => (object) ($stats ?? $this->stats([$rule->id])[$rule->id] ?? []),
             'version' => $rule->lock_version,
             'created_at' => $rule->created_at?->toIso8601String(),
             'updated_at' => $rule->updated_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * WFL-7 · Ejecuciones y errores de los últimos 30 días por regla, y el último error.
+     *
+     * @param  list<string>  $ruleIds
+     * @return array<string, array{runs: int, failed: int, succeeded: int, skipped: int, last_error: string|null}>
+     */
+    public function stats(array $ruleIds): array
+    {
+        if ($ruleIds === []) {
+            return [];
+        }
+        $rows = DB::table('automation_runs')->whereIn('automation_rule_id', $ruleIds)->where('started_at', '>=', now()->subDays(30))
+            ->selectRaw("automation_rule_id, count(*) AS runs, count(*) FILTER (WHERE status = 'failed') AS failed, count(*) FILTER (WHERE status = 'succeeded') AS succeeded, count(*) FILTER (WHERE status = 'skipped') AS skipped")
+            ->groupBy('automation_rule_id')->get()->keyBy('automation_rule_id');
+        $out = [];
+        foreach ($ruleIds as $id) {
+            $row = $rows->get($id);
+            $lastError = DB::table('automation_runs')->where('automation_rule_id', $id)->where('status', 'failed')->orderByDesc('started_at')->value('error');
+            $out[$id] = [
+                'runs' => (int) ($row->runs ?? 0), 'failed' => (int) ($row->failed ?? 0),
+                'succeeded' => (int) ($row->succeeded ?? 0), 'skipped' => (int) ($row->skipped ?? 0),
+                'last_error' => is_string($lastError) ? $lastError : null,
+            ];
+        }
+
+        return $out;
     }
 
     /**
@@ -128,6 +186,13 @@ final class AutomationRuleService
                 $errors['name'][] = (string) trans('validation.required', ['attribute' => 'name']);
             }
             $out['name'] = $name;
+        }
+        if (array_key_exists('owner_user_id', $input)) {
+            $owner = $input['owner_user_id'];
+            if ($owner !== null && (! is_string($owner) || preg_match('/^[0-9a-f-]{36}$/i', $owner) !== 1 || ! DB::table('users')->where('id', $owner)->exists())) {
+                $errors['owner_user_id'][] = (string) trans('workflow.automation.invalid_owner');
+            }
+            $out['owner_user_id'] = $owner;
         }
         $event = (string) ($input['trigger_event'] ?? '');
         if (! $this->catalog->isTrigger($event)) {
@@ -183,6 +248,17 @@ final class AutomationRuleService
         }
 
         return ['match' => ($conditions['match'] ?? 'all') === 'any' ? 'any' : 'all', 'rules' => $rules];
+    }
+
+    /**
+     * WFL-6 · Las acciones de los nodos del constructor se validan igual que las de una regla.
+     *
+     * @param  array<mixed>  $a
+     * @return array{0: array<string, mixed>, 1: array<string, list<string>>}
+     */
+    public function validateActionConfig(array $a, string $path): array
+    {
+        return $this->validateAction($a, $path);
     }
 
     /**

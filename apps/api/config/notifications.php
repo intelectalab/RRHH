@@ -22,6 +22,8 @@ return [
         'task.assigned' => ['variables' => ['title', 'due_on'], 'link' => '/tareas?id={task_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'task.overdue' => ['variables' => ['title', 'due_on'], 'link' => '/tareas?id={task_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'automation.notice' => ['variables' => ['title', 'message'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // WFL-7 · Una regla con fallas seguidas avisa una vez a su responsable.
+        'automation.failing' => ['variables' => ['rule', 'count', 'error'], 'link' => '/configuracion/automatizaciones', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => true],
         'automation.paused' => ['variables' => ['rule'], 'link' => '/configuracion/automatizaciones', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => true],
         'account.security' => ['variables' => ['event'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         'organization.suspended' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],

@@ -21,6 +21,10 @@ use Illuminate\Support\Carbon;
  * @property array<int, array<string, mixed>> $actions
  * @property string $status
  * @property Carbon|null $last_run_at
+ * @property Carbon|null $next_run_at
+ * @property string|null $workflow_definition_id
+ * @property string|null $owner_user_id
+ * @property Carbon|null $failing_since
  * @property int $lock_version
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -40,7 +44,7 @@ class AutomationRule extends Model
 
     protected $guarded = ['id', 'tenant_id', 'lock_version'];
 
-    protected $casts = ['conditions' => 'array', 'actions' => 'array', 'last_run_at' => 'datetime', 'lock_version' => 'integer'];
+    protected $casts = ['conditions' => 'array', 'actions' => 'array', 'last_run_at' => 'datetime', 'next_run_at' => 'datetime', 'failing_since' => 'datetime', 'lock_version' => 'integer'];
 
     protected static function newFactory(): AutomationRuleFactory
     {

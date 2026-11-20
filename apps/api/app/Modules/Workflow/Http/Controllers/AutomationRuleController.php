@@ -35,6 +35,10 @@ final class AutomationRuleController
         if (is_string($event) && $event !== '') {
             $query->where('trigger_event', $event);
         }
+        // WFL-7 · Reglas marcadas «con errores» (fallas seguidas).
+        if (in_array($request->input('filter.failing', $request->query('failing')), ['1', 'true', true], true)) {
+            $query->whereNotNull('failing_since');
+        }
         $q = trim((string) $request->query('q', ''));
         if ($q !== '') {
             $query->where('name', 'ilike', '%'.addcslashes($q, '%_\\').'%');
@@ -43,9 +47,10 @@ final class AutomationRuleController
         $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'id', 'desc');
         $ids = array_column($page['data'], 'id');
         $models = AutomationRule::query()->whereIn('id', $ids)->get()->keyBy('id');
+        $stats = $this->rules->stats(array_map('strval', $ids));
 
         return response()->json([
-            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (AutomationRule $r) => $this->rules->present($r))->all(),
+            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (AutomationRule $r) => $this->rules->present($r, $stats[$r->id] ?? null))->all(),
             'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
         ]);
     }
@@ -62,7 +67,9 @@ final class AutomationRuleController
 
     public function store(Request $request): JsonResponse
     {
-        return $this->respond($this->rules->create($this->input($request)), 201);
+        $user = $request->user()?->getAuthIdentifier();
+
+        return $this->respond($this->rules->create($this->input($request), is_string($user) ? $user : null), 201);
     }
 
     public function update(Request $request, string $id): JsonResponse
@@ -106,7 +113,7 @@ final class AutomationRuleController
      */
     private function input(Request $request): array
     {
-        return array_intersect_key($request->all(), array_flip(['name', 'trigger_event', 'conditions', 'actions']));
+        return array_intersect_key($request->all(), array_flip(['name', 'trigger_event', 'conditions', 'actions', 'owner_user_id']));
     }
 
     private function find(string $id): AutomationRule

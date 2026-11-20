@@ -20,7 +20,8 @@ final class RetryFailedAutomations extends Command
     {
         $total = 0;
         foreach ($tenants->operableTenantIds() as $tenantId) {
-            $total += (int) TenancyScope::runAs($tenantId, fn () => $runner->retryDue());
+            // WFL-6 · También retoma los flujos del constructor cuya espera venció.
+            $total += (int) TenancyScope::runAs($tenantId, fn () => $runner->retryDue() + $runner->resumeDue());
         }
         $this->info("Ejecuciones reintentadas: {$total}");
 
