@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 159 | 0 | 66,0 % |
-| Backlog completo | 512 | 159 | 0 | 31,1 % |
+| Primer corte comercial (MVP) | 241 | 160 | 0 | 66,4 % |
+| Backlog completo | 512 | 160 | 0 | 31,2 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -174,7 +174,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | IMP-4 | Plantillas peruanas listas para usar | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Paquete Perú pe-base 1.0.0 versionado: tipos de contrato, ausencias y licencias, feriados, constancias, políticas de vacaciones, motivos de cese y roles; aplica solo lo que falta sin pisar lo editado. |
 | IMP-5 | Organización demo coherente | IMP | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Demo con fechas relativas: 6 unidades, 22 ingresos con jefes, contratos y sueldos de ejemplo, vencimientos, vacaciones, ausencia en curso, promoción en flujo y una renuncia; idempotente. |
 | IMP-6 | Informe y reversión de importaciones | IMP | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Historial con filas creadas, actualizadas y rechazadas, descarga del original y deshacer que lleva a la papelera (deleted_at) solo lo del lote; bloqueado si ya se usa en otro proceso. |
-| IMP-7 | Importadores desde otros sistemas de RRHH y planilla | IMP | Fase 1 · Core HR | Story | sí | pendiente | — |  |
+| IMP-7 | Importadores desde otros sistemas de RRHH y planilla | IMP | Fase 1 · Core HR | Story | sí | hecha | 2026-11-20 | Perfiles de origen versionados (paquete Perú «por validar»: T-Registro, planilla tradicional, suite en inglés) que traducen cabeceras y códigos y se detectan solos; la organización agrega o corrige perfiles; errores con cabecera, valor y formato esperado. |
 | AYU-1 | Contenido de ayuda del producto con versiones | AYU | Fase 1 · Core HR | Task | sí | hecha | 2026-11-16 | Ayuda del producto en la consola con versiones inmutables por idioma, módulo, roles y pantallas; 44 artículos es/en/pt cargados por migración y help:sync-bundled sin pisar lo editado. |
 | AYU-2 | Centro de ayuda para todos los roles | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Botón de ayuda en todas las pantallas y el portal; pestañas Esta pantalla y Guías con búsqueda; filtra por módulo activo, rol y pantallas permitidas; búsquedas sin resultado anónimas. |
 | AYU-3 | Ayuda contextual por pantalla | AYU | Fase 1 · Core HR | Story | sí | hecha | 2026-11-16 | Clave de ayuda por pantalla (API y web sincronizadas por prueba), ayudas de campo versionadas y estados vacíos que enlazan a la ayuda. |

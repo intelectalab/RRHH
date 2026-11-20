@@ -3,7 +3,7 @@
 Importación masiva con validación, asistente de primeros pasos, plantillas peruanas y organización demo.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 7 (4 historias y 3 tareas); 7 del MVP. **Operaciones de API:** 18.
+- **Actividades:** 7 (4 historias y 3 tareas); 7 del MVP. **Operaciones de API:** 20.
 - **Especificación:** `kit/docs/modulos/M-IMP.md`.
 
 ## Prompt para una sesión nueva de Claude Code
