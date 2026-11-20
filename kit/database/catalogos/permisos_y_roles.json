@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 914,
+    "permisos": 917,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 138,
+    "fuera_del_contrato_api": 141,
     "roles": 11
   },
   "permisos": [
@@ -756,6 +756,42 @@
       "en_contrato_api": false,
       "ambito": "plataforma",
       "descripcion": "Ver la auditoría de la consola"
+    },
+    {
+      "codigo": "platform.settings.view",
+      "epica": "SAS",
+      "modulo": "base",
+      "recurso": "settings",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "plataforma",
+      "descripcion": "Ver configuraciones globales y avisos de la plataforma"
+    },
+    {
+      "codigo": "platform.health.manage",
+      "epica": "SAS",
+      "modulo": "base",
+      "recurso": "health",
+      "accion": "manage",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "plataforma",
+      "descripcion": "Reintentar trabajos y eventos fallidos desde el monitoreo"
+    },
+    {
+      "codigo": "platform.logs.view",
+      "epica": "SAS",
+      "modulo": "base",
+      "recurso": "logs",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "plataforma",
+      "descripcion": "Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH)"
     },
     {
       "codigo": "audit.logs.view",
@@ -11148,6 +11184,18 @@
         },
         {
           "codigo": "platform.audit.view",
+          "alcance": "platform"
+        },
+        {
+          "codigo": "platform.settings.view",
+          "alcance": "platform"
+        },
+        {
+          "codigo": "platform.health.manage",
+          "alcance": "platform"
+        },
+        {
+          "codigo": "platform.logs.view",
           "alcance": "platform"
         },
         {

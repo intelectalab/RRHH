@@ -14,6 +14,7 @@ import { CommandPalette } from './CommandPalette'
 import { CompanyProvider } from './CompanyProvider'
 import { CompanySelector } from './CompanySelector'
 import { InboxButton, useInboxCount } from './InboxButton'
+import { PlatformBanners } from './PlatformBanners'
 import { QuickCreate } from './QuickCreate'
 import { HelpButton, HelpProvider } from '@/modules/help/HelpCenter'
 import { useInstallPrompt, useOnline } from '@/modules/pwa/pwa'
@@ -250,6 +251,7 @@ function Shell({ children }: { children: ReactNode }) {
           </div>
         </header>
         {!online && <div className="offline-aviso" role="status">{t('shell.offline')}</div>}
+        <PlatformBanners />
         <div className="app-content">{children}</div>
       </div>
     </div>

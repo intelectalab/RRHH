@@ -18,6 +18,8 @@ export type SessionData = {
   modules_read_only?: string[]
   /** SAS-7: banderas activas para la organización (misma evaluación que la API). */
   features?: string[]
+  /** SAS-8: sesión abierta por el soporte de GestiaHR (se muestra la cabecera «sesión de soporte»). */
+  support_session?: { agent_name: string; expires_at: string; allow_sensitive: boolean } | null
 }
 
 type SessionContextValue = {

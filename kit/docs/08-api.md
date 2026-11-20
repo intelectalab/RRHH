@@ -301,6 +301,32 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/platform/feature-flags/{id}/tenants` | `platform.feature_flags.update` | 0 |
 | POST | `/platform/feature-flags/{id}/tenants/{tenantId}/remove` | `platform.feature_flags.update` | 0 |
 | GET | `/platform/tenants/{id}/feature-flags` | `platform.feature_flags.view` | 0 |
+| GET | `/platform/tenants/{id}/users` | `platform.support_sessions.create` | 0 |
+| POST | `/auth/support/enter` | público | 0 |
+| GET | `/support-access` | `identity.security_policies.view` | 0 |
+| PATCH | `/support-access` | `identity.security_policies.update` | 0 |
+| POST | `/support-access/grants` | `identity.security_policies.update` | 0 |
+| POST | `/support-access/grants/{id}/revoke` | `identity.security_policies.update` | 0 |
+| GET | `/platform/health/failed-jobs` | `platform.health.view` | 0 |
+| POST | `/platform/health/failed-jobs/{id}/retry` | `platform.health.manage` | 0 |
+| GET | `/platform/health/outbox-events` | `platform.health.view` | 0 |
+| POST | `/platform/health/outbox-events/{id}/retry` | `platform.health.manage` | 0 |
+| GET | `/platform/backups` | `platform.backups.view` | 0 |
+| POST | `/platform/backups` | `platform.backups.create` | 0 |
+| GET | `/platform/backups/{id}` | `platform.backups.view` | 0 |
+| POST | `/platform/backups/{id}/restores` | `platform.backups.restore` | 0 |
+| GET | `/platform/backup-restores` | `platform.backups.view` | 0 |
+| POST | `/platform/backup-restores/{id}/approve` | `platform.backups.restore` | 0 |
+| POST | `/platform/backup-restores/{id}/cancel` | `platform.backups.restore` | 0 |
+| GET | `/platform/settings` | `platform.settings.view` | 0 |
+| PATCH | `/platform/settings/{key}` | `platform.settings.update` | 0 |
+| GET | `/platform/notices` | `platform.settings.view` | 0 |
+| POST | `/platform/notices` | `platform.settings.update` | 0 |
+| PATCH | `/platform/notices/{id}` | `platform.settings.update` | 0 |
+| POST | `/platform/notices/{id}/cancel` | `platform.settings.update` | 0 |
+| GET | `/system-notices` | sesión | 0 |
+| GET | `/platform/activity-events` | `platform.logs.view` | 0 |
+| GET | `/platform/technical-logs` | `platform.logs.view` | 0 |
 | GET | `/usage` | `settings.organization.view` | 0 |
 
 **TEN · Organización (tenant)**

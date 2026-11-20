@@ -284,6 +284,18 @@
       "opciones": null
     },
     {
+      "codigo": "seguridad.acceso_soporte",
+      "modulo": "base",
+      "nombre": "Acceso del soporte de GestiaHR",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "Permite que el soporte de GestiaHR entre a la organización con motivo registrado y por tiempo limitado (RN-SAS-08). Desactivado, ninguna sesión de soporte puede abrirse.",
+      "opciones": null
+    },
+    {
       "codigo": "seguridad.registrar_acceso_sensible",
       "modulo": "base",
       "nombre": "Registrar accesos a datos sensibles",

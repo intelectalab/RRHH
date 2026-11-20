@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $user_agent
  * @property string|null $device_label
  * @property bool $mfa_passed
+ * @property string|null $impersonated_by_platform_user_id
  * @property CarbonInterface|null $created_at
  */
 class UserSession extends Model

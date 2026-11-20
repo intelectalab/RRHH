@@ -8,6 +8,7 @@ use App\Modules\Identity\Http\Controllers\MePreferencesController;
 use App\Modules\Identity\Http\Controllers\MfaController;
 use App\Modules\Identity\Http\Controllers\PermissionCatalogController;
 use App\Modules\Identity\Http\Controllers\RoleController;
+use App\Modules\Identity\Http\Controllers\SupportAccessController;
 use App\Modules\Identity\Http\Controllers\UserController;
 use App\Shared\Search\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,8 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
     Route::post('/auth/otp/request', [CodeSignInController::class, 'request'])->middleware('throttle:ayni-login');
     Route::post('/auth/otp/verify', [CodeSignInController::class, 'verify'])->middleware('throttle:ayni-login');
     Route::post('/auth/activation/code', [CodeSignInController::class, 'activate'])->middleware('throttle:ayni-login');
+    // SAS-8 · Enlace de un solo uso de una sesión de soporte creada en la consola.
+    Route::post('/auth/support/enter', [SupportAccessController::class, 'enter'])->middleware('throttle:ayni-login');
 
     Route::middleware('auth:ayni')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -62,6 +65,11 @@ Route::prefix('api/v1')->middleware('api')->group(function (): void {
         Route::post('/users/{id}/revoke-sessions', [UserController::class, 'revokeSessions'])->middleware('permission:identity.users.suspend');
         Route::post('/users/{id}/reset-mfa', [UserController::class, 'resetMfa'])->middleware('permission:identity.users.reset_mfa');
 
+        // SAS-8 · Acceso del soporte de GestiaHR (habilitarlo, autorizarlo por un tiempo y ver sus sesiones).
+        Route::get('/support-access', [SupportAccessController::class, 'show'])->middleware('permission:identity.security_policies.view');
+        Route::patch('/support-access', [SupportAccessController::class, 'update'])->middleware('permission:identity.security_policies.update');
+        Route::post('/support-access/grants', [SupportAccessController::class, 'grant'])->middleware('permission:identity.security_policies.update');
+        Route::post('/support-access/grants/{id}/revoke', [SupportAccessController::class, 'revoke'])->middleware('permission:identity.security_policies.update');
         Route::post('/roles/{id}/mfa-requirement', [RoleController::class, 'mfaRequirement'])->middleware('permission:identity.security_policies.update');
         Route::post('/roles/{id}/duplicate', [RoleController::class, 'duplicate'])->middleware('permission:identity.roles.duplicate');
     });

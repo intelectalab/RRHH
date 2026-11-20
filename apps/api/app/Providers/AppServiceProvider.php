@@ -21,6 +21,7 @@ use App\Shared\Permissions\DataScope;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
 use App\Shared\Search\SearchRegistry;
+use App\Shared\Security\SupportContext;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Setup\SetupStepRegistry;
@@ -53,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(TenantCache::class);
         $this->app->singleton(PermissionResolver::class);
+        $this->app->singleton(SupportContext::class);
         $this->app->singleton(ModuleGate::class);
         $this->app->singleton(DataScope::class);
         $this->app->singleton(SearchRegistry::class);

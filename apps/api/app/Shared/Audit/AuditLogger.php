@@ -2,6 +2,7 @@
 
 namespace App\Shared\Audit;
 
+use App\Shared\Security\SupportContext;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Crypt;
@@ -37,7 +38,8 @@ final class AuditLogger
         DB::table('audit_events')->insert([
             'tenant_id' => TenancyScope::requireTenant(),
             'actor_user_id' => $actorId,
-            'actor_kind' => $actorId === null ? 'system' : 'user',
+            // SAS-8 · RN-SAS-08: lo que hace el soporte de GestiaHR queda marcado «soporte».
+            'actor_kind' => app(SupportContext::class)->active() ? 'platform_support' : ($actorId === null ? 'system' : 'user'),
             'action' => $action,
             'entity_type' => $entityType,
             'entity_id' => $entityId,

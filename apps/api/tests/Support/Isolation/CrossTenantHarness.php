@@ -26,6 +26,7 @@ use App\Modules\Documents\Infrastructure\Models\DocumentRequest;
 use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
 use App\Modules\Helpdesk\Infrastructure\Models\Ticket;
 use App\Modules\Helpdesk\Infrastructure\Models\TicketCategory;
+use App\Modules\Identity\Infrastructure\Models\SupportAccessGrant;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Imports\Infrastructure\Models\SetupChecklistItem;
 use App\Modules\Imports\Infrastructure\Models\TenantCountryPack;
@@ -188,6 +189,8 @@ final class CrossTenantHarness
         '/certificate-requests/{id}/issue' => CertificateRequest::class,
         '/certificate-requests/{id}/reject' => CertificateRequest::class,
         '/ticket-categories/{id}' => TicketCategory::class,
+        // SAS-8 · Autorizaciones al soporte de la organización A: B no las revoca.
+        '/support-access/grants/{id}/revoke' => SupportAccessGrant::class,
         'Ticket' => Ticket::class,
         '/tickets/{id}/messages' => Ticket::class,
         '/tickets/{id}/messages/{message_id}/file' => Ticket::class,

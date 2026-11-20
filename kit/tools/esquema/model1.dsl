@@ -80,16 +80,24 @@
 @support_ticket_messages P | Mensajes de una incidencia de soporte.
   support_ticket_id => support_tickets ; author_kind enum(platform,tenant)! ; author_ref ; body text!
 @support_access_grants | Autorización explícita y temporal de la organización para que soporte acceda a sus datos.
-  granted_by_user_id -> users ; platform_user_id => platform_users ; reason text! ; access_level enum(read_only,full)=read_only
-  starts_at ts! ; expires_at ts! ; revoked_at
+  granted_by_user_id -> users ; platform_user_id ?=> platform_users ; reason text! ; access_level enum(read_only,full)=read_only
+  starts_at ts! ; expires_at ts! ; revoked_at ; revoked_by_user_id ?-> users
+@support_sessions P | Sesiones de soporte con suplantación (SAS-8, RN-SAS-08): motivo, usuario suplantado, vencimiento propio, ingreso por enlace de un solo uso y marca «soporte» en la auditoría de la organización. Sin campos sensibles salvo autorización «full» vigente del cliente.
+  tenant_id => tenants ; platform_user_id => platform_users ; agent_name text! ; target_user_id uuid! ; reason text! ; ticket_reference
+  status enum(pending,active,ended,expired)=pending ; allow_sensitive bool=f ; support_access_grant_id uuid ; entry_token_hash text #S
+  entry_used_at ts ; user_session_id uuid ; expires_at ts! ; started_at ts ; ended_at ts ; ended_by_platform_user_id ?=> platform_users
+  idx tenant_id, expires_at ; idx user_session_id
 @backup_runs P | Respaldos automáticos y manuales, con estado, tamaño y retención.
   tenant_id ?=> tenants ; kind enum(automatic,manual)! ; coverage enum(platform,tenant)! ; status enum(running,completed,failed,expired)=running
   storage_key ; size_bytes bigint ; checksum ; started_at ts! ; finished_at ; retention_until date
   requested_by_platform_user_id ?=> platform_users ; error
 @backup_restores P | Solicitudes de restauración con aprobación; por defecto se restaura a un entorno aislado.
   backup_run_id => backup_runs ; tenant_id ?=> tenants ; status enum(requested,approved,running,completed,failed,cancelled)=requested
-  target enum(sandbox,production)=sandbox ; requested_by_platform_user_id => platform_users
-  approved_by_platform_user_id ?=> platform_users ; reason text! ; started_at ; finished_at ; error
+  target enum(sandbox,production)=sandbox ; kind enum(manual,scheduled_test)=manual ; requested_by_platform_user_id ?=> platform_users
+  approved_by_platform_user_id ?=> platform_users ; approved_at ts ; reason text! ; verification j ; started_at ; finished_at ; error
+@platform_notices P | Avisos de la plataforma (mantenimiento, incidencias) para todas las organizaciones o las seleccionadas, con vigencia (SAS-13).
+  title text! ; message text! ; severity enum(info,warning,critical)=info ; audience enum(all,selected)=all ; tenant_ids j
+  starts_at ts! ; ends_at ts ; cancelled_at ts ; created_by_platform_user_id ?=> platform_users ; idx starts_at
 @platform_incidents P | Incidentes de servicio de la plataforma (salud).
   title ; severity enum(minor,major,critical)! ; status enum(open,monitoring,resolved)=open ; description ; started_at ts! ; resolved_at
   affected_tenant_id ?=> tenants

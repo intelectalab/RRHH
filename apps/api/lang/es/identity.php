@@ -52,4 +52,10 @@ return [
         'activation_not_pending' => 'La cuenta ya está activa: no necesita código de activación.',
         'no_phone' => 'El usuario no tiene celular registrado para enviarle el código.',
     ],
+    'support' => [
+        'link_invalid' => 'El enlace de soporte no es válido, ya se usó o venció.',
+        'disabled' => 'La organización desactivó el acceso del soporte.',
+        'device_label' => 'Sesión de soporte de GestiaHR',
+        'grant_not_active' => 'La autorización ya no está vigente.',
+    ],
 ];

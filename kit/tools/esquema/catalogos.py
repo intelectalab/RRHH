@@ -183,6 +183,7 @@ PARAMS = [
  ('seguridad.otp_intentos', 'base', 'Intentos por código', 'integer', 5, [O], 'Intentos fallidos que admite un código antes de anularse.', {'min': 3, 'max': 10}),
  ('seguridad.otp_reenvio_segundos', 'base', 'Espera para pedir otro código (segundos)', 'integer', 60, [O], 'Tiempo mínimo entre dos envíos de código al mismo usuario.', {'min': 30, 'max': 600}),
  ('seguridad.marca_agua_descargas', 'base', 'Marca de agua en exportaciones', 'boolean', False, [O], 'Agrega a cada archivo exportado el nombre de quien lo descargó y la fecha.', None),
+ ('seguridad.acceso_soporte', 'base', 'Acceso del soporte de GestiaHR', 'boolean', True, [O], 'Permite que el soporte de GestiaHR entre a la organización con motivo registrado y por tiempo limitado (RN-SAS-08). Desactivado, ninguna sesión de soporte puede abrirse.', None),
  ('seguridad.registrar_acceso_sensible', 'base', 'Registrar accesos a datos sensibles', 'boolean', True, [O], 'Deja constancia de cada consulta de sueldo, salud, denuncias, sanciones o biometría.', None),
  ('importacion.politica_errores', 'core', 'Filas con error al importar', 'select', 'only_valid', [O], 'Si una importación tiene filas con error: importar solo las válidas (las demás se descargan con su motivo) o exigir que se corrija todo antes (RN-IMP-02).', ['only_valid', 'fix_all']),
  ('importacion.tamano_lote', 'core', 'Filas por lote de importación', 'integer', 500, [O], 'Filas que se confirman juntas en una transacción; si un lote falla, se deshace la importación completa.', {'min': 50, 'max': 5000}),

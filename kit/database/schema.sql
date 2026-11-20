@@ -708,12 +708,13 @@ CREATE TABLE support_access_grants (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   granted_by_user_id uuid NOT NULL,
-  platform_user_id uuid NOT NULL,
+  platform_user_id uuid,
   reason text NOT NULL,
   access_level text NOT NULL DEFAULT 'read_only' CHECK (access_level IN ('read_only','full')),
   starts_at timestamptz NOT NULL,
   expires_at timestamptz NOT NULL,
   revoked_at timestamptz,
+  revoked_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_support_access_grants_tenant_id UNIQUE (tenant_id, id),
@@ -722,10 +723,42 @@ CREATE TABLE support_access_grants (
 COMMENT ON TABLE support_access_grants IS 'Autorización explícita y temporal de la organización para que soporte acceda a sus datos.';
 CREATE INDEX ix_support_access_grants_granted_by_user_id ON support_access_grants (tenant_id, granted_by_user_id);
 CREATE INDEX ix_support_access_grants_platform_user_id ON support_access_grants (tenant_id, platform_user_id);
+CREATE INDEX ix_support_access_grants_revoked_by_user_id ON support_access_grants (tenant_id, revoked_by_user_id);
 ALTER TABLE support_access_grants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE support_access_grants FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON support_access_grants USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_support_access_grants_touch BEFORE UPDATE ON support_access_grants FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE support_sessions (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL,
+  platform_user_id uuid NOT NULL,
+  agent_name text NOT NULL,
+  target_user_id uuid NOT NULL,
+  reason text NOT NULL,
+  ticket_reference text,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','active','ended','expired')),
+  allow_sensitive boolean NOT NULL DEFAULT false,
+  support_access_grant_id uuid,
+  entry_token_hash text,  -- SENSIBLE
+  entry_used_at timestamptz,
+  user_session_id uuid,
+  expires_at timestamptz NOT NULL,
+  started_at timestamptz,
+  ended_at timestamptz,
+  ended_by_platform_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fk_support_sessions_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
+  CONSTRAINT fk_support_sessions_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id),
+  CONSTRAINT fk_support_sessions_ended_by_platform_user_id FOREIGN KEY (ended_by_platform_user_id) REFERENCES platform_users (id)
+);
+COMMENT ON TABLE support_sessions IS 'Sesiones de soporte con suplantación (SAS-8, RN-SAS-08): motivo, usuario suplantado, vencimiento propio, ingreso por enlace de un solo uso y marca «soporte» en la auditoría de la organización. Sin campos sensibles salvo autorización «full» vigente del cliente.';
+CREATE INDEX ix_support_sessions_platform_user_id ON support_sessions (platform_user_id);
+CREATE INDEX ix_support_sessions_ended_by_platform_user_id ON support_sessions (ended_by_platform_user_id);
+CREATE INDEX ix_support_sessions_tenant_id_expires_at ON support_sessions (tenant_id, expires_at);
+CREATE INDEX ix_support_sessions_user_session_id ON support_sessions (user_session_id);
+CREATE TRIGGER trg_support_sessions_touch BEFORE UPDATE ON support_sessions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE backup_runs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -757,9 +790,12 @@ CREATE TABLE backup_restores (
   tenant_id uuid,
   status text NOT NULL DEFAULT 'requested' CHECK (status IN ('requested','approved','running','completed','failed','cancelled')),
   target text NOT NULL DEFAULT 'sandbox' CHECK (target IN ('sandbox','production')),
-  requested_by_platform_user_id uuid NOT NULL,
+  kind text NOT NULL DEFAULT 'manual' CHECK (kind IN ('manual','scheduled_test')),
+  requested_by_platform_user_id uuid,
   approved_by_platform_user_id uuid,
+  approved_at timestamptz,
   reason text NOT NULL,
+  verification jsonb,
   started_at timestamptz,
   finished_at timestamptz,
   error text,
@@ -776,6 +812,26 @@ CREATE INDEX ix_backup_restores_tenant_id ON backup_restores (tenant_id);
 CREATE INDEX ix_backup_restores_requested_by_platform_user_id ON backup_restores (requested_by_platform_user_id);
 CREATE INDEX ix_backup_restores_approved_by_platform_user_id ON backup_restores (approved_by_platform_user_id);
 CREATE TRIGGER trg_backup_restores_touch BEFORE UPDATE ON backup_restores FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE platform_notices (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  title text NOT NULL,
+  message text NOT NULL,
+  severity text NOT NULL DEFAULT 'info' CHECK (severity IN ('info','warning','critical')),
+  audience text NOT NULL DEFAULT 'all' CHECK (audience IN ('all','selected')),
+  tenant_ids jsonb,
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz,
+  cancelled_at timestamptz,
+  created_by_platform_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fk_platform_notices_created_by_platform_user_id FOREIGN KEY (created_by_platform_user_id) REFERENCES platform_users (id)
+);
+COMMENT ON TABLE platform_notices IS 'Avisos de la plataforma (mantenimiento, incidencias) para todas las organizaciones o las seleccionadas, con vigencia (SAS-13).';
+CREATE INDEX ix_platform_notices_created_by_platform_user_id ON platform_notices (created_by_platform_user_id);
+CREATE INDEX ix_platform_notices_starts_at ON platform_notices (starts_at);
+CREATE TRIGGER trg_platform_notices_touch BEFORE UPDATE ON platform_notices FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE platform_incidents (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -14321,6 +14377,7 @@ CREATE TRIGGER trg_partner_access_grants_touch BEFORE UPDATE ON partner_access_g
 ALTER TABLE tenant_status_events ADD CONSTRAINT fk_tenant_status_events_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id);
 ALTER TABLE tenant_feature_flags ADD CONSTRAINT fk_tenant_feature_flags_set_by_platform_user_id FOREIGN KEY (set_by_platform_user_id) REFERENCES platform_users (id);
 ALTER TABLE support_access_grants ADD CONSTRAINT fk_support_access_grants_granted_by_user_id FOREIGN KEY (tenant_id, granted_by_user_id) REFERENCES users (tenant_id, id);
+ALTER TABLE support_access_grants ADD CONSTRAINT fk_support_access_grants_revoked_by_user_id FOREIGN KEY (tenant_id, revoked_by_user_id) REFERENCES users (tenant_id, id);
 ALTER TABLE stored_files ADD CONSTRAINT fk_stored_files_uploaded_by_user_id FOREIGN KEY (tenant_id, uploaded_by_user_id) REFERENCES users (tenant_id, id);
 ALTER TABLE comments ADD CONSTRAINT fk_comments_author_user_id FOREIGN KEY (tenant_id, author_user_id) REFERENCES users (tenant_id, id);
 ALTER TABLE number_sequences ADD CONSTRAINT fk_number_sequences_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id);
@@ -14898,6 +14955,9 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('platform.backups.restore', 'base', 'backups', 'restore', 'action', false, 'Restaurar una copia (con doble aprobación)'),
   ('platform.settings.update', 'base', 'settings', 'update', 'action', false, 'Cambiar configuraciones globales'),
   ('platform.audit.view', 'base', 'audit', 'view', 'action', false, 'Ver la auditoría de la consola'),
+  ('platform.settings.view', 'base', 'settings', 'view', 'action', false, 'Ver configuraciones globales y avisos de la plataforma'),
+  ('platform.health.manage', 'base', 'health', 'manage', 'action', false, 'Reintentar trabajos y eventos fallidos desde el monitoreo'),
+  ('platform.logs.view', 'base', 'logs', 'view', 'action', false, 'Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH)'),
   ('audit.logs.view', 'base', 'logs', 'view', 'action', false, 'Ver la auditoría de negocio'),
   ('audit.logs.export', 'base', 'logs', 'export', 'action', false, 'Exportar auditoría para revisiones externas'),
   ('audit.activity.view', 'base', 'activity', 'view', 'action', false, 'Ver ingresos, vistas y descargas por usuario'),
@@ -15785,6 +15845,9 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('superadmin_saas', 'platform.backups.restore', 'platform'),
   ('superadmin_saas', 'platform.settings.update', 'platform'),
   ('superadmin_saas', 'platform.audit.view', 'platform'),
+  ('superadmin_saas', 'platform.settings.view', 'platform'),
+  ('superadmin_saas', 'platform.health.manage', 'platform'),
+  ('superadmin_saas', 'platform.logs.view', 'platform'),
   ('superadmin_saas', 'platform.web_products.view', 'platform'),
   ('superadmin_saas', 'platform.web_products.hide', 'platform'),
   ('superadmin_saas', 'platform.web_products.publish', 'platform'),
@@ -18434,6 +18497,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('seguridad.otp_intentos', 'base', 'Intentos por código', 'Intentos fallidos que admite un código antes de anularse.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
   ('seguridad.otp_reenvio_segundos', 'base', 'Espera para pedir otro código (segundos)', 'Tiempo mínimo entre dos envíos de código al mismo usuario.', 'integer', '60'::jsonb, ARRAY['organization'], '{"min": 30, "max": 600}'::jsonb),
   ('seguridad.marca_agua_descargas', 'base', 'Marca de agua en exportaciones', 'Agrega a cada archivo exportado el nombre de quien lo descargó y la fecha.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL),
+  ('seguridad.acceso_soporte', 'base', 'Acceso del soporte de GestiaHR', 'Permite que el soporte de GestiaHR entre a la organización con motivo registrado y por tiempo limitado (RN-SAS-08). Desactivado, ninguna sesión de soporte puede abrirse.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('seguridad.registrar_acceso_sensible', 'base', 'Registrar accesos a datos sensibles', 'Deja constancia de cada consulta de sueldo, salud, denuncias, sanciones o biometría.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('importacion.politica_errores', 'core', 'Filas con error al importar', 'Si una importación tiene filas con error: importar solo las válidas (las demás se descargan con su motivo) o exigir que se corrija todo antes (RN-IMP-02).', 'select', '"only_valid"'::jsonb, ARRAY['organization'], '["only_valid", "fix_all"]'::jsonb),
   ('importacion.tamano_lote', 'core', 'Filas por lote de importación', 'Filas que se confirman juntas en una transacción; si un lote falla, se deshace la importación completa.', 'integer', '500'::jsonb, ARRAY['organization'], '{"min": 50, "max": 5000}'::jsonb),
@@ -19007,7 +19071,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_ap
 -- Catálogos de plataforma: solo lectura para la aplicación.
 REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_notices, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_sessions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 

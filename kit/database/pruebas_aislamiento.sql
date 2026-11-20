@@ -46,8 +46,8 @@ BEGIN
        'legal_parameters', 'master_catalog_items', 'master_catalogs', 'metric_definitions', 'module_dependencies', 'modules', 'parameter_definitions',
        'partner_firm_tenants', 'partner_firm_users', 'partner_firms', 'pe_parametric_items', 'pe_parametric_tables',
        'pension_fund_rates', 'pension_funds', 'permissions', 'plan_features', 'plan_limits', 'plan_modules', 'plans', 'platform_audit_events',
-       'platform_incidents', 'platform_sessions', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
-       'saas_invoices', 'statutory_file_layouts', 'subscription_addons', 'subscriptions', 'support_ticket_messages', 'support_tickets',
+       'platform_incidents', 'platform_notices', 'platform_sessions', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
+       'saas_invoices', 'statutory_file_layouts', 'subscription_addons', 'subscriptions', 'support_sessions', 'support_ticket_messages', 'support_tickets',
        'system_role_permissions', 'system_roles', 'tenant_domains', 'tenant_status_events', 'tenants',
        'web_chat_sessions', 'web_complaints', 'web_demo_bookings', 'web_leads', 'web_product_modules', 'web_products', 'web_signups')
      AND NOT (c.relrowsecurity AND c.relforcerowsecurity

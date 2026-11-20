@@ -47,9 +47,10 @@ final class TenantController
             'name' => ['required', 'string', 'min:2', 'max:200'],
             'slug' => ['required', 'string', 'max:63', 'regex:'.self::SLUG],
             'country' => ['required', 'string', 'size:2'],
-            'currency' => ['required', 'string', 'size:3'],
-            'timezone' => ['required', 'string', 'max:64'],
-            'locale' => ['required', Rule::in(TenantAdministration::LOCALES)],
+            // SAS-13: si el alta no los indica, se toman de la configuración global del país (tenants.defaults).
+            'currency' => ['sometimes', 'string', 'size:3'],
+            'timezone' => ['sometimes', 'string', 'max:64'],
+            'locale' => ['sometimes', Rule::in(TenantAdministration::LOCALES)],
             'trial_ends_on' => ['sometimes', 'nullable', 'date_format:Y-m-d', 'after:today'],
             'contact_name' => ['sometimes', 'nullable', 'string', 'max:200'],
             'contact_email' => ['sometimes', 'nullable', 'email', 'max:254'],

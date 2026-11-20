@@ -4417,6 +4417,34 @@ paths:
       x-permission: public
       operationId: postAuthPasswordReset
       security: []
+  /auth/support/enter:
+    post:
+      summary: 'Ingresar con el enlace de un solo uso de una sesión de soporte (SAS-8): abre una sesión marcada «soporte»
+        que caduca sola; 422 si el enlace no vale o el acceso de soporte está desactivado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: public
+      operationId: postAuthSupportEnter
+      security: []
   /benefit-enrollments:
     get:
       summary: Listar BenefitEnrollment
@@ -26933,6 +26961,65 @@ paths:
       x-phase: 1
       x-permission: people.assignments.correct
       operationId: postPersonnelActionsIdCorrect
+  /platform/activity-events:
+    get:
+      summary: 'Consola SaaS: actividad de los usuarios de una organización (acción y fecha, sin datos de RRHH)'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: true
+        description: Organización (uuid, obligatoria)
+        schema:
+          type: string
+      - name: user_id
+        in: query
+        required: false
+        description: Usuario de la organización (uuid)
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: Desde (fecha)
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: false
+        description: Hasta (fecha)
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.logs.view
+      operationId: getPlatformActivityEvents
   /platform/addons:
     get:
       summary: Listar Addon
@@ -27121,6 +27208,51 @@ paths:
   /platform/audit-events:
     get:
       summary: 'Consola SaaS: auditoría propia de la consola (solo inserción)'
+      parameters:
+      - name: action
+        in: query
+        required: false
+        description: Código de la acción
+        schema:
+          type: string
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: platform_user_id
+        in: query
+        required: false
+        description: Usuario de la consola (uuid)
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: Desde (fecha)
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: false
+        description: Hasta (fecha)
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
       responses:
         '200':
           description: Correcto
@@ -27128,9 +27260,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
         '401': *id001
         '403': *id002
         '404': *id004
+        '422': *id006
       tags:
       - SAS
       x-phase: 0
@@ -27281,6 +27415,257 @@ paths:
       x-phase: 0
       x-permission: platform
       operationId: postPlatformAuthMfaVerify
+  /platform/backup-restores:
+    get:
+      summary: 'Consola SaaS: restauraciones pedidas, aprobadas, de prueba programada y su evidencia de verificación'
+      parameters:
+      - name: status
+        in: query
+        required: false
+        description: requested, approved, running, completed, failed o cancelled
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.view
+      operationId: getPlatformBackupRestores
+  /platform/backup-restores/{id}/approve:
+    post:
+      summary: 'Consola SaaS: segunda confirmación de una restauración por otro usuario de la consola; la ejecuta y deja la
+        verificación (409 si la aprueba quien la pidió)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.restore
+      operationId: postPlatformBackupRestoresIdApprove
+  /platform/backup-restores/{id}/cancel:
+    post:
+      summary: 'Consola SaaS: cancelar una restauración pendiente de aprobación'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.restore
+      operationId: postPlatformBackupRestoresIdCancel
+  /platform/backups:
+    get:
+      summary: 'Consola SaaS: historial de copias con resultado, tamaño, retención y restauraciones'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: kind
+        in: query
+        required: false
+        description: automatic o manual
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: running, completed, failed o expired
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.view
+      operationId: getPlatformBackups
+    post:
+      summary: 'Consola SaaS: lanzar una copia manual de la plataforma o de una organización (la de una organización es su
+        exportación completa)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.create
+      operationId: postPlatformBackups
+  /platform/backups/{id}:
+    get:
+      summary: 'Consola SaaS: detalle de una copia y sus restauraciones'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.view
+      operationId: getPlatformBackupsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /platform/backups/{id}/restores:
+    post:
+      summary: 'Consola SaaS: pedir una restauración (sandbox por defecto; a producción solo tras una restauración aislada
+        verificada de la misma copia); espera la aprobación de otro usuario'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.backups.restore
+      operationId: postPlatformBackupsIdRestores
   /platform/feature-flags:
     get:
       summary: Listar FeatureFlag
@@ -27590,6 +27975,13 @@ paths:
   /platform/health:
     get:
       summary: 'Salud de la plataforma: colas, trabajos fallidos, webhooks, conectores'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: 'Organización (uuid): uso de API, errores y almacenamiento solo de ella'
+        schema:
+          type: string
       responses:
         '200':
           description: Correcto
@@ -27597,14 +27989,158 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
         '401': *id001
         '403': *id002
         '404': *id004
+        '422': *id006
       tags:
       - SAS
       x-phase: 0
       x-permission: platform.health.view
       operationId: getPlatformHealth
+  /platform/health/failed-jobs:
+    get:
+      summary: 'Consola SaaS: trabajos de cola fallidos (cola, error resumido, organización y fecha)'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.health.view
+      operationId: getPlatformHealthFailedJobs
+  /platform/health/failed-jobs/{id}/retry:
+    post:
+      summary: 'Consola SaaS: reintentar un trabajo fallido (sale de la lista y vuelve a la cola); auditado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.health.manage
+      operationId: postPlatformHealthFailedJobsIdRetry
+  /platform/health/outbox-events:
+    get:
+      summary: 'Consola SaaS: eventos de dominio fallidos o descartados por organización (tipo, intentos y error, sin su contenido)'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: failed o dead
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.health.view
+      operationId: getPlatformHealthOutboxEvents
+  /platform/health/outbox-events/{id}/retry:
+    post:
+      summary: 'Consola SaaS: volver a encolar un evento fallido o descartado (409 si ya no lo está); auditado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.health.manage
+      operationId: postPlatformHealthOutboxEventsIdRetry
   /platform/help-articles:
     get:
       summary: Listar HelpArticle
@@ -27895,6 +28431,121 @@ paths:
       x-phase: 0
       x-permission: platform.metrics.view
       operationId: getPlatformMetrics
+  /platform/notices:
+    get:
+      summary: 'Consola SaaS: avisos de la plataforma (vigentes, programados, vencidos y cancelados)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.view
+      operationId: getPlatformNotices
+    post:
+      summary: 'Consola SaaS: publicar un aviso de mantenimiento para todas las organizaciones o las seleccionadas'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.update
+      operationId: postPlatformNotices
+  /platform/notices/{id}:
+    patch:
+      summary: 'Consola SaaS: editar un aviso no cancelado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.update
+      operationId: patchPlatformNoticesId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /platform/notices/{id}/cancel:
+    post:
+      summary: 'Consola SaaS: cancelar un aviso (deja de mostrarse)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.update
+      operationId: postPlatformNoticesIdCancel
   /platform/plans:
     get:
       summary: Listar Plan
@@ -28173,6 +28824,57 @@ paths:
       operationId: getPlatformPlansIdVersions
       parameters:
       - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /platform/settings:
+    get:
+      summary: 'Consola SaaS: configuración global vigente (valor, valor por defecto y descripción de cada clave)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.view
+      operationId: getPlatformSettings
+  /platform/settings/{key}:
+    patch:
+      summary: 'Consola SaaS: cambiar una configuración global (validada por clave); auditado con antes y después'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.settings.update
+      operationId: patchPlatformSettingsKey
+      parameters:
+      - name: key
         in: path
         required: true
         schema:
@@ -28775,6 +29477,66 @@ paths:
       x-phase: 0
       x-permission: platform.support_sessions.end
       operationId: postPlatformSupportSessionsIdEnd
+  /platform/technical-logs:
+    get:
+      summary: 'Consola SaaS: logs técnicos estructurados (ya sin datos sensibles) filtrados por organización, usuario, nivel
+        y fecha'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: user_id
+        in: query
+        required: false
+        description: Usuario (uuid)
+        schema:
+          type: string
+      - name: level
+        in: query
+        required: false
+        description: debug, info, notice, warning, error, critical, alert o emergency
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: Desde (fecha)
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: false
+        description: Hasta (fecha)
+        schema:
+          type: string
+          format: date
+      - name: limit
+        in: query
+        required: false
+        description: Máximo de líneas (máx. 500)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.logs.view
+      operationId: getPlatformTechnicalLogs
   /platform/tenants:
     get:
       summary: Listar Tenant
@@ -29295,6 +30057,31 @@ paths:
       x-phase: 0
       x-permission: platform.subscriptions.view
       operationId: getPlatformTenantsIdUsage
+  /platform/tenants/{id}/users:
+    get:
+      summary: 'Consola SaaS: usuarios de la organización para elegir a quién suplantar en una sesión de soporte (solo nombre,
+        roles y estado; RN-SAS-12)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.support_sessions.create
+      operationId: getPlatformTenantsIdUsers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /platform/web-complaints:
     get:
       summary: Listar WebComplaint
@@ -38763,6 +39550,114 @@ paths:
       x-phase: 5
       x-permission: careers.succession_plans.archive
       operationId: postSuccessionPlansIdArchive
+  /support-access:
+    get:
+      summary: 'Acceso del soporte de GestiaHR a la organización: si está habilitado, autorizaciones vigentes y sesiones de
+        soporte con motivo, inicio y fin (SAS-8)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: identity.security_policies.view
+      operationId: getSupportAccess
+    patch:
+      summary: Habilitar o desactivar por completo el acceso del soporte (desactivarlo cierra las sesiones abiertas); queda
+        auditado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: identity.security_policies.update
+      operationId: patchSupportAccess
+  /support-access/grants:
+    post:
+      summary: Autorizar al soporte por un tiempo (read_only, o full para ver campos sensibles) con motivo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: identity.security_policies.update
+      operationId: postSupportAccessGrants
+  /support-access/grants/{id}/revoke:
+    post:
+      summary: Revocar una autorización al soporte antes de su vencimiento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: identity.security_policies.update
+      operationId: postSupportAccessGrantsIdRevoke
   /surveys:
     get:
       summary: Listar Survey
@@ -39039,6 +39934,23 @@ paths:
         required: true
         schema:
           type: string
+  /system-notices:
+    get:
+      summary: Avisos de la plataforma vigentes para la organización (mantenimiento e incidencias; SAS-13)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: authenticated
+      operationId: getSystemNotices
   /talent-pools:
     get:
       summary: Listar TalentPool
@@ -53305,9 +54217,12 @@ components:
       required:
       - id
       - tenant_id
+      - target_user_id
       - reason
       - status
+      - allow_sensitive
       - expires_at
+      - allowed_actions
       properties:
         id:
           type: string
@@ -53315,18 +54230,56 @@ components:
         tenant_id: &id888
           type: string
           description: Identificador opaco
-        reason: &id889
+        tenant: &id889
+          type: object
+          additionalProperties: true
+          nullable: true
+        agent: &id890
+          type: object
+          additionalProperties: true
+          nullable: true
+        target_user_id: &id891
           type: string
+          description: Identificador opaco
+        target_user: &id892
+          type: object
+          additionalProperties: true
+          nullable: true
+        reason: &id893
+          type: string
+        ticket_reference: &id894
+          type: string
+          nullable: true
         status:
           type: string
           enum:
-          - requested
-          - granted
+          - pending
+          - active
           - ended
-          - denied
-        expires_at: &id890
+          - expired
+        allow_sensitive: &id895
+          type: boolean
+        expires_at: &id896
           type: string
           format: date-time
+        started_at: &id897
+          type: string
+          format: date-time
+          nullable: true
+        ended_at: &id898
+          type: string
+          format: date-time
+          nullable: true
+        entry_url: &id899
+          type: string
+          nullable: true
+        actions: &id900
+          type: array
+          items: *id008
+          nullable: true
+        allowed_actions:
+          type: array
+          items: *id009
         created_at:
           type: string
           format: date-time
@@ -53337,8 +54290,21 @@ components:
       type: object
       properties:
         tenant_id: *id888
-        reason: *id889
-        expires_at: *id890
+        tenant: *id889
+        agent: *id890
+        target_user_id: *id891
+        target_user: *id892
+        reason: *id893
+        ticket_reference: *id894
+        allow_sensitive: *id895
+        expires_at: *id896
+        started_at: *id897
+        ended_at: *id898
+        entry_url: *id899
+        actions: *id900
+        duration_minutes:
+          type: integer
+          description: Duración de la sesión en minutos (hasta la configuración global support.max_session_minutes)
     Survey:
       type: object
       required:
@@ -53353,9 +54319,9 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id891
+        title: &id901
           type: string
-        kind: &id892
+        kind: &id902
           type: string
           enum:
           - climate
@@ -53365,15 +54331,15 @@ components:
           - pulse
           - enps
           - custom
-        anonymous: &id893
+        anonymous: &id903
           type: boolean
-        min_segment_size: &id894
+        min_segment_size: &id904
           type: integer
           nullable: true
-        audience: &id895
+        audience: &id905
           type: object
           additionalProperties: true
-        questions: &id896
+        questions: &id906
           type: object
           additionalProperties: true
         status:
@@ -53391,12 +54357,12 @@ components:
     SurveyInput:
       type: object
       properties:
-        title: *id891
-        kind: *id892
-        anonymous: *id893
-        min_segment_size: *id894
-        audience: *id895
-        questions: *id896
+        title: *id901
+        kind: *id902
+        anonymous: *id903
+        min_segment_size: *id904
+        audience: *id905
+        questions: *id906
     TalentPool:
       type: object
       required:
@@ -53407,12 +54373,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id897
+        name: &id907
           type: string
-        description: &id898
+        description: &id908
           type: string
           nullable: true
-        candidate_ids: &id899
+        candidate_ids: &id909
           type: array
           items: *id009
         created_at:
@@ -53424,9 +54390,9 @@ components:
     TalentPoolInput:
       type: object
       properties:
-        name: *id897
-        description: *id898
-        candidate_ids: *id899
+        name: *id907
+        description: *id908
+        candidate_ids: *id909
     TalentReview:
       type: object
       required:
@@ -53437,13 +54403,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id900
+        name: &id910
           type: string
-        cycle_id: &id901
+        cycle_id: &id911
           type: string
           description: Identificador opaco
           nullable: true
-        placements: &id902
+        placements: &id912
           type: object
           additionalProperties: true
         status:
@@ -53464,9 +54430,9 @@ components:
     TalentReviewInput:
       type: object
       properties:
-        name: *id900
-        cycle_id: *id901
-        placements: *id902
+        name: *id910
+        cycle_id: *id911
+        placements: *id912
     Task:
       type: object
       required:
@@ -53478,30 +54444,30 @@ components:
         id:
           type: string
           description: Identificador opaco
-        title: &id903
+        title: &id913
           type: string
-        description: &id904
+        description: &id914
           type: string
           nullable: true
-        assignee_user_id: &id905
+        assignee_user_id: &id915
           type: string
           description: Identificador opaco
           nullable: true
-        assignee_role_id: &id906
+        assignee_role_id: &id916
           type: string
           description: Identificador opaco
           nullable: true
-        assignee_name: &id907
+        assignee_name: &id917
           type: string
           nullable: true
-        created_by_name: &id908
+        created_by_name: &id918
           type: string
           nullable: true
-        due_on: &id909
+        due_on: &id919
           type: string
           format: date
           nullable: true
-        priority: &id910
+        priority: &id920
           type: string
           enum:
           - low
@@ -53515,17 +54481,17 @@ components:
           - in_progress
           - done
           - cancelled
-        overdue: &id911
+        overdue: &id921
           type: boolean
           nullable: true
-        related_type: &id912
+        related_type: &id922
           type: string
           nullable: true
-        related_id: &id913
+        related_id: &id923
           type: string
           description: Identificador opaco
           nullable: true
-        completed_at: &id914
+        completed_at: &id924
           type: string
           format: date-time
           nullable: true
@@ -53533,7 +54499,7 @@ components:
           type: array
           items: *id009
           nullable: true
-        custom_fields: &id915
+        custom_fields: &id925
           type: object
           additionalProperties: true
           nullable: true
@@ -53546,19 +54512,19 @@ components:
     TaskInput:
       type: object
       properties:
-        title: *id903
-        description: *id904
-        assignee_user_id: *id905
-        assignee_role_id: *id906
-        assignee_name: *id907
-        created_by_name: *id908
-        due_on: *id909
-        priority: *id910
-        overdue: *id911
-        related_type: *id912
-        related_id: *id913
-        completed_at: *id914
-        custom_fields: *id915
+        title: *id913
+        description: *id914
+        assignee_user_id: *id915
+        assignee_role_id: *id916
+        assignee_name: *id917
+        created_by_name: *id918
+        due_on: *id919
+        priority: *id920
+        overdue: *id921
+        related_type: *id922
+        related_id: *id923
+        completed_at: *id924
+        custom_fields: *id925
     Tenant:
       type: object
       required:
@@ -53575,17 +54541,17 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id916
+        name: &id926
           type: string
-        slug: &id917
+        slug: &id927
           type: string
-        country: &id918
+        country: &id928
           type: string
-        currency: &id919
+        currency: &id929
           type: string
-        timezone: &id920
+        timezone: &id930
           type: string
-        locale: &id921
+        locale: &id931
           type: string
         status:
           type: string
@@ -53597,31 +54563,31 @@ components:
           - blocked
           - cancelled
           - deleted
-        trial_ends_on: &id922
+        trial_ends_on: &id932
           type: string
           format: date
           nullable: true
-        contact_name: &id923
+        contact_name: &id933
           type: string
           nullable: true
-        contact_email: &id924
+        contact_email: &id934
           type: string
           nullable: true
-        contact_phone: &id925
+        contact_phone: &id935
           type: string
           nullable: true
-        suspension_reason: &id926
+        suspension_reason: &id936
           type: string
           nullable: true
         cancelled_at:
           type: string
           format: date-time
           nullable: true
-        retention_until: &id927
+        retention_until: &id937
           type: string
           format: date
           nullable: true
-        beta_groups: &id928
+        beta_groups: &id938
           type: array
           items: *id009
         created_at:
@@ -53633,19 +54599,19 @@ components:
     TenantInput:
       type: object
       properties:
-        name: *id916
-        slug: *id917
-        country: *id918
-        currency: *id919
-        timezone: *id920
-        locale: *id921
-        trial_ends_on: *id922
-        contact_name: *id923
-        contact_email: *id924
-        contact_phone: *id925
-        suspension_reason: *id926
-        retention_until: *id927
-        beta_groups: *id928
+        name: *id926
+        slug: *id927
+        country: *id928
+        currency: *id929
+        timezone: *id930
+        locale: *id931
+        trial_ends_on: *id932
+        contact_name: *id933
+        contact_email: *id934
+        contact_phone: *id935
+        suspension_reason: *id936
+        retention_until: *id937
+        beta_groups: *id938
         admin_name:
           type: string
           description: 'Alta (SAS-2): nombre del primer administrador, que recibe la invitación'
@@ -53685,30 +54651,30 @@ components:
         id:
           type: string
           description: Identificador opaco
-        number: &id929
+        number: &id939
           type: string
-        category_id: &id930
+        category_id: &id940
           type: string
           description: Identificador opaco
         category_name:
           type: string
           nullable: true
-        employment_id: &id931
+        employment_id: &id941
           type: string
           description: Identificador opaco
           nullable: true
         person_name:
           type: string
           nullable: true
-        requester_user_id: &id932
+        requester_user_id: &id942
           type: string
           description: Identificador opaco
-        requester_name: &id933
+        requester_name: &id943
           type: string
           nullable: true
-        subject: &id934
+        subject: &id944
           type: string
-        description: &id935
+        description: &id945
           type: string
           nullable: true
         status:
@@ -53720,55 +54686,55 @@ components:
           - resolved
           - closed
           - cancelled
-        priority: &id936
+        priority: &id946
           type: string
           enum:
           - low
           - normal
           - high
           - urgent
-        assignee_user_id: &id937
+        assignee_user_id: &id947
           type: string
           description: Identificador opaco
           nullable: true
-        assignee_name: &id938
+        assignee_name: &id948
           type: string
           nullable: true
-        assignee_role_id: &id939
+        assignee_role_id: &id949
           type: string
           description: Identificador opaco
           nullable: true
-        first_response_due_at: &id940
+        first_response_due_at: &id950
           type: string
           format: date-time
           nullable: true
-        resolution_due_at: &id941
+        resolution_due_at: &id951
           type: string
           format: date-time
           nullable: true
-        first_responded_at: &id942
+        first_responded_at: &id952
           type: string
           format: date-time
           nullable: true
-        resolved_at: &id943
+        resolved_at: &id953
           type: string
           format: date-time
           nullable: true
-        closed_at: &id944
+        closed_at: &id954
           type: string
           format: date-time
           nullable: true
-        overdue: &id945
+        overdue: &id955
           type: boolean
           nullable: true
-        channel: &id946
+        channel: &id956
           type: string
           enum:
           - portal
           - email
           - whatsapp
           - ai_assistant
-        messages: &id947
+        messages: &id957
           type: array
           items: *id008
           nullable: true
@@ -53786,25 +54752,25 @@ components:
     TicketInput:
       type: object
       properties:
-        number: *id929
-        category_id: *id930
-        employment_id: *id931
-        requester_user_id: *id932
-        requester_name: *id933
-        subject: *id934
-        description: *id935
-        priority: *id936
-        assignee_user_id: *id937
-        assignee_name: *id938
-        assignee_role_id: *id939
-        first_response_due_at: *id940
-        resolution_due_at: *id941
-        first_responded_at: *id942
-        resolved_at: *id943
-        closed_at: *id944
-        overdue: *id945
-        channel: *id946
-        messages: *id947
+        number: *id939
+        category_id: *id940
+        employment_id: *id941
+        requester_user_id: *id942
+        requester_name: *id943
+        subject: *id944
+        description: *id945
+        priority: *id946
+        assignee_user_id: *id947
+        assignee_name: *id948
+        assignee_role_id: *id949
+        first_response_due_at: *id950
+        resolution_due_at: *id951
+        first_responded_at: *id952
+        resolved_at: *id953
+        closed_at: *id954
+        overdue: *id955
+        channel: *id956
+        messages: *id957
     TimeBankMovement:
       type: object
       required:
@@ -53817,25 +54783,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id948
+        employment_id: &id958
           type: string
           description: Identificador opaco
-        date: &id949
+        date: &id959
           type: string
           format: date
-        minutes: &id950
+        minutes: &id960
           type: integer
-        kind: &id951
+        kind: &id961
           type: string
           enum:
           - credit
           - debit
           - expiry
           - adjustment
-        source_type: &id952
+        source_type: &id962
           type: string
           nullable: true
-        source_id: &id953
+        source_id: &id963
           type: string
           description: Identificador opaco
           nullable: true
@@ -53848,12 +54814,12 @@ components:
     TimeBankMovementInput:
       type: object
       properties:
-        employment_id: *id948
-        date: *id949
-        minutes: *id950
-        kind: *id951
-        source_type: *id952
-        source_id: *id953
+        employment_id: *id958
+        date: *id959
+        minutes: *id960
+        kind: *id961
+        source_type: *id962
+        source_id: *id963
     TimePunch:
       type: object
       required:
@@ -53867,20 +54833,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id954
+        employment_id: &id964
           type: string
           description: Identificador opaco
-        punched_at: &id955
+        punched_at: &id965
           type: string
           format: date-time
-        kind: &id956
+        kind: &id966
           type: string
           enum:
           - in
           - out
           - break_start
           - break_end
-        method: &id957
+        method: &id967
           type: string
           enum:
           - web
@@ -53891,25 +54857,25 @@ components:
           - crew
           - biometric
           - whatsapp
-        site_id: &id958
+        site_id: &id968
           type: string
           description: Identificador opaco
           nullable: true
-        geo: &id959
+        geo: &id969
           type: object
           additionalProperties: true
           nullable: true
-        device_id: &id960
+        device_id: &id970
           type: string
           description: Identificador opaco
           nullable: true
-        offline: &id961
+        offline: &id971
           type: boolean
-        corrects_id: &id962
+        corrects_id: &id972
           type: string
           description: Identificador opaco
           nullable: true
-        reason: &id963
+        reason: &id973
           type: string
           nullable: true
         created_at:
@@ -53921,16 +54887,16 @@ components:
     TimePunchInput:
       type: object
       properties:
-        employment_id: *id954
-        punched_at: *id955
-        kind: *id956
-        method: *id957
-        site_id: *id958
-        geo: *id959
-        device_id: *id960
-        offline: *id961
-        corrects_id: *id962
-        reason: *id963
+        employment_id: *id964
+        punched_at: *id965
+        kind: *id966
+        method: *id967
+        site_id: *id968
+        geo: *id969
+        device_id: *id970
+        offline: *id971
+        corrects_id: *id972
+        reason: *id973
     Timesheet:
       type: object
       required:
@@ -53944,16 +54910,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id964
+        employment_id: &id974
           type: string
           description: Identificador opaco
-        week_start: &id965
+        week_start: &id975
           type: string
           format: date
-        entries: &id966
+        entries: &id976
           type: object
           additionalProperties: true
-        total_minutes: &id967
+        total_minutes: &id977
           type: integer
         status:
           type: string
@@ -53971,10 +54937,10 @@ components:
     TimesheetInput:
       type: object
       properties:
-        employment_id: *id964
-        week_start: *id965
-        entries: *id966
-        total_minutes: *id967
+        employment_id: *id974
+        week_start: *id975
+        entries: *id976
+        total_minutes: *id977
     TrainingPlan:
       type: object
       required:
@@ -53986,13 +54952,13 @@ components:
         id:
           type: string
           description: Identificador opaco
-        year: &id968
+        year: &id978
           type: integer
-        legal_entity_id: &id969
+        legal_entity_id: &id979
           type: string
           description: Identificador opaco
           nullable: true
-        items: &id970
+        items: &id980
           type: object
           additionalProperties: true
         status:
@@ -54010,9 +54976,9 @@ components:
     TrainingPlanInput:
       type: object
       properties:
-        year: *id968
-        legal_entity_id: *id969
-        items: *id970
+        year: *id978
+        legal_entity_id: *id979
+        items: *id980
     TravelAdvance:
       type: object
       required:
@@ -54026,14 +54992,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id971
+        employment_id: &id981
           type: string
           description: Identificador opaco
-        amount: &id972
+        amount: &id982
           $ref: '#/components/schemas/Money'
-        purpose: &id973
+        purpose: &id983
           type: string
-        due_on: &id974
+        due_on: &id984
           type: string
           format: date
         status:
@@ -54053,10 +55019,10 @@ components:
     TravelAdvanceInput:
       type: object
       properties:
-        employment_id: *id971
-        amount: *id972
-        purpose: *id973
-        due_on: *id974
+        employment_id: *id981
+        amount: *id982
+        purpose: *id983
+        due_on: *id984
     Union:
       type: object
       required:
@@ -54068,15 +55034,15 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id975
+        name: &id985
           type: string
-        legal_entity_id: &id976
+        legal_entity_id: &id986
           type: string
           description: Identificador opaco
-        registration: &id977
+        registration: &id987
           type: string
           nullable: true
-        dues_concept_code: &id978
+        dues_concept_code: &id988
           type: string
           nullable: true
         status:
@@ -54093,10 +55059,10 @@ components:
     UnionInput:
       type: object
       properties:
-        name: *id975
-        legal_entity_id: *id976
-        registration: *id977
-        dues_concept_code: *id978
+        name: *id985
+        legal_entity_id: *id986
+        registration: *id987
+        dues_concept_code: *id988
     UnionMembership:
       type: object
       required:
@@ -54106,20 +55072,20 @@ components:
         id:
           type: string
           description: Identificador opaco
-        union_id: &id979
+        union_id: &id989
           type: string
           description: Identificador opaco
-        employment_id: &id980
+        employment_id: &id990
           type: string
           description: Identificador opaco
-        valid_from: &id981
+        valid_from: &id991
           type: string
           format: date
-        valid_to: &id982
+        valid_to: &id992
           type: string
           format: date
           nullable: true
-        role: &id983
+        role: &id993
           type: string
           nullable: true
         created_at:
@@ -54135,11 +55101,11 @@ components:
     UnionMembershipInput:
       type: object
       properties:
-        union_id: *id979
-        employment_id: *id980
-        valid_from: *id981
-        valid_to: *id982
-        role: *id983
+        union_id: *id989
+        employment_id: *id990
+        valid_from: *id991
+        valid_to: *id992
+        role: *id993
     User:
       type: object
       required:
@@ -54152,19 +55118,19 @@ components:
         id:
           type: string
           description: Identificador opaco
-        person_id: &id984
+        person_id: &id994
           type: string
           description: Identificador opaco
           nullable: true
-        login: &id985
+        login: &id995
           type: string
           nullable: true
-        display_name: &id986
+        display_name: &id996
           type: string
-        email: &id987
+        email: &id997
           type: string
           nullable: true
-        document_type: &id988
+        document_type: &id998
           type: string
           enum:
           - dni
@@ -54174,10 +55140,10 @@ components:
           - cpp
           - other
           nullable: true
-        document_number: &id989
+        document_number: &id999
           type: string
           nullable: true
-        phone: &id990
+        phone: &id1000
           type: string
           nullable: true
         document_number_masked:
@@ -54194,12 +55160,12 @@ components:
           - locked
           - alumni
           - disabled
-        mfa_enabled: &id991
+        mfa_enabled: &id1001
           type: boolean
-        role_ids: &id992
+        role_ids: &id1002
           type: array
           items: *id009
-        role_assignments: &id993
+        role_assignments: &id1003
           type: array
           items: *id008
           nullable: true
@@ -54216,16 +55182,16 @@ components:
     UserInput:
       type: object
       properties:
-        person_id: *id984
-        login: *id985
-        display_name: *id986
-        email: *id987
-        document_type: *id988
-        document_number: *id989
-        phone: *id990
-        mfa_enabled: *id991
-        role_ids: *id992
-        role_assignments: *id993
+        person_id: *id994
+        login: *id995
+        display_name: *id996
+        email: *id997
+        document_type: *id998
+        document_number: *id999
+        phone: *id1000
+        mfa_enabled: *id1001
+        role_ids: *id1002
+        role_assignments: *id1003
     VacationBalance:
       type: object
       required:
@@ -54367,10 +55333,10 @@ components:
         id:
           type: string
           description: Identificador opaco
-        employment_id: &id994
+        employment_id: &id1004
           type: string
           description: Identificador opaco
-        person_id: &id995
+        person_id: &id1005
           type: string
           description: Identificador opaco
           nullable: true
@@ -54380,14 +55346,14 @@ components:
         employee_code:
           type: string
           nullable: true
-        legal_entity_id: &id996
+        legal_entity_id: &id1006
           type: string
           description: Identificador opaco
           nullable: true
-        starts_on: &id997
+        starts_on: &id1007
           type: string
           format: date
-        ends_on: &id998
+        ends_on: &id1008
           type: string
           format: date
         days:
@@ -54395,12 +55361,12 @@ components:
         calendar_days:
           type: string
           nullable: true
-        advance_days: &id999
+        advance_days: &id1009
           type: string
           nullable: true
-        advance: &id1000
+        advance: &id1010
           type: boolean
-        kind: &id1001
+        kind: &id1011
           type: string
           enum:
           - leave
@@ -54418,10 +55384,10 @@ components:
           - taken
           - rejected
           - cancelled
-        notes: &id1002
+        notes: &id1012
           type: string
           nullable: true
-        exception_reason: &id1003
+        exception_reason: &id1013
           type: string
           nullable: true
         requested_by_user_id:
@@ -54449,11 +55415,11 @@ components:
         cancellation_reason:
           type: string
           nullable: true
-        started_at: &id1004
+        started_at: &id1014
           type: string
           format: date-time
           nullable: true
-        completed_at: &id1005
+        completed_at: &id1015
           type: string
           format: date-time
           nullable: true
@@ -54481,18 +55447,18 @@ components:
     VacationRequestInput:
       type: object
       properties:
-        employment_id: *id994
-        person_id: *id995
-        legal_entity_id: *id996
-        starts_on: *id997
-        ends_on: *id998
-        advance_days: *id999
-        advance: *id1000
-        kind: *id1001
-        notes: *id1002
-        exception_reason: *id1003
-        started_at: *id1004
-        completed_at: *id1005
+        employment_id: *id1004
+        person_id: *id1005
+        legal_entity_id: *id1006
+        starts_on: *id1007
+        ends_on: *id1008
+        advance_days: *id1009
+        advance: *id1010
+        kind: *id1011
+        notes: *id1012
+        exception_reason: *id1013
+        started_at: *id1014
+        completed_at: *id1015
     WageTable:
       type: object
       required:
@@ -54508,25 +55474,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        country: &id1006
+        country: &id1016
           type: string
-        regime: &id1007
+        regime: &id1017
           type: string
-        name: &id1008
+        name: &id1018
           type: string
-        legal_source: &id1009
+        legal_source: &id1019
           type: string
-        valid_from: &id1010
+        valid_from: &id1020
           type: string
           format: date
-        valid_to: &id1011
+        valid_to: &id1021
           type: string
           format: date
           nullable: true
-        values: &id1012
+        values: &id1022
           type: object
           additionalProperties: true
-        verified: &id1013
+        verified: &id1023
           type: boolean
         created_at:
           type: string
@@ -54537,14 +55503,14 @@ components:
     WageTableInput:
       type: object
       properties:
-        country: *id1006
-        regime: *id1007
-        name: *id1008
-        legal_source: *id1009
-        valid_from: *id1010
-        valid_to: *id1011
-        values: *id1012
-        verified: *id1013
+        country: *id1016
+        regime: *id1017
+        name: *id1018
+        legal_source: *id1019
+        valid_from: *id1020
+        valid_to: *id1021
+        values: *id1022
+        verified: *id1023
     WebComplaint:
       type: object
       required:
@@ -54608,25 +55574,25 @@ components:
         id:
           type: string
           description: Identificador opaco
-        web_lead_id: &id1014
+        web_lead_id: &id1024
           type: string
           description: Identificador opaco
-        starts_at: &id1015
+        starts_at: &id1025
           type: string
           format: date-time
-        ends_at: &id1016
+        ends_at: &id1026
           type: string
           format: date-time
-        channel: &id1017
+        channel: &id1027
           type: string
           enum:
           - video
           - phone
-        host_platform_user_id: &id1018
+        host_platform_user_id: &id1028
           type: string
           description: Identificador opaco
           nullable: true
-        meeting_url: &id1019
+        meeting_url: &id1029
           type: string
           nullable: true
         status:
@@ -54646,12 +55612,12 @@ components:
     WebDemoBookingInput:
       type: object
       properties:
-        web_lead_id: *id1014
-        starts_at: *id1015
-        ends_at: *id1016
-        channel: *id1017
-        host_platform_user_id: *id1018
-        meeting_url: *id1019
+        web_lead_id: *id1024
+        starts_at: *id1025
+        ends_at: *id1026
+        channel: *id1027
+        host_platform_user_id: *id1028
+        meeting_url: *id1029
     WebLead:
       type: object
       required:
@@ -54663,7 +55629,7 @@ components:
         id:
           type: string
           description: Identificador opaco
-        kind: &id1020
+        kind: &id1030
           type: string
           enum:
           - demo
@@ -54676,27 +55642,27 @@ components:
         full_name:
           type: string
           nullable: true
-        email: &id1021
+        email: &id1031
           type: string
-        phone: &id1022
-          type: string
-          nullable: true
-        company_name: &id1023
+        phone: &id1032
           type: string
           nullable: true
-        ruc: &id1024
+        company_name: &id1033
           type: string
           nullable: true
-        product_code: &id1025
+        ruc: &id1034
           type: string
           nullable: true
-        module_code: &id1026
+        product_code: &id1035
           type: string
           nullable: true
-        source_page: &id1027
+        module_code: &id1036
           type: string
           nullable: true
-        utm: &id1028
+        source_page: &id1037
+          type: string
+          nullable: true
+        utm: &id1038
           type: object
           additionalProperties: true
           nullable: true
@@ -54708,11 +55674,11 @@ components:
           - qualified
           - converted
           - discarded
-        assigned_platform_user_id: &id1029
+        assigned_platform_user_id: &id1039
           type: string
           description: Identificador opaco
           nullable: true
-        notified_at: &id1030
+        notified_at: &id1040
           type: string
           format: date-time
           nullable: true
@@ -54725,17 +55691,17 @@ components:
     WebLeadInput:
       type: object
       properties:
-        kind: *id1020
-        email: *id1021
-        phone: *id1022
-        company_name: *id1023
-        ruc: *id1024
-        product_code: *id1025
-        module_code: *id1026
-        source_page: *id1027
-        utm: *id1028
-        assigned_platform_user_id: *id1029
-        notified_at: *id1030
+        kind: *id1030
+        email: *id1031
+        phone: *id1032
+        company_name: *id1033
+        ruc: *id1034
+        product_code: *id1035
+        module_code: *id1036
+        source_page: *id1037
+        utm: *id1038
+        assigned_platform_user_id: *id1039
+        notified_at: *id1040
     WebProduct:
       type: object
       required:
@@ -54752,23 +55718,23 @@ components:
         id:
           type: string
           description: Identificador opaco
-        code: &id1031
+        code: &id1041
           type: string
-        name: &id1032
+        name: &id1042
           type: string
-        acronym: &id1033
+        acronym: &id1043
           type: string
-        slug: &id1034
+        slug: &id1044
           type: string
-        tagline: &id1035
+        tagline: &id1045
           type: string
           nullable: true
-        module_codes: &id1036
+        module_codes: &id1046
           type: array
           items: *id009
-        is_suite: &id1037
+        is_suite: &id1047
           type: boolean
-        sort_order: &id1038
+        sort_order: &id1048
           type: integer
         status:
           type: string
@@ -54785,14 +55751,14 @@ components:
     WebProductInput:
       type: object
       properties:
-        code: *id1031
-        name: *id1032
-        acronym: *id1033
-        slug: *id1034
-        tagline: *id1035
-        module_codes: *id1036
-        is_suite: *id1037
-        sort_order: *id1038
+        code: *id1041
+        name: *id1042
+        acronym: *id1043
+        slug: *id1044
+        tagline: *id1045
+        module_codes: *id1046
+        is_suite: *id1047
+        sort_order: *id1048
     WebhookDelivery:
       type: object
       required:
@@ -54848,12 +55814,12 @@ components:
         id:
           type: string
           description: Identificador opaco
-        url: &id1039
+        url: &id1049
           type: string
-        events: &id1040
+        events: &id1050
           type: array
           items: *id009
-        secret_hint: &id1041
+        secret_hint: &id1051
           type: string
         status:
           type: string
@@ -54870,9 +55836,9 @@ components:
     WebhookEndpointInput:
       type: object
       properties:
-        url: *id1039
-        events: *id1040
-        secret_hint: *id1041
+        url: *id1049
+        events: *id1050
+        secret_hint: *id1051
     WorkSchedule:
       type: object
       required:
@@ -54887,16 +55853,16 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id1042
+        name: &id1052
           type: string
-        weekly_hours: &id1043
+        weekly_hours: &id1053
           type: number
         days:
           type: object
           additionalProperties: true
-        tolerance_minutes: &id1044
+        tolerance_minutes: &id1054
           type: integer
-        break_minutes: &id1045
+        break_minutes: &id1055
           type: integer
         status:
           type: string
@@ -54912,10 +55878,10 @@ components:
     WorkScheduleInput:
       type: object
       properties:
-        name: *id1042
-        weekly_hours: *id1043
-        tolerance_minutes: *id1044
-        break_minutes: *id1045
+        name: *id1052
+        weekly_hours: *id1053
+        tolerance_minutes: *id1054
+        break_minutes: *id1055
     Workflow:
       type: object
       required:
@@ -54931,14 +55897,14 @@ components:
         id:
           type: string
           description: Identificador opaco
-        name: &id1046
+        name: &id1056
           type: string
-        trigger_event: &id1047
+        trigger_event: &id1057
           type: string
-        conditions: &id1048
+        conditions: &id1058
           type: object
           additionalProperties: true
-        actions: &id1049
+        actions: &id1059
           type: array
           items: *id008
         status:
@@ -54951,7 +55917,7 @@ components:
         allowed_actions:
           type: array
           items: *id009
-        last_run_at: &id1050
+        last_run_at: &id1060
           type: string
           format: date-time
           nullable: true
@@ -54966,11 +55932,11 @@ components:
     WorkflowInput:
       type: object
       properties:
-        name: *id1046
-        trigger_event: *id1047
-        conditions: *id1048
-        actions: *id1049
-        last_run_at: *id1050
+        name: *id1056
+        trigger_event: *id1057
+        conditions: *id1058
+        actions: *id1059
+        last_run_at: *id1060
     WorkflowRun:
       type: object
       required:
