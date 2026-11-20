@@ -45,6 +45,8 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/tiempo/ausencias', key: 'time.absences' },
   { route: '/tiempo/subsidios', key: 'time.subsidies' },
   { route: '/tiempo/resumen-periodo', key: 'time.period_summary' },
+  { route: '/planilla/calculos', key: 'payroll.runs' },
+  { route: '/planilla/micro-pequena-empresa', key: 'payroll.small_business' },
   { route: '/mi', key: 'portal.home' },
   { route: '/mi/documentos', key: 'portal.documents' },
   { route: '/mi/perfil', key: 'portal.profile' },

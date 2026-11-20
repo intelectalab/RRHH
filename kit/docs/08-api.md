@@ -985,6 +985,17 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/payroll-formulas/validate` | `payroll.concepts.test` | 3 |
 | GET | `/payroll-calculation-order` | `payroll.concepts.view` | 3 |
 | POST | `/payroll-test-bench` | `payroll.concepts.test` | 3 |
+| GET | `/payroll-runs` | `payroll.periods.view` | 3 |
+| POST | `/payroll-runs` | `payroll.periods.calculate` | 3 |
+| GET | `/payroll-runs/{id}` | `payroll.periods.view` | 3 |
+| POST | `/payroll-runs/{id}/resume` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-runs/{id}/discard` | `payroll.periods.calculate` | 3 |
+| GET | `/payroll-runs/{id}/employments` | `payroll.periods.view` | 3 |
+| GET | `/payroll-run-employments/{id}/lines` | `payroll.results.view` | 3 |
+| GET | `/payroll-run-lines/{id}/explanation` | `payroll.results.trace.view` | 3 |
+| POST | `/employments/{employment_id}/payroll-retroactive` | `payroll.periods.calculate` | 3 |
+| GET | `/legal-entities/{id}/small-business-status` | `payroll.entity_annual_figures.view` | 3 |
+| POST | `/legal-entities/{id}/labor-regime-change` | `org.legal_entities.update` | 3 |
 
 **CPT · Conceptos y fórmulas**
 

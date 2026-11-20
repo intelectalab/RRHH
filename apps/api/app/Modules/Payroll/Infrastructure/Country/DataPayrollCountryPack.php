@@ -10,13 +10,13 @@ use App\Shared\Payroll\PayrollCountryPack;
  */
 final class DataPayrollCountryPack implements PayrollCountryPack
 {
-    /** @var array{pais: string, version: string, decimales: int, por_validar?: bool, regimenes: array<string, array{tipo: string, base_prorrateo: string, mes_completo_igual_base: bool, requiere_acreditacion: bool}>} */
+    /** @var array{pais: string, version: string, decimales: int, por_validar?: bool, regimen_por_defecto?: string, regimenes: array<string, array{tipo: string, estrategia?: string, unidad_remuneracion?: string, base_prorrateo: string, mes_completo_igual_base: bool, requiere_acreditacion: bool, procesos?: list<string>, gratificaciones?: bool}>} */
     private array $data;
 
     public function __construct(string $country)
     {
         $file = base_path('packages/country-'.strtolower($country).'/data/motor_planilla.php');
-        /** @var array{pais: string, version: string, decimales: int, por_validar?: bool, regimenes: array<string, array{tipo: string, base_prorrateo: string, mes_completo_igual_base: bool, requiere_acreditacion: bool}>} $data */
+        /** @var array{pais: string, version: string, decimales: int, por_validar?: bool, regimen_por_defecto?: string, regimenes: array<string, array{tipo: string, estrategia?: string, unidad_remuneracion?: string, base_prorrateo: string, mes_completo_igual_base: bool, requiere_acreditacion: bool, procesos?: list<string>, gratificaciones?: bool}>} $data */
         $data = is_file($file) ? require $file : ['pais' => strtoupper($country), 'version' => '0', 'decimales' => 2, 'regimenes' => []];
         $this->data = $data;
     }
@@ -46,8 +46,10 @@ final class DataPayrollCountryPack implements PayrollCountryPack
         $r = $this->data['regimenes'][$code] ?? null;
 
         return $r === null ? null : [
-            'code' => $code, 'kind' => $r['tipo'], 'proration_parameter' => $r['base_prorrateo'],
+            'code' => $code, 'kind' => $r['tipo'], 'strategy' => $r['estrategia'] ?? $r['tipo'], 'pay_unit' => $r['unidad_remuneracion'] ?? 'mensual',
+            'proration_parameter' => $r['base_prorrateo'],
             'full_month_equals_base' => $r['mes_completo_igual_base'], 'requires_accreditation' => $r['requiere_acreditacion'],
+            'processes' => $r['procesos'] ?? ['regular'], 'gratifications' => (bool) ($r['gratificaciones'] ?? false),
             'pending_validation' => (bool) ($this->data['por_validar'] ?? true),
         ];
     }
@@ -63,5 +65,12 @@ final class DataPayrollCountryPack implements PayrollCountryPack
         }
 
         return $out;
+    }
+
+    public function defaultRegime(): ?string
+    {
+        $code = $this->data['regimen_por_defecto'] ?? null;
+
+        return $code !== null && isset($this->data['regimenes'][$code]) ? $code : null;
     }
 }

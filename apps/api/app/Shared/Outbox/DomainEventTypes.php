@@ -116,6 +116,9 @@ final class DomainEventTypes
 
     public const PAYROLL_CLOSED = 'payroll.closed.v1';
 
+    // NOM-8 · Corrida de cálculo en cola: la procesa el consumidor por relación, con avance y reanudación.
+    public const PAYROLL_RUN_REQUESTED = 'payroll.run_requested.v1';
+
     public const PAYSLIP_PUBLISHED = 'payslip.published.v1';
 
     // Selección / Reclutamiento
@@ -833,6 +836,7 @@ final class DomainEventTypes
         self::DOCUMENT_EXPIRED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'expires_on'], 'description' => 'Un documento llegó a su fecha de vencimiento y pasó a Vencido (RN-DOC-09)'],
         self::DOCUMENT_REQUESTED => ['version' => 1, 'required_fields' => ['document_request_id', 'category_id', 'employment_id'], 'description' => 'RRHH pidió un documento a un colaborador con fecha límite (DOC-3): se le avisa para que lo entregue desde el portal'],
         self::DOCUMENT_GENERATION_STARTED => ['version' => 1, 'required_fields' => ['batch_id', 'template_id'], 'description' => 'Se pidió generar documentos para varias personas: el lote se procesa en segundo plano con su avance (DOC-5)'],
+        self::PAYROLL_RUN_REQUESTED => ['version' => 1, 'required_fields' => ['payroll_run_id'], 'description' => 'Se pidió calcular un periodo de planilla en segundo plano o reanudar una corrida (NOM-8)'],
         self::EXPORT_REQUESTED => ['version' => 1, 'required_fields' => ['export_id', 'resource'], 'description' => 'Se pidió una exportación que pasa el umbral de segundo plano: se genera fuera de la solicitud y se avisa con enlace (UI-11)'],
         self::DOCUMENT_GENERATED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'template_version_id'], 'description' => 'Se generó un documento PDF desde una plantilla y entró al legajo con la versión de la plantilla con que se emitió (DOC-5 · RN-DOC-11)'],
         self::SIGNATURE_SENT => ['version' => 1, 'required_fields' => ['signature_request_id', 'user_ids'], 'description' => 'Documento enviado a firma (o recordatorio): avisa a los firmantes de turno (DOC-6)'],

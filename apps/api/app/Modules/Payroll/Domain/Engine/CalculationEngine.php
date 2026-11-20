@@ -131,7 +131,7 @@ final class CalculationEngine
      * @param  list<array<string, mixed>>  $lines
      * @return array<string, string>
      */
-    private static function totals(array $lines, int $decimals): array
+    public static function totals(array $lines, int $decimals): array
     {
         $zero = BigDecimal::zero()->toScale($decimals);
         $t = ['earnings' => $zero, 'deductions' => $zero, 'employer_contributions' => $zero];

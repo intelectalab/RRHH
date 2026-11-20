@@ -39,7 +39,7 @@ final class ContextBuilder
     /**
      * @param  array<string, string|bool>  $overrides  datos hipotéticos del banco de pruebas (solo nombres conocidos)
      * @param  array<string, array{amount?: string, quantity?: string}>  $extraIncidents  incidencias hipotéticas por código
-     * @return array{context: CalculationContext, country: string, legal_entity_id: string, decimals: int, pack_version: string}
+     * @return array{context: CalculationContext, tramos: list<CalculationContext>, country: string, legal_entity_id: string, decimals: int, pack_version: string}
      */
     public function build(string $employmentId, string $from, string $to, string $periodKind = 'regular', ?string $periodId = null, array $overrides = [], array $extraIncidents = []): array
     {
@@ -109,65 +109,104 @@ final class ContextBuilder
 
         $variables = [];
         $incidents = [];
+        $tramos = [];
         if ($errors === []) {
             /** @var BigDecimal $base */
-            $prorated = BigDecimal::zero();
-            $relationDays = 0;
-            foreach ($segments as $s) {
-                $amount = BigDecimal::of($s['salary']['amount']);
-                $part = $s['salary']['basis'] === 'daily' ? $amount->multipliedBy($s['days'])
-                    : $amount->multipliedBy($s['days'])->dividedBy($base, self::SCALE, RoundingMode::HALF_UP);
-                $prorated = $prorated->plus($part);
-                $relationDays += $s['days'];
-            }
-            $last = $segments[count($segments) - 1];
-            $summary = $this->absences->summary($employmentId, $start, $end);
-            $totals = (array) ($summary['totals'] ?? []);
-            $sum = fn (string $key): int => array_sum(array_map(fn ($t) => (int) ($t[$key] ?? 0), (array) ($summary['types'] ?? [])));
-            $health = DB::table('employment_labor_regimes')->where('employment_id', $employmentId)->whereNull('deleted_at');
-            EffectiveDated::applyAsOf($health, $end);
-            $flags = $health->first(['health_scheme', 'has_family_allowance', 'has_risk_insurance']);
-            $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
-
-            $variables = [
-                'sueldo' => BigDecimal::of($last['salary']['amount']),
-                'sueldo_tramos' => $prorated,
-                'dias_base' => $base,
-                'dias_periodo' => BigDecimal::of(self::days($from, $to)),
-                'dias_relacion' => BigDecimal::of($relationDays),
-                'dias_laborados' => BigDecimal::of((int) ($totals['worked_days'] ?? 0)),
-                'dias_remotos' => BigDecimal::of((int) ($totals['remote_days'] ?? 0)),
-                'dias_ausencia' => BigDecimal::of((int) ($totals['absence_days'] ?? 0)),
-                'dias_ausencia_pagada' => BigDecimal::of($sum('paid_days')),
-                'dias_sin_goce' => BigDecimal::of($sum('unpaid_days')),
-                'dias_cargo_empleador' => BigDecimal::of($sum('employer_paid_days')),
-                'dias_subsidio' => BigDecimal::of($sum('subsidized_days')),
-                'horas_ausencia' => BigDecimal::of((string) ($totals['absence_hours'] ?? '0')),
-                'fecha_inicio' => $start,
-                'fecha_fin' => $end,
-                'fecha_ingreso' => $hire,
-                'fecha_cese' => $termination ?? '',
-                'regimen' => (string) $regimeAtEnd,
-                'sistema_salud' => (string) ($flags->health_scheme ?? ''),
-                'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
-                'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
-            ];
-            foreach ($overrides as $name => $value) {
-                if (ContextVariables::has($name)) {
-                    $variables[$name] = match (ContextVariables::ALL[$name]) {
-                        'number' => BigDecimal::of((string) $value),
-                        'boolean' => (bool) $value,
-                        default => (string) $value,
-                    };
+            $variables = $this->variables($employmentId, $segments, $base, $from, $to, $start, $end, $hire, $termination, (string) $regimeAtEnd, $overrides, $sources);
+            $incidents = $this->incidents($employmentId, $periodId, $extraIncidents);
+            // NOM-9 · Un cambio de régimen dentro del periodo: un contexto por tramo de régimen, cada uno con sus
+            // días, su sueldo proporcional y sus ausencias; las incidencias del periodo van al último tramo.
+            $groups = [];
+            foreach ($segments as $seg) {
+                $last = count($groups) - 1;
+                if ($last >= 0 && $groups[$last]['regime'] === $seg['regime']) {
+                    $groups[$last]['segments'][] = $seg;
+                } else {
+                    $groups[] = ['regime' => (string) $seg['regime'], 'segments' => [$seg]];
                 }
             }
-            $incidents = $this->incidents($employmentId, $periodId, $extraIncidents);
+            if (count($groups) > 1) {
+                foreach ($groups as $i => $g) {
+                    $gFrom = (string) $g['segments'][0]['from'];
+                    $gTo = (string) $g['segments'][count($g['segments']) - 1]['to'];
+                    $gSources = $sources;
+                    $gVars = $this->variables($employmentId, $g['segments'], $base, $from, $to, $gFrom, $gTo, $hire, $termination, $g['regime'], $overrides, $gSources);
+                    $isLast = $i === count($groups) - 1;
+                    $tramos[] = new CalculationContext($employmentId, $from, $to, $periodKind, $currency, $g['regime'], $gVars,
+                        $isLast ? $incidents : [], $g['segments'], [], $gSources + ['tramo' => ['index' => $i + 1, 'from' => $gFrom, 'to' => $gTo, 'regime' => $g['regime']]]);
+                }
+            }
         }
 
         return [
             'context' => new CalculationContext($employmentId, $from, $to, $periodKind, $currency, $regimeAtEnd, $variables, $incidents, $segments, $errors, $sources),
+            'tramos' => $tramos,
             'country' => $country, 'legal_entity_id' => (string) $emp->legal_entity_id, 'decimals' => $pack->decimals(), 'pack_version' => $pack->version(),
         ];
+    }
+
+    /**
+     * Variables de las fórmulas para unos tramos (todo el periodo o un tramo de régimen).
+     *
+     * @param  list<array<string, mixed>>  $segments
+     * @param  array<string, string|bool>  $overrides
+     * @param  array<string, mixed>  $sources
+     * @return array<string, BigDecimal|string|bool>
+     */
+    private function variables(string $employmentId, array $segments, BigDecimal $base, string $from, string $to, string $start, string $end, string $hire, ?string $termination, string $regime, array $overrides, array &$sources): array
+    {
+        $prorated = BigDecimal::zero();
+        $relationDays = 0;
+        foreach ($segments as $s) {
+            $amount = BigDecimal::of($s['salary']['amount']);
+            $part = $s['salary']['basis'] === 'daily' ? $amount->multipliedBy($s['days'])
+                : $amount->multipliedBy($s['days'])->dividedBy($base, self::SCALE, RoundingMode::HALF_UP);
+            $prorated = $prorated->plus($part);
+            $relationDays += (int) $s['days'];
+        }
+        $last = $segments[count($segments) - 1];
+        $summary = $this->absences->summary($employmentId, $start, $end);
+        $totals = (array) ($summary['totals'] ?? []);
+        $sum = fn (string $key): int => array_sum(array_map(fn ($t) => (int) ($t[$key] ?? 0), (array) ($summary['types'] ?? [])));
+        $health = DB::table('employment_labor_regimes')->where('employment_id', $employmentId)->whereNull('deleted_at');
+        EffectiveDated::applyAsOf($health, $end);
+        $flags = $health->first(['health_scheme', 'has_family_allowance', 'has_risk_insurance']);
+        $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
+
+        $variables = [
+            'sueldo' => BigDecimal::of($last['salary']['amount']),
+            'sueldo_tramos' => $prorated,
+            'dias_base' => $base,
+            'dias_periodo' => BigDecimal::of(self::days($from, $to)),
+            'dias_relacion' => BigDecimal::of($relationDays),
+            'dias_laborados' => BigDecimal::of((int) ($totals['worked_days'] ?? 0)),
+            'dias_remotos' => BigDecimal::of((int) ($totals['remote_days'] ?? 0)),
+            'dias_ausencia' => BigDecimal::of((int) ($totals['absence_days'] ?? 0)),
+            'dias_ausencia_pagada' => BigDecimal::of($sum('paid_days')),
+            'dias_sin_goce' => BigDecimal::of($sum('unpaid_days')),
+            'dias_cargo_empleador' => BigDecimal::of($sum('employer_paid_days')),
+            'dias_subsidio' => BigDecimal::of($sum('subsidized_days')),
+            'horas_ausencia' => BigDecimal::of((string) ($totals['absence_hours'] ?? '0')),
+            'fecha_inicio' => $start,
+            'fecha_fin' => $end,
+            'fecha_ingreso' => $hire,
+            'fecha_cese' => $termination ?? '',
+            'regimen' => $regime,
+            'sistema_salud' => (string) ($flags->health_scheme ?? ''),
+            'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
+            'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
+        ];
+        foreach ($overrides as $name => $value) {
+            if (ContextVariables::has($name)) {
+                $variables[$name] = match (ContextVariables::ALL[$name]) {
+                    'number' => BigDecimal::of((string) $value),
+                    'boolean' => (bool) $value,
+                    default => (string) $value,
+                };
+            }
+        }
+
+        return $variables;
     }
 
     /**
@@ -208,6 +247,8 @@ final class ContextBuilder
         if ($periodId !== null) {
             $rows = DB::table('payroll_incidents AS i')->join('payroll_concepts AS c', 'c.id', '=', 'i.payroll_concept_id')
                 ->where('i.payroll_period_id', $periodId)->where('i.employment_id', $employmentId)->whereNull('i.deleted_at')
+                // NOM-7 · Las diferencias retroactivas no alimentan fórmulas: entran como líneas propias con su periodo de origen.
+                ->where('i.source', '<>', 'retroactive')
                 ->whereIn('i.status', ['pending', 'approved', 'applied'])->orderBy('c.code')
                 ->get(['c.code', 'i.amount', 'i.quantity']);
             foreach ($rows as $r) {

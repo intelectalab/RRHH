@@ -1,7 +1,7 @@
 <?php
 
 /**
- * NOM-1 · NOM-5 · Casos dorados de la mecánica del núcleo (tests/Golden/Engine/<caso>/). Comparación exacta al
+ * NOM-1 · NOM-5 · NOM-9 · Casos dorados de la mecánica del núcleo (tests/Golden/Engine/<caso>/). Comparación exacta al
  * céntimo de cada línea, los totales y los tramos. Los casos de norma peruana van aparte en
  * packages/country-pe/tests/golden y los escribe el especialista (kit/docs/11 §8): el desarrollador nunca
  * cambia un resultado esperado para hacer pasar la prueba.
@@ -46,6 +46,11 @@ test('caso dorado del motor', function (string $case): void {
     $calc = TenancyScope::runAs(GLD_TENANT, function () use ($input, $params): array {
         $entity = PayrollFixtures::entity($input['employment']['regime']);
         $employment = PayrollFixtures::employment($entity, $input['employment']['hire_date'], $input['employment']['compensations']);
+        // NOM-9 · Régimen propio del trabajador por tramos de vigencia (cambio de régimen dentro del periodo).
+        foreach ((array) ($input['employment']['regimes'] ?? []) as $r) {
+            DB::table('employment_labor_regimes')->insert(['tenant_id' => GLD_TENANT, 'employment_id' => $employment, 'labor_regime_code' => $r['code'],
+                'valid_from' => $r['valid_from'], 'valid_to' => $r['valid_to'] ?? null]);
+        }
         foreach ($input['concepts'] as $c) {
             PayrollFixtures::concept($c);
         }

@@ -2,17 +2,20 @@
 
 namespace App\Modules\Payroll\Application;
 
+use App\Modules\Payroll\Domain\Engine\CalculationContext;
 use App\Modules\Payroll\Domain\Engine\CalculationEngine;
+use App\Modules\Payroll\Domain\Engine\ConceptDefinition;
 use App\Modules\Payroll\Domain\Engine\CycleDetected;
 use App\Modules\Payroll\Domain\Engine\DependencyGraph;
 use App\Modules\Payroll\Domain\Formula\FormulaError;
 use App\Modules\Payroll\Domain\Formula\Parser;
 use App\Modules\Payroll\Infrastructure\ConceptCatalog;
 use App\Modules\Payroll\Infrastructure\ContextBuilder;
+use App\Modules\Payroll\Infrastructure\Country\DataPayrollCountryPack;
 use App\Modules\Payroll\Infrastructure\PayrollParameters;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\LegalParameters\LegalParameters;
-use App\Shared\Tenancy\TenancyScope;
+use Brick\Math\BigDecimal;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -70,7 +73,11 @@ final class PayrollEngine
     }
 
     /**
-     * Calcula una relación laboral en un periodo sin guardar nada (banco de pruebas, simulación).
+     * Calcula una relación laboral en un periodo sin guardar nada (banco de pruebas, simulación, recálculo en
+     * sombra). NOM-9: un cambio de régimen dentro del periodo calcula cada tramo con la estrategia y los
+     * parámetros de su régimen y conserva la traza por tramo; un tipo de proceso que el régimen no genera
+     * (p. ej. gratificación en microempresa) deja la relación «excluida» con su motivo. NOM-7: las diferencias
+     * retroactivas del periodo entran como líneas propias con su periodo de origen.
      *
      * @param  array<string, string|bool>  $overrides
      * @param  array<string, array{amount?: string, quantity?: string}>  $incidents
@@ -80,78 +87,132 @@ final class PayrollEngine
     {
         $built = $this->contexts->build($employmentId, $from, $to, $periodKind, $periodId, $overrides, $incidents);
         $context = $built['context'];
-        $date = $context->to;
-        $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date);
-        $result = $this->engine->run($context, $this->catalog->at($date), $params, $built['decimals']);
-        $result['pack_version'] = $built['pack_version'];
+        $pack = new DataPayrollCountryPack($built['country']);
+        $strategy = $context->regime === null ? null : $pack->regime($context->regime);
+        $concepts = $this->catalog->at($context->to);
 
-        return ['employment_id' => $employmentId, 'from' => $from, 'to' => $to, 'period_kind' => $periodKind, 'context' => $context->snapshot(), 'result' => $result];
+        if ($context->errors === [] && $strategy !== null && ! in_array($periodKind, $strategy['processes'], true)) {
+            $result = ['status' => 'excluded', 'errors' => [], 'order' => [], 'lines' => [], 'totals' => [], 'engine_version' => CalculationEngine::VERSION,
+                'warnings' => [['code' => 'process_not_applicable', 'message' => (string) trans('payroll.process_not_applicable', ['kind' => $periodKind, 'regime' => (string) $context->regime])]]];
+        } elseif ($built['tramos'] === []) {
+            $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $context->to);
+            $result = $this->engine->run($context, $concepts, $params, $built['decimals']);
+        } else {
+            $result = $this->byTramos($built['tramos'], $built, $concepts);
+        }
+        if ($periodId !== null && $result['status'] === 'calculated') {
+            $retro = $this->retroactiveLines($employmentId, $periodId, $context->currency);
+            if ($retro !== []) {
+                $result['lines'] = array_values(array_merge($result['lines'], $retro));
+                $result['totals'] = CalculationEngine::totals($result['lines'], $built['decimals']);
+            }
+        }
+        $result['pack_version'] = $built['pack_version'];
+        $result['strategy'] = $strategy === null ? null : ['regime' => $strategy['code'], 'strategy' => $strategy['strategy'], 'pay_unit' => $strategy['pay_unit']];
+
+        return ['employment_id' => $employmentId, 'from' => $from, 'to' => $to, 'period_kind' => $periodKind, 'context' => $context->snapshot()
+            + ['tramos' => array_map(fn (CalculationContext $t) => $t->snapshot(), $built['tramos'])], 'result' => $result];
     }
 
     /**
-     * Calcula y guarda una corrida de un periodo: payroll_runs con la versión del motor y los parámetros
-     * usados, una fila por relación con su contexto (context_snapshot) y una línea por concepto con su
-     * traza. Una relación con error queda «con error» y no detiene a las demás (RN-NOM-10).
+     * NOM-9 · Corre el núcleo una vez por tramo de régimen (cada uno con los parámetros de su régimen) y suma
+     * las líneas por concepto; la traza de cada línea guarda el detalle de cada tramo.
+     *
+     * @param  list<CalculationContext>  $tramos
+     * @param  array{country: string, legal_entity_id: string, decimals: int}  $built
+     * @param  list<ConceptDefinition>  $concepts
+     * @return array<string, mixed>
+     */
+    private function byTramos(array $tramos, array $built, array $concepts): array
+    {
+        $merged = [];
+        $order = [];
+        $warnings = [];
+        $errors = [];
+        foreach ($tramos as $i => $t) {
+            $params = new PayrollParameters($this->legal, $built['country'], $t->regime, $built['legal_entity_id'], (string) $t->variables['fecha_fin']);
+            $r = $this->engine->run($t, $concepts, $params, $built['decimals']);
+            $tramo = ['index' => $i + 1, 'from' => (string) $t->variables['fecha_inicio'], 'to' => (string) $t->variables['fecha_fin'], 'regime' => (string) $t->regime];
+            foreach ($r['errors'] as $e) {
+                $errors[] = $e + ['tramo' => $tramo];
+            }
+            foreach ($r['warnings'] as $w) {
+                $warnings[$w['code'].'|'.($w['parameter'] ?? '')] = $w;
+            }
+            foreach ($r['order'] as $code) {
+                if (! in_array($code, $order, true)) {
+                    $order[] = $code;
+                }
+            }
+            foreach ($r['lines'] as $line) {
+                $code = $line['concept_code'];
+                $entry = $tramo + ['amount' => $line['amount']['amount'], 'concept_version_id' => $line['concept_version_id'], 'trace' => $line['trace']];
+                if (! isset($merged[$code])) {
+                    $merged[$code] = $line;
+                    $merged[$code]['trace'] = ['source' => 'tramos', 'formula' => $line['trace']['formula'] ?? null,
+                        'version_valid_from' => $line['trace']['version_valid_from'] ?? null, 'parameters' => [], 'tramos' => [$entry]];
+                } else {
+                    $merged[$code]['amount']['amount'] = (string) BigDecimal::of($merged[$code]['amount']['amount'])->plus(BigDecimal::of($line['amount']['amount']));
+                    $merged[$code]['trace']['tramos'][] = $entry;
+                }
+                foreach ($line['trace']['parameters'] as $p) {
+                    $merged[$code]['trace']['parameters'][$p['code'].'@'.$p['valid_from'].'@'.$tramo['regime']] = $p;
+                }
+            }
+        }
+        foreach ($merged as $code => $line) {
+            $merged[$code]['trace']['parameters'] = array_values($line['trace']['parameters']);
+        }
+        if ($errors !== []) {
+            return ['status' => 'error', 'errors' => $errors, 'warnings' => array_values($warnings), 'order' => $order, 'lines' => [], 'totals' => [], 'engine_version' => CalculationEngine::VERSION];
+        }
+        $lines = array_values($merged);
+
+        return ['status' => 'calculated', 'errors' => [], 'warnings' => array_values($warnings), 'order' => $order, 'lines' => $lines,
+            'totals' => CalculationEngine::totals($lines, $built['decimals']), 'engine_version' => CalculationEngine::VERSION];
+    }
+
+    /**
+     * NOM-7 · Diferencias retroactivas pendientes o aprobadas del periodo: una línea por incidencia con el
+     * periodo de origen en su traza (el periodo cerrado nunca se toca).
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function retroactiveLines(string $employmentId, string $periodId, string $currency): array
+    {
+        $rows = DB::table('payroll_incidents AS i')->join('payroll_concepts AS c', 'c.id', '=', 'i.payroll_concept_id')
+            ->leftJoin('payroll_periods AS o', 'o.id', '=', 'i.retro_period_id')
+            ->where('i.payroll_period_id', $periodId)->where('i.employment_id', $employmentId)->where('i.source', 'retroactive')
+            ->whereNull('i.deleted_at')->whereIn('i.status', ['pending', 'approved', 'applied'])->orderBy('o.starts_on')->orderBy('c.code')
+            ->get(['i.id', 'i.amount', 'i.currency', 'i.notes', 'c.id AS concept_id', 'c.code', 'c.name', 'c.kind', 'o.id AS origin_id', 'o.period_year', 'o.period_number', 'o.starts_on', 'o.ends_on']);
+        $out = [];
+        foreach ($rows as $r) {
+            $label = $r->period_year === null ? '' : sprintf('%04d-%02d', (int) $r->period_year, (int) $r->period_number);
+            $out[] = [
+                'concept_code' => (string) $r->code, 'concept_name' => (string) $r->name, 'kind' => (string) $r->kind,
+                'concept_id' => (string) $r->concept_id, 'concept_version_id' => null, 'origin' => 'retroactive', 'incident_id' => (string) $r->id,
+                'amount' => ['amount' => (string) BigDecimal::of((string) ($r->amount ?? '0')), 'currency' => (string) ($r->currency ?? $currency)],
+                'trace' => ['source' => 'retroactive', 'formula' => null, 'parameters' => [], 'notes' => $r->notes,
+                    'origin_period' => ['id' => $r->origin_id, 'label' => $label, 'from' => $r->starts_on === null ? null : substr((string) $r->starts_on, 0, 10),
+                        'to' => $r->ends_on === null ? null : substr((string) $r->ends_on, 0, 10)]],
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Calcula y guarda una corrida de un periodo en el acto (corridas pequeñas y pruebas). Las grandes van en
+     * segundo plano con PayrollRuns (NOM-8), que usa el mismo procesamiento por relación.
      *
      * @param  list<string>  $employmentIds
      */
     public function storeRun(string $periodId, array $employmentIds, string $kind, ?string $userId): string
     {
-        $period = DB::table('payroll_periods AS p')->join('payroll_groups AS g', 'g.id', '=', 'p.payroll_group_id')
-            ->where('p.id', $periodId)->first(['p.id', 'p.starts_on', 'p.ends_on', 'p.kind', 'g.currency']);
-        if ($period === null) {
-            throw new AyniException('not_found', 404);
-        }
-        $from = substr((string) $period->starts_on, 0, 10);
-        $to = substr((string) $period->ends_on, 0, 10);
-        $periodKind = (string) $period->kind;
+        $runs = app(PayrollRuns::class);
+        $runId = $runs->open($periodId, ['employment_ids' => $employmentIds], $kind, $userId, false);
+        $runs->process($runId);
 
-        return DB::transaction(function () use ($periodId, $employmentIds, $kind, $userId, $from, $to, $periodKind, $period): string {
-            $tenant = TenancyScope::requireTenant();
-            DB::table('payroll_periods')->where('id', $periodId)->lockForUpdate()->first(['id']);
-            $number = (int) DB::table('payroll_runs')->where('payroll_period_id', $periodId)->max('run_number') + 1;
-            $runId = (string) DB::table('payroll_runs')->insertGetId([
-                'tenant_id' => $tenant, 'payroll_period_id' => $periodId, 'run_number' => $number, 'kind' => $kind, 'status' => 'running',
-                'engine_version' => CalculationEngine::VERSION, 'started_at' => now(), 'requested_by_user_id' => $userId,
-            ]);
-            $parameters = [];
-            $sorted = $employmentIds;
-            sort($sorted);
-            foreach ($sorted as $employmentId) {
-                $calc = $this->calculate($employmentId, $from, $to, $periodKind, $periodId);
-                $r = $calc['result'];
-                $ok = $r['status'] === 'calculated';
-                $proration = $calc['context']['sources']['proration_parameter'] ?? null;
-                if (is_array($proration)) {
-                    $parameters[$proration['code'].'@'.$proration['valid_from']] = $proration;
-                }
-                $rowId = (string) DB::table('payroll_run_employments')->insertGetId([
-                    'tenant_id' => $tenant, 'payroll_run_id' => $runId, 'employment_id' => $employmentId, 'status' => $ok ? 'calculated' : 'error',
-                    'gross_amount' => $ok ? $r['totals']['earnings'] : null, 'deductions_amount' => $ok ? $r['totals']['deductions'] : null,
-                    'net_amount' => $ok ? $r['totals']['net'] : null, 'employer_cost' => $ok ? $r['totals']['employer_cost'] : null,
-                    'currency' => $calc['context']['currency'] !== '' ? $calc['context']['currency'] : (string) $period->currency,
-                    'worked_days' => $calc['context']['variables']['dias_laborados'] ?? null,
-                    'context_snapshot' => json_encode($calc['context'] + ['warnings' => $r['warnings'], 'order' => $r['order']]),
-                    'error' => $ok ? null : json_encode($r['errors']),
-                ]);
-                foreach ($r['lines'] as $line) {
-                    foreach ($line['trace']['parameters'] as $p) {
-                        $parameters[$p['code'].'@'.$p['valid_from']] = $p;
-                    }
-                    DB::table('payroll_run_lines')->insert([
-                        'tenant_id' => $tenant, 'payroll_run_id' => $runId, 'payroll_run_employment_id' => $rowId,
-                        'payroll_concept_id' => $line['concept_id'], 'payroll_concept_version_id' => $line['concept_version_id'],
-                        'amount' => $line['amount']['amount'], 'currency' => $line['amount']['currency'], 'origin' => 'calculated',
-                        'trace' => json_encode($line['trace']),
-                    ]);
-                }
-            }
-            ksort($parameters);
-            DB::table('payroll_runs')->where('id', $runId)->update([
-                'status' => 'completed', 'finished_at' => now(), 'parameters_snapshot' => json_encode(array_values($parameters)),
-            ]);
-
-            return $runId;
-        });
+        return $runId;
     }
 }

@@ -58,6 +58,8 @@ return [
     'pantalla-ausencias' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.absences']],
     'pantalla-programacion-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_planning']],
     'pantalla-acuerdos-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_agreements']],
+    'pantalla-calculos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.runs']],
+    'pantalla-micro-pequena-empresa' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.small_business']],
     'pantalla-resumen-periodo' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.period_summary']],
     'pantalla-subsidios' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.subsidies']],
     'pantalla-portal' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['portal.home']],

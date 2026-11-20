@@ -12,13 +12,23 @@
  */
 return [
     'pais' => 'PE',
-    'version' => '1.0.0',
+    'version' => '1.1.0',
     'decimales' => 2,
     'por_validar' => true,
+    // NOM-10 · RN-PE-MYP-02/03: régimen que se propone cuando la empresa no tiene acreditación vigente o la
+    // relación es anterior a la acreditación.
+    'regimen_por_defecto' => 'pe_general',
+    // NOM-9 · Estrategia de cada régimen: qué estrategia de cálculo usa (micro y pequeña usan la general con
+    // sus propios parámetros), la unidad de remuneración, los procesos especiales que genera y si percibe
+    // gratificaciones. Los montos y tasas viven en los parámetros legales del régimen, no aquí.
     'regimenes' => [
-        'pe_general' => ['tipo' => 'general', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => false],
-        'pe_micro' => ['tipo' => 'micro', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => true],
-        'pe_pequena' => ['tipo' => 'small', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => true],
-        'pe_formativo' => ['tipo' => 'training', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => false],
+        'pe_general' => ['tipo' => 'general', 'estrategia' => 'general', 'unidad_remuneracion' => 'mensual', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => false,
+            'procesos' => ['regular', 'gratification', 'cts', 'profit_sharing', 'settlement', 'special'], 'gratificaciones' => true],
+        'pe_micro' => ['tipo' => 'micro', 'estrategia' => 'general', 'unidad_remuneracion' => 'mensual', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => true,
+            'procesos' => ['regular', 'settlement', 'special'], 'gratificaciones' => false],
+        'pe_pequena' => ['tipo' => 'small', 'estrategia' => 'general', 'unidad_remuneracion' => 'mensual', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => true,
+            'procesos' => ['regular', 'gratification', 'cts', 'profit_sharing', 'settlement', 'special'], 'gratificaciones' => true],
+        'pe_formativo' => ['tipo' => 'training', 'estrategia' => 'formativo', 'unidad_remuneracion' => 'mensual', 'base_prorrateo' => 'dias_base_mes', 'mes_completo_igual_base' => true, 'requiere_acreditacion' => false,
+            'procesos' => ['regular', 'special'], 'gratificaciones' => false],
     ],
 ];

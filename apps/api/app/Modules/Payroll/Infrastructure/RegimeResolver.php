@@ -2,6 +2,7 @@
 
 namespace App\Modules\Payroll\Infrastructure;
 
+use App\Modules\Payroll\Infrastructure\Country\DataPayrollCountryPack;
 use App\Shared\Vigencia\EffectiveDated;
 use Illuminate\Support\Facades\DB;
 
@@ -9,11 +10,15 @@ use Illuminate\Support\Facades\DB;
  * NOM-2 · Régimen laboral de una relación a una fecha: el propio del trabajador (employment_labor_regimes,
  * con vigencia) o, si no lo tiene, el de su empresa (legal_entity_regimes). Dos trabajadores de la misma
  * empresa pueden estar en regímenes distintos según su fecha de ingreso.
+ *
+ * NOM-10 · RN-PE-MYP-02/03: un régimen heredado que exige acreditación (micro, pequeña) solo se aplica si la
+ * empresa la tiene vigente a la fecha y la relación ingresó en o después de la fecha de acreditación; si no,
+ * la relación queda en el régimen por defecto del paquete de país (source = legal_entity_default).
  */
 final class RegimeResolver
 {
     /**
-     * @return array{code: string, source: 'employment'|'legal_entity', valid_from: string, valid_to: string|null}|null
+     * @return array{code: string, source: 'employment'|'legal_entity'|'legal_entity_default', valid_from: string, valid_to: string|null}|null
      */
     public function at(string $employmentId, string $date): ?array
     {
@@ -22,14 +27,27 @@ final class RegimeResolver
         $row = $own->first(['labor_regime_code', 'valid_from', 'valid_to']);
         $source = 'employment';
         if ($row === null) {
-            $entity = DB::table('employments')->where('id', $employmentId)->value('legal_entity_id');
-            if ($entity === null) {
+            $emp = DB::table('employments AS e')->join('legal_entities AS l', 'l.id', '=', 'e.legal_entity_id')
+                ->where('e.id', $employmentId)->first(['e.legal_entity_id', 'e.hire_date', 'l.country_code']);
+            if ($emp === null) {
                 return null;
             }
-            $q = DB::table('legal_entity_regimes')->where('legal_entity_id', $entity);
+            $q = DB::table('legal_entity_regimes')->where('legal_entity_id', $emp->legal_entity_id);
             EffectiveDated::applyAsOf($q, $date);
-            $row = $q->first(['labor_regime_code', 'valid_from', 'valid_to']);
+            $row = $q->first(['labor_regime_code', 'valid_from', 'valid_to', 'accreditation_status', 'registered_on']);
             $source = 'legal_entity';
+            if ($row !== null) {
+                $pack = new DataPayrollCountryPack((string) $emp->country_code);
+                $strategy = $pack->regime((string) $row->labor_regime_code);
+                $default = $pack->defaultRegime();
+                $accredited = in_array((string) $row->accreditation_status, ['accredited', 'in_grace_period'], true);
+                $since = $row->registered_on === null ? null : substr((string) $row->registered_on, 0, 10);
+                $hiredBefore = $since !== null && substr((string) $emp->hire_date, 0, 10) < $since;
+                if ($strategy !== null && $strategy['requires_accreditation'] && $default !== null && (! $accredited || $hiredBefore)) {
+                    return ['code' => $default, 'source' => 'legal_entity_default',
+                        'valid_from' => substr((string) $row->valid_from, 0, 10), 'valid_to' => $row->valid_to === null ? null : substr((string) $row->valid_to, 0, 10)];
+                }
+            }
         }
 
         return $row === null ? null : [

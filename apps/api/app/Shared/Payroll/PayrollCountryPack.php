@@ -17,14 +17,22 @@ interface PayrollCountryPack
     public function decimals(): int;
 
     /**
-     * Estrategia del régimen; null si el paquete aún no lo soporta.
+     * NOM-9 · Estrategia del régimen; null si el paquete aún no lo soporta. `strategy` agrupa regímenes que
+     * calculan igual con parámetros distintos (micro y pequeña usan la general); `processes` son los tipos
+     * de periodo que el régimen genera (un régimen sin gratificación no tiene ese proceso).
      *
-     * @return array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool}|null
+     * @return array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool}|null
      */
     public function regime(string $code): ?array;
 
     /**
-     * @return list<array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool}>
+     * @return list<array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool}>
      */
     public function regimes(): array;
+
+    /**
+     * NOM-10 · Régimen que se propone cuando la empresa no tiene acreditación vigente o la relación es
+     * anterior a ella (RN-PE-MYP-02/03); null si el paquete no lo define.
+     */
+    public function defaultRegime(): ?string;
 }

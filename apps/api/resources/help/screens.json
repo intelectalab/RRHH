@@ -265,6 +265,18 @@
       "permissions": [
         "time.vacation_balances.view"
       ]
+    },
+    "payroll.runs": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.periods.view"
+      ]
+    },
+    "payroll.small_business": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.entity_annual_figures.view"
+      ]
     }
   }
 }

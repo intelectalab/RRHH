@@ -97,6 +97,17 @@ return [
         'totals' => ['payroll.results.view', 'salary'],
         'context' => ['payroll.results.view', 'salary'],
     ],
+    // NOM-6 · NOM-8 · Resultado por relación de una corrida, líneas con su explicación y diferencias retroactivas.
+    'PayrollRunEmployment' => [
+        'totals' => ['payroll.results.view', 'salary'],
+    ],
+    'PayrollRunLine' => [
+        'amount' => ['payroll.results.view', 'salary'],
+        'explanation' => ['payroll.results.trace.view', 'salary'],
+    ],
+    'PayrollRetroactive' => [
+        'differences' => ['payroll.results.view', 'salary'],
+    ],
     'PayrollResult' => [
         'earnings' => ['payroll.results.view', 'salary'],
         'deductions' => ['payroll.results.view', 'salary'],

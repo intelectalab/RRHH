@@ -1,0 +1,13 @@
+period: { from: "2026-03-01", to: "2026-03-31", kind: regular }
+employment:
+  hire_date: "2025-01-01"
+  regime: pe_general
+  compensations:
+    - { amount: "3000.00", valid_from: "2025-01-01" }
+  regimes:
+    - { code: pe_general, valid_from: "2025-01-01", valid_to: "2026-03-15" }
+    - { code: pe_micro, valid_from: "2026-03-16" }
+concepts:
+  - { code: BASICO, kind: earning, formula: "sueldo_tramos", sort_order: 1 }
+  - { code: SOLO_GENERAL, kind: earning, formula: "dias_relacion * 10", sort_order: 2, regimes: [pe_general] }
+  - { code: SOLO_MICRO, kind: earning, formula: "dias_relacion * 5", sort_order: 3, regimes: [pe_micro] }

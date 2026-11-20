@@ -261,11 +261,12 @@
   source enum(manual,import,attendance,absence,overtime,loan,advance,expense,retroactive,benefit,union,system)=manual
   source_type ; source_id uuid ; retro_period_id ?-> payroll_periods ; notes
   status enum(pending,approved,applied,rejected)=pending
-@payroll_runs main lock | Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica.
+@payroll_runs main lock | Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica. NOM-8: scope (todas, relaciones o grupo calculado), avance (total, hechas, con error) y motivo si falló; se reanuda sin repetir lo hecho.
   payroll_period_id -> payroll_periods ; run_number integer! ; kind enum(simulation,calculation,recalculation)=calculation
   status enum(queued,running,completed,failed,discarded,approved,closed)=queued ; engine_version ; parameters_snapshot j
   started_at ; finished_at ; requested_by_user_id ?-> users ; approved_by_user_id ?-> users ; closed_at ; totals j
-  compared_to_run_id ?-> payroll_runs ; uniq payroll_period_id, run_number
+  compared_to_run_id ?-> payroll_runs ; scope j ; employments_total integer=0 ; employments_done integer=0 ; employments_failed integer=0
+  failure_reason ; uniq payroll_period_id, run_number
 @payroll_run_employments sens | Resultado por trabajador de una corrida: totales y fotografía de la asignación, compensación y régimen usados.
   payroll_run_id -> payroll_runs ; employment_id -> employments ; status enum(calculated,error,excluded)=calculated
   gross_amount money #S ; deductions_amount money #S ; net_amount money #S ; employer_cost money #S ; currency cur

@@ -6550,6 +6550,11 @@ CREATE TABLE payroll_runs (
   closed_at timestamptz,
   totals jsonb,
   compared_to_run_id uuid,
+  scope jsonb,
+  employments_total integer NOT NULL DEFAULT 0,
+  employments_done integer NOT NULL DEFAULT 0,
+  employments_failed integer NOT NULL DEFAULT 0,
+  failure_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -6560,7 +6565,7 @@ CREATE TABLE payroll_runs (
   CONSTRAINT fk_payroll_runs_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id),
   CONSTRAINT fk_payroll_runs_compared_to_run_id FOREIGN KEY (tenant_id, compared_to_run_id) REFERENCES payroll_runs (tenant_id, id)
 );
-COMMENT ON TABLE payroll_runs IS 'Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica.';
+COMMENT ON TABLE payroll_runs IS 'Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica. NOM-8: scope (todas, relaciones o grupo calculado), avance (total, hechas, con error) y motivo si falló; se reanuda sin repetir lo hecho.';
 CREATE INDEX ix_payroll_runs_requested_by_user_id ON payroll_runs (tenant_id, requested_by_user_id);
 CREATE INDEX ix_payroll_runs_approved_by_user_id ON payroll_runs (tenant_id, approved_by_user_id);
 CREATE INDEX ix_payroll_runs_compared_to_run_id ON payroll_runs (tenant_id, compared_to_run_id);

@@ -14470,6 +14470,42 @@ paths:
       x-phase: 3
       x-permission: people.employments.update
       operationId: postEmploymentsEmploymentIdPayrollRegime
+  /employments/{employment_id}/payroll-retroactive:
+    post:
+      summary: NOM-7 · Recalcular en sombra los periodos cerrados desde una fecha (from, to?, preview?, reason?) y dejar la
+        diferencia por concepto como incidencia retroactiva en el periodo abierto del grupo, con su periodo de origen; el
+        periodo cerrado no se modifica. preview=true solo muestra las diferencias
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: employment_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postEmploymentsEmploymentIdPayrollRetroactive
   /employments/{employment_id}/pension-affiliations:
     get:
       summary: Historia de la afiliación previsional (sistema, administradora, tipo de comisión) con vigencia; el código de
@@ -21890,6 +21926,43 @@ paths:
       x-phase: 1
       x-permission: org.legal_entities.archive
       operationId: postLegalEntitiesIdArchive
+  /legal-entities/{id}/labor-regime-change:
+    post:
+      summary: 'NOM-10 · Cambio masivo de régimen con fecha efectiva (labor_regime_code, effective_on, reason, accreditation_status?,
+        registry_number?, registered_on?): nuevo tramo del régimen de la empresa y de cada relación vigente con otro régimen;
+        devuelve cuántas cambiaron y las que no pudieron'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: org.legal_entities.update
+      operationId: postLegalEntitiesIdLaborRegimeChange
   /legal-entities/{id}/logo:
     get:
       summary: Logo de la empresa (imagen PNG, JPEG o WebP); 404 si no tiene
@@ -22049,6 +22122,40 @@ paths:
       x-phase: 1
       x-permission: org.legal_entities.restore
       operationId: postLegalEntitiesIdRestore
+  /legal-entities/{id}/small-business-status:
+    get:
+      summary: 'NOM-10 · Estado del régimen micro o pequeña empresa de la razón social a una fecha (as_of): acreditación,
+        ventas en UIT de los últimos ejercicios contra el tope, alerta (exit_risk, permanence_due, permanence), fin de la
+        permanencia y régimen que se propone a los nuevos ingresos'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.entity_annual_figures.view
+      operationId: getLegalEntitiesIdSmallBusinessStatus
   /legal-entity-annual-figures:
     get:
       summary: Listar LegalEntityAnnualFigure
@@ -27112,6 +27219,251 @@ paths:
       x-phase: 3
       x-permission: payroll.results.view
       operationId: getPayrollResultsId
+  /payroll-run-employments/{id}/lines:
+    get:
+      summary: NOM-6 · Líneas de una relación en una corrida, cada una con su origen (cálculo o diferencia retroactiva) y
+        su explicación en lenguaje claro (esta solo con payroll.results.trace.view)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.results.view
+      operationId: getPayrollRunEmploymentsIdLines
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-run-lines/{id}/explanation:
+    get:
+      summary: 'NOM-6 · Cómo se calculó un monto: versión del concepto, fórmula, datos, conceptos e incidencias usados, parámetros
+        con su vigencia y origen, redondeo, tramos por régimen o periodo de origen de una diferencia retroactiva'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.results.trace.view
+      operationId: getPayrollRunLinesIdExplanation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-runs:
+    get:
+      summary: 'NOM-8 · Corridas de cálculo de planilla del alcance (?filter[period_id], ?filter[status]) con su avance: total,
+        calculadas, con error y pendientes'
+      parameters:
+      - name: filter[period_id]
+        in: query
+        required: false
+        description: Periodo de planilla (uuid)
+        schema:
+          type: string
+      - name: filter[status]
+        in: query
+        required: false
+        description: queued, running, completed, failed, discarded, approved o closed
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollRuns
+    post:
+      summary: NOM-8 · Abrir una corrida en segundo plano (period_id, kind simulation|calculation|recalculation, employment_ids?
+        u org_unit_id? para un cálculo parcial). Una simulación exige además payroll.periods.simulate; 409 period_closed si
+        el periodo ya está aprobado o cerrado. Responde con la corrida en cola
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollRuns
+  /payroll-runs/{id}:
+    get:
+      summary: NOM-8 · Estado y avance de una corrida (porcentaje, relaciones calculadas y con error, motivo si falló) y sus
+        totales al terminar
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollRunsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-runs/{id}/discard:
+    post:
+      summary: NOM-8 · Descartar una corrida que no se usará; 409 invalid_transition si está aprobada o cerrada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollRunsIdDiscard
+  /payroll-runs/{id}/employments:
+    get:
+      summary: 'NOM-8 · Resultado por relación de una corrida: estado (calculada, con error y su causa, excluida y su motivo)
+        y totales (estos solo con payroll.results.view)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollRunsIdEmployments
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-runs/{id}/resume:
+    post:
+      summary: 'NOM-8 · Reanudar una corrida que falló o quedó a medias: calcula solo las relaciones que faltan, sin duplicar;
+        409 invalid_transition si ya terminó'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - NOM
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollRunsIdResume
   /payroll-test-bench:
     post:
       summary: 'NOM-5 · Banco de pruebas: calcular una relación en un periodo (hasta 93 días) sin guardar nada, opcionalmente

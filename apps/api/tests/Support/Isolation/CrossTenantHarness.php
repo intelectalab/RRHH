@@ -46,6 +46,9 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
+use App\Modules\Payroll\Infrastructure\Models\PayrollRun;
+use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
+use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -153,6 +156,15 @@ final class CrossTenantHarness
         '/employments/{employment_id}/health-regimes' => HealthRegime::class,
         // NOM-2 · El régimen de la relación vive en employment_labor_regimes (el mismo modelo de COL-7).
         '/employments/{employment_id}/payroll-regime' => HealthRegime::class,
+        // NOM-7 · El recálculo retroactivo es de una relación de A.
+        '/employments/{employment_id}/payroll-retroactive' => HealthRegime::class,
+        // NOM-6 · NOM-8 · Corridas de A, su resultado por relación y sus líneas.
+        '/payroll-runs/{id}' => PayrollRun::class,
+        '/payroll-runs/{id}/resume' => PayrollRun::class,
+        '/payroll-runs/{id}/discard' => PayrollRun::class,
+        '/payroll-runs/{id}/employments' => PayrollRun::class,
+        '/payroll-run-employments/{id}/lines' => PayrollRunEmployment::class,
+        '/payroll-run-lines/{id}/explanation' => PayrollRunLine::class,
         '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,
         '/employments/{employment_id}/insurance-coverages/{id}/end' => InsuranceCoverage::class,
         '/employments/{employment_id}/life-insurance-declarations' => LifeInsuranceBeneficiary::class,

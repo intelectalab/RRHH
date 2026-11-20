@@ -5701,6 +5701,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{employment_id}/payroll-retroactive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-7 · Recalcular en sombra los periodos cerrados desde una fecha (from, to?, preview?, reason?) y dejar la diferencia por concepto como incidencia retroactiva en el periodo abierto del grupo, con su periodo de origen; el periodo cerrado no se modifica. preview=true solo muestra las diferencias */
+        post: operations["postEmploymentsEmploymentIdPayrollRetroactive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{employment_id}/pension-affiliations": {
         parameters: {
             query?: never;
@@ -8771,6 +8788,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/legal-entities/{id}/labor-regime-change": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-10 · Cambio masivo de régimen con fecha efectiva (labor_regime_code, effective_on, reason, accreditation_status?, registry_number?, registered_on?): nuevo tramo del régimen de la empresa y de cada relación vigente con otro régimen; devuelve cuántas cambiaron y las que no pudieron */
+        post: operations["postLegalEntitiesIdLaborRegimeChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/legal-entities/{id}/logo": {
         parameters: {
             query?: never;
@@ -8821,6 +8855,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postLegalEntitiesIdRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-entities/{id}/small-business-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-10 · Estado del régimen micro o pequeña empresa de la razón social a una fecha (as_of): acreditación, ventas en UIT de los últimos ejercicios contra el tope, alerta (exit_risk, permanence_due, permanence), fin de la permanencia y régimen que se propone a los nuevos ingresos */
+        get: operations["getLegalEntitiesIdSmallBusinessStatus"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -11029,6 +11080,126 @@ export interface paths {
         get: operations["getPayrollResultsId"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-run-employments/{id}/lines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-6 · Líneas de una relación en una corrida, cada una con su origen (cálculo o diferencia retroactiva) y su explicación en lenguaje claro (esta solo con payroll.results.trace.view) */
+        get: operations["getPayrollRunEmploymentsIdLines"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-run-lines/{id}/explanation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-6 · Cómo se calculó un monto: versión del concepto, fórmula, datos, conceptos e incidencias usados, parámetros con su vigencia y origen, redondeo, tramos por régimen o periodo de origen de una diferencia retroactiva */
+        get: operations["getPayrollRunLinesIdExplanation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-8 · Corridas de cálculo de planilla del alcance (?filter[period_id], ?filter[status]) con su avance: total, calculadas, con error y pendientes */
+        get: operations["getPayrollRuns"];
+        put?: never;
+        /** NOM-8 · Abrir una corrida en segundo plano (period_id, kind simulation|calculation|recalculation, employment_ids? u org_unit_id? para un cálculo parcial). Una simulación exige además payroll.periods.simulate; 409 period_closed si el periodo ya está aprobado o cerrado. Responde con la corrida en cola */
+        post: operations["postPayrollRuns"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-8 · Estado y avance de una corrida (porcentaje, relaciones calculadas y con error, motivo si falló) y sus totales al terminar */
+        get: operations["getPayrollRunsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-runs/{id}/discard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-8 · Descartar una corrida que no se usará; 409 invalid_transition si está aprobada o cerrada */
+        post: operations["postPayrollRunsIdDiscard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-runs/{id}/employments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NOM-8 · Resultado por relación de una corrida: estado (calculada, con error y su causa, excluida y su motivo) y totales (estos solo con payroll.results.view) */
+        get: operations["getPayrollRunsIdEmployments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-runs/{id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** NOM-8 · Reanudar una corrida que falló o quedó a medias: calcula solo las relaciones que faltan, sin duplicar; 409 invalid_transition si ya terminó */
+        post: operations["postPayrollRunsIdResume"];
         delete?: never;
         options?: never;
         head?: never;
@@ -40339,6 +40510,41 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    postEmploymentsEmploymentIdPayrollRetroactive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getEmploymentsEmploymentIdPensionAffiliations: {
         parameters: {
             query?: never;
@@ -47774,6 +47980,42 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postLegalEntitiesIdLaborRegimeChange: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getLegalEntitiesIdLogo: {
         parameters: {
             query?: never;
@@ -47923,6 +48165,35 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getLegalEntitiesIdSmallBusinessStatus: {
+        parameters: {
+            query?: {
+                /** @description Fecha (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getLegalEntityAnnualFigures: {
@@ -53068,6 +53339,243 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getPayrollRunEmploymentsIdLines: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPayrollRunLinesIdExplanation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPayrollRuns: {
+        parameters: {
+            query?: {
+                /** @description Periodo de planilla (uuid) */
+                "filter[period_id]"?: string;
+                /** @description queued, running, completed, failed, discarded, approved o closed */
+                "filter[status]"?: string;
+                /** @description Página */
+                page?: string;
+                /** @description Tamaño de página (máx. 100) */
+                per_page?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postPayrollRuns: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayrollRunsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPayrollRunsIdDiscard: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayrollRunsIdEmployments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPayrollRunsIdResume: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postPayrollTestBench: {
