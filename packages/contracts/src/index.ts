@@ -7263,6 +7263,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/help/tours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recorridos guiados del usuario (uno por rol de sistema y módulo contratado) con su estado: pending, completed o skipped (AYU-7) */
+        get: operations["getHelpTours"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/help/tours/{tour_key}/complete": {
         parameters: {
             query?: never;
@@ -20360,16 +20377,27 @@ export interface components {
             /** @description Identificador opaco */
             category_id?: string | null;
             body: string;
+            locale?: string | null;
             audience: {
                 [key: string]: unknown;
             };
             /** @description Identificador opaco */
             owner_user_id: string;
+            owner_name?: string | null;
             /** Format: date */
             review_on?: string | null;
             version: number;
             /** @enum {string} */
             status: "draft" | "published" | "in_review" | "archived";
+            has_unpublished_changes?: boolean | null;
+            review_due?: boolean | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            helpful_count?: number | null;
+            not_helpful_count?: number | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -20380,13 +20408,24 @@ export interface components {
             /** @description Identificador opaco */
             category_id?: string | null;
             body?: string;
+            locale?: string | null;
             audience?: {
                 [key: string]: unknown;
             };
             /** @description Identificador opaco */
             owner_user_id?: string;
+            owner_name?: string | null;
             /** Format: date */
             review_on?: string | null;
+            has_unpublished_changes?: boolean | null;
+            review_due?: boolean | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            helpful_count?: number | null;
+            not_helpful_count?: number | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         HolidayCalendar: {
             /** @description Identificador opaco */
@@ -41561,7 +41600,7 @@ export interface operations {
     getHelpArticles: {
         parameters: {
             query?: {
-                /** @description guide, screen, field, tour, release_note o faq */
+                /** @description guide, screen, field, tour, release_note, faq o policy (artículos de la organización, AYU-4) */
                 "filter[kind]"?: string;
                 /** @description Código del módulo */
                 "filter[module]"?: string;
@@ -41686,8 +41725,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Correcto */
-            200: {
+            /** @description Creado */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -41991,6 +42030,28 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getHelpTours: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
         };

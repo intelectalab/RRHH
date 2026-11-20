@@ -103,6 +103,9 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::patch('/help-articles/{id}', [HelpArticleController::class, 'update'])->middleware('platform.permission:platform.help_articles.update');
             Route::post('/help-articles/{id}/publish', [HelpArticleController::class, 'publish'])->middleware('platform.permission:platform.help_articles.publish');
             Route::post('/help-articles/{id}/archive', [HelpArticleController::class, 'archive'])->middleware('platform.permission:platform.help_articles.archive');
+            // AYU-5 · AYU-6 · Búsquedas sin resultado, valoración y consultas de soporte de las organizaciones.
+            Route::get('/help-insights', [HelpArticleController::class, 'insights'])->middleware('platform.permission:platform.help_articles.view');
+            Route::get('/help-escalations', [HelpArticleController::class, 'escalations'])->middleware('platform.permission:platform.help_articles.view');
         });
     });
 });

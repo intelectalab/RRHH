@@ -73,7 +73,7 @@
   subject text! ; description ; status enum(new,in_progress,waiting_info,resolved,closed,cancelled)=new
   priority enum(low,normal,high,urgent)=normal ; assignee_user_id ?-> users ; sla_policy_id ?-> sla_policies
   first_response_due_at ; resolution_due_at ; first_responded_at ; resolved_at ; closed_at ; satisfaction_rating smallint
-  channel enum(portal,email,whatsapp,ai_assistant)=portal ; uniq number
+  channel enum(portal,email,whatsapp,ai_assistant,help_center)=portal ; help_escalation_id ?-> help_escalations ; uniq number
 @ticket_messages | Mensajes y notas internas de una solicitud.
   ticket_id -> tickets ; author_user_id ?-> users ; body text! ; is_internal_note ; via enum(portal,email,whatsapp,system)=portal
   event enum(created,assigned,info_requested,replied,resolved,reopened,closed,comment)=comment ; stored_file_id ?-> stored_files ; file_name

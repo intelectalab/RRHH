@@ -4,7 +4,9 @@ import { api } from '@/lib/api'
 export type HelpArticle = {
   id: string
   slug: string
-  kind: 'guide' | 'screen' | 'field' | 'tour' | 'release_note' | 'faq'
+  /** product: ayuda de GestiaHR · organization: artículo o política propia (AYU-4). */
+  source: 'product' | 'organization'
+  kind: 'guide' | 'screen' | 'field' | 'tour' | 'release_note' | 'faq' | 'policy'
   title: string
   summary: string | null
   body: string
@@ -14,7 +16,34 @@ export type HelpArticle = {
   translation_missing: boolean
   product_version: string
   version_number: number
+  /** Artículo de la organización «por revisar» (RN-AYU-04): sigue visible. */
+  review_due: boolean
   published_at: string
+}
+
+/** AYU-7 · Recorrido de primer ingreso con su estado para el usuario. */
+export type HelpTour = HelpArticle & { status: 'pending' | 'completed' | 'skipped' }
+
+/** AYU-6 · Consulta derivada desde la ayuda. */
+export type HelpEscalation = {
+  id: string
+  target: 'hr' | 'platform_support'
+  question: string
+  screen_key: string | null
+  consulted_articles: Array<{ id: string; title: string; source: string }>
+  status: 'open' | 'answered' | 'closed'
+  request_id: string | null
+  request_number: string | null
+  created_at: string
+}
+
+/** Cada párrafo del recorrido es un paso: «Título: texto» muestra el título aparte. */
+export function tourSteps(body: string): Array<{ title: string | null; text: string }> {
+  return helpBlocks(body).filter((b) => b.kind === 'p').map((b) => {
+    const text = (b as { text: string }).text
+    const i = text.indexOf(': ')
+    return i > 0 && i < 60 ? { title: text.slice(0, i), text: text.slice(i + 2) } : { title: null, text }
+  })
 }
 
 export type ScreenHelp = { screen_key: string; articles: HelpArticle[]; fields: Record<string, HelpArticle> }

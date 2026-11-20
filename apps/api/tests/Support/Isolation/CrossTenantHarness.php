@@ -24,6 +24,7 @@ use App\Modules\Documents\Infrastructure\Models\Document;
 use App\Modules\Documents\Infrastructure\Models\DocumentCategory;
 use App\Modules\Documents\Infrastructure\Models\DocumentRequest;
 use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
+use App\Modules\HelpCenter\Infrastructure\Models\HelpOrgArticle;
 use App\Modules\Helpdesk\Infrastructure\Models\Ticket;
 use App\Modules\Helpdesk\Infrastructure\Models\TicketCategory;
 use App\Modules\Identity\Infrastructure\Models\User;
@@ -189,6 +190,8 @@ final class CrossTenantHarness
         '/certificate-requests/{id}/reject' => CertificateRequest::class,
         '/ticket-categories/{id}' => TicketCategory::class,
         'Ticket' => Ticket::class,
+        // AYU-5 · Valorar un artículo propio de otra organización: 404 (la ayuda del producto es compartida).
+        '/help/articles/{id}/feedback' => HelpOrgArticle::class,
         '/tickets/{id}/messages' => Ticket::class,
         '/tickets/{id}/messages/{message_id}/file' => Ticket::class,
         '/document-categories/{id}/archive' => DocumentCategory::class,
@@ -228,7 +231,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}'];
+    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

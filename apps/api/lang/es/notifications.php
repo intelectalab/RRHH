@@ -130,6 +130,10 @@ return [
             'in_app' => ['subject' => 'Tu {certificate} no se emitió', 'body' => 'Recursos Humanos no emitió tu {certificate}: {reason}'],
             'email' => ['subject' => 'Tu {certificate} no se emitió', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos no emitió tu {certificate}: {reason}\n\nRevisa tus solicitudes aquí: {link}"],
         ],
+        'help.article_review_due' => [
+            'in_app' => ['subject' => 'Revisa «{title}»', 'body' => 'El artículo «{title}» de la ayuda de tu organización tiene revisión el {review_on}. Quedó marcado por revisar y sigue visible.'],
+            'email' => ['subject' => 'Toca revisar «{title}»', 'body' => "Hola {name}:\n\nEn {organization}, el artículo «{title}» de la ayuda tiene revisión el {review_on}. Sigue visible para su audiencia mientras lo revisas.\n\nRevísalo aquí: {link}"],
+        ],
         'tickets.created' => [
             'in_app' => ['subject' => 'Nueva solicitud {number}: {subject}', 'body' => '{employee} envió una solicitud de {category}: {subject}.'],
             'email' => ['subject' => 'Nueva solicitud {number}: {subject}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} envió la solicitud {number} ({category}): {subject}.\n\nAtiéndela aquí: {link}"],

@@ -56,6 +56,8 @@ return [
         // ESS-4: constancia por emitir (a RRHH), emitida o rechazada (al colaborador).
         'certificates.requested' => ['variables' => ['certificate', 'employee'], 'link' => '/personas/constancias', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'certificates.issued' => ['variables' => ['certificate'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // AYU-4 · RN-AYU-04: artículo de la organización por revisar (al responsable).
+        'help.article_review_due' => ['variables' => ['title', 'review_on'], 'link' => '/configuracion/ayuda', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'certificates.rejected' => ['variables' => ['certificate', 'reason'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // ESS-5: solicitud a RRHH nueva o respondida (a quien la atiende) y cambio de estado (al solicitante).
         'tickets.created' => ['variables' => ['number', 'subject', 'employee', 'category'], 'link' => '/personas/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],

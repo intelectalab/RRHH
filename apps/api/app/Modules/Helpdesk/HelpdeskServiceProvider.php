@@ -2,8 +2,10 @@
 
 namespace App\Modules\Helpdesk;
 
+use App\Modules\Helpdesk\Infrastructure\Help\HelpEscalationRequests;
 use App\Modules\Helpdesk\Infrastructure\Inbox\TicketInboxSource;
 use App\Modules\Helpdesk\Infrastructure\SelfService\TicketsHomeCard;
+use App\Shared\Help\HrRequests;
 use App\Shared\Inbox\InboxRegistry;
 use App\Shared\SelfService\HomeCardRegistry;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +16,12 @@ use Illuminate\Support\ServiceProvider;
  */
 final class HelpdeskServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        // AYU-6 · El centro de ayuda deriva consultas a RRHH como solicitudes.
+        $this->app->bind(HrRequests::class, HelpEscalationRequests::class);
+    }
+
     public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');

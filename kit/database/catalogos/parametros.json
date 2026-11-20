@@ -1305,6 +1305,21 @@
       "opciones": null
     },
     {
+      "codigo": "ayuda.revision_anticipacion_dias",
+      "modulo": "core",
+      "nombre": "Aviso de revisión de artículos (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 7,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "AYU-4 · RN-AYU-04: días antes de la fecha de revisión de un artículo de la organización en que se avisa a su responsable y el artículo pasa a «por revisar» (sigue visible).",
+      "opciones": {
+        "min": 0,
+        "max": 90
+      }
+    },
+    {
       "codigo": "mesa_ayuda.sla_respuesta_horas",
       "modulo": "helpdesk",
       "nombre": "Primera respuesta (horas)",

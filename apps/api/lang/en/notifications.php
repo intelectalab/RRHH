@@ -130,6 +130,10 @@ return [
             'in_app' => ['subject' => 'Your {certificate} was not issued', 'body' => 'Human Resources did not issue your {certificate}: {reason}'],
             'email' => ['subject' => 'Your {certificate} was not issued', 'body' => "Hi {name}:\n\nAt {organization}, Human Resources did not issue your {certificate}: {reason}\n\nCheck your requests here: {link}"],
         ],
+        'help.article_review_due' => [
+            'in_app' => ['subject' => 'Review “{title}”', 'body' => 'The help article “{title}” of your organization is due for review on {review_on}. It is marked for review and still visible.'],
+            'email' => ['subject' => 'Time to review “{title}”', 'body' => "Hello {name}:\n\nAt {organization}, the help article “{title}” is due for review on {review_on}. It stays visible to its audience while you review it.\n\nReview it here: {link}"],
+        ],
         'tickets.created' => [
             'in_app' => ['subject' => 'New request {number}: {subject}', 'body' => '{employee} sent a {category} request: {subject}.'],
             'email' => ['subject' => 'New request {number}: {subject}', 'body' => "Hi {name}:\n\nAt {organization}, {employee} sent request {number} ({category}): {subject}.\n\nHandle it here: {link}"],

@@ -531,3 +531,25 @@ END
 $$;
 REVOKE ALL ON FUNCTION trash_labor_history_row(text, uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION trash_labor_history_row(text, uuid) TO gestia_app;
+-- AYU-6 · El administrador de una organización escribe al soporte de GestiaHR desde la ayuda. support_tickets es
+-- de la plataforma (el rol de aplicación no la toca): estas funciones abren la incidencia y leen su estado solo
+-- para la organización activa.
+CREATE OR REPLACE FUNCTION open_support_ticket(p_subject text, p_body text, p_opened_by_email text) RETURNS uuid
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE t uuid := app_tenant_id(); v uuid;
+BEGIN
+  IF t IS NULL THEN
+    RAISE EXCEPTION 'sin organización activa';
+  END IF;
+  INSERT INTO support_tickets (tenant_id, opened_by_email, subject, body) VALUES (t, p_opened_by_email, left(p_subject, 200), p_body) RETURNING id INTO v;
+  RETURN v;
+END
+$$;
+REVOKE ALL ON FUNCTION open_support_ticket(text, text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION open_support_ticket(text, text, text) TO gestia_app;
+CREATE OR REPLACE FUNCTION support_ticket_status(p_id uuid) RETURNS text
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT status FROM support_tickets WHERE id = p_id AND tenant_id = app_tenant_id()
+$$;
+REVOKE ALL ON FUNCTION support_ticket_status(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION support_ticket_status(uuid) TO gestia_app;
