@@ -86,7 +86,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 20 | Sí | A-10 |
 | 3 | [CPT](../prompts/CPT.md) · Conceptos y fórmulas | Nómina Perú | 5 | 2 | 7 | 7 | Sí | — |
 | 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 8 | Sí | D-36 |
-| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 19 | Sí | — |
+| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 33 | Sí | — |
 | 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 6 | — | A-11 |
 | 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 6 | Sí | — |
 | 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
