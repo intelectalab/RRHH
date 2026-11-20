@@ -3,7 +3,7 @@
 Boletas en PDF, publicación en el portal con constancia de entrega e historial.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 5 (3 historias y 2 tareas); 5 del MVP. **Operaciones de API:** 6.
+- **Actividades:** 5 (3 historias y 2 tareas); 5 del MVP. **Operaciones de API:** 17.
 - **Especificación:** `kit/docs/modulos/M-BOL.md`.
 
 ## Prompt para una sesión nueva de Claude Code

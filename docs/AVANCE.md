@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 208 | 0 | 86,3 % |
-| Backlog completo | 512 | 215 | 0 | 42,0 % |
+| Primer corte comercial (MVP) | 241 | 213 | 0 | 88,4 % |
+| Backlog completo | 512 | 220 | 0 | 43,0 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -260,11 +260,11 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PER-11 | Libro de retenciones de quinta | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Libro de retenciones de quinta con consulta, detalle, resumen conciliado con boletas cerradas y exportación; Nómina → Retenciones de quinta. |
 | PER-12 | Importación de acumulados de planilla del ejercicio | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Importación de acumulados del ejercicio con fecha de corte y sustento que alimentan la proyección de quinta; revertible y bloqueada si hay periodo cerrado. |
 | PER-13 | Comparación con el sistema anterior durante la planilla en paralelo | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BOL-1 | Generación de boletas en PDF | BOL | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| BOL-2 | Publicación en el portal y constancia de entrega | BOL | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BOL-3 | Historial y descarga masiva | BOL | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BOL-4 | Conservación de boletas y constancias | BOL | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| BOL-5 | Explicación del cambio de neto en la boleta | BOL | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| BOL-1 | Generación de boletas en PDF | BOL | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Boletas PDF al legajo desde la corrida aprobada o cerrada, idempotentes y con versión al corregir. |
+| BOL-2 | Publicación en el portal y constancia de entrega | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Publicación en el portal con constancia de vista y descarga, acuse con evidencia, entrega física y recordatorio diario. |
+| BOL-3 | Historial y descarga masiva | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Historial propio y de nómina con alcance y permiso por campo; descarga masiva por enlace temporal registrada. |
+| BOL-4 | Conservación de boletas y constancias | BOL | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Boleta inmutable y no borrable; conservación por parámetro legal (por validar: no vence). |
+| BOL-5 | Explicación del cambio de neto en la boleta | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Explicación del cambio de neto desde la traza del cálculo con tolerancia parametrizada. |
 | BSO-1 | Gratificaciones | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | BSO-2 | CTS | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | BSO-3 | Utilidades | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
