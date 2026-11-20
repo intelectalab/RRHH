@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Payroll\Http\Controllers\DeclarationController;
 use App\Modules\Payroll\Http\Controllers\FifthCategoryLedgerController;
 use App\Modules\Payroll\Http\Controllers\LegalParametersController;
 use App\Modules\Payroll\Http\Controllers\PayrollConceptController;
@@ -137,4 +138,32 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/employments/{employment_id}/fifth-category-summary', [FifthCategoryLedgerController::class, 'summary'])->middleware('permission:payroll.fifth_category_ledger.view');
     // PER-12 · Acumulados del ejercicio traídos del sistema anterior (se cargan con el importador payroll_balances).
     Route::get('/payroll-opening-balances', [PayrollOpeningBalanceController::class, 'index'])->middleware('permission:payroll.incidents.view');
+    // DEC-1 · Mapeo de conceptos a la Tabla 22 (vigencia) y verificación de los conceptos usados en un periodo.
+    Route::get('/statutory-mapping-check', [DeclarationController::class, 'mappingCheck'])->middleware('permission:payroll.declaration_files.view');
+    Route::get('/payroll-concepts/{id}/statutory-mappings', [DeclarationController::class, 'conceptMappings'])->middleware('permission:payroll.concepts.view');
+    Route::get('/statutory-file-layouts', [DeclarationController::class, 'layouts'])->middleware('permission:payroll.file_layouts.view');
+    Route::get('/statutory-file-layouts/{id}', [DeclarationController::class, 'layoutShow'])->middleware('permission:payroll.file_layouts.view');
+    // DEC-2 · DEC-3 · DEC-4 · Declaraciones (PLAME, T-Registro, AFPnet): validación previa, archivos, presentación y rectificatoria (ME-24).
+    Route::get('/declaration-files', [DeclarationController::class, 'index'])->middleware('permission:payroll.declaration_files.view');
+    Route::post('/declaration-files', [DeclarationController::class, 'store'])->middleware('permission:payroll.declaration_files.create');
+    Route::post('/declaration-files/preview', [DeclarationController::class, 'preview'])->middleware('permission:payroll.declaration_files.create');
+    Route::get('/declaration-files/{id}', [DeclarationController::class, 'show'])->whereUuid('id')->middleware('permission:payroll.declaration_files.view');
+    Route::post('/declaration-files/{id}/validate', [DeclarationController::class, 'validateFiling'])->middleware('permission:payroll.declaration_files.validate');
+    Route::post('/declaration-files/{id}/mark-submitted', [DeclarationController::class, 'markSubmitted'])->middleware('permission:payroll.declaration_files.mark_submitted');
+    Route::post('/declaration-files/{id}/accept', [DeclarationController::class, 'accept'])->middleware('permission:payroll.declaration_files.mark_submitted');
+    Route::post('/declaration-files/{id}/observe', [DeclarationController::class, 'observe'])->middleware('permission:payroll.declaration_files.mark_submitted');
+    Route::post('/declaration-files/{id}/rectify', [DeclarationController::class, 'rectify'])->middleware('permission:payroll.declaration_files.rectify');
+    Route::get('/declaration-files/{id}/files', [DeclarationController::class, 'files'])->middleware('permission:payroll.declaration_files.view');
+    Route::get('/declaration-files/{id}/files/{file_id}/file', [DeclarationController::class, 'download'])->middleware('permission:payroll.declaration_files.view');
+    Route::get('/registry-events', [DeclarationController::class, 'registryEvents'])->middleware('permission:payroll.declaration_files.view');
+    Route::post('/registry-events/sync', [DeclarationController::class, 'syncRegistry'])->middleware('permission:payroll.declaration_files.create');
+    Route::get('/registry-reconciliation', [DeclarationController::class, 'reconciliation'])->middleware('permission:payroll.declaration_files.view');
+    // DEC-5 · Plantillas de archivo bancario (ADR 0020): un banco nuevo es una plantilla, sin programar.
+    Route::get('/bank-file-templates', [DeclarationController::class, 'bankTemplates'])->middleware('permission:payroll.declaration_files.view');
+    Route::post('/bank-file-templates', [DeclarationController::class, 'createBankTemplate'])->middleware('permission:payroll.file_formats.update');
+    Route::patch('/bank-file-templates/{id}', [DeclarationController::class, 'updateBankTemplate'])->middleware('permission:payroll.file_formats.update');
+    // DEC-6 · Certificados de rentas y retenciones de quinta desde el libro (PER-11).
+    Route::get('/withholding-certificates', [DeclarationController::class, 'certificates'])->middleware('permission:payroll.fifth_category_ledger.view');
+    Route::post('/withholding-certificates', [DeclarationController::class, 'issueCertificate'])->middleware('permission:payroll.declaration_files.create');
+    Route::get('/withholding-certificates/{id}/certificate', [DeclarationController::class, 'downloadCertificate'])->middleware('permission:payroll.fifth_category_ledger.view');
 });

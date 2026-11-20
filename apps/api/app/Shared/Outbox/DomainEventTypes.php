@@ -135,6 +135,12 @@ final class DomainEventTypes
     // PER-10 · RN-PER-12 · Pago del periodo registrado (lotes confirmados).
     public const PAYROLL_PAID = 'payroll.paid.v1';
 
+    // DEC-2 a DEC-4 · ME-24 · Declaración o archivo oficial: generado, validado, presentado, aceptado, observado y rectificado.
+    public const FILING_STATUS_CHANGED = 'filing.status_changed.v1';
+
+    // DEC-3 · RN-DEC-04 · Novedad del T-Registro pendiente con su plazo.
+    public const TREGISTRO_PENDING = 'tregistro.pending.v1';
+
     // PER-7 · Anomalías detectadas al comparar el cálculo con el periodo anterior.
     public const PAYROLL_ANOMALY_DETECTED = 'payroll.anomaly_detected.v1';
 
@@ -548,6 +554,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['period_id', 'paid_at', 'batches'],
             'description' => 'Pago del periodo de planilla registrado con sus lotes confirmados',
+        ],
+        self::FILING_STATUS_CHANGED => [
+            'version' => 1,
+            'required_fields' => ['filing_id', 'kind', 'period_code', 'status'],
+            'description' => 'Declaración o archivo oficial que cambió de estado (generado, validado, presentado, aceptado, observado o rectificado)',
+        ],
+        self::TREGISTRO_PENDING => [
+            'version' => 1,
+            'required_fields' => ['registry_event_id', 'kind', 'due_on'],
+            'description' => 'Novedad del T-Registro pendiente con su fecha límite',
         ],
         self::PAYROLL_ANOMALY_DETECTED => [
             'version' => 1,

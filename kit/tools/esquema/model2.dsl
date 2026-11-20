@@ -401,6 +401,7 @@
   period_code text! ; payroll_period_id ?-> payroll_periods ; is_rectification ; rectifies_filing_id ?-> statutory_filings
   status enum(draft,generated,validated,with_errors,submitted,accepted,rejected,observed,rectified)=draft ; validation_report j ; submitted_at
   submitted_by_user_id ?-> users ; external_reference ; due_on
+  created_by_user_id ?-> users ; accepted_at ; observation ; rectification_reason ; submission_document_id ?-> documents
 @statutory_filing_files | Archivos generados de una declaración.
   statutory_filing_id -> statutory_filings ; file_kind text! ; stored_file_id -> stored_files ; record_count integer ; checksum
   statutory_file_layout_id ?=> statutory_file_layouts ; file_name ; sha256 ; byte_size bigint ; control_totals j ; generator_version
@@ -416,6 +417,10 @@
   kind enum(worker_registration,worker_termination,worker_update,dependent_registration,dependent_termination,dependent_update,establishment_update,period_update,intern_registration)!
   event_date date! ; due_on ; status enum(pending,included,submitted,confirmed,overdue)=pending
   statutory_filing_id ?-> statutory_filings ; confirmation_document_id ?-> documents
+@bank_file_templates lock | DEC-5 · Plantilla de archivo de pago de un banco (haberes, CTS y otros) definida como datos: separador o ancho fijo, cabecera, detalle y validación de cuentas. Las del paquete de país quedan por validar con cada banco.
+  code text! ; bank_code text! ; name text! ; kind enum(salary,cts,other)=salary ; definition j! ; verified bool=f
+  status enum(active,inactive)=active ; source ; deleted_at ; uniq code
+  check jsonb_typeof(definition) = 'object'
 @concept_statutory_mappings | Mapeo de conceptos de planilla a códigos oficiales por tipo de declaración.
   payroll_concept_id -> payroll_concepts ; filing_kind text! ; statutory_code text! ; column_hint
   amount_role enum(accrued_and_paid,accrued_only,paid_only)=accrued_and_paid ; verified bool=f ; verified_by_user_id ?-> users

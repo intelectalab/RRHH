@@ -139,18 +139,18 @@ AS $$
 DECLARE
   v_bad text[] := '{}';
 BEGIN
-  IF NOT pe_param_ok(8::smallint,  NEW.worker_type_code,           NEW.valid_from) THEN v_bad := v_bad || 'worker_type_code'; END IF;
-  IF NOT pe_param_ok(33::smallint, NEW.labor_regime_sunat_code,    NEW.valid_from) THEN v_bad := v_bad || 'labor_regime_sunat_code'; END IF;
-  IF NOT pe_param_ok(24::smallint, NEW.occupational_category_code, NEW.valid_from) THEN v_bad := v_bad || 'occupational_category_code'; END IF;
-  IF NOT pe_param_ok(30::smallint, NEW.occupation_code,            NEW.valid_from) THEN v_bad := v_bad || 'occupation_code'; END IF;
-  IF NOT pe_param_ok(9::smallint,  NEW.education_status_code,      NEW.valid_from) THEN v_bad := v_bad || 'education_status_code'; END IF;
-  IF NOT pe_param_ok(12::smallint, NEW.contract_type_sunat_code,   NEW.valid_from) THEN v_bad := v_bad || 'contract_type_sunat_code'; END IF;
-  IF NOT pe_param_ok(35::smallint, NEW.special_situation_code,     NEW.valid_from) THEN v_bad := v_bad || 'special_situation_code'; END IF;
-  IF NOT pe_param_ok(16::smallint, NEW.payment_type_code,          NEW.valid_from) THEN v_bad := v_bad || 'payment_type_code'; END IF;
-  IF NOT pe_param_ok(13::smallint, NEW.pay_periodicity_code,       NEW.valid_from) THEN v_bad := v_bad || 'pay_periodicity_code'; END IF;
-  IF NOT pe_param_ok(15::smallint, NEW.worker_situation_code,      NEW.valid_from) THEN v_bad := v_bad || 'worker_situation_code'; END IF;
-  IF NOT pe_param_ok(25::smallint, NEW.tax_treaty_code,            NEW.valid_from) THEN v_bad := v_bad || 'tax_treaty_code'; END IF;
-  IF NOT pe_param_ok(14::smallint, NEW.eps_code,                   NEW.valid_from) THEN v_bad := v_bad || 'eps_code'; END IF;
+  IF NOT pe_param_ok(8::smallint,  NEW.worker_type_code,           NEW.valid_from) THEN v_bad := array_append(v_bad, 'worker_type_code'); END IF;
+  IF NOT pe_param_ok(33::smallint, NEW.labor_regime_sunat_code,    NEW.valid_from) THEN v_bad := array_append(v_bad, 'labor_regime_sunat_code'); END IF;
+  IF NOT pe_param_ok(24::smallint, NEW.occupational_category_code, NEW.valid_from) THEN v_bad := array_append(v_bad, 'occupational_category_code'); END IF;
+  IF NOT pe_param_ok(30::smallint, NEW.occupation_code,            NEW.valid_from) THEN v_bad := array_append(v_bad, 'occupation_code'); END IF;
+  IF NOT pe_param_ok(9::smallint,  NEW.education_status_code,      NEW.valid_from) THEN v_bad := array_append(v_bad, 'education_status_code'); END IF;
+  IF NOT pe_param_ok(12::smallint, NEW.contract_type_sunat_code,   NEW.valid_from) THEN v_bad := array_append(v_bad, 'contract_type_sunat_code'); END IF;
+  IF NOT pe_param_ok(35::smallint, NEW.special_situation_code,     NEW.valid_from) THEN v_bad := array_append(v_bad, 'special_situation_code'); END IF;
+  IF NOT pe_param_ok(16::smallint, NEW.payment_type_code,          NEW.valid_from) THEN v_bad := array_append(v_bad, 'payment_type_code'); END IF;
+  IF NOT pe_param_ok(13::smallint, NEW.pay_periodicity_code,       NEW.valid_from) THEN v_bad := array_append(v_bad, 'pay_periodicity_code'); END IF;
+  IF NOT pe_param_ok(15::smallint, NEW.worker_situation_code,      NEW.valid_from) THEN v_bad := array_append(v_bad, 'worker_situation_code'); END IF;
+  IF NOT pe_param_ok(25::smallint, NEW.tax_treaty_code,            NEW.valid_from) THEN v_bad := array_append(v_bad, 'tax_treaty_code'); END IF;
+  IF NOT pe_param_ok(14::smallint, NEW.eps_code,                   NEW.valid_from) THEN v_bad := array_append(v_bad, 'eps_code'); END IF;
   IF array_length(v_bad, 1) > 0 THEN
     RAISE EXCEPTION 'Códigos fuera de las tablas paramétricas vigentes: %', array_to_string(v_bad, ', ') USING ERRCODE = 'AY010';
   END IF;

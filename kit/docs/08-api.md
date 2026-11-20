@@ -1137,6 +1137,21 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/parametric-tables` | `payroll.parametric_tables.view` | 3 |
 | GET | `/parametric-tables/{id}` | `payroll.parametric_tables.view` | 3 |
 | POST | `/declaration-files/preview` | `payroll.declaration_files.create` | 3 |
+| POST | `/declaration-files/{id}/accept` | `payroll.declaration_files.mark_submitted` | 3 |
+| POST | `/declaration-files/{id}/observe` | `payroll.declaration_files.mark_submitted` | 3 |
+| GET | `/declaration-files/{id}/files` | `payroll.declaration_files.view` | 3 |
+| GET | `/declaration-files/{id}/files/{file_id}/file` | `payroll.declaration_files.view` | 3 |
+| GET | `/statutory-mapping-check` | `payroll.declaration_files.view` | 3 |
+| GET | `/payroll-concepts/{id}/statutory-mappings` | `payroll.concepts.view` | 3 |
+| GET | `/registry-events` | `payroll.declaration_files.view` | 3 |
+| POST | `/registry-events/sync` | `payroll.declaration_files.create` | 3 |
+| GET | `/registry-reconciliation` | `payroll.declaration_files.view` | 3 |
+| GET | `/bank-file-templates` | `payroll.declaration_files.view` | 3 |
+| POST | `/bank-file-templates` | `payroll.file_formats.update` | 3 |
+| PATCH | `/bank-file-templates/{id}` | `payroll.file_formats.update` | 3 |
+| GET | `/withholding-certificates` | `payroll.fifth_category_ledger.view` | 3 |
+| POST | `/withholding-certificates` | `payroll.declaration_files.create` | 3 |
+| GET | `/withholding-certificates/{id}/certificate` | `payroll.fifth_category_ledger.view` | 3 |
 | POST | `/fifth-category/simulate` | `payroll.fifth_category_ledger.view` | 3 |
 | POST | `/employments/{employment_id}/registry-validation` | `payroll.registry_profiles.view` | 3 |
 

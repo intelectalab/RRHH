@@ -47,6 +47,7 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
 use App\Modules\Payroll\Infrastructure\Models\AccountingAccount;
+use App\Modules\Payroll\Infrastructure\Models\BankFileTemplate;
 use App\Modules\Payroll\Infrastructure\Models\FifthCategoryLedgerEntry;
 use App\Modules\Payroll\Infrastructure\Models\PayrollPaymentBatch;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRun;
@@ -54,6 +55,8 @@ use App\Modules\Payroll\Infrastructure\Models\PayrollRunAnomaly;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
 use App\Modules\Payroll\Infrastructure\Models\PayrollVarianceThreshold;
+use App\Modules\Payroll\Infrastructure\Models\StatutoryFiling;
+use App\Modules\Payroll\Infrastructure\Models\WithholdingCertificate;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -176,6 +179,14 @@ final class CrossTenantHarness
         '/payroll-run-anomalies/{id}/review' => PayrollRunAnomaly::class,
         '/payroll-run-anomalies/{id}/dismiss' => PayrollRunAnomaly::class,
         '/payroll-variance-thresholds/{id}' => PayrollVarianceThreshold::class,
+        // DEC-2 a DEC-6 · Declaraciones, plantillas bancarias y certificados de quinta de A.
+        'DeclarationFile' => StatutoryFiling::class,
+        '/declaration-files/{id}/accept' => StatutoryFiling::class,
+        '/declaration-files/{id}/observe' => StatutoryFiling::class,
+        '/declaration-files/{id}/files' => StatutoryFiling::class,
+        '/declaration-files/{id}/files/{file_id}/file' => StatutoryFiling::class,
+        '/bank-file-templates/{id}' => BankFileTemplate::class,
+        '/withholding-certificates/{id}/certificate' => WithholdingCertificate::class,
         '/payroll-payment-batches/{id}' => PayrollPaymentBatch::class,
         '/payroll-payment-batches/{id}/generate' => PayrollPaymentBatch::class,
         '/payroll-payment-batches/{id}/file' => PayrollPaymentBatch::class,
@@ -297,7 +308,7 @@ final class CrossTenantHarness
      *
      * @var array<int, string>
      */
-    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete', '/payroll-regimes', '/payroll-regimes/{id}', '/payroll-regimes/{id}/parameters',
+    public const SHARED_PRODUCT_CONTENT = ['/statutory-file-layouts', '/statutory-file-layouts/{id}', '/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete', '/payroll-regimes', '/payroll-regimes/{id}', '/payroll-regimes/{id}/parameters',
         '/legal-parameters/{id}', '/legal-parameters/{id}/add-value', '/legal-parameters/{id}/confirm', '/wage-tables/{id}', '/wage-tables/{id}/verify'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */

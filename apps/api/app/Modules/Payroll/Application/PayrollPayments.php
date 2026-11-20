@@ -2,10 +2,12 @@
 
 namespace App\Modules\Payroll\Application;
 
+use App\Modules\Payroll\Application\Declarations\BankFileTemplates;
 use App\Modules\Payroll\Domain\PaymentBatchStateMachine;
 use App\Modules\Payroll\Infrastructure\Models\PayrollGroup;
 use App\Modules\Payroll\Infrastructure\Models\PayrollPeriod;
 use App\Modules\Payroll\Infrastructure\Payments\GenericCsvBankFile;
+use App\Modules\Payroll\Infrastructure\Payments\TemplateBankFile;
 use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Files\FileService;
@@ -40,6 +42,7 @@ final class PayrollPayments
         private readonly FileService $files,
         private readonly AuditLogger $audit,
         GenericCsvBankFile $generic,
+        private readonly BankFileTemplates $templates,
     ) {
         $this->formats = [$generic->code() => $generic];
     }
@@ -134,7 +137,8 @@ final class PayrollPayments
     {
         $b = $this->batch($batchId);
         $next = $this->machine->getNextState((string) $b->status, 'generate');
-        $writer = $this->formats[$format] ?? null;
+        // DEC-5 · Además del genérico, cualquier plantilla activa (del paquete o de la organización) es un formato.
+        $writer = $this->formats[$format] ?? $this->templates->format($format);
         if ($writer === null) {
             throw new AyniException('validation_failed', 422, (string) trans('payroll.payments.unknown_format'),
                 [['field' => 'format', 'rule' => 'in', 'message' => (string) trans('payroll.payments.unknown_format')]]);
@@ -155,6 +159,10 @@ final class PayrollPayments
                 'account_type' => $account['account_type'], 'account_number' => $account['account_number'], 'interbank_code' => $account['interbank_code'],
                 'amount' => (string) BigDecimal::of((string) $r->amount)->toScale(2), 'currency' => (string) $r->currency, 'reference' => (string) $r->id,
             ];
+        }
+        if ($writer instanceof TemplateBankFile && ($invalid = $writer->invalidAccounts($items)) !== []) {
+            throw new AyniException('validation_failed', 422, (string) trans('payroll.declarations.accounts_invalid'),
+                array_map(fn (array $i): array => ['field' => 'items.'.$i['reference'], 'rule' => $i['rule'], 'message' => $i['name']], $invalid));
         }
         $content = $writer->render([
             'batch_id' => $batchId, 'legal_entity_tax_id' => $entity?->tax_id, 'legal_entity_name' => $entity?->legal_name, 'bank_code' => $b->bank_code,

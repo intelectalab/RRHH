@@ -518,6 +518,84 @@ PENSION_FUNDS_PE = [
  ('pe_afp_prima', 'Prima AFP', 'private'), ('pe_afp_profuturo', 'Profuturo AFP', 'private'),
 ]
 
+# DEC-4 · Código de cada AFP en AFPnet (guía rápida para empleadores de AFPnet, docs/18 §3.5, V). Distinto del
+# código de la tabla 11 de SUNAT (statutory_code), que sigue vacío hasta cotejarlo.
+AFPNET_CODES_PE = {'pe_afp_habitat': 'HA', 'pe_afp_integra': 'IN', 'pe_afp_prima': 'RI', 'pe_afp_profuturo': 'PR'}
+
+# DEC-2 a DEC-4 · DEC-10 · Estructuras de los archivos oficiales como datos con vigencia (statutory_file_layouts),
+# según docs/18 §3.1, §3.3 y §3.5. Todas van verified = False: hasta que el especialista acepte un archivo dorado
+# importado sin errores en el PDT PLAME, el T-Registro o AFPnet, el archivo solo sale como borrador (AR-11).
+# Cada campo: n, name, type (text|number|date|fixed_number), max_len, decimals, required, table, source y, en los de
+# ancho fijo, width. «truncate» marca los textos que el archivo recorta (nombres en AFPnet) en vez de rechazar.
+def _f(n, name, typ, max_len, required=True, table=None, source=None, decimals=None, width=None, truncate=False, values=None):
+    d = dict(n=n, name=name, type=typ, max_len=max_len, required=required)
+    if table is not None: d['table'] = table
+    if source is not None: d['source'] = source
+    if decimals is not None: d['decimals'] = decimals
+    if width is not None: d['width'] = width
+    if truncate: d['truncate'] = True
+    if values is not None: d['values'] = values
+    return d
+_DOC = [_f(1, 'tipo_documento', 'text', 2, table=3, source='document.type_code'), _f(2, 'numero_documento', 'text', 15, source='document.number')]
+_PLAME = dict(filing_kind='plame', file_name_pattern='0601{yyyy}{mm}{ruc}.{ext}', layout_version='2023-07', field_separator='|',
+              encoding='ISO-8859-1', line_ending='CRLF', has_header=False, trailing_separator=True, valid_from='2023-07-01',
+              source='R.S. 223-2017/SUNAT (estructura 26, V); estructuras 14, 15 y 18 por orden de campos V2 y longitudes por confirmar (docs/18 §3.1)')
+_TREG = dict(filing_kind='t_registro', file_name_pattern='RP_{ruc}.{ext}', layout_version='2020-06', field_separator='|',
+             encoding='ISO-8859-1', line_ending='CRLF', has_header=False, trailing_separator=True, valid_from='2020-06-01',
+             source='SUNAT, Ejemplos de carga masiva al T-Registro (06/2020): orden de campos V; prefijo, extensiones, tipos y longitudes por confirmar (docs/18 §3.3)')
+ESTRUCTURAS_PE = [
+ dict(_PLAME, structure_code='18', name='Ingresos, tributos y descuentos', file_extension='rem', fields=_DOC + [
+   _f(3, 'codigo_concepto', 'text', 4, table=22, source='concept.statutory_code'),
+   _f(4, 'monto_devengado', 'number', 10, decimals=2, source='line.accrued'), _f(5, 'monto_pagado', 'number', 10, decimals=2, source='line.paid')]),
+ dict(_PLAME, structure_code='15', name='Días subsidiados y otros no laborados', file_extension='snl', fields=_DOC + [
+   _f(3, 'tipo_suspension', 'text', 2, table=21, source='absence.statutory_suspension_code'), _f(4, 'numero_dias', 'number', 2, decimals=0, source='absence.days')]),
+ dict(_PLAME, structure_code='26', name='Otras condiciones del trabajador', file_extension='toc', fields=_DOC + [
+   _f(3, 'asegura_tu_pension', 'text', 1, values=['0', '1'], source='profile.asegura_pension'), _f(4, 'mas_vida', 'text', 1, values=['0', '1'], source='profile.essalud_vida'),
+   _f(5, 'fondo_artista', 'text', 1, required=False, source='profile.artist_fund'), _f(6, 'domiciliado', 'text', 1, values=['1', '2'], source='profile.is_tax_resident')]),
+ dict(_TREG, structure_code='4', name='Datos personales', file_extension='ide', fields=[
+   _f(1, 'tipo_documento', 'text', 2, table=3, source='document.type_code'), _f(2, 'numero_documento', 'text', 15, source='document.number'),
+   _f(3, 'pais_emisor', 'text', 3, table=26, source='document.issuing_country'), _f(4, 'fecha_nacimiento', 'date', 10, source='person.birth_date'),
+   _f(5, 'apellido_paterno', 'text', 40, source='person.paternal_surname'), _f(6, 'apellido_materno', 'text', 40, required=False, source='person.maternal_surname'),
+   _f(7, 'nombres', 'text', 40, source='person.first_names'), _f(8, 'sexo', 'text', 1, source='person.sex_code'), _f(9, 'nacionalidad', 'text', 4, table=4, source='person.nationality_code')]),
+ dict(_TREG, structure_code='5', name='Datos del trabajador', file_extension='tra', fields=[
+   _f(1, 'tipo_documento', 'text', 2, table=3, source='document.type_code'), _f(2, 'numero_documento', 'text', 15, source='document.number'),
+   _f(3, 'pais_emisor', 'text', 3, table=26, source='document.issuing_country'), _f(4, 'regimen_laboral', 'text', 2, table=33, source='profile.labor_regime_sunat_code'),
+   _f(5, 'situacion_educativa', 'text', 2, table=9, source='profile.education_status_code'), _f(6, 'ocupacion', 'text', 6, table=30, source='profile.occupation_code'),
+   _f(7, 'discapacidad', 'text', 1, values=['0', '1'], source='profile.has_disability'), _f(8, 'cuspp', 'text', 12, required=False, source='pension.cuspp'),
+   _f(9, 'sctr_pension', 'text', 1, values=['0', '1', '2'], source='profile.sctr_pension'), _f(10, 'tipo_contrato', 'text', 2, table=12, source='profile.contract_type_sunat_code'),
+   _f(11, 'regimen_alternativo', 'text', 1, values=['0', '1'], source='profile.alternative_working_regime'), _f(12, 'jornada_maxima', 'text', 1, values=['0', '1'], source='profile.subject_to_max_working_time'),
+   _f(13, 'horario_nocturno', 'text', 1, values=['0', '1'], source='profile.subject_to_night_shift'), _f(14, 'sindicalizado', 'text', 1, values=['0', '1'], source='profile.is_unionized'),
+   _f(15, 'periodicidad', 'text', 1, table=13, source='profile.pay_periodicity_code'), _f(16, 'remuneracion_basica_inicial', 'number', 10, decimals=2, source='profile.initial_basic_remuneration'),
+   _f(17, 'situacion', 'text', 2, table=15, source='profile.worker_situation_code'), _f(18, 'quinta_exonerada', 'text', 1, values=['0', '1'], source='profile.fifth_category_exempt'),
+   _f(19, 'situacion_especial', 'text', 1, table=35, source='profile.special_situation_code'), _f(20, 'tipo_pago', 'text', 1, table=16, source='profile.payment_type_code'),
+   _f(21, 'categoria_ocupacional', 'text', 2, required=False, table=24, source='profile.occupational_category_code'), _f(22, 'convenio_doble_tributacion', 'text', 1, table=25, source='profile.tax_treaty_code'),
+   _f(23, 'ruc_cas', 'text', 11, required=False, source='profile.cas_tax_id')]),
+ dict(_TREG, structure_code='11', name='Periodos', file_extension='per', fields=[
+   _f(1, 'tipo_documento', 'text', 2, table=3, source='document.type_code'), _f(2, 'numero_documento', 'text', 15, source='document.number'),
+   _f(3, 'pais_emisor', 'text', 3, table=26, source='document.issuing_country'), _f(4, 'categoria', 'text', 1, source='period.category_code'),
+   _f(5, 'tipo_registro', 'text', 1, source='period.record_type_code'), _f(6, 'fecha_inicio', 'date', 10, source='period.starts_on'),
+   _f(7, 'fecha_fin', 'date', 10, required=False, source='period.ends_on'), _f(8, 'indicador', 'text', 2, required=False, source='period.indicator_code'),
+   _f(9, 'eps', 'text', 2, required=False, table=14, source='period.eps_code')]),
+ dict(filing_kind='afpnet', structure_code='planilla', name='Planilla de declaración de aportes (texto de ancho fijo)', file_extension='txt',
+      file_name_pattern='AFPNET_{ruc}_{yyyy}{mm}.{ext}', layout_version='guia-afpnet', field_separator=None, encoding='ISO-8859-1', line_ending='CRLF',
+      has_header=False, trailing_separator=False, valid_from='2020-01-01',
+      source='AFPnet, Guía rápida para empleadores: 17 columnas, 141 caracteres por línea, montos sin punto con ceros a la izquierda (V, docs/18 §3.5); códigos de documento 6 en adelante por confirmar',
+      fields=[_f(1, 'secuencia', 'fixed_number', 5, width=5, source='seq'), _f(2, 'cuspp', 'text', 12, required=False, width=12, source='pension.cuspp'),
+        _f(3, 'tipo_documento', 'fixed_number', 1, width=1, source='document.afpnet_code'), _f(4, 'numero_documento', 'text', 20, width=20, source='document.number'),
+        _f(5, 'apellido_paterno', 'text', 20, required=False, width=20, truncate=True, source='person.paternal_surname'),
+        _f(6, 'apellido_materno', 'text', 20, required=False, width=20, truncate=True, source='person.maternal_surname'),
+        _f(7, 'nombres', 'text', 20, required=False, width=20, truncate=True, source='person.first_names'),
+        _f(8, 'relacion_laboral', 'text', 1, width=1, values=['S', 'N'], source='afp.relation'), _f(9, 'inicio_relacion', 'text', 1, width=1, values=['S', 'N'], source='afp.start'),
+        _f(10, 'cese_relacion', 'text', 1, width=1, values=['S', 'N'], source='afp.end'),
+        _f(11, 'excepcion_aportar', 'text', 1, required=False, width=1, values=['', 'L', 'U', 'J', 'I', 'P', 'O'], source='afp.exception'),
+        _f(12, 'remuneracion_asegurable', 'fixed_number', 9, width=9, decimals=2, source='afp.insurable'),
+        _f(13, 'aporte_voluntario_previsional', 'fixed_number', 9, width=9, decimals=2, source='afp.voluntary_pension'),
+        _f(14, 'aporte_voluntario_sin_fin', 'fixed_number', 9, width=9, decimals=2, source='afp.voluntary_other'),
+        _f(15, 'aporte_voluntario_empleador', 'fixed_number', 9, width=9, decimals=2, source='afp.voluntary_employer'),
+        _f(16, 'tipo_trabajo', 'text', 1, required=False, width=1, values=['', 'N', 'C', 'M', 'P'], source='afp.work_type'),
+        _f(17, 'afp', 'text', 2, required=False, width=2, source='pension.afpnet_code')]),
+]
+
 REGIMES_PE = [
  ('pe_general', 'Régimen general', 'general'), ('pe_micro', 'Microempresa', 'micro'), ('pe_pequena', 'Pequeña empresa', 'small'),
  ('pe_construccion', 'Construcción civil', 'construction'), ('pe_agrario', 'Agrario', 'agrarian'),

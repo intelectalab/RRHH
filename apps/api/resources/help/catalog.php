@@ -62,6 +62,7 @@ return [
     'pantalla-revision-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.review']],
     'pantalla-pagos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payments']],
     'pantalla-retenciones-quinta' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.fifth_ledger']],
+    'pantalla-declaraciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.declarations']],
     'pantalla-micro-pequena-empresa' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.small_business']],
     'pantalla-planilla-periodos' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.periods']],
     'pantalla-parametros-legales' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.legal_parameters']],

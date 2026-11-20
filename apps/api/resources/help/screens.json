@@ -313,6 +313,12 @@
       "permissions": [
         "payroll.fifth_category_ledger.view"
       ]
+    },
+    "payroll.declarations": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.declaration_files.view"
+      ]
     }
   }
 }

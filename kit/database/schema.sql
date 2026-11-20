@@ -7500,6 +7500,11 @@ CREATE TABLE statutory_filings (
   submitted_by_user_id uuid,
   external_reference text,
   due_on date,
+  created_by_user_id uuid,
+  accepted_at timestamptz,
+  observation text,
+  rectification_reason text,
+  submission_document_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -7507,13 +7512,17 @@ CREATE TABLE statutory_filings (
   CONSTRAINT fk_statutory_filings_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
   CONSTRAINT fk_statutory_filings_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
   CONSTRAINT fk_statutory_filings_rectifies_filing_id FOREIGN KEY (tenant_id, rectifies_filing_id) REFERENCES statutory_filings (tenant_id, id),
-  CONSTRAINT fk_statutory_filings_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_statutory_filings_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_statutory_filings_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_statutory_filings_submission_document_id FOREIGN KEY (tenant_id, submission_document_id) REFERENCES documents (tenant_id, id)
 );
 COMMENT ON TABLE statutory_filings IS 'Declaración o archivo oficial por empresa y periodo (planilla electrónica, registro laboral, aportes previsionales), con validación previa y rectificatorias.';
 CREATE INDEX ix_statutory_filings_legal_entity_id ON statutory_filings (tenant_id, legal_entity_id);
 CREATE INDEX ix_statutory_filings_payroll_period_id ON statutory_filings (tenant_id, payroll_period_id);
 CREATE INDEX ix_statutory_filings_rectifies_filing_id ON statutory_filings (tenant_id, rectifies_filing_id);
 CREATE INDEX ix_statutory_filings_submitted_by_user_id ON statutory_filings (tenant_id, submitted_by_user_id);
+CREATE INDEX ix_statutory_filings_created_by_user_id ON statutory_filings (tenant_id, created_by_user_id);
+CREATE INDEX ix_statutory_filings_submission_document_id ON statutory_filings (tenant_id, submission_document_id);
 ALTER TABLE statutory_filings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE statutory_filings FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON statutory_filings USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -7617,6 +7626,31 @@ ALTER TABLE registry_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registry_events FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON registry_events USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_registry_events_touch BEFORE UPDATE ON registry_events FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE bank_file_templates (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  code text NOT NULL,
+  bank_code text NOT NULL,
+  name text NOT NULL,
+  kind text NOT NULL DEFAULT 'salary' CHECK (kind IN ('salary','cts','other')),
+  definition jsonb NOT NULL,
+  verified boolean NOT NULL DEFAULT false,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','inactive')),
+  source text,
+  deleted_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_bank_file_templates_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_bank_file_templates_code UNIQUE (tenant_id, code),
+  CONSTRAINT ck_bank_file_templates_1 CHECK (jsonb_typeof(definition) = 'object')
+);
+COMMENT ON TABLE bank_file_templates IS 'DEC-5 · Plantilla de archivo de pago de un banco (haberes, CTS y otros) definida como datos: separador o ancho fijo, cabecera, detalle y validación de cuentas. Las del paquete de país quedan por validar con cada banco.';
+ALTER TABLE bank_file_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bank_file_templates FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON bank_file_templates USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_bank_file_templates_touch BEFORE UPDATE ON bank_file_templates FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE concept_statutory_mappings (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -15162,18 +15196,18 @@ AS $$
 DECLARE
   v_bad text[] := '{}';
 BEGIN
-  IF NOT pe_param_ok(8::smallint,  NEW.worker_type_code,           NEW.valid_from) THEN v_bad := v_bad || 'worker_type_code'; END IF;
-  IF NOT pe_param_ok(33::smallint, NEW.labor_regime_sunat_code,    NEW.valid_from) THEN v_bad := v_bad || 'labor_regime_sunat_code'; END IF;
-  IF NOT pe_param_ok(24::smallint, NEW.occupational_category_code, NEW.valid_from) THEN v_bad := v_bad || 'occupational_category_code'; END IF;
-  IF NOT pe_param_ok(30::smallint, NEW.occupation_code,            NEW.valid_from) THEN v_bad := v_bad || 'occupation_code'; END IF;
-  IF NOT pe_param_ok(9::smallint,  NEW.education_status_code,      NEW.valid_from) THEN v_bad := v_bad || 'education_status_code'; END IF;
-  IF NOT pe_param_ok(12::smallint, NEW.contract_type_sunat_code,   NEW.valid_from) THEN v_bad := v_bad || 'contract_type_sunat_code'; END IF;
-  IF NOT pe_param_ok(35::smallint, NEW.special_situation_code,     NEW.valid_from) THEN v_bad := v_bad || 'special_situation_code'; END IF;
-  IF NOT pe_param_ok(16::smallint, NEW.payment_type_code,          NEW.valid_from) THEN v_bad := v_bad || 'payment_type_code'; END IF;
-  IF NOT pe_param_ok(13::smallint, NEW.pay_periodicity_code,       NEW.valid_from) THEN v_bad := v_bad || 'pay_periodicity_code'; END IF;
-  IF NOT pe_param_ok(15::smallint, NEW.worker_situation_code,      NEW.valid_from) THEN v_bad := v_bad || 'worker_situation_code'; END IF;
-  IF NOT pe_param_ok(25::smallint, NEW.tax_treaty_code,            NEW.valid_from) THEN v_bad := v_bad || 'tax_treaty_code'; END IF;
-  IF NOT pe_param_ok(14::smallint, NEW.eps_code,                   NEW.valid_from) THEN v_bad := v_bad || 'eps_code'; END IF;
+  IF NOT pe_param_ok(8::smallint,  NEW.worker_type_code,           NEW.valid_from) THEN v_bad := array_append(v_bad, 'worker_type_code'); END IF;
+  IF NOT pe_param_ok(33::smallint, NEW.labor_regime_sunat_code,    NEW.valid_from) THEN v_bad := array_append(v_bad, 'labor_regime_sunat_code'); END IF;
+  IF NOT pe_param_ok(24::smallint, NEW.occupational_category_code, NEW.valid_from) THEN v_bad := array_append(v_bad, 'occupational_category_code'); END IF;
+  IF NOT pe_param_ok(30::smallint, NEW.occupation_code,            NEW.valid_from) THEN v_bad := array_append(v_bad, 'occupation_code'); END IF;
+  IF NOT pe_param_ok(9::smallint,  NEW.education_status_code,      NEW.valid_from) THEN v_bad := array_append(v_bad, 'education_status_code'); END IF;
+  IF NOT pe_param_ok(12::smallint, NEW.contract_type_sunat_code,   NEW.valid_from) THEN v_bad := array_append(v_bad, 'contract_type_sunat_code'); END IF;
+  IF NOT pe_param_ok(35::smallint, NEW.special_situation_code,     NEW.valid_from) THEN v_bad := array_append(v_bad, 'special_situation_code'); END IF;
+  IF NOT pe_param_ok(16::smallint, NEW.payment_type_code,          NEW.valid_from) THEN v_bad := array_append(v_bad, 'payment_type_code'); END IF;
+  IF NOT pe_param_ok(13::smallint, NEW.pay_periodicity_code,       NEW.valid_from) THEN v_bad := array_append(v_bad, 'pay_periodicity_code'); END IF;
+  IF NOT pe_param_ok(15::smallint, NEW.worker_situation_code,      NEW.valid_from) THEN v_bad := array_append(v_bad, 'worker_situation_code'); END IF;
+  IF NOT pe_param_ok(25::smallint, NEW.tax_treaty_code,            NEW.valid_from) THEN v_bad := array_append(v_bad, 'tax_treaty_code'); END IF;
+  IF NOT pe_param_ok(14::smallint, NEW.eps_code,                   NEW.valid_from) THEN v_bad := array_append(v_bad, 'eps_code'); END IF;
   IF array_length(v_bad, 1) > 0 THEN
     RAISE EXCEPTION 'Códigos fuera de las tablas paramétricas vigentes: %', array_to_string(v_bad, ', ') USING ERRCODE = 'AY010';
   END IF;
@@ -15450,12 +15484,12 @@ INSERT INTO labor_regimes (code, country_code, name, kind) VALUES
   ('pe_agrario', 'PE', 'Agrario', 'agrarian'),
   ('pe_formativo', 'PE', 'Modalidades formativas', 'training');
 INSERT INTO country_packs (country_code, code, name, status, current_version) VALUES ('PE', 'pe-base', 'Perú · configuración inicial', 'available', '1.0.0');
-INSERT INTO pension_funds (code, country_code, name, kind, status) VALUES
-  ('pe_onp', 'PE', 'Oficina de Normalización Previsional (ONP)', 'public', 'active'),
-  ('pe_afp_habitat', 'PE', 'AFP Habitat', 'private', 'active'),
-  ('pe_afp_integra', 'PE', 'AFP Integra', 'private', 'active'),
-  ('pe_afp_prima', 'PE', 'Prima AFP', 'private', 'active'),
-  ('pe_afp_profuturo', 'PE', 'Profuturo AFP', 'private', 'active');
+INSERT INTO pension_funds (code, country_code, name, kind, afpnet_code, status) VALUES
+  ('pe_onp', 'PE', 'Oficina de Normalización Previsional (ONP)', 'public', NULL, 'active'),
+  ('pe_afp_habitat', 'PE', 'AFP Habitat', 'private', 'HA', 'active'),
+  ('pe_afp_integra', 'PE', 'AFP Integra', 'private', 'IN', 'active'),
+  ('pe_afp_prima', 'PE', 'Prima AFP', 'private', 'RI', 'active'),
+  ('pe_afp_profuturo', 'PE', 'Profuturo AFP', 'private', 'PR', 'active');
 INSERT INTO system_roles (code, name, description, realm, mfa_required_default) VALUES
   ('superadmin_saas', 'Superadmin SaaS', 'Propietario del SaaS. Opera en una consola aparte; no es un rol de organización y no ve datos de RRHH salvo acceso de soporte autorizado.', 'platform', true),
   ('admin_empresa', 'Administrador empresa', 'Administra la organización completa. Por defecto no accede a denuncias ni a datos médicos: esos permisos se asignan aparte.', 'tenant', true),
@@ -19563,6 +19597,14 @@ INSERT INTO pe_parametric_items (table_number, code, description, private_sector
   (22, '0916', 'Subsidios de incapacidad por enfermedad', true, 'SUNAT · Tabla 22 – Definición de conceptos PLAME, versión del 01-10-2025', true, '2000-01-01'),
   (22, '0917', 'Condiciones de trabajo', true, 'SUNAT · Tabla 22 – Definición de conceptos PLAME, versión del 01-10-2025', true, '2000-01-01'),
   (22, '0928', 'Devolución de retención en exceso de quinta categoría', true, 'SUNAT · Tabla 22 – Definición de conceptos PLAME, versión del 01-10-2025', true, '2000-01-01');
+INSERT INTO statutory_file_layouts (country_code, filing_kind, structure_code, name, file_name_pattern, file_extension, layout_version, field_separator, encoding, line_ending, has_header, trailing_separator, fields, source, verified, valid_from) VALUES
+  ('PE', 'plame', '18', 'Ingresos, tributos y descuentos', '0601{yyyy}{mm}{ruc}.{ext}', 'rem', '2023-07', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "codigo_concepto", "type": "text", "max_len": 4, "required": true, "table": 22, "source": "concept.statutory_code"}, {"n": 4, "name": "monto_devengado", "type": "number", "max_len": 10, "required": true, "source": "line.accrued", "decimals": 2}, {"n": 5, "name": "monto_pagado", "type": "number", "max_len": 10, "required": true, "source": "line.paid", "decimals": 2}]'::jsonb, 'R.S. 223-2017/SUNAT (estructura 26, V); estructuras 14, 15 y 18 por orden de campos V2 y longitudes por confirmar (docs/18 §3.1)', false, '2023-07-01'),
+  ('PE', 'plame', '15', 'Días subsidiados y otros no laborados', '0601{yyyy}{mm}{ruc}.{ext}', 'snl', '2023-07', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "tipo_suspension", "type": "text", "max_len": 2, "required": true, "table": 21, "source": "absence.statutory_suspension_code"}, {"n": 4, "name": "numero_dias", "type": "number", "max_len": 2, "required": true, "source": "absence.days", "decimals": 0}]'::jsonb, 'R.S. 223-2017/SUNAT (estructura 26, V); estructuras 14, 15 y 18 por orden de campos V2 y longitudes por confirmar (docs/18 §3.1)', false, '2023-07-01'),
+  ('PE', 'plame', '26', 'Otras condiciones del trabajador', '0601{yyyy}{mm}{ruc}.{ext}', 'toc', '2023-07', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "asegura_tu_pension", "type": "text", "max_len": 1, "required": true, "source": "profile.asegura_pension", "values": ["0", "1"]}, {"n": 4, "name": "mas_vida", "type": "text", "max_len": 1, "required": true, "source": "profile.essalud_vida", "values": ["0", "1"]}, {"n": 5, "name": "fondo_artista", "type": "text", "max_len": 1, "required": false, "source": "profile.artist_fund"}, {"n": 6, "name": "domiciliado", "type": "text", "max_len": 1, "required": true, "source": "profile.is_tax_resident", "values": ["1", "2"]}]'::jsonb, 'R.S. 223-2017/SUNAT (estructura 26, V); estructuras 14, 15 y 18 por orden de campos V2 y longitudes por confirmar (docs/18 §3.1)', false, '2023-07-01'),
+  ('PE', 't_registro', '4', 'Datos personales', 'RP_{ruc}.{ext}', 'ide', '2020-06', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "pais_emisor", "type": "text", "max_len": 3, "required": true, "table": 26, "source": "document.issuing_country"}, {"n": 4, "name": "fecha_nacimiento", "type": "date", "max_len": 10, "required": true, "source": "person.birth_date"}, {"n": 5, "name": "apellido_paterno", "type": "text", "max_len": 40, "required": true, "source": "person.paternal_surname"}, {"n": 6, "name": "apellido_materno", "type": "text", "max_len": 40, "required": false, "source": "person.maternal_surname"}, {"n": 7, "name": "nombres", "type": "text", "max_len": 40, "required": true, "source": "person.first_names"}, {"n": 8, "name": "sexo", "type": "text", "max_len": 1, "required": true, "source": "person.sex_code"}, {"n": 9, "name": "nacionalidad", "type": "text", "max_len": 4, "required": true, "table": 4, "source": "person.nationality_code"}]'::jsonb, 'SUNAT, Ejemplos de carga masiva al T-Registro (06/2020): orden de campos V; prefijo, extensiones, tipos y longitudes por confirmar (docs/18 §3.3)', false, '2020-06-01'),
+  ('PE', 't_registro', '5', 'Datos del trabajador', 'RP_{ruc}.{ext}', 'tra', '2020-06', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "pais_emisor", "type": "text", "max_len": 3, "required": true, "table": 26, "source": "document.issuing_country"}, {"n": 4, "name": "regimen_laboral", "type": "text", "max_len": 2, "required": true, "table": 33, "source": "profile.labor_regime_sunat_code"}, {"n": 5, "name": "situacion_educativa", "type": "text", "max_len": 2, "required": true, "table": 9, "source": "profile.education_status_code"}, {"n": 6, "name": "ocupacion", "type": "text", "max_len": 6, "required": true, "table": 30, "source": "profile.occupation_code"}, {"n": 7, "name": "discapacidad", "type": "text", "max_len": 1, "required": true, "source": "profile.has_disability", "values": ["0", "1"]}, {"n": 8, "name": "cuspp", "type": "text", "max_len": 12, "required": false, "source": "pension.cuspp"}, {"n": 9, "name": "sctr_pension", "type": "text", "max_len": 1, "required": true, "source": "profile.sctr_pension", "values": ["0", "1", "2"]}, {"n": 10, "name": "tipo_contrato", "type": "text", "max_len": 2, "required": true, "table": 12, "source": "profile.contract_type_sunat_code"}, {"n": 11, "name": "regimen_alternativo", "type": "text", "max_len": 1, "required": true, "source": "profile.alternative_working_regime", "values": ["0", "1"]}, {"n": 12, "name": "jornada_maxima", "type": "text", "max_len": 1, "required": true, "source": "profile.subject_to_max_working_time", "values": ["0", "1"]}, {"n": 13, "name": "horario_nocturno", "type": "text", "max_len": 1, "required": true, "source": "profile.subject_to_night_shift", "values": ["0", "1"]}, {"n": 14, "name": "sindicalizado", "type": "text", "max_len": 1, "required": true, "source": "profile.is_unionized", "values": ["0", "1"]}, {"n": 15, "name": "periodicidad", "type": "text", "max_len": 1, "required": true, "table": 13, "source": "profile.pay_periodicity_code"}, {"n": 16, "name": "remuneracion_basica_inicial", "type": "number", "max_len": 10, "required": true, "source": "profile.initial_basic_remuneration", "decimals": 2}, {"n": 17, "name": "situacion", "type": "text", "max_len": 2, "required": true, "table": 15, "source": "profile.worker_situation_code"}, {"n": 18, "name": "quinta_exonerada", "type": "text", "max_len": 1, "required": true, "source": "profile.fifth_category_exempt", "values": ["0", "1"]}, {"n": 19, "name": "situacion_especial", "type": "text", "max_len": 1, "required": true, "table": 35, "source": "profile.special_situation_code"}, {"n": 20, "name": "tipo_pago", "type": "text", "max_len": 1, "required": true, "table": 16, "source": "profile.payment_type_code"}, {"n": 21, "name": "categoria_ocupacional", "type": "text", "max_len": 2, "required": false, "table": 24, "source": "profile.occupational_category_code"}, {"n": 22, "name": "convenio_doble_tributacion", "type": "text", "max_len": 1, "required": true, "table": 25, "source": "profile.tax_treaty_code"}, {"n": 23, "name": "ruc_cas", "type": "text", "max_len": 11, "required": false, "source": "profile.cas_tax_id"}]'::jsonb, 'SUNAT, Ejemplos de carga masiva al T-Registro (06/2020): orden de campos V; prefijo, extensiones, tipos y longitudes por confirmar (docs/18 §3.3)', false, '2020-06-01'),
+  ('PE', 't_registro', '11', 'Periodos', 'RP_{ruc}.{ext}', 'per', '2020-06', '|', 'ISO-8859-1', 'CRLF', false, true, '[{"n": 1, "name": "tipo_documento", "type": "text", "max_len": 2, "required": true, "table": 3, "source": "document.type_code"}, {"n": 2, "name": "numero_documento", "type": "text", "max_len": 15, "required": true, "source": "document.number"}, {"n": 3, "name": "pais_emisor", "type": "text", "max_len": 3, "required": true, "table": 26, "source": "document.issuing_country"}, {"n": 4, "name": "categoria", "type": "text", "max_len": 1, "required": true, "source": "period.category_code"}, {"n": 5, "name": "tipo_registro", "type": "text", "max_len": 1, "required": true, "source": "period.record_type_code"}, {"n": 6, "name": "fecha_inicio", "type": "date", "max_len": 10, "required": true, "source": "period.starts_on"}, {"n": 7, "name": "fecha_fin", "type": "date", "max_len": 10, "required": false, "source": "period.ends_on"}, {"n": 8, "name": "indicador", "type": "text", "max_len": 2, "required": false, "source": "period.indicator_code"}, {"n": 9, "name": "eps", "type": "text", "max_len": 2, "required": false, "table": 14, "source": "period.eps_code"}]'::jsonb, 'SUNAT, Ejemplos de carga masiva al T-Registro (06/2020): orden de campos V; prefijo, extensiones, tipos y longitudes por confirmar (docs/18 §3.3)', false, '2020-06-01'),
+  ('PE', 'afpnet', 'planilla', 'Planilla de declaración de aportes (texto de ancho fijo)', 'AFPNET_{ruc}_{yyyy}{mm}.{ext}', 'txt', 'guia-afpnet', NULL, 'ISO-8859-1', 'CRLF', false, false, '[{"n": 1, "name": "secuencia", "type": "fixed_number", "max_len": 5, "required": true, "source": "seq", "width": 5}, {"n": 2, "name": "cuspp", "type": "text", "max_len": 12, "required": false, "source": "pension.cuspp", "width": 12}, {"n": 3, "name": "tipo_documento", "type": "fixed_number", "max_len": 1, "required": true, "source": "document.afpnet_code", "width": 1}, {"n": 4, "name": "numero_documento", "type": "text", "max_len": 20, "required": true, "source": "document.number", "width": 20}, {"n": 5, "name": "apellido_paterno", "type": "text", "max_len": 20, "required": false, "source": "person.paternal_surname", "width": 20, "truncate": true}, {"n": 6, "name": "apellido_materno", "type": "text", "max_len": 20, "required": false, "source": "person.maternal_surname", "width": 20, "truncate": true}, {"n": 7, "name": "nombres", "type": "text", "max_len": 20, "required": false, "source": "person.first_names", "width": 20, "truncate": true}, {"n": 8, "name": "relacion_laboral", "type": "text", "max_len": 1, "required": true, "source": "afp.relation", "width": 1, "values": ["S", "N"]}, {"n": 9, "name": "inicio_relacion", "type": "text", "max_len": 1, "required": true, "source": "afp.start", "width": 1, "values": ["S", "N"]}, {"n": 10, "name": "cese_relacion", "type": "text", "max_len": 1, "required": true, "source": "afp.end", "width": 1, "values": ["S", "N"]}, {"n": 11, "name": "excepcion_aportar", "type": "text", "max_len": 1, "required": false, "source": "afp.exception", "width": 1, "values": ["", "L", "U", "J", "I", "P", "O"]}, {"n": 12, "name": "remuneracion_asegurable", "type": "fixed_number", "max_len": 9, "required": true, "source": "afp.insurable", "decimals": 2, "width": 9}, {"n": 13, "name": "aporte_voluntario_previsional", "type": "fixed_number", "max_len": 9, "required": true, "source": "afp.voluntary_pension", "decimals": 2, "width": 9}, {"n": 14, "name": "aporte_voluntario_sin_fin", "type": "fixed_number", "max_len": 9, "required": true, "source": "afp.voluntary_other", "decimals": 2, "width": 9}, {"n": 15, "name": "aporte_voluntario_empleador", "type": "fixed_number", "max_len": 9, "required": true, "source": "afp.voluntary_employer", "decimals": 2, "width": 9}, {"n": 16, "name": "tipo_trabajo", "type": "text", "max_len": 1, "required": false, "source": "afp.work_type", "width": 1, "values": ["", "N", "C", "M", "P"]}, {"n": 17, "name": "afp", "type": "text", "max_len": 2, "required": false, "source": "pension.afpnet_code", "width": 2}]'::jsonb, 'AFPnet, Guía rápida para empleadores: 17 columnas, 141 caracteres por línea, montos sin punto con ceros a la izquierda (V, docs/18 §3.5); códigos de documento 6 en adelante por confirmar', false, '2020-01-01');
 
 -- ====================================================================================================
 -- VISTA Y FUNCIONES PARA LA APLICACIÓN

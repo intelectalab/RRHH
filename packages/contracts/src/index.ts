@@ -1975,6 +1975,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bank-file-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-5 · Plantillas de archivo bancario: las del paquete de país (por validar) y las propias */
+        get: operations["getBankFileTemplates"];
+        put?: never;
+        /** DEC-5 · Crear una plantilla de archivo bancario (definition con separador o ancho fijo, cabecera, detalle, cierre y reglas de cuentas) */
+        post: operations["postBankFileTemplates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bank-file-templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** DEC-5 · Editar, activar o desactivar una plantilla propia (lock_version) */
+        patch: operations["patchBankFileTemplatesId"];
+        trace?: never;
+    };
     "/benefit-enrollments": {
         parameters: {
             query?: never;
@@ -4463,6 +4498,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/declaration-files/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** DEC-2 · DEC-4 · Registrar la respuesta aceptada (en AFPnet, liquidation con contribution, commission y premium concilia el cálculo propio con tolerancia; en T-Registro guarda lo declarado por tipo de registro) */
+        post: operations["postDeclarationFilesIdAccept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/declaration-files/{id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-2 · Archivos generados de la declaración con huella, tamaño, versión del generador, autor y fecha (los sustituidos se conservan) */
+        get: operations["getDeclarationFilesIdFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/declaration-files/{id}/files/{file_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-2 · Descargar un archivo generado (queda en auditoría con su huella, RN-DEC-10) */
+        get: operations["getDeclarationFilesIdFilesFileIdFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/declaration-files/{id}/mark-submitted": {
         parameters: {
             query?: never;
@@ -4477,6 +4563,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postDeclarationFilesIdMarkSubmitted"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/declaration-files/{id}/observe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** DEC-2 · Registrar la respuesta observada con su observación (luego se rectifica) */
+        post: operations["postDeclarationFilesIdObserve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10916,6 +11019,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-concepts/{id}/statutory-mappings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-1 · Historia con vigencia del código de declaración de un concepto */
+        get: operations["getPayrollConceptsIdStatutoryMappings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-concepts/{id}/test": {
         parameters: {
             query?: never;
@@ -15699,6 +15819,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/registry-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-3 · Pendientes de T-Registro (altas, bajas) con su plazo según los parámetros treg_*; meta.deadlines con los plazos vigentes */
+        get: operations["getRegistryEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/registry-events/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** DEC-3 · Crear los pendientes de T-Registro que falten para una empresa desde los ingresos y ceses (idempotente) */
+        post: operations["postRegistryEventsSync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/registry-reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-3 · Conciliar lo declarado en T-Registro con la historia de la relación laboral (?legal_entity_id) */
+        get: operations["getRegistryReconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/remote-work-agreements": {
         parameters: {
             query?: never;
@@ -17864,6 +18035,23 @@ export interface paths {
         };
         /** Ver StatutoryFileLayout */
         get: operations["getStatutoryFileLayoutsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/statutory-mapping-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-1 · Conceptos usados en el periodo sin código de la Tabla 22 vigente a su fecha (?payroll_period_id); impiden generar la PLAME */
+        get: operations["getStatutoryMappingCheck"];
         put?: never;
         post?: never;
         delete?: never;
@@ -20183,6 +20371,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/withholding-certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-6 · Certificados de rentas y retenciones de quinta emitidos (filter[employment_id], filter[fiscal_year]); montos con permiso del libro */
+        get: operations["getWithholdingCertificates"];
+        put?: never;
+        /** DEC-6 · Emitir el certificado de un trabajador y ejercicio (reason annual, termination u on_request) desde el libro de retenciones; 409 si no hay movimientos */
+        post: operations["postWithholdingCertificates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/withholding-certificates/{id}/certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DEC-6 · Descargar el PDF del certificado (queda en auditoría) */
+        get: operations["getWithholdingCertificatesIdCertificate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/work-schedules": {
         parameters: {
             query?: never;
@@ -22117,15 +22340,34 @@ export interface components {
             /** @description Identificador opaco */
             legal_entity_id: string;
             /** @enum {string} */
-            kind: "plame" | "t_registro" | "afpnet" | "bank" | "accounting";
-            period: string;
+            kind: "plame" | "t_registro" | "afpnet";
+            period_code: string;
             /** @description Identificador opaco */
-            file_id?: string | null;
-            validation?: {
+            payroll_period_id?: string | null;
+            is_rectification: boolean;
+            /** @description Identificador opaco */
+            rectifies_filing_id?: string | null;
+            /** @enum {string} */
+            status: "draft" | "generated" | "validated" | "with_errors" | "submitted" | "accepted" | "observed" | "rejected" | "rectified";
+            validation_report?: {
                 [key: string]: unknown;
             } | null;
-            /** @enum {string} */
-            status: "generated" | "validated" | "with_errors" | "submitted" | "rectified";
+            draft_only: boolean;
+            /** Format: date */
+            due_on?: string | null;
+            overdue: boolean;
+            external_reference?: string | null;
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            accepted_at?: string | null;
+            observation?: string | null;
+            rectification_reason?: string | null;
+            /** @description Identificador opaco */
+            submission_document_id?: string | null;
+            files: {
+                [key: string]: unknown;
+            }[];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -22135,13 +22377,30 @@ export interface components {
             /** @description Identificador opaco */
             legal_entity_id?: string;
             /** @enum {string} */
-            kind?: "plame" | "t_registro" | "afpnet" | "bank" | "accounting";
-            period?: string;
+            kind?: "plame" | "t_registro" | "afpnet";
+            period_code?: string;
             /** @description Identificador opaco */
-            file_id?: string | null;
-            validation?: {
+            payroll_period_id?: string | null;
+            is_rectification?: boolean;
+            /** @description Identificador opaco */
+            rectifies_filing_id?: string | null;
+            validation_report?: {
                 [key: string]: unknown;
             } | null;
+            draft_only?: boolean;
+            /** Format: date */
+            due_on?: string | null;
+            overdue?: boolean;
+            external_reference?: string | null;
+            /** Format: date-time */
+            accepted_at?: string | null;
+            observation?: string | null;
+            rectification_reason?: string | null;
+            /** @description Identificador opaco */
+            submission_document_id?: string | null;
+            files?: {
+                [key: string]: unknown;
+            }[];
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): document_number, birth_date, has_disability */
         Dependent: {
@@ -31654,6 +31913,93 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getBankFileTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postBankFileTemplates: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchBankFileTemplatesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getBenefitEnrollments: {
         parameters: {
             query?: {
@@ -38199,6 +38545,94 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    postDeclarationFilesIdAccept: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getDeclarationFilesIdFiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getDeclarationFilesIdFilesFileIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                    "application/octet-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     postDeclarationFilesIdMarkSubmitted: {
         parameters: {
             query?: never;
@@ -38233,6 +38667,42 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postDeclarationFilesIdObserve: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postDeclarationFilesIdRectify: {
@@ -53753,6 +54223,31 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getPayrollConceptsIdStatutoryMappings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     postPayrollConceptsIdTest: {
         parameters: {
             query?: never;
@@ -64788,6 +65283,92 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getRegistryEvents: {
+        parameters: {
+            query?: {
+                /** @description Empresa (uuid) */
+                legal_entity_id?: string;
+                /** @description pending, overdue, included, submitted o confirmed */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postRegistryEventsSync: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getRegistryReconciliation: {
+        parameters: {
+            query: {
+                /** @description Empresa (uuid) */
+                legal_entity_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getRemoteWorkAgreements: {
         parameters: {
             query?: {
@@ -70540,6 +71121,32 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getStatutoryMappingCheck: {
+        parameters: {
+            query: {
+                /** @description Periodo de planilla (uuid) */
+                payroll_period_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getSuccessionPlans: {
@@ -76344,6 +76951,94 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getWithholdingCertificates: {
+        parameters: {
+            query?: {
+                /** @description Relación laboral */
+                "filter[employment_id]"?: string;
+                /** @description Ejercicio (AAAA) */
+                "filter[fiscal_year]"?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postWithholdingCertificates: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getWithholdingCertificatesIdCertificate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getWorkSchedules: {
