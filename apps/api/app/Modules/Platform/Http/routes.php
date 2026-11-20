@@ -10,11 +10,13 @@ use App\Modules\Platform\Http\Controllers\LegalUpdatesController;
 use App\Modules\Platform\Http\Controllers\ModuleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\PublicCatalogController;
+use App\Modules\Platform\Http\Controllers\PublicSiteController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
 use App\Modules\Platform\Http\Controllers\SystemNoticesController;
 use App\Modules\Platform\Http\Controllers\TenantController;
 use App\Modules\Platform\Http\Controllers\TenantModuleController;
 use App\Modules\Platform\Http\Controllers\UsageController;
+use App\Modules\Platform\Http\Controllers\WebLeadController;
 use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
 use App\Modules\Platform\Http\Middleware\EnsureConsoleSecondFactor;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +58,12 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::get('/tenants/{id}/modules', [TenantModuleController::class, 'index'])->middleware('platform.permission:platform.subscriptions.view');
             Route::post('/tenants/{id}/modules/{code}/activate', [TenantModuleController::class, 'activate'])->middleware('platform.permission:platform.subscriptions.update');
             Route::post('/tenants/{id}/modules/{code}/deactivate', [TenantModuleController::class, 'deactivate'])->middleware('platform.permission:platform.subscriptions.update');
+
+            // WEB-5 a WEB-7 · Sitio web: leads (con el paso de los registros a medias), demos y lista de espera.
+            Route::get('/web-leads', [WebLeadController::class, 'index'])->middleware('platform.permission:platform.web_leads.view');
+            Route::get('/web-leads/{id}', [WebLeadController::class, 'show'])->middleware('platform.permission:platform.web_leads.view');
+            Route::get('/web-waitlist', [WebLeadController::class, 'waitlist'])->middleware('platform.permission:platform.web_leads.view');
+            Route::get('/web-demo-bookings', [WebLeadController::class, 'demos'])->middleware('platform.permission:platform.web_demo_bookings.view');
 
             // SAS-3 · Planes comerciales (versionados) y complementos.
             // WEB-2 · Módulos a la venta: el sitio muestra «Disponible» o «Próximamente» según esta marca.
@@ -189,4 +197,18 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
 Route::prefix('api/v1/public')->middleware(['api', ConsoleBoundary::ALIAS, 'throttle:120,1'])->group(function (): void {
     Route::get('/catalog', [PublicCatalogController::class, 'catalog']);
     Route::get('/quote', [PublicCatalogController::class, 'quote']);
+
+    // WEB-5 a WEB-7 · Registro de prueba, leads, lista de espera y demos (formularios con antiabuso y límite por IP).
+    Route::get('/ruc/{ruc}', [PublicSiteController::class, 'ruc']);
+    Route::get('/subdomains/{slug}', [PublicSiteController::class, 'subdomain']);
+    Route::get('/demo-slots', [PublicSiteController::class, 'demoSlots']);
+    Route::get('/demo-bookings/{token}', [PublicSiteController::class, 'showDemo']);
+    Route::middleware('throttle:public-forms')->group(function (): void {
+        Route::post('/signups', [PublicSiteController::class, 'startSignup']);
+        Route::patch('/signups/{token}', [PublicSiteController::class, 'updateSignup']);
+        Route::post('/signups/{token}/complete', [PublicSiteController::class, 'completeSignup']);
+        Route::post('/leads', [PublicSiteController::class, 'storeLead']);
+        Route::post('/demo-bookings', [PublicSiteController::class, 'bookDemo']);
+        Route::post('/demo-bookings/{token}/cancel', [PublicSiteController::class, 'manageDemo']);
+    });
 });

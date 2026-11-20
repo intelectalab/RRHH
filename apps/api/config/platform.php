@@ -6,6 +6,9 @@
  * no usa la tabla de parámetros por organización.
  */
 return [
+    // WEB-5 a WEB-7 · Dirección del sitio comercial para los enlaces de los correos (demo, lista de espera).
+    'site_url' => env('SITE_URL', 'http://localhost:3001'),
+    'public_form_attempts_per_minute' => (int) env('PUBLIC_FORM_ATTEMPTS_PER_MINUTE', 20),
     // Cookie propia: una sesión de organización nunca abre la consola, ni al revés.
     'session_cookie' => env('PLATFORM_SESSION_COOKIE', 'gestia_console_session'),
     'xsrf_cookie' => 'CONSOLE-XSRF-TOKEN',
@@ -64,6 +67,20 @@ return [
         'billing.suspend_after_overdue_days' => 7,
         'billing.einvoice_series' => 'F001',
         'billing.foreign_tax_treatment' => 'pending',
+        // WEB-5 · Días de prueba de un registro desde el sitio cuando el plan no define los suyos («por validar» con ventas).
+        'web.signup_trial_days' => 14,
+        // WEB-5 · RN-WEB-07: días que se guarda un registro a medias (como lead) antes de borrarlo.
+        'web.abandoned_signup_retention_days' => 90,
+        // WEB-6 · Demos: duración, anticipación mínima, días ofrecidos, horario (hora de Lima) y días de la semana (1 = lunes).
+        'web.demo_slot_minutes' => 30,
+        'web.demo_min_notice_hours' => 24,
+        'web.demo_days_ahead' => 14,
+        'web.demo_day_start' => '09:00',
+        'web.demo_day_end' => '18:00',
+        'web.demo_timezone' => 'America/Lima',
+        'web.demo_weekdays' => [1, 2, 3, 4, 5],
+        // WEB-7 · Cupón de lanzamiento por módulo que va en el aviso de la lista de espera (código del módulo => cupón).
+        'web.launch_coupons' => [],
     ],
 
     'roles' => [

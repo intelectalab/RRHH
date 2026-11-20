@@ -20,25 +20,25 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 522 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 458 |
-| Tablas de plataforma (sin RLS de organización) | 64 |
-| Políticas RLS | 461 |
-| Claves foráneas | 1681 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1109 |
-| — simples `tenant_id` → `tenants(id)` | 471 |
-| — resto (hacia catálogos y tablas de plataforma) | 101 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2378 |
-| — creados con `CREATE INDEX` | 1202 |
-| Triggers | 543 |
+| Tablas | 528 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 461 |
+| Tablas de plataforma (sin RLS de organización) | 67 |
+| Políticas RLS | 464 |
+| Claves foráneas | 1703 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1121 |
+| — simples `tenant_id` → `tenants(id)` | 474 |
+| — resto (hacia catálogos y tablas de plataforma) | 108 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2413 |
+| — creados con `CREATE INDEX` | 1225 |
+| Triggers | 552 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 645 |
-| Restricciones `UNIQUE` | 624 |
-| Columnas | 7060 |
+| Restricciones `CHECK` | 648 |
+| Restricciones `UNIQUE` | 630 |
+| Columnas | 7158 |
 | Columnas marcadas `-- SENSIBLE` | 168 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
-| Tablas con vigencia (`valid_from` / `valid_to`) | 42 |
-| Tablas inalterables (solo inserción, por trigger) | 24 |
+| Tablas con vigencia (`valid_from` / `valid_to`) | 44 |
+| Tablas inalterables (solo inserción, por trigger) | 27 |
 | Tablas con borrado lógico (`deleted_at`) | 171 |
 | Tablas con concurrencia optimista (`lock_version`) | 253 |
 | Funciones | 30 |
@@ -56,7 +56,7 @@ Tablas por épica:
 |---:|---|---|---:|
 | 0 | TEN | Multiempresa y aislamiento | 5 |
 | 0 | SAS | Consola SaaS: organizaciones, planes, módulos, límites, feature flags, soporte y salud | 32 |
-| 0 | WEB | Sitio comercial gestiahr.com: productos, leads, demos, registros, chatbot y libro de reclamaciones | 7 |
+| 0 | WEB | Sitio comercial gestiahr.com: productos, leads, demos, registros, chatbot y libro de reclamaciones | 8 |
 | 0 | PLT | Plataforma técnica: archivos, eventos, idempotencia | 12 |
 | 0 | SEG | Identidad, roles, permisos por campo y alcance | 17 |
 | 0 | AUD | Auditoría, actividad y accesos a datos sensibles | 6 |
@@ -82,8 +82,8 @@ Tablas por épica:
 | 2 | TSH | Hojas de tiempo por proyecto | 5 |
 | 3 | NOM | Motor de nómina | 10 |
 | 3 | CPT | Conceptos y fórmulas | 4 |
-| 3 | PAR | Parámetros legales con vigencia | 2 |
-| 3 | PER | Periodos, incidencias, cálculo, simulación y cierre | 8 |
+| 3 | PAR | Parámetros legales con vigencia | 6 |
+| 3 | PER | Periodos, incidencias, cálculo, simulación y cierre | 9 |
 | 3 | BOL | Boletas | 2 |
 | 3 | BSO | Beneficios sociales, seguros y derechohabientes | 6 |
 | 3 | PRE | Préstamos, adelantos y adelanto de sueldo | 5 |
@@ -196,6 +196,8 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 | `payroll_concept_drafts` | — | No: conviven filas de distinto alcance |
 | `legal_parameters` | — | Sí, restricción propia |
 | `legal_parameter_overrides` | — | Sí, restricción propia |
+| `legal_parameter_changes` | — | No: conviven filas de distinto alcance |
+| `wage_table_verifications` | — | No: conviven filas de distinto alcance |
 | `advance_policies` | — | No: conviven filas de distinto alcance |
 | `statutory_file_layouts` | `country_code`, `filing_kind`, `structure_code` | Sí |
 | `concept_statutory_mappings` | `payroll_concept_id`, `filing_kind` | Sí |
@@ -213,7 +215,7 @@ EXCLUDE USING gist (tenant_id WITH =, employment_id WITH =,
 
 ### 2.4 Registros inalterables y auditoría (C-07)
 
-- Tablas de solo inserción, protegidas por trigger (`reject_mutation`, SQLSTATE `AY001`) contra `UPDATE`, `DELETE` y `TRUNCATE`, y además sin esos privilegios para `gestia_app` y `gestia_platform`: `absence_period_closings`, `ai_interactions`, `application_stage_events`, `asset_events`, `attendance_punches`, `audit_events`, `calibration_adjustments`, `complaint_events`, `compliance_ledger_anchors`, `compliance_ledger_entries`, `data_access_logs`, `employment_status_events`, `evidence_exports`, `fifth_category_ledger`, `help_article_versions`, `job_profile_versions`, `kb_article_versions`, `platform_audit_events`, `position_status_events`, `signature_events`, `tenant_status_events`, `time_bank_entries`, `vacation_ledger_entries`, `workflow_decisions`.
+- Tablas de solo inserción, protegidas por trigger (`reject_mutation`, SQLSTATE `AY001`) contra `UPDATE`, `DELETE` y `TRUNCATE`, y además sin esos privilegios para `gestia_app` y `gestia_platform`: `absence_period_closings`, `ai_interactions`, `application_stage_events`, `asset_events`, `attendance_punches`, `audit_events`, `calibration_adjustments`, `complaint_events`, `compliance_ledger_anchors`, `compliance_ledger_entries`, `data_access_logs`, `employment_status_events`, `evidence_exports`, `fifth_category_ledger`, `help_article_versions`, `job_profile_versions`, `kb_article_versions`, `legal_parameter_confirmations`, `payroll_period_time_cutoffs`, `platform_audit_events`, `position_status_events`, `signature_events`, `tenant_status_events`, `time_bank_entries`, `vacation_ledger_entries`, `wage_table_verifications`, `workflow_decisions`.
 - Los saldos (vacaciones, bolsa de horas) son libros de movimientos: el saldo es la suma y un error se corrige con un contraasiento.
 - Una marcación (`attendance_punches`) no se edita: la corrección es otra fila con `entry_type = 'correction'`, `corrects_punch_id` y `correction_reason`.
 - Boletas y corridas de planilla se pueden modificar mientras son borrador; cerradas (`closed_at`), cualquier cambio falla con `AY002`.
@@ -602,9 +604,9 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `web_leads`
 
 - **Propósito:** Leads del sitio: demo, contacto, partner, boletín, calculadora, lista de espera o registro abandonado.
-- **Columnas clave:** `kind`, `full_name`, `email`, `phone`, `company_name`, `ruc`, `employees_range`, `source_page`, `utm`, `consent_purpose`, `consent_at`, `status`, `notified_at`, `notes`.
+- **Columnas clave:** `kind`, `full_name`, `email`, `phone`, `company_name`, `ruc`, `employees_range`, `source_page`, `utm`, `consent_purpose`, `consent_at`, `status`, `notified_at`, `notes`, `message`, `idempotency_key`.
 - **Relaciones:** `web_product_id` → `web_products` (opcional); `module_code` → `modules.code` (opcional); `assigned_platform_user_id` → `platform_users` (opcional); `tenant_id` → `tenants` (opcional).
-- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`); único: `idempotency_key`.
 
 #### `web_demo_bookings`
 
@@ -616,9 +618,16 @@ Páginas, blog, comentarios, popups y testimonios viven en el CMS del sitio (`ap
 #### `web_signups`
 
 - **Propósito:** Registros de prueba o suscripción en curso desde el sitio (cuenta, empresa, plan).
-- **Columnas clave:** `token_hash`, `email`, `full_name`, `ruc`, `company_name`, `employees_range`, `labor_regime`, `subdomain`, `addon_codes`, `billing_cycle`, `step`, `completed_at`.
+- **Columnas clave:** `token_hash`, `email`, `full_name`, `ruc`, `company_name`, `employees_range`, `labor_regime`, `subdomain`, `addon_codes`, `billing_cycle`, `step`, `completed_at`, `verification_code_hash`, `code_expires_at`, `code_attempts`, `email_verified_at`, `locale`, `idempotency_key`.
 - **Relaciones:** `plan_id` → `plans` (opcional); `tenant_id` → `tenants` (opcional); `web_lead_id` → `web_leads` (opcional).
-- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`); único: `token_hash`.
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso; concurrencia optimista (`lock_version`); único: `idempotency_key`; único: `token_hash`.
+
+#### `web_messages`
+
+- **Propósito:** Correos del sitio (código de verificación, confirmación y recordatorio de demo, aviso de lista de espera) en cola, enviados por el puerto de correo y reintentables (WEB-5 a WEB-7). Hace de outbox de la plataforma: no hay organización.
+- **Columnas clave:** `kind`, `to_email`, `locale`, `subject`, `body`, `ref_type`, `ref_id`, `status`, `attempts`, `last_error`, `sent_at`, `provider_ref`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso.
 
 #### `web_chat_sessions`
 
@@ -2002,6 +2011,7 @@ erDiagram
   payroll_periods ||--o{ payroll_incidents : "payroll_period_id"
   employments ||--o{ payroll_incidents : "employment_id"
   payroll_concepts ||--o{ payroll_incidents : "payroll_concept_id"
+  users |o--o{ payroll_incidents : "created_by_user_id"
   payroll_periods ||--o{ payroll_runs : "payroll_period_id"
   users |o--o{ payroll_runs : "requested_by_user_id"
   payroll_runs ||--o{ payroll_run_lines : "payroll_run_id"
@@ -2148,27 +2158,62 @@ erDiagram
 - **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `approved_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **vigencia** (`valid_from`/`valid_to`); el no solapamiento se define en una restricción propia; concurrencia optimista (`lock_version`).
 
+#### `legal_parameter_publications`
+
+- **Propósito:** PAR-4 · Actualización normativa preparada en la consola: cambios de parámetros legales de un país con su norma; la publica una segunda persona del equipo del producto (ADR 0023). Publicar inserta las vigencias nuevas y cierra las anteriores, nunca las modifica.
+- **Columnas clave:** `title`, `summary`, `legal_source`, `changes`, `status`, `review_note`, `submitted_at`, `published_at`.
+- **Relaciones:** `country_code` → `countries.code`; `prepared_by_platform_user_id` → `platform_users` (opcional); `reviewed_by_platform_user_id` → `platform_users` (opcional).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación no tiene acceso.
+
+#### `legal_parameter_changes`
+
+- **Propósito:** PAR-7 · Registro de novedades normativas: cada vigencia nueva o valor completado de un parámetro legal, con el valor anterior y el nuevo, la norma y su origen (publicación de la consola o paquete de país). Lo leen las organizaciones del país.
+- **Columnas clave:** `code`, `name`, `unit`, `previous_value`, `new_value`, `valid_from`, `valid_to`, `legal_source`, `origin`, `published_at`.
+- **Relaciones:** `legal_parameter_publication_id` → `legal_parameter_publications` (opcional); `country_code` → `countries.code`; `labor_regime_code` → `labor_regimes.code` (opcional).
+- **Reglas:** tabla de plataforma: sin `tenant_id` ni RLS; la aplicación solo la lee.
+
+#### `legal_parameter_confirmations`
+
+- **Propósito:** PAR-1 · RN-PAR-03 · Confirmación expresa de la organización de un parámetro legal «por validar» antes de cerrar un periodo que lo usa (solo inserción).
+- **Columnas clave:** `legal_parameter_id`, `parameter_code`, `note`.
+- **Relaciones:** `confirmed_by_user_id` → `users`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001).
+
+#### `wage_table_verifications`
+
+- **Propósito:** PAR-6 · RN-PAR-10 · Verificación de la organización de una tabla salarial por convenio (lote de parámetros con la misma vigencia) contra el acta (solo inserción).
+- **Columnas clave:** `table_code`, `valid_from`, `acta_reference`, `note`.
+- **Relaciones:** `labor_regime_code` → `labor_regimes.code`; `verified_by_user_id` → `users`.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001); único: `table_code`, `valid_from`.
+
 
 ### PER · Periodos, incidencias, cálculo, simulación y cierre
 
 #### `payroll_periods`
 
 - **Propósito:** Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.
-- **Columnas clave:** `period_year`, `period_number`, `kind`, `starts_on`, `ends_on`, `payment_date`, `attendance_from`, `attendance_to`, `statutory_period_code`, `status`, `closed_at`.
-- **Relaciones:** `payroll_group_id` → `payroll_groups`; `closed_by_user_id` → `users` (opcional).
+- **Columnas clave:** `period_year`, `period_number`, `kind`, `starts_on`, `ends_on`, `payment_date`, `attendance_from`, `attendance_to`, `statutory_period_code`, `status`, `closed_at`, `submitted_at`, `approved_at`, `return_reason`, `reopen_reason`, `time_consumed_at`.
+- **Relaciones:** `payroll_group_id` → `payroll_groups`; `closed_by_user_id` → `users` (opcional); `opened_by_user_id` → `users` (opcional); `submitted_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional); `time_consumed_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); único: `payroll_group_id`, `kind`, `period_year`, `period_number`; `CHECK (statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$')`.
 
 #### `payroll_incidents`
 
 - **Propósito:** Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).
-- **Columnas clave:** `quantity`, `rate`, `amount`, `currency`, `source`, `source_type`, `source_id`, `notes`, `status`.
-- **Relaciones:** `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `payroll_concept_id` → `payroll_concepts`; `retro_period_id` → `payroll_periods` (opcional); `source_type` + `source_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
+- **Columnas clave:** `quantity`, `rate`, `amount`, `currency`, `source`, `source_type`, `source_id`, `notes`, `status`, `decided_at`, `decision_reason`.
+- **Relaciones:** `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `payroll_concept_id` → `payroll_concepts`; `retro_period_id` → `payroll_periods` (opcional); `created_by_user_id` → `users` (opcional); `updated_by_user_id` → `users` (opcional); `decided_by_user_id` → `users` (opcional); `source_type` + `source_id`: referencia polimórfica sin clave foránea (la valida la aplicación).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`).
+
+#### `payroll_period_time_cutoffs`
+
+- **Propósito:** PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.
+- **Columnas clave:** `period_from`, `period_to`, `fingerprint`, `summary`.
+- **Relaciones:** `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `consumed_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001).
 
 #### `payroll_runs`
 
-- **Propósito:** Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica.
-- **Columnas clave:** `run_number`, `kind`, `status`, `engine_version`, `parameters_snapshot`, `started_at`, `finished_at`, `closed_at`, `totals`.
+- **Propósito:** Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica. NOM-8: scope (todas, relaciones o grupo calculado), avance (total, hechas, con error) y motivo si falló; se reanuda sin repetir lo hecho.
+- **Columnas clave:** `run_number`, `kind`, `status`, `engine_version`, `parameters_snapshot`, `started_at`, `finished_at`, `closed_at`, `totals`, `scope`, `employments_total`, `employments_done`, `employments_failed`, `failure_reason`.
 - **Relaciones:** `payroll_period_id` → `payroll_periods`; `requested_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional); `compared_to_run_id` → `payroll_runs` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); único: `payroll_period_id`, `run_number`; cerrada (`closed_at`), no admite UPDATE ni DELETE (AY002).
 

@@ -35,6 +35,14 @@ final class GlobalSettings
         'billing.suspend_after_overdue_days' => ['type' => 'integer', 'rules' => ['integer', 'min:0', 'max:365']],
         'billing.einvoice_series' => ['type' => 'string', 'rules' => ['string', 'regex:/^[A-Z0-9]{4}$/']],
         'billing.foreign_tax_treatment' => ['type' => 'string', 'rules' => ['string', 'in:pending,taxed,export_exempt']],
+        'web.signup_trial_days' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:90']],
+        'web.abandoned_signup_retention_days' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:730']],
+        'web.demo_slot_minutes' => ['type' => 'integer', 'rules' => ['integer', 'min:15', 'max:120']],
+        'web.demo_min_notice_hours' => ['type' => 'integer', 'rules' => ['integer', 'min:0', 'max:336']],
+        'web.demo_days_ahead' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:60']],
+        'web.demo_day_start' => ['type' => 'string', 'rules' => ['string', 'date_format:H:i']],
+        'web.demo_day_end' => ['type' => 'string', 'rules' => ['string', 'date_format:H:i']],
+        'web.launch_coupons' => ['type' => 'map', 'rules' => ['array'], 'item' => 'coupon'],
     ];
 
     public function __construct(
@@ -154,6 +162,16 @@ final class GlobalSettings
                 $codes = DB::table('parameter_definitions')->pluck('code')->map(fn ($c): string => (string) $c)->all();
                 if (array_diff(array_keys((array) $value), $codes) !== []) {
                     $fail();
+                }
+
+                return $value === [] ? (object) [] : $value;
+            case 'coupon':
+                // WEB-7 · Código de módulo => cupón de lanzamiento (texto corto).
+                $codes = DB::table('modules')->pluck('code')->map(fn ($c): string => (string) $c)->all();
+                foreach ((array) $value as $module => $coupon) {
+                    if (! in_array($module, $codes, true) || ! is_string($coupon) || $coupon === '' || mb_strlen($coupon) > 40) {
+                        $fail();
+                    }
                 }
 
                 return $value === [] ? (object) [] : $value;

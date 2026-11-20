@@ -8,6 +8,7 @@ use App\Modules\Platform\Console\ResetPlatformMfaCommand;
 use App\Modules\Platform\Console\RunBackupsCommand;
 use App\Modules\Platform\Console\RunBillingDunningCommand;
 use App\Modules\Platform\Console\RunTrialLifecycleCommand;
+use App\Modules\Platform\Console\RunWebSiteTasksCommand;
 use App\Modules\Platform\Console\SnapshotUsageCommand;
 use App\Modules\Platform\Console\SyncBundledHelpCommand;
 use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
@@ -59,6 +60,9 @@ final class PlatformServiceProvider extends ServiceProvider
                 ->by('console|'.sha1($request->ip().'|'.$identifier));
         });
 
+        // WEB-5 a WEB-7 · Formularios públicos del sitio: pocas peticiones por minuto y por IP.
+        RateLimiter::for('public-forms', fn (Request $request) => Limit::perMinute((int) config('platform.public_form_attempts_per_minute', 20))->by('web|'.$request->ip()));
+
         /** @var Router $router */
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware(ConsoleBoundary::ALIAS, ConsoleBoundary::class);
@@ -66,7 +70,7 @@ final class PlatformServiceProvider extends ServiceProvider
         $router->aliasMiddleware(RequirePlatformPermission::ALIAS, RequirePlatformPermission::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class, RunBackupsCommand::class, RunBillingDunningCommand::class]);
+            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class, RunBackupsCommand::class, RunBillingDunningCommand::class, RunWebSiteTasksCommand::class]);
             // SAS-4 · RN-SAS-04: vencimiento de pruebas y fin de la gracia, una vez al día.
             $this->app->booted(function (): void {
                 $schedule = $this->app->make(Schedule::class);
@@ -77,6 +81,9 @@ final class PlatformServiceProvider extends ServiceProvider
                 $schedule->command('backups:run')->dailyAt('02:20')->withoutOverlapping();
                 // SAS-11 · Avisos de vencimiento, mora y suspensión por falta de pago.
                 $schedule->command('billing:dunning')->dailyAt('06:10')->withoutOverlapping();
+                // WEB-5 a WEB-7 · Correos del sitio y recordatorios de demo; de madrugada, retención de registros a medias.
+                $schedule->command('web:run')->everyFiveMinutes()->withoutOverlapping();
+                $schedule->command('web:run --purge')->dailyAt('03:35')->withoutOverlapping();
             });
         }
 

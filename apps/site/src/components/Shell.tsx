@@ -29,6 +29,8 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
                 <Link key={l} href={href(l, path)} hrefLang={l} aria-current={l === lang ? 'true' : undefined}>{l.toUpperCase()}</Link>
               ))}
             </nav>
+            <Link className="nav-login" href={href(lang, '/ingresar')}>{t.nav.login}</Link>
+            <Link className="btn btn-line" href={href(lang, '/demo')}>{t.nav.demo}</Link>
             <Link className="btn btn-primary" href={`${href(lang, '/precios')}#planes`}>{t.nav.trial}</Link>
             <details className="mnav">
               <summary aria-label={t.nav.menu}>{'☰'}</summary>
@@ -41,6 +43,9 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
                 ))}
                 <Link href={href(lang, '/suite')}>{t.nav.suite}</Link>
                 <Link href={href(lang, '/precios')}>{t.nav.pricing}</Link>
+                <Link href={href(lang, '/demo')}>{t.nav.demo}</Link>
+                <Link href={href(lang, '/contacto')}>{t.nav.contact}</Link>
+                <Link href={href(lang, '/ingresar')}>{t.nav.login}</Link>
               </div>
             </details>
           </div>
@@ -61,6 +66,15 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
               ))}
               <li><Link href={href(lang, '/suite')}>{t.nav.suite}</Link></li>
               <li><Link href={href(lang, '/precios')}>{t.nav.pricing}</Link></li>
+            </ul>
+          </div>
+          <div>
+            <b>{t.nav.contact}</b>
+            <ul>
+              <li><Link href={href(lang, '/demo')}>{t.nav.demo}</Link></li>
+              <li><Link href={href(lang, '/contacto')}>{t.nav.contact}</Link></li>
+              <li><Link href={href(lang, '/partners')}>{t.nav.partners}</Link></li>
+              <li><Link href={href(lang, '/ingresar')}>{t.nav.login}</Link></li>
             </ul>
           </div>
           <p className="fine">{t.footer.rights}</p>

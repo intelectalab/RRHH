@@ -8,6 +8,7 @@ use App\Shared\Integrations\Fake\FakeAiAdapter;
 use App\Shared\Integrations\Fake\FakeBackupStorageAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
 use App\Shared\Integrations\Fake\FakeBiometricAdapter;
+use App\Shared\Integrations\Fake\FakeCaptchaAdapter;
 use App\Shared\Integrations\Fake\FakeEInvoicingAdapter;
 use App\Shared\Integrations\Fake\FakeEmailAdapter;
 use App\Shared\Integrations\Fake\FakeExchangeRatesAdapter;
@@ -20,6 +21,7 @@ use App\Shared\Integrations\Ports\AiPort;
 use App\Shared\Integrations\Ports\BackupStoragePort;
 use App\Shared\Integrations\Ports\BankingPort;
 use App\Shared\Integrations\Ports\BiometricPort;
+use App\Shared\Integrations\Ports\CaptchaPort;
 use App\Shared\Integrations\Ports\EInvoicingPort;
 use App\Shared\Integrations\Ports\EmailPort;
 use App\Shared\Integrations\Ports\ExchangeRatesPort;
@@ -55,6 +57,8 @@ final class IntegrationManager
     private ?EInvoicingPort $einvoicingAdapter = null;
 
     private ?PaymentGatewayPort $paymentsAdapter = null;
+
+    private ?CaptchaPort $captchaAdapter = null;
 
     public function __construct(
         private readonly IntegrationCallRecorder $recorder,
@@ -263,6 +267,27 @@ final class IntegrationManager
         }
 
         throw new RuntimeException('No live Payment gateway configured for production.');
+    }
+
+    /** WEB-5 a WEB-7 · Antirrobot de los formularios del sitio (proveedor por elegir; la falsa fuera de producción). */
+    public function captcha(): CaptchaPort
+    {
+        if ($this->captchaAdapter !== null) {
+            return $this->captchaAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->captchaAdapter = new FakeCaptchaAdapter($this->recorder);
+
+            return $this->captchaAdapter;
+        }
+
+        throw new RuntimeException('No live Captcha provider configured for production.');
+    }
+
+    public function setCaptchaAdapter(CaptchaPort $adapter): void
+    {
+        $this->captchaAdapter = $adapter;
     }
 
     public function setPaymentsAdapter(PaymentGatewayPort $adapter): void

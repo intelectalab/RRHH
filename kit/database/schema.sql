@@ -971,9 +971,12 @@ CREATE TABLE web_leads (
   tenant_id uuid,
   notified_at timestamptz,
   notes text,
+  message text,
+  idempotency_key text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_web_leads_idempotency_key UNIQUE (idempotency_key),
   CONSTRAINT fk_web_leads_web_product_id FOREIGN KEY (web_product_id) REFERENCES web_products (id),
   CONSTRAINT fk_web_leads_module_code FOREIGN KEY (module_code) REFERENCES modules (code),
   CONSTRAINT fk_web_leads_assigned_platform_user_id FOREIGN KEY (assigned_platform_user_id) REFERENCES platform_users (id),
@@ -1028,9 +1031,16 @@ CREATE TABLE web_signups (
   tenant_id uuid,
   web_lead_id uuid,
   completed_at timestamptz,
+  verification_code_hash text,
+  code_expires_at timestamptz,
+  code_attempts integer NOT NULL DEFAULT 0,
+  email_verified_at timestamptz,
+  locale text,
+  idempotency_key text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_web_signups_idempotency_key UNIQUE (idempotency_key),
   CONSTRAINT uq_web_signups_token_hash UNIQUE (token_hash),
   CONSTRAINT fk_web_signups_plan_id FOREIGN KEY (plan_id) REFERENCES plans (id),
   CONSTRAINT fk_web_signups_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
@@ -1042,6 +1052,28 @@ CREATE INDEX ix_web_signups_tenant_id ON web_signups (tenant_id);
 CREATE INDEX ix_web_signups_web_lead_id ON web_signups (web_lead_id);
 CREATE INDEX ix_web_signups_email ON web_signups (email);
 CREATE TRIGGER trg_web_signups_touch BEFORE UPDATE ON web_signups FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE web_messages (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  kind text NOT NULL,
+  to_email text NOT NULL,
+  locale text,
+  subject text NOT NULL,
+  body text NOT NULL,
+  ref_type text NOT NULL,
+  ref_id uuid NOT NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','sent','failed')),
+  attempts integer NOT NULL DEFAULT 0,
+  last_error text,
+  sent_at timestamptz,
+  provider_ref text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE web_messages IS 'Correos del sitio (código de verificación, confirmación y recordatorio de demo, aviso de lista de espera) en cola, enviados por el puerto de correo y reintentables (WEB-5 a WEB-7). Hace de outbox de la plataforma: no hay organización.';
+CREATE INDEX ix_web_messages_status ON web_messages (status);
+CREATE INDEX ix_web_messages_ref_type_ref_id ON web_messages (ref_type, ref_id);
+CREATE TRIGGER trg_web_messages_touch BEFORE UPDATE ON web_messages FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE web_chat_sessions (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -19614,7 +19646,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_ap
 -- Catálogos de plataforma: solo lectura para la aplicación.
 REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameter_changes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, platform_notices, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, legal_parameter_publications, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, saas_payments, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, legal_parameter_publications, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, saas_payments, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_messages, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 

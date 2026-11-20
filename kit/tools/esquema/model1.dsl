@@ -122,6 +122,7 @@
   kind enum(demo,contact,partner,newsletter,calculator,waitlist,signup)! ; full_name ; email text! ; phone ; company_name ; ruc ; employees_range
   web_product_id ?=> web_products ; module_code ?~> modules.code ; source_page ; utm j ; consent_purpose text! ; consent_at ts!
   status enum(new,contacted,qualified,converted,discarded)=new ; assigned_platform_user_id ?=> platform_users ; tenant_id ?=> tenants ; notified_at ; notes
+  message ; idempotency_key ; uniq idempotency_key
   idx kind, status ; idx email
 @web_demo_bookings P lock | Demos agendadas desde el sitio.
   web_lead_id => web_leads ; starts_at ts! ; ends_at ts! ; channel enum(video,phone)=video ; host_platform_user_id ?=> platform_users ; meeting_url
@@ -129,7 +130,11 @@
 @web_signups P lock | Registros de prueba o suscripción en curso desde el sitio (cuenta, empresa, plan).
   token_hash text! ; email text! ; full_name ; ruc ; company_name ; employees_range ; labor_regime ; subdomain ; plan_id ?=> plans ; addon_codes text[]
   billing_cycle enum(monthly,annual)=monthly ; step enum(account,company,plan,payment,done)=account ; tenant_id ?=> tenants ; web_lead_id ?=> web_leads ; completed_at
+  verification_code_hash ; code_expires_at ; code_attempts integer=0 ; email_verified_at ; locale ; idempotency_key ; uniq idempotency_key
   uniq token_hash ; idx email
+@web_messages P | Correos del sitio (código de verificación, confirmación y recordatorio de demo, aviso de lista de espera) en cola, enviados por el puerto de correo y reintentables (WEB-5 a WEB-7). Hace de outbox de la plataforma: no hay organización.
+  kind text! ; to_email text! ; locale ; subject text! ; body text! ; ref_type text! ; ref_id uuid! ; status enum(pending,sent,failed)=pending ; attempts integer=0 ; last_error ; sent_at ; provider_ref
+  idx status ; idx ref_type, ref_id
 @web_chat_sessions P | Conversaciones del chatbot comercial (solo contenido público), con borrado por retención.
   visitor_ref text! ; started_at ts! ; ended_at ; transcript j ; handoff enum(none,sales,whatsapp,lead)=none ; web_lead_id ?=> web_leads ; delete_after_on
 @web_complaints P lock | Libro de reclamaciones virtual del sitio.

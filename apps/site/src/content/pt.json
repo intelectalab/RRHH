@@ -15,6 +15,22 @@
     "signup": {
       "title": "Cadastro · GestiaHR",
       "description": "Crie sua conta do GestiaHR."
+    },
+    "demo": {
+      "title": "Agende uma demo do GestiaHR",
+      "description": "Escolha um horário e conheça o GestiaHR com um caso como o da sua empresa."
+    },
+    "contact": {
+      "title": "Contato · GestiaHR",
+      "description": "Escreva para nós e respondemos em um dia útil."
+    },
+    "partners": {
+      "title": "Parceiros · GestiaHR",
+      "description": "Programa para escritórios contábeis e consultorias de RH."
+    },
+    "login": {
+      "title": "Entrar · GestiaHR",
+      "description": "Entre na sua organização no GestiaHR."
     }
   },
   "nav": {
@@ -27,7 +43,11 @@
     "home": "Início do GestiaHR",
     "languages": "Idioma",
     "brand_a": "Gestia",
-    "brand_b": "HR"
+    "brand_b": "HR",
+    "demo": "Agendar demo",
+    "contact": "Contato",
+    "login": "Entrar",
+    "partners": "Parceiros"
   },
   "status": {
     "available": "Disponível",
@@ -248,15 +268,135 @@
     ]
   },
   "signup": {
-    "title": "O cadastro abre muito em breve",
-    "text": "Guardamos sua escolha de plano e produtos. Em breve você poderá criar sua organização aqui em três passos.",
+    "title": "Crie sua organização de teste",
+    "text": "Três passos: sua conta, sua empresa e seu plano. O teste não pede cartão nem pagamento.",
     "summary": "Sua escolha",
-    "back": "Voltar aos preços"
+    "back": "Voltar aos preços",
+    "steps": [
+      "Sua conta",
+      "Sua empresa",
+      "Seu plano"
+    ],
+    "full_name": "Nome completo",
+    "email": "E-mail de trabalho",
+    "start": "Enviar código",
+    "code_title": "Confira seu e-mail",
+    "code_text": "Enviamos um código de 6 dígitos para {email}. Ele vence em 15 minutos.",
+    "code": "Código de verificação",
+    "verify": "Verificar",
+    "resend": "Enviar outro código",
+    "resent": "Enviamos um código novo.",
+    "ruc": "RUC",
+    "ruc_ok": "RUC válido",
+    "ruc_bad": "O RUC não é válido.",
+    "ruc_taken": "Esse RUC já tem uma organização no GestiaHR.",
+    "company_name": "Razão social",
+    "employees": "Colaboradores",
+    "regime": "Regime trabalhista",
+    "regimes": {
+      "pe_general": "Regime geral",
+      "pe_micro": "Microempresa (REMYPE)",
+      "pe_pequena": "Pequena empresa (REMYPE)"
+    },
+    "subdomain": "Endereço da sua organização",
+    "subdomain_hint": "Apenas minúsculas, números e hífens.",
+    "subdomain_ok": "Disponível",
+    "subdomain_bad": "Esse endereço não está disponível.",
+    "next": "Continuar",
+    "plan": "Plano",
+    "cycle": "Faturamento",
+    "cycles": {
+      "monthly": "Mensal",
+      "annual": "Anual"
+    },
+    "addons": "Complementos",
+    "no_plan": "Escolha um plano na página de preços para continuar.",
+    "choose_plan": "Ir para preços",
+    "trial_note": "O teste dura os dias definidos pelo plano. No fim você decide se contrata.",
+    "create": "Criar minha organização de teste",
+    "done_title": "Sua organização está pronta",
+    "done_text": "Enviamos um e-mail para {email} para você criar sua senha e entrar.",
+    "open": "Ir para minha organização",
+    "consent": "Aceito a política de privacidade e o tratamento dos meus dados para criar o teste."
   },
   "footer": {
     "tagline": "Software de folha de pagamento e recursos humanos para o Peru.",
     "products": "Produtos",
     "company": "GestiaHR",
     "rights": "© GestiaHR"
+  },
+  "forms": {
+    "name": "Nome completo",
+    "email": "E-mail de trabalho",
+    "phone": "Telefone",
+    "company": "Empresa",
+    "ruc": "RUC",
+    "employees": "Colaboradores",
+    "message": "Mensagem",
+    "optional": "opcional",
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "consent": "Aceito a política de privacidade e ser contatado por este motivo.",
+    "error": "Não conseguimos enviar o formulário. Revise os dados e tente de novo.",
+    "unavailable": "O serviço não responde agora. Tente em alguns minutos.",
+    "select": "Escolha uma opção"
+  },
+  "contact": {
+    "title": "Vamos conversar",
+    "text": "Conte o que você precisa e respondemos em um dia útil.",
+    "sent": "Recebemos sua mensagem. Escrevemos em breve.",
+    "purpose": "Resposta a um contato"
+  },
+  "partners": {
+    "title": "Programa de parceiros",
+    "text": "Para escritórios contábeis e consultorias que administram a folha de vários clientes.",
+    "sent": "Recebemos sua solicitação. Entraremos em contato.",
+    "purpose": "Avaliação como parceiro"
+  },
+  "waitlist": {
+    "module": "Sobre o que devemos avisar",
+    "cta": "Avise-me",
+    "sent": "Pronto. Escrevemos uma única vez quando estiver disponível.",
+    "purpose": "Aviso de lançamento de um módulo"
+  },
+  "demo": {
+    "title": "Agende uma demo",
+    "text": "Escolha um horário e mostramos o GestiaHR com um caso como o seu. Horário de Lima.",
+    "slots": "Horários disponíveis",
+    "no_slots": "Não há horários livres nos próximos dias. Escreva para nós pelo contato.",
+    "channel": "Como prefere a demo",
+    "channels": {
+      "video": "Videochamada",
+      "phone": "Telefone"
+    },
+    "book": "Confirmar demo",
+    "taken": "Esse horário acabou de ser ocupado. Escolha outro.",
+    "booked_title": "Demo agendada",
+    "booked_text": "Enviamos a confirmação para {email} com o link para alterar ou cancelar.",
+    "when": "Data e hora",
+    "manage_title": "Sua demo",
+    "not_found": "Não encontramos essa demo. Confira o link do e-mail.",
+    "status": {
+      "scheduled": "Agendada",
+      "rescheduled": "Reagendada",
+      "cancelled": "Cancelada",
+      "completed": "Realizada",
+      "no_show": "Não compareceu"
+    },
+    "reschedule": "Alterar horário",
+    "cancel": "Cancelar demo",
+    "cancelled": "Cancelamos sua demo.",
+    "rescheduled": "Alteramos o horário da sua demo.",
+    "closed": "Esta demo não pode mais ser alterada.",
+    "purpose": "Combinar e realizar a demo"
+  },
+  "login": {
+    "title": "Entre na sua organização",
+    "text": "Digite o endereço da sua organização e levamos você à tela de acesso.",
+    "subdomain": "Endereço da organização",
+    "go": "Continuar",
+    "not_found": "Não encontramos uma organização com esse endereço.",
+    "no_account": "Ainda não tem conta?",
+    "trial": "Crie um teste"
   }
 }

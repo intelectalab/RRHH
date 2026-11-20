@@ -7,6 +7,7 @@ import pt from '@/content/pt.json'
 import { plansIncluding, suggestPlan, type Catalog } from '@/lib/catalog'
 import { fill, href, localeOfPath } from '@/lib/i18n'
 import { formatMoney } from '@/lib/money'
+import { isAllowedPublicCall, parseError } from '@/lib/publicApi'
 
 const catalog: Catalog = {
   products: [
@@ -80,5 +81,29 @@ describe('WEB-4 · buscador de plan', () => {
   it('un producto lo incluyen los planes que traen alguno de sus módulos', () => {
     expect(plansIncluding(catalog, catalog.products[1]).map((p) => p.code)).toEqual(['profesional'])
     expect(plansIncluding(catalog, catalog.products[0]).map((p) => p.code)).toEqual(['esencial', 'profesional'])
+  })
+})
+
+describe('WEB-5 a WEB-7 · puente con la API pública', () => {
+  const token = 'a'.repeat(48)
+  it('solo reenvía las rutas públicas de registro, leads y demos', () => {
+    expect(isAllowedPublicCall('GET', 'ruc/20100070971')).toBe(true)
+    expect(isAllowedPublicCall('POST', 'signups')).toBe(true)
+    expect(isAllowedPublicCall('PATCH', `signups/${token}`)).toBe(true)
+    expect(isAllowedPublicCall('POST', `signups/${token}/complete`)).toBe(true)
+    expect(isAllowedPublicCall('POST', 'leads')).toBe(true)
+    expect(isAllowedPublicCall('GET', 'demo-slots')).toBe(true)
+    expect(isAllowedPublicCall('POST', `demo-bookings/${token}/cancel`)).toBe(true)
+    expect(isAllowedPublicCall('GET', 'catalog/../../platform/tenants')).toBe(false)
+    expect(isAllowedPublicCall('DELETE', 'leads')).toBe(false)
+    expect(isAllowedPublicCall('GET', 'leads')).toBe(false)
+    expect(isAllowedPublicCall('POST', 'ruc/123')).toBe(false)
+  })
+
+  it('lee el código, la regla y los campos del error de la API', () => {
+    const err = parseError(422, { error: { code: 'validation_failed', details: [{ field: 'verification_code', message: 'Código incorrecto' }] } })
+    expect(err).toEqual({ code: 'validation_failed', rule: undefined, fields: { verification_code: 'Código incorrecto' } })
+    expect(parseError(409, { error: { code: 'business_rule_violated', meta: { rule: 'slot_unavailable' } } }).rule).toBe('slot_unavailable')
+    expect(parseError(502, null).code).toBe('upstream_unavailable')
   })
 })

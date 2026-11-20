@@ -96,7 +96,7 @@ final class TenantAdministration
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    public function create(array $input, PlatformUser $actor): array
+    public function create(array $input, ?PlatformUser $actor): array
     {
         $input = $this->withGlobalDefaults($input);
         $this->validateReferences($input);
@@ -126,7 +126,7 @@ final class TenantAdministration
             ]);
             DB::table('tenant_status_events')->insert([
                 'tenant_id' => $id, 'from_status' => null, 'to_status' => $status,
-                'reason' => 'created', 'platform_user_id' => $actor->id,
+                'reason' => 'created', 'platform_user_id' => $actor?->id,
             ]);
 
             // Roles de sistema, política de seguridad y módulos base; luego lo que aporta cada módulo.

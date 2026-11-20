@@ -399,6 +399,12 @@ final class CrossTenantHarness
                 continue;
             }
 
+            // Sitio comercial (WEB-5 a WEB-7): rutas públicas sin organización, identificadas por un token de un solo
+            // uso o por un dato público (RUC, subdominio); su frontera se prueba en tests/Feature/Platform/SiteFormsTest.
+            if (str_starts_with($op['path'], '/public/') && $permission === 'public') {
+                continue;
+            }
+
             if (in_array($op['path'], self::SHARED_PRODUCT_CONTENT, true)) {
                 continue;
             }

@@ -14018,6 +14018,23 @@ export interface paths {
         patch: operations["patchPlatformWebSettings"];
         trace?: never;
     };
+    "/platform/web-waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** WEB-7 · Cuántas empresas esperan cada módulo en «Próximamente» y cuántas ya fueron avisadas */
+        get: operations["getPlatformWebWaitlist"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/position-options": {
         parameters: {
             query?: never;
@@ -14979,8 +14996,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sitio: agendar una demo */
+        /** WEB-6 · Sitio: agendar una demo en un horario ofrecido; crea el lead con origen y consentimiento, confirma por correo con el enlace para reprogramar o cancelar y devuelve manage_token. 409 si el horario ya no está libre */
         post: operations["postPublicDemoBookings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/demo-bookings/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** WEB-6 · Sitio: ver la demo desde el enlace del correo (para reprogramar o cancelar) */
+        get: operations["getPublicDemoBookingsToken"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -14996,7 +15030,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sitio: cancelar o reprogramar una demo desde el enlace del correo */
+        /** WEB-6 · Sitio: cancelar (action=cancel) o reprogramar (action=reschedule con starts_at) una demo desde el enlace del correo; 409 si ya pasó o se cerró, o si el horario nuevo no está libre */
         post: operations["postPublicDemoBookingsTokenCancel"];
         delete?: never;
         options?: never;
@@ -15011,7 +15045,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Sitio: horarios libres para agendar una demo */
+        /** WEB-6 · Sitio: horarios libres para agendar una demo desde ?from, dentro del horario de la consola y con la anticipación mínima; nunca los ya tomados */
         get: operations["getPublicDemoSlots"];
         put?: never;
         post?: never;
@@ -15132,7 +15166,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sitio: formulario de contacto, partner, boletín, calculadora o lista de espera (con consentimiento) */
+        /** WEB-6 · WEB-7 · Sitio: formulario de contacto, partner, boletín, calculadora o lista de espera (module_code de un módulo en «Próximamente»), con consentimiento, página de origen y campaña (RN-WEB-09); confirma por correo */
         post: operations["postPublicLeads"];
         delete?: never;
         options?: never;
@@ -15164,7 +15198,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado) */
+        /** WEB-5 · Sitio: validar un RUC (dígito verificador y si ya tiene una organización en GestiaHR); la razón social la escribe la persona */
         get: operations["getPublicRucRuc"];
         put?: never;
         post?: never;
@@ -15183,7 +15217,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sitio: iniciar un registro de prueba o suscripción (paso cuenta) */
+        /** WEB-5 · Sitio: iniciar un registro de prueba (paso cuenta: nombre, correo y consentimiento). Envía un código de verificación por correo y devuelve el token del registro (solo su hash queda en base). Antiabuso: campo trampa website, captcha_token por el puerto de captcha y límite por IP; con Idempotency-Key no crea otro registro */
         post: operations["postPublicSignups"];
         delete?: never;
         options?: never;
@@ -15204,7 +15238,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Sitio: guardar el paso empresa o plan de un registro en curso */
+        /** WEB-5 · Sitio: confirmar el correo (verification_code), pedir otro código (resend_code), guardar la empresa (company: ruc, company_name, employees_range, labor_regime, subdomain; RN-WEB-06) o el plan (plan, addons, billing_cycle). 409 si el registro ya terminó */
         patch: operations["patchPublicSignupsToken"];
         trace?: never;
     };
@@ -15217,7 +15251,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Sitio: completar el registro; crea la organización o inicia el pago */
+        /** WEB-5 · Sitio: completar el registro: crea la organización con su empresa, subdominio, administrador (invitado por correo a crear su contraseña), suscripción en prueba y módulos del plan, con el mismo servicio que la consola (RN-WEB-05). Repetirlo devuelve la misma organización. Por ahora solo prueba (mode=trial) */
         post: operations["postPublicSignupsTokenComplete"];
         delete?: never;
         options?: never;
@@ -60605,6 +60639,29 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getPlatformWebWaitlist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
     getPositionOptions: {
         parameters: {
             query?: never;
@@ -63024,6 +63081,32 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPublicDemoBookingsToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
             /** @description Correcto */
             200: {
                 headers: {
@@ -63033,9 +63116,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPublicDemoBookingsTokenCancel: {
@@ -63067,13 +63148,17 @@ export interface operations {
             };
             400: components["responses"]["BadRequest"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
     };
     getPublicDemoSlots: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Primer día a mostrar (AAAA-MM-DD); por defecto hoy */
+                from?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -63089,6 +63174,8 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     postPublicGrievances: {
@@ -63269,8 +63356,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Correcto */
-            200: {
+            /** @description Creado */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -63353,8 +63440,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Correcto */
-            200: {
+            /** @description Creado */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -63363,6 +63450,7 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -63393,6 +63481,7 @@ export interface operations {
             };
             400: components["responses"]["BadRequest"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };

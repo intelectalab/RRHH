@@ -23,6 +23,7 @@ final class DatabaseConventionsChecker
         'web_product_modules',
         'web_products',
         'web_signups',
+        'web_messages',
         'backup_restores',
         'backup_runs',
         'compliance_obligation_templates',

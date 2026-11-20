@@ -49,7 +49,7 @@ BEGIN
        'platform_incidents', 'platform_notices', 'platform_sessions', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
        'saas_invoices', 'saas_payments', 'statutory_file_layouts', 'subscription_addons', 'subscriptions', 'support_ticket_messages', 'support_tickets',
        'system_role_permissions', 'system_roles', 'tenant_domains', 'tenant_status_events', 'tenants',
-       'web_chat_sessions', 'web_complaints', 'web_demo_bookings', 'web_leads', 'web_product_modules', 'web_products', 'web_signups')
+       'web_chat_sessions', 'web_complaints', 'web_demo_bookings', 'web_leads', 'web_messages', 'web_product_modules', 'web_products', 'web_signups')
      AND NOT (c.relrowsecurity AND c.relforcerowsecurity
               AND EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid AND a.attname = 'tenant_id' AND a.attnotnull)
               AND EXISTS (SELECT 1 FROM pg_policy p WHERE p.polrelid = c.oid AND p.polname = 'tenant_isolation'

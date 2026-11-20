@@ -479,10 +479,12 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/public/leads` | público | 0 |
 | GET | `/public/demo-slots` | público | 0 |
 | POST | `/public/demo-bookings` | público | 0 |
+| GET | `/public/demo-bookings/{token}` | público | 0 |
 | POST | `/public/demo-bookings/{token}/cancel` | público | 0 |
 | POST | `/public/chat/messages` | público | 0 |
 | POST | `/public/complaints` | público | 0 |
 | GET | `/platform/web-metrics` | `platform.web_leads.view` | 0 |
+| GET | `/platform/web-waitlist` | `platform.web_leads.view` | 0 |
 | GET | `/platform/web-settings` | `platform.web_settings.view` | 0 |
 | PATCH | `/platform/web-settings` | `platform.web_settings.update` | 0 |
 

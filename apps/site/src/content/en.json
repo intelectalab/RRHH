@@ -15,6 +15,22 @@
     "signup": {
       "title": "Sign up · GestiaHR",
       "description": "Create your GestiaHR account."
+    },
+    "demo": {
+      "title": "Book a GestiaHR demo",
+      "description": "Pick a time and see GestiaHR with a case like your company."
+    },
+    "contact": {
+      "title": "Contact · GestiaHR",
+      "description": "Write to us and we will reply within one business day."
+    },
+    "partners": {
+      "title": "Partners · GestiaHR",
+      "description": "Program for accounting firms and HR consultancies."
+    },
+    "login": {
+      "title": "Log in · GestiaHR",
+      "description": "Sign in to your GestiaHR organization."
     }
   },
   "nav": {
@@ -27,7 +43,11 @@
     "home": "GestiaHR home",
     "languages": "Language",
     "brand_a": "Gestia",
-    "brand_b": "HR"
+    "brand_b": "HR",
+    "demo": "Book a demo",
+    "contact": "Contact",
+    "login": "Log in",
+    "partners": "Partners"
   },
   "status": {
     "available": "Available",
@@ -248,15 +268,135 @@
     ]
   },
   "signup": {
-    "title": "Sign-up opens very soon",
-    "text": "We kept your choice of plan and products. Soon you will be able to create your organization here in three steps.",
-    "summary": "Your choice",
-    "back": "Back to pricing"
+    "title": "Create your trial organization",
+    "text": "Three steps: your account, your company and your plan. The trial asks for no card or payment.",
+    "summary": "Your selection",
+    "back": "Back to pricing",
+    "steps": [
+      "Your account",
+      "Your company",
+      "Your plan"
+    ],
+    "full_name": "Full name",
+    "email": "Work email",
+    "start": "Send code",
+    "code_title": "Check your inbox",
+    "code_text": "We sent a 6-digit code to {email}. It expires in 15 minutes.",
+    "code": "Verification code",
+    "verify": "Verify",
+    "resend": "Send another code",
+    "resent": "We sent you a new code.",
+    "ruc": "RUC (tax ID)",
+    "ruc_ok": "Valid RUC",
+    "ruc_bad": "The RUC is not valid.",
+    "ruc_taken": "That RUC already has an organization in GestiaHR.",
+    "company_name": "Legal name",
+    "employees": "Employees",
+    "regime": "Labor regime",
+    "regimes": {
+      "pe_general": "General regime",
+      "pe_micro": "Micro business (REMYPE)",
+      "pe_pequena": "Small business (REMYPE)"
+    },
+    "subdomain": "Your organization address",
+    "subdomain_hint": "Lowercase letters, numbers and hyphens only.",
+    "subdomain_ok": "Available",
+    "subdomain_bad": "That address is not available.",
+    "next": "Continue",
+    "plan": "Plan",
+    "cycle": "Billing",
+    "cycles": {
+      "monthly": "Monthly",
+      "annual": "Annual"
+    },
+    "addons": "Add-ons",
+    "no_plan": "Choose a plan on the pricing page to continue.",
+    "choose_plan": "Go to pricing",
+    "trial_note": "The trial lasts the days set by the plan. When it ends you decide whether to subscribe.",
+    "create": "Create my trial organization",
+    "done_title": "Your organization is ready",
+    "done_text": "We emailed {email} so you can set your password and sign in.",
+    "open": "Go to my organization",
+    "consent": "I accept the privacy policy and the processing of my data to create the trial."
   },
   "footer": {
     "tagline": "Payroll and human resources software for Peru.",
     "products": "Products",
     "company": "GestiaHR",
     "rights": "© GestiaHR"
+  },
+  "forms": {
+    "name": "Full name",
+    "email": "Work email",
+    "phone": "Phone",
+    "company": "Company",
+    "ruc": "RUC (tax ID)",
+    "employees": "Employees",
+    "message": "Message",
+    "optional": "optional",
+    "send": "Send",
+    "sending": "Sending…",
+    "consent": "I accept the privacy policy and agree to be contacted for this purpose.",
+    "error": "We could not send the form. Check your details and try again.",
+    "unavailable": "The service is not responding right now. Try again in a few minutes.",
+    "select": "Choose an option"
+  },
+  "contact": {
+    "title": "Let's talk",
+    "text": "Tell us what you need and we will reply within one business day.",
+    "sent": "We got your message. We will write back soon.",
+    "purpose": "Reply to a contact request"
+  },
+  "partners": {
+    "title": "Partner program",
+    "text": "For accounting firms and consultancies that run payroll for several clients.",
+    "sent": "We got your request. We will contact you to talk.",
+    "purpose": "Partner evaluation"
+  },
+  "waitlist": {
+    "module": "What should we notify you about",
+    "cta": "Notify me",
+    "sent": "Done. We will write to you once when it is available.",
+    "purpose": "Module launch notice"
+  },
+  "demo": {
+    "title": "Book a demo",
+    "text": "Pick a time and we will show you GestiaHR with a case like yours. Lima time.",
+    "slots": "Available times",
+    "no_slots": "There are no free times in the coming days. Write to us from the contact page.",
+    "channel": "How you prefer the demo",
+    "channels": {
+      "video": "Video call",
+      "phone": "Phone"
+    },
+    "book": "Confirm demo",
+    "taken": "That time was just taken. Pick another one.",
+    "booked_title": "Demo booked",
+    "booked_text": "We sent the confirmation to {email} with the link to change or cancel it.",
+    "when": "Date and time",
+    "manage_title": "Your demo",
+    "not_found": "We could not find that demo. Check the link in the email.",
+    "status": {
+      "scheduled": "Booked",
+      "rescheduled": "Rescheduled",
+      "cancelled": "Cancelled",
+      "completed": "Done",
+      "no_show": "No show"
+    },
+    "reschedule": "Change time",
+    "cancel": "Cancel demo",
+    "cancelled": "Your demo was cancelled.",
+    "rescheduled": "Your demo time was changed.",
+    "closed": "This demo can no longer be changed.",
+    "purpose": "Arrange and hold the demo"
+  },
+  "login": {
+    "title": "Sign in to your organization",
+    "text": "Type your organization address and we will take you to its sign-in screen.",
+    "subdomain": "Organization address",
+    "go": "Continue",
+    "not_found": "We could not find an organization with that address.",
+    "no_account": "Don't have an account yet?",
+    "trial": "Start a trial"
   }
 }
