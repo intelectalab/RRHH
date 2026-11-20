@@ -9,6 +9,7 @@ use App\Shared\Exceptions\AyniException;
 use App\Shared\Labor\MasterData;
 use App\Shared\LegalParameters\LegalParameters;
 use App\Shared\Time\AbsenceIncidents;
+use App\Shared\Time\VacationPayrollIncidents;
 use App\Shared\Vigencia\EffectiveDated;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -34,6 +35,7 @@ final class ContextBuilder
         private readonly AbsenceIncidents $absences,
         private readonly RegimeResolver $regimes,
         private readonly LegalParameters $legal,
+        private readonly VacationPayrollIncidents $vacations,
     ) {}
 
     /**
@@ -182,6 +184,18 @@ final class ContextBuilder
         // PER-6 · Tipo de comisión de la AFP (flujo o mixta) vigente al fin del tramo: decide qué tasa de comisión aplica.
         $commissionScheme = (string) ($affiliation->commission_scheme ?? '');
         $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
+        // BSO-5 · Días de descanso vacacional del tramo, del libro de vacaciones y con su periodo vacacional.
+        $vacations = $this->vacations->taken($employmentId, $start, $end);
+        $vacationDays = BigDecimal::zero();
+        foreach ($vacations as $v) {
+            $vacationDays = $vacationDays->plus($v['days']);
+        }
+        if ($vacations !== []) {
+            $sources['vacations'] = $vacations;
+        }
+        // BSO-4 · Asignación familiar: hijos con sustento vigente al fin del tramo (no la marca manual).
+        $family = $this->familyAllowance($employmentId, $end);
+        $sources['family_allowance'] = $family;
 
         $variables = [
             'sueldo' => BigDecimal::of($last['salary']['amount']),
@@ -197,6 +211,8 @@ final class ContextBuilder
             'dias_cargo_empleador' => BigDecimal::of($sum('employer_paid_days')),
             'dias_subsidio' => BigDecimal::of($sum('subsidized_days')),
             'horas_ausencia' => BigDecimal::of((string) ($totals['absence_hours'] ?? '0')),
+            'dias_vacaciones' => $vacationDays,
+            'hijos_asignacion_familiar' => BigDecimal::of(count($family['children'])),
             'fecha_inicio' => $start,
             'fecha_fin' => $end,
             'fecha_ingreso' => $hire,
@@ -205,7 +221,7 @@ final class ContextBuilder
             'sistema_salud' => (string) ($flags->health_scheme ?? ''),
             'sistema_pension' => $pensionSystem,
             'afp_comision_tipo' => $commissionScheme,
-            'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
+            'tiene_asignacion_familiar' => $family['children'] !== [],
             'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
         ];
         foreach ($overrides as $name => $value) {
@@ -219,6 +235,61 @@ final class ContextBuilder
         }
 
         return $variables;
+    }
+
+    /**
+     * BSO-4 · Derechohabientes que dan asignación familiar a una fecha (Ley 25129): hijos con sustento adjunto, no
+     * dados de baja y no excluidos por RRHH, menores de la mayoría de edad del parámetro legal; los mayores, solo
+     * si estudian y no pasan la edad del parámetro de estudios (por validar: sin valor, no cuentan), o si tienen
+     * incapacidad. La marca manual del régimen ya no decide: sin derechohabiente con sustento vigente no se otorga.
+     *
+     * @return array{children: list<array{dependent_id: string, reason: string}>, as_of: string, pending: list<string>}
+     */
+    private function familyAllowance(string $employmentId, string $asOf): array
+    {
+        $emp = DB::table('employments AS e')->join('legal_entities AS le', 'le.id', '=', 'e.legal_entity_id')
+            ->where('e.id', $employmentId)->first(['e.person_id', 'e.legal_entity_id', 'le.country_code']);
+        $out = ['children' => [], 'as_of' => $asOf, 'pending' => []];
+        if ($emp === null) {
+            return $out;
+        }
+        $params = new PayrollParameters($this->legal, (string) $emp->country_code, null, (string) $emp->legal_entity_id, $asOf);
+        $majority = $params->resolve('mayoria_edad_anios');
+        $study = $params->resolve('asignacion_familiar_edad_max_estudios');
+        $majorityAge = $majority === null || $majority['value'] === null ? null : (int) $majority['value'];
+        $studyAge = $study === null || $study['value'] === null ? null : (int) $study['value'];
+        if ($majorityAge === null) {
+            $out['pending'][] = 'mayoria_edad_anios';
+        }
+        $rows = DB::table('dependents')->where('person_id', $emp->person_id)->whereNull('deleted_at')
+            ->whereIn('relationship', ['child', 'disabled_adult_child'])->whereNotNull('proof_file_id')
+            ->where('entitles_family_allowance', true)
+            ->where(fn ($q) => $q->whereNull('registered_on')->orWhere('registered_on', '<=', $asOf))
+            ->where(fn ($q) => $q->whereNull('deregistered_on')->orWhere('deregistered_on', '>', $asOf))
+            ->get(['id', 'relationship', 'birth_date', 'is_student']);
+        foreach ($rows as $d) {
+            if ($d->relationship === 'disabled_adult_child') {
+                $out['children'][] = ['dependent_id' => (string) $d->id, 'reason' => 'disability'];
+
+                continue;
+            }
+            if ($d->birth_date === null || $majorityAge === null) {
+                continue;
+            }
+            $age = CarbonImmutable::parse(substr((string) $d->birth_date, 0, 10))->diffInYears(CarbonImmutable::parse($asOf));
+            if ($age < $majorityAge) {
+                $out['children'][] = ['dependent_id' => (string) $d->id, 'reason' => 'minor'];
+            } elseif ((bool) $d->is_student) {
+                if ($studyAge === null) {
+                    $out['pending'][] = 'asignacion_familiar_edad_max_estudios';
+                } elseif ($age < $studyAge) {
+                    $out['children'][] = ['dependent_id' => (string) $d->id, 'reason' => 'student'];
+                }
+            }
+        }
+        $out['pending'] = array_values(array_unique($out['pending']));
+
+        return $out;
     }
 
     /**

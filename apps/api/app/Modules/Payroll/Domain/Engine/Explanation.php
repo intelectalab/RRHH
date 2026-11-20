@@ -43,6 +43,12 @@ final class Explanation
                 $steps[] = self::t('income_tax', ['gross' => (string) ($tax['gross_annual_income'] ?? ''), 'net' => (string) ($tax['net_annual_income'] ?? ''),
                     'tax' => (string) ($tax['annual_tax'] ?? ''), 'prior' => (string) ($tax['prior_withholdings'] ?? ''), 'divisor' => (string) ($tax['divisor'] ?? ''),
                     'amount' => (string) ($tax['withholding'] ?? $amount), 'currency' => $currency]);
+                // PER-12 · Acumulados del sistema anterior que entraron a la proyección.
+                $opening = (array) ($tax['opening'] ?? []);
+                if (($opening['cutoff'] ?? null) !== null) {
+                    $steps[] = self::t('income_tax_opening', ['cutoff' => (string) $opening['cutoff'], 'income' => (string) ($opening['income'] ?? '0'),
+                        'withheld' => (string) ($opening['withheld'] ?? '0'), 'currency' => $currency]);
+                }
             } elseif ($source === 'formula') {
                 $steps[] = self::t('formula', ['formula' => (string) ($trace['formula'] ?? '')]);
             } else {

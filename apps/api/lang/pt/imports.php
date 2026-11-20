@@ -14,6 +14,7 @@ return [
         'dependents' => 'Dependentes',
         'positions' => 'Posições',
         'payroll_incidents' => 'Ocorrências da folha',
+        'payroll_balances' => 'Acumulados da folha do exercício',
         'job_profiles' => 'Cargos',
     ],
     'columns' => [
@@ -28,6 +29,19 @@ return [
             'category' => 'Categoria',
             'print_on_payslip' => 'Impresso no holerite',
             'notes' => 'Nota',
+        ],
+        'payroll_balances' => [
+            'document_type' => 'Tipo de documento',
+            'document_number' => 'Número do documento',
+            'legal_entity' => 'Empresa (RUC)',
+            'fiscal_year' => 'Exercício',
+            'cutoff_date' => 'Data de corte',
+            'kind' => 'Tipo de acumulado',
+            'amount' => 'Valor',
+            'period_month' => 'Mês',
+            'semester' => 'Semestre',
+            'concept_code' => 'Código do conceito',
+            'evidence' => 'Comprovação',
         ],
         'payroll_incidents' => [
             'payroll_group' => 'Grupo de folha',

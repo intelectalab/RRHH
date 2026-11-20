@@ -46,6 +46,7 @@ return [
     'process_not_applicable' => 'The :regime regime does not have the :kind process: the employment is left out of this calculation.',
     'explain' => [
         'income_tax' => 'Fifth-category withholding: projected annual gross income :gross, net income :net, annual tax :tax, withheld before :prior, divisor :divisor; withholding for the month :amount :currency.',
+        'income_tax_opening' => 'Includes the year-to-date amounts brought from the previous system as of :cutoff: income :income and withholdings :withheld :currency.',
         'formula' => 'The formula «:formula» was applied.',
         'incidents' => 'The amount comes from the incidents recorded in the period.',
         'variable' => 'Data «:name»: :value.',
@@ -158,5 +159,20 @@ return [
         'code_format' => 'The code is lowercase with no spaces: letters, numbers and underscore.',
         'kind_invalid' => 'The kind is not valid. Use one of: :options.',
         'concept_note' => 'Imported in batch :job.',
+    ],
+    'balances' => [
+        'cutoff_year' => 'The cutoff date must fall within the fiscal year.',
+        'kind_invalid' => 'Invalid balance type. Use one of: :kinds.',
+        'month_invalid' => 'The month must be between 1 and 12.',
+        'semester_required' => 'Give the semester (1 or 2) for gratification and CTS bases and deposits.',
+        'evidence_required' => 'Give the supporting source (report from the previous system).',
+        'closed_period' => 'A closed period of the fiscal year already calculated this worker: the balance cannot be changed.',
+    ],
+    'ledger' => [
+        'kind_monthly' => 'Monthly withholding',
+        'kind_final_adjustment' => 'Final adjustment',
+        'kind_refund' => 'Refund',
+        'kind_prior_employer' => 'Prior employer',
+        'kind_correction' => 'Correction',
     ],
 ];

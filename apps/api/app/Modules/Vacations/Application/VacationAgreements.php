@@ -10,6 +10,7 @@ use App\Shared\Documents\SimplePdf;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Time\VacationPayrollIncidents;
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +33,9 @@ final class VacationAgreements implements VacationPayrollIncidents
 
     /** Concepto del paquete de país que paga la venta de días. */
     public const SALE_CONCEPT = 'vacaciones_compra';
+
+    /** BSO-5 · Concepto del paquete de país que paga la indemnización por vacaciones no gozadas a tiempo. */
+    public const INDEMNITY_CONCEPT = 'indemnizacion_vacacional';
 
     public function __construct(
         private readonly VacationAgreementStateMachine $machine,
@@ -141,6 +145,50 @@ final class VacationAgreements implements VacationPayrollIncidents
             ->whereBetween('effective_on', [$from, $to])->orderBy('effective_on')->get() as $a) {
             $out[] = ['agreement_id' => $a->id, 'days' => (string) BigDecimal::of((string) $a->days)->toScale(2),
                 'effective_on' => $a->day('effective_on'), 'concept_code' => (string) $a->payroll_concept_code];
+        }
+
+        return $out;
+    }
+
+    public function taken(string $employmentId, string $from, string $to): array
+    {
+        $out = [];
+        $requests = DB::table('vacation_requests')->where('employment_id', $employmentId)->whereNull('deleted_at')
+            ->whereIn('kind', ['leave', 'advance'])->whereIn('status', ['approved', 'in_progress', 'taken'])
+            ->where('starts_on', '<=', $to)->where('ends_on', '>=', $from)->orderBy('starts_on')->get(['id', 'starts_on', 'ends_on', 'days']);
+        foreach ($requests as $r) {
+            $start = substr((string) $r->starts_on, 0, 10);
+            $end = substr((string) $r->ends_on, 0, 10);
+            $a = max($start, $from);
+            $b = min($end, $to);
+            $total = CarbonImmutable::parse($start)->diffInDays(CarbonImmutable::parse($end)) + 1;
+            $inside = CarbonImmutable::parse($a)->diffInDays(CarbonImmutable::parse($b)) + 1;
+            $days = BigDecimal::of((string) $r->days);
+            if ($inside < $total) {
+                $days = $days->multipliedBy($inside)->dividedBy($total, 2, RoundingMode::HALF_UP);
+            }
+            $period = DB::table('vacation_ledger_entries AS l')->join('vacation_accrual_periods AS p', 'p.id', '=', 'l.vacation_accrual_period_id')
+                ->where('l.vacation_request_id', $r->id)->whereIn('l.entry_type', ['taken', 'scheduled'])->orderBy('l.effective_on')
+                ->first(['p.id', 'p.period_start']);
+            $out[] = ['request_id' => (string) $r->id, 'accrual_period_id' => $period === null ? null : (string) $period->id,
+                'period_start' => $period === null ? null : substr((string) $period->period_start, 0, 10), 'from' => $a, 'to' => $b,
+                'days' => (string) $days->toScale(2)];
+        }
+
+        return $out;
+    }
+
+    public function expired(string $employmentId, string $asOf): array
+    {
+        $out = [];
+        $periods = DB::table('vacation_accrual_periods')->where('employment_id', $employmentId)->whereNotNull('enjoy_by')
+            ->where('enjoy_by', '<', $asOf)->whereIn('status', ['earned', 'overdue'])->orderBy('period_start')->get(['id', 'period_start', 'enjoy_by']);
+        foreach ($periods as $p) {
+            $left = BigDecimal::of((string) (DB::table('vacation_ledger_entries')->where('vacation_accrual_period_id', $p->id)->sum('days') ?: '0'));
+            if ($left->isPositive()) {
+                $out[] = ['accrual_period_id' => (string) $p->id, 'period_start' => substr((string) $p->period_start, 0, 10),
+                    'enjoy_by' => substr((string) $p->enjoy_by, 0, 10), 'days' => (string) $left->toScale(2), 'concept_code' => self::INDEMNITY_CONCEPT];
+            }
         }
 
         return $out;

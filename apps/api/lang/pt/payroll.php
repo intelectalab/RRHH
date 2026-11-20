@@ -46,6 +46,7 @@ return [
     'process_not_applicable' => 'O regime :regime não gera o processo :kind: o vínculo fica fora deste cálculo.',
     'explain' => [
         'income_tax' => 'Retenção de quinta categoria: renda bruta anual projetada :gross, renda líquida :net, imposto anual :tax, retido antes :prior, divisor :divisor; retenção do mês :amount :currency.',
+        'income_tax_opening' => 'Inclui os acumulados trazidos do sistema anterior até :cutoff: rendimentos :income e retenções :withheld :currency.',
         'formula' => 'Foi aplicada a fórmula «:formula».',
         'incidents' => 'O valor vem das ocorrências registradas no período.',
         'variable' => 'Dado «:name»: :value.',
@@ -158,5 +159,20 @@ return [
         'code_format' => 'O código vai em minúsculas, sem espaços: letras, números e sublinhado.',
         'kind_invalid' => 'A natureza não é válida. Use uma de: :options.',
         'concept_note' => 'Importado no lote :job.',
+    ],
+    'balances' => [
+        'cutoff_year' => 'A data de corte deve estar dentro do exercício.',
+        'kind_invalid' => 'Tipo de acumulado inválido. Use um de: :kinds.',
+        'month_invalid' => 'O mês deve estar entre 1 e 12.',
+        'semester_required' => 'Informe o semestre (1 ou 2) para bases de gratificação, CTS e depósitos.',
+        'evidence_required' => 'Informe a comprovação do acumulado (relatório do sistema anterior).',
+        'closed_period' => 'Um período fechado do exercício já calculou este trabalhador: o acumulado não pode ser alterado.',
+    ],
+    'ledger' => [
+        'kind_monthly' => 'Retenção mensal',
+        'kind_final_adjustment' => 'Ajuste final',
+        'kind_refund' => 'Devolução',
+        'kind_prior_employer' => 'Empregador anterior',
+        'kind_correction' => 'Correção',
     ],
 ];

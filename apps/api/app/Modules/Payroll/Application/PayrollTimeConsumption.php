@@ -69,6 +69,15 @@ final class PayrollTimeConsumption
                     $desired['benefit|vacation_agreement|'.$sale['agreement_id']] = ['source' => 'benefit', 'source_type' => 'vacation_agreement',
                         'source_id' => $sale['agreement_id'], 'code' => $sale['concept_code'], 'quantity' => $sale['days'], 'retro' => null];
                 }
+                // BSO-5 · Periodos vacacionales vencidos con días sin gozar: la indemnización entra pendiente de
+                // visto bueno (RRHH la revisa) y una sola vez por periodo vacacional.
+                foreach ($this->vacations->expired($employmentId, $to) as $exp) {
+                    if ($this->indemnityElsewhere($p, $employmentId, $exp['accrual_period_id'])) {
+                        continue;
+                    }
+                    $desired['benefit|vacation_expired|'.$exp['accrual_period_id']] = ['source' => 'benefit', 'source_type' => 'vacation_expired',
+                        'source_id' => $exp['accrual_period_id'], 'code' => $exp['concept_code'], 'quantity' => $exp['days'], 'retro' => null, 'status' => 'pending'];
+                }
                 if ($previous !== null) {
                     foreach ($this->differencesSinceCutoff($previous, $employmentId) as $diff) {
                         $desired['retroactive|'.self::ABSENCE_PREFIX.$diff['type_code'].'|'.$previous->id] = ['source' => 'retroactive',
@@ -185,7 +194,7 @@ final class PayrollTimeConsumption
     /**
      * Crea, actualiza o retira (papelera) las incidencias de origen de módulo del trabajador en el periodo.
      *
-     * @param  array<string, array{source: string, source_type: string, source_id: ?string, code: string, quantity: string, retro: ?string}>  $desired
+     * @param  array<string, array{source: string, source_type: string, source_id: ?string, code: string, quantity: string, retro: ?string, status?: string}>  $desired
      * @param  array<string, string>  $concepts
      * @param  array<string, int>  $stats
      * @param  list<string>  $missing
@@ -194,7 +203,7 @@ final class PayrollTimeConsumption
     {
         $existing = PayrollIncident::query()->where('payroll_period_id', $p->id)->where('employment_id', $employmentId)
             ->where(fn ($q) => $q->where(fn ($w) => $w->whereIn('source', ['absence', 'retroactive'])->where('source_type', 'like', self::ABSENCE_PREFIX.'%'))
-                ->orWhere(fn ($w) => $w->where('source', 'benefit')->where('source_type', 'vacation_agreement')))
+                ->orWhere(fn ($w) => $w->where('source', 'benefit')->whereIn('source_type', ['vacation_agreement', 'vacation_expired'])))
             ->get()->keyBy(fn (PayrollIncident $i): string => $i->source.'|'.$i->source_type.'|'.($i->source === 'retroactive' ? $i->retro_period_id : $i->source_id));
         foreach ($desired as $key => $d) {
             $conceptId = $concepts[$d['code']] ?? null;
@@ -207,7 +216,7 @@ final class PayrollTimeConsumption
             $current = $existing->pull($key);
             if ($current instanceof PayrollIncident) {
                 if ($current->quantity === null || ! BigDecimal::of($current->quantity)->isEqualTo($quantity) || $current->payroll_concept_id !== $conceptId) {
-                    $current->fill(['quantity' => $quantity, 'payroll_concept_id' => $conceptId, 'status' => 'approved'])->save();
+                    $current->fill(['quantity' => $quantity, 'payroll_concept_id' => $conceptId, 'status' => $d['status'] ?? 'approved'])->save();
                     $stats['updated']++;
                 }
 
@@ -215,7 +224,7 @@ final class PayrollTimeConsumption
             }
             PayrollIncident::query()->create([
                 'payroll_period_id' => $p->id, 'employment_id' => $employmentId, 'payroll_concept_id' => $conceptId, 'quantity' => $quantity,
-                'source' => $d['source'], 'source_type' => $d['source_type'], 'source_id' => $d['source_id'], 'retro_period_id' => $d['retro'], 'status' => 'approved',
+                'source' => $d['source'], 'source_type' => $d['source_type'], 'source_id' => $d['source_id'], 'retro_period_id' => $d['retro'], 'status' => $d['status'] ?? 'approved',
             ]);
             $stats['created']++;
             if ($d['source'] === 'retroactive') {
@@ -226,5 +235,12 @@ final class PayrollTimeConsumption
             $gone->delete();
             $stats['removed']++;
         }
+    }
+
+    /** BSO-5 · ¿La indemnización de este periodo vacacional ya entró en otro periodo de planilla (no rechazada)? */
+    private function indemnityElsewhere(PayrollPeriod $p, string $employmentId, string $accrualPeriodId): bool
+    {
+        return PayrollIncident::query()->where('employment_id', $employmentId)->where('source', 'benefit')->where('source_type', 'vacation_expired')
+            ->where('source_id', $accrualPeriodId)->where('payroll_period_id', '<>', $p->id)->where('status', '<>', 'rejected')->exists();
     }
 }

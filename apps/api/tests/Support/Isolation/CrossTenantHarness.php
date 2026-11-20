@@ -47,6 +47,7 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
 use App\Modules\Payroll\Infrastructure\Models\AccountingAccount;
+use App\Modules\Payroll\Infrastructure\Models\FifthCategoryLedgerEntry;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRun;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
@@ -93,6 +94,8 @@ final class CrossTenantHarness
         'CustomField' => CustomFieldDefinition::class,
         '/settings/{group}' => TenantSetting::class,
         '/notification-deliveries' => NotificationDelivery::class,
+        // PER-11 · El resumen del ejercicio se pide por la relación de un movimiento del libro de A.
+        '/employments/{employment_id}/fifth-category-summary' => FifthCategoryLedgerEntry::class,
         // NOT-3: reactivar la dirección que rebotó en una entrega de A.
         '/notification-deliveries/{id}/clear-bounce' => NotificationDelivery::class,
         // WFL-5 · Las reglas y su centro de ejecuciones usan el contrato Workflow / WorkflowRun.

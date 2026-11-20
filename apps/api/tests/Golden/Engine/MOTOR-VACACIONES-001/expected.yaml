@@ -1,0 +1,15 @@
+status: calculated
+segments:
+  - { from: "2026-03-01", to: "2026-03-31", days: 30 }
+lines:
+  rem_basica: "2000.00"
+  rem_vacacional: "1000.00"
+  vacaciones_compra: "500.00"
+  indemnizacion_vacacional: "300.00"
+  asig_familiar: "100.00"
+totals:
+  earnings: "3900.00"
+  deductions: "0.00"
+  net: "3900.00"
+  employer_contributions: "0.00"
+  employer_cost: "3900.00"

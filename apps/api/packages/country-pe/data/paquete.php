@@ -15,10 +15,11 @@
  */
 return [
     'code' => 'pe-base',
-    'version' => '1.2.0',
-    'released_on' => '2026-11-30',
+    'version' => '1.3.0',
+    'released_on' => '2026-12-01',
     'components' => ['contract_types', 'absence_types', 'holidays', 'document_templates', 'vacation_policies', 'termination_reasons', 'roles', 'payroll_concepts'],
     'changelog' => [
+        '1.3.0' => 'Asignación familiar solo con hijos con sustento vigente y en los regímenes que corresponde (BSO-4); remuneración vacacional, venta de días e indemnización por vacaciones no gozadas calculadas desde el libro de vacaciones, y básica sin los días de descanso vacacional (BSO-5). Los conceptos ya instalados no cambian: la organización publica la nueva versión desde Conceptos.',
         '1.2.0' => 'Aportes (PER-6): comisión de AFP según el tipo (flujo o mixta), prima con el tope de la remuneración asegurable, EsSalud salvo para afiliados al SIS y crédito por EPS. Los conceptos ya instalados no cambian: la organización publica la nueva versión desde Conceptos.',
         '1.1.0' => 'Conceptos de planilla (CPT-5) desde conceptos_pe.json: fórmula en el lenguaje del motor donde ya se calcula, afectaciones por base y código de la Tabla 22. Se aplican solo con el módulo de planilla contratado.',
         '1.0.0' => 'Primera versión: tipos de contrato, tipos de ausencia y licencias de ley, feriados nacionales, certificado y constancia de trabajo, políticas de vacaciones por régimen, motivos de cese (Tabla 17) y roles de sistema.',

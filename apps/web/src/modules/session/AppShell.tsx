@@ -63,6 +63,7 @@ const MENU: NavLink[] = [
   { href: '/nomina/conceptos', key: 'shell.modules_payroll_concepts', group: 'payroll', icon: 'sliders', module: 'payroll', visible: (can) => can('payroll.concepts.view') },
   { href: '/nomina/parametros', key: 'shell.modules_legal_parameters', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.legal_parameters.view') },
   { href: '/nomina/calculos', key: 'shell.modules_payroll_runs', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.view') },
+  { href: '/nomina/retenciones-quinta', key: 'shell.modules_fifth_ledger', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.fifth_category_ledger.view') && can('payroll.periods.view') },
   { href: '/nomina/micro-pequena-empresa', key: 'shell.modules_small_business', group: 'payroll', icon: 'building', module: 'payroll', visible: (can) => can('payroll.entity_annual_figures.view') },
 ]
 

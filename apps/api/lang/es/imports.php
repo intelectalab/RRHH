@@ -14,6 +14,7 @@ return [
         'dependents' => 'Dependientes',
         'positions' => 'Posiciones',
         'payroll_incidents' => 'Incidencias de planilla',
+        'payroll_balances' => 'Acumulados de planilla del ejercicio',
         'job_profiles' => 'Puestos',
     ],
     'columns' => [
@@ -28,6 +29,19 @@ return [
             'category' => 'Categoría',
             'print_on_payslip' => 'Se imprime en la boleta',
             'notes' => 'Nota',
+        ],
+        'payroll_balances' => [
+            'document_type' => 'Tipo de documento',
+            'document_number' => 'Número de documento',
+            'legal_entity' => 'Empresa (RUC)',
+            'fiscal_year' => 'Ejercicio',
+            'cutoff_date' => 'Fecha de corte',
+            'kind' => 'Tipo de acumulado',
+            'amount' => 'Monto',
+            'period_month' => 'Mes',
+            'semester' => 'Semestre',
+            'concept_code' => 'Código del concepto',
+            'evidence' => 'Sustento',
         ],
         'payroll_incidents' => [
             'payroll_group' => 'Grupo de planilla',

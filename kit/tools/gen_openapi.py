@@ -646,6 +646,8 @@ EXTRA = [
     ("PER", 3, "post", "/payroll-periods/{id}/incidents/bulk", "payroll.incidents.create", "Carga masiva de incidencias del periodo (rows: employment_id o employee_code, concept_code, quantity, rate, amount, notes); todo o nada, con el error de cada fila", False),
     # PER-3 · Consumo de ausencias y vacaciones con corte registrado; lo posterior al corte entra como diferencia al periodo siguiente.
     ("PER", 3, "post", "/payroll-periods/{id}/consume-time", "payroll.incidents.create", "Tomar ausencias y vacaciones del periodo hasta la fecha de corte: crea o actualiza sus incidencias, registra el corte y trae como diferencia lo ocurrido después del corte del periodo anterior", False),
+    ("PER", 3, "get", "/employments/{employment_id}/fifth-category-summary", "payroll.fifth_category_ledger.view", "PER-11 · Resumen del ejercicio (?fiscal_year) del libro de quinta del trabajador: retención vigente de cada mes (última secuencia, sin corridas descartadas) y su acumulado, acumulados traídos del sistema anterior (PER-12) y conciliación con las boletas de los periodos cerrados (closed_payslips frente a closed_ledger, reconciled). Montos sensibles con registro de accesos", False),
+    ("PER", 3, "get", "/payroll-opening-balances", "payroll.incidents.view", "PER-12 · Acumulados del ejercicio traídos del sistema anterior (saldos de apertura por trabajador con fecha de corte y sustento) para revisarlos contra el reporte de origen; entran y se revierten con la importación payroll_balances. El monto viaja con payroll.results.view", False),
     ("PER", 3, "get", "/payroll-periods/{id}/time-summary", "payroll.periods.view", "Corte de tiempo del periodo por trabajador: lo tomado, lo que quedó fuera de corte y las diferencias desde el corte", False),
     ("PER", 3, "get", "/payroll-periods/{id}/variance", "payroll.periods.view", "Comparación contra el periodo anterior y anomalías explicadas", False),
     ("BOL", 3, "get", "/me/payslips", "-", "Boletas propias", False),
@@ -846,6 +848,14 @@ CREATED = {('post', '/absences/{id}/attachments'), ('post', '/accounting-account
 _q = lambda name, desc, required=False, fmt=None: {"name": name, "in": "query", "required": required, "description": desc,
                                                    "schema": {"type": "string", **({"format": fmt} if fmt else {})}}
 QUERY = {
+    ("get", "/employments/{employment_id}/fifth-category-summary"): [
+        _q("fiscal_year", "Ejercicio (AAAA)", True, "integer"),
+    ],
+    ("get", "/payroll-opening-balances"): [
+        _q("filter[employment_id]", "Relación laboral"), _q("filter[fiscal_year]", "Ejercicio (AAAA)", False, "integer"),
+        _q("filter[kind]", "Tipo: fifth_income, fifth_withheld, pension_contribution, health_contribution, gratification_base, cts_base, cts_deposit"),
+        _q("filter[import_job_id]", "Importación que lo trajo"),
+    ],
     ("get", "/payroll-affectation-matrix"): [_q("as_of", "Fecha de vigencia (AAAA-MM-DD); por defecto hoy", False, "date")],
     ("get", "/payroll-accounting-check"): [_q("legal_entity_id", "Empresa (uuid)", True), _q("as_of", "Fecha (AAAA-MM-DD); por defecto hoy", False, "date")],
     ("get", "/accounting-accounts"): [_q("legal_entity_id", "Empresa (uuid): las cuentas comunes y las de esa empresa")],
@@ -1115,7 +1125,7 @@ ERRS = {
 }
 
 # Consultas que pueden responder 422 por una regla de negocio (CFG-7: falta el tipo de cambio).
-GET_RULES = {('get', '/employments/{employment_id}/absence-summary'), ('get', '/exchange-rates/convert'), ('get', '/fifth-category-scale'), ('get', '/headcount'), ('get', '/legal-parameters'), ('get', '/legal-updates'), ('get', '/payroll-accounting-check'), ('get', '/payroll-calculation-order'), ('get', '/payroll-regimes/{id}/parameters'), ('get', '/pension-fund-rates'), ('get', '/platform/activity-events'), ('get', '/platform/audit-events'), ('get', '/platform/backup-restores'), ('get', '/platform/backups'), ('get', '/platform/health'), ('get', '/platform/health/failed-jobs'), ('get', '/platform/health/outbox-events'), ('get', '/platform/invoices'), ('get', '/platform/pension-fund-rates'), ('get', '/platform/support-sessions'), ('get', '/platform/technical-logs'), ('get', '/public/demo-slots'), ('get', '/public/quote'), ('get', '/wage-tables'), ('get', '/wage-tables/{id}')}
+GET_RULES = {('get', '/employments/{employment_id}/absence-summary'), ('get', '/employments/{employment_id}/fifth-category-summary'), ('get', '/exchange-rates/convert'), ('get', '/fifth-category-scale'), ('get', '/headcount'), ('get', '/legal-parameters'), ('get', '/legal-updates'), ('get', '/payroll-accounting-check'), ('get', '/payroll-calculation-order'), ('get', '/payroll-regimes/{id}/parameters'), ('get', '/pension-fund-rates'), ('get', '/platform/activity-events'), ('get', '/platform/audit-events'), ('get', '/platform/backup-restores'), ('get', '/platform/backups'), ('get', '/platform/health'), ('get', '/platform/health/failed-jobs'), ('get', '/platform/health/outbox-events'), ('get', '/platform/invoices'), ('get', '/platform/pension-fund-rates'), ('get', '/platform/support-sessions'), ('get', '/platform/technical-logs'), ('get', '/public/demo-slots'), ('get', '/public/quote'), ('get', '/wage-tables'), ('get', '/wage-tables/{id}')}
 # Operaciones que dependen de un proveedor externo por su puerto (503 upstream_unavailable).
 UPSTREAM = {("post", "/exchange-rates/import")}
 

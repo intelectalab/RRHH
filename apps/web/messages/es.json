@@ -164,7 +164,8 @@
     "modules_payroll_concepts": "Conceptos",
     "modules_legal_parameters": "Parámetros legales",
     "modules_payroll_runs": "Cálculos de planilla",
-    "modules_small_business": "Micro y pequeña empresa"
+    "modules_small_business": "Micro y pequeña empresa",
+    "modules_fifth_ledger": "Retenciones de quinta"
   },
   "home": {
     "title": "Hola, {name}",
@@ -5747,5 +5748,31 @@
     "rates_import": "Cargar archivo",
     "rates_loaded": "Tablas cargadas: {n}.",
     "saved": "Guardado."
+  },
+  "fql": {
+    "title": "Retenciones de quinta",
+    "sub": "Libro de retenciones de quinta categoría del ejercicio, con su resumen y conciliación por trabajador.",
+    "error": "No se pudo cargar la información.",
+    "year": "Ejercicio",
+    "empty_title": "Sin movimientos",
+    "empty_text": "Aún no hay retenciones calculadas para este ejercicio.",
+    "col_person": "Colaborador",
+    "col_month": "Mes",
+    "col_kind": "Movimiento",
+    "col_gross": "Renta bruta anual",
+    "col_tax": "Impuesto anual",
+    "col_withholding": "Retención",
+    "col_accumulated": "Acumulado",
+    "discarded": "descartada",
+    "summary": "Resumen",
+    "summary_of": "Resumen de {name} · {year}",
+    "reconciled": "Lo retenido en las boletas de los periodos cerrados coincide con el libro.",
+    "not_reconciled": "No cuadra: boletas cerradas {payslips}, libro {ledger}. Revisa el periodo antes de declarar.",
+    "opening": "Traído del sistema anterior al {date}: renta {income}, retenido {withheld}.",
+    "kind_monthly": "Retención mensual",
+    "kind_final_adjustment": "Ajuste final",
+    "kind_refund": "Devolución",
+    "kind_prior_employer": "Empleador anterior",
+    "kind_correction": "Corrección"
   }
 }

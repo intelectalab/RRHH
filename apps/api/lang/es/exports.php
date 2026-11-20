@@ -3,6 +3,18 @@
 // SEG-12 · Exportaciones de listados.
 return [
     'columns' => [
+        'fiscal_year' => 'Ejercicio',
+        'period_month' => 'Mes',
+        'sequence' => 'Secuencia',
+        'entry_kind' => 'Movimiento',
+        'gross_annual_income' => 'Renta bruta anual',
+        'net_annual_income' => 'Renta neta anual',
+        'annual_tax' => 'Impuesto anual',
+        'prior_withholdings_deducted' => 'Retenciones previas',
+        'divisor' => 'Divisor',
+        'withholding_amount' => 'Retención del mes',
+        'engine_version' => 'Versión del motor',
+        'created_at' => 'Registrado',
         'year' => 'Año',
         'starts_on' => 'Desde',
         'ends_on' => 'Hasta',
@@ -31,7 +43,7 @@ return [
     'watermark' => 'Exportado por :name el :date',
     'resource_invalid' => 'Este listado no se puede exportar.',
     'format_invalid' => 'Elige CSV, Excel o PDF.',
-    'resources' => ['users' => 'Usuarios', 'legal_entities' => 'Empresas', 'employments' => 'Colaboradores'],
+    'resources' => ['users' => 'Usuarios', 'legal_entities' => 'Empresas', 'fifth_category_ledger' => 'Libro de retenciones de quinta', 'employments' => 'Colaboradores'],
     'failed_reason' => 'No se pudo generar el archivo. Vuelve a pedir la exportación.',
     'pdf_rows' => ':count filas',
     'pdf_empty' => 'No hay filas para los filtros elegidos.',

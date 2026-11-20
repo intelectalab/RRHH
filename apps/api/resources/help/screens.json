@@ -295,6 +295,12 @@
       "permissions": [
         "payroll.entity_annual_figures.view"
       ]
+    },
+    "payroll.fifth_ledger": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.fifth_category_ledger.view"
+      ]
     }
   }
 }

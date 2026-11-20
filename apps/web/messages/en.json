@@ -164,7 +164,8 @@
     "modules_payroll_concepts": "Concepts",
     "modules_legal_parameters": "Legal parameters",
     "modules_payroll_runs": "Payroll calculations",
-    "modules_small_business": "Micro and small business"
+    "modules_small_business": "Micro and small business",
+    "modules_fifth_ledger": "Fifth-category withholdings"
   },
   "home": {
     "title": "Hello, {name}",
@@ -5747,5 +5748,31 @@
     "rates_import": "Load file",
     "rates_loaded": "Tables loaded: {n}.",
     "saved": "Saved."
+  },
+  "fql": {
+    "title": "Fifth-category withholdings",
+    "sub": "Fifth-category withholding ledger of the year, with its per-employee summary and reconciliation.",
+    "error": "The information could not be loaded.",
+    "year": "Fiscal year",
+    "empty_title": "No entries",
+    "empty_text": "There are no withholdings calculated for this year yet.",
+    "col_person": "Employee",
+    "col_month": "Month",
+    "col_kind": "Entry",
+    "col_gross": "Gross annual income",
+    "col_tax": "Annual tax",
+    "col_withholding": "Withholding",
+    "col_accumulated": "Running total",
+    "discarded": "discarded",
+    "summary": "Summary",
+    "summary_of": "Summary for {name} · {year}",
+    "reconciled": "What was withheld on the payslips of closed periods matches the ledger.",
+    "not_reconciled": "Does not match: closed payslips {payslips}, ledger {ledger}. Review the period before filing.",
+    "opening": "Brought from the previous system as of {date}: income {income}, withheld {withheld}.",
+    "kind_monthly": "Monthly withholding",
+    "kind_final_adjustment": "Final adjustment",
+    "kind_refund": "Refund",
+    "kind_prior_employer": "Prior employer",
+    "kind_correction": "Correction"
   }
 }

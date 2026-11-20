@@ -3,6 +3,18 @@
 // SEG-12 · List exports.
 return [
     'columns' => [
+        'fiscal_year' => 'Fiscal year',
+        'period_month' => 'Month',
+        'sequence' => 'Sequence',
+        'entry_kind' => 'Entry',
+        'gross_annual_income' => 'Gross annual income',
+        'net_annual_income' => 'Net annual income',
+        'annual_tax' => 'Annual tax',
+        'prior_withholdings_deducted' => 'Prior withholdings',
+        'divisor' => 'Divisor',
+        'withholding_amount' => 'Monthly withholding',
+        'engine_version' => 'Engine version',
+        'created_at' => 'Recorded',
         'year' => 'Year',
         'starts_on' => 'From',
         'ends_on' => 'To',
@@ -31,7 +43,7 @@ return [
     'watermark' => 'Exported by :name on :date',
     'resource_invalid' => 'This list cannot be exported.',
     'format_invalid' => 'Choose CSV, Excel or PDF.',
-    'resources' => ['users' => 'Users', 'legal_entities' => 'Companies', 'employments' => 'Employees'],
+    'resources' => ['users' => 'Users', 'legal_entities' => 'Companies', 'fifth_category_ledger' => 'Fifth-category withholding ledger', 'employments' => 'Employees'],
     'failed_reason' => 'The file could not be generated. Request the export again.',
     'pdf_rows' => ':count rows',
     'pdf_empty' => 'There are no rows for the selected filters.',

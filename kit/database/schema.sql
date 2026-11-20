@@ -4489,7 +4489,7 @@ CREATE TRIGGER trg_certificate_requests_touch BEFORE UPDATE ON certificate_reque
 CREATE TABLE import_templates (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
-  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles','payroll_incidents')),
+  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles','payroll_incidents','payroll_balances')),
   name text NOT NULL,
   column_mapping jsonb NOT NULL,
   is_system boolean NOT NULL DEFAULT false,
@@ -4516,7 +4516,7 @@ CREATE TRIGGER trg_import_templates_touch BEFORE UPDATE ON import_templates FOR 
 CREATE TABLE import_jobs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
-  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles','payroll_incidents')),
+  entity text NOT NULL CHECK (entity IN ('legal_entities','employees','contracts','vacation_balances','salaries','attendance','concepts','history','org_structure','dependents','positions','job_profiles','payroll_incidents','payroll_balances')),
   import_template_id uuid,
   stored_file_id uuid NOT NULL,
   status text NOT NULL DEFAULT 'uploaded' CHECK (status IN ('uploaded','mapped','validating','validated','previewed','importing','completed','failed','cancelled','with_errors','reverted')),
@@ -6762,6 +6762,41 @@ ALTER TABLE payroll_period_time_cutoffs FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_period_time_cutoffs USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_period_time_cutoffs_inmutable BEFORE UPDATE OR DELETE ON payroll_period_time_cutoffs FOR EACH ROW EXECUTE FUNCTION reject_mutation();
 CREATE TRIGGER trg_payroll_period_time_cutoffs_no_truncate BEFORE TRUNCATE ON payroll_period_time_cutoffs FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
+
+CREATE TABLE payroll_opening_balances (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  employment_id uuid NOT NULL,
+  fiscal_year smallint NOT NULL,
+  cutoff_date date NOT NULL,
+  period_month smallint,
+  kind text NOT NULL CHECK (kind IN ('fifth_income','fifth_withheld','pension_contribution','health_contribution','gratification_base','cts_base','cts_deposit')),
+  semester smallint,
+  concept_code text,
+  amount numeric(14,2) NOT NULL,  -- SENSIBLE
+  currency char(3) NOT NULL,
+  evidence text NOT NULL,
+  import_job_id uuid,
+  created_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_payroll_opening_balances_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_payroll_opening_balances_1 CHECK (period_month IS NULL OR period_month BETWEEN 1 AND 12),
+  CONSTRAINT ck_payroll_opening_balances_2 CHECK (semester IS NULL OR semester IN (1, 2)),
+  CONSTRAINT fk_payroll_opening_balances_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_payroll_opening_balances_import_job_id FOREIGN KEY (tenant_id, import_job_id) REFERENCES import_jobs (tenant_id, id),
+  CONSTRAINT fk_payroll_opening_balances_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE payroll_opening_balances IS 'PER-12 · Acumulados del ejercicio traídos del sistema anterior (organización que empieza a mitad de año): saldo de apertura por trabajador con fecha de corte y sustento, nunca boletas inventadas. Lo leen la proyección de quinta (ingresos y retenciones previas) y la gratificación y CTS del semestre en curso. Se revierte con su importación mientras ningún periodo cerrado del ejercicio lo use. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+CREATE INDEX ix_payroll_opening_balances_import_job_id ON payroll_opening_balances (tenant_id, import_job_id);
+CREATE INDEX ix_payroll_opening_balances_created_by_user_id ON payroll_opening_balances (tenant_id, created_by_user_id);
+CREATE INDEX ix_payroll_opening_balances_employment_id_fiscal_year ON payroll_opening_balances (tenant_id, employment_id, fiscal_year);
+ALTER TABLE payroll_opening_balances ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_opening_balances FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_opening_balances USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_opening_balances_touch BEFORE UPDATE ON payroll_opening_balances FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE payroll_runs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),

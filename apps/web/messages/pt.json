@@ -164,7 +164,8 @@
     "modules_payroll_concepts": "Conceitos",
     "modules_legal_parameters": "Parâmetros legais",
     "modules_payroll_runs": "Cálculos da folha",
-    "modules_small_business": "Micro e pequena empresa"
+    "modules_small_business": "Micro e pequena empresa",
+    "modules_fifth_ledger": "Retenções de quinta"
   },
   "home": {
     "title": "Olá, {name}",
@@ -5747,5 +5748,31 @@
     "rates_import": "Carregar arquivo",
     "rates_loaded": "Tabelas carregadas: {n}.",
     "saved": "Salvo."
+  },
+  "fql": {
+    "title": "Retenções de quinta categoria",
+    "sub": "Livro de retenções de quinta categoria do exercício, com resumo e conciliação por trabalhador.",
+    "error": "Não foi possível carregar as informações.",
+    "year": "Exercício",
+    "empty_title": "Sem movimentos",
+    "empty_text": "Ainda não há retenções calculadas para este exercício.",
+    "col_person": "Colaborador",
+    "col_month": "Mês",
+    "col_kind": "Movimento",
+    "col_gross": "Renda bruta anual",
+    "col_tax": "Imposto anual",
+    "col_withholding": "Retenção",
+    "col_accumulated": "Acumulado",
+    "discarded": "descartada",
+    "summary": "Resumo",
+    "summary_of": "Resumo de {name} · {year}",
+    "reconciled": "O retido nos holerites dos períodos fechados coincide com o livro.",
+    "not_reconciled": "Não bate: holerites fechados {payslips}, livro {ledger}. Revise o período antes de declarar.",
+    "opening": "Trazido do sistema anterior em {date}: renda {income}, retido {withheld}.",
+    "kind_monthly": "Retenção mensal",
+    "kind_final_adjustment": "Ajuste final",
+    "kind_refund": "Devolução",
+    "kind_prior_employer": "Empregador anterior",
+    "kind_correction": "Correção"
   }
 }

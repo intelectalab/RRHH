@@ -3,14 +3,19 @@
 namespace App\Modules\Payroll;
 
 use App\Modules\Payroll\Application\ConceptAccounting;
+use App\Modules\Payroll\Application\PayrollOpeningBalances;
+use App\Modules\Payroll\Infrastructure\Exports\FifthCategoryLedgerExportSource;
+use App\Modules\Payroll\Infrastructure\Imports\PayrollBalancesImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
 use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
+use App\Shared\Exports\ExportRegistry;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Payroll\ConceptAccounts;
+use App\Shared\Payroll\OpeningBalances;
 use App\Shared\Setup\CountryPackRegistry;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +32,7 @@ final class PayrollServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(ConceptAccounts::class, ConceptAccounting::class);
+        $this->app->bind(OpeningBalances::class, PayrollOpeningBalances::class);
     }
 
     public function boot(): void
@@ -38,6 +44,10 @@ final class PayrollServiceProvider extends ServiceProvider
         $imports = $this->app->make(ImportRegistry::class);
         $imports->register($this->app->make(PayrollConceptsImporter::class));
         $imports->register($this->app->make(PayrollIncidentsImporter::class));
+        // PER-12 · Acumulados del ejercicio traídos del sistema anterior.
+        $imports->register($this->app->make(PayrollBalancesImporter::class));
+        // PER-11 · Libro de retenciones de quinta exportable con el servicio común (UI-11).
+        $this->app->make(ExportRegistry::class)->register($this->app->make(FifthCategoryLedgerExportSource::class));
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(ProcessPayrollRun::class));
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));

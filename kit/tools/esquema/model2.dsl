@@ -288,6 +288,11 @@
 @payroll_period_time_cutoffs imm | PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.
   payroll_period_id -> payroll_periods ; employment_id -> employments ; period_from date! ; period_to date! ; fingerprint text! ; summary j!
   consumed_by_user_id ?-> users ; idx payroll_period_id, employment_id
+@payroll_opening_balances soft lock sens | PER-12 · Acumulados del ejercicio traídos del sistema anterior (organización que empieza a mitad de año): saldo de apertura por trabajador con fecha de corte y sustento, nunca boletas inventadas. Lo leen la proyección de quinta (ingresos y retenciones previas) y la gratificación y CTS del semestre en curso. Se revierte con su importación mientras ningún periodo cerrado del ejercicio lo use.
+  employment_id -> employments ; fiscal_year smallint! ; cutoff_date date! ; period_month smallint
+  kind enum(fifth_income,fifth_withheld,pension_contribution,health_contribution,gratification_base,cts_base,cts_deposit)!
+  semester smallint ; concept_code ; amount money! #S ; currency cur ; evidence text! ; import_job_id ?-> import_jobs ; created_by_user_id ?-> users
+  idx employment_id, fiscal_year ; check period_month IS NULL OR period_month BETWEEN 1 AND 12 ; check semester IS NULL OR semester IN (1, 2)
 @payroll_runs main lock | Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica. NOM-8: scope (todas, relaciones o grupo calculado), avance (total, hechas, con error) y motivo si falló; se reanuda sin repetir lo hecho.
   payroll_period_id -> payroll_periods ; run_number integer! ; kind enum(simulation,calculation,recalculation)=calculation
   status enum(queued,running,completed,failed,discarded,approved,closed)=queued ; engine_version ; parameters_snapshot j

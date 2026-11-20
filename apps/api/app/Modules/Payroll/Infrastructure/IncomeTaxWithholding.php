@@ -6,6 +6,7 @@ use App\Modules\Payroll\Domain\Engine\CalculationEngine;
 use App\Modules\Payroll\Domain\Engine\ParameterResolver;
 use App\Modules\Payroll\Domain\Tax\ProjectedAnnualWithholding;
 use App\Modules\Payroll\Infrastructure\Country\DataPayrollCountryPack;
+use App\Shared\Payroll\OpeningBalances;
 use App\Shared\Vigencia\EffectiveDated;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -28,6 +29,8 @@ use Illuminate\Support\Facades\DB;
  */
 final class IncomeTaxWithholding
 {
+    public function __construct(private readonly OpeningBalances $opening) {}
+
     /**
      * @param  array<string, mixed>  $result  resultado del núcleo (estado calculado)
      * @param  array<string, mixed>  $variables  variables del contexto (sueldo, fechas, sistema de salud)
@@ -109,6 +112,12 @@ final class IncomeTaxWithholding
         $projectedExternal = BigDecimal::zero();
         $withholds = true;
         $withheld = $this->ledgerWithholdings($employmentId, $year);
+        // PER-12 · Acumulados del ejercicio traídos del sistema anterior: suman a los ingresos previos (A) y a las
+        // retenciones previas de su mes (o completas desde el primer cálculo si no traen mes).
+        $opening = $this->opening->fifthCategory($employmentId, $year);
+        foreach ($opening['withheld_by_month'] as $m => $amount) {
+            $withheld[$m] = BigDecimal::of($withheld[$m] ?? '0')->plus($amount);
+        }
         foreach ($declarations as $d) {
             if ($d->kind === 'previous_employer') {
                 $received = $received->plus((string) ($d->gross_income ?? '0'))->minus((string) ($d->exempt_income ?? '0'));
@@ -134,7 +143,7 @@ final class IncomeTaxWithholding
             'this_employer_withholds' => $withholds,
             'ordinary_month' => (string) $ordinary,
             'pending_gratifications' => (string) $this->pendingGratifications($tax, $params, $month, $year, $ordinary, $gratPaidNow, $variables, $regime, $decimals),
-            'prior_income' => (string) $this->priorIncome($tax['base'], $employmentId, $periodId, $year, $month),
+            'prior_income' => (string) $this->priorIncome($tax['base'], $employmentId, $periodId, $year, $month)->plus($opening['income']),
             'external_received' => (string) $received, 'external_projected' => (string) $projectedExternal,
             'extraordinary_month' => (string) $extraordinary, 'taxable_month_total' => (string) $taxable,
             'withholdings_by_month' => array_map(fn ($v) => (string) $v, $withheld),
@@ -166,7 +175,8 @@ final class IncomeTaxWithholding
         $used = array_values(array_filter(array_map(fn ($r) => $r === null ? null : ['code' => $r['code'], 'value' => $r['value'], 'valid_from' => $r['valid_from'],
             'pending_validation' => $r['pending_validation'], 'origin' => $r['origin']], $resolved)));
         $result['lines'][$index]['amount']['amount'] = (string) $lineAmount;
-        $result['lines'][$index]['trace'] = array_merge($line['trace'], ['source' => 'income_tax', 'income_tax' => $calc + ['refund' => $refund], 'parameters' => $used]);
+        $result['lines'][$index]['trace'] = array_merge($line['trace'], ['source' => 'income_tax', 'income_tax' => $calc + ['refund' => $refund, 'opening' => $opening['cutoff'] === null ? null
+            : ['cutoff' => $opening['cutoff'], 'income' => $opening['income'], 'withheld' => $opening['withheld']]], 'parameters' => $used]);
         if ($refund !== null) {
             $result['warnings'][] = ['code' => 'income_tax_refund', 'amount' => $refund, 'message' => (string) trans('payroll.income_tax_refund', ['amount' => $refund])];
         }
