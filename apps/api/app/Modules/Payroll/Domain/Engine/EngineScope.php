@@ -14,8 +14,8 @@ final class EngineScope implements FormulaScope
     /** @var array<string, BigDecimal> */
     private array $results = [];
 
-    /** @var array{variables: array<string, mixed>, parameters: array<string, array<string, mixed>>, concepts: array<string, string>, incidents: array<string, array<string, string>>} */
-    private array $trace = ['variables' => [], 'parameters' => [], 'concepts' => [], 'incidents' => []];
+    /** @var array{variables: array<string, mixed>, parameters: array<string, array<string, mixed>>, concepts: array<string, string>, incidents: array<string, array<string, string>>, bases: array<string, array{amount: string, concepts: array<string, string>}>} */
+    private array $trace = ['variables' => [], 'parameters' => [], 'concepts' => [], 'incidents' => [], 'bases' => []];
 
     /** @var array<string, array<string, mixed>|null> */
     private array $paramCache = [];
@@ -27,14 +27,14 @@ final class EngineScope implements FormulaScope
 
     public function startTrace(): void
     {
-        $this->trace = ['variables' => [], 'parameters' => [], 'concepts' => [], 'incidents' => []];
+        $this->trace = ['variables' => [], 'parameters' => [], 'concepts' => [], 'incidents' => [], 'bases' => []];
     }
 
-    /** @return array{variables: array<string, mixed>, parameters: list<array<string, mixed>>, concepts: array<string, string>, incidents: array<string, array<string, string>>} */
+    /** @return array{variables: array<string, mixed>, parameters: list<array<string, mixed>>, concepts: array<string, string>, incidents: array<string, array<string, string>>, bases: array<string, array{amount: string, concepts: array<string, string>}>} */
     public function trace(): array
     {
         return ['variables' => $this->trace['variables'], 'parameters' => array_values($this->trace['parameters']),
-            'concepts' => $this->trace['concepts'], 'incidents' => $this->trace['incidents']];
+            'concepts' => $this->trace['concepts'], 'incidents' => $this->trace['incidents'], 'bases' => $this->trace['bases']];
     }
 
     public function setResult(string $code, BigDecimal $value): void
@@ -89,5 +89,24 @@ final class EngineScope implements FormulaScope
         $this->trace['incidents'][$code] = $row;
 
         return BigDecimal::of($field === 'quantity' ? $row['quantity'] : $row['amount']);
+    }
+
+    /**
+     * CPT-3 · Suma de los conceptos ya calculados que afectan a la base; la traza dice cuáles la formaron.
+     * El orden de cálculo garantiza que todos ellos se calcularon antes (ConceptDependencies).
+     */
+    public function base(string $code): BigDecimal
+    {
+        $sum = BigDecimal::zero();
+        $parts = [];
+        foreach ($this->concepts as $c) {
+            if ($c->affects($code) && isset($this->results[$c->code])) {
+                $sum = $sum->plus($this->results[$c->code]);
+                $parts[$c->code] = (string) $this->results[$c->code];
+            }
+        }
+        $this->trace['bases'][$code] = ['amount' => (string) $sum, 'concepts' => $parts];
+
+        return $sum;
     }
 }

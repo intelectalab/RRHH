@@ -2,17 +2,30 @@
 
 namespace App\Modules\Payroll;
 
+use App\Modules\Payroll\Application\ConceptAccounting;
+use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
+use App\Shared\Payroll\ConceptAccounts;
+use App\Shared\Setup\CountryPackRegistry;
 use Illuminate\Support\ServiceProvider;
 
 /**
  * Módulo NOM · Motor de nómina (kit/docs/modulos/M-NOM.md). Módulo comercial payroll.
  * Núcleo genérico (Domain: fórmulas, dependencias y cálculo) + paquete de país (packages/country-xx/data/
  * motor_planilla.php) + régimen laboral por empresa y por trabajador. Se usa solo por servicios y por la API.
+ * Módulo CPT · Conceptos y fórmulas (M-CPT): catálogo con versiones, borrador y publicación, afectaciones,
+ * contabilización por concepto (puerto ConceptAccounts) y conceptos del paquete de país.
  */
 final class PayrollServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(ConceptAccounts::class, ConceptAccounting::class);
+    }
+
     public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+        // CPT-5 · Conceptos peruanos precargados como parte del paquete de país (IMP-4).
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(PayrollConceptsPackComponent::class));
     }
 }

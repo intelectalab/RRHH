@@ -56,7 +56,7 @@ test('el paquete declara lo que crea; aplicarlo crea solo lo que falta, registra
     $pack = $list->json('data.0');
     expect($pack['code'])->toBe('pe-base')
         ->and($pack['installed_version'])->toBeNull()
-        ->and(array_column($pack['components'], 'code'))->toBe(['contract_types', 'absence_types', 'holidays', 'document_templates', 'vacation_policies', 'termination_reasons', 'roles']);
+        ->and(array_column($pack['components'], 'code'))->toBe(['contract_types', 'absence_types', 'holidays', 'document_templates', 'vacation_policies', 'termination_reasons', 'roles', 'payroll_concepts']);
     $contracts = collect($pack['components'])->firstWhere('code', 'contract_types');
     expect($contracts['total'])->toBeGreaterThan(0)->and($contracts['present'])->toBe(0)->and($contracts['link'])->toBe('/configuracion/tipos-contrato');
 
@@ -65,7 +65,7 @@ test('el paquete declara lo que crea; aplicarlo crea solo lo que falta, registra
     expect($applied->json('data.created.contract_types'))->toBe($contracts['total'])
         ->and($applied->json('data.created.vacation_policies'))->toBe(3)
         ->and($applied->json('data.created.holidays'))->toBeGreaterThan(0)
-        ->and($applied->json('data.pack.installed_version'))->toBe('1.0.0');
+        ->and($applied->json('data.pack.installed_version'))->toBe('1.1.0');
 
     TenancyScope::runAs(SET_TENANT, function (): void {
         expect(DB::table('vacation_policies')->where('code', 'pe_general')->value('labor_regime_code'))->toBe('pe_general')

@@ -35,4 +35,6 @@ return [
     'invalid_token' => 'El enlace no es válido o ya caducó. Solicite uno nuevo.',
     'csrf_mismatch' => 'La sesión no pudo verificarse. Recargue la página e inténtelo de nuevo.',
     'invalid_signature' => 'La firma de la llamada no es válida.',
+    'dual_control_required' => 'Otra persona debe publicar lo que tú editaste (doble control).',
+    'concept_invalid' => 'El concepto tiene errores y no se puede publicar.',
 ];

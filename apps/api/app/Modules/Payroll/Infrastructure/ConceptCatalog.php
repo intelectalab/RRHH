@@ -21,7 +21,15 @@ final class ConceptCatalog
             ->whereNull('c.deleted_at')->where('c.status', 'active');
         EffectiveDated::applyAsOf($q, $date, 'v.valid_from', 'v.valid_to');
         $rows = $q->orderBy('c.code')->get(['c.id AS concept_id', 'c.code', 'c.name', 'c.kind', 'c.sort_order', 'v.id AS version_id', 'v.formula',
-            'v.rounding', 'v.applies_to_regimes', 'v.applies_to_period_kinds', 'v.valid_from']);
+            'v.condition', 'v.rounding', 'v.applies_to_regimes', 'v.applies_to_period_kinds', 'v.valid_from']);
+        // CPT-3 · Bases a las que suma cada versión.
+        $affects = [];
+        if ($rows->isNotEmpty()) {
+            foreach (DB::table('payroll_concept_affectations')->whereIn('payroll_concept_version_id', $rows->pluck('version_id')->all())
+                ->where('affects', true)->orderBy('base_code')->get(['payroll_concept_version_id', 'base_code']) as $a) {
+                $affects[(string) $a->payroll_concept_version_id][] = (string) $a->base_code;
+            }
+        }
 
         $out = [];
         foreach ($rows as $r) {
@@ -29,6 +37,7 @@ final class ConceptCatalog
                 (string) $r->code, (string) $r->name, (string) $r->kind, $r->formula === null ? null : (string) $r->formula,
                 (string) $r->rounding, (int) $r->sort_order, self::pgArray($r->applies_to_regimes), self::pgArray($r->applies_to_period_kinds),
                 (string) $r->concept_id, (string) $r->version_id, substr((string) $r->valid_from, 0, 10),
+                $r->condition === null || trim((string) $r->condition) === '' ? null : (string) $r->condition, $affects[(string) $r->version_id] ?? [],
             );
         }
 
@@ -48,7 +57,7 @@ final class ConceptCatalog
     /**
      * @return list<string>|null
      */
-    private static function pgArray(mixed $value): ?array
+    public static function pgArray(mixed $value): ?array
     {
         if ($value === null) {
             return null;

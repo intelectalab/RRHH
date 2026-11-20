@@ -35,4 +35,6 @@ return [
     'invalid_token' => 'The link is invalid or has expired. Request a new one.',
     'csrf_mismatch' => 'The session could not be verified. Reload the page and try again.',
     'invalid_signature' => 'The request signature is not valid.',
+    'dual_control_required' => 'Someone else must publish what you edited (dual control).',
+    'concept_invalid' => 'The concept has errors and cannot be published.',
 ];

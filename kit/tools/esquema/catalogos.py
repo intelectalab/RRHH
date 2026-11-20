@@ -257,6 +257,7 @@ PARAMS = [
  ('nomina.publicar_boletas_al_cerrar', 'payroll', 'Publicar boletas al cerrar', 'boolean', True, [O, E], 'Publica las boletas en el portal al cerrar el periodo.', None),
  ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'boolean', False, [O, E], 'El trabajador confirma la recepción de su boleta.', None),
  ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'boolean', True, [O, E], 'Quien procesa no puede aprobar ni cerrar.', None),
+ ('nomina.doble_control_conceptos', 'payroll', 'Doble control de conceptos', 'boolean', True, [O], 'CPT-2 · RN-CPT-07 · Quien edita un concepto no puede publicarlo: lo publica otra persona con permiso de publicar.', None),
  ('prestamos.adelanto_tope_pct_devengado', 'advances', 'Tope de adelanto sobre lo devengado (%)', 'decimal', 50, [O, E], 'Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).', None),
  ('prestamos.adelantos_por_periodo', 'advances', 'Adelantos por periodo', 'integer', 2, [O, E], 'Número máximo de adelantos por periodo de planilla.', None),
  ('reclutamiento.retencion_candidatos_meses', 'recruiting', 'Retención de candidatos (meses)', 'integer', 24, [O], 'Meses que se conservan los datos de candidatos no contratados, según el consentimiento.', None),
@@ -522,17 +523,22 @@ REGIMES_PE = [
 ]
 
 BASES = ['essalud', 'pension', 'quinta', 'cts', 'gratificacion', 'vacaciones', 'utilidades']
-def cp(code, name, kind, method, afecta, formula=None, rem=True, sunat=None, note='', params=None, ok=False, reg=None, proy=None, rol='accrued_and_paid'):
+# CPT-5 · formula_motor / condicion_motor: la fórmula en el lenguaje del motor (NOM-3, docs/formulas-de-planilla.md)
+# para los conceptos que ya se calculan con los datos del contexto y parámetros con valor. Los demás entran como
+# «ingresados» (toman el monto de sus incidencias) hasta que su historia (PER, LIQ, BSO, PRV) complete la fórmula.
+# Todo «por validar» con el especialista en planilla (ADR 0021).
+def cp(code, name, kind, method, afecta, formula=None, rem=True, sunat=None, note='', params=None, ok=False, reg=None, proy=None, rol='accrued_and_paid', motor=None, cond=None, orden=None):
     return dict(codigo=code, nombre=name, tipo=kind, metodo=method, remunerativo=rem,
                 afectaciones={b: (b in afecta) for b in BASES}, formula=formula,
-                parametros_legales=params or [], codigo_plame=sunat, codigo_plame_verificado=bool(ok and sunat), regimenes=reg or ['pe_general', 'pe_micro', 'pe_pequena', 'pe_construccion', 'pe_agrario'], proyeccion_quinta=proy, rol_monto=rol, nota=note)
+                parametros_legales=params or [], codigo_plame=sunat, codigo_plame_verificado=bool(ok and sunat), regimenes=reg or ['pe_general', 'pe_micro', 'pe_pequena', 'pe_construccion', 'pe_agrario'], proyeccion_quinta=proy, rol_monto=rol, nota=note,
+                formula_motor=motor, condicion_motor=cond, orden=orden)
 ALL = BASES
 CONCEPTS_PE = [
- cp('rem_basica', 'Remuneración básica', 'earning', 'formula', ALL, 'sueldo_base * dias_trabajados / dias_periodo', sunat='0121', ok=True, proy='ordinary'),
- cp('asig_familiar', 'Asignación familiar', 'earning', 'formula', ALL, 'param(rmv) * param(asignacion_familiar_pct_rmv) / 100', sunat='0201', params=['rmv', 'asignacion_familiar_pct_rmv'], ok=True, proy='ordinary'),
+ cp('rem_basica', 'Remuneración básica', 'earning', 'formula', ALL, 'sueldo_base * dias_trabajados / dias_periodo', sunat='0121', ok=True, proy='ordinary', motor='sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio)', orden=10),
+ cp('asig_familiar', 'Asignación familiar', 'earning', 'formula', ALL, 'param(rmv) * param(asignacion_familiar_pct_rmv) / 100', sunat='0201', params=['rmv', 'asignacion_familiar_pct_rmv'], ok=True, proy='ordinary', motor='param.rmv * param.asignacion_familiar_pct_rmv / 100', cond='tiene_asignacion_familiar', orden=20),
  cp('he_tramo1', 'Horas extra, primer tramo', 'earning', 'formula', ALL, 'valor_hora * (1 + param(sobretiempo_tasa_tramo1_pct)/100) * horas', sunat='0105', params=['sobretiempo_tasa_tramo1_pct'], ok=True, proy='ordinary'),
  cp('he_tramo2', 'Horas extra, segundo tramo', 'earning', 'formula', ALL, 'valor_hora * (1 + param(sobretiempo_tasa_tramo2_pct)/100) * horas', sunat='0106', params=['sobretiempo_tasa_tramo2_pct'], ok=True, proy='ordinary'),
- cp('trabajo_nocturno', 'Sobretasa por trabajo nocturno', 'earning', 'formula', ALL, 'incidencia', params=['nocturnidad_sobretasa_pct']),
+ cp('trabajo_nocturno', 'Sobretasa por trabajo nocturno', 'earning', 'formula', ALL, 'incidencia', params=['nocturnidad_sobretasa_pct'], proy='ordinary'),
  cp('feriado_trabajado', 'Trabajo en feriado o día de descanso', 'earning', 'input', ALL, sunat='0107', ok=True, proy='ordinary'),
  cp('comisiones', 'Comisiones', 'earning', 'input', ALL, sunat='0103', ok=True, proy='ordinary'),
  cp('bono_productividad', 'Bonificación regular', 'earning', 'input', ALL, sunat='0902', ok=True, proy='ordinary'),
@@ -540,23 +546,23 @@ CONCEPTS_PE = [
  cp('movilidad', 'Movilidad supeditada a la asistencia', 'earning', 'input', [], rem=False, note='Condición de trabajo; validar tratamiento tributario según el caso.', sunat='0909', ok=True),
  cp('teletrabajo_gastos', 'Compensación de gastos de teletrabajo', 'earning', 'input', [], rem=False, note='Concepto no remunerativo (Ley 31572).'),
  cp('rem_vacacional', 'Remuneración vacacional', 'earning', 'formula', ['essalud', 'pension', 'quinta', 'cts', 'gratificacion', 'utilidades'], 'remuneracion_computable * dias_vacaciones / 30', sunat='0118', ok=True, proy='ordinary'),
- cp('vacaciones_compra', 'Compensación por venta de vacaciones', 'earning', 'formula', ['essalud', 'pension', 'quinta'], 'remuneracion_computable * dias_vendidos / 30'),
+ cp('vacaciones_compra', 'Compensación por venta de vacaciones', 'earning', 'formula', ['essalud', 'pension', 'quinta'], 'remuneracion_computable * dias_vendidos / 30', proy='ordinary'),
  cp('subsidio_incapacidad', 'Subsidio por incapacidad temporal', 'earning', 'input', ['pension', 'quinta'], rem=False, note='A cargo de la seguridad social; el empleador adelanta y recupera.', sunat='0916', ok=True, proy='ordinary'),
  cp('subsidio_maternidad', 'Subsidio por maternidad', 'earning', 'input', ['pension', 'quinta'], rem=False, sunat='0915', ok=True, proy='ordinary'),
  cp('gratificacion', 'Gratificación legal', 'earning', 'formula', ['quinta'], 'remuneracion_computable * meses_completos / 6 * factor_regimen', sunat='0406', params=['gratificacion_factor', 'gratificacion_meses'], note='Inafecta a aportes por Ley 30334.', ok=True, proy='gratification'),
- cp('bonif_extraordinaria', 'Bonificación extraordinaria de la gratificación', 'earning', 'formula', ['quinta'], 'gratificacion * param(gratificacion_bonificacion_extraordinaria_pct) / 100', rem=False, sunat='0312', params=['gratificacion_bonificacion_extraordinaria_pct'], ok=True, proy='gratification'),
+ cp('bonif_extraordinaria', 'Bonificación extraordinaria de la gratificación', 'earning', 'formula', ['quinta'], 'gratificacion * param(gratificacion_bonificacion_extraordinaria_pct) / 100', rem=False, sunat='0312', params=['gratificacion_bonificacion_extraordinaria_pct'], ok=True, proy='gratification', motor='concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_pct / 100', orden=60),
  cp('gratificacion_trunca', 'Gratificación trunca', 'earning', 'formula', ['quinta'], 'remuneracion_computable * meses_completos / 6', sunat='0407', ok=True, proy='gratification'),
  cp('cts', 'Compensación por tiempo de servicios', 'benefit', 'formula', [], '(remuneracion_computable + gratificacion * param(cts_fraccion_gratificacion)) * meses / 12', rem=False, sunat='0904', params=['cts_fraccion_gratificacion', 'cts_meses_deposito'], ok=True),
  cp('utilidades', 'Participación en utilidades', 'earning', 'formula', ['quinta'], 'monto_por_dias + monto_por_remuneraciones', rem=False, params=['utilidades_minimo_trabajadores'], sunat='0911', ok=True, proy='extraordinary'),
  cp('vacaciones_truncas', 'Vacaciones truncas', 'earning', 'formula', ['essalud', 'pension', 'quinta'], 'remuneracion_computable * meses / 12', sunat='0114', ok=True, proy='extraordinary'),
  cp('indemnizacion_vacacional', 'Indemnización por vacaciones no gozadas', 'earning', 'formula', [], 'remuneracion_computable', rem=False, sunat='0504', ok=True),
  cp('indemnizacion_despido', 'Indemnización por despido', 'earning', 'formula', [], 'segun_regimen', rem=False, sunat='0501', ok=True),
- cp('afp_aporte', 'Aporte obligatorio AFP', 'employee_contribution', 'formula', [], 'base_pension * param(afp_aporte_obligatorio_pct) / 100', sunat='0608', params=['afp_aporte_obligatorio_pct'], ok=True),
+ cp('afp_aporte', 'Aporte obligatorio AFP', 'employee_contribution', 'formula', [], 'base_pension * param(afp_aporte_obligatorio_pct) / 100', sunat='0608', params=['afp_aporte_obligatorio_pct'], ok=True, motor='base.pension * param.afp_aporte_obligatorio_pct / 100', cond='sistema_pension = "afp"', orden=100),
  cp('afp_comision', 'Comisión AFP', 'employee_contribution', 'formula', [], 'base_pension * tasa_afp(comision)', sunat='0601', params=['afp_comision_flujo_pct', 'afp_comision_mixta_pct'], ok=True),
  cp('afp_prima', 'Prima de seguro AFP', 'employee_contribution', 'formula', [], 'min(base_pension, param(afp_remuneracion_maxima_asegurable)) * tasa_afp(prima)', sunat='0606', params=['afp_prima_seguro_pct', 'afp_remuneracion_maxima_asegurable'], ok=True),
- cp('onp_aporte', 'Aporte ONP', 'employee_contribution', 'formula', [], 'base_pension * param(onp_aporte_pct) / 100', sunat='0607', params=['onp_aporte_pct'], ok=True),
+ cp('onp_aporte', 'Aporte ONP', 'employee_contribution', 'formula', [], 'base_pension * param(onp_aporte_pct) / 100', sunat='0607', params=['onp_aporte_pct'], ok=True, motor='base.pension * param.onp_aporte_pct / 100', cond='sistema_pension = "onp"', orden=100),
  cp('renta_quinta', 'Retención de renta de quinta categoría', 'tax', 'formula', [], 'retencion_quinta(proyeccion_anual, param(uit), param(quinta_deduccion_uit), param(quinta_escala))', sunat='0605', params=['uit', 'quinta_deduccion_uit', 'quinta_escala'], ok=True),
- cp('essalud', 'Aporte EsSalud', 'employer_contribution', 'formula', [], 'max(base_essalud, param(rmv)) * param(essalud_aporte_pct) / 100', sunat='0804', params=['essalud_aporte_pct', 'rmv']),
+ cp('essalud', 'Aporte EsSalud', 'employer_contribution', 'formula', [], 'max(base_essalud, param(rmv)) * param(essalud_aporte_pct) / 100', sunat='0804', params=['essalud_aporte_pct', 'rmv'], motor='max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100', orden=200),
  cp('sctr', 'Seguro complementario de trabajo de riesgo', 'employer_contribution', 'formula', [], 'base * tasa_poliza'),
  cp('vida_ley', 'Seguro de vida de ley', 'employer_contribution', 'formula', [], 'base * tasa_poliza'),
  cp('dscto_prestamo', 'Descuento de préstamo', 'deduction', 'input', []),
@@ -571,7 +577,7 @@ CONCEPTS_PE = [
  cp('prov_vacaciones', 'Provisión de vacaciones', 'provision', 'formula', [], 'provision_mensual(vacaciones)'),
  # ---- Devolución de quinta y bonificación proporcional (docs/18 §2.7 y §3.2)
  cp('renta_quinta_devolucion', 'Devolución de retención en exceso de quinta categoría', 'earning', 'formula', [], 'exceso_quinta(libro_de_retenciones)', rem=False, sunat='0928', ok=True, note='No es ingreso: devuelve una retención. Ver docs/18 §2.7.'),
- cp('bonif_extraordinaria_trunca', 'Bonificación extraordinaria proporcional', 'earning', 'formula', ['quinta'], 'gratificacion_trunca * param(gratificacion_bonificacion_extraordinaria_pct) / 100', rem=False, sunat='0313', ok=True, proy='gratification', params=['gratificacion_bonificacion_extraordinaria_pct']),
+ cp('bonif_extraordinaria_trunca', 'Bonificación extraordinaria proporcional', 'earning', 'formula', ['quinta'], 'gratificacion_trunca * param(gratificacion_bonificacion_extraordinaria_pct) / 100', rem=False, sunat='0313', ok=True, proy='gratification', params=['gratificacion_bonificacion_extraordinaria_pct'], motor='concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100', orden=60),
  # ---- Construcción civil (docs/18 §4.5). Afectaciones por confirmar con la Tabla 22.
  cp('cc_jornal', 'Jornal básico (construcción civil)', 'earning', 'formula', ALL, 'suma_dias(param(cc_jornal_basico)[categoria])', sunat='0121', ok=True, reg=['pe_construccion'], proy='ordinary', params=['cc_jornal_basico']),
  cp('cc_dominical', 'Dominical (construcción civil)', 'earning', 'formula', ALL, 'suma_dias(param(cc_jornal_basico)[categoria]) / 6', sunat='0115', ok=True, reg=['pe_construccion'], proy='ordinary', params=['cc_jornal_basico']),

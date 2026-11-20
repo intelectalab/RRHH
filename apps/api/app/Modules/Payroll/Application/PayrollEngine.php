@@ -3,6 +3,8 @@
 namespace App\Modules\Payroll\Application;
 
 use App\Modules\Payroll\Domain\Engine\CalculationEngine;
+use App\Modules\Payroll\Domain\Engine\ConceptDefinition;
+use App\Modules\Payroll\Domain\Engine\ConceptDependencies;
 use App\Modules\Payroll\Domain\Engine\CycleDetected;
 use App\Modules\Payroll\Domain\Engine\DependencyGraph;
 use App\Modules\Payroll\Domain\Formula\FormulaError;
@@ -49,7 +51,7 @@ final class PayrollEngine
         foreach ($concepts as $code => $c) {
             $sort[$code] = $c->sortOrder;
             try {
-                $deps[$code] = $c->formula === null || trim($c->formula) === '' ? [] : Parser::references($parser->parse($c->formula))['concept'];
+                $deps[$code] = ConceptDependencies::of($c, $concepts, $parser)['depends_on'];
             } catch (FormulaError $e) {
                 throw new AyniException('formula_invalid', 422, (string) trans('payroll.formula_invalid', ['concept' => $code]), [], ['concept' => $code] + $e->toArray());
             }
@@ -74,15 +76,21 @@ final class PayrollEngine
      *
      * @param  array<string, string|bool>  $overrides
      * @param  array<string, array{amount?: string, quantity?: string}>  $incidents
+     * @param  ConceptDefinition|null  $candidate  CPT-2 · versión en borrador de un concepto que reemplaza a la vigente (probador)
      * @return array{employment_id: string, from: string, to: string, period_kind: string, context: array<string, mixed>, result: array<string, mixed>}
      */
-    public function calculate(string $employmentId, string $from, string $to, string $periodKind = 'regular', ?string $periodId = null, array $overrides = [], array $incidents = []): array
+    public function calculate(string $employmentId, string $from, string $to, string $periodKind = 'regular', ?string $periodId = null, array $overrides = [], array $incidents = [], ?ConceptDefinition $candidate = null): array
     {
         $built = $this->contexts->build($employmentId, $from, $to, $periodKind, $periodId, $overrides, $incidents);
         $context = $built['context'];
         $date = $context->to;
         $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date);
-        $result = $this->engine->run($context, $this->catalog->at($date), $params, $built['decimals']);
+        $concepts = $this->catalog->at($date);
+        if ($candidate !== null) {
+            $concepts = array_values(array_filter($concepts, fn (ConceptDefinition $c) => $c->code !== $candidate->code));
+            $concepts[] = $candidate;
+        }
+        $result = $this->engine->run($context, $concepts, $params, $built['decimals']);
         $result['pack_version'] = $built['pack_version'];
 
         return ['employment_id' => $employmentId, 'from' => $from, 'to' => $to, 'period_kind' => $periodKind, 'context' => $context->snapshot(), 'result' => $result];

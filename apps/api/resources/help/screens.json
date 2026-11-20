@@ -236,6 +236,12 @@
         "time.absences.view"
       ]
     },
+    "payroll.concepts": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.concepts.view"
+      ]
+    },
     "people.renewal_batches": {
       "module": "core",
       "permissions": [

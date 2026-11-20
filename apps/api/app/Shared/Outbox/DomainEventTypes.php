@@ -11,6 +11,13 @@ final class DomainEventTypes
 
     public const EMPLOYEE_UPDATED = 'employee.updated.v1';
 
+    // CPT-1 · CPT-2 · Conceptos de planilla: alta, publicación de una versión con vigencia y retiro (M-CPT §11).
+    public const PAYROLL_CONCEPT_CREATED = 'payroll_concept.created.v1';
+
+    public const PAYROLL_CONCEPT_VERSION_PUBLISHED = 'payroll_concept.version_published.v1';
+
+    public const PAYROLL_CONCEPT_ARCHIVED = 'payroll_concept.archived.v1';
+
     public const EMPLOYEE_TERMINATED = 'employee.terminated.v1';
 
     public const EMPLOYEE_COMPENSATION_CHANGED = 'employment.compensation_changed.v1';
@@ -837,6 +844,9 @@ final class DomainEventTypes
         self::DOCUMENT_GENERATED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'template_version_id'], 'description' => 'Se generó un documento PDF desde una plantilla y entró al legajo con la versión de la plantilla con que se emitió (DOC-5 · RN-DOC-11)'],
         self::SIGNATURE_SENT => ['version' => 1, 'required_fields' => ['signature_request_id', 'user_ids'], 'description' => 'Documento enviado a firma (o recordatorio): avisa a los firmantes de turno (DOC-6)'],
         self::SIGNATURE_DECLINED => ['version' => 1, 'required_fields' => ['signature_request_id', 'reason'], 'description' => 'Un firmante rechazó la firma con su motivo; la solicitud termina (DOC-6)'],
+        self::PAYROLL_CONCEPT_CREATED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code'], 'description' => 'Se creó un concepto de planilla propio de la organización (CPT-1)'],
+        self::PAYROLL_CONCEPT_VERSION_PUBLISHED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code', 'version_id', 'valid_from'], 'description' => 'Se publicó una versión de un concepto con su vigencia; los periodos anteriores siguen con la versión de su fecha (CPT-2 · RN-CPT-01)'],
+        self::PAYROLL_CONCEPT_ARCHIVED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code'], 'description' => 'Se retiró un concepto: deja de usarse en los cálculos y su historia se conserva (RN-CPT-02)'],
         self::SIGNATURE_COMPLETED => [
             'version' => 1,
             'required_fields' => ['signature_request_id', 'completed_at'],

@@ -46,6 +46,7 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
+use App\Modules\Payroll\Infrastructure\Models\AccountingAccount;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -153,6 +154,8 @@ final class CrossTenantHarness
         '/employments/{employment_id}/health-regimes' => HealthRegime::class,
         // NOM-2 · El régimen de la relación vive en employment_labor_regimes (el mismo modelo de COL-7).
         '/employments/{employment_id}/payroll-regime' => HealthRegime::class,
+        // CPT-4 · Editar una cuenta contable de A.
+        '/accounting-accounts/{id}' => AccountingAccount::class,
         '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,
         '/employments/{employment_id}/insurance-coverages/{id}/end' => InsuranceCoverage::class,
         '/employments/{employment_id}/life-insurance-declarations' => LifeInsuranceBeneficiary::class,
