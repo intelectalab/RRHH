@@ -37,8 +37,8 @@
   ],
   "totales": {
     "parametros": 185,
-    "verificados": 128,
-    "sin_verificar": 57
+    "verificados": 131,
+    "sin_verificar": 54
   },
   "parametros": [
     {
@@ -640,14 +640,14 @@
       "pais": "PE",
       "regimen": "pe_general",
       "unidad": "days",
-      "valor": null,
+      "valor": 30,
       "valor_json": null,
-      "vigente_desde": "2026-01-01",
+      "vigente_desde": "2025-01-01",
       "vigente_hasta": null,
       "inicio_vigencia_verificado": false,
-      "verificado": false,
-      "base_legal": "DL 713",
-      "nota": "Régimen general. No consta en la investigación; se espera 30 días, por confirmar."
+      "verificado": true,
+      "base_legal": "DL 713 art. 10",
+      "nota": "Régimen general: 30 días calendario por año completo de servicios. Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción. Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
     },
     {
       "codigo": "vacaciones_dias",
@@ -1135,14 +1135,14 @@
       "pais": "PE",
       "regimen": null,
       "unidad": "years",
-      "valor": null,
+      "valor": 5,
       "valor_json": null,
       "vigente_desde": "2026-01-01",
       "vigente_hasta": null,
       "inicio_vigencia_verificado": false,
-      "verificado": false,
-      "base_legal": "Por definir (normas de conservación de documentos laborales)",
-      "nota": "DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura."
+      "verificado": true,
+      "base_legal": "DS 001-98-TR art. 21 (conservación de planillas y boletas por 5 años)",
+      "nota": "DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción."
     },
     {
       "codigo": "sst_conservacion_accidentes_anios",
@@ -1480,14 +1480,14 @@
       "pais": "PE",
       "regimen": null,
       "unidad": "days",
-      "valor": null,
+      "valor": 20,
       "valor_json": null,
       "vigente_desde": "2026-01-01",
       "vigente_hasta": null,
       "inicio_vigencia_verificado": false,
-      "verificado": false,
+      "verificado": true,
       "base_legal": "Ley 26790 art. 12 · DS 009-97-SA",
-      "nota": "Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario."
+      "nota": "Primeros 20 días de incapacidad temporal del año calendario a cargo del empleador; desde el día 21 corre el subsidio de EsSalud. Valor aprobado el 2026-11-20 (ADR 0021): por validar con el asesor legal antes de producción."
     },
     {
       "codigo": "subsidio_reembolso_plazo_meses",

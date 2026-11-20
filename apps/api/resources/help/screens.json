@@ -253,6 +253,18 @@
       "permissions": [
         "documents.signature_requests.sign"
       ]
+    },
+    "time.vacation_planning": {
+      "module": "time_off",
+      "permissions": [
+        "time.vacation_requests.view"
+      ]
+    },
+    "time.vacation_agreements": {
+      "module": "time_off",
+      "permissions": [
+        "time.vacation_balances.view"
+      ]
     }
   }
 }

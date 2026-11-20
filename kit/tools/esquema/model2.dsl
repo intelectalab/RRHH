@@ -103,6 +103,16 @@
   entry_type enum(accrual,taken,scheduled,sold,adjustment,expired,opening_balance,reversal,settlement)! ; days numeric(6,2)!
   effective_on date! ; vacation_request_id ?-> vacation_requests ; reverses_entry_id ?-> vacation_ledger_entries ; reason
   created_by_user_id ?-> users ; evidence ; idempotency_key ; uniq idempotency_key ; idx employment_id, effective_on
+@vacation_schedules lock | Rol anual de vacaciones por empresa y año (VAC-5): RRHH abre la campaña, los jefes proponen fechas, cada trabajador confirma y lo confirmado se convierte en solicitudes aprobadas. Cerrar la campaña impide nuevas propuestas.
+  legal_entity_id -> legal_entities ; year smallint! ; name ; status enum(open,closed)=open ; opened_by_user_id ?-> users ; closed_at ts ; uniq legal_entity_id, year
+@vacation_schedule_lines lock | Fechas propuestas para un trabajador en el rol anual (VAC-5). Estados solo por acciones: propuesta, confirmada o declinada por el trabajador, convertida en solicitud o retirada.
+  vacation_schedule_id -> vacation_schedules ; employment_id -> employments ; starts_on date! ; ends_on date! ; days numeric(6,2)
+  status enum(proposed,confirmed,declined,converted,withdrawn)=proposed ; proposed_by_user_id ?-> users ; responded_at ts ; response_note
+  vacation_request_id ?-> vacation_requests ; check ends_on >= starts_on ; idx vacation_schedule_id, employment_id
+@vacation_agreements soft lock | Acuerdo escrito de vacaciones (VAC-6, DL 713 · DL 1405): fraccionamiento del descanso, adelanto a cuenta del periodo en curso o venta de días (reducción del descanso). Se emite en PDF al legajo, se registra firmado y entonces queda vigente; la venta firmada descuenta el saldo con un movimiento «sold» y da el concepto de planilla. Los límites salen de parámetros legales y de la política.
+  employment_id -> employments ; kind enum(fractionation,advance,sale)! ; vacation_accrual_period_id ?-> vacation_accrual_periods ; days numeric(6,2)
+  effective_on date! ; status enum(draft,issued,active,cancelled)=draft ; document_id ?-> documents ; signed_at ; signature_origin enum(physical_scan,electronic)
+  payroll_concept_code ; ledger_entry_id ?-> vacation_ledger_entries ; created_by_user_id ?-> users ; cancel_reason ; notes ; idx employment_id, kind
 
 #E AUS | Ausencias y permisos
 @absence_types soft lock | Tipo de ausencia configurable (descanso médico, licencias, permiso personal, compensación, trabajo remoto…). Las reglas viven en absence_type_rules con vigencia; los del paquete de país (is_system) no se editan.

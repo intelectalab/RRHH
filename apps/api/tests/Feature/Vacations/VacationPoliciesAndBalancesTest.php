@@ -239,12 +239,15 @@ test('VAC-2 · micro y general devengan días distintos; el periodo cumplido ent
     vacCall($this->admin, 'GET', '/vacation-balances?filter[status]=nope')->assertStatus(400)->assertJsonPath('error.code', 'invalid_filter');
 });
 
-test('VAC-2 · el régimen general sin días verificados queda «por validar» y no inventa días', function (): void {
+test('VAC-2 · el régimen general toma los días del parámetro legal (30, aprobado el 2026-11-20) y no inventa días antes de su vigencia', function (): void {
     [$emp] = vacHire($this->entity, 'pe_general', '2025-01-01');
     $b = vacBalance($emp);
-    expect($b['pending_validation'])->toBeTrue()
-        ->and($b['periods'][0]['pending_validation'])->toBeTrue()
-        ->and($b['totals']['available'])->toBe('0.00');
+    expect($b['pending_validation'])->toBeFalse()
+        ->and($b['periods'][0]['pending_validation'])->toBeFalse()
+        ->and($b['totals']['available'])->toBe('30.00');
+    // Un año anterior a la vigencia del parámetro queda «por validar» y sin días.
+    [$old] = vacHire($this->entity, 'pe_general', '2023-01-01');
+    expect(vacBalance($old)['periods'][0]['pending_validation'])->toBeTrue();
 });
 
 test('VAC-2 · los periodos no gozados en plazo quedan vencidos y se identifican', function (): void {

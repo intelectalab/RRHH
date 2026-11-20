@@ -1226,6 +1226,19 @@
       "opciones": null
     },
     {
+      "codigo": "vacaciones.aviso_vencimiento_dias",
+      "modulo": "time_off",
+      "nombre": "Aviso de periodos por vencer",
+      "tipo": "integer",
+      "valor_por_defecto": 60,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "VAC-5 · Días de anticipación con que se alerta al jefe y a RRHH que un periodo vacacional ganado vence sin gozarse (fecha límite de goce). Política de la organización, no valor legal.",
+      "opciones": null
+    },
+    {
       "codigo": "ausencias.dias_descanso_semanal",
       "modulo": "time_off",
       "nombre": "Días de descanso semanal (cómputo en días hábiles)",

@@ -58,6 +58,8 @@ return [
         // CON-4 · RN-CON-04: un contrato vence pronto (con el acumulado frente al tope) o el acumulado se acerca al tope.
         'contracts.expiring' => ['variables' => ['employee', 'ends_on', 'days_left', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // CON-6 · Solicitud de teletrabajo cuyo plazo legal de respuesta vence pronto.
+        // VAC-5 · Periodos vacacionales vencidos o por vencer (al jefe y a RRHH, una vez por periodo).
+        'vacations.accumulation' => ['variables' => ['employee', 'explanation'], 'link' => '/tiempo/vacaciones/programacion', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'remote_work.response_due' => ['variables' => ['employee', 'due_on'], 'link' => '/personas/teletrabajo', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'contracts.cap_approaching' => ['variables' => ['employee', 'ends_on', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // AUS-3: un descanso pasó a subsidio; quien gestiona subsidios presenta el reembolso (sin datos de salud).

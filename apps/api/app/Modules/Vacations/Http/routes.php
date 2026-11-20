@@ -1,8 +1,10 @@
 <?php
 
+use App\Modules\Vacations\Http\Controllers\VacationAgreementController;
 use App\Modules\Vacations\Http\Controllers\VacationBalanceController;
 use App\Modules\Vacations\Http\Controllers\VacationPolicyController;
 use App\Modules\Vacations\Http\Controllers\VacationRequestController;
+use App\Modules\Vacations\Http\Controllers\VacationScheduleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -35,4 +37,27 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
 
     // VAC-4 · Calendario de ausencias del equipo (vacaciones y ausencias, aprobadas y en trámite).
     Route::get('/team-calendar', [VacationRequestController::class, 'teamCalendar'])->middleware('permission:time.vacation_requests.view');
+
+    // VAC-5 · Rol anual de vacaciones (campaña → propuestas → confirmación → solicitudes) y alertas de acumulación.
+    Route::get('/vacation-schedules', [VacationScheduleController::class, 'index'])->middleware('permission:time.vacation_requests.view');
+    Route::post('/vacation-schedules', [VacationScheduleController::class, 'store'])->middleware('permission:time.vacation_requests.schedule');
+    Route::get('/vacation-schedules/{id}', [VacationScheduleController::class, 'show'])->middleware('permission:time.vacation_requests.view');
+    Route::post('/vacation-schedules/{id}/close', [VacationScheduleController::class, 'close'])->middleware('permission:time.vacation_requests.schedule');
+    Route::post('/vacation-schedules/{id}/reopen', [VacationScheduleController::class, 'reopen'])->middleware('permission:time.vacation_requests.schedule');
+    Route::get('/vacation-schedules/{id}/lines', [VacationScheduleController::class, 'lines'])->middleware('permission:time.vacation_requests.view');
+    Route::post('/vacation-schedules/{id}/lines', [VacationScheduleController::class, 'propose'])->middleware('permission:time.vacation_requests.schedule');
+    Route::post('/vacation-schedules/{id}/convert', [VacationScheduleController::class, 'convert'])->middleware('permission:time.vacation_requests.validate');
+    Route::post('/vacation-schedule-lines/{id}/confirm', [VacationScheduleController::class, 'confirm'])->middleware('permission:time.vacation_requests.create');
+    Route::post('/vacation-schedule-lines/{id}/decline', [VacationScheduleController::class, 'decline'])->middleware('permission:time.vacation_requests.create');
+    Route::post('/vacation-schedule-lines/{id}/withdraw', [VacationScheduleController::class, 'withdraw'])->middleware('permission:time.vacation_requests.schedule');
+    Route::get('/vacation-accumulation-alerts', [VacationScheduleController::class, 'alerts'])->middleware('permission:time.vacation_balances.view');
+
+    // VAC-6 · Acuerdos de fraccionamiento, adelanto y venta de vacaciones.
+    Route::get('/vacation-agreements', [VacationAgreementController::class, 'index'])->middleware('permission:time.vacation_balances.view');
+    Route::post('/vacation-agreements', [VacationAgreementController::class, 'store'])->middleware('permission:time.vacation_balances.adjust');
+    Route::get('/vacation-agreements/{id}', [VacationAgreementController::class, 'show'])->middleware('permission:time.vacation_balances.view');
+    Route::post('/vacation-agreements/{id}/issue', [VacationAgreementController::class, 'issue'])->middleware('permission:time.vacation_balances.adjust');
+    Route::post('/vacation-agreements/{id}/register-signature', [VacationAgreementController::class, 'registerSignature'])->middleware('permission:time.vacation_balances.adjust');
+    Route::post('/vacation-agreements/{id}/cancel', [VacationAgreementController::class, 'cancel'])->middleware('permission:time.vacation_balances.adjust');
+    Route::get('/vacation-agreements/{id}/document', [VacationAgreementController::class, 'document'])->middleware('permission:time.vacation_balances.view');
 });

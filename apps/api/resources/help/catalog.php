@@ -56,6 +56,8 @@ return [
     'pantalla-plantillas' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['documents.templates']],
     'pantalla-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacations']],
     'pantalla-ausencias' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.absences']],
+    'pantalla-programacion-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_planning']],
+    'pantalla-acuerdos-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_agreements']],
     'pantalla-resumen-periodo' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.period_summary']],
     'pantalla-subsidios' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.subsidies']],
     'pantalla-portal' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['portal.home']],

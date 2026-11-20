@@ -50,6 +50,7 @@ use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
 use App\Modules\Settings\Infrastructure\Models\TenantSetting;
+use App\Modules\Vacations\Infrastructure\Models\VacationScheduleLine;
 use App\Modules\Workflow\Infrastructure\Models\AutomationRule;
 use App\Modules\Workflow\Infrastructure\Models\AutomationRun;
 use App\Shared\Tenancy\TenancyScope;
@@ -105,6 +106,11 @@ final class CrossTenantHarness
         '/catalog-items/{id}/reactivate' => CatalogItem::class,
         // VAC-2: el saldo de vacaciones se identifica por la relación laboral de A.
         'VacationBalance' => Employment::class,
+        // VAC-5 · Líneas del rol anual de A y alertas de acumulación de sus relaciones.
+        '/vacation-schedule-lines/{id}/confirm' => VacationScheduleLine::class,
+        '/vacation-schedule-lines/{id}/decline' => VacationScheduleLine::class,
+        '/vacation-schedule-lines/{id}/withdraw' => VacationScheduleLine::class,
+        '/vacation-accumulation-alerts' => Employment::class,
         // AUS-1: historia de reglas de un tipo de ausencia de A.
         '/absence-types/{id}/rules' => AbsenceType::class,
         // AUS-2: ausencias de A (esquema Absence), su registro directo y sus sustentos.

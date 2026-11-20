@@ -94,9 +94,11 @@ final class VacationAccrual
     private function syncPeriod(array $employment, string $start, string $end, string $today, string $country): void
     {
         $period = VacationAccrualPeriod::query()->firstOrNew(['employment_id' => $employment['id'], 'period_start' => $start]);
-        if ($period->exists && in_array($period->status, ['earned', 'overdue', 'closed'], true) && $period->earned_on !== null) {
+        if ($period->exists && in_array($period->status, ['earned', 'overdue', 'closed'], true) && $period->earned_on !== null && ! $period->pending_validation) {
             return; // Ya ganado: sus días están en el libro y no se recalculan.
         }
+        // Un periodo ganado mientras los días del régimen estaban «por validar» se recalcula cuando el parámetro se
+        // valida (ADR 0021): su movimiento de devengo se crea una sola vez (clave accrual:periodo).
         $calc = $this->entitlement($employment, $start, $end, $country);
         // Un año completo se gana al día siguiente de su fin; si el cese cae justo en el último día, también.
         $completed = $end < $today && ($employment['termination_date'] === null || $end <= $employment['termination_date']);

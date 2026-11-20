@@ -154,6 +154,10 @@ return [
             'in_app' => ['subject' => 'Your {certificate} was not issued', 'body' => 'Human Resources did not issue your {certificate}: {reason}'],
             'email' => ['subject' => 'Your {certificate} was not issued', 'body' => "Hi {name}:\n\nAt {organization}, Human Resources did not issue your {certificate}: {reason}\n\nCheck your requests here: {link}"],
         ],
+        'vacations.accumulation' => [
+            'in_app' => ['subject' => '{employee} has accumulated vacation', 'body' => '{explanation}'],
+            'email' => ['subject' => '{employee} has accumulated vacation', 'body' => "Hello {name}:\n\nAt {organization}, {employee} has vacation to take: {explanation}\n\nReview it here: {link}"],
+        ],
         'remote_work.response_due' => [
             'in_app' => ['subject' => 'Answer the remote work request from {employee}', 'body' => 'The deadline to answer the remote work request from {employee} is {due_on}.'],
             'email' => ['subject' => 'Remote work request from {employee} is due on {due_on}', 'body' => "Hello {name}:\n\nAt {organization}, the deadline to answer the remote work request from {employee} is {due_on}.\n\nAnswer it here: {link}"],

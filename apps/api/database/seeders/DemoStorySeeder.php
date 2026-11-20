@@ -9,7 +9,9 @@ use App\Modules\CoreHR\Application\TerminationService;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Modules\Vacations\Application\VacationAccrual;
 use App\Modules\Vacations\Application\VacationRequestService;
+use App\Modules\Vacations\Application\VacationScheduling;
 use App\Modules\Vacations\Infrastructure\Models\VacationRequest;
+use App\Modules\Vacations\Infrastructure\Models\VacationSchedule;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
@@ -41,6 +43,7 @@ class DemoStorySeeder extends Seeder
         Model::reguard();
         try {
             $this->story((string) $tenantId);
+            $this->andesVacations((string) $tenantId);
         } finally {
             if ($wasUnguarded) {
                 Model::unguard();
@@ -64,8 +67,7 @@ class DemoStorySeeder extends Seeder
             }
             $vacations = app(VacationRequestService::class);
             // Vacaciones ya gozadas, registradas por RRHH (acordadas fuera del sistema).
-            // Ya gozadas (registradas por RRHH) y una aprobada para las próximas semanas. Son de Transportes Inti
-            // (pequeña empresa): los días del régimen general siguen «por validar» y su saldo sale en cero.
+            // Ya gozadas (registradas por RRHH) y una aprobada para las próximas semanas (Transportes Inti, pequeña empresa).
             foreach ([['wilmer.ccori', -120, -106], ['carmen.delgado', -60, -46], ['nancy.condori', 21, 30]] as [$who, $from, $to]) {
                 $e = $by($who);
                 if ($e !== null) {
@@ -113,6 +115,44 @@ class DemoStorySeeder extends Seeder
                     'notice_date' => DemoDates::daysAgo(50),
                     'notes' => 'Renuncia para continuar estudios.',
                 ], $admin);
+            }
+        });
+    }
+
+    /**
+     * Comercial Los Andes (régimen general, 30 días con el parámetro legal aprobado el 2026-11-20): dos solicitudes en
+     * aprobación y el rol de vacaciones del año siguiente con una propuesta. Idempotente: solo agrega lo que falta,
+     * también en una demo sembrada con una versión anterior.
+     */
+    private function andesVacations(string $tenantId): void
+    {
+        TenancyScope::runAs($tenantId, function (): void {
+            $andes = DB::table('legal_entities')->where('tax_id', '20999999901')->value('id');
+            if ($andes === null) {
+                return;
+            }
+            $admin = (string) DB::table('users')->orderBy('created_at')->value('id');
+            $by = fn (string $email): ?Employment => Employment::query()->where('work_email', $email.'@demo.gestiahr.test')->first();
+            $vacations = app(VacationRequestService::class);
+            foreach ([['valeria.ramos', 28, 37, 'Viaje a Cusco con la familia.'], ['raul.valdivia', 50, 56, 'Descanso después del cierre contable.']] as [$who, $from, $to, $note]) {
+                $e = $by($who);
+                if ($e === null || VacationRequest::query()->where('employment_id', $e->id)->exists()) {
+                    continue;
+                }
+                app(VacationAccrual::class)->sync((string) $e->id);
+                try {
+                    $vacations->submit($vacations->create(['employment_id' => $e->id, 'starts_on' => DemoDates::inDays($from), 'ends_on' => DemoDates::inDays($to), 'notes' => $note], $admin), 'hr', $admin);
+                } catch (\Throwable) {
+                    // Sin saldo suficiente (organización demo antigua): se omite.
+                }
+            }
+            // VAC-5 · Rol de vacaciones del año siguiente con una propuesta para la gerencia de Administración.
+            $year = (int) now()->addYear()->format('Y');
+            $patricia = $by('patricia.medina');
+            if ($patricia !== null && ! VacationSchedule::query()->where('legal_entity_id', $andes)->where('year', $year)->exists()) {
+                $scheduling = app(VacationScheduling::class);
+                $schedule = $scheduling->open((string) $andes, $year, null, $admin);
+                $scheduling->propose($schedule, (string) $patricia->id, $year.'-02-02', $year.'-02-16', $admin);
             }
         });
     }

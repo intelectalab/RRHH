@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **57 parámetros sin valor verificado**; **50** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **54 parámetros sin valor verificado**; **47** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -16,7 +16,6 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `afp_remuneracion_maxima_asegurable` | Remuneración máxima asegurable | Todos | amount | SBS | Sí | Cargar desde la fuente oficial cada periodo. | |
 | `boletas_conservacion_anios` | Conservación de documentos de pago | Todos | years | DL 1310 | Sí | Citado de memoria en la investigación; validar con el texto vigente. | |
 | `contrato_modalidad_tope_acumulado_anios` | Tope acumulado de contratos a modalidad | Todos | years | DS 003-97-TR | Sí | El tope general no consta en la investigación. | |
-| `descanso_medico_dias_cargo_empleador` | Días de incapacidad temporal del año a cargo del empleador antes del subsidio | Todos | days | Ley 26790 art. 12 · DS 009-97-SA | Sí | Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario. | |
 | `discapacidad_cuota_minimo_trabajadores` | Trabajadores desde los que aplica la cuota | Todos | count | Ley 29973 | Sí | No confirmado en el texto. | |
 | `discapacidad_cuota_pct` | Cuota de empleo de personas con discapacidad | Todos | percent | Ley 29973 | Sí | No confirmado en el texto. | |
 | `eps_credito_pct` | Crédito por EPS contra el aporte de salud | Todos | percent | Ley 26790 | Sí | Porcentaje no verificado. | |
@@ -26,7 +25,6 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `igv_tasa_pct` | Tasa del impuesto general a las ventas del comprobante del SaaS (%) | Todos | percent | TUO de la Ley del IGV (DS 055-99-EF) art. 17 | Sí | SAS-11: tasa total que se aplica al emitir el comprobante del SaaS a una organización peruana. Por confirmar con el contador (IGV más IPM) antes del primer cobro real; sin valor validado no se emite ningún comprobante. | |
 | `jornada_maxima_semanal_horas` | Jornada máxima semanal | Todos | hours | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `lactario_minimo_mujeres_edad_fertil` | Mujeres en edad fértil por centro de trabajo que obligan a lactario | Todos | count | Ley 29896 | Sí | Umbral no verificado. | |
-| `legajo_conservacion_anios` | Conservación del legajo después del cese | Todos | years | Por definir (normas de conservación de documentos laborales) | Sí | DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura. | |
 | `licencia_fallecimiento_familiar_dias` | Licencia por fallecimiento de un familiar directo (días) | Todos | days | Por confirmar | Sí | Por confirmar si existe licencia general en el régimen privado o solo por convenio. | |
 | `licencia_maternidad_dias` | Licencia por maternidad (días naturales, prenatal y postnatal) | Todos | days | Ley 26644 | Sí | Por confirmar la duración vigente y las extensiones (parto múltiple, discapacidad). | |
 | `licencia_maternidad_dias_adicionales_discapacidad` | Licencia por maternidad: días adicionales por nacimiento de un hijo con discapacidad | Todos | days | Ley 26644 modificada por Ley 30367 | Sí | Por confirmar los días que se suman al descanso postnatal. | |
@@ -55,7 +53,6 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `treg_baja_dias` | T-Registro: baja | Todos | days | DS 018-2007-TR art. 4-A | Sí | SUNAT: al día siguiente; otras fuentes: primer día hábil siguiente. Tipo de día por confirmar; alertar con día calendario. | |
 | `utilidades_pct_otros_sectores` | Participación en utilidades: demás sectores de la norma | Todos | scale | DL 892 | Sí | La norma tiene más sectores que los citados; verificar. | |
 | `vacaciones_adelanto_max_dias` | Días de vacaciones que se pueden adelantar antes de cumplir el récord | Todos | days | DL 1405 art. 3 · DS 013-2019-TR | Sí | Adelanto a cuenta de días generados en proporción al tiempo trabajado; por confirmar. | |
-| `vacaciones_dias` | Días de vacaciones por año | Régimen general | days | DL 713 | Sí | Régimen general. No consta en la investigación; se espera 30 días, por confirmar. | |
 | `vacaciones_fraccion_minima_dias` | Bloque mínimo al fraccionar las vacaciones | Todos | days | DL 1405 art. 2 · DS 013-2019-TR | Sí | Fraccionamiento del descanso en bloques; por confirmar. | |
 | `vacaciones_record_dias_jornada_5` | Récord vacacional: días efectivos con jornada de 5 días a la semana | Todos | days | DL 713 art. 10 | Sí | Se espera 210 días de labor efectiva; por confirmar. | |
 | `vacaciones_record_dias_jornada_6` | Récord vacacional: días efectivos con jornada de 6 días a la semana | Todos | days | DL 713 art. 10 | Sí | Se espera 260 días de labor efectiva; por confirmar. | |
@@ -70,7 +67,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 
 ## 2. Con valor, pero con fecha de inicio no verificada
 
-104 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
+107 parámetros tienen valor verificado y una fecha «vigente_desde» de referencia. Basta con confirmar que el valor regía en esa fecha.
 
 | Código | Parámetro | Régimen | Valor | Vigente desde | Base legal citada |
 |---|---|---|---|---|---|
@@ -103,6 +100,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `cts_fraccion_gratificacion` | Fracción de la gratificación en la remuneración computable de CTS | Todos | 0.166667 | 2025-01-01 | DS 001-97-TR |
 | `cts_meses_deposito` | Meses de depósito de CTS | Todos | [5, 11] | 2025-01-01 | DS 001-97-TR |
 | `cts_tope_dias` | Tope de CTS en remuneraciones diarias | Pequeña empresa | 90 | 2025-01-01 | DS 013-2013-PRODUCE; guía MTPE |
+| `descanso_medico_dias_cargo_empleador` | Días de incapacidad temporal del año a cargo del empleador antes del subsidio | Todos | 20 | 2026-01-01 | Ley 26790 art. 12 · DS 009-97-SA |
 | `dias_base_mes` | Días de la base mensual para prorratear y calcular truncos | Todos | 30 | 2025-01-01 | DS 001-97-TR |
 | `essalud_aporte_pct` | Aporte del empleador a EsSalud | Todos | 9 | 2025-01-01 | Ley 26790 |
 | `gratificacion_aplica` | Corresponde gratificación | Todos | 1 | 2025-01-01 | Ley 27735 |
@@ -127,6 +125,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `indemnizacion_tope_dias` | Indemnización por despido: tope en remuneraciones diarias | Pequeña empresa | 120 | 2025-01-01 | DS 013-2013-PRODUCE; guía MTPE |
 | `indemnizacion_tope_dias` | Indemnización por despido: tope en remuneraciones diarias | Todos | 360 | 2025-01-01 | DS 003-97-TR art. 38 |
 | `indemnizacion_vacacional_aplica` | Corresponde indemnización por vacaciones no gozadas en el año siguiente | Todos | 1 | 2025-01-01 | DL 713 art. 23 |
+| `legajo_conservacion_anios` | Conservación del legajo después del cese | Todos | 5 | 2026-01-01 | DS 001-98-TR art. 21 (conservación de planillas y boletas por 5 años) |
 | `mayoria_edad_anios` | Edad en que un hijo derechohabiente pasa a revisión | Todos | 18 | 2026-01-01 | Código Civil, art. 42 |
 | `mype_anios_consecutivos_exceso` | Años consecutivos de exceso de ventas que inician la permanencia | Todos | 2 | 2026-01-01 | DS 013-2013-PRODUCE art. 42; guía MTPE |
 | `mype_permanencia_anios` | Permanencia en el régimen tras superar el tope de ventas | Microempresa | 1 | 2026-01-01 | DS 013-2013-PRODUCE art. 42; guía MTPE |
@@ -174,6 +173,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `utilidades_pct_comercio_restaurantes` | Participación en utilidades: comercio y restaurantes | Todos | 8 | 2025-01-01 | DL 892 |
 | `utilidades_pct_industria` | Participación en utilidades: industria | Todos | 10 | 2025-01-01 | DL 892 |
 | `utilidades_pct_otras_actividades` | Participación en utilidades: otras actividades | Todos | 5 | 2025-01-01 | DL 892 |
+| `vacaciones_dias` | Días de vacaciones por año | Régimen general | 30 | 2025-01-01 | DL 713 art. 10 |
 | `vacaciones_dias` | Días de vacaciones por año | Microempresa | 15 | 2025-01-01 | DS 013-2013-PRODUCE |
 | `vacaciones_dias` | Días de vacaciones por año | Pequeña empresa | 15 | 2025-01-01 | DS 013-2013-PRODUCE |
 | `vacaciones_plazo_goce_meses` | Plazo para gozar un periodo vacacional ganado | Todos | 12 | 2025-01-01 | DL 713 art. 23 |

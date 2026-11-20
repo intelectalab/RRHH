@@ -55,6 +55,8 @@ const MENU: NavLink[] = [
   { href: '/calendario', key: 'shell.modules_calendar', group: 'time', icon: 'calendar', module: 'base', visible: (can) => can('time.calendar.view') },
   { href: '/tiempo/ausencias', key: 'shell.modules_absences', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.view') },
   { href: '/tiempo/vacaciones', key: 'shell.modules_vacations', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
+  { href: '/tiempo/vacaciones/programacion', key: 'shell.modules_vacation_planning', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.vacation_requests.view') },
+  { href: '/tiempo/vacaciones/acuerdos', key: 'shell.modules_vacation_agreements', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.vacation_balances.adjust') },
   { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
   { href: '/tiempo/resumen-periodo', key: 'shell.modules_period_summary', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.create_for_others') },
 ]

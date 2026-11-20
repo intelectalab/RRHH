@@ -5525,6 +5525,102 @@ CREATE POLICY tenant_isolation ON vacation_ledger_entries USING (tenant_id = NUL
 CREATE TRIGGER trg_vacation_ledger_entries_inmutable BEFORE UPDATE OR DELETE ON vacation_ledger_entries FOR EACH ROW EXECUTE FUNCTION reject_mutation();
 CREATE TRIGGER trg_vacation_ledger_entries_no_truncate BEFORE TRUNCATE ON vacation_ledger_entries FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
 
+CREATE TABLE vacation_schedules (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  legal_entity_id uuid NOT NULL,
+  year smallint NOT NULL,
+  name text NOT NULL,
+  status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','closed')),
+  opened_by_user_id uuid,
+  closed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_vacation_schedules_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_vacation_schedules_legal_entity_id_year UNIQUE (tenant_id, legal_entity_id, year),
+  CONSTRAINT fk_vacation_schedules_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_vacation_schedules_opened_by_user_id FOREIGN KEY (tenant_id, opened_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE vacation_schedules IS 'Rol anual de vacaciones por empresa y año (VAC-5): RRHH abre la campaña, los jefes proponen fechas, cada trabajador confirma y lo confirmado se convierte en solicitudes aprobadas. Cerrar la campaña impide nuevas propuestas.';
+CREATE INDEX ix_vacation_schedules_opened_by_user_id ON vacation_schedules (tenant_id, opened_by_user_id);
+ALTER TABLE vacation_schedules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vacation_schedules FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON vacation_schedules USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_vacation_schedules_touch BEFORE UPDATE ON vacation_schedules FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE vacation_schedule_lines (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  vacation_schedule_id uuid NOT NULL,
+  employment_id uuid NOT NULL,
+  starts_on date NOT NULL,
+  ends_on date NOT NULL,
+  days numeric(6,2),
+  status text NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed','confirmed','declined','converted','withdrawn')),
+  proposed_by_user_id uuid,
+  responded_at timestamptz,
+  response_note text,
+  vacation_request_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_vacation_schedule_lines_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT ck_vacation_schedule_lines_1 CHECK (ends_on >= starts_on),
+  CONSTRAINT fk_vacation_schedule_lines_vacation_schedule_id FOREIGN KEY (tenant_id, vacation_schedule_id) REFERENCES vacation_schedules (tenant_id, id),
+  CONSTRAINT fk_vacation_schedule_lines_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_vacation_schedule_lines_proposed_by_user_id FOREIGN KEY (tenant_id, proposed_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_vacation_schedule_lines_vacation_request_id FOREIGN KEY (tenant_id, vacation_request_id) REFERENCES vacation_requests (tenant_id, id)
+);
+COMMENT ON TABLE vacation_schedule_lines IS 'Fechas propuestas para un trabajador en el rol anual (VAC-5). Estados solo por acciones: propuesta, confirmada o declinada por el trabajador, convertida en solicitud o retirada.';
+CREATE INDEX ix_vacation_schedule_lines_employment_id ON vacation_schedule_lines (tenant_id, employment_id);
+CREATE INDEX ix_vacation_schedule_lines_proposed_by_user_id ON vacation_schedule_lines (tenant_id, proposed_by_user_id);
+CREATE INDEX ix_vacation_schedule_lines_vacation_request_id ON vacation_schedule_lines (tenant_id, vacation_request_id);
+CREATE INDEX ix_vacation_schedule_lines_vacation_schedule_id_employment_id ON vacation_schedule_lines (tenant_id, vacation_schedule_id, employment_id);
+ALTER TABLE vacation_schedule_lines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vacation_schedule_lines FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON vacation_schedule_lines USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_vacation_schedule_lines_touch BEFORE UPDATE ON vacation_schedule_lines FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE vacation_agreements (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  employment_id uuid NOT NULL,
+  kind text NOT NULL CHECK (kind IN ('fractionation','advance','sale')),
+  vacation_accrual_period_id uuid,
+  days numeric(6,2),
+  effective_on date NOT NULL,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','issued','active','cancelled')),
+  document_id uuid,
+  signed_at timestamptz,
+  signature_origin text CHECK (signature_origin IN ('physical_scan','electronic')),
+  payroll_concept_code text,
+  ledger_entry_id uuid,
+  created_by_user_id uuid,
+  cancel_reason text,
+  notes text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  deleted_at timestamptz,
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_vacation_agreements_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_vacation_agreements_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_vacation_agreements_vacation_accrual_period_id FOREIGN KEY (tenant_id, vacation_accrual_period_id) REFERENCES vacation_accrual_periods (tenant_id, id),
+  CONSTRAINT fk_vacation_agreements_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_vacation_agreements_ledger_entry_id FOREIGN KEY (tenant_id, ledger_entry_id) REFERENCES vacation_ledger_entries (tenant_id, id),
+  CONSTRAINT fk_vacation_agreements_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE vacation_agreements IS 'Acuerdo escrito de vacaciones (VAC-6, DL 713 · DL 1405): fraccionamiento del descanso, adelanto a cuenta del periodo en curso o venta de días (reducción del descanso). Se emite en PDF al legajo, se registra firmado y entonces queda vigente; la venta firmada descuenta el saldo con un movimiento «sold» y da el concepto de planilla. Los límites salen de parámetros legales y de la política.';
+CREATE INDEX ix_vacation_agreements_vacation_accrual_period_id ON vacation_agreements (tenant_id, vacation_accrual_period_id);
+CREATE INDEX ix_vacation_agreements_document_id ON vacation_agreements (tenant_id, document_id);
+CREATE INDEX ix_vacation_agreements_ledger_entry_id ON vacation_agreements (tenant_id, ledger_entry_id);
+CREATE INDEX ix_vacation_agreements_created_by_user_id ON vacation_agreements (tenant_id, created_by_user_id);
+CREATE INDEX ix_vacation_agreements_employment_id_kind ON vacation_agreements (tenant_id, employment_id, kind);
+ALTER TABLE vacation_agreements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vacation_agreements FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON vacation_agreements USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_vacation_agreements_touch BEFORE UPDATE ON vacation_agreements FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
 -- --------------------------------------------------------------------------------------------------
 -- AUS · Ausencias y permisos
 -- --------------------------------------------------------------------------------------------------
@@ -18743,6 +18839,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('vacaciones.valida_rrhh', 'time_off', 'Validación de RRHH', 'Tras el jefe, RRHH valida la solicitud.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.maximo_ausentes_simultaneos', 'time_off', 'Máximo de ausentes simultáneos por unidad', 'VAC-4 · Si más personas de una misma unidad estarán ausentes el mismo día (vacaciones y ausencias aprobadas o pendientes), el calendario del equipo y la aprobación lo alertan. 0 = sin límite.', 'integer', '0'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('vacaciones.alerta_acumulacion_dias', 'time_off', 'Aviso de vacaciones acumuladas', 'Saldo desde el que se alerta acumulación.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('vacaciones.aviso_vencimiento_dias', 'time_off', 'Aviso de periodos por vencer', 'VAC-5 · Días de anticipación con que se alerta al jefe y a RRHH que un periodo vacacional ganado vence sin gozarse (fecha límite de goce). Política de la organización, no valor legal.', 'integer', '60'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('ausencias.dias_descanso_semanal', 'time_off', 'Días de descanso semanal (cómputo en días hábiles)', 'AUS-2 · Días de la semana que no cuentan cuando un tipo de ausencia se computa en días hábiles (además de los feriados del calendario de la sede). Se reemplaza por el horario del trabajador cuando exista el módulo de Tiempo.', 'list', '["saturday", "sunday"]'::jsonb, ARRAY['organization','legal_entity','site'], '["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]'::jsonb),
   ('horas_extra.requiere_autorizacion', 'attendance', 'Autorización previa', 'El sobretiempo solo se reconoce si fue autorizado.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity','site','org_unit'], NULL),
   ('horas_extra.compensacion', 'attendance', 'Compensación del sobretiempo', 'Pago, bolsa de horas o a elección.', 'select', '"pay"'::jsonb, ARRAY['organization','legal_entity'], '["pay", "time_bank", "choice"]'::jsonb),
