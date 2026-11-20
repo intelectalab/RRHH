@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "home": {
+      "title": "GestiaHR · Software de folha de pagamento e RH para o Peru",
+      "description": "Pessoas, Tempo, Folha, Talentos e Formação em um só sistema. Escolha o produto que precisa hoje e some os demais quando crescer."
+    },
+    "suite": {
+      "title": "Suíte GestiaHR · HCM · Todos os produtos integrados",
+      "description": "O mapa completo do GestiaHR: o que está disponível, o que chega em breve e quais planos o incluem."
+    },
+    "pricing": {
+      "title": "Preços e planos do GestiaHR",
+      "description": "Compare planos, some produtos e calcule seu subtotal pela quantidade de colaboradores."
+    },
+    "signup": {
+      "title": "Cadastro · GestiaHR",
+      "description": "Crie sua conta do GestiaHR."
+    }
+  },
+  "nav": {
+    "products": "Produtos",
+    "suite": "Suíte",
+    "pricing": "Preços",
+    "trial": "Teste grátis",
+    "menu": "Menu",
+    "skip": "Pular para o conteúdo",
+    "home": "Início do GestiaHR",
+    "languages": "Idioma",
+    "brand_a": "Gestia",
+    "brand_b": "HR"
+  },
+  "status": {
+    "available": "Disponível",
+    "partial": "Disponível em parte",
+    "coming_soon": "Em breve"
+  },
+  "price": {
+    "label": "Preço",
+    "per_month": "por mês",
+    "per_year": "por ano",
+    "per_employee": "por colaborador",
+    "on_request": "Consulte",
+    "included_in_all": "Incluído em todos os planos",
+    "not_standalone": "Não é vendido sozinho: vem dentro dos planos",
+    "standalone": "Também é vendido sozinho",
+    "included_in": "Incluído em",
+    "tax_note": "Preços sem impostos. O imposto é aplicado com a alíquota vigente ao emitir a nota.",
+    "catalog_unavailable": "Os preços não estão disponíveis agora. Tente de novo em alguns minutos."
+  },
+  "home": {
+    "kicker": "Software de folha de pagamento e RH para o Peru",
+    "title": "Toda a gestão da sua equipe, da contratação ao holerite, em um só sistema.",
+    "subtitle": "Escolha o produto que precisa hoje e some os demais quando crescer. Todos compartilham a mesma ficha do colaborador.",
+    "cta_primary": "Ver planos e preços",
+    "cta_secondary": "Conhecer a Suíte",
+    "fine": "Teste sem cartão · Ajudamos na migração · Suporte em espanhol",
+    "needs_title": "O que você quer resolver?",
+    "products_kicker": "Produtos",
+    "products_title": "Um produto para cada necessidade",
+    "products_lead": "Contrate dentro de um plano ou some depois. Abra cada um para ver as funções e quais planos o incluem.",
+    "see_product": "Ver funções e planos",
+    "plans_kicker": "Planos",
+    "plans_title": "Um plano para cada etapa da sua empresa",
+    "plans_lead": "Todos incluem Gestia Pessoas. Valores e limites vêm sempre do nosso catálogo vigente.",
+    "compare_all": "Comparar tudo",
+    "faq_title": "Perguntas frequentes",
+    "faq": [
+      {
+        "q": "Posso começar com um produto e somar outros depois?",
+        "a": "Sim. Todos os produtos compartilham a mesma ficha do colaborador, então somar um novo não exige carregar dados de novo."
+      },
+      {
+        "q": "E o que está em breve?",
+        "a": "Você pode pedir que avisemos. Não é cobrado até estar disponível e você ativar."
+      },
+      {
+        "q": "Meus dados ficam separados dos de outras empresas?",
+        "a": "Sim. Cada organização tem seus dados isolados e todo acesso a dados sensíveis fica registrado."
+      }
+    ],
+    "closing_title": "Comece a organizar sua equipe hoje",
+    "closing_text": "Escolha um plano, some o que precisar e crie sua organização em minutos."
+  },
+  "products": {
+    "personas": {
+      "need": "Organizar a ficha e os contratos",
+      "headline": "Ficha digital e contratos em dia",
+      "description": "Ficha completa do colaborador, contratos com aviso de vencimento, organograma e documentos em um só lugar. É a base de todos os produtos do GestiaHR.",
+      "features": [
+        "Ficha 360 com histórico por datas",
+        "Contratos, renovações e aditivos com alertas",
+        "Arquivo digital com versões",
+        "Organograma, posições e diretório",
+        "Portal do colaborador e do gestor"
+      ],
+      "faq": [
+        {
+          "q": "Posso comprar Pessoas separadamente?",
+          "a": "Não é preciso: Gestia Pessoas vem em todos os planos porque é a base do sistema."
+        }
+      ]
+    },
+    "tiempo": {
+      "need": "Gerenciar férias e licenças",
+      "headline": "Férias, ausências e tempo de trabalho",
+      "description": "Saldos de férias, solicitações com aprovação, ausências, atestados médicos e licenças legais. Ponto, escalas e folhas de horas chegam em breve.",
+      "features": [
+        "Saldos e solicitações de férias",
+        "Ausências, atestados e licenças",
+        "Calendário da equipe",
+        "Trabalho remoto e desconexão digital",
+        "Ponto e escalas (em breve)"
+      ],
+      "faq": [
+        {
+          "q": "Preciso de Tempo para usar a Folha?",
+          "a": "Sim. A folha usa as férias e ausências do período, por isso a Folha exige Tempo."
+        }
+      ]
+    },
+    "planilla": {
+      "need": "Calcular a folha e declarar",
+      "headline": "Folha, holerites e declarações",
+      "description": "Cálculo da folha com gratificações, CTS e rescisões, holerites para o colaborador e os arquivos para a SUNAT e o seu banco.",
+      "features": [
+        "Cálculo por regime trabalhista",
+        "Holerites publicados no portal",
+        "Arquivos do PLAME e T-Registro",
+        "Pagamento ao banco por arquivo",
+        "Rescisões"
+      ],
+      "faq": [
+        {
+          "q": "A Folha é vendida sozinha?",
+          "a": "Vem dentro dos planos que incluem Tempo, ou como complemento de um plano que já o tem."
+        }
+      ]
+    },
+    "talento": {
+      "need": "Contratar e avaliar",
+      "headline": "Seleção, desempenho e carreira",
+      "description": "Recrutamento, integração, avaliações de desempenho, planos de carreira e remuneração no mesmo sistema.",
+      "features": [
+        "Vagas e seleção",
+        "Integração guiada",
+        "Avaliações de desempenho",
+        "Carreira e sucessão",
+        "Revisão salarial"
+      ],
+      "faq": [
+        {
+          "q": "Posso pedir para ser avisado?",
+          "a": "Sim. Deixe seu interesse e avisaremos quando cada parte estiver disponível."
+        }
+      ]
+    },
+    "formacion": {
+      "need": "Capacitar minha equipe",
+      "headline": "Seus próprios cursos e certificados",
+      "description": "Suba seus cursos, atribua por cargo ou área e acompanhe quem concluiu o quê. Não inclui uma biblioteca de cursos de terceiros.",
+      "features": [
+        "Cursos próprios",
+        "Atribuição por cargo ou área",
+        "Certificados",
+        "Acompanhamento do progresso"
+      ],
+      "faq": [
+        {
+          "q": "Inclui cursos prontos?",
+          "a": "Não. Formação é para os seus próprios cursos: você sobe e atribui."
+        }
+      ]
+    }
+  },
+  "product_page": {
+    "what_title": "O que resolve",
+    "features_title": "Funções",
+    "parts_title": "O que inclui",
+    "plans_title": "Planos que o incluem",
+    "plans_none": "Ainda não há um plano publicado que o inclua.",
+    "standalone_title": "Preço individual",
+    "waitlist_title": "Chega em breve",
+    "waitlist_text": "Esta parte está em breve. Ainda não pode ser comprada; escolha-a na página de preços para avisarmos você.",
+    "faq_title": "Perguntas frequentes",
+    "back_suite": "Ver todos os produtos",
+    "see_pricing": "Ver preços"
+  },
+  "suite": {
+    "kicker": "Suíte GestiaHR · HCM",
+    "title": "Todos os produtos, integrados em um só sistema",
+    "lead": "Cada produto pode ser contratado dentro de um plano. O estado de cada parte vem do nosso catálogo vigente.",
+    "map_title": "Mapa de produtos",
+    "plans_title": "Planos completos",
+    "extras_title": "Complementos da Suíte",
+    "extras_text": "Benefícios, clima, central de ajuda, saúde e segurança, análises e integrações chegam como complementos ou dentro do plano mais completo."
+  },
+  "pricing": {
+    "kicker": "Preços",
+    "title": "Um plano para cada etapa da sua empresa",
+    "lead": "Escolha seu plano ou monte o seu somando produtos. Os valores vêm do nosso catálogo vigente.",
+    "cycle_label": "Ciclo de pagamento",
+    "monthly": "Mensal",
+    "annual": "Anual",
+    "cycle_unavailable": "Não disponível neste ciclo",
+    "tab_plans": "Planos",
+    "tab_products": "Produtos individuais",
+    "products_lead": "Produtos que podem ser somados a um plano, com o preço por colaborador.",
+    "limit_up_to": "Até {n} colaboradores",
+    "limit_unlimited": "Colaboradores sob medida",
+    "choose_plan": "Escolher {plan}",
+    "selected": "Escolhido",
+    "finder_title": "Não sabe qual plano combina com você?",
+    "finder_lead": "Responda duas perguntas e recomendamos um.",
+    "finder_employees": "Quantos colaboradores você tem?",
+    "finder_payroll": "Precisa calcular a folha no GestiaHR?",
+    "finder_yes": "Sim",
+    "finder_no": "Não, por enquanto só ficha e férias",
+    "finder_result": "Recomendamos {plan}.",
+    "finder_none": "Nenhum plano publicado se ajusta: conte-nos o que precisa.",
+    "compare_title": "O que cada plano inclui",
+    "compare_feature": "Produto e parte",
+    "included": "Incluído",
+    "not_included": "Não incluído",
+    "addons_title": "Somar produtos ao seu plano",
+    "addons_lead": "Some produtos por colaborador. Se um exigir outro, adicionamos ou avisamos.",
+    "employees": "Colaboradores",
+    "subtotal": "Subtotal",
+    "tax": "Imposto ({rate} %)",
+    "tax_pending": "Imposto: confirmado ao emitir a nota",
+    "total": "Total",
+    "notify_me": "Avise-me",
+    "notify_on": "Avisaremos você",
+    "continue": "Continuar com {plan}",
+    "calculating": "Calculando…",
+    "quote_error": "Não conseguimos calcular o subtotal. Tente de novo.",
+    "no_plans": "Estamos preparando os planos. Volte em breve.",
+    "per_employee_month": "por colaborador por mês",
+    "faq_title": "Perguntas frequentes",
+    "faq": [
+      {
+        "q": "Os preços incluem impostos?",
+        "a": "Não. O imposto é aplicado com a alíquota vigente ao emitir a nota."
+      },
+      {
+        "q": "Posso mudar de plano depois?",
+        "a": "Sim. Você pode subir de plano ou somar produtos quando precisar."
+      }
+    ]
+  },
+  "signup": {
+    "title": "O cadastro abre muito em breve",
+    "text": "Guardamos sua escolha de plano e produtos. Em breve você poderá criar sua organização aqui em três passos.",
+    "summary": "Sua escolha",
+    "back": "Voltar aos preços"
+  },
+  "footer": {
+    "tagline": "Software de folha de pagamento e recursos humanos para o Peru.",
+    "products": "Produtos",
+    "company": "GestiaHR",
+    "rights": "© GestiaHR"
+  }
+}

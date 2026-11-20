@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "home": {
+      "title": "GestiaHR · Payroll and HR software for Peru",
+      "description": "People, Time, Payroll, Talent and Learning in one system. Pick the product you need today and add the rest as you grow."
+    },
+    "suite": {
+      "title": "GestiaHR Suite · HCM · All products integrated",
+      "description": "The complete GestiaHR map: what is available, what is coming soon and which plans include it."
+    },
+    "pricing": {
+      "title": "GestiaHR pricing and plans",
+      "description": "Compare plans, add products and get your subtotal for your number of employees."
+    },
+    "signup": {
+      "title": "Sign up · GestiaHR",
+      "description": "Create your GestiaHR account."
+    }
+  },
+  "nav": {
+    "products": "Products",
+    "suite": "Suite",
+    "pricing": "Pricing",
+    "trial": "Free trial",
+    "menu": "Menu",
+    "skip": "Skip to content",
+    "home": "GestiaHR home",
+    "languages": "Language",
+    "brand_a": "Gestia",
+    "brand_b": "HR"
+  },
+  "status": {
+    "available": "Available",
+    "partial": "Partly available",
+    "coming_soon": "Coming soon"
+  },
+  "price": {
+    "label": "Price",
+    "per_month": "per month",
+    "per_year": "per year",
+    "per_employee": "per employee",
+    "on_request": "Ask us",
+    "included_in_all": "Included in every plan",
+    "not_standalone": "Not sold on its own: it comes inside the plans",
+    "standalone": "Also sold on its own",
+    "included_in": "Included in",
+    "tax_note": "Prices exclude taxes. Tax is applied at the current rate when the invoice is issued.",
+    "catalog_unavailable": "Prices are not available right now. Please try again in a few minutes."
+  },
+  "home": {
+    "kicker": "Payroll and HR software for Peru",
+    "title": "Manage your whole team, from hiring to payslip, in one system.",
+    "subtitle": "Pick the product you need today and add the rest as you grow. They all share the same employee record.",
+    "cta_primary": "See plans and pricing",
+    "cta_secondary": "Explore the Suite",
+    "fine": "No card needed for the trial · We help you migrate · Support in Spanish",
+    "needs_title": "What do you need to solve?",
+    "products_kicker": "Products",
+    "products_title": "A product for every need",
+    "products_lead": "Get them inside a plan or add them later. Open each one to see its features and which plans include it.",
+    "see_product": "See features and plans",
+    "plans_kicker": "Plans",
+    "plans_title": "A plan for every stage of your company",
+    "plans_lead": "Every plan includes Gestia People. Amounts and limits always come from our current catalog.",
+    "compare_all": "Compare everything",
+    "faq_title": "Frequently asked questions",
+    "faq": [
+      {
+        "q": "Can I start with one product and add others later?",
+        "a": "Yes. All products share the same employee record, so adding one does not mean loading data again."
+      },
+      {
+        "q": "What about what is coming soon?",
+        "a": "You can ask us to let you know. It is not charged until it is available and you turn it on."
+      },
+      {
+        "q": "Is my data separate from other companies?",
+        "a": "Yes. Each organization's data is isolated and every access to sensitive data is logged."
+      }
+    ],
+    "closing_title": "Start organizing your team today",
+    "closing_text": "Pick a plan, add what you need and create your organization in minutes."
+  },
+  "products": {
+    "personas": {
+      "need": "Organize records and contracts",
+      "headline": "Digital records and up-to-date contracts",
+      "description": "Complete employee records, contracts with expiry alerts, org chart and documents in one place. It is the base of every GestiaHR product.",
+      "features": [
+        "360 record with dated history",
+        "Contracts, renewals and addenda with alerts",
+        "Versioned digital file",
+        "Org chart, positions and directory",
+        "Employee and manager portals"
+      ],
+      "faq": [
+        {
+          "q": "Can I buy People on its own?",
+          "a": "No need: Gestia People comes in every plan because it is the base of the system."
+        }
+      ]
+    },
+    "tiempo": {
+      "need": "Manage vacation and leave",
+      "headline": "Vacation, absences and working time",
+      "description": "Vacation balances, requests with approval, absences, medical leave and statutory leave. Attendance, shifts and timesheets are coming soon.",
+      "features": [
+        "Vacation balances and requests",
+        "Absences, medical and statutory leave",
+        "Team calendar",
+        "Remote work and right to disconnect",
+        "Attendance and shifts (coming soon)"
+      ],
+      "faq": [
+        {
+          "q": "Do I need Time to use Payroll?",
+          "a": "Yes. Payroll uses the period's vacation and absences, so Payroll requires Time."
+        }
+      ]
+    },
+    "planilla": {
+      "need": "Run payroll and file returns",
+      "headline": "Payroll, payslips and filings",
+      "description": "Payroll calculation with bonuses, severance fund and settlements, payslips for employees and the files for SUNAT and your bank.",
+      "features": [
+        "Calculation by labor regime",
+        "Payslips published in the portal",
+        "PLAME and T-Registro files",
+        "Bank payment files",
+        "Termination settlements"
+      ],
+      "faq": [
+        {
+          "q": "Is Payroll sold on its own?",
+          "a": "It comes inside the plans that include Time, or as an add-on to a plan that already has it."
+        }
+      ]
+    },
+    "talento": {
+      "need": "Hire and evaluate",
+      "headline": "Recruiting, performance and careers",
+      "description": "Recruiting, onboarding, performance reviews, career plans and compensation in the same system.",
+      "features": [
+        "Openings and recruiting",
+        "Guided onboarding",
+        "Performance reviews",
+        "Careers and succession",
+        "Salary review"
+      ],
+      "faq": [
+        {
+          "q": "Can I ask to be notified?",
+          "a": "Yes. Leave your interest and we will let you know when each part is available."
+        }
+      ]
+    },
+    "formacion": {
+      "need": "Train my team",
+      "headline": "Your own courses and certificates",
+      "description": "Upload your courses, assign them by job or area and keep track of who completed what. It does not include a third-party course library.",
+      "features": [
+        "Your own courses",
+        "Assignment by job or area",
+        "Certificates",
+        "Progress tracking"
+      ],
+      "faq": [
+        {
+          "q": "Does it include ready-made courses?",
+          "a": "No. Learning is for your own courses: you upload and assign them."
+        }
+      ]
+    }
+  },
+  "product_page": {
+    "what_title": "What it solves",
+    "features_title": "Features",
+    "parts_title": "What it includes",
+    "plans_title": "Plans that include it",
+    "plans_none": "No published plan includes it yet.",
+    "standalone_title": "Price on its own",
+    "waitlist_title": "Coming soon",
+    "waitlist_text": "This part is coming soon. It cannot be bought yet; you can pick it on the pricing page so we let you know.",
+    "faq_title": "Frequently asked questions",
+    "back_suite": "See all products",
+    "see_pricing": "See pricing"
+  },
+  "suite": {
+    "kicker": "GestiaHR Suite · HCM",
+    "title": "Every product, integrated in one system",
+    "lead": "Each product can be bought inside a plan. The status of each part comes from our current catalog.",
+    "map_title": "Product map",
+    "plans_title": "Complete plans",
+    "extras_title": "Suite add-ons",
+    "extras_text": "Benefits, engagement, help desk, health and safety, analytics and integrations come as add-ons or inside the most complete plan."
+  },
+  "pricing": {
+    "kicker": "Pricing",
+    "title": "A plan for every stage of your company",
+    "lead": "Pick your plan or build your own by adding products. Amounts come from our current catalog.",
+    "cycle_label": "Billing cycle",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "cycle_unavailable": "Not available on this cycle",
+    "tab_plans": "Plans",
+    "tab_products": "Individual products",
+    "products_lead": "Products you can add to a plan, with their price per employee.",
+    "limit_up_to": "Up to {n} employees",
+    "limit_unlimited": "Custom number of employees",
+    "choose_plan": "Choose {plan}",
+    "selected": "Selected",
+    "finder_title": "Not sure which plan suits you?",
+    "finder_lead": "Answer two questions and we will recommend one.",
+    "finder_employees": "How many employees do you have?",
+    "finder_payroll": "Do you need to run payroll in GestiaHR?",
+    "finder_yes": "Yes",
+    "finder_no": "No, only records and vacation for now",
+    "finder_result": "We recommend {plan}.",
+    "finder_none": "No published plan fits: tell us what you need.",
+    "compare_title": "What each plan includes",
+    "compare_feature": "Product and part",
+    "included": "Included",
+    "not_included": "Not included",
+    "addons_title": "Add products to your plan",
+    "addons_lead": "Add products per employee. If one requires another, we add it or let you know.",
+    "employees": "Employees",
+    "subtotal": "Subtotal",
+    "tax": "Tax ({rate} %)",
+    "tax_pending": "Tax: confirmed when the invoice is issued",
+    "total": "Total",
+    "notify_me": "Notify me",
+    "notify_on": "We will let you know",
+    "continue": "Continue with {plan}",
+    "calculating": "Calculating…",
+    "quote_error": "We could not calculate the subtotal. Please try again.",
+    "no_plans": "We are preparing the plans. Come back soon.",
+    "per_employee_month": "per employee per month",
+    "faq_title": "Frequently asked questions",
+    "faq": [
+      {
+        "q": "Do prices include taxes?",
+        "a": "No. Tax is applied at the current rate when the invoice is issued."
+      },
+      {
+        "q": "Can I change plans later?",
+        "a": "Yes. You can upgrade or add products whenever you need."
+      }
+    ]
+  },
+  "signup": {
+    "title": "Sign-up opens very soon",
+    "text": "We kept your choice of plan and products. Soon you will be able to create your organization here in three steps.",
+    "summary": "Your choice",
+    "back": "Back to pricing"
+  },
+  "footer": {
+    "tagline": "Payroll and human resources software for Peru.",
+    "products": "Products",
+    "company": "GestiaHR",
+    "rights": "© GestiaHR"
+  }
+}

@@ -6,7 +6,9 @@ use App\Modules\Platform\Http\Controllers\ConsoleController;
 use App\Modules\Platform\Http\Controllers\ConsoleOperationsController as Ops;
 use App\Modules\Platform\Http\Controllers\FeatureFlagController;
 use App\Modules\Platform\Http\Controllers\HelpArticleController;
+use App\Modules\Platform\Http\Controllers\ModuleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
+use App\Modules\Platform\Http\Controllers\PublicCatalogController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
 use App\Modules\Platform\Http\Controllers\SystemNoticesController;
 use App\Modules\Platform\Http\Controllers\TenantController;
@@ -55,6 +57,11 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::post('/tenants/{id}/modules/{code}/deactivate', [TenantModuleController::class, 'deactivate'])->middleware('platform.permission:platform.subscriptions.update');
 
             // SAS-3 · Planes comerciales (versionados) y complementos.
+            // WEB-2 · Módulos a la venta: el sitio muestra «Disponible» o «Próximamente» según esta marca.
+            Route::get('/modules', [ModuleController::class, 'index'])->middleware('platform.permission:platform.plans.view');
+            Route::post('/modules/{code}/publish', [ModuleController::class, 'publish'])->middleware('platform.permission:platform.plans.activate');
+            Route::post('/modules/{code}/unpublish', [ModuleController::class, 'unpublish'])->middleware('platform.permission:platform.plans.activate');
+
             Route::get('/plans', [PlanController::class, 'index'])->middleware('platform.permission:platform.plans.view');
             Route::post('/plans', [PlanController::class, 'store'])->middleware('platform.permission:platform.plans.create');
             Route::get('/plans/{id}', [PlanController::class, 'show'])->middleware('platform.permission:platform.plans.view');
@@ -160,4 +167,13 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/system-notices', SystemNoticesController::class);
     // SAS-11 · Plan, comprobantes electrónicos con su constancia, pagos y saldo de la organización.
     Route::get('/billing/account', [BillingController::class, 'mine'])->middleware('permission:settings.organization.view');
+});
+
+/*
+ * WEB-2 · WEB-4 · API pública del sitio gestiahr.com: sin sesión, solo lectura del catálogo de la plataforma.
+ * Desde el host de una organización responde 404 (ConsoleBoundary), igual que la consola.
+ */
+Route::prefix('api/v1/public')->middleware(['api', ConsoleBoundary::ALIAS, 'throttle:120,1'])->group(function (): void {
+    Route::get('/catalog', [PublicCatalogController::class, 'catalog']);
+    Route::get('/quote', [PublicCatalogController::class, 'quote']);
 });

@@ -7,7 +7,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
 | Primer corte comercial (MVP) | 241 | 168 | 0 | 69,7 % |
-| Backlog completo | 512 | 168 | 0 | 32,8 % |
+| Backlog completo | 512 | 172 | 0 | 33,6 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -99,10 +99,10 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | CFG-8 | Calendarios, feriados y calendario de RRHH | CFG | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Calendarios de feriados con precarga del Perú; GET /calendar?from&to&sources reúne las fuentes que registra cada módulo (feriados y tareas) según módulo contratado, permiso y alcance; cada elemento enlaza a su registro; pantalla Calendario mensual con filtro y lista en móvil. Pendiente: cumpleaños, vacaciones, contratos y capacitaciones con su CalendarSource. |
 | CFG-9 | Papelera y restauración | CFG | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-11 | Papelera con restauración y depuración definitiva diaria (trash:purge, 03:50) al vencer papelera.dias_restauracion; los registros aún referenciados se conservan y se reintentan; cada depuración queda en auditoría. Hoy aplica a roles y campos personalizados. |
 | CFG-10 | Catálogos maestros | CFG | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Catálogos maestros: tipos de documento (Tabla 3), países es/en/pt, departamentos de ubigeo, bancos y motivos de cese (Tabla 17); catalogs:import sin despliegue y sin borrar; elementos propios por organización, archivados con auditoría; pantalla Catálogos. Pendiente: provincias y distritos INEI, códigos de banco «por validar», pantalla en consola (SAS-1). |
-| WEB-1 | Aplicación del sitio comercial y su CMS | WEB | Fase 0 · Cimientos | Task | — | pendiente | — |  |
-| WEB-2 | Catálogo de productos ligado a los módulos | WEB | Fase 0 · Cimientos | Task | — | pendiente | — |  |
-| WEB-3 | Inicio, páginas de producto y página de la Suite | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
-| WEB-4 | Precios, comparador y selector de módulos | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
+| WEB-1 | Aplicación del sitio comercial y su CMS | WEB | Fase 0 · Cimientos | Task | — | hecha | 2026-11-20 | Aplicación apps/site (Next 15, puerto 3001) con CMS de contenido versionado es/en/pt, SEO (canónica, hreflang, sitemap) y noindex fuera de producción; solo usa la API pública. |
+| WEB-2 | Catálogo de productos ligado a los módulos | WEB | Fase 0 · Cimientos | Task | — | hecha | 2026-11-20 | Catálogo público con productos según módulos publicados, planes con precio del catálogo y complementos; la consola publica o retira módulos (auditado). |
+| WEB-3 | Inicio, páginas de producto y página de la Suite | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | Inicio, cinco páginas de producto y /suite; precios leídos del catálogo, «Consultar» sin precio cargado, lista de espera en lo «Próximamente». |
+| WEB-4 | Precios, comparador y selector de módulos | WEB | Fase 0 · Cimientos | Story | — | hecha | 2026-11-20 | /precios con comparador y selector de módulos; cotización en el servidor (requisitos, «Avísame» sin cobro, sin total mientras el IGV esté por validar). |
 | WEB-5 | Registro de prueba y suscripción en tres pasos | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
 | WEB-6 | Agendar demo, contacto y partners | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |
 | WEB-7 | Lista de espera de lo que está en «Próximamente» | WEB | Fase 0 · Cimientos | Story | — | pendiente | — |  |

@@ -269,11 +269,13 @@ CREATE TABLE modules (
   is_core boolean NOT NULL DEFAULT false,
   epic_codes text[] NOT NULL,
   description text,
+  is_published boolean NOT NULL DEFAULT false,
+  published_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_modules_code UNIQUE (code)
 );
-COMMENT ON TABLE modules IS 'Módulos comerciales que una organización puede contratar; agrupan épicas del backlog.';
+COMMENT ON TABLE modules IS 'Módulos comerciales que una organización puede contratar; agrupan épicas del backlog. is_published: el módulo está a la venta (WEB-2: el sitio lo muestra «Disponible»; si no, «Próximamente» con lista de espera); lo cambia la consola.';
 CREATE TRIGGER trg_modules_touch BEFORE UPDATE ON modules FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE module_dependencies (
@@ -14886,6 +14888,7 @@ INSERT INTO modules (code, name, phase, is_core, epic_codes, description) VALUES
   ('whatsapp', 'WhatsApp', 9, false, ARRAY['WHA'], 'Épicas: WHA.'),
   ('white_label', 'Marca blanca', 9, false, ARRAY['WLB'], 'Épicas: WLB.'),
   ('partner', 'Estudio contable', 9, false, ARRAY['EST'], 'Épicas: EST.');
+UPDATE modules SET is_published = true, published_at = now() WHERE code IN ('base', 'core', 'time_off');
 INSERT INTO module_dependencies (module_code, depends_on_code, is_required) VALUES
   ('core', 'base', true),
   ('attendance', 'core', true),

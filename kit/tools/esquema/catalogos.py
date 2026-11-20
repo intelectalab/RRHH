@@ -34,6 +34,8 @@ _DESC = {
 for _m in MODULES:
     _m[7] = _DESC.get(_m[0], f'Épicas: {", ".join(_m[4])}.')
 MODULES = [tuple(m) for m in MODULES]
+# WEB-2 · módulos publicados (a la venta) en la carga inicial; Planilla se publica desde la consola cuando su motor esté listo.
+PUBLISHED_MODULES = ('base', 'core', 'time_off')
 EPIC_MODULE = {e: m[0] for m in MODULES for e in m[4]}
 EPIC_MODULE.setdefault('SAS', 'base')   # la consola SaaS no es un módulo contratable
 EPIC_MODULE.setdefault('PAI', 'base')   # si el documento 01 no asigna PAI, sus permisos van a la base

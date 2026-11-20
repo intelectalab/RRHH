@@ -237,6 +237,8 @@ def seeds():
     o.append("INSERT INTO currencies (code, name, symbol) VALUES ('PEN', 'Sol', 'S/'), ('USD', 'Dólar estadounidense', '$'), ('EUR', 'Euro', '€');")
     o.append('INSERT INTO modules (code, name, phase, is_core, epic_codes, description) VALUES')
     o.append(',\n'.join(f"  ({q(c)}, {q(n)}, {ph}, {str(core).lower()}, ARRAY[{','.join(q(e) for e in ep)}], {q(d)})" for c, n, ph, core, ep, req, rec, d in C.MODULES) + ';')
+    # WEB-2 · módulos a la venta al primer corte comercial (docs/01 §5.1); después los publica la consola.
+    o.append('UPDATE modules SET is_published = true, published_at = now() WHERE code IN (' + ', '.join(q(c) for c in C.PUBLISHED_MODULES) + ');')
     deps = [(c, r, True) for c, n, ph, core, ep, req, rec, d in C.MODULES for r in req] + [(c, r, False) for c, n, ph, core, ep, req, rec, d in C.MODULES for r in rec]
     o.append('INSERT INTO module_dependencies (module_code, depends_on_code, is_required) VALUES')
     o.append(',\n'.join(f"  ({q(a)}, {q(b)}, {str(r).lower()})" for a, b, r in deps) + ';')

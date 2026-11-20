@@ -466,7 +466,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/platform/web-complaints` | `platform.web_complaints.view` | 0 |
 | GET | `/platform/web-complaints/{id}` | `platform.web_complaints.view` | 0 |
 | POST | `/platform/web-complaints/{id}/{answer,close}` | `platform.web_complaints.{answer,close}` | 0 |
+| GET | `/platform/modules` | `platform.plans.view` | 0 |
+| POST | `/platform/modules/{code}/publish` | `platform.plans.activate` | 0 |
+| POST | `/platform/modules/{code}/unpublish` | `platform.plans.activate` | 0 |
 | GET | `/public/catalog` | público | 0 |
+| GET | `/public/quote` | público | 0 |
 | GET | `/public/ruc/{ruc}` | público | 0 |
 | GET | `/public/subdomains/{slug}` | público | 0 |
 | POST | `/public/signups` | público | 0 |

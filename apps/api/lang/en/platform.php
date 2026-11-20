@@ -157,4 +157,17 @@ return [
             'incidents_in_period' => 'Incidents that started within the period.',
         ],
     ],
+    'web' => [
+        'unknown_addon' => 'Add-on not found: :codes.',
+        'notices' => [
+            'cycle_unavailable' => 'This plan is not offered with that billing cycle; ask us for the price.',
+            'exceeds_limit' => 'The plan allows up to :limit employees; a larger plan suits you better.',
+            'already_included' => ':addon is already included in the plan.',
+            'waitlist' => ':addon is coming soon: we will let you know and it is not charged.',
+            'requirement_added' => ':addon requires :required; we added it to your selection.',
+            'requirement_missing' => ':addon requires :module, which is not offered as an add-on yet.',
+            'price_on_request' => 'A price is not published yet: contact us.',
+            'tax_pending' => 'Tax is confirmed when the invoice is issued.',
+        ],
+    ],
 ];

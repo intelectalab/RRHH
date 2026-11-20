@@ -420,6 +420,9 @@ EXTRA = [
     ("SAS", 0, "get", "/platform/tenants/{id}/modules", "platform.subscriptions.view", "Consola SaaS: módulos comerciales de la organización (activos, en solo lectura o no contratados) y sus dependencias", False),
     ("SAS", 0, "post", "/platform/tenants/{id}/modules/{code}/activate", "platform.subscriptions.update", "Consola SaaS: activar un módulo en la organización sin migrar datos (activa también sus dependencias)", False),
     ("SAS", 0, "post", "/platform/tenants/{id}/modules/{code}/deactivate", "platform.subscriptions.update", "Consola SaaS: retirar un módulo; sus datos se conservan en solo lectura durante la transición (RN-SAS-06)", False),
+    ("WEB", 0, "get", "/platform/modules", "platform.plans.view", "Consola SaaS: módulos comerciales con sus dependencias y si están a la venta (publicados) en el sitio", False),
+    ("WEB", 0, "post", "/platform/modules/{code}/publish", "platform.plans.activate", "Consola SaaS: poner un módulo a la venta; el sitio deja de mostrarlo en «Próximamente» (WEB-2)", False),
+    ("WEB", 0, "post", "/platform/modules/{code}/unpublish", "platform.plans.activate", "Consola SaaS: retirar un módulo de la venta; el sitio lo vuelve a mostrar en «Próximamente»", False),
     ("SAS", 0, "get", "/platform/plans/{id}/versions", "platform.plans.view", "Consola SaaS: versiones de un plan (editar un plan con suscriptores crea la siguiente y conserva la anterior para ellos)", False),
     ("SAS", 0, "get", "/platform/subscriptions/{id}/events", "platform.subscriptions.view", "Consola SaaS: historial de la suscripción, cada cambio con su autor", False),
     ("SAS", 0, "post", "/platform/subscriptions/{id}/convert", "platform.subscriptions.change_plan", "Consola SaaS: convertir una suscripción en prueba (o vencida) en activa; la organización vuelve a operar (ME-40 convertir o regularizar)", False),
@@ -475,6 +478,7 @@ EXTRA = [
     ("SAS", 0, "get", "/platform/technical-logs", "platform.logs.view", "Consola SaaS: logs técnicos estructurados (ya sin datos sensibles) filtrados por organización, usuario, nivel y fecha", False),
     ("SAS", 0, "get", "/usage", "settings.organization.view", "Consumo de la organización frente a los límites de su plan (colaboradores, administradores, empresas, almacenamiento, llamadas a la API; SAS-6)", False),
     ("WEB", 0, "get", "/public/catalog", None, "Sitio: productos, planes públicos con módulos, límites y complementos, y estado de cada módulo", True),
+    ("WEB", 0, "get", "/public/quote", None, "Sitio: cotización de un plan con complementos para cierta cantidad de colaboradores (WEB-4): subtotal, impuesto vigente y total desde los precios de la consola; agrega o avisa los módulos requeridos y no cobra lo que está en «Próximamente»", True),
     ("WEB", 0, "get", "/public/ruc/{ruc}", None, "Sitio: validar un RUC (dígito verificador, razón social y si ya está registrado)", True),
     ("WEB", 0, "get", "/public/subdomains/{slug}", None, "Sitio: disponibilidad de un subdominio", True),
     ("WEB", 0, "post", "/public/signups", None, "Sitio: iniciar un registro de prueba o suscripción (paso cuenta)", True),
@@ -855,6 +859,12 @@ QUERY = {
     ("get", "/headcount-scenarios/compare"): [
         _q("ids", "Identificadores de los escenarios separados por coma (de 2 a 4)", True),
     ],
+    ("get", "/public/quote"): [
+        _q("plan", "Código del plan público", True),
+        _q("employees", "Cantidad de colaboradores (entero de 1 en adelante)", True),
+        _q("cycle", "monthly o annual; por defecto, el ciclo del plan"),
+        _q("addons", "Códigos de complementos separados por coma"),
+    ],
     ("get", "/platform/metrics"): [
         _q("from", "Inicio del periodo (AAAA-MM-DD); por defecto, hace 30 días", False, "date"),
         _q("to", "Fin del periodo (AAAA-MM-DD); por defecto, hoy", False, "date"),
@@ -982,7 +992,7 @@ ERRS = {
 }
 
 # Consultas que pueden responder 422 por una regla de negocio (CFG-7: falta el tipo de cambio).
-GET_RULES = {('get', '/employments/{employment_id}/absence-summary'), ('get', '/exchange-rates/convert'), ('get', '/headcount'), ('get', '/payroll-calculation-order'), ('get', '/platform/activity-events'), ('get', '/platform/audit-events'), ('get', '/platform/backup-restores'), ('get', '/platform/backups'), ('get', '/platform/health'), ('get', '/platform/health/failed-jobs'), ('get', '/platform/health/outbox-events'), ('get', '/platform/invoices'), ('get', '/platform/support-sessions'), ('get', '/platform/technical-logs')}
+GET_RULES = {('get', '/employments/{employment_id}/absence-summary'), ('get', '/exchange-rates/convert'), ('get', '/headcount'), ('get', '/payroll-calculation-order'), ('get', '/platform/activity-events'), ('get', '/platform/audit-events'), ('get', '/platform/backup-restores'), ('get', '/platform/backups'), ('get', '/platform/health'), ('get', '/platform/health/failed-jobs'), ('get', '/platform/health/outbox-events'), ('get', '/platform/invoices'), ('get', '/platform/support-sessions'), ('get', '/platform/technical-logs'), ('get', '/public/quote')}
 # Operaciones que dependen de un proveedor externo por su puerto (503 upstream_unavailable).
 UPSTREAM = {("post", "/exchange-rates/import")}
 
