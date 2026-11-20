@@ -12,6 +12,7 @@ use App\Modules\Payroll\Http\Controllers\PayrollReviewController;
 use App\Modules\Payroll\Http\Controllers\PayrollRunController;
 use App\Modules\Payroll\Http\Controllers\PayslipController;
 use App\Modules\Payroll\Http\Controllers\SmallBusinessController;
+use App\Modules\Payroll\Http\Controllers\SocialBenefitsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -92,6 +93,14 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     // PER-9 · Planilla complementaria de un periodo cerrado.
     Route::post('/payroll-periods/{id}/complementary', [PayrollPeriodController::class, 'complementary'])->middleware('permission:payroll.periods.create');
     // PER-10 · Lotes de pago por banco, archivo bancario, confirmación y registro del pago del periodo.
+    // BSO-2 y BSO-3 · Depósitos de CTS y distribución de utilidades.
+    Route::get('/payroll-periods/{id}/cts-deposits', [SocialBenefitsController::class, 'ctsDeposits'])->middleware('permission:payroll.benefit_runs.view');
+    Route::post('/cts-deposits/{id}/deposit', [SocialBenefitsController::class, 'deposit'])->middleware('permission:payroll.benefit_runs.manage_cts');
+    Route::get('/profit-sharing-distributions', [SocialBenefitsController::class, 'index'])->middleware('permission:payroll.benefit_runs.view');
+    Route::post('/profit-sharing-distributions', [SocialBenefitsController::class, 'store'])->middleware('permission:payroll.benefit_runs.configure_profit_sharing');
+    Route::get('/profit-sharing-distributions/{id}', [SocialBenefitsController::class, 'show'])->middleware('permission:payroll.benefit_runs.view');
+    Route::post('/profit-sharing-distributions/{id}/calculate', [SocialBenefitsController::class, 'calculate'])->middleware('permission:payroll.benefit_runs.configure_profit_sharing');
+    Route::post('/profit-sharing-distributions/{id}/approve', [SocialBenefitsController::class, 'approve'])->middleware('permission:payroll.benefit_runs.approve');
     Route::get('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'batches'])->middleware('permission:payroll.periods.view');
     Route::post('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'prepareBatches'])->middleware('permission:payroll.periods.mark_paid');
     Route::post('/payroll-periods/{id}/mark-paid', [PayrollPeriodController::class, 'markPaid'])->middleware('permission:payroll.periods.mark_paid');

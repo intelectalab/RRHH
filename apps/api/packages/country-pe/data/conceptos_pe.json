@@ -43,7 +43,12 @@
       "nota": "BSO-5 · Los días de descanso vacacional se pagan con la remuneración vacacional, no con la básica.",
       "formula_motor": "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio + dias_vacaciones)",
       "condicion_motor": null,
-      "orden": 10
+      "orden": 10,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "asig_familiar",
@@ -80,7 +85,12 @@
       "nota": "BSO-4 · Solo con hijos con sustento vigente en derechohabientes (COL-6) y en los regímenes donde corresponde; el monto cambia solo con la RMV.",
       "formula_motor": "param.rmv * param.asignacion_familiar_pct_rmv / 100",
       "condicion_motor": "tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1",
-      "orden": 20
+      "orden": 20,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "he_tramo1",
@@ -115,7 +125,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "he_tramo2",
@@ -150,7 +165,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "trabajo_nocturno",
@@ -185,7 +205,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "feriado_trabajado",
@@ -218,7 +243,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "comisiones",
@@ -251,7 +281,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "bono_productividad",
@@ -284,7 +319,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "bono_extraordinario",
@@ -317,7 +357,12 @@
       "nota": "A título de liberalidad, no regular.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "movilidad",
@@ -350,7 +395,12 @@
       "nota": "Condición de trabajo; validar tratamiento tributario según el caso.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "teletrabajo_gastos",
@@ -383,7 +433,12 @@
       "nota": "Concepto no remunerativo (Ley 31572).",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "rem_vacacional",
@@ -416,7 +471,12 @@
       "nota": "BSO-5 · Días gozados del libro de vacaciones con su periodo vacacional en la traza. Base: sueldo vigente (la asignación familiar se paga aparte en el mes); remuneración computable con promedios por validar con el especialista.",
       "formula_motor": "sueldo / dias_base * dias_vacaciones",
       "condicion_motor": "dias_vacaciones > 0",
-      "orden": 15
+      "orden": 15,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "vacaciones_compra",
@@ -449,7 +509,12 @@
       "nota": "BSO-5 · Días vendidos con acuerdo firmado (VAC-6) que la planilla toma como incidencia; base por validar.",
       "formula_motor": "sueldo / dias_base * cantidad.vacaciones_compra",
       "condicion_motor": "cantidad.vacaciones_compra > 0",
-      "orden": 16
+      "orden": 16,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "subsidio_incapacidad",
@@ -482,7 +547,12 @@
       "nota": "A cargo de la seguridad social; el empleador adelanta y recupera.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "subsidio_maternidad",
@@ -515,7 +585,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "gratificacion",
@@ -534,8 +609,12 @@
       },
       "formula": "remuneracion_computable * meses_completos / 6 * factor_regimen",
       "parametros_legales": [
+        "gratificacion_aplica",
         "gratificacion_factor",
-        "gratificacion_meses"
+        "gratificacion_meses",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
       ],
       "codigo_plame": "0406",
       "codigo_plame_verificado": true,
@@ -548,10 +627,13 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "Inafecta a aportes por Ley 30334.",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "Inafecta a aportes por Ley 30334. BSO-1 · Remuneración computable: sueldo vigente al fin del semestre más la asignación familiar; el promedio de remuneraciones variables regulares queda por validar con el especialista (RN-BSO-12). Meses calendario completos del semestre (enero-junio o julio-diciembre).",
+      "formula_motor": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) * param.gratificacion_factor * meses_computables / 6",
+      "condicion_motor": "param.gratificacion_aplica = 1 y meses_computables > 0",
+      "orden": 50,
+      "procesos": [
+        "gratification"
+      ]
     },
     {
       "codigo": "bonif_extraordinaria",
@@ -570,7 +652,8 @@
       },
       "formula": "gratificacion * param(gratificacion_bonificacion_extraordinaria_pct) / 100",
       "parametros_legales": [
-        "gratificacion_bonificacion_extraordinaria_pct"
+        "gratificacion_bonificacion_extraordinaria_pct",
+        "gratificacion_bonificacion_extraordinaria_eps_pct"
       ],
       "codigo_plame": "0312",
       "codigo_plame_verificado": true,
@@ -583,10 +666,13 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": "concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_pct / 100",
+      "nota": "BSO-1 · Para afiliados a EPS usa su propio porcentaje (por validar: sin valor, el cálculo lo reporta).",
+      "formula_motor": "si(sistema_salud = \"eps\", concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_eps_pct / 100, concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_pct / 100)",
       "condicion_motor": null,
-      "orden": 60
+      "orden": 60,
+      "procesos": [
+        "gratification"
+      ]
     },
     {
       "codigo": "gratificacion_trunca",
@@ -616,10 +702,13 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
+      "nota": "BSO-1 · Misma regla de la gratificación sobre los meses del semestre hasta el cese; la calcula la liquidación (LIQ).",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "settlement"
+      ]
     },
     {
       "codigo": "cts",
@@ -638,8 +727,14 @@
       },
       "formula": "(remuneracion_computable + gratificacion * param(cts_fraccion_gratificacion)) * meses / 12",
       "parametros_legales": [
+        "cts_aplica",
         "cts_fraccion_gratificacion",
-        "cts_meses_deposito"
+        "cts_meses_deposito",
+        "cts_dias_por_anio",
+        "dias_base_mes",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
       ],
       "codigo_plame": "0904",
       "codigo_plame_verificado": true,
@@ -652,10 +747,13 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "BSO-2 · Semestre de CTS que termina el mes anterior al depósito (noviembre-abril o mayo-octubre). Remuneración computable: sueldo vigente más asignación familiar más la fracción de la última gratificación del semestre; la proporción del régimen sale de sus días de remuneración por año (pequeña empresa: 15; el tope acumulado de 90 días queda por validar). Promedios de variables por validar (RN-BSO-12).",
+      "formula_motor": "((sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) + gratificacion_ultima * param.cts_fraccion_gratificacion) / param.dias_base_mes * param.cts_dias_por_anio * (meses_computables / 12 + dias_computables / (12 * param.dias_base_mes))",
+      "condicion_motor": "param.cts_aplica = 1 y meses_computables + dias_computables > 0",
+      "orden": 70,
+      "procesos": [
+        "cts"
+      ]
     },
     {
       "codigo": "utilidades",
@@ -687,10 +785,13 @@
       ],
       "proyeccion_quinta": "extraordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "BSO-3 · Monto de la liquidación individual de la distribución aprobada del ejercicio anterior (parte por días más parte por remuneraciones, con tope).",
+      "formula_motor": "utilidades_asignadas",
+      "condicion_motor": "utilidades_asignadas > 0",
+      "orden": 80,
+      "procesos": [
+        "profit_sharing"
+      ]
     },
     {
       "codigo": "vacaciones_truncas",
@@ -723,7 +824,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "indemnizacion_vacacional",
@@ -758,7 +864,12 @@
       "nota": "BSO-5 · Días sin gozar de periodos vencidos; entra como incidencia pendiente de visto bueno para revisión de RRHH (no alcanza a quien decidió no gozarlas: por validar).",
       "formula_motor": "sueldo / dias_base * cantidad.indemnizacion_vacacional * param.indemnizacion_vacacional_aplica",
       "condicion_motor": "cantidad.indemnizacion_vacacional > 0",
-      "orden": 17
+      "orden": 17,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "indemnizacion_despido",
@@ -791,7 +902,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "afp_aporte",
@@ -826,7 +942,12 @@
       "nota": "",
       "formula_motor": "base.pension * param.afp_aporte_obligatorio_pct / 100",
       "condicion_motor": "sistema_pension = \"afp\"",
-      "orden": 100
+      "orden": 100,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "afp_comision",
@@ -862,7 +983,12 @@
       "nota": "",
       "formula_motor": "si(afp_comision_tipo = \"mixed\", base.pension * param.afp_comision_mixta_pct / 100, base.pension * param.afp_comision_flujo_pct / 100)",
       "condicion_motor": "sistema_pension = \"afp\"",
-      "orden": 100
+      "orden": 100,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "afp_prima",
@@ -898,7 +1024,12 @@
       "nota": "",
       "formula_motor": "min(base.pension, param.afp_remuneracion_maxima_asegurable) * param.afp_prima_seguro_pct / 100",
       "condicion_motor": "sistema_pension = \"afp\"",
-      "orden": 100
+      "orden": 100,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "onp_aporte",
@@ -933,7 +1064,12 @@
       "nota": "",
       "formula_motor": "base.pension * param.onp_aporte_pct / 100",
       "condicion_motor": "sistema_pension = \"onp\"",
-      "orden": 100
+      "orden": 100,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "renta_quinta",
@@ -970,7 +1106,14 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement",
+        "gratification",
+        "profit_sharing"
+      ]
     },
     {
       "codigo": "essalud",
@@ -1006,7 +1149,12 @@
       "nota": "CPT-7 · El código de la serie 0800 de la Tabla 22 (aportes del empleador) no se pudo leer en la revisión del 01-10-2025: se carga cuando el especialista lo coteje (docs/18 §3.2).",
       "formula_motor": "max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100",
       "condicion_motor": "sistema_salud <> \"sis\"",
-      "orden": 200
+      "orden": 200,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "essalud_credito_eps",
@@ -1041,7 +1189,12 @@
       "nota": "PER-6 · Resta del aporte de salud el crédito por EPS cuando el trabajador está en una EPS; porcentaje y tope por validar (Ley 26790).",
       "formula_motor": "0 - concepto.essalud * param.eps_credito_pct / 100",
       "condicion_motor": "sistema_salud = \"eps\"",
-      "orden": 210
+      "orden": 210,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "sctr",
@@ -1074,7 +1227,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "vida_ley",
@@ -1107,7 +1265,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "dscto_prestamo",
@@ -1140,7 +1303,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "dscto_adelanto",
@@ -1173,7 +1341,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "dscto_judicial",
@@ -1206,7 +1379,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cuota_sindical",
@@ -1239,7 +1417,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "tardanzas",
@@ -1272,7 +1455,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "faltas",
@@ -1305,7 +1493,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "eps_copago",
@@ -1338,7 +1531,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "prov_cts",
@@ -1371,7 +1569,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "prov_gratificacion",
@@ -1404,7 +1607,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "prov_vacaciones",
@@ -1437,7 +1645,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "renta_quinta_devolucion",
@@ -1470,7 +1683,12 @@
       "nota": "No es ingreso: devuelve una retención. Ver docs/18 §2.7.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "bonif_extraordinaria_trunca",
@@ -1505,7 +1723,12 @@
       "nota": "",
       "formula_motor": "concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100",
       "condicion_motor": null,
-      "orden": 60
+      "orden": 60,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_jornal",
@@ -1536,7 +1759,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_dominical",
@@ -1567,7 +1795,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_buc",
@@ -1598,7 +1831,12 @@
       "nota": "Afectaciones por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_movilidad",
@@ -1629,7 +1867,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_escolar",
@@ -1661,7 +1904,12 @@
       "nota": "Afectaciones por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_altura",
@@ -1692,7 +1940,12 @@
       "nota": "Afectaciones por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_agua",
@@ -1723,7 +1976,12 @@
       "nota": "Afectaciones por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_nocturno",
@@ -1754,7 +2012,12 @@
       "nota": "Porcentaje por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_altas_temperaturas",
@@ -1785,7 +2048,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_bae",
@@ -1816,7 +2084,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_gratificacion",
@@ -1849,7 +2122,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_comp_vacacional",
@@ -1881,7 +2159,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_comp_tiempo_servicios",
@@ -1913,7 +2196,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "cc_conafovicer",
@@ -1944,7 +2232,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "agr_rb",
@@ -1973,7 +2266,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "agr_gratif_pror",
@@ -2004,7 +2302,12 @@
       "nota": "Solo con opción de prorrateo.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "agr_cts_pror",
@@ -2035,7 +2338,12 @@
       "nota": "Solo con opción de prorrateo.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "agr_beta",
@@ -2067,7 +2375,12 @@
       "nota": "No remunerativa. Tratamiento en quinta por confirmar.",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     },
     {
       "codigo": "agr_essalud",
@@ -2098,7 +2411,12 @@
       "nota": "",
       "formula_motor": null,
       "condicion_motor": null,
-      "orden": null
+      "orden": null,
+      "procesos": [
+        "regular",
+        "special",
+        "settlement"
+      ]
     }
   ]
 }

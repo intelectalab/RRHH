@@ -51,6 +51,10 @@ test('caso dorado del motor', function (string $case): void {
             DB::table('employment_labor_regimes')->insert(['tenant_id' => GLD_TENANT, 'employment_id' => $employment, 'labor_regime_code' => $r['code'],
                 'valid_from' => $r['valid_from'], 'valid_to' => $r['valid_to'] ?? null]);
         }
+        // BSO-2 · Entidad depositaria de la CTS (sin ella la relación queda con error, RN-BSO-05).
+        if (! empty($input['employment']['cts_account'])) {
+            PayrollFixtures::ctsAccount($employment);
+        }
         foreach ($input['concepts'] as $c) {
             PayrollFixtures::concept($c);
         }

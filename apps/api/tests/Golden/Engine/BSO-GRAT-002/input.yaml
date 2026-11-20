@@ -1,0 +1,12 @@
+period: { from: "2026-07-01", to: "2026-07-31", kind: gratification }
+employment:
+  hire_date: "2026-03-01"
+  regime: pe_pequena
+  cts_account: false
+  compensations:
+    - { amount: "2400.00", valid_from: "2026-03-01" }
+incidents: {}
+variables: {}
+concepts:
+  - { code: "gratificacion", kind: "earning", formula: "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) * param.gratificacion_factor * meses_computables / 6", sort_order: 50, kinds: [gratification], condition: "param.gratificacion_aplica = 1 y meses_computables > 0" }
+  - { code: "bonif_extraordinaria", kind: "earning", formula: "si(sistema_salud = \"eps\", concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_eps_pct / 100, concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_pct / 100)", sort_order: 60, kinds: [gratification] }

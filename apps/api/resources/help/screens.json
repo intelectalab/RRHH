@@ -323,6 +323,12 @@
     "portal.payslips": {
       "module": "payroll",
       "permissions": []
+    },
+    "payroll.benefits": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.benefit_runs.view"
+      ]
     }
   }
 }

@@ -1,0 +1,11 @@
+status: calculated
+segments:
+  - { from: "2026-05-01", to: "2026-05-31", days: 30 }
+lines:
+  cts: "1750.00"
+totals:
+  earnings: "1750.00"
+  deductions: "0.00"
+  net: "1750.00"
+  employer_contributions: "0.00"
+  employer_cost: "1750.00"
