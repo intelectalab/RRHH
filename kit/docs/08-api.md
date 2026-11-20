@@ -1191,6 +1191,10 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/settlements/{id}` | `payroll.settlements.{view,update}` | 3 |
 | POST | `/settlements/{id}/{calculate,approve,mark-paid,void}` | `payroll.settlements.{calculate,approve,mark_paid,void}` | 3 |
 | POST | `/settlements/simulate` | `payroll.settlements.simulate` | 3 |
+| POST | `/settlements/{id}/submit` | `payroll.settlements.calculate` | 3 |
+| POST | `/settlements/{id}/return` | `payroll.settlements.approve` | 3 |
+| POST | `/settlements/{id}/documents` | `payroll.settlements.mark_paid` | 3 |
+| POST | `/settlements/{id}/deliver-documents` | `payroll.settlements.mark_paid` | 3 |
 
 **LOC · Locadores**
 

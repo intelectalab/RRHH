@@ -135,6 +135,19 @@ final class DomainEventTypes
     // PER-10 · RN-PER-12 · Pago del periodo registrado (lotes confirmados).
     public const PAYROLL_PAID = 'payroll.paid.v1';
 
+    // LIQ-1 a LIQ-4 · ME-23: liquidación de beneficios sociales al cese.
+    public const SETTLEMENT_CALCULATED = 'settlement.calculated.v1';
+
+    public const SETTLEMENT_APPROVED = 'settlement.approved.v1';
+
+    public const SETTLEMENT_PAID = 'settlement.paid.v1';
+
+    public const SETTLEMENT_DOCUMENTS_ISSUED = 'settlement.documents_issued.v1';
+
+    public const SETTLEMENT_VOIDED = 'settlement.voided.v1';
+
+    public const SETTLEMENT_PAYMENT_DUE = 'settlement.payment_due.v1';
+
     // DEC-2 a DEC-4 · ME-24 · Declaración o archivo oficial: generado, validado, presentado, aceptado, observado y rectificado.
     public const FILING_STATUS_CHANGED = 'filing.status_changed.v1';
 
@@ -555,6 +568,12 @@ final class DomainEventTypes
             'required_fields' => ['period_id', 'paid_at', 'batches'],
             'description' => 'Pago del periodo de planilla registrado con sus lotes confirmados',
         ],
+        self::SETTLEMENT_CALCULATED => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'termination_date'], 'description' => 'Liquidación de beneficios sociales calculada o recalculada con su traza (ME-23)'],
+        self::SETTLEMENT_APPROVED => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'approved_by'], 'description' => 'Liquidación aprobada por alguien distinto de quien la calculó: queda inmutable (RN-LIQ-06, RN-LIQ-07)'],
+        self::SETTLEMENT_PAID => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'paid_on', 'on_time'], 'description' => 'Liquidación pagada: dispara documentos de cese y bajas en T-Registro y seguros (RN-LIQ-08)'],
+        self::SETTLEMENT_DOCUMENTS_ISSUED => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'document_ids'], 'description' => 'Documentos de cese firmados entregados y publicados en el portal del ex colaborador (LIQ-4)'],
+        self::SETTLEMENT_VOIDED => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'reason'], 'description' => 'Liquidación anulada antes de aprobarse (cese revertido)'],
+        self::SETTLEMENT_PAYMENT_DUE => ['version' => 1, 'required_fields' => ['settlement_id', 'employment_id', 'due_at'], 'description' => 'El plazo legal de pago de una liquidación está por vencer o venció sin pago (RN-LIQ-02)'],
         self::FILING_STATUS_CHANGED => [
             'version' => 1,
             'required_fields' => ['filing_id', 'kind', 'period_code', 'status'],

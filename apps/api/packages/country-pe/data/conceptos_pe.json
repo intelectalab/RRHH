@@ -40,9 +40,9 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "BSO-5 · Los días de descanso vacacional se pagan con la remuneración vacacional, no con la básica.",
+      "nota": "BSO-5 · Los días de descanso vacacional se pagan con la remuneración vacacional, no con la básica. LIQ-1 · En la liquidación solo se paga si se pide la remuneración pendiente (si no, la paga la planilla del mes).",
       "formula_motor": "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio + dias_vacaciones)",
-      "condicion_motor": null,
+      "condicion_motor": "remuneracion_del_mes = 1",
       "orden": 10,
       "procesos": [
         "regular",
@@ -84,7 +84,7 @@
       "rol_monto": "accrued_and_paid",
       "nota": "BSO-4 · Solo con hijos con sustento vigente en derechohabientes (COL-6) y en los regímenes donde corresponde; el monto cambia solo con la RMV.",
       "formula_motor": "param.rmv * param.asignacion_familiar_pct_rmv / 100",
-      "condicion_motor": "tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1",
+      "condicion_motor": "tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1 y remuneracion_del_mes = 1",
       "orden": 20,
       "procesos": [
         "regular",
@@ -470,7 +470,7 @@
       "rol_monto": "accrued_and_paid",
       "nota": "BSO-5 · Días gozados del libro de vacaciones con su periodo vacacional en la traza. Base: sueldo vigente (la asignación familiar se paga aparte en el mes); remuneración computable con promedios por validar con el especialista.",
       "formula_motor": "sueldo / dias_base * dias_vacaciones",
-      "condicion_motor": "dias_vacaciones > 0",
+      "condicion_motor": "dias_vacaciones > 0 y remuneracion_del_mes = 1",
       "orden": 15,
       "procesos": [
         "regular",
@@ -690,7 +690,13 @@
         "utilidades": false
       },
       "formula": "remuneracion_computable * meses_completos / 6",
-      "parametros_legales": [],
+      "parametros_legales": [
+        "gratificacion_aplica",
+        "gratificacion_factor",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
+      ],
       "codigo_plame": "0407",
       "codigo_plame_verificado": true,
       "regimenes": [
@@ -702,10 +708,54 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "BSO-1 · Misma regla de la gratificación sobre los meses del semestre hasta el cese; la calcula la liquidación (LIQ).",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null,
+      "nota": "BSO-1 · LIQ-1 · Misma regla de la gratificación sobre los meses calendario completos del semestre hasta el cese (RN-BSO-01). Remuneración computable por validar (RN-BSO-12).",
+      "formula_motor": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) * param.gratificacion_factor * liq_meses_gratificacion / 6",
+      "condicion_motor": "param.gratificacion_aplica = 1 y liq_meses_gratificacion > 0",
+      "orden": 50,
+      "procesos": [
+        "settlement"
+      ]
+    },
+    {
+      "codigo": "cts_trunca",
+      "nombre": "CTS trunca",
+      "tipo": "benefit",
+      "metodo": "formula",
+      "remunerativo": false,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "(remuneracion_computable + gratificacion * param(cts_fraccion_gratificacion)) * tiempo / 12",
+      "parametros_legales": [
+        "cts_aplica",
+        "cts_fraccion_gratificacion",
+        "cts_dias_por_anio",
+        "dias_base_mes",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
+      ],
+      "codigo_plame": "0904",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "LIQ-1 · Tiempo desde el inicio del semestre de CTS sin depositar (último mes de depósito) hasta el cese, con la fracción de la gratificación recibida en ese periodo; se paga directamente al trabajador. Por validar con el especialista.",
+      "formula_motor": "((sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) + liq_gratificacion_cts * param.cts_fraccion_gratificacion) / param.dias_base_mes * param.cts_dias_por_anio * (liq_meses_cts / 12 + liq_dias_cts / (12 * param.dias_base_mes))",
+      "condicion_motor": "param.cts_aplica = 1 y liq_meses_cts + liq_dias_cts > 0",
+      "orden": 70,
       "procesos": [
         "settlement"
       ]
@@ -809,7 +859,13 @@
         "utilidades": false
       },
       "formula": "remuneracion_computable * meses / 12",
-      "parametros_legales": [],
+      "parametros_legales": [
+        "vacaciones_dias",
+        "dias_base_mes",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
+      ],
       "codigo_plame": "0114",
       "codigo_plame_verificado": true,
       "regimenes": [
@@ -821,13 +877,52 @@
       ],
       "proyeccion_quinta": "extraordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null,
+      "nota": "LIQ-1 · RN-LIQ-04 · Dozavos y treintavos del año de servicios en curso (desde el último aniversario de ingreso) con los días de vacaciones del régimen. Por validar con el especialista.",
+      "formula_motor": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * param.vacaciones_dias * (liq_meses_vacaciones / 12 + liq_dias_vacaciones / (12 * param.dias_base_mes))",
+      "condicion_motor": "liq_meses_vacaciones + liq_dias_vacaciones > 0",
+      "orden": 30,
       "procesos": [
-        "regular",
-        "special",
+        "settlement"
+      ]
+    },
+    {
+      "codigo": "vacaciones_no_gozadas",
+      "nombre": "Vacaciones ganadas y no gozadas",
+      "tipo": "earning",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": true,
+        "pension": true,
+        "quinta": true,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "remuneracion_computable / 30 * dias_pendientes",
+      "parametros_legales": [
+        "dias_base_mes",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
+      ],
+      "codigo_plame": "0118",
+      "codigo_plame_verificado": true,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": "extraordinary",
+      "rol_monto": "accrued_and_paid",
+      "nota": "LIQ-1 · RN-LIQ-04 · Días disponibles de los periodos ganados (vencidos o no) del libro de vacaciones al cese; la indemnización de los vencidos va aparte. Afectaciones por validar.",
+      "formula_motor": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * liq_dias_vacaciones_pendientes",
+      "condicion_motor": "liq_dias_vacaciones_pendientes > 0",
+      "orden": 31,
+      "procesos": [
         "settlement"
       ]
     },
@@ -861,9 +956,9 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "BSO-5 · Días sin gozar de periodos vencidos; entra como incidencia pendiente de visto bueno para revisión de RRHH (no alcanza a quien decidió no gozarlas: por validar).",
-      "formula_motor": "sueldo / dias_base * cantidad.indemnizacion_vacacional * param.indemnizacion_vacacional_aplica",
-      "condicion_motor": "cantidad.indemnizacion_vacacional > 0",
+      "nota": "BSO-5 · Días sin gozar de periodos vencidos; entra como incidencia pendiente de visto bueno para revisión de RRHH (no alcanza a quien decidió no gozarlas: por validar). LIQ-1 · En la liquidación toma los días vencidos del libro de vacaciones al cese.",
+      "formula_motor": "si(liq_dias_vacaciones_vencidas > 0, (sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * liq_dias_vacaciones_vencidas, sueldo / dias_base * cantidad.indemnizacion_vacacional) * param.indemnizacion_vacacional_aplica",
+      "condicion_motor": "cantidad.indemnizacion_vacacional + liq_dias_vacaciones_vencidas > 0",
       "orden": 17,
       "procesos": [
         "regular",
@@ -887,7 +982,15 @@
         "utilidades": false
       },
       "formula": "segun_regimen",
-      "parametros_legales": [],
+      "parametros_legales": [
+        "indemnizacion_dias_por_anio",
+        "indemnizacion_tope_dias",
+        "indemnizacion_plazo_fijo_dias_por_mes",
+        "dias_base_mes",
+        "rmv",
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
+      ],
       "codigo_plame": "0501",
       "codigo_plame_verificado": true,
       "regimenes": [
@@ -899,13 +1002,11 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null,
+      "nota": "LIQ-1 · RN-LIQ-03 · Solo si la liquidación indica que el motivo la genera (despido arbitrario) y fuera del periodo de prueba: remuneraciones diarias por año de servicios (o por mes que falta en el plazo fijo) con el tope del régimen de la relación. Por validar con el asesor legal.",
+      "formula_motor": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * min(si(liq_plazo_fijo = 1, param.indemnizacion_plazo_fijo_dias_por_mes * (liq_meses_restantes + liq_dias_restantes / param.dias_base_mes), param.indemnizacion_dias_por_anio * (liq_meses_servicio / 12 + liq_dias_servicio / (12 * param.dias_base_mes))), param.indemnizacion_tope_dias)",
+      "condicion_motor": "liq_indemnizacion = 1",
+      "orden": 40,
       "procesos": [
-        "regular",
-        "special",
         "settlement"
       ]
     },
@@ -1147,7 +1248,7 @@
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
       "nota": "CPT-7 · El código de la serie 0800 de la Tabla 22 (aportes del empleador) no se pudo leer en la revisión del 01-10-2025: se carga cuando el especialista lo coteje (docs/18 §3.2).",
-      "formula_motor": "max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100",
+      "formula_motor": "si(remuneracion_del_mes = 1, max(base.essalud, param.rmv), base.essalud) * param.essalud_aporte_pct / 100",
       "condicion_motor": "sistema_salud <> \"sis\"",
       "orden": 200,
       "procesos": [
@@ -1707,7 +1808,8 @@
       },
       "formula": "gratificacion_trunca * param(gratificacion_bonificacion_extraordinaria_pct) / 100",
       "parametros_legales": [
-        "gratificacion_bonificacion_extraordinaria_pct"
+        "gratificacion_bonificacion_extraordinaria_pct",
+        "gratificacion_bonificacion_extraordinaria_eps_pct"
       ],
       "codigo_plame": "0313",
       "codigo_plame_verificado": true,
@@ -1720,13 +1822,11 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": "concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100",
+      "nota": "LIQ-1 · Proporcional a la gratificación trunca; para afiliados a EPS usa su propio porcentaje (por validar).",
+      "formula_motor": "si(sistema_salud = \"eps\", concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_eps_pct / 100, concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100)",
       "condicion_motor": null,
       "orden": 60,
       "procesos": [
-        "regular",
-        "special",
         "settlement"
       ]
     },

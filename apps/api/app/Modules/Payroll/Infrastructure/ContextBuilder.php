@@ -118,9 +118,12 @@ final class ContextBuilder
         $tramos = [];
         if ($errors === []) {
             /** @var BigDecimal $base */
-            $variables = $this->variables($employmentId, $segments, $base, $from, $to, $start, $end, $hire, $termination, (string) $regimeAtEnd, $overrides, $sources);
+            $variables = $this->variables($employmentId, $segments, $base, $from, $to, $start, $end, $hire, $termination, (string) $regimeAtEnd, array_diff_key($overrides, array_flip(BenefitBases::SETTLEMENT_INPUTS)), $sources);
             // BSO-1 a BSO-3 · Meses y días computables del semestre, última gratificación y utilidades asignadas.
-            $benefit = $this->benefits->variables($employmentId, (string) $emp->legal_entity_id, $periodKind, $to, $hire, $termination, $errors, $sources);
+            // LIQ-1 · Los pedidos de la liquidación (indemnización, remuneración pendiente) los interpreta BenefitBases.
+            $inputs = array_intersect_key($overrides, array_flip(BenefitBases::SETTLEMENT_INPUTS));
+            $overrides = array_diff_key($overrides, $inputs);
+            $benefit = $this->benefits->variables($employmentId, (string) $emp->legal_entity_id, $periodKind, $to, $hire, $termination, $errors, $sources, $inputs);
             foreach ($benefit as $name => $value) {
                 $benefit[$name] = isset($overrides[$name]) ? BigDecimal::of((string) $overrides[$name]) : $value;
             }

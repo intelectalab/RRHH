@@ -12,6 +12,7 @@ use App\Modules\Payroll\Http\Controllers\PayrollPeriodController;
 use App\Modules\Payroll\Http\Controllers\PayrollReviewController;
 use App\Modules\Payroll\Http\Controllers\PayrollRunController;
 use App\Modules\Payroll\Http\Controllers\PayslipController;
+use App\Modules\Payroll\Http\Controllers\SettlementController;
 use App\Modules\Payroll\Http\Controllers\SmallBusinessController;
 use App\Modules\Payroll\Http\Controllers\SocialBenefitsController;
 use Illuminate\Support\Facades\Route;
@@ -102,6 +103,21 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/profit-sharing-distributions/{id}', [SocialBenefitsController::class, 'show'])->middleware('permission:payroll.benefit_runs.view');
     Route::post('/profit-sharing-distributions/{id}/calculate', [SocialBenefitsController::class, 'calculate'])->middleware('permission:payroll.benefit_runs.configure_profit_sharing');
     Route::post('/profit-sharing-distributions/{id}/approve', [SocialBenefitsController::class, 'approve'])->middleware('permission:payroll.benefit_runs.approve');
+
+    // LIQ-1 a LIQ-4 · Liquidación de beneficios sociales (ME-23) y su simulador.
+    Route::get('/settlements', [SettlementController::class, 'index'])->middleware('permission:payroll.settlements.view');
+    Route::post('/settlements', [SettlementController::class, 'store'])->middleware('permission:payroll.settlements.create');
+    Route::post('/settlements/simulate', [SettlementController::class, 'simulate'])->middleware('permission:payroll.settlements.simulate');
+    Route::get('/settlements/{id}', [SettlementController::class, 'show'])->middleware('permission:payroll.settlements.view');
+    Route::patch('/settlements/{id}', [SettlementController::class, 'update'])->middleware('permission:payroll.settlements.update');
+    Route::post('/settlements/{id}/calculate', [SettlementController::class, 'calculate'])->middleware('permission:payroll.settlements.calculate');
+    Route::post('/settlements/{id}/submit', [SettlementController::class, 'submit'])->middleware('permission:payroll.settlements.calculate');
+    Route::post('/settlements/{id}/approve', [SettlementController::class, 'approve'])->middleware('permission:payroll.settlements.approve');
+    Route::post('/settlements/{id}/return', [SettlementController::class, 'return'])->middleware('permission:payroll.settlements.approve');
+    Route::post('/settlements/{id}/mark-paid', [SettlementController::class, 'markPaid'])->middleware('permission:payroll.settlements.mark_paid');
+    Route::post('/settlements/{id}/documents', [SettlementController::class, 'documents'])->middleware('permission:payroll.settlements.mark_paid');
+    Route::post('/settlements/{id}/deliver-documents', [SettlementController::class, 'deliverDocuments'])->middleware('permission:payroll.settlements.mark_paid');
+    Route::post('/settlements/{id}/void', [SettlementController::class, 'void'])->middleware('permission:payroll.settlements.void');
     Route::get('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'batches'])->middleware('permission:payroll.periods.view');
     Route::post('/payroll-periods/{id}/payment-batches', [PayrollReviewController::class, 'prepareBatches'])->middleware('permission:payroll.periods.mark_paid');
     Route::post('/payroll-periods/{id}/mark-paid', [PayrollPeriodController::class, 'markPaid'])->middleware('permission:payroll.periods.mark_paid');

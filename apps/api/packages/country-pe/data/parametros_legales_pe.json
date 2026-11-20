@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 188,
+    "parametros": 189,
     "verificados": 132,
-    "sin_verificar": 56
+    "sin_verificar": 57
   },
   "parametros": [
     {
@@ -1142,7 +1142,22 @@
       "inicio_vigencia_verificado": false,
       "verificado": false,
       "base_legal": "DS 001-97-TR",
-      "nota": "Las 48 horas no fueron verificadas."
+      "nota": "Las 48 horas no fueron verificadas. LIQ-3 · Mientras no tenga valor (o la organización no fije el suyo) la liquidación no muestra plazo y lo advierte."
+    },
+    {
+      "codigo": "liquidacion_descuento_tope_pct",
+      "nombre": "Tope de descuentos de préstamos y adelantos en la liquidación",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "percent",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DS 001-97-TR · DL 650",
+      "nota": "LIQ-1 · RN-LIQ-05 · Porcentaje del neto de la liquidación que pueden absorber los saldos de préstamos y adelantos (el remanente se documenta); por confirmar. Sin valor, el descuento llega como máximo al neto y se advierte."
     },
     {
       "codigo": "asistencia_conservacion_anios",

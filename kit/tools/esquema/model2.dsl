@@ -488,18 +488,23 @@
   exported_by_user_id ?-> users ; external_reference ; error
 
 #E LIQ | Liquidación de beneficios
-@settlements main soft lock sens | Liquidación de beneficios sociales al cese o su simulación (E-04).
+@settlements main soft lock sens | Liquidación de beneficios sociales al cese o su simulación (E-04). LIQ-1 a LIQ-4: inputs guarda los descuentos ingresados; totals, periods, errors y warnings el resultado del motor con tipo de periodo «settlement»; due_alerted_at recuerda el aviso de plazo de pago; cada cálculo suma calculation_number y sus líneas lo llevan (las de cálculos anteriores se conservan).
   employment_id -> employments ; termination_id ?-> terminations ; is_simulation ; termination_date date! ; reason_code
   status enum(draft,calculated,approved,paid,voided,pending_approval,documents_delivered)=draft ; total_amount money #S ; currency cur ; due_on ; paid_on
   payroll_run_id ?-> payroll_runs ; parameters_snapshot j ; document_id ?-> documents ; approved_by_user_id ?-> users
+  severance_applies bool=f ; include_pending_salary bool=f ; inputs j ; totals j ; periods j ; errors j ; warnings j
+  calculated_at ; calculated_by_user_id ?-> users ; submitted_at ; submitted_by_user_id ?-> users ; approved_at ; return_reason
+  void_reason ; payment_reference ; paid_by_user_id ?-> users ; due_alerted_at ; documents_delivered_at ; calculation_number integer
 @settlement_lines sens | Líneas de la liquidación (truncos, vacaciones no gozadas, indemnización, saldos por descontar), con traza.
   settlement_id -> settlements
   kind enum(cts_truncated,vacation_truncated,vacation_unused,vacation_indemnity,gratification_truncated,extraordinary_bonus,severance_indemnity,pending_salary,loan_balance,advance_balance,other_earning,other_deduction,tax,contribution)!
   payroll_concept_id ?-> payroll_concepts ; base_amount money ; quantity numeric(12,4) ; amount money! #S ; currency cur ; trace j!
+  concept_code ; concept_name ; concept_kind ; explanation ; calculation_number integer
 @termination_documents | Documentos de cese entregados (certificado de trabajo, carta de liberación de CTS, constancia de cese).
   employment_id -> employments ; settlement_id ?-> settlements
   kind enum(work_certificate,cts_release_letter,termination_record,settlement_statement,withholding_certificate)!
   document_id -> documents ; delivered_at ; delivery_method
+  title ; status enum(generated,pending_signature,signed,declined)=generated ; signature_request_id ?-> signature_requests ; signed_at
 
 #E LOC | Locadores
 @contractors main soft lock | Prestador de servicios independiente (E-18), separado de la planilla.

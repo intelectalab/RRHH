@@ -1,0 +1,18 @@
+period: { from: "2026-08-01", to: "2026-08-15", kind: settlement }
+employment:
+  hire_date: "2024-03-01"
+  regime: pe_general
+  compensations:
+    - { amount: "3000.00", valid_from: "2024-03-01" }
+incidents: {}
+# Pedido de la liquidación (despido arbitrario) y 10 días ganados sin gozar del libro de vacaciones.
+variables:
+  liq_indemnizacion: true
+  liq_dias_vacaciones_pendientes: "10"
+concepts:
+  - {"code": "vacaciones_truncas", "kind": "earning", "formula": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * param.vacaciones_dias * (liq_meses_vacaciones / 12 + liq_dias_vacaciones / (12 * param.dias_base_mes))", "sort_order": 30, "kinds": ["settlement"], "condition": "liq_meses_vacaciones + liq_dias_vacaciones > 0"}
+  - {"code": "vacaciones_no_gozadas", "kind": "earning", "formula": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * liq_dias_vacaciones_pendientes", "sort_order": 31, "kinds": ["settlement"], "condition": "liq_dias_vacaciones_pendientes > 0"}
+  - {"code": "indemnizacion_despido", "kind": "earning", "formula": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) / param.dias_base_mes * min(si(liq_plazo_fijo = 1, param.indemnizacion_plazo_fijo_dias_por_mes * (liq_meses_restantes + liq_dias_restantes / param.dias_base_mes), param.indemnizacion_dias_por_anio * (liq_meses_servicio / 12 + liq_dias_servicio / (12 * param.dias_base_mes))), param.indemnizacion_tope_dias)", "sort_order": 40, "kinds": ["settlement"], "condition": "liq_indemnizacion = 1"}
+  - {"code": "gratificacion_trunca", "kind": "earning", "formula": "(sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) * param.gratificacion_factor * liq_meses_gratificacion / 6", "sort_order": 50, "kinds": ["settlement"], "condition": "param.gratificacion_aplica = 1 y liq_meses_gratificacion > 0"}
+  - {"code": "bonif_extraordinaria_trunca", "kind": "earning", "formula": "si(sistema_salud = \"eps\", concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_eps_pct / 100, concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100)", "sort_order": 60, "kinds": ["settlement"], "condition": null}
+  - {"code": "cts_trunca", "kind": "benefit", "formula": "((sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) + liq_gratificacion_cts * param.cts_fraccion_gratificacion) / param.dias_base_mes * param.cts_dias_por_anio * (liq_meses_cts / 12 + liq_dias_cts / (12 * param.dias_base_mes))", "sort_order": 70, "kinds": ["settlement"], "condition": "param.cts_aplica = 1 y liq_meses_cts + liq_dias_cts > 0"}

@@ -59,7 +59,9 @@ test('caso dorado del motor', function (string $case): void {
             PayrollFixtures::concept($c);
         }
         foreach ($params as $p) {
-            PayrollFixtures::parameter($p['code'], (string) $p['value'], $p['valid_from']);
+            // LIQ-1 · Parámetros en JSON (meses de depósito de CTS) además de los numéricos.
+            isset($p['json']) ? PayrollFixtures::parameterJson($p['code'], (array) $p['json'], $p['valid_from'])
+                : PayrollFixtures::parameter($p['code'], (string) $p['value'], $p['valid_from']);
         }
 
         return app(PayrollEngine::class)->calculate($employment, $input['period']['from'], $input['period']['to'], $input['period']['kind'],

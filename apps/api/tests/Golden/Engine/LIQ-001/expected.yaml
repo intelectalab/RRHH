@@ -1,0 +1,17 @@
+status: calculated
+segments:
+  - { from: "2026-08-01", to: "2026-08-15", days: 15 }
+# Ingreso 01-03-2024 · cese 15-08-2026 · sueldo 3000 (sin asignación familiar).
+lines:
+  vacaciones_truncas: "1375.00"         # 3000 / 30 × 30 × (5/12 + 15/360): 01-03-2026 al 15-08-2026
+  vacaciones_no_gozadas: "1000.00"      # 3000 / 30 × 10 días
+  indemnizacion_despido: "11062.50"     # 3000 / 30 × min(45 × (29/12 + 15/360), 360) = 100 × 110.625
+  gratificacion_trunca: "500.00"        # 3000 × 1 × 1 mes (julio) / 6
+  bonif_extraordinaria_trunca: "45.00"  # 500 × 9 %
+  cts_trunca: "875.00"                  # 3000 / 30 × 30 × (3/12 + 15/360): 01-05-2026 al 15-08-2026
+totals:
+  earnings: "14857.50"
+  deductions: "0.00"
+  net: "14857.50"
+  employer_contributions: "0.00"
+  employer_cost: "14857.50"

@@ -211,6 +211,7 @@ return [
     'Settlement' => [
         'lines' => ['payroll.settlements.view', 'salary'],
         'total' => ['payroll.settlements.view', 'salary'],
+        'totals' => ['payroll.settlements.view', 'salary'],
     ],
     'SstIncident' => ['medical_details' => ['people.people.health_data.view', 'health']],
     'SuccessionPlan' => ['successors' => ['careers.succession_plans.view', 'other']],

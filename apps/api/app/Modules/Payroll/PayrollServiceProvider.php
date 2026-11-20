@@ -4,6 +4,8 @@ namespace App\Modules\Payroll;
 
 use App\Modules\Payroll\Application\ConceptAccounting;
 use App\Modules\Payroll\Application\PayrollOpeningBalances;
+use App\Modules\Payroll\Application\Settlements\SettlementDocuments;
+use App\Modules\Payroll\Console\AlertSettlementDeadlines;
 use App\Modules\Payroll\Console\RemindPayslipAcknowledgement;
 use App\Modules\Payroll\Infrastructure\Exports\FifthCategoryLedgerExportSource;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollBalancesImporter;
@@ -11,15 +13,18 @@ use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
 use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
 use App\Modules\Payroll\Infrastructure\Subscribers\GeneratePayslips;
+use App\Modules\Payroll\Infrastructure\Subscribers\OpenSettlementOnTermination;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
 use App\Modules\Payroll\Infrastructure\Workflow\PayrollPeriodOutcome;
+use App\Modules\Payroll\Infrastructure\Workflow\SettlementOutcome;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Imports\ImportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Payroll\ConceptAccounts;
 use App\Shared\Payroll\OpeningBalances;
 use App\Shared\Setup\CountryPackRegistry;
+use App\Shared\Signatures\SignatureSubjectRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -58,14 +63,21 @@ final class PayrollServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));
         // BOL-1 · Boletas al cerrar el periodo.
         $outbox->subscribe($this->app->make(GeneratePayslips::class));
+        // LIQ-1 · RN-LIQ-01 · Liquidación en borrador al registrarse el cese; anulada si se revierte.
+        $outbox->subscribe($this->app->make(OpenSettlementOnTermination::class));
         if ($this->app->runningInConsole()) {
-            $this->commands([RemindPayslipAcknowledgement::class]);
+            $this->commands([RemindPayslipAcknowledgement::class, AlertSettlementDeadlines::class]);
             $this->app->booted(function (): void {
                 // BOL-2 · RN-BOL-03 · Recordatorio diario del acuse pendiente.
                 $this->app->make(Schedule::class)->command('payslips:remind-acknowledgement')->dailyAt('09:20')->withoutOverlapping();
+                // LIQ-3 · RN-LIQ-02 · Aviso del plazo de pago de las liquidaciones.
+                $this->app->make(Schedule::class)->command('settlements:alert-deadlines')->hourly()->withoutOverlapping();
             });
         }
         // PER-8 · Aprobación del periodo por el flujo configurado (WFL-2).
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(PayrollPeriodOutcome::class));
+        // LIQ-3 · Aprobación de la liquidación por el flujo configurado; LIQ-4 · firma de los documentos de cese (DOC-6).
+        $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(SettlementOutcome::class));
+        $this->app->make(SignatureSubjectRegistry::class)->register($this->app->make(SettlementDocuments::class));
     }
 }

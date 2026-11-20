@@ -335,6 +335,12 @@
       "permissions": [
         "payroll.declaration_files.view"
       ]
+    },
+    "payroll.settlements": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.settlements.view"
+      ]
     }
   }
 }

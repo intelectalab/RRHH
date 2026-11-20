@@ -58,6 +58,7 @@ use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
 use App\Modules\Payroll\Infrastructure\Models\PayrollVarianceThreshold;
 use App\Modules\Payroll\Infrastructure\Models\Payslip;
 use App\Modules\Payroll\Infrastructure\Models\ProfitSharingDistribution;
+use App\Modules\Payroll\Infrastructure\Models\Settlement;
 use App\Modules\Payroll\Infrastructure\Models\StatutoryFiling;
 use App\Modules\Payroll\Infrastructure\Models\WithholdingCertificate;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
@@ -298,6 +299,17 @@ final class CrossTenantHarness
         '/me/payslips/{id}/file' => Payslip::class,
         '/me/payslips/{id}/acknowledge' => Payslip::class,
         '/me/payslips/{id}/explanation' => Payslip::class,
+        // LIQ-1 a LIQ-4 · Liquidaciones de beneficios sociales de A.
+        'Settlement' => Settlement::class,
+        '/settlements/{id}' => Settlement::class,
+        '/settlements/{id}/calculate' => Settlement::class,
+        '/settlements/{id}/submit' => Settlement::class,
+        '/settlements/{id}/approve' => Settlement::class,
+        '/settlements/{id}/return' => Settlement::class,
+        '/settlements/{id}/mark-paid' => Settlement::class,
+        '/settlements/{id}/documents' => Settlement::class,
+        '/settlements/{id}/deliver-documents' => Settlement::class,
+        '/settlements/{id}/void' => Settlement::class,
     ];
 
     /**

@@ -53,6 +53,7 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/nomina/pagos', key: 'payroll.payments' },
   { route: '/nomina/boletas', key: 'payroll.payslips' },
   { route: '/nomina/beneficios', key: 'payroll.benefits' },
+  { route: '/nomina/liquidaciones', key: 'payroll.settlements' },
   { route: '/nomina/micro-pequena-empresa', key: 'payroll.small_business' },
   { route: '/nomina/retenciones-quinta', key: 'payroll.fifth_ledger' },
   { route: '/nomina/declaraciones', key: 'payroll.declarations' },

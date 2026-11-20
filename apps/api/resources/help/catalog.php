@@ -63,6 +63,7 @@ return [
     'pantalla-boletas' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payslips']],
     'pantalla-mis-boletas' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['portal.payslips']],
     'pantalla-beneficios-sociales' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.benefits']],
+    'pantalla-liquidaciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.settlements']],
     'pantalla-pagos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payments']],
     'pantalla-retenciones-quinta' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.fifth_ledger']],
     'pantalla-declaraciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.declarations']],

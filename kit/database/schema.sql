@@ -8108,6 +8108,25 @@ CREATE TABLE settlements (
   parameters_snapshot jsonb,
   document_id uuid,
   approved_by_user_id uuid,
+  severance_applies boolean NOT NULL DEFAULT false,
+  include_pending_salary boolean NOT NULL DEFAULT false,
+  inputs jsonb,
+  totals jsonb,
+  periods jsonb,
+  errors jsonb,
+  warnings jsonb,
+  calculated_at timestamptz,
+  calculated_by_user_id uuid,
+  submitted_at timestamptz,
+  submitted_by_user_id uuid,
+  approved_at timestamptz,
+  return_reason text,
+  void_reason text,
+  payment_reference text,
+  paid_by_user_id uuid,
+  due_alerted_at timestamptz,
+  documents_delivered_at timestamptz,
+  calculation_number integer,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -8116,14 +8135,20 @@ CREATE TABLE settlements (
   CONSTRAINT fk_settlements_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_settlements_payroll_run_id FOREIGN KEY (tenant_id, payroll_run_id) REFERENCES payroll_runs (tenant_id, id),
   CONSTRAINT fk_settlements_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
-  CONSTRAINT fk_settlements_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_settlements_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_settlements_calculated_by_user_id FOREIGN KEY (tenant_id, calculated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_settlements_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_settlements_paid_by_user_id FOREIGN KEY (tenant_id, paid_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE settlements IS 'Liquidación de beneficios sociales al cese o su simulación (E-04). -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+COMMENT ON TABLE settlements IS 'Liquidación de beneficios sociales al cese o su simulación (E-04). LIQ-1 a LIQ-4: inputs guarda los descuentos ingresados; totals, periods, errors y warnings el resultado del motor con tipo de periodo «settlement»; due_alerted_at recuerda el aviso de plazo de pago; cada cálculo suma calculation_number y sus líneas lo llevan (las de cálculos anteriores se conservan). -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_settlements_employment_id ON settlements (tenant_id, employment_id);
 CREATE INDEX ix_settlements_termination_id ON settlements (tenant_id, termination_id);
 CREATE INDEX ix_settlements_payroll_run_id ON settlements (tenant_id, payroll_run_id);
 CREATE INDEX ix_settlements_document_id ON settlements (tenant_id, document_id);
 CREATE INDEX ix_settlements_approved_by_user_id ON settlements (tenant_id, approved_by_user_id);
+CREATE INDEX ix_settlements_calculated_by_user_id ON settlements (tenant_id, calculated_by_user_id);
+CREATE INDEX ix_settlements_submitted_by_user_id ON settlements (tenant_id, submitted_by_user_id);
+CREATE INDEX ix_settlements_paid_by_user_id ON settlements (tenant_id, paid_by_user_id);
 ALTER TABLE settlements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settlements FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON settlements USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -8140,6 +8165,11 @@ CREATE TABLE settlement_lines (
   amount numeric(14,2) NOT NULL,  -- SENSIBLE
   currency char(3) NOT NULL,
   trace jsonb NOT NULL,
+  concept_code text,
+  concept_name text,
+  concept_kind text,
+  explanation text,
+  calculation_number integer,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_settlement_lines_tenant_id UNIQUE (tenant_id, id),
@@ -8163,17 +8193,23 @@ CREATE TABLE termination_documents (
   document_id uuid NOT NULL,
   delivered_at timestamptz,
   delivery_method text,
+  title text NOT NULL,
+  status text NOT NULL DEFAULT 'generated' CHECK (status IN ('generated','pending_signature','signed','declined')),
+  signature_request_id uuid,
+  signed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_termination_documents_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT fk_termination_documents_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_termination_documents_settlement_id FOREIGN KEY (tenant_id, settlement_id) REFERENCES settlements (tenant_id, id),
-  CONSTRAINT fk_termination_documents_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_termination_documents_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_termination_documents_signature_request_id FOREIGN KEY (tenant_id, signature_request_id) REFERENCES signature_requests (tenant_id, id)
 );
 COMMENT ON TABLE termination_documents IS 'Documentos de cese entregados (certificado de trabajo, carta de liberación de CTS, constancia de cese).';
 CREATE INDEX ix_termination_documents_employment_id ON termination_documents (tenant_id, employment_id);
 CREATE INDEX ix_termination_documents_settlement_id ON termination_documents (tenant_id, settlement_id);
 CREATE INDEX ix_termination_documents_document_id ON termination_documents (tenant_id, document_id);
+CREATE INDEX ix_termination_documents_signature_request_id ON termination_documents (tenant_id, signature_request_id);
 ALTER TABLE termination_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE termination_documents FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON termination_documents USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);

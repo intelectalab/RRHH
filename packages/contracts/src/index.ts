@@ -16936,7 +16936,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Simular una liquidación sin guardarla */
+        /** LIQ-2 · Simular la liquidación de una relación para una o dos fechas de cese hipotéticas (employment_id, termination_dates[], severance_applies, include_pending_salary, deductions[]) sin registrar el cese ni guardar nada; deja el acceso sensible en el registro de accesos (RN-LIQ-09) */
         post: operations["postSettlementsSimulate"];
         delete?: never;
         options?: never;
@@ -17002,6 +17002,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/settlements/{id}/deliver-documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** LIQ-4 · Registrar la entrega de los documentos de cese firmados (delivery_method): quedan en el legajo y visibles para el ex colaborador; 409 documents_not_signed */
+        post: operations["postSettlementsIdDeliverDocuments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** LIQ-4 · Generar desde plantilla (o el formato base) la hoja de liquidación, el certificado de trabajo, la carta de liberación de CTS y la constancia de cese de la liquidación pagada; con send_for_signature los envía a firma (DOC-6) */
+        post: operations["postSettlementsIdDocuments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settlements/{id}/mark-paid": {
         parameters: {
             query?: never;
@@ -17016,6 +17050,40 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postSettlementsIdMarkPaid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** LIQ-3 · Devolver la liquidación en aprobación a «calculada» con observaciones (reason) */
+        post: operations["postSettlementsIdReturn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** LIQ-3 · Enviar la liquidación calculada y sin errores a aprobación (con flujo WFL si está configurado) */
+        post: operations["postSettlementsIdSubmit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -25886,22 +25954,74 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
-        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): lines, total */
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): lines, totals, total */
         Settlement: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
             employment_id: string;
+            employee_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            termination_id?: string | null;
             /** Format: date */
             termination_date: string;
-            reason: string;
+            reason_code?: string | null;
+            reason_name?: string | null;
+            /** @enum {string} */
+            status: "draft" | "calculated" | "pending_approval" | "approved" | "paid" | "documents_delivered" | "voided";
+            severance_applies: boolean;
+            include_pending_salary: boolean;
+            deductions?: {
+                [key: string]: unknown;
+            }[] | null;
             lines?: {
                 [key: string]: unknown;
-            };
+            }[] | null;
+            totals?: {
+                [key: string]: unknown;
+            } | null;
             total?: components["schemas"]["Money"];
-            documents: string[];
-            /** @enum {string} */
-            status: "simulated" | "calculated" | "approved" | "paid" | "voided";
+            periods?: {
+                [key: string]: unknown;
+            } | null;
+            errors?: {
+                [key: string]: unknown;
+            }[] | null;
+            warnings?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: date-time */
+            due_at?: string | null;
+            /** @enum {string|null} */
+            due_status?: "no_deadline" | "on_time" | "due_soon" | "overdue" | "paid_on_time" | "paid_late" | null;
+            /** Format: date */
+            paid_on?: string | null;
+            payment_reference?: string | null;
+            /** Format: date-time */
+            calculated_at?: string | null;
+            /** @description Identificador opaco */
+            calculated_by_user_id?: string | null;
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            approved_at?: string | null;
+            /** @description Identificador opaco */
+            approved_by_user_id?: string | null;
+            return_reason?: string | null;
+            void_reason?: string | null;
+            documents?: {
+                [key: string]: unknown;
+            }[] | null;
+            approval?: {
+                [key: string]: unknown;
+            } | null;
+            allowed_actions: string[];
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -25910,14 +26030,46 @@ export interface components {
         SettlementInput: {
             /** @description Identificador opaco */
             employment_id?: string;
+            employee_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @description Identificador opaco */
+            termination_id?: string | null;
             /** Format: date */
             termination_date?: string;
-            reason?: string;
+            reason_code?: string | null;
+            reason_name?: string | null;
+            severance_applies?: boolean;
+            include_pending_salary?: boolean;
+            deductions?: {
+                [key: string]: unknown;
+            }[] | null;
             lines?: {
                 [key: string]: unknown;
-            };
+            }[] | null;
             total?: components["schemas"]["Money"];
-            documents?: string[];
+            errors?: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Format: date */
+            due_on?: string | null;
+            /** Format: date-time */
+            due_at?: string | null;
+            /** @enum {string|null} */
+            due_status?: "no_deadline" | "on_time" | "due_soon" | "overdue" | "paid_on_time" | "paid_late" | null;
+            /** Format: date */
+            paid_on?: string | null;
+            payment_reference?: string | null;
+            /** Format: date-time */
+            calculated_at?: string | null;
+            /** @description Identificador opaco */
+            calculated_by_user_id?: string | null;
+            /** @description Identificador opaco */
+            approved_by_user_id?: string | null;
+            void_reason?: string | null;
+            documents?: {
+                [key: string]: unknown;
+            }[] | null;
         };
         Shift: {
             /** @description Identificador opaco */
@@ -68438,6 +68590,7 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -68583,6 +68736,78 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postSettlementsIdDeliverDocuments: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postSettlementsIdDocuments: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postSettlementsIdMarkPaid: {
         parameters: {
             query?: never;
@@ -68617,6 +68842,78 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postSettlementsIdReturn: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postSettlementsIdSubmit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postSettlementsIdVoid: {
