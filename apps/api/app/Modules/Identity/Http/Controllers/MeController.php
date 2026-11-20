@@ -10,6 +10,7 @@ use App\Modules\Identity\Infrastructure\Models\UserSession;
 use App\Shared\Features\FeatureFlags;
 use App\Shared\Permissions\ModuleGate;
 use App\Shared\Permissions\PermissionResolver;
+use App\Shared\Security\SupportContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,16 @@ use Illuminate\Support\Facades\DB;
  */
 final class MeController
 {
+    /**
+     * @return array{agent_name: string, expires_at: string, allow_sensitive: bool}|null
+     */
+    private function supportSession(): ?array
+    {
+        $current = app(SupportContext::class)->current();
+
+        return $current === null ? null : ['agent_name' => $current['agent_name'], 'expires_at' => $current['expires_at'], 'allow_sensitive' => $current['allow_sensitive']];
+    }
+
     public function __invoke(Request $request, PermissionResolver $resolver, ModuleGate $modules, MfaService $mfa, FeatureFlags $features): JsonResponse
     {
         /** @var User $user */
@@ -63,6 +74,8 @@ final class MeController
             'modules_read_only' => $pending ? [] : $modules->readOnlyModules(),
             // SAS-7: banderas activas para la organización, con la misma evaluación que la API.
             'features' => $pending ? [] : $features->enabledCodes(),
+            // SAS-8 · Sesión abierta por el soporte de GestiaHR: la interfaz muestra la cabecera «sesión de soporte».
+            'support_session' => $this->supportSession(),
         ]]);
     }
 }

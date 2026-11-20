@@ -10,6 +10,7 @@ use App\Shared\Exceptions\BusinessRuleViolatedException;
 use App\Shared\Features\FeatureFlags;
 use App\Shared\Outbox\Contracts\OutboxWriter;
 use App\Shared\Outbox\DomainEventTypes;
+use App\Shared\Settings\ParameterResolver;
 use App\Shared\Tenancy\CrossTenantMaintenance;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\Provisioning\TenantSeed;
@@ -97,6 +98,7 @@ final class TenantAdministration
      */
     public function create(array $input, PlatformUser $actor): array
     {
+        $input = $this->withGlobalDefaults($input);
         $this->validateReferences($input);
         if (DB::table('tenants')->where('slug', $input['slug'])->whereNull('deleted_at')->exists()
             || in_array($input['slug'], (array) config('tenancy.reserved_subdomains', []), true)) {
@@ -142,6 +144,15 @@ final class TenantAdministration
             });
             foreach ($moduleCodes as $code) {
                 $this->modules->activate($id, $code, $actor, 'plan');
+            }
+            // SAS-13 · La organización nace con los parámetros por defecto vigentes de la configuración global.
+            $parameters = $this->settings->value('tenants.default_parameters');
+            if (is_array($parameters) && $parameters !== []) {
+                TenancyScope::runAs($id, function () use ($parameters): void {
+                    foreach ($parameters as $code => $value) {
+                        app(ParameterResolver::class)->set((string) $code, $value, 'organization', null, null, (string) trans('platform.settings.default_parameter_reason'));
+                    }
+                });
             }
 
             $this->audit->record('tenant.created', $actor, 'tenant', $id, null, [
@@ -374,6 +385,34 @@ final class TenantAdministration
             'open_invoices' => (int) $open->sum('n'),
             'overdue_invoices' => (int) $open->sum('overdue'),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     */
+    /**
+     * SAS-13 · País habilitado y moneda, zona horaria e idioma por defecto del país cuando el alta no los trae.
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
+     */
+    private function withGlobalDefaults(array $input): array
+    {
+        $enabled = (array) ($this->settings->value('tenants.enabled_countries') ?? []);
+        if ($enabled !== [] && ! in_array($input['country'] ?? null, $enabled, true)) {
+            throw ValidationException::withMessages(['country' => [(string) trans('platform.tenants.country_not_enabled')]]);
+        }
+        $defaults = (array) (((array) ($this->settings->value('tenants.defaults') ?? []))[(string) ($input['country'] ?? '')] ?? []);
+        foreach (['currency', 'timezone', 'locale'] as $field) {
+            if (! isset($input[$field]) || $input[$field] === '') {
+                if (! isset($defaults[$field])) {
+                    throw ValidationException::withMessages([$field => [(string) trans('validation.required', ['attribute' => $field])]]);
+                }
+                $input[$field] = (string) $defaults[$field];
+            }
+        }
+
+        return $input;
     }
 
     /**

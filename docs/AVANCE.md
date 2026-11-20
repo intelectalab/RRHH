@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 147 | 0 | 61,0 % |
-| Backlog completo | 512 | 147 | 0 | 28,7 % |
+| Primer corte comercial (MVP) | 241 | 151 | 0 | 62,7 % |
+| Backlog completo | 512 | 151 | 0 | 29,5 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -51,12 +51,12 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | SAS-5 | Módulos por organización | SAS | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-12 | Activar un módulo desde la consola activa sus dependencias sin migrar ni desplegar y conserva los datos; 403 module_not_enabled; /me publica módulos activos y en solo lectura y el menú los filtra; retirar un módulo lo deja en solo lectura (403 module_read_only) durante la transición y luego oculto (RN-SAS-06); no se retira un módulo base ni uno con dependientes. Pendiente: activación por suscripción (SAS-4) y vista de módulos del cliente. |
 | SAS-6 | Límites y consumo | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Consumo frente a tenant_limits (colaboradores, administradores, empresas, almacenamiento, llamadas a la API); bloqueo en el servidor al superar el tope (403 plan_limit_reached) sin afectar lo existente (RN-SAS-02/03); aviso único al llegar a limites.porcentaje_alerta y al tope; foto diaria; bajar de plan con exceso bloquea altas hasta regularizar; consumo e historia en la consola y comparación con otro plan; pantalla Configuración → Consumo del plan. Pendiente: alta de colaboradores (COL) y tope de llamadas a la API. |
 | SAS-7 | Feature flags | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-12 | Banderas evaluadas en una función de base en el orden organización → plan → grupo beta → país → porcentaje → por defecto (RN-SAS-07); middleware feature: (403 feature_not_enabled) y /me → features en la web; Consola → Funciones con reglas, archivar/restaurar por acción y activación por organización con motivo y vencimiento; auditoría; rige sin desplegar. |
-| SAS-8 | Acceso de soporte auditado | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
-| SAS-9 | Salud y monitoreo de la plataforma | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
+| SAS-8 | Acceso de soporte auditado | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Sesión de soporte con motivo, ticket, duración máxima y enlace de un solo uso; requiere habilitación de la organización; sin campos sensibles salvo autorización «full»; auditada en ambos lados; RLS en support_sessions. |
+| SAS-9 | Salud y monitoreo de la plataforma | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Monitoreo: estado de servicios, colas, trabajos y eventos fallidos con reintento auditado, uso por organización (solo metadatos). |
 | SAS-10 | Tablero del negocio SaaS | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
 | SAS-11 | Facturación de la suscripción y estado de cuenta | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
-| SAS-12 | Copias de seguridad y restauración | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
-| SAS-13 | Configuración global y registros de la consola | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
+| SAS-12 | Copias de seguridad y restauración | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Copias: historial, copia manual, restauración por puerto (falso en desarrollo), siempre en aislado primero y a producción con doble confirmación; backups:run diario con prueba de restauración. |
+| SAS-13 | Configuración global y registros de la consola | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Configuración global validada y auditada (países, valores por defecto de organizaciones nuevas), avisos de mantenimiento y registros separados (auditoría, actividad, logs técnicos). |
 | AUD-1 | Bitácora de auditoría de solo inserción | AUD | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | audit_events de solo inserción: triggers reject_mutation y REVOKE UPDATE/DELETE al rol de la aplicación (prueba con ayni_app); no existe ruta que la modifique (prueba sobre todas las rutas); cada entrada guarda organización, actor, acción, entidad, id, IP, agente, request_id y momento con microsegundos. |
 | AUD-2 | Captura automática de antes y después | AUD | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | AuditLogger cifra los campos sensibles del esquema (config/audit.php → sensitive_fields) y calcula los campos cambiados; trait Auditable captura altas, cambios y bajas por campo (una entrada por registro, también en acciones masivas que iteran modelos); el visor enmascara el valor a quien no tiene el permiso del campo ni audit.logs.sensitive_values.view. |
 | AUD-3 | Actividad de usuario y logs técnicos separados | AUD | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-11 | Tres almacenes con retención propia: actividad (privacidad.retencion_actividad_dias + activity:prune), auditoría (privacidad.retencion_auditoria_anios) y logs técnicos sin datos personales (LOG_RETENTION_DAYS). GET /activity-events; búsquedas y vistas de ficha van a actividad sin guardar el término; pantalla Configuración › Actividad. Pendiente: pasar inserciones antiguas al ActivityLogger. |

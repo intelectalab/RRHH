@@ -52,4 +52,10 @@ return [
         'activation_not_pending' => 'The account is already active: it does not need an activation code.',
         'no_phone' => 'The user has no mobile number to send the code to.',
     ],
+    'support' => [
+        'link_invalid' => 'The support link is invalid, already used or expired.',
+        'disabled' => 'The organization turned off support access.',
+        'device_label' => 'GestiaHR support session',
+        'grant_not_active' => 'The authorization is no longer active.',
+    ],
 ];

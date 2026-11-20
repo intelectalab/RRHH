@@ -19,6 +19,10 @@ return [
     // Nombre que muestra la aplicación autenticadora.
     'mfa_issuer' => env('PLATFORM_MFA_ISSUER', 'GestiaHR Consola'),
     'password_min_length' => 14,
+    // SAS-13 · Archivo del log técnico estructurado (JSON por línea) que la consola consulta; vacío = no disponible.
+    'technical_log_path' => env('PLATFORM_TECHNICAL_LOG', storage_path('logs/structured.log')),
+    // SAS-9 · Colas que muestra el monitoreo además de «default».
+    'monitored_queues' => ['notifications', 'imports', 'exports'],
 
     /*
      * Roles internos de la consola (M-SAS §5: propietario, soporte, finanzas, operaciones)
@@ -36,6 +40,17 @@ return [
         'modules.read_only_transition_days' => 30,
         // SAS-4 · RN-SAS-04: días de gracia (organización en solo lectura) tras vencer la prueba sin conversión.
         'subscriptions.trial_grace_days' => 7,
+        // SAS-13 · Países en los que se pueden crear organizaciones (paquete de país disponible).
+        'tenants.enabled_countries' => ['PE'],
+        // SAS-13 · Datos con que nace una organización de cada país si el alta no los indica.
+        'tenants.defaults' => ['PE' => ['currency' => 'PEN', 'timezone' => 'America/Lima', 'locale' => 'es']],
+        // SAS-13 · Parámetros de política con que nace toda organización nueva (código => valor); vacío = los del catálogo.
+        'tenants.default_parameters' => [],
+        // SAS-8 · RN-SAS-08: duración máxima de una sesión de soporte (minutos).
+        'support.max_session_minutes' => 60,
+        // SAS-12 · Días que se conserva cada copia y cada cuántos días se prueba una restauración en aislado.
+        'backups.retention_days' => 30,
+        'backups.test_restore_every_days' => 7,
     ],
 
     'roles' => [
@@ -43,7 +58,7 @@ return [
         'support' => [
             'platform.tenants.view', 'platform.support_sessions.view', 'platform.support_sessions.create',
             'platform.support_sessions.end', 'platform.health.view', 'platform.metrics.view',
-            'platform.help_articles.view', 'platform.web_complaints.view',
+            'platform.help_articles.view', 'platform.web_complaints.view', 'platform.logs.view',
         ],
         'billing' => [
             'platform.tenants.view', 'platform.plans.view', 'platform.subscriptions.view',

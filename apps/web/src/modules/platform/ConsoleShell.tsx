@@ -30,7 +30,12 @@ export function useConsoleTabs(): Tab[] {
     { href: '/plataforma/suscripciones', label: t('console.tab_subscriptions'), active: pathname.startsWith('/plataforma/suscripciones'), perm: 'platform.subscriptions.view' },
     { href: '/plataforma/funciones', label: t('console.tab_flags'), active: pathname.startsWith('/plataforma/funciones'), perm: 'platform.feature_flags.view' },
     { href: '/plataforma/ayuda', label: t('console.tab_help'), active: pathname.startsWith('/plataforma/ayuda'), perm: 'platform.help_articles.view' },
+    { href: '/plataforma/soporte', label: t('console.tab_support'), active: pathname.startsWith('/plataforma/soporte'), perm: 'platform.support_sessions.view' },
+    { href: '/plataforma/monitoreo', label: t('console.tab_health'), active: pathname.startsWith('/plataforma/monitoreo'), perm: 'platform.health.view' },
+    { href: '/plataforma/copias', label: t('console.tab_backups'), active: pathname.startsWith('/plataforma/copias'), perm: 'platform.backups.view' },
+    { href: '/plataforma/configuracion', label: t('console.tab_settings'), active: pathname.startsWith('/plataforma/configuracion'), perm: 'platform.settings.view' },
     { href: '/plataforma/auditoria', label: t('console.tab_audit'), active: pathname.startsWith('/plataforma/auditoria'), perm: 'platform.audit.view' },
+    { href: '/plataforma/registros', label: t('console.tab_records'), active: pathname.startsWith('/plataforma/registros'), perm: 'platform.logs.view' },
   ]
   return tabs.filter((tab) => me.permissions.includes(tab.perm)).map(({ perm: _perm, ...tab }) => tab)
 }

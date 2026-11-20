@@ -226,6 +226,9 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 | `platform.backups.restore` **(+)** | Restaurar una copia (con doble aprobación) | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.settings.update` **(+)** | Cambiar configuraciones globales | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.audit.view` **(+)** | Ver la auditoría de la consola | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `platform.settings.view` **(+)** | Ver configuraciones globales y avisos de la plataforma | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `platform.health.manage` **(+)** | Reintentar trabajos y eventos fallidos desde el monitoreo | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `platform.logs.view` **(+)** | Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH) | ✓ |  |  |  |  |  |  |  |  |  |  |
 
 #### AUD · Auditoría, actividad y logs
 

@@ -2,6 +2,7 @@
 
 namespace App\Shared\Permissions;
 
+use App\Shared\Security\SupportContext;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +18,10 @@ final class PermissionResolver
 
     public function for(string $userId): EffectivePermissions
     {
-        $key = TenancyScope::requireTenant().'|'.$userId;
+        // SAS-8 · RN-SAS-08: en una sesión de soporte sin autorización «full» los permisos sensibles no surten efecto.
+        $support = app(SupportContext::class);
+        $withoutSensitive = ! $support->allowsSensitive();
+        $key = TenancyScope::requireTenant().'|'.$userId.($withoutSensitive ? '|support' : '');
         if (isset($this->memo[$key])) {
             return $this->memo[$key];
         }
@@ -36,6 +40,7 @@ final class PermissionResolver
             ->whereNull('r.deleted_at')
             ->where(fn ($q) => $q->whereNull('ur.valid_from')->orWhere('ur.valid_from', '<=', $today))
             ->where(fn ($q) => $q->whereNull('ur.valid_to')->orWhere('ur.valid_to', '>=', $today))
+            ->when($withoutSensitive, fn ($q) => $q->where('p.is_sensitive', false))
             ->get(['rp.permission_code', 'p.kind', DB::raw('COALESCE(ur.scope_override, rp.scope) as scope')]);
 
         $actions = [];

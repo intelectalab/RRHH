@@ -58,6 +58,7 @@ final class DatabaseConventionsChecker
         'plans',
         'platform_audit_events',
         'platform_incidents',
+        'platform_notices',
         'platform_sessions',
         'platform_settings',
         'platform_usage_snapshots',

@@ -5,6 +5,7 @@ namespace App\Modules\Platform;
 use App\Modules\Platform\Application\Console\ConsoleSessions;
 use App\Modules\Platform\Console\CreatePlatformAdminCommand;
 use App\Modules\Platform\Console\ResetPlatformMfaCommand;
+use App\Modules\Platform\Console\RunBackupsCommand;
 use App\Modules\Platform\Console\RunTrialLifecycleCommand;
 use App\Modules\Platform\Console\SnapshotUsageCommand;
 use App\Modules\Platform\Console\SyncBundledHelpCommand;
@@ -62,13 +63,15 @@ final class PlatformServiceProvider extends ServiceProvider
         $router->aliasMiddleware(RequirePlatformPermission::ALIAS, RequirePlatformPermission::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class]);
+            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class, RunBackupsCommand::class]);
             // SAS-4 · RN-SAS-04: vencimiento de pruebas y fin de la gracia, una vez al día.
             $this->app->booted(function (): void {
                 $schedule = $this->app->make(Schedule::class);
                 $schedule->command('platform:subscriptions:trials')->dailyAt('01:15')->withoutOverlapping();
                 // SAS-6 · Foto diaria del consumo (historia de la consola y avisos de límite).
                 $schedule->command('usage:snapshot')->dailyAt('00:40')->withoutOverlapping();
+                // SAS-12 · Copia diaria, vencimiento por retención y prueba de restauración en aislado cuando toca.
+                $schedule->command('backups:run')->dailyAt('02:20')->withoutOverlapping();
             });
         }
 

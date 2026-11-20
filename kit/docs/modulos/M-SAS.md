@@ -67,6 +67,9 @@ Dar al propietario de la plataforma un panel separado para administrar organizac
 | `platform.backups.restore` **(+)** | Restaurar una copia (con doble aprobación) | Superadmin SaaS |
 | `platform.settings.update` **(+)** | Cambiar configuraciones globales | Superadmin SaaS |
 | `platform.audit.view` **(+)** | Ver la auditoría de la consola | Superadmin SaaS |
+| `platform.settings.view` **(+)** | Ver configuraciones globales y avisos de la plataforma | Superadmin SaaS |
+| `platform.health.manage` **(+)** | Reintentar trabajos y eventos fallidos desde el monitoreo | Superadmin SaaS |
+| `platform.logs.view` **(+)** | Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH) | Superadmin SaaS |
 
 **(S)** sensible · **(+)** por añadir a `api/openapi.yaml`. Alcance, permisos por campo y matriz completa: `07-permisos-y-roles.md`.
 

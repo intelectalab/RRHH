@@ -3,6 +3,7 @@
 namespace App\Modules\Identity;
 
 use App\Modules\Identity\Application\SessionManager;
+use App\Modules\Identity\Application\Support\SupportAccess;
 use App\Modules\Identity\Infrastructure\Exports\UsersExportSource;
 use App\Modules\Identity\Infrastructure\Provisioning\InviteFirstAdmin;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
@@ -16,6 +17,7 @@ use App\Modules\Identity\Infrastructure\Usage\AdminsUsageSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
+use App\Shared\Security\SupportContext;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\TenancyScope;
@@ -40,6 +42,7 @@ final class IdentityServiceProvider extends ServiceProvider
         $this->app->make(CountryPackRegistry::class)->register($this->app->make(RolesPackComponent::class));
         // Guard de sesión web: resuelve la cookie dentro de la organización activa (RLS).
         Auth::viaRequest('ayni-session', function (Request $request) {
+            $support = $this->app->make(SupportContext::class);
             if (TenancyScope::current() === null) {
                 return null;
             }
@@ -47,6 +50,17 @@ final class IdentityServiceProvider extends ServiceProvider
             $session = $this->app->make(SessionManager::class)->resolve($request);
             if ($session === null || $session->user === null || ! $session->user->canSignIn()) {
                 return null;
+            }
+            // SAS-8 · Sesión abierta por el soporte: vale solo mientras su sesión de soporte esté activa y vigente.
+            $support->clear();
+            if ($session->impersonated_by_platform_user_id !== null) {
+                $context = $this->app->make(SupportAccess::class)->contextForUserSession($session);
+                if ($context === null) {
+                    $this->app->make(SessionManager::class)->revoke($session);
+
+                    return null;
+                }
+                $support->enter($context);
             }
 
             $request->attributes->set('gestia_session', $session);

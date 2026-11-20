@@ -46,7 +46,7 @@ BEGIN
        'legal_parameters', 'master_catalog_items', 'master_catalogs', 'metric_definitions', 'module_dependencies', 'modules', 'parameter_definitions',
        'partner_firm_tenants', 'partner_firm_users', 'partner_firms', 'pe_parametric_items', 'pe_parametric_tables',
        'pension_fund_rates', 'pension_funds', 'permissions', 'plan_features', 'plan_limits', 'plan_modules', 'plans', 'platform_audit_events',
-       'platform_incidents', 'platform_sessions', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
+       'platform_incidents', 'platform_notices', 'platform_sessions', 'platform_settings', 'platform_usage_snapshots', 'platform_users', 'saas_invoice_lines',
        'saas_invoices', 'statutory_file_layouts', 'subscription_addons', 'subscriptions', 'support_ticket_messages', 'support_tickets',
        'system_role_permissions', 'system_roles', 'tenant_domains', 'tenant_status_events', 'tenants',
        'web_chat_sessions', 'web_complaints', 'web_demo_bookings', 'web_leads', 'web_product_modules', 'web_products', 'web_signups')
@@ -114,6 +114,13 @@ BEGIN
   RAISE NOTICE 'OK 1    seed_tenant_defaults creó 10 roles y % permisos por organización, sin duplicar al repetirse', n;
 END
 $$;
+
+-- SAS-8 · Una sesión de soporte de A (la crea la consola con el rol de plataforma).
+INSERT INTO platform_users (id, email, full_name, role) VALUES ('99999999-0000-4000-8000-0000000000e1', 'soporte@aislamiento.test', 'Soporte Aislamiento', 'support');
+SET LOCAL ROLE gestia_platform;
+INSERT INTO support_sessions (id, tenant_id, platform_user_id, agent_name, target_user_id, reason, expires_at)
+VALUES ('99999999-0000-4000-8000-0000000000e2', 'aaaaaaaa-0000-4000-8000-000000000001', '99999999-0000-4000-8000-0000000000e1', 'Soporte Aislamiento', 'aaaaaaaa-0000-4000-8000-0000000000a9', 'Prueba de aislamiento', now() + interval '1 hour');
+RESET ROLE;
 
 -- A partir de aquí, todo se ejecuta como la aplicación.
 SET LOCAL ROLE gestia_app;
@@ -241,7 +248,9 @@ BEGIN
   IF n <> 0 THEN RAISE EXCEPTION 'FALLO 4.10: B ve personas de A'; END IF;
   SELECT count(*) INTO n FROM audit_events;
   IF n <> 1 THEN RAISE EXCEPTION 'FALLO 4.11: B ve % eventos de auditoría (esperado 1)', n; END IF;
-  RAISE NOTICE 'OK 4c   B tampoco ve las filas de A';
+  SELECT count(*) INTO n FROM support_sessions;
+  IF n <> 0 THEN RAISE EXCEPTION 'FALLO 4.12: B ve % sesiones de soporte de A', n; END IF;
+  RAISE NOTICE 'OK 4c   B tampoco ve las filas de A (ni sus sesiones de soporte)';
 END
 $$;
 

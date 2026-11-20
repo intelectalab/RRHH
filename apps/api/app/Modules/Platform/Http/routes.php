@@ -2,10 +2,12 @@
 
 use App\Modules\Platform\Http\Controllers\ConsoleAuthController;
 use App\Modules\Platform\Http\Controllers\ConsoleController;
+use App\Modules\Platform\Http\Controllers\ConsoleOperationsController as Ops;
 use App\Modules\Platform\Http\Controllers\FeatureFlagController;
 use App\Modules\Platform\Http\Controllers\HelpArticleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
+use App\Modules\Platform\Http\Controllers\SystemNoticesController;
 use App\Modules\Platform\Http\Controllers\TenantController;
 use App\Modules\Platform\Http\Controllers\TenantModuleController;
 use App\Modules\Platform\Http\Controllers\UsageController;
@@ -96,6 +98,39 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::post('/feature-flags/{id}/tenants/{tenantId}/remove', [FeatureFlagController::class, 'removeTenant'])->middleware('platform.permission:platform.feature_flags.update');
             Route::get('/tenants/{id}/feature-flags', [FeatureFlagController::class, 'forTenant'])->middleware('platform.permission:platform.feature_flags.view');
 
+            // SAS-8 · Soporte auditado: sesiones con motivo, vencimiento y enlace de un solo uso (RN-SAS-08).
+            Route::get('/support-sessions', [Ops::class, 'supportSessions'])->middleware('platform.permission:platform.support_sessions.view');
+            Route::post('/support-sessions', [Ops::class, 'createSupportSession'])->middleware('platform.permission:platform.support_sessions.create');
+            Route::get('/support-sessions/{id}', [Ops::class, 'supportSession'])->middleware('platform.permission:platform.support_sessions.view');
+            Route::post('/support-sessions/{id}/end', [Ops::class, 'endSupportSession'])->middleware('platform.permission:platform.support_sessions.end');
+            Route::get('/tenants/{id}/users', [Ops::class, 'tenantUsers'])->middleware('platform.permission:platform.support_sessions.create');
+
+            // SAS-9 · Salud y monitoreo (sin datos de RRHH).
+            Route::get('/health', [Ops::class, 'health'])->middleware('platform.permission:platform.health.view');
+            Route::get('/health/failed-jobs', [Ops::class, 'failedJobs'])->middleware('platform.permission:platform.health.view');
+            Route::post('/health/failed-jobs/{id}/retry', [Ops::class, 'retryFailedJob'])->middleware('platform.permission:platform.health.manage');
+            Route::get('/health/outbox-events', [Ops::class, 'outboxEvents'])->middleware('platform.permission:platform.health.view');
+            Route::post('/health/outbox-events/{id}/retry', [Ops::class, 'retryOutboxEvent'])->middleware('platform.permission:platform.health.manage');
+
+            // SAS-12 · Copias de seguridad y restauración en aislado con doble aprobación (RN-SAS-09).
+            Route::get('/backups', [Ops::class, 'backupList'])->middleware('platform.permission:platform.backups.view');
+            Route::post('/backups', [Ops::class, 'backupCreate'])->middleware('platform.permission:platform.backups.create');
+            Route::get('/backups/{id}', [Ops::class, 'backupShow'])->middleware('platform.permission:platform.backups.view');
+            Route::post('/backups/{id}/restores', [Ops::class, 'backupRestore'])->middleware('platform.permission:platform.backups.restore');
+            Route::get('/backup-restores', [Ops::class, 'restoreList'])->middleware('platform.permission:platform.backups.view');
+            Route::post('/backup-restores/{id}/approve', [Ops::class, 'restoreApprove'])->middleware('platform.permission:platform.backups.restore');
+            Route::post('/backup-restores/{id}/cancel', [Ops::class, 'restoreCancel'])->middleware('platform.permission:platform.backups.restore');
+
+            // SAS-13 · Configuración global, avisos de mantenimiento y registros (auditoría, actividad y logs técnicos).
+            Route::get('/settings', [Ops::class, 'settingsIndex'])->middleware('platform.permission:platform.settings.view');
+            Route::patch('/settings/{key}', [Ops::class, 'settingsUpdate'])->middleware('platform.permission:platform.settings.update');
+            Route::get('/notices', [Ops::class, 'noticeIndex'])->middleware('platform.permission:platform.settings.view');
+            Route::post('/notices', [Ops::class, 'noticeStore'])->middleware('platform.permission:platform.settings.update');
+            Route::patch('/notices/{id}', [Ops::class, 'noticeUpdate'])->middleware('platform.permission:platform.settings.update');
+            Route::post('/notices/{id}/cancel', [Ops::class, 'noticeCancel'])->middleware('platform.permission:platform.settings.update');
+            Route::get('/activity-events', [Ops::class, 'activity'])->middleware('platform.permission:platform.logs.view');
+            Route::get('/technical-logs', [Ops::class, 'technicalLogs'])->middleware('platform.permission:platform.logs.view');
+
             // AYU-1 · Ayuda del producto: artículos por módulo, rol y pantalla con versiones (RN-AYU-02).
             Route::get('/help-articles', [HelpArticleController::class, 'index'])->middleware('platform.permission:platform.help_articles.view');
             Route::post('/help-articles', [HelpArticleController::class, 'store'])->middleware('platform.permission:platform.help_articles.create');
@@ -108,4 +143,9 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::get('/help-escalations', [HelpArticleController::class, 'escalations'])->middleware('platform.permission:platform.help_articles.view');
         });
     });
+});
+
+// SAS-13 · Avisos de la plataforma vigentes, para la organización en curso (fuera de la consola).
+Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
+    Route::get('/system-notices', SystemNoticesController::class);
 });

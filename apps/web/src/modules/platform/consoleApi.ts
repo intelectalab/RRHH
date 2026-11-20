@@ -208,3 +208,82 @@ export type ConsoleFlagOverride = {
 }
 
 export type ConsoleFlagEvaluation = { code: string; name: string; enabled: boolean; source: 'tenant' | FlagTarget | 'default' }
+
+/** SAS-8 · Sesión de soporte con suplantación (RN-SAS-08); entry_url solo al crearla. */
+export type ConsoleSupportSession = {
+  id: string
+  tenant_id: string
+  tenant?: { name: string; slug: string }
+  agent?: { id: string; name: string; email: string }
+  target_user_id: string
+  target_user?: { display_name: string | null }
+  reason: string
+  ticket_reference: string | null
+  status: 'pending' | 'active' | 'ended' | 'expired'
+  allow_sensitive: boolean
+  expires_at: string
+  started_at: string | null
+  ended_at: string | null
+  entry_url?: string
+  actions?: Array<{ action: string; entity_type: string; occurred_at: string }>
+  allowed_actions: string[]
+}
+
+/** SAS-9 · Salud de la plataforma (solo cifras y metadatos técnicos). */
+export type ConsoleHealth = {
+  status: 'operational' | 'degraded' | 'down'
+  components: Array<{ code: string; status: string; detail: string | null }>
+  queues: Array<{ name: string; size: number | null }>
+  failed_jobs: number
+  outbox: { failed: number }
+  webhooks: { failed: number }
+  integrations: Array<{ port: string; provider: string | null; fake: boolean }>
+  tenants: Array<{ tenant_id: string; name: string; api_calls_month: number; storage_mb: number; errors: { failed_jobs: number; outbox_events: number; webhook_deliveries: number } }>
+  checked_at: string
+}
+
+/** SAS-12 · Copia de seguridad y restauración (RN-SAS-09). */
+export type ConsoleBackup = {
+  id: string
+  kind: 'automatic' | 'manual'
+  coverage: 'platform' | 'tenant'
+  tenant_id: string | null
+  tenant_name: string | null
+  status: 'running' | 'completed' | 'failed' | 'expired'
+  size_bytes: number | null
+  started_at: string
+  finished_at: string | null
+  retention_until: string | null
+  verified_in_sandbox: boolean
+  error: string | null
+}
+
+export type ConsoleBackupRestore = {
+  id: string
+  backup_run_id: string
+  kind: 'manual' | 'scheduled_test'
+  target: 'sandbox' | 'production'
+  status: 'requested' | 'approved' | 'running' | 'completed' | 'failed' | 'cancelled'
+  reason: string
+  requested_by: string | null
+  approved_by: string | null
+  verification: { verified: boolean; environment: string; checks: Array<{ name: string; ok: boolean; detail: string }> } | null
+  created_at: string
+  allowed_actions: string[]
+}
+
+/** SAS-13 · Configuración global y avisos de la plataforma. */
+export type ConsoleSetting = { key: string; type: string; value: unknown; default: unknown; customized: boolean; description: string; updated_at: string | null }
+
+export type ConsoleNotice = {
+  id: string
+  title: string
+  message: string
+  severity: 'info' | 'warning' | 'critical'
+  audience: 'all' | 'selected'
+  tenant_ids: string[]
+  starts_at: string
+  ends_at: string | null
+  status: 'scheduled' | 'active' | 'ended' | 'cancelled'
+  allowed_actions: string[]
+}

@@ -5,6 +5,7 @@ namespace App\Shared\Integrations;
 use App\Shared\Integrations\DevInbox\DevInboxEmailAdapter;
 use App\Shared\Integrations\DevInbox\DevInboxMessagingAdapter;
 use App\Shared\Integrations\Fake\FakeAiAdapter;
+use App\Shared\Integrations\Fake\FakeBackupStorageAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
 use App\Shared\Integrations\Fake\FakeBiometricAdapter;
 use App\Shared\Integrations\Fake\FakeEmailAdapter;
@@ -13,6 +14,7 @@ use App\Shared\Integrations\Fake\FakeMessagingAdapter;
 use App\Shared\Integrations\Fake\FakeSignatureAdapter;
 use App\Shared\Integrations\Logging\IntegrationCallRecorder;
 use App\Shared\Integrations\Ports\AiPort;
+use App\Shared\Integrations\Ports\BackupStoragePort;
 use App\Shared\Integrations\Ports\BankingPort;
 use App\Shared\Integrations\Ports\BiometricPort;
 use App\Shared\Integrations\Ports\EmailPort;
@@ -39,6 +41,8 @@ final class IntegrationManager
     private ?AiPort $aiAdapter = null;
 
     private ?ExchangeRatesPort $exchangeRatesAdapter = null;
+
+    private ?BackupStoragePort $backupsAdapter = null;
 
     public function __construct(
         private readonly IntegrationCallRecorder $recorder,
@@ -178,6 +182,50 @@ final class IntegrationManager
         }
 
         throw new RuntimeException('No live Exchange rates provider configured for production.');
+    }
+
+    /** SAS-12 · Almacenamiento de copias y entorno aislado de restauración (sin proveedor real: la falsa fuera de producción). */
+    public function backups(): BackupStoragePort
+    {
+        if ($this->backupsAdapter !== null) {
+            return $this->backupsAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->backupsAdapter = new FakeBackupStorageAdapter($this->recorder);
+
+            return $this->backupsAdapter;
+        }
+
+        throw new RuntimeException('No live Backup storage provider configured for production.');
+    }
+
+    public function setBackupsAdapter(BackupStoragePort $adapter): void
+    {
+        $this->backupsAdapter = $adapter;
+    }
+
+    /**
+     * SAS-9 · Proveedor de cada puerto para la página de estado (falso o real); un puerto sin proveedor en
+     * producción aparece como no configurado.
+     *
+     * @return list<array{port: string, provider: string|null, fake: bool}>
+     */
+    public function status(): array
+    {
+        $out = [];
+        foreach (['email' => fn () => $this->email(), 'messaging' => fn () => $this->messaging(), 'signature' => fn () => $this->signature(),
+            'banking' => fn () => $this->banking(), 'biometric' => fn () => $this->biometric(), 'ai' => fn () => $this->ai(),
+            'exchange_rates' => fn () => $this->exchangeRates(), 'backups' => fn () => $this->backups()] as $port => $resolve) {
+            try {
+                $adapter = $resolve();
+                $out[] = ['port' => $port, 'provider' => $adapter->providerName(), 'fake' => $adapter->isFake()];
+            } catch (RuntimeException) {
+                $out[] = ['port' => $port, 'provider' => null, 'fake' => false];
+            }
+        }
+
+        return $out;
     }
 
     /** Desarrollo local: correo y mensajes al buzón de pruebas (config integrations.dev_inbox). */

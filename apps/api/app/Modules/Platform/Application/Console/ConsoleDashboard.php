@@ -41,11 +41,16 @@ final class ConsoleDashboard
      *
      * @return array{data: list<array<string, mixed>>, meta: array<string, mixed>}
      */
-    public function auditEvents(int $page, int $perPage, ?string $action): array
+    public function auditEvents(int $page, int $perPage, ?string $action, ?string $tenantId = null, ?string $platformUserId = null, ?string $from = null, ?string $to = null): array
     {
+        // SAS-13 · Filtros por organización, usuario de la consola y fecha.
         $query = DB::table('platform_audit_events AS e')
             ->leftJoin('platform_users AS u', 'u.id', '=', 'e.platform_user_id')
-            ->when($action !== null && $action !== '', fn ($q) => $q->where('e.action', $action));
+            ->when($action !== null && $action !== '', fn ($q) => $q->where('e.action', $action))
+            ->when($tenantId !== null, fn ($q) => $q->where('e.tenant_id', $tenantId))
+            ->when($platformUserId !== null, fn ($q) => $q->where('e.platform_user_id', $platformUserId))
+            ->when($from !== null, fn ($q) => $q->where('e.occurred_at', '>=', Carbon::parse((string) $from)->startOfDay()))
+            ->when($to !== null, fn ($q) => $q->where('e.occurred_at', '<=', Carbon::parse((string) $to)->endOfDay()));
         $total = (clone $query)->count();
         $rows = $query->orderByDesc('e.occurred_at')->orderByDesc('e.id')
             ->forPage($page, $perPage)
