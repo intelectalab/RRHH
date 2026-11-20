@@ -313,6 +313,16 @@
       "permissions": [
         "payroll.fifth_category_ledger.view"
       ]
+    },
+    "payroll.payslips": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.payslips.view"
+      ]
+    },
+    "portal.payslips": {
+      "module": "payroll",
+      "permissions": []
     }
   }
 }

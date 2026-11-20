@@ -23202,7 +23202,39 @@ paths:
       operationId: postMePassword
   /me/payslips:
     get:
-      summary: Boletas propias
+      summary: BOL-3 · Boletas propias (historial de todas las relaciones del usuario, incluidas las de periodos migrados),
+        sin las anuladas salvo ?include_voided=1
+      parameters:
+      - name: employment_id
+        in: query
+        required: false
+        description: Relación propia; por defecto todas
+        schema:
+          type: string
+      - name: include_voided
+        in: query
+        required: false
+        description: Incluir anuladas (1)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: authenticated
+      operationId: getMePayslips
+  /me/payslips/{id}:
+    get:
+      summary: BOL-2 · Boleta propia con sus líneas (solo el titular; de otro, 404)
       responses:
         '200':
           description: Correcto
@@ -23212,11 +23244,112 @@ paths:
                 $ref: '#/components/schemas/GenericEnvelope'
         '401': *id001
         '403': *id002
+        '404': *id004
       tags:
       - BOL
       x-phase: 3
       x-permission: authenticated
-      operationId: getMePayslips
+      operationId: getMePayslipsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /me/payslips/{id}/acknowledge:
+    post:
+      summary: BOL-2 · RN-BOL-03 · Acuse de recibo del titular (IP y dispositivo como evidencia); 409 si ya tiene acuse o
+        está anulada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: authenticated
+      operationId: postMePayslipsIdAcknowledge
+  /me/payslips/{id}/explanation:
+    get:
+      summary: BOL-5 · Qué cambió el neto frente a la boleta anterior y por qué, desde la traza del cálculo (solo el titular)
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: authenticated
+      operationId: getMePayslipsIdExplanation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /me/payslips/{id}/file:
+    get:
+      summary: BOL-2 · RN-BOL-02 · PDF de la boleta propia; la primera apertura y cada descarga quedan como constancia de
+        entrega
+      responses:
+        '200':
+          description: Archivo
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: authenticated
+      operationId: getMePayslipsIdFile
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /me/preferences:
     patch:
       summary: 'Preferencias propias (CFG-6): idioma de la interfaz y de las notificaciones (es, en, pt); null vuelve al idioma
@@ -27972,6 +28105,103 @@ paths:
       x-phase: 3
       x-permission: payroll.periods.mark_paid
       operationId: postPayrollPeriodsIdPaymentBatches
+  /payroll-periods/{id}/payslip-summary:
+    get:
+      summary: 'BOL-2 · Resumen de entrega del periodo: generadas, publicadas, vistas, con acuse, pendientes de acuse, en
+        físico y anuladas'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.view
+      operationId: getPayrollPeriodsIdPayslipSummary
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-periods/{id}/payslips:
+    post:
+      summary: 'BOL-1 · Generar las boletas del periodo aprobado o cerrado desde su corrida vigente: una por relación calculada,
+        PDF al legajo; idempotente. Una boleta de otra corrida se anula y la nueva la referencia (RN-BOL-04). Con boletas.publicar_al_cerrar
+        se publican al generarse'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.publish
+      operationId: postPayrollPeriodsIdPayslips
+  /payroll-periods/{id}/payslips/publish:
+    post:
+      summary: BOL-2 · Publicar en el portal todas las boletas generadas del periodo y avisar a cada trabajador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.publish
+      operationId: postPayrollPeriodsIdPayslipsPublish
   /payroll-periods/{id}/population:
     get:
       summary: 'Población del periodo: relaciones del grupo con vínculo en alguna fecha del periodo'
@@ -28915,6 +29145,36 @@ paths:
       x-phase: 3
       x-permission: payroll.payslips.view
       operationId: getPayslips
+  /payslips/bulk-download:
+    post:
+      summary: 'BOL-3 · RN-BOL-08 · Descarga masiva por periodo, unidad o selección (payroll_period_id?, org_unit_id?, payslip_ids?):
+        ZIP de PDF por enlace temporal; queda registrado quién lo pidió'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.bulk_download
+      operationId: postPayslipsBulkDownload
   /payslips/{id}:
     get:
       summary: Ver Payslip
@@ -28946,10 +29206,16 @@ paths:
       x-phase: 3
       x-permission: payroll.payslips.view
       operationId: getPayslipsId
-  /payslips/{id}/acknowledge:
+  /payslips/{id}/deliver-printed:
     post:
-      summary: Acción «acknowledge» sobre Payslip
-      description: Transición explícita; valida la máquina de estados y deja auditoría.
+      summary: BOL-2 · RN-BOL-07 · Registrar la entrega en físico (delivered_on, evidence_document_id del cargo escaneado
+        en el legajo, note)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
       parameters:
       - name: id
         in: path
@@ -28957,34 +29223,109 @@ paths:
         schema:
           type: string
       - $ref: '#/components/parameters/IdempotencyKey'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActionRequest'
       responses:
         '200':
           description: Correcto
           content:
             application/json:
               schema:
-                type: object
-                required:
-                - data
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Payslip'
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
         '401': *id001
         '403': *id002
         '404': *id004
         '409': *id005
         '422': *id006
+        '429': *id007
       tags:
       - BOL
       x-phase: 3
-      x-permission: payroll.payslips.acknowledge
-      operationId: postPayslipsIdAcknowledge
+      x-permission: payroll.payslips.publish
+      operationId: postPayslipsIdDeliverPrinted
+  /payslips/{id}/deliveries:
+    get:
+      summary: 'BOL-2 · Constancias de entrega de la boleta: emisión, publicación, primera vista, descarga, acuse y entrega
+        en físico'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.view
+      operationId: getPayslipsIdDeliveries
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payslips/{id}/explanation:
+    get:
+      summary: BOL-5 · Explicación del cambio de neto frente a la boleta anterior (conceptos nuevos o que desaparecen, días,
+        sueldo, quinta, descuentos) citando conceptos y montos de la traza; con payroll.results.view
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.view
+      operationId: getPayslipsIdExplanation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payslips/{id}/file:
+    get:
+      summary: 'BOL-3 · PDF de la boleta (RN-BOL-06: otro distinto del titular necesita además payroll.results.view; queda
+        en el registro de accesos)'
+      responses:
+        '200':
+          description: Archivo
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - BOL
+      x-phase: 3
+      x-permission: payroll.payslips.view
+      operationId: getPayslipsIdFile
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /payslips/{id}/publish:
     post:
       summary: Acción «publish» sobre Payslip
@@ -57416,26 +57757,91 @@ components:
       type: object
       required:
       - id
-      - period_id
+      - payroll_period_id
       - employment_id
+      - legal_entity_id
+      - number
+      - kind
+      - version
       - status
       properties:
         id:
           type: string
           description: Identificador opaco
-        period_id:
+        payroll_period_id:
           type: string
           description: Identificador opaco
         employment_id:
           type: string
           description: Identificador opaco
+        legal_entity_id:
+          type: string
+          description: Identificador opaco
+        number:
+          type: string
+        kind:
+          type: string
+          enum:
+          - regular
+          - gratification
+          - cts
+          - profit_sharing
+          - settlement
+          - rectification
+        version:
+          type: integer
+        status:
+          type: string
+          enum:
+          - generated
+          - published
+          - viewed
+          - acknowledged
+          - voided
+        employee_name:
+          type: string
+          nullable: true
+        employee_code:
+          type: string
+          nullable: true
+        period_label:
+          type: string
+          nullable: true
+        gross:
+          $ref: '#/components/schemas/Money'
+        deductions:
+          $ref: '#/components/schemas/Money'
         net:
           $ref: '#/components/schemas/Money'
-        file_id:
+        employer_contributions:
+          $ref: '#/components/schemas/Money'
+        lines:
+          type: array
+          items: *id008
+          nullable: true
+        requires_acknowledgement:
+          type: boolean
+          nullable: true
+        is_imported:
+          type: boolean
+          nullable: true
+        rectifies_payslip_id:
           type: string
           description: Identificador opaco
           nullable: true
+        document_id:
+          type: string
+          description: Identificador opaco
+          nullable: true
+        generated_at:
+          type: string
+          format: date-time
+          nullable: true
         published_at:
+          type: string
+          format: date-time
+          nullable: true
+        first_viewed_at:
           type: string
           format: date-time
           nullable: true
@@ -57443,22 +57849,31 @@ components:
           type: string
           format: date-time
           nullable: true
-        status:
+        voided_at:
           type: string
-          enum:
-          - generated
-          - published
-          - acknowledged
-          - voided
+          format: date-time
+          nullable: true
+        void_reason:
+          type: string
+          nullable: true
+        retention_until:
+          type: string
+          format: date
+          nullable: true
+        deliveries:
+          type: array
+          items: *id008
+          nullable: true
+        allowed_actions:
+          type: array
+          items: *id009
+          nullable: true
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-      x-sensitive-fields:
-      - net
-      description: 'Campos sensibles (requieren permiso por campo; se omiten si no se tiene): net'
     Person:
       type: object
       required:

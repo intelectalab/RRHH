@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'Você tem uma fatura vencida', 'body' => 'A fatura {number} de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}.'],
             'email' => ['subject' => 'Fatura vencida: {number}', 'body' => "Olá {name}:\n\nA fatura {number} de {organization} no valor de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}: ninguém poderá operar até regularizar, e os dados são mantidos.\n\nVeja seu extrato aqui: {link}"],
         ],
+        'payslips.published' => [
+            'in_app' => ['subject' => 'Seu holerite de {period} está disponível', 'body' => 'Você já pode ver e baixar seu holerite de {period} no seu portal.'],
+            'email' => ['subject' => 'Seu holerite de {period} está disponível', 'body' => "Olá {name}:\n\nEm {organization}, seu holerite de {period} já está no seu portal.\n\nVeja aqui: {link}"],
+        ],
+        'payslips.acknowledgement_pending' => [
+            'in_app' => ['subject' => 'Confirme o recebimento do holerite de {period}', 'body' => 'Sua empresa pede que confirme que recebeu o holerite de {period}.'],
+            'email' => ['subject' => 'Confirme o recebimento do holerite de {period}', 'body' => "Olá {name}:\n\nEm {organization}, falta confirmar o recebimento do seu holerite de {period}.\n\nConfirme aqui: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Novidade normativa: {title}', 'body' => 'Vigente desde {valid_from} ({legal_source}). Veja o detalhe em Parâmetros legais.'],
             'email' => ['subject' => 'Novidade normativa: {title}', 'body' => "Olá {name}:\n\nFoi publicada uma atualização de parâmetros legais que se aplica a {organization}: {title}, vigente desde {valid_from} ({legal_source}).\n\nVeja o detalhe aqui: {link}"],

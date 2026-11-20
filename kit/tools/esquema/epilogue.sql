@@ -3,16 +3,29 @@
 -- REGLAS DE INTEGRIDAD ADICIONALES (triggers específicos)
 -- ====================================================================================================
 
--- BOL · Una boleta cerrada no se modifica ni se borra (SQLSTATE AY002). Una rectificación es una boleta nueva.
+-- BOL · Una boleta generada no se borra y su contenido (montos, líneas, archivo, número, versión) no cambia:
+-- solo avanza su estado de entrega (ME-20). Una anulada ya no cambia. Una corrección es otra boleta que la
+-- referencia (RN-BOL-04). SQLSTATE AY002.
 CREATE FUNCTION guard_closed_payslip() RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  IF OLD.closed_at IS NOT NULL THEN
-    RAISE EXCEPTION 'La boleta % está cerrada: % no está permitido. Emite una boleta de rectificación.', OLD.number, TG_OP
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'La boleta % no se borra: se anula y se emite otra versión.', OLD.number USING ERRCODE = 'AY002';
+  END IF;
+  IF OLD.closed_at IS NOT NULL AND (
+       NEW.content IS DISTINCT FROM OLD.content OR NEW.gross_amount IS DISTINCT FROM OLD.gross_amount
+    OR NEW.deductions_amount IS DISTINCT FROM OLD.deductions_amount OR NEW.net_amount IS DISTINCT FROM OLD.net_amount
+    OR NEW.employer_contributions IS DISTINCT FROM OLD.employer_contributions OR NEW.number IS DISTINCT FROM OLD.number
+    OR NEW.file_id IS DISTINCT FROM OLD.file_id OR NEW.content_hash IS DISTINCT FROM OLD.content_hash
+    OR NEW.employment_id IS DISTINCT FROM OLD.employment_id OR NEW.payroll_period_id IS DISTINCT FROM OLD.payroll_period_id
+    OR NEW.version IS DISTINCT FROM OLD.version OR NEW.closed_at IS DISTINCT FROM OLD.closed_at) THEN
+    RAISE EXCEPTION 'La boleta % está cerrada: su contenido no cambia. Emite una boleta de rectificación.', OLD.number
       USING ERRCODE = 'AY002';
   END IF;
-  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
+  IF OLD.status = 'voided' AND NEW.status IS DISTINCT FROM OLD.status THEN
+    RAISE EXCEPTION 'La boleta % está anulada.', OLD.number USING ERRCODE = 'AY002';
+  END IF;
   RETURN NEW;
 END
 $$;

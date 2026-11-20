@@ -54,6 +54,7 @@ use App\Modules\Payroll\Infrastructure\Models\PayrollRunAnomaly;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
 use App\Modules\Payroll\Infrastructure\Models\PayrollVarianceThreshold;
+use App\Modules\Payroll\Infrastructure\Models\Payslip;
 use App\Modules\Settings\Infrastructure\Models\Catalog;
 use App\Modules\Settings\Infrastructure\Models\CatalogItem;
 use App\Modules\Settings\Infrastructure\Models\CustomFieldDefinition;
@@ -275,6 +276,11 @@ final class CrossTenantHarness
         '/personnel-actions/{id}' => PersonnelAction::class,
         '/personnel-actions/{id}/cancel' => PersonnelAction::class,
         '/personnel-actions/{id}/correct' => PersonnelAction::class,
+        // BOL-2 · BOL-5: la boleta propia (portal) de A y sus acciones.
+        '/me/payslips/{id}' => Payslip::class,
+        '/me/payslips/{id}/file' => Payslip::class,
+        '/me/payslips/{id}/acknowledge' => Payslip::class,
+        '/me/payslips/{id}/explanation' => Payslip::class,
     ];
 
     /**

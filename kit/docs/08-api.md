@@ -1092,8 +1092,20 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 |---|---|---|---|
 | GET | `/payslips` | `payroll.payslips.view` | 3 |
 | GET | `/payslips/{id}` | `payroll.payslips.view` | 3 |
-| POST | `/payslips/{id}/{publish,acknowledge,void}` | `payroll.payslips.{publish,acknowledge,void}` | 3 |
+| POST | `/payslips/{id}/{publish,void}` | `payroll.payslips.{publish,void}` | 3 |
 | GET | `/me/payslips` | sesión | 3 |
+| GET | `/me/payslips/{id}` | sesión | 3 |
+| GET | `/me/payslips/{id}/file` | sesión | 3 |
+| POST | `/me/payslips/{id}/acknowledge` | sesión | 3 |
+| GET | `/me/payslips/{id}/explanation` | sesión | 3 |
+| POST | `/payroll-periods/{id}/payslips` | `payroll.payslips.publish` | 3 |
+| POST | `/payroll-periods/{id}/payslips/publish` | `payroll.payslips.publish` | 3 |
+| GET | `/payroll-periods/{id}/payslip-summary` | `payroll.payslips.view` | 3 |
+| GET | `/payslips/{id}/file` | `payroll.payslips.view` | 3 |
+| GET | `/payslips/{id}/explanation` | `payroll.payslips.view` | 3 |
+| GET | `/payslips/{id}/deliveries` | `payroll.payslips.view` | 3 |
+| POST | `/payslips/{id}/deliver-printed` | `payroll.payslips.publish` | 3 |
+| POST | `/payslips/bulk-download` | `payroll.payslips.bulk_download` | 3 |
 
 **BSO · Beneficios sociales**
 

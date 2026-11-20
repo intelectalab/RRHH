@@ -440,7 +440,7 @@ INSERT INTO payslips (id, tenant_id, payroll_period_id, employment_id, legal_ent
   ('aaaaaaaa-0000-4000-8000-000000000a12', 'aaaaaaaa-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000a11',
    'aaaaaaaa-0000-4000-8000-0000000000c1', 'aaaaaaaa-0000-4000-8000-0000000000e1', 'B-2026-09-0001', 'PEN', '{}');
 UPDATE payslips SET net_amount = 100 WHERE id = 'aaaaaaaa-0000-4000-8000-000000000a12';                   -- borrador: se puede
-UPDATE payslips SET status = 'closed', closed_at = now() WHERE id = 'aaaaaaaa-0000-4000-8000-000000000a12'; -- cierre
+UPDATE payslips SET status = 'published', closed_at = now() WHERE id = 'aaaaaaaa-0000-4000-8000-000000000a12'; -- emisión (ME-20)
 DO $$
 DECLARE
   sentencia text;

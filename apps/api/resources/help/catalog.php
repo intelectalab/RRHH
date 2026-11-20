@@ -60,6 +60,8 @@ return [
     'pantalla-acuerdos-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_agreements']],
     'pantalla-calculos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.runs']],
     'pantalla-revision-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.review']],
+    'pantalla-boletas' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payslips']],
+    'pantalla-mis-boletas' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['portal.payslips']],
     'pantalla-pagos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payments']],
     'pantalla-retenciones-quinta' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.fifth_ledger']],
     'pantalla-micro-pequena-empresa' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.small_business']],

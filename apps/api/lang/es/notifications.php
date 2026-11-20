@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'Tienes un comprobante vencido', 'body' => 'El comprobante {number} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}.'],
             'email' => ['subject' => 'Comprobante vencido: {number}', 'body' => "Hola {name}:\n\nEl comprobante {number} de {organization} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}: nadie podrá operar hasta regularizar, y los datos se conservan.\n\nRevisa tu estado de cuenta aquí: {link}"],
         ],
+        'payslips.published' => [
+            'in_app' => ['subject' => 'Tu boleta de {period} está disponible', 'body' => 'Ya puedes ver y descargar tu boleta de pago de {period} en tu portal.'],
+            'email' => ['subject' => 'Tu boleta de {period} está disponible', 'body' => "Hola {name}:\n\nEn {organization}, tu boleta de pago de {period} ya está en tu portal.\n\nRevísala aquí: {link}"],
+        ],
+        'payslips.acknowledgement_pending' => [
+            'in_app' => ['subject' => 'Confirma la recepción de tu boleta de {period}', 'body' => 'Tu empresa pide que confirmes que recibiste tu boleta de {period}.'],
+            'email' => ['subject' => 'Confirma la recepción de tu boleta de {period}', 'body' => "Hola {name}:\n\nEn {organization}, falta que confirmes la recepción de tu boleta de {period}.\n\nConfírmala aquí: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Novedad normativa: {title}', 'body' => 'Vigente desde el {valid_from} ({legal_source}). Revisa el detalle en Parámetros legales.'],
             'email' => ['subject' => 'Novedad normativa: {title}', 'body' => "Hola {name}:\n\nSe publicó una actualización de parámetros legales que aplica a {organization}: {title}, vigente desde el {valid_from} ({legal_source}).\n\nRevisa el detalle aquí: {link}"],

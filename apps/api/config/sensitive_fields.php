@@ -126,7 +126,14 @@ return [
         'lines' => ['payroll.results.view', 'salary'],
         'trace' => ['payroll.results.trace.view', 'salary'],
     ],
-    'Payslip' => ['net' => ['payroll.results.view', 'salary']],
+    // BOL-1 · RN-BOL-06 · Montos y líneas de la boleta: solo con ver resultados de planilla.
+    'Payslip' => [
+        'gross' => ['payroll.results.view', 'salary'],
+        'deductions' => ['payroll.results.view', 'salary'],
+        'net' => ['payroll.results.view', 'salary'],
+        'employer_contributions' => ['payroll.results.view', 'salary'],
+        'lines' => ['payroll.results.view', 'salary'],
+    ],
     // COL-6 · Derechohabientes: datos de terceros (el recurso exige people.dependents.view).
     'Dependent' => [
         'document_number' => ['people.people.personal_data.view', 'identity_document'],

@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'You have an overdue invoice', 'body' => 'Invoice {number} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}.'],
             'email' => ['subject' => 'Overdue invoice: {number}', 'body' => "Hi {name},\n\nInvoice {number} for {organization} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}: nobody can work until it is settled, and the data is kept.\n\nSee your account statement here: {link}"],
         ],
+        'payslips.published' => [
+            'in_app' => ['subject' => 'Your {period} payslip is available', 'body' => 'You can now view and download your {period} payslip in your portal.'],
+            'email' => ['subject' => 'Your {period} payslip is available', 'body' => "Hello {name}:\n\nAt {organization}, your {period} payslip is now in your portal.\n\nSee it here: {link}"],
+        ],
+        'payslips.acknowledgement_pending' => [
+            'in_app' => ['subject' => 'Confirm receipt of your {period} payslip', 'body' => 'Your company asks you to confirm you received your {period} payslip.'],
+            'email' => ['subject' => 'Confirm receipt of your {period} payslip', 'body' => "Hello {name}:\n\nAt {organization}, please confirm receipt of your {period} payslip.\n\nConfirm it here: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Regulatory update: {title}', 'body' => 'Effective from {valid_from} ({legal_source}). See the details in Legal parameters.'],
             'email' => ['subject' => 'Regulatory update: {title}', 'body' => "Hello {name}:\n\nA legal parameter update that applies to {organization} was published: {title}, effective from {valid_from} ({legal_source}).\n\nSee the details here: {link}"],

@@ -40,6 +40,9 @@ return [
         'billing.invoice_issued' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
         'billing.due_soon' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
         'billing.overdue' => ['variables' => ['number', 'total', 'due_on', 'suspend_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // BOL-2 · RN-BOL-01 · RN-BOL-03: boleta publicada en el portal y recordatorio del acuse pendiente (al titular).
+        'payslips.published' => ['variables' => ['period'], 'link' => '/mi/boletas', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'payslips.acknowledgement_pending' => ['variables' => ['period'], 'link' => '/mi/boletas', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // PAR-4 · PAR-7 · RN-PAR-06: se publicó una actualización normativa (y si toca un periodo abierto, simularlo).
         'payroll.legal_update' => ['variables' => ['title', 'legal_source', 'valid_from', 'open_periods'], 'link' => '/nomina/parametros?vista=novedades', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'payroll.legal_update_open_period' => ['variables' => ['title', 'legal_source', 'valid_from', 'open_periods'], 'link' => '/nomina/parametros?vista=novedades', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],

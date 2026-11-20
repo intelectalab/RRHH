@@ -4,11 +4,13 @@ namespace App\Modules\Payroll;
 
 use App\Modules\Payroll\Application\ConceptAccounting;
 use App\Modules\Payroll\Application\PayrollOpeningBalances;
+use App\Modules\Payroll\Console\RemindPayslipAcknowledgement;
 use App\Modules\Payroll\Infrastructure\Exports\FifthCategoryLedgerExportSource;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollBalancesImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
 use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
+use App\Modules\Payroll\Infrastructure\Subscribers\GeneratePayslips;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
 use App\Modules\Payroll\Infrastructure\Workflow\PayrollPeriodOutcome;
@@ -19,6 +21,7 @@ use App\Shared\Payroll\ConceptAccounts;
 use App\Shared\Payroll\OpeningBalances;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -53,6 +56,15 @@ final class PayrollServiceProvider extends ServiceProvider
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(ProcessPayrollRun::class));
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));
+        // BOL-1 · Boletas al cerrar el periodo.
+        $outbox->subscribe($this->app->make(GeneratePayslips::class));
+        if ($this->app->runningInConsole()) {
+            $this->commands([RemindPayslipAcknowledgement::class]);
+            $this->app->booted(function (): void {
+                // BOL-2 · RN-BOL-03 · Recordatorio diario del acuse pendiente.
+                $this->app->make(Schedule::class)->command('payslips:remind-acknowledgement')->dailyAt('09:20')->withoutOverlapping();
+            });
+        }
         // PER-8 · Aprobación del periodo por el flujo configurado (WFL-2).
         $this->app->make(ApprovalOutcomeRegistry::class)->register($this->app->make(PayrollPeriodOutcome::class));
     }

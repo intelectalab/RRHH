@@ -9361,8 +9361,76 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Boletas propias */
+        /** BOL-3 · Boletas propias (historial de todas las relaciones del usuario, incluidas las de periodos migrados), sin las anuladas salvo ?include_voided=1 */
         get: operations["getMePayslips"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-2 · Boleta propia con sus líneas (solo el titular; de otro, 404) */
+        get: operations["getMePayslipsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips/{id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** BOL-2 · RN-BOL-03 · Acuse de recibo del titular (IP y dispositivo como evidencia); 409 si ya tiene acuse o está anulada */
+        post: operations["postMePayslipsIdAcknowledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips/{id}/explanation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-5 · Qué cambió el neto frente a la boleta anterior y por qué, desde la traza del cálculo (solo el titular) */
+        get: operations["getMePayslipsIdExplanation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-2 · RN-BOL-02 · PDF de la boleta propia; la primera apertura y cada descarga quedan como constancia de entrega */
+        get: operations["getMePayslipsIdFile"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11411,6 +11479,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-periods/{id}/payslip-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-2 · Resumen de entrega del periodo: generadas, publicadas, vistas, con acuse, pendientes de acuse, en físico y anuladas */
+        get: operations["getPayrollPeriodsIdPayslipSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/payslips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** BOL-1 · Generar las boletas del periodo aprobado o cerrado desde su corrida vigente: una por relación calculada, PDF al legajo; idempotente. Una boleta de otra corrida se anula y la nueva la referencia (RN-BOL-04). Con boletas.publicar_al_cerrar se publican al generarse */
+        post: operations["postPayrollPeriodsIdPayslips"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/payslips/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** BOL-2 · Publicar en el portal todas las boletas generadas del periodo y avisar a cada trabajador */
+        post: operations["postPayrollPeriodsIdPayslipsPublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-periods/{id}/population": {
         parameters: {
             query?: never;
@@ -11884,6 +12003,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payslips/bulk-download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** BOL-3 · RN-BOL-08 · Descarga masiva por periodo, unidad o selección (payroll_period_id?, org_unit_id?, payslip_ids?): ZIP de PDF por enlace temporal; queda registrado quién lo pidió */
+        post: operations["postPayslipsBulkDownload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payslips/{id}": {
         parameters: {
             query?: never;
@@ -11901,7 +12037,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/payslips/{id}/acknowledge": {
+    "/payslips/{id}/deliver-printed": {
         parameters: {
             query?: never;
             header?: never;
@@ -11910,11 +12046,59 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «acknowledge» sobre Payslip
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
-        post: operations["postPayslipsIdAcknowledge"];
+        /** BOL-2 · RN-BOL-07 · Registrar la entrega en físico (delivered_on, evidence_document_id del cargo escaneado en el legajo, note) */
+        post: operations["postPayslipsIdDeliverPrinted"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payslips/{id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-2 · Constancias de entrega de la boleta: emisión, publicación, primera vista, descarga, acuse y entrega en físico */
+        get: operations["getPayslipsIdDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payslips/{id}/explanation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-5 · Explicación del cambio de neto frente a la boleta anterior (conceptos nuevos o que desaparecen, días, sueldo, quinta, descuentos) citando conceptos y montos de la traza; con payroll.results.view */
+        get: operations["getPayslipsIdExplanation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payslips/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** BOL-3 · PDF de la boleta (RN-BOL-06: otro distinto del titular necesita además payroll.results.view; queda en el registro de accesos) */
+        get: operations["getPayslipsIdFile"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -24440,23 +24624,54 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
-        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): net */
         Payslip: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            period_id: string;
+            payroll_period_id: string;
             /** @description Identificador opaco */
             employment_id: string;
-            net?: components["schemas"]["Money"];
             /** @description Identificador opaco */
-            file_id?: string | null;
+            legal_entity_id: string;
+            number: string;
+            /** @enum {string} */
+            kind: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "rectification";
+            version: number;
+            /** @enum {string} */
+            status: "generated" | "published" | "viewed" | "acknowledged" | "voided";
+            employee_name?: string | null;
+            employee_code?: string | null;
+            period_label?: string | null;
+            gross?: components["schemas"]["Money"];
+            deductions?: components["schemas"]["Money"];
+            net?: components["schemas"]["Money"];
+            employer_contributions?: components["schemas"]["Money"];
+            lines?: {
+                [key: string]: unknown;
+            }[] | null;
+            requires_acknowledgement?: boolean | null;
+            is_imported?: boolean | null;
+            /** @description Identificador opaco */
+            rectifies_payslip_id?: string | null;
+            /** @description Identificador opaco */
+            document_id?: string | null;
+            /** Format: date-time */
+            generated_at?: string | null;
             /** Format: date-time */
             published_at?: string | null;
             /** Format: date-time */
+            first_viewed_at?: string | null;
+            /** Format: date-time */
             acknowledged_at?: string | null;
-            /** @enum {string} */
-            status: "generated" | "published" | "acknowledged" | "voided";
+            /** Format: date-time */
+            voided_at?: string | null;
+            void_reason?: string | null;
+            /** Format: date */
+            retention_until?: string | null;
+            deliveries?: {
+                [key: string]: unknown;
+            }[] | null;
+            allowed_actions?: string[] | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -50144,7 +50359,12 @@ export interface operations {
     };
     getMePayslips: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Relación propia; por defecto todas */
+                employment_id?: string;
+                /** @description Incluir anuladas (1) */
+                include_voided?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -50160,8 +50380,122 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    getMePayslipsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postMePayslipsIdAcknowledge: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getMePayslipsIdExplanation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getMePayslipsIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     patchMePreferences: {
@@ -54954,6 +55288,103 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getPayrollPeriodsIdPayslipSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPayrollPeriodsIdPayslips: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollPeriodsIdPayslipsPublish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getPayrollPeriodsIdPopulation: {
         parameters: {
             query?: never;
@@ -55895,6 +56326,39 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    postPayslipsBulkDownload: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getPayslipsId: {
         parameters: {
             query?: {
@@ -55927,7 +56391,7 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
-    postPayslipsIdAcknowledge: {
+    postPayslipsIdDeliverPrinted: {
         parameters: {
             query?: never;
             header?: {
@@ -55941,7 +56405,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -55951,16 +56415,93 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["Payslip"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayslipsIdDeliveries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPayslipsIdExplanation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getPayslipsIdFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPayslipsIdPublish: {

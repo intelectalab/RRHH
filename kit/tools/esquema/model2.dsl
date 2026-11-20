@@ -329,17 +329,19 @@
   status enum(pending,paid,rejected,returned)=pending ; payslip_id ?-> payslips ; reference ; rejection_reason
 
 #E BOL | Boletas
-@payslips main lock sens | Boleta de pago. Una vez cerrada no admite cambios ni borrado; una rectificación es una boleta nueva que referencia a la anterior.
+@payslips main lock sens | Boleta de pago. Generada, su contenido, montos y archivo no cambian ni se borra; una corrección la anula y genera otra versión que la referencia (RN-BOL-04). BOL-1 a BOL-5: estados por acciones (ME-20), documento del legajo y conservación por parámetro legal.
   payroll_run_employment_id ?-> payroll_run_employments ; payroll_period_id -> payroll_periods ; employment_id -> employments
   legal_entity_id -> legal_entities ; number text! ; kind enum(regular,gratification,cts,profit_sharing,settlement,rectification)=regular
-  status enum(draft,closed)=draft ; gross_amount money #S ; deductions_amount money #S ; net_amount money #S
+  status enum(generated,published,viewed,acknowledged,voided)=generated ; gross_amount money #S ; deductions_amount money #S ; net_amount money #S
   employer_contributions money #S ; currency cur ; content j! #S ; file_id ?-> stored_files ; content_hash ; closed_at
   rectifies_payslip_id ?-> payslips ; uniq legal_entity_id, number ; idx employment_id, payroll_period_id
-  check (status = 'closed') = (closed_at IS NOT NULL)
-@payslip_deliveries | Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse.
+  version integer=1 ; document_id ?-> documents ; requires_acknowledgement bool=f ; is_imported bool=f
+  published_at ; voided_at ; void_reason ; voided_by_user_id ?-> users ; generated_by_user_id ?-> users
+@payslip_deliveries | Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse; o entrega en físico con cargo escaneado (RN-BOL-07).
   payslip_id -> payslips ; employment_id -> employments ; channel enum(portal,email,whatsapp,printed)=portal
   status enum(published,viewed,acknowledged)=published ; published_at
   first_viewed_at ; downloaded_at ; acknowledged_at ; signature_request_id ?-> signature_requests ; uniq payslip_id, channel
+  first_viewed_ip ; acknowledged_ip ; acknowledged_user_agent ; last_reminded_at ; delivered_by_user_id ?-> users ; evidence_document_id ?-> documents ; note
 
 #E BSO | Beneficios sociales, seguros y derechohabientes
 @cts_deposits lock sens | Depósito semestral de CTS por trabajador: remuneración computable, monto, entidad depositaria y constancia.

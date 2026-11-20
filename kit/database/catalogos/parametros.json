@@ -1348,6 +1348,47 @@
       "opciones": null
     },
     {
+      "codigo": "boletas.publicar_al_cerrar",
+      "modulo": "payroll",
+      "nombre": "Publicar boletas al cerrar el periodo",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "BOL-1 · BOL-2 · RN-BOL-01: al cerrar el periodo las boletas generadas se publican solas en el portal y se avisa a cada trabajador; sin esto quedan generadas hasta que Payroll las publique.",
+      "opciones": null
+    },
+    {
+      "codigo": "boletas.exige_acuse",
+      "modulo": "payroll",
+      "nombre": "Exigir acuse de recibo de la boleta",
+      "tipo": "boolean",
+      "valor_por_defecto": false,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "BOL-2 · RN-BOL-03: la boleta publicada queda pendiente de acuse del trabajador y se le recuerda cada día hasta que lo dé. Política de la empresa.",
+      "opciones": null
+    },
+    {
+      "codigo": "boletas.tolerancia_explicacion",
+      "modulo": "payroll",
+      "nombre": "Diferencia de neto que se explica en la boleta",
+      "tipo": "decimal",
+      "valor_por_defecto": 0,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "BOL-5: una diferencia de neto frente a la boleta anterior mayor que este monto lleva al menos un motivo explicado. 0: se explica toda diferencia. Política de la organización, no valor legal.",
+      "opciones": {
+        "min": 0
+      }
+    },
+    {
       "codigo": "nomina.incidencia_monto_visto_bueno",
       "modulo": "payroll",
       "nombre": "Monto de incidencia que requiere visto bueno",

@@ -2,6 +2,7 @@
 
 use App\Modules\Payroll\Http\Controllers\FifthCategoryLedgerController;
 use App\Modules\Payroll\Http\Controllers\LegalParametersController;
+use App\Modules\Payroll\Http\Controllers\MyPayslipController;
 use App\Modules\Payroll\Http\Controllers\PayrollConceptController;
 use App\Modules\Payroll\Http\Controllers\PayrollEngineController;
 use App\Modules\Payroll\Http\Controllers\PayrollIncidentController;
@@ -9,6 +10,7 @@ use App\Modules\Payroll\Http\Controllers\PayrollOpeningBalanceController;
 use App\Modules\Payroll\Http\Controllers\PayrollPeriodController;
 use App\Modules\Payroll\Http\Controllers\PayrollReviewController;
 use App\Modules\Payroll\Http\Controllers\PayrollRunController;
+use App\Modules\Payroll\Http\Controllers\PayslipController;
 use App\Modules\Payroll\Http\Controllers\SmallBusinessController;
 use Illuminate\Support\Facades\Route;
 
@@ -137,4 +139,22 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/employments/{employment_id}/fifth-category-summary', [FifthCategoryLedgerController::class, 'summary'])->middleware('permission:payroll.fifth_category_ledger.view');
     // PER-12 · Acumulados del ejercicio traídos del sistema anterior (se cargan con el importador payroll_balances).
     Route::get('/payroll-opening-balances', [PayrollOpeningBalanceController::class, 'index'])->middleware('permission:payroll.incidents.view');
+    // BOL-1 a BOL-5 · Boletas de pago: generación y publicación del periodo, historial, PDF, entrega y explicación.
+    Route::post('/payroll-periods/{id}/payslips', [PayslipController::class, 'generate'])->middleware('permission:payroll.payslips.publish');
+    Route::post('/payroll-periods/{id}/payslips/publish', [PayslipController::class, 'publishPeriod'])->middleware('permission:payroll.payslips.publish');
+    Route::get('/payroll-periods/{id}/payslip-summary', [PayslipController::class, 'summary'])->middleware('permission:payroll.payslips.view');
+    Route::get('/payslips', [PayslipController::class, 'index'])->middleware('permission:payroll.payslips.view');
+    Route::post('/payslips/bulk-download', [PayslipController::class, 'bulkDownload'])->middleware('permission:payroll.payslips.bulk_download');
+    Route::get('/payslips/{id}', [PayslipController::class, 'show'])->middleware('permission:payroll.payslips.view');
+    Route::get('/payslips/{id}/file', [PayslipController::class, 'file'])->middleware('permission:payroll.payslips.view');
+    Route::get('/payslips/{id}/explanation', [PayslipController::class, 'explanation'])->middleware('permission:payroll.payslips.view');
+    Route::get('/payslips/{id}/deliveries', [PayslipController::class, 'deliveries'])->middleware('permission:payroll.payslips.view');
+    Route::post('/payslips/{id}/publish', [PayslipController::class, 'publish'])->middleware('permission:payroll.payslips.publish');
+    Route::post('/payslips/{id}/void', [PayslipController::class, 'void'])->middleware('permission:payroll.payslips.void');
+    Route::post('/payslips/{id}/deliver-printed', [PayslipController::class, 'deliverPrinted'])->middleware('permission:payroll.payslips.publish');
+    Route::get('/me/payslips', [MyPayslipController::class, 'index']);
+    Route::get('/me/payslips/{id}', [MyPayslipController::class, 'show']);
+    Route::get('/me/payslips/{id}/file', [MyPayslipController::class, 'file']);
+    Route::post('/me/payslips/{id}/acknowledge', [MyPayslipController::class, 'acknowledge']);
+    Route::get('/me/payslips/{id}/explanation', [MyPayslipController::class, 'explanation']);
 });

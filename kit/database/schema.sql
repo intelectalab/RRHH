@@ -7054,7 +7054,7 @@ CREATE TABLE payslips (
   legal_entity_id uuid NOT NULL,
   number text NOT NULL,
   kind text NOT NULL DEFAULT 'regular' CHECK (kind IN ('regular','gratification','cts','profit_sharing','settlement','rectification')),
-  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','closed')),
+  status text NOT NULL DEFAULT 'generated' CHECK (status IN ('generated','published','viewed','acknowledged','voided')),
   gross_amount numeric(14,2),  -- SENSIBLE
   deductions_amount numeric(14,2),  -- SENSIBLE
   net_amount numeric(14,2),  -- SENSIBLE
@@ -7065,24 +7065,38 @@ CREATE TABLE payslips (
   content_hash text,
   closed_at timestamptz,
   rectifies_payslip_id uuid,
+  version integer NOT NULL DEFAULT 1,
+  document_id uuid,
+  requires_acknowledgement boolean NOT NULL DEFAULT false,
+  is_imported boolean NOT NULL DEFAULT false,
+  published_at timestamptz,
+  voided_at timestamptz,
+  void_reason text,
+  voided_by_user_id uuid,
+  generated_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_payslips_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_payslips_legal_entity_id_number UNIQUE (tenant_id, legal_entity_id, number),
-  CONSTRAINT ck_payslips_1 CHECK ((status = 'closed') = (closed_at IS NOT NULL)),
   CONSTRAINT fk_payslips_payroll_run_employment_id FOREIGN KEY (tenant_id, payroll_run_employment_id) REFERENCES payroll_run_employments (tenant_id, id),
   CONSTRAINT fk_payslips_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
   CONSTRAINT fk_payslips_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_payslips_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
   CONSTRAINT fk_payslips_file_id FOREIGN KEY (tenant_id, file_id) REFERENCES stored_files (tenant_id, id),
-  CONSTRAINT fk_payslips_rectifies_payslip_id FOREIGN KEY (tenant_id, rectifies_payslip_id) REFERENCES payslips (tenant_id, id)
+  CONSTRAINT fk_payslips_rectifies_payslip_id FOREIGN KEY (tenant_id, rectifies_payslip_id) REFERENCES payslips (tenant_id, id),
+  CONSTRAINT fk_payslips_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_payslips_voided_by_user_id FOREIGN KEY (tenant_id, voided_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payslips_generated_by_user_id FOREIGN KEY (tenant_id, generated_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE payslips IS 'Boleta de pago. Una vez cerrada no admite cambios ni borrado; una rectificación es una boleta nueva que referencia a la anterior. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
+COMMENT ON TABLE payslips IS 'Boleta de pago. Generada, su contenido, montos y archivo no cambian ni se borra; una corrección la anula y genera otra versión que la referencia (RN-BOL-04). BOL-1 a BOL-5: estados por acciones (ME-20), documento del legajo y conservación por parámetro legal. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_payslips_payroll_run_employment_id ON payslips (tenant_id, payroll_run_employment_id);
 CREATE INDEX ix_payslips_payroll_period_id ON payslips (tenant_id, payroll_period_id);
 CREATE INDEX ix_payslips_file_id ON payslips (tenant_id, file_id);
 CREATE INDEX ix_payslips_rectifies_payslip_id ON payslips (tenant_id, rectifies_payslip_id);
+CREATE INDEX ix_payslips_document_id ON payslips (tenant_id, document_id);
+CREATE INDEX ix_payslips_voided_by_user_id ON payslips (tenant_id, voided_by_user_id);
+CREATE INDEX ix_payslips_generated_by_user_id ON payslips (tenant_id, generated_by_user_id);
 CREATE INDEX ix_payslips_employment_id_payroll_period_id ON payslips (tenant_id, employment_id, payroll_period_id);
 ALTER TABLE payslips ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payslips FORCE ROW LEVEL SECURITY;
@@ -7101,17 +7115,28 @@ CREATE TABLE payslip_deliveries (
   downloaded_at timestamptz,
   acknowledged_at timestamptz,
   signature_request_id uuid,
+  first_viewed_ip text,
+  acknowledged_ip text,
+  acknowledged_user_agent text,
+  last_reminded_at timestamptz,
+  delivered_by_user_id uuid,
+  evidence_document_id uuid,
+  note text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_payslip_deliveries_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_payslip_deliveries_payslip_id_channel UNIQUE (tenant_id, payslip_id, channel),
   CONSTRAINT fk_payslip_deliveries_payslip_id FOREIGN KEY (tenant_id, payslip_id) REFERENCES payslips (tenant_id, id),
   CONSTRAINT fk_payslip_deliveries_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
-  CONSTRAINT fk_payslip_deliveries_signature_request_id FOREIGN KEY (tenant_id, signature_request_id) REFERENCES signature_requests (tenant_id, id)
+  CONSTRAINT fk_payslip_deliveries_signature_request_id FOREIGN KEY (tenant_id, signature_request_id) REFERENCES signature_requests (tenant_id, id),
+  CONSTRAINT fk_payslip_deliveries_delivered_by_user_id FOREIGN KEY (tenant_id, delivered_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payslip_deliveries_evidence_document_id FOREIGN KEY (tenant_id, evidence_document_id) REFERENCES documents (tenant_id, id)
 );
-COMMENT ON TABLE payslip_deliveries IS 'Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse.';
+COMMENT ON TABLE payslip_deliveries IS 'Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse; o entrega en físico con cargo escaneado (RN-BOL-07).';
 CREATE INDEX ix_payslip_deliveries_employment_id ON payslip_deliveries (tenant_id, employment_id);
 CREATE INDEX ix_payslip_deliveries_signature_request_id ON payslip_deliveries (tenant_id, signature_request_id);
+CREATE INDEX ix_payslip_deliveries_delivered_by_user_id ON payslip_deliveries (tenant_id, delivered_by_user_id);
+CREATE INDEX ix_payslip_deliveries_evidence_document_id ON payslip_deliveries (tenant_id, evidence_document_id);
 ALTER TABLE payslip_deliveries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payslip_deliveries FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payslip_deliveries USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -15026,16 +15051,29 @@ ALTER TABLE ai_interactions ADD CONSTRAINT fk_ai_interactions_api_token_id FOREI
 -- REGLAS DE INTEGRIDAD ADICIONALES (triggers específicos)
 -- ====================================================================================================
 
--- BOL · Una boleta cerrada no se modifica ni se borra (SQLSTATE AY002). Una rectificación es una boleta nueva.
+-- BOL · Una boleta generada no se borra y su contenido (montos, líneas, archivo, número, versión) no cambia:
+-- solo avanza su estado de entrega (ME-20). Una anulada ya no cambia. Una corrección es otra boleta que la
+-- referencia (RN-BOL-04). SQLSTATE AY002.
 CREATE FUNCTION guard_closed_payslip() RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  IF OLD.closed_at IS NOT NULL THEN
-    RAISE EXCEPTION 'La boleta % está cerrada: % no está permitido. Emite una boleta de rectificación.', OLD.number, TG_OP
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'La boleta % no se borra: se anula y se emite otra versión.', OLD.number USING ERRCODE = 'AY002';
+  END IF;
+  IF OLD.closed_at IS NOT NULL AND (
+       NEW.content IS DISTINCT FROM OLD.content OR NEW.gross_amount IS DISTINCT FROM OLD.gross_amount
+    OR NEW.deductions_amount IS DISTINCT FROM OLD.deductions_amount OR NEW.net_amount IS DISTINCT FROM OLD.net_amount
+    OR NEW.employer_contributions IS DISTINCT FROM OLD.employer_contributions OR NEW.number IS DISTINCT FROM OLD.number
+    OR NEW.file_id IS DISTINCT FROM OLD.file_id OR NEW.content_hash IS DISTINCT FROM OLD.content_hash
+    OR NEW.employment_id IS DISTINCT FROM OLD.employment_id OR NEW.payroll_period_id IS DISTINCT FROM OLD.payroll_period_id
+    OR NEW.version IS DISTINCT FROM OLD.version OR NEW.closed_at IS DISTINCT FROM OLD.closed_at) THEN
+    RAISE EXCEPTION 'La boleta % está cerrada: su contenido no cambia. Emite una boleta de rectificación.', OLD.number
       USING ERRCODE = 'AY002';
   END IF;
-  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
+  IF OLD.status = 'voided' AND NEW.status IS DISTINCT FROM OLD.status THEN
+    RAISE EXCEPTION 'La boleta % está anulada.', OLD.number USING ERRCODE = 'AY002';
+  END IF;
   RETURN NEW;
 END
 $$;
@@ -19163,6 +19201,9 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('nomina.variacion_neto_alerta_pct', 'payroll', 'Variación de neto para alertar (%)', 'Variación frente al periodo anterior que genera una anomalía a revisar.', 'decimal', '20'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.publicar_boletas_al_cerrar', 'payroll', 'Publicar boletas al cerrar', 'Publica las boletas en el portal al cerrar el periodo.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'El trabajador confirma la recepción de su boleta.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('boletas.publicar_al_cerrar', 'payroll', 'Publicar boletas al cerrar el periodo', 'BOL-1 · BOL-2 · RN-BOL-01: al cerrar el periodo las boletas generadas se publican solas en el portal y se avisa a cada trabajador; sin esto quedan generadas hasta que Payroll las publique.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('boletas.exige_acuse', 'payroll', 'Exigir acuse de recibo de la boleta', 'BOL-2 · RN-BOL-03: la boleta publicada queda pendiente de acuse del trabajador y se le recuerda cada día hasta que lo dé. Política de la empresa.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('boletas.tolerancia_explicacion', 'payroll', 'Diferencia de neto que se explica en la boleta', 'BOL-5: una diferencia de neto frente a la boleta anterior mayor que este monto lleva al menos un motivo explicado. 0: se explica toda diferencia. Política de la organización, no valor legal.', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0}'::jsonb),
   ('nomina.incidencia_monto_visto_bueno', 'payroll', 'Monto de incidencia que requiere visto bueno', 'PER-2 · RN-PER-10: una incidencia manual cuyo monto supera este valor necesita el visto bueno de alguien con payroll.incidents.approve antes de entrar al cálculo. 0: sin visto bueno. Política de la organización, no valor legal.', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0}'::jsonb),
   ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'Quien procesa no puede aprobar ni cerrar.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.doble_control_conceptos', 'payroll', 'Doble control de conceptos', 'CPT-2 · RN-CPT-07 · Quien edita un concepto no puede publicarlo: lo publica otra persona con permiso de publicar.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
