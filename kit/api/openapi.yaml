@@ -5134,6 +5134,24 @@ paths:
       x-phase: 5
       x-permission: benefits.benefits.archive
       operationId: postBenefitsIdArchive
+  /billing/account:
+    get:
+      summary: 'Estado de cuenta de la organización: plan, comprobantes electrónicos con su constancia de aceptación, pagos,
+        saldo, próximo vencimiento y regla de mora'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: settings.organization.view
+      operationId: getBillingAccount
   /branding:
     get:
       summary: Marca de la organización
@@ -28936,6 +28954,189 @@ paths:
       x-phase: 1
       x-permission: platform.help_articles.view
       operationId: getPlatformHelpInsights
+  /platform/invoices:
+    get:
+      summary: 'Consola SaaS: comprobantes del SaaS por organización, estado y estado del comprobante electrónico'
+      parameters:
+      - name: tenant_id
+        in: query
+        required: false
+        description: Organización (uuid)
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: draft, observed, issued, paid, overdue o void
+        schema:
+          type: string
+      - name: einvoice_status
+        in: query
+        required: false
+        description: not_sent, pending, accepted o rejected
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Página
+        schema:
+          type: string
+      - name: per_page
+        in: query
+        required: false
+        description: Tamaño de página (máx. 100)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.view
+      operationId: getPlatformInvoices
+  /platform/invoices/{id}:
+    get:
+      summary: 'Consola SaaS: comprobante con sus líneas, impuesto aplicado, constancia de aceptación o motivo del rechazo,
+        y pagos'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.view
+      operationId: getPlatformInvoicesId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /platform/invoices/{id}/issue:
+    post:
+      summary: 'Consola SaaS: emitir el comprobante electrónico (impuesto del parámetro legal vigente; 422 si está por validar);
+        lo envía al proveedor y solo queda emitido con la constancia de aceptación, un rechazo lo deja observado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.manage
+      operationId: postPlatformInvoicesIdIssue
+  /platform/invoices/{id}/payments:
+    post:
+      summary: 'Consola SaaS: registrar un pago manual ({amount, currency}, fecha, medio) o uno de la pasarela (gateway_ref,
+        verificado por el adaptador de cobro); al cubrir el total queda pagado y se regulariza la suscripción'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.manage
+      operationId: postPlatformInvoicesIdPayments
+  /platform/invoices/{id}/void:
+    post:
+      summary: 'Consola SaaS: anular con motivo un borrador o un comprobante observado (uno aceptado no se anula aquí)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.manage
+      operationId: postPlatformInvoicesIdVoid
   /platform/me:
     get:
       summary: 'Consola SaaS: usuario actual, rol interno, paso del segundo factor y permisos de la consola'
@@ -29792,6 +29993,42 @@ paths:
         required: true
         schema:
           type: string
+  /platform/subscriptions/{id}/invoices:
+    post:
+      summary: 'Consola SaaS: generar en borrador el cargo del periodo siguiente (o del que empieza en period_start) con los
+        precios guardados en la suscripción y sus complementos; 409 si el periodo ya tiene cargo'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.manage
+      operationId: postPlatformSubscriptionsIdInvoices
   /platform/subscriptions/{id}/plan-fit:
     get:
       summary: 'Consola SaaS: comparar el consumo actual con los límites de otro plan antes de cambiarlo (over = las altas
@@ -30243,6 +30480,31 @@ paths:
       x-phase: 0
       x-permission: platform.tenants.update
       operationId: patchPlatformTenantsId
+  /platform/tenants/{id}/account-statement:
+    get:
+      summary: 'Consola SaaS: estado de cuenta de una organización (plan, saldo por moneda, comprobantes, pagos y regla de
+        mora)'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - SAS
+      x-phase: 0
+      x-permission: platform.billing.view
+      operationId: getPlatformTenantsIdAccountStatement
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
   /platform/tenants/{id}/activate:
     post:
       summary: 'Consola SaaS: convertir una organización en prueba en activa (ME-40 convertir)'

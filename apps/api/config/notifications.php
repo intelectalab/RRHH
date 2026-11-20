@@ -36,6 +36,10 @@ return [
         'organization.cancelled' => ['variables' => ['reason', 'retention_until'], 'link' => '/', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         // NOT-3: la dirección de correo de una persona rebotó; RRHH la corrige o la reactiva.
         'notifications.email_bounced' => ['variables' => ['user', 'reason'], 'link' => '/configuracion/mensajes?vista=entregas&estado=bounced', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // SAS-11: comprobante del SaaS emitido, por vencer o vencido (a los administradores de la organización).
+        'billing.invoice_issued' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
+        'billing.due_soon' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
+        'billing.overdue' => ['variables' => ['number', 'total', 'due_on', 'suspend_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
         // SAS-6 · RN-SAS-02 · RN-SAS-03: el consumo se acerca al tope del plan o llega a él.
         'limits.warning' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // COL-6: un hijo derechohabiente cumplió la mayoría de edad; RRHH lo revisa en la ficha.

@@ -443,7 +443,7 @@ CREATE TABLE saas_invoices (
   tenant_id uuid NOT NULL,
   subscription_id uuid,
   number text NOT NULL,
-  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','issued','paid','overdue','void')),
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','observed','issued','paid','overdue','void')),
   period_start date NOT NULL,
   period_end date NOT NULL,
   subtotal numeric(14,2) NOT NULL,
@@ -454,6 +454,24 @@ CREATE TABLE saas_invoices (
   due_on date,
   paid_at timestamptz,
   external_ref text,
+  tax_rate numeric(7,4),
+  tax_treatment text CHECK (tax_treatment IN ('taxed','export_exempt')),
+  amount_paid numeric(14,2) NOT NULL DEFAULT 0,
+  buyer_tax_id text,
+  buyer_name text,
+  einvoice_status text NOT NULL DEFAULT 'not_sent' CHECK (einvoice_status IN ('not_sent','pending','accepted','rejected')),
+  einvoice_series text,
+  einvoice_number text,
+  einvoice_ticket text,
+  einvoice_hash text,
+  einvoice_message text,
+  einvoice_accepted_at timestamptz,
+  einvoice_attempts integer NOT NULL DEFAULT 0,
+  reminded_at timestamptz,
+  overdue_at timestamptz,
+  voided_at timestamptz,
+  void_reason text,
+  created_by_platform_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -461,9 +479,10 @@ CREATE TABLE saas_invoices (
   CONSTRAINT fk_saas_invoices_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
   CONSTRAINT fk_saas_invoices_subscription_id FOREIGN KEY (subscription_id) REFERENCES subscriptions (id)
 );
-COMMENT ON TABLE saas_invoices IS 'Facturación del SaaS a la organización cliente (no es la nómina del cliente).';
+COMMENT ON TABLE saas_invoices IS 'Facturación del SaaS a la organización cliente (no es la nómina del cliente). SAS-11: el cargo del periodo nace en borrador con los precios guardados en la suscripción; emitirlo lo envía como comprobante electrónico al proveedor OSE o PSE (adaptador) y solo queda emitido con la constancia de aceptación; uno rechazado queda observado. La tasa del impuesto es la del parámetro legal vigente al emitir.';
 CREATE INDEX ix_saas_invoices_tenant_id ON saas_invoices (tenant_id);
 CREATE INDEX ix_saas_invoices_subscription_id ON saas_invoices (subscription_id);
+CREATE INDEX ix_saas_invoices_created_by_platform_user_id ON saas_invoices (created_by_platform_user_id);
 CREATE TRIGGER trg_saas_invoices_touch BEFORE UPDATE ON saas_invoices FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE saas_invoice_lines (
@@ -481,6 +500,32 @@ CREATE TABLE saas_invoice_lines (
 COMMENT ON TABLE saas_invoice_lines IS 'Líneas de la factura SaaS.';
 CREATE INDEX ix_saas_invoice_lines_saas_invoice_id ON saas_invoice_lines (saas_invoice_id);
 CREATE TRIGGER trg_saas_invoice_lines_touch BEFORE UPDATE ON saas_invoice_lines FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE saas_payments (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL,
+  saas_invoice_id uuid NOT NULL,
+  amount numeric(14,2) NOT NULL,
+  currency char(3) NOT NULL,
+  paid_on date NOT NULL,
+  method text NOT NULL DEFAULT 'transfer' CHECK (method IN ('transfer','card','wallet','cash','other')),
+  reference text,
+  source text NOT NULL DEFAULT 'manual' CHECK (source IN ('manual','gateway')),
+  gateway_ref text,
+  status text NOT NULL DEFAULT 'confirmed' CHECK (status IN ('confirmed','reversed')),
+  recorded_by_platform_user_id uuid,
+  reversed_at timestamptz,
+  reverse_reason text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fk_saas_payments_tenant_id FOREIGN KEY (tenant_id) REFERENCES tenants (id),
+  CONSTRAINT fk_saas_payments_saas_invoice_id FOREIGN KEY (saas_invoice_id) REFERENCES saas_invoices (id)
+);
+COMMENT ON TABLE saas_payments IS 'SAS-11 · Pagos de la organización a un comprobante del SaaS, registrados a mano en la consola o llegados por la pasarela (adaptador de cobro). Un pago no se borra: se anula con motivo.';
+CREATE INDEX ix_saas_payments_tenant_id ON saas_payments (tenant_id);
+CREATE INDEX ix_saas_payments_saas_invoice_id ON saas_payments (saas_invoice_id);
+CREATE INDEX ix_saas_payments_recorded_by_platform_user_id ON saas_payments (recorded_by_platform_user_id);
+CREATE TRIGGER trg_saas_payments_touch BEFORE UPDATE ON saas_payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE tenant_modules (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -14447,6 +14492,8 @@ CREATE TRIGGER trg_partner_access_grants_touch BEFORE UPDATE ON partner_access_g
 -- CLAVES FORÁNEAS DIFERIDAS (referencias hacia tablas definidas más abajo en el archivo)
 -- ==================================================================================================
 ALTER TABLE tenant_status_events ADD CONSTRAINT fk_tenant_status_events_platform_user_id FOREIGN KEY (platform_user_id) REFERENCES platform_users (id);
+ALTER TABLE saas_invoices ADD CONSTRAINT fk_saas_invoices_created_by_platform_user_id FOREIGN KEY (created_by_platform_user_id) REFERENCES platform_users (id);
+ALTER TABLE saas_payments ADD CONSTRAINT fk_saas_payments_recorded_by_platform_user_id FOREIGN KEY (recorded_by_platform_user_id) REFERENCES platform_users (id);
 ALTER TABLE tenant_feature_flags ADD CONSTRAINT fk_tenant_feature_flags_set_by_platform_user_id FOREIGN KEY (set_by_platform_user_id) REFERENCES platform_users (id);
 ALTER TABLE support_access_grants ADD CONSTRAINT fk_support_access_grants_granted_by_user_id FOREIGN KEY (tenant_id, granted_by_user_id) REFERENCES users (tenant_id, id);
 ALTER TABLE support_access_grants ADD CONSTRAINT fk_support_access_grants_revoked_by_user_id FOREIGN KEY (tenant_id, revoked_by_user_id) REFERENCES users (tenant_id, id);
@@ -15031,6 +15078,8 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('platform.settings.view', 'base', 'settings', 'view', 'action', false, 'Ver configuraciones globales y avisos de la plataforma'),
   ('platform.health.manage', 'base', 'health', 'manage', 'action', false, 'Reintentar trabajos y eventos fallidos desde el monitoreo'),
   ('platform.logs.view', 'base', 'logs', 'view', 'action', false, 'Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH)'),
+  ('platform.billing.view', 'base', 'billing', 'view', 'action', false, 'Ver cargos, comprobantes electrónicos, pagos y estado de cuenta de las organizaciones'),
+  ('platform.billing.manage', 'base', 'billing', 'manage', 'action', false, 'Generar cargos, emitir comprobantes electrónicos, registrar pagos y anular comprobantes'),
   ('audit.logs.view', 'base', 'logs', 'view', 'action', false, 'Ver la auditoría de negocio'),
   ('audit.logs.export', 'base', 'logs', 'export', 'action', false, 'Exportar auditoría para revisiones externas'),
   ('audit.activity.view', 'base', 'activity', 'view', 'action', false, 'Ver ingresos, vistas y descargas por usuario'),
@@ -15926,6 +15975,8 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('superadmin_saas', 'platform.settings.view', 'platform'),
   ('superadmin_saas', 'platform.health.manage', 'platform'),
   ('superadmin_saas', 'platform.logs.view', 'platform'),
+  ('superadmin_saas', 'platform.billing.view', 'platform'),
+  ('superadmin_saas', 'platform.billing.manage', 'platform'),
   ('superadmin_saas', 'platform.web_products.view', 'platform'),
   ('superadmin_saas', 'platform.web_products.hide', 'platform'),
   ('superadmin_saas', 'platform.web_products.publish', 'platform'),
@@ -19168,7 +19219,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_ap
 -- Catálogos de plataforma: solo lectura para la aplicación.
 REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, platform_notices, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, saas_payments, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 
@@ -19304,4 +19355,29 @@ CREATE OR REPLACE FUNCTION support_ticket_status(p_id uuid) RETURNS text
 $$;
 REVOKE ALL ON FUNCTION support_ticket_status(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION support_ticket_status(uuid) TO gestia_app;
+-- SAS-11 · Estado de cuenta del SaaS para la organización activa. La suscripción, los comprobantes y los pagos son
+-- tablas de la plataforma (el rol de aplicación no las toca): esta función devuelve solo los de la organización
+-- activa y nunca los borradores (un cargo aún no emitido no es parte del estado de cuenta).
+CREATE OR REPLACE FUNCTION current_tenant_billing() RETURNS jsonb
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT jsonb_build_object(
+    'subscription', (SELECT jsonb_build_object('plan', p.name, 'status', s.status, 'billing_cycle', s.billing_cycle,
+        'price', COALESCE(s.price, p.price)::text, 'currency', COALESCE(s.currency, p.currency), 'starts_on', s.starts_on,
+        'trial_ends_on', s.trial_ends_on)
+      FROM subscriptions s JOIN plans p ON p.id = s.plan_id WHERE s.tenant_id = app_tenant_id() LIMIT 1),
+    'invoices', COALESCE((SELECT jsonb_agg(jsonb_build_object('id', i.id, 'number', i.number, 'status', i.status,
+        'period_start', i.period_start, 'period_end', i.period_end, 'subtotal', i.subtotal::text, 'tax', i.tax::text,
+        'total', i.total::text, 'amount_paid', i.amount_paid::text, 'currency', i.currency, 'issued_at', i.issued_at,
+        'due_on', i.due_on, 'paid_at', i.paid_at, 'einvoice_status', i.einvoice_status, 'einvoice_series', i.einvoice_series,
+        'einvoice_number', i.einvoice_number, 'einvoice_hash', i.einvoice_hash, 'einvoice_accepted_at', i.einvoice_accepted_at,
+        'einvoice_message', i.einvoice_message) ORDER BY i.period_start DESC, i.number DESC)
+      FROM saas_invoices i WHERE i.tenant_id = app_tenant_id() AND i.status <> 'draft'), '[]'::jsonb),
+    'payments', COALESCE((SELECT jsonb_agg(jsonb_build_object('id', y.id, 'invoice_id', y.saas_invoice_id, 'amount', y.amount::text,
+        'currency', y.currency, 'paid_on', y.paid_on, 'method', y.method, 'status', y.status) ORDER BY y.paid_on DESC)
+      FROM saas_payments y WHERE y.tenant_id = app_tenant_id()), '[]'::jsonb),
+    'settings', COALESCE((SELECT jsonb_object_agg(key, value) FROM platform_settings
+      WHERE key IN ('billing.reminder_days_before_due', 'billing.suspend_after_overdue_days')), '{}'::jsonb))
+$$;
+REVOKE ALL ON FUNCTION current_tenant_billing() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION current_tenant_billing() TO gestia_app;
 

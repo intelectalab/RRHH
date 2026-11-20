@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **56 parámetros sin valor verificado**; **49** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **57 parámetros sin valor verificado**; **50** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -23,6 +23,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `gratificacion_bonificacion_extraordinaria_eps_pct` | Bonificación extraordinaria para afiliados a EPS | Todos | percent | Ley 30334 | Sí | Porcentaje no verificado. | |
 | `host_alegatos_dias` | Hostigamiento: plazo interno de alegatos | Todos | days | DS 014-2019-MIMP art. 29.6 | Sí | Dentro de los 10 días de la decisión; por confirmar. | |
 | `host_descargos_dias` | Hostigamiento: plazo interno de descargos | Todos | days | DS 014-2019-MIMP art. 29.5 | Sí | Lo fija el comité dentro de sus 15 días; por confirmar. | |
+| `igv_tasa_pct` | Tasa del impuesto general a las ventas del comprobante del SaaS (%) | Todos | percent | TUO de la Ley del IGV (DS 055-99-EF) art. 17 | Sí | SAS-11: tasa total que se aplica al emitir el comprobante del SaaS a una organización peruana. Por confirmar con el contador (IGV más IPM) antes del primer cobro real; sin valor validado no se emite ningún comprobante. | |
 | `jornada_maxima_semanal_horas` | Jornada máxima semanal | Todos | hours | DS 007-2002-TR | Sí | No consta en la investigación. | |
 | `lactario_minimo_mujeres_edad_fertil` | Mujeres en edad fértil por centro de trabajo que obligan a lactario | Todos | count | Ley 29896 | Sí | Umbral no verificado. | |
 | `legajo_conservacion_anios` | Conservación del legajo después del cese | Todos | years | Por definir (normas de conservación de documentos laborales) | Sí | DOC-1 · DOC-2: plazo durante el que un documento del legajo no se depura de la papelera. Sin valor validado, nada se depura. | |

@@ -283,6 +283,11 @@ final class DomainEventTypes
     // Suscripción de la organización (SAS-4): plan, complementos o estado.
     public const SUBSCRIPTION_CHANGED = 'subscription.changed.v1';
 
+    // Cobro de la suscripción (SAS-11): envío del comprobante electrónico al proveedor y avisos del estado de cuenta.
+    public const SAAS_INVOICE_ISSUE_REQUESTED = 'saas_invoice.issue_requested.v1';
+
+    public const SAAS_BILLING_NOTICE = 'saas_billing.notice.v1';
+
     // Límites y consumo (SAS-6): el consumo se acercó al tope del plan o llegó a él (RN-SAS-02, RN-SAS-03).
     public const LIMIT_WARNING = 'limit.warning.v1';
 
@@ -640,6 +645,16 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['tenant_id', 'subscription_id', 'plan_code', 'status'],
             'description' => 'La suscripción de la organización cambió de plan, complementos, datos o estado',
+        ],
+        self::SAAS_INVOICE_ISSUE_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['invoice_id'],
+            'description' => 'Se pidió emitir un comprobante del SaaS: se envía al proveedor de facturación electrónica (OSE o PSE)',
+        ],
+        self::SAAS_BILLING_NOTICE => [
+            'version' => 1,
+            'required_fields' => ['invoice_id', 'kind', 'number', 'total', 'currency', 'due_on'],
+            'description' => 'Aviso del estado de cuenta a la organización: comprobante emitido, vence pronto o vencido',
         ],
         self::LIMIT_WARNING => [
             'version' => 1,

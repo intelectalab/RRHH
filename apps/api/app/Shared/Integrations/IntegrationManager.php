@@ -8,9 +8,11 @@ use App\Shared\Integrations\Fake\FakeAiAdapter;
 use App\Shared\Integrations\Fake\FakeBackupStorageAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
 use App\Shared\Integrations\Fake\FakeBiometricAdapter;
+use App\Shared\Integrations\Fake\FakeEInvoicingAdapter;
 use App\Shared\Integrations\Fake\FakeEmailAdapter;
 use App\Shared\Integrations\Fake\FakeExchangeRatesAdapter;
 use App\Shared\Integrations\Fake\FakeMessagingAdapter;
+use App\Shared\Integrations\Fake\FakePaymentGatewayAdapter;
 use App\Shared\Integrations\Fake\FakePushAdapter;
 use App\Shared\Integrations\Fake\FakeSignatureAdapter;
 use App\Shared\Integrations\Logging\IntegrationCallRecorder;
@@ -18,9 +20,11 @@ use App\Shared\Integrations\Ports\AiPort;
 use App\Shared\Integrations\Ports\BackupStoragePort;
 use App\Shared\Integrations\Ports\BankingPort;
 use App\Shared\Integrations\Ports\BiometricPort;
+use App\Shared\Integrations\Ports\EInvoicingPort;
 use App\Shared\Integrations\Ports\EmailPort;
 use App\Shared\Integrations\Ports\ExchangeRatesPort;
 use App\Shared\Integrations\Ports\MessagingPort;
+use App\Shared\Integrations\Ports\PaymentGatewayPort;
 use App\Shared\Integrations\Ports\PushPort;
 use App\Shared\Integrations\Ports\SignaturePort;
 use RuntimeException;
@@ -47,6 +51,10 @@ final class IntegrationManager
     private ?BackupStoragePort $backupsAdapter = null;
 
     private ?PushPort $pushAdapter = null;
+
+    private ?EInvoicingPort $einvoicingAdapter = null;
+
+    private ?PaymentGatewayPort $paymentsAdapter = null;
 
     public function __construct(
         private readonly IntegrationCallRecorder $recorder,
@@ -220,6 +228,48 @@ final class IntegrationManager
         throw new RuntimeException('No live Push provider configured for production.');
     }
 
+    /** SAS-11 · Comprobante electrónico del SaaS por un proveedor OSE o PSE (aún sin elegir: la falsa fuera de producción). */
+    public function einvoicing(): EInvoicingPort
+    {
+        if ($this->einvoicingAdapter !== null) {
+            return $this->einvoicingAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->einvoicingAdapter = new FakeEInvoicingAdapter($this->recorder);
+
+            return $this->einvoicingAdapter;
+        }
+
+        throw new RuntimeException('No live E-invoicing provider configured for production.');
+    }
+
+    public function setEInvoicingAdapter(EInvoicingPort $adapter): void
+    {
+        $this->einvoicingAdapter = $adapter;
+    }
+
+    /** SAS-11 · Pasarela de cobro de la suscripción (se conecta después; la falsa fuera de producción). */
+    public function payments(): PaymentGatewayPort
+    {
+        if ($this->paymentsAdapter !== null) {
+            return $this->paymentsAdapter;
+        }
+
+        if (! app()->isProduction()) {
+            $this->paymentsAdapter = new FakePaymentGatewayAdapter($this->recorder);
+
+            return $this->paymentsAdapter;
+        }
+
+        throw new RuntimeException('No live Payment gateway configured for production.');
+    }
+
+    public function setPaymentsAdapter(PaymentGatewayPort $adapter): void
+    {
+        $this->paymentsAdapter = $adapter;
+    }
+
     public function setPushAdapter(PushPort $adapter): void
     {
         $this->pushAdapter = $adapter;
@@ -241,7 +291,8 @@ final class IntegrationManager
         $out = [];
         foreach (['email' => fn () => $this->email(), 'messaging' => fn () => $this->messaging(), 'signature' => fn () => $this->signature(),
             'banking' => fn () => $this->banking(), 'biometric' => fn () => $this->biometric(), 'ai' => fn () => $this->ai(),
-            'exchange_rates' => fn () => $this->exchangeRates(), 'backups' => fn () => $this->backups(), 'push' => fn () => $this->push()] as $port => $resolve) {
+            'exchange_rates' => fn () => $this->exchangeRates(), 'backups' => fn () => $this->backups(), 'push' => fn () => $this->push(),
+            'einvoicing' => fn () => $this->einvoicing(), 'payments' => fn () => $this->payments()] as $port => $resolve) {
             try {
                 $adapter = $resolve();
                 $out[] = ['port' => $port, 'provider' => $adapter->providerName(), 'fake' => $adapter->isFake()];

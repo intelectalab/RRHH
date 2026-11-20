@@ -11,7 +11,8 @@ use App\Shared\StateMachine\StateMachine;
  *  - vencida → activa (convertir) · suspendida (fin de la gracia, sistema) · cancelada;
  *  - activa ↔ suspendida; activa o suspendida → cancelada; cancelada → activa (dentro de la retención).
  *
- * «past_due» (pago vencido) lo pone el cobro (SAS-11); desde aquí se regulariza, suspende o cancela.
+ * «past_due» (pago vencido) lo pone el cobro (SAS-11, acción de sistema «mark_past_due» sobre una activa); desde
+ * aquí se regulariza (convertir, al pagarse lo vencido), suspende (mora más allá del plazo configurado) o cancela.
  */
 final class SubscriptionStateMachine extends StateMachine
 {
@@ -25,12 +26,14 @@ final class SubscriptionStateMachine extends StateMachine
 
     public const CANCEL = 'cancel';
 
+    public const MARK_PAST_DUE = 'mark_past_due'; // sistema: un comprobante venció sin pagarse (SAS-11)
+
     public function transitions(): array
     {
         return [
             'trialing' => [self::CONVERT => 'active', self::EXPIRE => 'expired', self::CANCEL => 'cancelled'],
             'expired' => [self::CONVERT => 'active', self::SUSPEND => 'suspended', self::CANCEL => 'cancelled'],
-            'active' => [self::SUSPEND => 'suspended', self::CANCEL => 'cancelled'],
+            'active' => [self::SUSPEND => 'suspended', self::CANCEL => 'cancelled', self::MARK_PAST_DUE => 'past_due'],
             'past_due' => [self::CONVERT => 'active', self::SUSPEND => 'suspended', self::CANCEL => 'cancelled'],
             'suspended' => [self::REACTIVATE => 'active', self::CANCEL => 'cancelled'],
             'cancelled' => [self::REACTIVATE => 'active'],

@@ -42,10 +42,10 @@
     "La matriz se carga en system_role_permissions y seed_tenant_defaults la copia a cada organización."
   ],
   "totales": {
-    "permisos": 922,
+    "permisos": 924,
     "permisos_por_campo": 28,
     "sensibles": 108,
-    "fuera_del_contrato_api": 141,
+    "fuera_del_contrato_api": 143,
     "roles": 11
   },
   "permisos": [
@@ -792,6 +792,30 @@
       "en_contrato_api": false,
       "ambito": "plataforma",
       "descripcion": "Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH)"
+    },
+    {
+      "codigo": "platform.billing.view",
+      "epica": "SAS",
+      "modulo": "base",
+      "recurso": "billing",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "plataforma",
+      "descripcion": "Ver cargos, comprobantes electrónicos, pagos y estado de cuenta de las organizaciones"
+    },
+    {
+      "codigo": "platform.billing.manage",
+      "epica": "SAS",
+      "modulo": "base",
+      "recurso": "billing",
+      "accion": "manage",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": false,
+      "ambito": "plataforma",
+      "descripcion": "Generar cargos, emitir comprobantes electrónicos, registrar pagos y anular comprobantes"
     },
     {
       "codigo": "audit.logs.view",
@@ -11256,6 +11280,14 @@
         },
         {
           "codigo": "platform.logs.view",
+          "alcance": "platform"
+        },
+        {
+          "codigo": "platform.billing.view",
+          "alcance": "platform"
+        },
+        {
+          "codigo": "platform.billing.manage",
           "alcance": "platform"
         },
         {

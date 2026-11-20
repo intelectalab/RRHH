@@ -6,6 +6,7 @@ use App\Modules\Platform\Application\Console\ConsoleSessions;
 use App\Modules\Platform\Console\CreatePlatformAdminCommand;
 use App\Modules\Platform\Console\ResetPlatformMfaCommand;
 use App\Modules\Platform\Console\RunBackupsCommand;
+use App\Modules\Platform\Console\RunBillingDunningCommand;
 use App\Modules\Platform\Console\RunTrialLifecycleCommand;
 use App\Modules\Platform\Console\SnapshotUsageCommand;
 use App\Modules\Platform\Console\SyncBundledHelpCommand;
@@ -13,6 +14,8 @@ use App\Modules\Platform\Http\Middleware\ConsoleBoundary;
 use App\Modules\Platform\Http\Middleware\EnsureConsoleSecondFactor;
 use App\Modules\Platform\Http\Middleware\RequirePlatformPermission;
 use App\Modules\Platform\Infrastructure\Models\PlatformSession;
+use App\Modules\Platform\Infrastructure\Subscribers\DeliverSaasInvoice;
+use App\Shared\Outbox\OutboxService;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Console\Scheduling\Schedule;
@@ -63,7 +66,7 @@ final class PlatformServiceProvider extends ServiceProvider
         $router->aliasMiddleware(RequirePlatformPermission::ALIAS, RequirePlatformPermission::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class, RunBackupsCommand::class]);
+            $this->commands([CreatePlatformAdminCommand::class, ResetPlatformMfaCommand::class, RunTrialLifecycleCommand::class, SnapshotUsageCommand::class, SyncBundledHelpCommand::class, RunBackupsCommand::class, RunBillingDunningCommand::class]);
             // SAS-4 · RN-SAS-04: vencimiento de pruebas y fin de la gracia, una vez al día.
             $this->app->booted(function (): void {
                 $schedule = $this->app->make(Schedule::class);
@@ -72,8 +75,13 @@ final class PlatformServiceProvider extends ServiceProvider
                 $schedule->command('usage:snapshot')->dailyAt('00:40')->withoutOverlapping();
                 // SAS-12 · Copia diaria, vencimiento por retención y prueba de restauración en aislado cuando toca.
                 $schedule->command('backups:run')->dailyAt('02:20')->withoutOverlapping();
+                // SAS-11 · Avisos de vencimiento, mora y suspensión por falta de pago.
+                $schedule->command('billing:dunning')->dailyAt('06:10')->withoutOverlapping();
             });
         }
+
+        // SAS-11 · El comprobante del SaaS sale al proveedor de facturación electrónica por el outbox.
+        $this->app->make(OutboxService::class)->subscribe($this->app->make(DeliverSaasInvoice::class));
 
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Platform\Http\Controllers\BillingController;
 use App\Modules\Platform\Http\Controllers\ConsoleAuthController;
 use App\Modules\Platform\Http\Controllers\ConsoleController;
 use App\Modules\Platform\Http\Controllers\ConsoleOperationsController as Ops;
@@ -86,6 +87,15 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::get('/tenants/{id}/usage', [UsageController::class, 'show'])->middleware('platform.permission:platform.subscriptions.view');
             Route::get('/subscriptions/{id}/plan-fit', [UsageController::class, 'planFit'])->middleware('platform.permission:platform.subscriptions.view');
 
+            // SAS-11 · ADR 0010 · Cargos, comprobantes electrónicos, pagos y estado de cuenta.
+            Route::get('/invoices', [BillingController::class, 'index'])->middleware('platform.permission:platform.billing.view');
+            Route::get('/invoices/{id}', [BillingController::class, 'show'])->middleware('platform.permission:platform.billing.view');
+            Route::post('/subscriptions/{id}/invoices', [BillingController::class, 'generate'])->middleware('platform.permission:platform.billing.manage');
+            Route::post('/invoices/{id}/issue', [BillingController::class, 'issue'])->middleware('platform.permission:platform.billing.manage');
+            Route::post('/invoices/{id}/void', [BillingController::class, 'void'])->middleware('platform.permission:platform.billing.manage');
+            Route::post('/invoices/{id}/payments', [BillingController::class, 'pay'])->middleware('platform.permission:platform.billing.manage');
+            Route::get('/tenants/{id}/account-statement', [BillingController::class, 'statement'])->middleware('platform.permission:platform.billing.view');
+
             // SAS-7 · Banderas de funcionalidad (cada cambio, auditado y sin desplegar).
             Route::get('/feature-flags', [FeatureFlagController::class, 'index'])->middleware('platform.permission:platform.feature_flags.view');
             Route::post('/feature-flags', [FeatureFlagController::class, 'store'])->middleware('platform.permission:platform.feature_flags.create');
@@ -148,4 +158,6 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
 // SAS-13 · Avisos de la plataforma vigentes, para la organización en curso (fuera de la consola).
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
     Route::get('/system-notices', SystemNoticesController::class);
+    // SAS-11 · Plan, comprobantes electrónicos con su constancia, pagos y saldo de la organización.
+    Route::get('/billing/account', [BillingController::class, 'mine'])->middleware('permission:settings.organization.view');
 });

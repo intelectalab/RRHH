@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 184,
+    "parametros": 185,
     "verificados": 128,
-    "sin_verificar": 56
+    "sin_verificar": 57
   },
   "parametros": [
     {
@@ -1503,6 +1503,21 @@
       "verificado": false,
       "base_legal": "Ley 26790 · Acuerdo de EsSalud",
       "nota": "Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso)."
+    },
+    {
+      "codigo": "igv_tasa_pct",
+      "nombre": "Tasa del impuesto general a las ventas del comprobante del SaaS (%)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "percent",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "TUO de la Ley del IGV (DS 055-99-EF) art. 17",
+      "nota": "SAS-11: tasa total que se aplica al emitir el comprobante del SaaS a una organización peruana. Por confirmar con el contador (IGV más IPM) antes del primer cobro real; sin valor validado no se emite ningún comprobante."
     },
     {
       "codigo": "teletrabajo_respuesta_dias_habiles",

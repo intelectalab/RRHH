@@ -162,6 +162,18 @@ return [
             'in_app' => ['subject' => 'Your request {number} changed', 'body' => '{number} · {subject}: {status}.'],
             'email' => ['subject' => 'Your request {number} changed', 'body' => "Hi {name}:\n\nAt {organization}, your request {number} ({subject}) is now: {status}.\n\nSee the details here: {link}"],
         ],
+        'billing.invoice_issued' => [
+            'in_app' => ['subject' => 'New GestiaHR invoice', 'body' => 'Invoice {number} for {total}, due on {due_on}.'],
+            'email' => ['subject' => 'Your GestiaHR invoice {number}', 'body' => "Hi {name},\n\nWe issued electronic invoice {number} for {organization} for {total}, due on {due_on}.\n\nSee your account statement here: {link}"],
+        ],
+        'billing.due_soon' => [
+            'in_app' => ['subject' => 'An invoice is due soon', 'body' => 'Invoice {number} for {total} is due on {due_on}.'],
+            'email' => ['subject' => 'Your invoice {number} is due on {due_on}', 'body' => "Hi {name},\n\nInvoice {number} for {organization} for {total} is due on {due_on}. If you already paid, there is nothing to do.\n\nSee your account statement here: {link}"],
+        ],
+        'billing.overdue' => [
+            'in_app' => ['subject' => 'You have an overdue invoice', 'body' => 'Invoice {number} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}.'],
+            'email' => ['subject' => 'Overdue invoice: {number}', 'body' => "Hi {name},\n\nInvoice {number} for {organization} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}: nobody can work until it is settled, and the data is kept.\n\nSee your account statement here: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],

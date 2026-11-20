@@ -398,6 +398,8 @@ LEGAL_PE = [
  # AUS-3 · Descansos médicos: días del año a cargo del empleador antes del subsidio (RN-AUS-03) y plazo del reembolso.
  lp('descanso_medico_dias_cargo_empleador', 'Días de incapacidad temporal del año a cargo del empleador antes del subsidio', 'days', None, False, 'Ley 26790 art. 12 · DS 009-97-SA', 'Desde el día siguiente corre el subsidio por incapacidad temporal; por confirmar el número vigente y si se cuenta por año calendario.'),
  lp('subsidio_reembolso_plazo_meses', 'Plazo para solicitar el reembolso de un subsidio a la seguridad social', 'months', None, False, 'Ley 26790 · Acuerdo de EsSalud', 'Por confirmar el plazo vigente y desde cuándo se cuenta (fin del descanso).'),
+ # SAS-11 · ADR 0010 · Impuesto del comprobante del SaaS: tasa con vigencia, por validar con el contador (incluye o no el IPM).
+ lp('igv_tasa_pct', 'Tasa del impuesto general a las ventas del comprobante del SaaS (%)', 'percent', None, False, 'TUO de la Ley del IGV (DS 055-99-EF) art. 17', 'SAS-11: tasa total que se aplica al emitir el comprobante del SaaS a una organización peruana. Por confirmar con el contador (IGV más IPM) antes del primer cobro real; sin valor validado no se emite ningún comprobante.'),
  lp('teletrabajo_respuesta_dias_habiles', 'Plazo de respuesta a solicitudes de teletrabajo (días hábiles)', 'days', 10, True, 'Ley 31572'),
  lp('teletrabajo_desconexion_horas', 'Desconexión digital mínima continua', 'hours', 12, True, 'Ley 31572'),
  lp('privacidad_notificacion_incidente_horas', 'Plazo para notificar un incidente de datos personales', 'hours', 48, True, 'DS 016-2024-JUS', vfrom='2025-03-30', vfrom_ok=True),

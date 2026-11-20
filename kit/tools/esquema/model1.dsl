@@ -41,12 +41,20 @@
   cancelled_at ; cancel_reason ; license_key ; expired_at ts ; uniq tenant_id
 @subscription_addons P | Complementos contratados dentro de una suscripción.
   subscription_id => subscriptions ; addon_id => addons ; quantity integer=1 ; price money ; currency cur? ; starts_on date! ; ends_on
-@saas_invoices P lock | Facturación del SaaS a la organización cliente (no es la nómina del cliente).
-  tenant_id => tenants ; subscription_id ?=> subscriptions ; number text! ; status enum(draft,issued,paid,overdue,void)=draft
+@saas_invoices P lock | Facturación del SaaS a la organización cliente (no es la nómina del cliente). SAS-11: el cargo del periodo nace en borrador con los precios guardados en la suscripción; emitirlo lo envía como comprobante electrónico al proveedor OSE o PSE (adaptador) y solo queda emitido con la constancia de aceptación; uno rechazado queda observado. La tasa del impuesto es la del parámetro legal vigente al emitir.
+  tenant_id => tenants ; subscription_id ?=> subscriptions ; number text! ; status enum(draft,observed,issued,paid,overdue,void)=draft
   period_start date! ; period_end date! ; subtotal money! ; tax money=0 ; total money! ; currency cur ; issued_at ; due_on ; paid_at
   external_ref ; uniq number
+  tax_rate numeric(7,4) ; tax_treatment enum(taxed,export_exempt) ; amount_paid money=0 ; buyer_tax_id ; buyer_name
+  einvoice_status enum(not_sent,pending,accepted,rejected)=not_sent ; einvoice_series ; einvoice_number ; einvoice_ticket ; einvoice_hash
+  einvoice_message ; einvoice_accepted_at ts ; einvoice_attempts integer=0 ; reminded_at ts ; overdue_at ts ; voided_at ts ; void_reason
+  created_by_platform_user_id ?=> platform_users
 @saas_invoice_lines P | Líneas de la factura SaaS.
   saas_invoice_id => saas_invoices ; description text! ; quantity numeric(14,2)=1 ; unit_price money! ; amount money! ; currency cur
+@saas_payments P | SAS-11 · Pagos de la organización a un comprobante del SaaS, registrados a mano en la consola o llegados por la pasarela (adaptador de cobro). Un pago no se borra: se anula con motivo.
+  tenant_id => tenants ; saas_invoice_id => saas_invoices ; amount money! ; currency cur ; paid_on date!
+  method enum(transfer,card,wallet,cash,other)=transfer ; reference ; source enum(manual,gateway)=manual ; gateway_ref
+  status enum(confirmed,reversed)=confirmed ; recorded_by_platform_user_id ?=> platform_users ; reversed_at ts ; reverse_reason
 @tenant_modules main | Módulos activos por organización (resultado de plan, complemento o activación manual). Condiciona menú, API y permisos.
   module_code ~> modules.code ; status enum(active,inactive,trial)=active ; source enum(plan,addon,manual,trial)=plan
   activated_at ; deactivated_at ; read_only_until ts ; uniq module_code

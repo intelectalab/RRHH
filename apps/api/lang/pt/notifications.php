@@ -162,6 +162,18 @@ return [
             'in_app' => ['subject' => 'Sua solicitação {number} mudou', 'body' => '{number} · {subject}: {status}.'],
             'email' => ['subject' => 'Sua solicitação {number} mudou', 'body' => "Olá {name}:\n\nEm {organization}, sua solicitação {number} ({subject}) agora está: {status}.\n\nVeja o detalhe aqui: {link}"],
         ],
+        'billing.invoice_issued' => [
+            'in_app' => ['subject' => 'Nova fatura do GestiaHR', 'body' => 'Fatura {number} de {total}, vence em {due_on}.'],
+            'email' => ['subject' => 'Sua fatura do GestiaHR {number}', 'body' => "Olá {name}:\n\nEmitimos a fatura eletrônica {number} de {organization} no valor de {total}, com vencimento em {due_on}.\n\nVeja seu extrato aqui: {link}"],
+        ],
+        'billing.due_soon' => [
+            'in_app' => ['subject' => 'Uma fatura vence em breve', 'body' => 'A fatura {number} de {total} vence em {due_on}.'],
+            'email' => ['subject' => 'Sua fatura {number} vence em {due_on}', 'body' => "Olá {name}:\n\nA fatura {number} de {organization} no valor de {total} vence em {due_on}. Se já pagou, não é preciso fazer nada.\n\nVeja seu extrato aqui: {link}"],
+        ],
+        'billing.overdue' => [
+            'in_app' => ['subject' => 'Você tem uma fatura vencida', 'body' => 'A fatura {number} de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}.'],
+            'email' => ['subject' => 'Fatura vencida: {number}', 'body' => "Olá {name}:\n\nA fatura {number} de {organization} no valor de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}: ninguém poderá operar até regularizar, e os dados são mantidos.\n\nVeja seu extrato aqui: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],
