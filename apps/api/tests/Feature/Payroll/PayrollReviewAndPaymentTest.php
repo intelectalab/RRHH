@@ -243,3 +243,43 @@ test('PER-10 · PER-9 · lotes por banco, archivo, confirmación idempotente, pa
     $this->assertMatchesOpenApi(prvCall($this->employee, 'POST', "/payroll-periods/{$jan}/complementary")->assertStatus(403), 'post', '/payroll-periods/{id}/complementary', 403);
     expect(prvCall($this->payroll, 'GET', "/payroll-periods/{$jan}")->assertOk()->json('data.status'))->toBe('paid');
 });
+
+test('PER-8 · con flujo WFL activo el envío lo arranca, la aprobación directa se rechaza y el flujo decide', function (): void {
+    $approver = prvUser(PRV_TENANT, 'admin_empresa');
+    $flow = prvCall($this->admin, 'POST', '/approval-flows', ['name' => 'Planilla', 'subject_type' => 'payroll_period',
+        'steps' => ['levels' => [['mode' => 'sequential', 'approvers' => [['kind' => 'user', 'user_id' => $approver->id]]]]]])->assertCreated();
+    prvCall($this->admin, 'POST', '/approval-flows/'.$flow->json('data.id').'/publish')->assertOk();
+    $instance = fn (string $p): string => (string) TenancyScope::runAs(PRV_TENANT, fn () => DB::table('workflow_instances')
+        ->where('subject_type', 'payroll_period')->where('subject_id', $p)->whereIn('status', ['pending', 'running', 'escalated'])->value('id'));
+
+    $jan = prvPeriod($this, 1);
+    prvCalculate($this, $jan);
+    $sent = prvCall($this->payroll, 'POST', "/payroll-periods/{$jan}/submit")->assertOk();
+    $this->assertMatchesOpenApi($sent, 'post', '/payroll-periods/{id}/submit', 200);
+    expect($sent->json('data.status'))->toBe('in_review')->and($sent->json('data.approval'))->not->toBeNull();
+    $first = $instance($jan);
+    expect($first)->not->toBe('');
+
+    // Con el flujo en curso la aprobación directa no procede.
+    $direct = prvCall($this->admin, 'POST', "/payroll-periods/{$jan}/approve")->assertStatus(409);
+    $this->assertMatchesOpenApi($direct, 'post', '/payroll-periods/{id}/approve', 409);
+    expect($direct->json('error.code'))->toBe('managed_by_flow');
+    prvCall($this->admin, 'POST', "/payroll-periods/{$jan}/reject", ['reason' => 'x'])->assertStatus(409);
+
+    // El rechazo del flujo devuelve el periodo a calculado con el motivo.
+    $rej = prvCall($approver, 'POST', "/approval-requests/{$first}/reject", ['comment' => 'Revisar bonos'])->assertOk();
+    $this->assertMatchesOpenApi($rej, 'post', '/approval-requests/{id}/reject', 200);
+    $back = prvCall($this->payroll, 'GET', "/payroll-periods/{$jan}")->assertOk();
+    expect($back->json('data.status'))->toBe('calculated')->and($back->json('data.return_reason'))->toBe('Revisar bonos');
+
+    // Reenviado, la aprobación del flujo deja el periodo aprobado y la corrida aprobada.
+    prvCall($this->payroll, 'POST', "/payroll-periods/{$jan}/submit")->assertOk();
+    $second = $instance($jan);
+    expect($second)->not->toBe($first);
+    $ok = prvCall($approver, 'POST', "/approval-requests/{$second}/approve")->assertOk();
+    $this->assertMatchesOpenApi($ok, 'post', '/approval-requests/{id}/approve', 200);
+    $done = prvCall($this->payroll, 'GET', "/payroll-periods/{$jan}")->assertOk();
+    $this->assertMatchesOpenApi($done, 'get', '/payroll-periods/{id}', 200);
+    expect($done->json('data.status'))->toBe('approved');
+    TenancyScope::runAs(PRV_TENANT, fn () => expect(DB::table('payroll_runs')->where('payroll_period_id', $jan)->where('status', 'approved')->exists())->toBeTrue());
+});
