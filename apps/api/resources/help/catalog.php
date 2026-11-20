@@ -31,6 +31,7 @@ return [
     'pantalla-seguridad-cuenta' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.security']],
     'pantalla-mis-notificaciones' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.notifications']],
     'pantalla-primeros-pasos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['setup']],
+    'pantalla-ayuda-organizacion' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['settings.help']],
     'pantalla-configuracion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['settings']],
     'pantalla-organizacion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['org']],
     'pantalla-empresas' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['org.companies']],
@@ -59,4 +60,19 @@ return [
     'campo.time.absences.absence_type' => ['kind' => 'field', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.absences']],
     'campo.documents.requests.due_on' => ['kind' => 'field', 'module' => 'core', 'roles' => [], 'screens' => ['documents.requests']],
     'campo.portal.requests.category' => ['kind' => 'field', 'module' => 'core', 'roles' => [], 'screens' => ['portal.requests']],
+    // AYU-7 · Recorridos de primer ingreso (uno por rol; cada párrafo es un paso).
+    'recorrido.admin_empresa' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['admin_empresa'], 'screens' => []],
+    'recorrido.rrhh' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['rrhh'], 'screens' => []],
+    'recorrido.payroll' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['payroll'], 'screens' => []],
+    'recorrido.recruiter' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['recruiter'], 'screens' => []],
+    'recorrido.manager' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['manager'], 'screens' => []],
+    'recorrido.empleado' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['empleado'], 'screens' => []],
+    'recorrido.auditor' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['auditor'], 'screens' => []],
+    'recorrido.sst' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['sst'], 'screens' => []],
+    'recorrido.investigador_denuncias' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['investigador_denuncias'], 'screens' => []],
+    'recorrido.contador' => ['kind' => 'tour', 'module' => 'base', 'roles' => ['contador'], 'screens' => []],
+    // AYU-7 · Novedades de versión por módulo (solo se muestran las de módulos contratados).
+    'novedades.1-0.base' => ['kind' => 'release_note', 'module' => 'base', 'roles' => [], 'screens' => []],
+    'novedades.1-0.core' => ['kind' => 'release_note', 'module' => 'core', 'roles' => [], 'screens' => []],
+    'novedades.1-0.time_off' => ['kind' => 'release_note', 'module' => 'time_off', 'roles' => [], 'screens' => []],
 ];

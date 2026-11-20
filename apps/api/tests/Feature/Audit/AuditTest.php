@@ -186,7 +186,9 @@ test('el Auditor consulta todo y no puede modificar nada en el sistema', functio
     // el catálogo (kit/docs/07) le da reports.exports.create al Auditor.
     // UI-4: las vistas guardadas son preferencias propias de la tabla (no datos del sistema); el
     // catálogo da settings.saved_views.* a todos los roles, solo sobre lo propio.
-    $readOnlyPosts = ['api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}'];
+    // AYU-5 · AYU-7: valorar un artículo de ayuda y marcar el recorrido propio como visto son registros del
+    // propio usuario sobre la ayuda (no datos del sistema); el catálogo los deja con help.articles.view.
+    $readOnlyPosts = ['api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}', 'api/v1/help/articles/{id}/feedback', 'api/v1/help/tours/{tour_key}/complete'];
 
     $writes = [];
     foreach (Route::getRoutes()->getRoutes() as $route) {

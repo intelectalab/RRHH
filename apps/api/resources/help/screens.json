@@ -205,6 +205,12 @@
       "permissions": [
         "imports.setup.use"
       ]
+    },
+    "settings.help": {
+      "module": "core",
+      "permissions": [
+        "help.org_articles.view"
+      ]
     }
   }
 }

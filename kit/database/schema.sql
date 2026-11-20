@@ -10613,7 +10613,8 @@ CREATE TABLE tickets (
   resolved_at timestamptz,
   closed_at timestamptz,
   satisfaction_rating smallint,
-  channel text NOT NULL DEFAULT 'portal' CHECK (channel IN ('portal','email','whatsapp','ai_assistant')),
+  channel text NOT NULL DEFAULT 'portal' CHECK (channel IN ('portal','email','whatsapp','ai_assistant','help_center')),
+  help_escalation_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -10623,7 +10624,8 @@ CREATE TABLE tickets (
   CONSTRAINT fk_tickets_requester_user_id FOREIGN KEY (tenant_id, requester_user_id) REFERENCES users (tenant_id, id),
   CONSTRAINT fk_tickets_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_tickets_assignee_user_id FOREIGN KEY (tenant_id, assignee_user_id) REFERENCES users (tenant_id, id),
-  CONSTRAINT fk_tickets_sla_policy_id FOREIGN KEY (tenant_id, sla_policy_id) REFERENCES sla_policies (tenant_id, id)
+  CONSTRAINT fk_tickets_sla_policy_id FOREIGN KEY (tenant_id, sla_policy_id) REFERENCES sla_policies (tenant_id, id),
+  CONSTRAINT fk_tickets_help_escalation_id FOREIGN KEY (tenant_id, help_escalation_id) REFERENCES help_escalations (tenant_id, id)
 );
 COMMENT ON TABLE tickets IS 'Solicitud del colaborador a RRHH con estados y plazos.';
 CREATE UNIQUE INDEX uq_tickets_number ON tickets (tenant_id, number) WHERE deleted_at IS NULL;
@@ -10632,6 +10634,7 @@ CREATE INDEX ix_tickets_requester_user_id ON tickets (tenant_id, requester_user_
 CREATE INDEX ix_tickets_employment_id ON tickets (tenant_id, employment_id);
 CREATE INDEX ix_tickets_assignee_user_id ON tickets (tenant_id, assignee_user_id);
 CREATE INDEX ix_tickets_sla_policy_id ON tickets (tenant_id, sla_policy_id);
+CREATE INDEX ix_tickets_help_escalation_id ON tickets (tenant_id, help_escalation_id);
 ALTER TABLE tickets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tickets FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON tickets USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -18504,6 +18507,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('aprendizaje.aviso_vencimiento_dias', 'learning', 'Aviso de curso por vencer', 'Días de anticipación del recordatorio.', 'integer', '7'::jsonb, ARRAY['organization'], NULL),
   ('compensaciones.tamano_minimo_grupo', 'compensation', 'Tamaño mínimo de grupo', 'Grupo mínimo para mostrar promedios salariales en el reporte de brecha.', 'integer', '3'::jsonb, ARRAY['organization'], NULL),
   ('encuestas.umbral_anonimato', 'engagement', 'Umbral de anonimato', 'Mínimo de respuestas por segmento para mostrar resultados (C-06).', 'integer', '5'::jsonb, ARRAY['organization'], NULL),
+  ('ayuda.revision_anticipacion_dias', 'core', 'Aviso de revisión de artículos (días)', 'AYU-4 · RN-AYU-04: días antes de la fecha de revisión de un artículo de la organización en que se avisa a su responsable y el artículo pasa a «por revisar» (sigue visible).', 'integer', '7'::jsonb, ARRAY['organization'], '{"min": 0, "max": 90}'::jsonb),
   ('mesa_ayuda.sla_respuesta_horas', 'helpdesk', 'Primera respuesta (horas)', 'Plazo por defecto de primera respuesta.', 'integer', '8'::jsonb, ARRAY['organization'], NULL),
   ('mesa_ayuda.sla_resolucion_horas', 'helpdesk', 'Resolución (horas)', 'Plazo por defecto de resolución.', 'integer', '48'::jsonb, ARRAY['organization'], NULL),
   ('sst.aviso_examen_dias', 'sst', 'Aviso de examen médico', 'Días de anticipación del aviso de examen ocupacional por vencer.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
@@ -19122,4 +19126,26 @@ END
 $$;
 REVOKE ALL ON FUNCTION trash_labor_history_row(text, uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION trash_labor_history_row(text, uuid) TO gestia_app;
+-- AYU-6 · El administrador de una organización escribe al soporte de GestiaHR desde la ayuda. support_tickets es
+-- de la plataforma (el rol de aplicación no la toca): estas funciones abren la incidencia y leen su estado solo
+-- para la organización activa.
+CREATE OR REPLACE FUNCTION open_support_ticket(p_subject text, p_body text, p_opened_by_email text) RETURNS uuid
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE t uuid := app_tenant_id(); v uuid;
+BEGIN
+  IF t IS NULL THEN
+    RAISE EXCEPTION 'sin organización activa';
+  END IF;
+  INSERT INTO support_tickets (tenant_id, opened_by_email, subject, body) VALUES (t, p_opened_by_email, left(p_subject, 200), p_body) RETURNING id INTO v;
+  RETURN v;
+END
+$$;
+REVOKE ALL ON FUNCTION open_support_ticket(text, text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION open_support_ticket(text, text, text) TO gestia_app;
+CREATE OR REPLACE FUNCTION support_ticket_status(p_id uuid) RETURNS text
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT status FROM support_tickets WHERE id = p_id AND tenant_id = app_tenant_id()
+$$;
+REVOKE ALL ON FUNCTION support_ticket_status(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION support_ticket_status(uuid) TO gestia_app;
 

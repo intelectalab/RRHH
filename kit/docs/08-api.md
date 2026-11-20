@@ -740,6 +740,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/help/search` | `help.articles.view` | 1 |
 | GET | `/help/screens/{screen_key}` | `help.articles.view` | 1 |
 | GET | `/help/whats-new` | `help.articles.view` | 1 |
+| GET | `/help/tours` | `help.articles.view` | 1 |
 | POST | `/help/tours/{tour_key}/complete` | `help.articles.view` | 1 |
 | GET | `/help/escalations` | `help.escalations.view` | 1 |
 | POST | `/help/escalations` | `help.escalations.create` | 1 |

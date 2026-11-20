@@ -3,6 +3,7 @@
 namespace App\Modules\Platform\Http\Controllers;
 
 use App\Modules\Platform\Application\Help\ProductHelpArticles;
+use App\Modules\Platform\Application\Help\ProductHelpInsights;
 use App\Modules\Platform\Infrastructure\Models\PlatformUser;
 use App\Shared\Exceptions\InvalidFilterException;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +16,10 @@ use Illuminate\Validation\Rule;
  */
 final class HelpArticleController
 {
-    public function __construct(private readonly ProductHelpArticles $articles) {}
+    public function __construct(
+        private readonly ProductHelpArticles $articles,
+        private readonly ProductHelpInsights $insights,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -67,6 +71,18 @@ final class HelpArticleController
     public function archive(Request $request, string $id): JsonResponse
     {
         return response()->json(['data' => $this->articles->archive($id, $this->actor($request))]);
+    }
+
+    public function insights(): JsonResponse
+    {
+        return response()->json(['data' => $this->insights->summary()]);
+    }
+
+    public function escalations(): JsonResponse
+    {
+        $rows = $this->insights->escalations();
+
+        return response()->json(['data' => $rows, 'meta' => ['total' => count($rows)]]);
     }
 
     /**

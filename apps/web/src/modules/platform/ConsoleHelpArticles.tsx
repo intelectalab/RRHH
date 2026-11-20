@@ -13,6 +13,7 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { StatusBadge, Tag } from '@/ui/components/Status'
 import { useConsole, useConsoleTabs } from './ConsoleShell'
 import { consoleApi } from './consoleApi'
+import { ConsoleHelpInsights } from './ConsoleHelpInsights'
 
 type HelpKind = 'guide' | 'screen' | 'field' | 'tour' | 'release_note' | 'faq'
 type HelpVersion = { version_number: number; product_version: string; title: string; body: string; published_at: string }
@@ -136,6 +137,7 @@ export function ConsoleHelpArticles() {
             </div>
           </section>
         )}
+        <ConsoleHelpInsights />
       </main>
       {editing && <HelpEditor article={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onDone={() => { setEditing(null); load() }} />}
     </>
