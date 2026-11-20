@@ -3,7 +3,7 @@
 Tipos de ausencia configurables con reglas propias, descansos médicos, licencias y teletrabajo.
 
 - **Fase:** Fase 2 · Tiempo. **Módulo comercial:** Vacaciones y ausencias.
-- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 26.
+- **Actividades:** 6 (5 historias y 1 tareas); 6 del MVP. **Operaciones de API:** 28.
 - **Especificación:** `kit/docs/modulos/M-AUS.md`.
 
 ## Prompt para una sesión nueva de Claude Code

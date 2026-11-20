@@ -80,7 +80,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 2 | [ASI](../prompts/ASI.md) · Asistencia y marcación | Asistencia y turnos | 7 | 4 | 0 | 20 | — | A-06, A-12, D-16 |
 | 2 | [TUR](../prompts/TUR.md) · Horarios, jornadas y turnos | Asistencia y turnos | 6 | 0 | 0 | 21 | — | — |
 | 2 | [VAC](../prompts/VAC.md) · Vacaciones | Vacaciones y ausencias | 5 | 2 | 7 | 22 | — | — |
-| 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 26 | — | — |
+| 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 28 | — | — |
 | 2 | [BHO](../prompts/BHO.md) · Horas extra y bolsa de horas | Asistencia y turnos | 3 | 2 | 0 | 8 | — | — |
 | 2 | [TSH](../prompts/TSH.md) · Hojas de tiempo por proyecto | Hojas de tiempo | 4 | 0 | 0 | 12 | — | — |
 | 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 15 | Sí | A-10, A-14, D-06, D-07 |
