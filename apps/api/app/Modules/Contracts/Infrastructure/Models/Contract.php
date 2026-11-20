@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $tenant_id
  * @property string $employment_id
+ * @property string|null $signature_request_id
  * @property string $contract_type_id
  * @property string|null $number
  * @property string|null $objective_cause

@@ -6,6 +6,7 @@ return [
         'system_read_only' => 'Country package contract types cannot be changed: create your own type.',
     ],
     'contracts' => [
+        'not_pending_signature' => 'Only items awaiting signature can be sent to sign: issue it first.',
         'type_invalid' => 'Choose a valid contract type.',
         'end_required' => 'This contract type requires an end date (RN-CON-01).',
         'end_before_start' => 'The end date cannot be before the start date.',
@@ -84,5 +85,12 @@ return [
         'body' => "Between :employer (the employer) and :employee (the worker), it is agreed that services will be provided under the remote work modality.\n\nModality: :modality.\nTerm: from :starts_on:ends_on.\nUsual work place: :work_place.\nWorking hours: :schedule.\nDigital disconnection: at least :disconnection consecutive hours in every twenty-four hour period.\nSupervision mechanism: :supervision.\nEquipment: :equipment.\nExpense compensation: :compensation.",
         'ends_on_text' => ' until :date',
         'due_soon_title' => 'Remote work request about to expire',
+    ],
+    'renewal_batches' => [
+        'unknown_contract' => 'A contract does not exist or is outside your scope.',
+        'default_name' => 'Renewals to :date',
+        'not_renewable' => 'Not renewed: the contract is not running or has no end date.',
+        'end_before_start' => 'The new end date is before the renewal starts.',
+        'exceeds' => 'Excluded: it exceeds the accumulated limit. :explanation',
     ],
 ];

@@ -4,6 +4,7 @@ use App\Modules\Contracts\Http\Controllers\ContractAddendumController;
 use App\Modules\Contracts\Http\Controllers\ContractController;
 use App\Modules\Contracts\Http\Controllers\ContractTypeController;
 use App\Modules\Contracts\Http\Controllers\RemoteWorkController;
+use App\Modules\Contracts\Http\Controllers\RenewalBatchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -29,6 +30,13 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/contracts/{id}/renew', [ContractController::class, 'renew'])->middleware('permission:contracts.contracts.renew');
     Route::get('/contracts/{id}/document', [ContractController::class, 'document'])->middleware('permission:contracts.contracts.view');
     Route::get('/employments/{employment_id}/contracts', [ContractController::class, 'chain'])->middleware('permission:contracts.contracts.view');
+
+    // CON-5 · Renovación masiva con firma: el lote revisa los topes, genera las renovaciones y las envía a firma.
+    Route::get('/contract-renewal-batches', [RenewalBatchController::class, 'index'])->middleware('permission:contracts.contracts.view');
+    Route::post('/contract-renewal-batches', [RenewalBatchController::class, 'store'])->middleware('permission:contracts.contracts.bulk_renew');
+    Route::get('/contract-renewal-batches/{id}', [RenewalBatchController::class, 'show'])->middleware('permission:contracts.contracts.view');
+    Route::post('/contract-renewal-batches/{id}/send', [RenewalBatchController::class, 'send'])->middleware('permission:contracts.contracts.bulk_renew');
+    Route::post('/contract-renewal-batches/{id}/cancel', [RenewalBatchController::class, 'cancel'])->middleware('permission:contracts.contracts.bulk_renew');
 
     // CON-3 · Adendas: se generan, se firman y, firmadas, aplican sus cambios con vigencia (RN-CON-08).
     Route::get('/contract-addenda', [ContractAddendumController::class, 'index'])->middleware('permission:contracts.addenda.view');

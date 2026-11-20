@@ -149,6 +149,11 @@ final class DomainEventTypes
 
     public const SIGNATURE_COMPLETED = 'signature.completed.v1';
 
+    // DOC-6 · Flujo de firma: envío (o recordatorio) al firmante de turno y rechazo con motivo.
+    public const SIGNATURE_SENT = 'signature.sent.v1';
+
+    public const SIGNATURE_DECLINED = 'signature.declined.v1';
+
     // Identidad
     public const USER_PASSWORD_RESET_REQUESTED = 'user.password_reset_requested.v1';
 
@@ -830,6 +835,8 @@ final class DomainEventTypes
         self::DOCUMENT_GENERATION_STARTED => ['version' => 1, 'required_fields' => ['batch_id', 'template_id'], 'description' => 'Se pidió generar documentos para varias personas: el lote se procesa en segundo plano con su avance (DOC-5)'],
         self::EXPORT_REQUESTED => ['version' => 1, 'required_fields' => ['export_id', 'resource'], 'description' => 'Se pidió una exportación que pasa el umbral de segundo plano: se genera fuera de la solicitud y se avisa con enlace (UI-11)'],
         self::DOCUMENT_GENERATED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'template_version_id'], 'description' => 'Se generó un documento PDF desde una plantilla y entró al legajo con la versión de la plantilla con que se emitió (DOC-5 · RN-DOC-11)'],
+        self::SIGNATURE_SENT => ['version' => 1, 'required_fields' => ['signature_request_id', 'user_ids'], 'description' => 'Documento enviado a firma (o recordatorio): avisa a los firmantes de turno (DOC-6)'],
+        self::SIGNATURE_DECLINED => ['version' => 1, 'required_fields' => ['signature_request_id', 'reason'], 'description' => 'Un firmante rechazó la firma con su motivo; la solicitud termina (DOC-6)'],
         self::SIGNATURE_COMPLETED => [
             'version' => 1,
             'required_fields' => ['signature_request_id', 'completed_at'],

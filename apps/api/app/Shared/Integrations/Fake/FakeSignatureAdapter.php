@@ -73,6 +73,30 @@ final class FakeSignatureAdapter implements SignaturePort
         return $status;
     }
 
+    public function sign(string $envelopeId, array $signer, string $documentHash): array
+    {
+        $start = hrtime(true);
+        if ($this->nextException !== null) {
+            $e = $this->nextException;
+            $this->nextException = null;
+            $this->recorder?->record('fake_signature', 'sign', (hrtime(true) - $start) / 1e6, 'failed', $e->getMessage());
+
+            throw $e;
+        }
+        if (isset($this->requests[$envelopeId])) {
+            $this->requests[$envelopeId]['status'] = 'signed';
+        }
+        $this->recorder?->record('fake_signature', 'sign', (hrtime(true) - $start) / 1e6, 'success', null, ['envelope' => $envelopeId]);
+
+        return [
+            'provider' => $this->providerName(),
+            'certificate_serial' => strtoupper(substr(hash('sha256', 'cert|'.($signer['user_id'] ?? $signer['name'])), 0, 16)),
+            'certificate_issuer' => 'CN=Fake CA (desarrollo)',
+            'signed_at' => now()->toIso8601String(),
+            'signature' => hash('sha256', $envelopeId.'|'.$documentHash.'|'.($signer['user_id'] ?? $signer['name'])),
+        ];
+    }
+
     public function setStatus(string $signatureRequestId, string $status): void
     {
         if (isset($this->requests[$signatureRequestId])) {

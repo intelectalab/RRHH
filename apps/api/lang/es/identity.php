@@ -46,6 +46,7 @@ return [
     ],
     'codes' => [
         'login_message' => 'GestiaHR: tu código de ingreso es :code. Vence en :minutes minutos. No lo compartas con nadie.',
+        'signature_message' => 'GestiaHR: tu código para firmar el documento es :code. Vence en :minutes minutos. No lo compartas con nadie.',
         'activation_message' => 'GestiaHR: tu código para activar tu cuenta es :code. Vence en :hours horas. Ingresa con tu documento y este código.',
         'email_subject' => 'Tu código de GestiaHR',
         'invalid' => 'El documento o el código no son válidos, o el código ya venció.',

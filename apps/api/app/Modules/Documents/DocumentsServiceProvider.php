@@ -3,9 +3,12 @@
 namespace App\Modules\Documents;
 
 use App\Modules\Documents\Application\DocumentTemplateService;
+use App\Modules\Documents\Application\SignatureService;
+use App\Modules\Documents\Console\AdvanceSignatures;
 use App\Modules\Documents\Console\CheckDocumentExpiry;
 use App\Modules\Documents\Infrastructure\Calendar\DocumentCalendarSource;
 use App\Modules\Documents\Infrastructure\Catalog\DocumentTypesAdapter;
+use App\Modules\Documents\Infrastructure\Inbox\SignatureInboxSource;
 use App\Modules\Documents\Infrastructure\SelfService\DocumentsHomeCard;
 use App\Modules\Documents\Infrastructure\Setup\DocumentTemplatesPackComponent;
 use App\Modules\Documents\Infrastructure\Subscribers\RunDocumentGeneration;
@@ -14,9 +17,11 @@ use App\Modules\Documents\Infrastructure\Workflow\DocumentRequestOutcome;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Documents\DocumentTypes;
 use App\Shared\Documents\TemplateRenderer;
+use App\Shared\Inbox\InboxRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Setup\CountryPackRegistry;
+use App\Shared\Signatures\SignatureRequests;
 use App\Shared\Trash\TrashRegistry;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -33,6 +38,8 @@ final class DocumentsServiceProvider extends ServiceProvider
         $this->app->bind(TemplateRenderer::class, DocumentTemplateService::class);
         // ESS-4 · Los módulos que archivan en el legajo piden el tipo documental del sistema por su código.
         $this->app->bind(DocumentTypes::class, DocumentTypesAdapter::class);
+        // DOC-6 · Otros módulos (renovación masiva de contratos) envían a firma por este puerto.
+        $this->app->bind(SignatureRequests::class, SignatureService::class);
     }
 
     public function boot(): void
@@ -50,12 +57,16 @@ final class DocumentsServiceProvider extends ServiceProvider
         $this->app->make(OutboxService::class)->subscribe($this->app->make(RunDocumentGeneration::class));
         // ESS-3 · Mis documentos en el inicio del colaborador.
         $this->app->make(HomeCardRegistry::class)->register($this->app->make(DocumentsHomeCard::class));
+        // DOC-6 · Documentos por firmar en la bandeja del firmante de turno.
+        $this->app->make(InboxRegistry::class)->register($this->app->make(SignatureInboxSource::class));
 
         if ($this->app->runningInConsole()) {
-            $this->commands([CheckDocumentExpiry::class]);
+            $this->commands([CheckDocumentExpiry::class, AdvanceSignatures::class]);
             $this->app->booted(function (): void {
                 // DOC-2 · RN-DOC-09 · Avisos de vencimiento y paso a Vencido, al empezar el día.
                 $this->app->make(Schedule::class)->command('documents:check-expiry')->dailyAt('00:35')->withoutOverlapping();
+                // DOC-6 · Firmas vencidas y recordatorios al firmante de turno.
+                $this->app->make(Schedule::class)->command('signatures:advance')->dailyAt('08:10')->withoutOverlapping();
             });
         }
     }

@@ -235,6 +235,24 @@
       "permissions": [
         "time.absences.view"
       ]
+    },
+    "people.renewal_batches": {
+      "module": "core",
+      "permissions": [
+        "contracts.contracts.bulk_renew"
+      ]
+    },
+    "documents.signatures": {
+      "module": "core",
+      "permissions": [
+        "documents.signature_requests.create"
+      ]
+    },
+    "portal.signatures": {
+      "module": "core",
+      "permissions": [
+        "documents.signature_requests.sign"
+      ]
     }
   }
 }

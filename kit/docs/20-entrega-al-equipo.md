@@ -71,8 +71,8 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 1 | [POS](../prompts/POS.md) · Posiciones y headcount | Core HR | 5 | 2 | 7 | 47 | — | D-05 |
 | 1 | [COL](../prompts/COL.md) · Colaboradores y ficha 360 | Core HR | 10 | 2 | 12 | 63 | — | A-05, A-10, D-14, D-17, D-35 |
 | 1 | [HIS](../prompts/HIS.md) · Historia con vigencia | Core HR | 3 | 3 | 6 | 19 | — | — |
-| 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 36 | — | — |
-| 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 45 | — | A-11 |
+| 1 | [CON](../prompts/CON-epica.md) · Contratos y adendas | Core HR | 5 | 1 | 6 | 41 | — | — |
+| 1 | [DOC](../prompts/DOC.md) · Gestión documental, plantillas y firma | Core HR | 5 | 3 | 8 | 53 | — | A-11 |
 | 1 | [ESS](../prompts/ESS.md) · Portal del colaborador | Core HR | 5 | 1 | 6 | 33 | — | A-12, D-23 |
 | 1 | [MSS](../prompts/MSS.md) · Portal del manager | Core HR | 4 | 0 | 4 | 4 | — | — |
 | 1 | [IMP](../prompts/IMP.md) · Importador y puesta en marcha | Core HR | 4 | 3 | 7 | 20 | — | — |

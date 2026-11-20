@@ -46,6 +46,7 @@ return [
     ],
     'codes' => [
         'login_message' => 'GestiaHR: your sign-in code is :code. It expires in :minutes minutes. Do not share it.',
+        'signature_message' => 'GestiaHR: your code to sign the document is :code. It expires in :minutes minutes. Do not share it.',
         'activation_message' => 'GestiaHR: your account activation code is :code. It expires in :hours hours. Sign in with your ID document and this code.',
         'email_subject' => 'Your GestiaHR code',
         'invalid' => 'The document or the code is not valid, or the code has expired.',

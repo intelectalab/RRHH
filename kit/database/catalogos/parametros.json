@@ -1024,6 +1024,44 @@
       ]
     },
     {
+      "codigo": "firma.tipos_con_certificado",
+      "modulo": "core",
+      "nombre": "Tipos documentales que se firman con certificado",
+      "tipo": "list",
+      "valor_por_defecto": [
+        "contracts"
+      ],
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "DOC-8 · ADR 0019 (D-10): códigos de tipo o carpeta documental que se firman con proveedor y certificado digital; el resto usa la firma electrónica propia con evidencia (OTP, IP, huella, sello de tiempo). Por defecto los contratos, sus adendas y acuerdos de teletrabajo (carpeta contracts). Por validar con el área legal (D-15).",
+      "opciones": null
+    },
+    {
+      "codigo": "firma.vigencia_dias",
+      "modulo": "core",
+      "nombre": "Días para firmar",
+      "tipo": "integer",
+      "valor_por_defecto": 15,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "DOC-6 · Días que tiene un envío a firma antes de vencer; vencido, se reenvía como un envío nuevo.",
+      "opciones": null
+    },
+    {
+      "codigo": "firma.recordatorio_dias",
+      "modulo": "core",
+      "nombre": "Recordatorio de firma pendiente",
+      "tipo": "integer",
+      "valor_por_defecto": 3,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "DOC-6 · Cada cuántos días se recuerda al firmante de turno que tiene un documento por firmar (0: sin recordatorios automáticos).",
+      "opciones": null
+    },
+    {
       "codigo": "documentos.aviso_vencimiento_dias",
       "modulo": "core",
       "nombre": "Aviso de vencimiento de documentos",

@@ -6,6 +6,7 @@ use App\Modules\Documents\Http\Controllers\DocumentGenerationBatchController;
 use App\Modules\Documents\Http\Controllers\DocumentRequestController;
 use App\Modules\Documents\Http\Controllers\DocumentTemplateController;
 use App\Modules\Documents\Http\Controllers\EmploymentDocumentsController;
+use App\Modules\Documents\Http\Controllers\SignatureRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): void {
@@ -57,4 +58,22 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/document-templates/{id}/generate', [DocumentTemplateController::class, 'generate'])->middleware('permission:documents.templates.generate');
     Route::get('/document-generation-batches', [DocumentGenerationBatchController::class, 'index'])->middleware('permission:documents.templates.view');
     Route::get('/document-generation-batches/{id}', [DocumentGenerationBatchController::class, 'show'])->middleware('permission:documents.templates.view');
+
+    // DOC-6 · DOC-7 · DOC-8 · Flujo de firma (ME-10): RRHH envía y sigue; el firmante firma con código (portal).
+    Route::get('/signature-requests', [SignatureRequestController::class, 'index'])->middleware('permission:documents.signature_requests.view');
+    Route::post('/signature-requests', [SignatureRequestController::class, 'store'])->middleware('permission:documents.signature_requests.create');
+    Route::get('/signature-requests/{id}', [SignatureRequestController::class, 'show'])->middleware('permission:documents.signature_requests.view');
+    Route::post('/signature-requests/{id}/send', [SignatureRequestController::class, 'send'])->middleware('permission:documents.signature_requests.send');
+    Route::post('/signature-requests/{id}/cancel', [SignatureRequestController::class, 'cancel'])->middleware('permission:documents.signature_requests.cancel');
+    Route::post('/signature-requests/{id}/remind', [SignatureRequestController::class, 'remind'])->middleware('permission:documents.signature_requests.remind');
+    Route::get('/signature-requests/{id}/evidence', [SignatureRequestController::class, 'evidence'])->middleware('permission:documents.signature_requests.evidence');
+    Route::get('/signature-requests/{id}/document', [SignatureRequestController::class, 'document'])->middleware('permission:documents.signature_requests.view');
+    Route::get('/signature-requests/{id}/certificate', [SignatureRequestController::class, 'certificate'])->middleware('permission:documents.signature_requests.view');
+    Route::get('/me/signature-requests', [SignatureRequestController::class, 'mine'])->middleware('permission:documents.signature_requests.sign');
+    Route::get('/me/signature-requests/{id}', [SignatureRequestController::class, 'mineShow'])->middleware('permission:documents.signature_requests.sign');
+    Route::get('/me/signature-requests/{id}/document', [SignatureRequestController::class, 'mineDocument'])->middleware('permission:documents.signature_requests.sign');
+    Route::post('/me/signature-requests/{id}/view', [SignatureRequestController::class, 'mineView'])->middleware('permission:documents.signature_requests.sign');
+    Route::post('/me/signature-requests/{id}/code', [SignatureRequestController::class, 'mineCode'])->middleware(['permission:documents.signature_requests.sign', 'throttle:ayni-login']);
+    Route::post('/me/signature-requests/{id}/sign', [SignatureRequestController::class, 'mineSign'])->middleware(['permission:documents.signature_requests.sign', 'throttle:ayni-login']);
+    Route::post('/me/signature-requests/{id}/decline', [SignatureRequestController::class, 'mineDecline'])->middleware('permission:documents.signature_requests.decline');
 });

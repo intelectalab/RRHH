@@ -69,6 +69,10 @@ return [
         // DOC-3 · Documento solicitado al colaborador: lo entrega desde su portal.
         'documents.requested' => ['variables' => ['document', 'due_on', 'instructions'], 'link' => '/mi', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // ESS-4: constancia por emitir (a RRHH), emitida o rechazada (al colaborador).
+        // DOC-6: documento por firmar (al firmante de turno), firma completada o rechazada (a quien lo envió).
+        'signatures.requested' => ['variables' => ['document'], 'link' => '/mi/firmas', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'signatures.completed' => ['variables' => ['document'], 'link' => '/documentos/firmas', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'signatures.declined' => ['variables' => ['document', 'signer', 'reason'], 'link' => '/documentos/firmas', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'certificates.requested' => ['variables' => ['certificate', 'employee'], 'link' => '/personas/constancias', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'certificates.issued' => ['variables' => ['certificate'], 'link' => '/mi/solicitudes', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // AYU-4 · RN-AYU-04: artículo de la organización por revisar (al responsable).

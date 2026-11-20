@@ -41,7 +41,11 @@ final class SendMessageCode implements DomainEventSubscriber
             if ($identity === null) {
                 return;
             }
-            $key = $payload['purpose'] === 'invite' ? 'identity.codes.activation_message' : 'identity.codes.login_message';
+            $key = match ($payload['purpose']) {
+                'invite' => 'identity.codes.activation_message',
+                'signature_otp' => 'identity.codes.signature_message',
+                default => 'identity.codes.login_message',
+            };
             $text = (string) trans($key, [
                 'code' => Crypt::decryptString((string) $payload['code_enc']),
                 'minutes' => (int) $payload['minutes'],
