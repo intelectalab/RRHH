@@ -209,6 +209,8 @@ final class ProrationFifthCategoryAndSettlementTest extends TestCase
 
     public function test_liquidacion_regimen_general_sin_dias_de_vacaciones_queda_con_error(): void
     {
+        // Sin valor vigente para los días de vacaciones del régimen, la liquidación no se calcula a ciegas.
+        $this->params->put('vacaciones_dias', 'pe_general', null, '2025-01-01', verified: false, unit: 'days');
         $r = $this->settlement()->calculate($this->employee(['base_salary' => '3000.00', 'hire_date' => '2024-03-10', 'termination_date' => '2026-11-20']));
 
         $this->assertSame(SettlementResult::STATUS_ERROR, $r->status);
