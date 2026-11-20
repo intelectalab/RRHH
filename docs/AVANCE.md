@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-16** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-19** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 140 | 0 | 58,1 % |
-| Backlog completo | 512 | 140 | 0 | 27,3 % |
+| Primer corte comercial (MVP) | 241 | 143 | 0 | 59,3 % |
+| Backlog completo | 512 | 143 | 0 | 27,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -71,9 +71,9 @@ Actualizado el **2026-11-16** con `python3 scripts/gen_avance.py` desde `kit/bac
 | UI-7 | Paleta de comandos y búsqueda global | UI | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-10 | GET /search con registro de fuentes por módulo (usuarios, roles, empresas) que aplican permiso, módulo contratado y alcance en la consulta; cubierto por la batería de aislamiento; paleta de comandos con Ctrl/⌘+K y botón Buscar en la barra superior: resultados del servidor + accesos a pantallas permitidas, navegación con flechas, Enter y Esc. Las demás fuentes (personas, documentos, vacantes…) se registran al construir sus módulos. |
 | UI-8 | Botón de creación rápida | UI | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-16 | «+ Crear» en la barra superior (Alt+N) y en la paleta de comandos; solo opciones con módulo activo y permiso; abre el formulario real por ?crear=. |
 | UI-9 | Experiencia móvil y aplicación instalable | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-16 | App instalable con service worker (red primero, respaldo «Sin conexión», nunca guarda la API); aviso sin conexión e «Instalar aplicación»; armazón a 360 px. |
-| UI-10 | Divulgación progresiva | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
-| UI-11 | Servicio de exportación | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
-| UI-12 | Componentes de calendario, kanban y gráficos | UI | Fase 0 · Cimientos | Task | sí | pendiente | — |  |
+| UI-10 | Divulgación progresiva | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-19 | Componente Disclosure (plegable con resumen, se abre ante error del servidor) aplicado al panel de tareas; patrón documentado en docs/divulgacion-progresiva.md. |
+| UI-11 | Servicio de exportación | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-19 | Exportación CSV, Excel y PDF; sobre el umbral parametrizado va en segundo plano con permisos y alcance recalculados, sin duplicar, con aviso; pantalla Mis exportaciones. |
+| UI-12 | Componentes de calendario, kanban y gráficos | UI | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-19 | Calendar (mes, semana, agenda), Kanban, Tree ARIA y gráficos SVG con tabla alternativa y modo oscuro; tablero de tareas y calendario con confirmación del servidor; Dotación con gráficos. |
 | WFL-1 | Modelo de definiciones, versiones y ejecuciones | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | Flujos de aprobación versionados (workflow_definitions + versions + steps): crear, editar (abre una versión borrador), publicar (materializa los niveles) y retirar por acciones con 409 invalid_transition; Pantalla Configuración → Flujos de aprobación (niveles, quién aprueba, modo, plazo y escalamiento; guardar borrador y publicar); RN-WFL-01 elige el flujo publicado más específico por condiciones del contexto; RN-WFL-08 una solicitud en curso sigue con la versión con la que empezó; la traza completa queda en tareas, decisiones inalterables y auditoría. API /approval-flows. |
 | WFL-2 | Motor de aprobaciones de N niveles | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | ApprovalEngine: 1 a N niveles secuenciales, paralelos «todos» o «cualquiera» (con mínimo de aprobaciones para mayoría); aprobar/rechazar idempotente y auditado, rechazo con motivo obligatorio (RN-WFL-04); el resultado sale una sola vez por outbox (approval.approved/rejected.v1) hacia el módulo dueño; cancelación por el origen (RN-WFL-13). API /approval-requests (listado con alcance y filtro «asignadas a mí», detalle con tareas, approve/reject/delegate). La «devolución para corrección» queda para cuando la use el primer módulo (VAC). |
 | WFL-3 | Resolución de aprobadores, delegación y escalamiento | WFL | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | ApproverResolver: usuario fijo, rol, jefe directo y jefe del jefe (por la asignación vigente, con excepción por relación); delegación vigente por ausencia (RN-WFL-07) y delegación manual; aprobador inactivo → su jefe; nadie aprueba lo suyo (RN-WFL-05: se salta el nivel o va a RRHH); vencimiento: primer aviso con recordatorio y luego escalamiento al destino configurado, al jefe del aprobador o a RRHH, auditado (comando workflow:process-overdue cada 15 min por organización). |

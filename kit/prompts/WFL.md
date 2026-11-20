@@ -3,7 +3,7 @@
 Motor transversal de aprobaciones, reglas CUANDO → SI → ENTONCES, constructor visual, tareas y bandejas.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** Plataforma base.
-- **Actividades:** 9 (5 historias y 4 tareas); 9 del MVP. **Operaciones de API:** 32.
+- **Actividades:** 9 (5 historias y 4 tareas); 9 del MVP. **Operaciones de API:** 33.
 - **Especificación:** `kit/docs/modulos/M-WFL.md`.
 
 ## Prompt para una sesión nueva de Claude Code
