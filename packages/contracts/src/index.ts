@@ -123,6 +123,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/absence-summaries/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AUS-6 · Cerrar (congelar) el resumen de ausencias de un periodo para las relaciones laborales del alcance (opcional: empresa o lista de relaciones); volver a cerrar sin cambios no agrega nada y un cambio posterior se informa como diferencia */
+        post: operations["postAbsenceSummariesClose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/absence-types": {
         parameters: {
             query?: never;
@@ -5119,6 +5136,23 @@ export interface paths {
         put?: never;
         /** Crear Employment */
         post: operations["postEmployments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/employments/{employment_id}/absence-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AUS-6 · Resumen de ausencias del trabajador en el periodo (hasta 93 días): cada día explicado (fuera de la relación, descanso, feriado, laborado, laborado en remoto por acuerdo o por trabajo remoto aprobado, ausencia con su efecto: pagada, sin goce, a cargo del empleador o subsidio; permisos por horas), totales por tipo con su concepto de planilla, incidencias importadas, huella reproducible y, si el periodo se cerró, las diferencias contra el último cierre. Un tipo confidencial se muestra genérico sin permiso de datos de salud */
+        get: operations["getEmploymentsEmploymentIdAbsenceSummary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -25392,6 +25426,38 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    postAbsenceSummariesClose: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getAbsenceTypes: {
         parameters: {
             query?: {
@@ -37941,6 +38007,38 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getEmploymentsEmploymentIdAbsenceSummary: {
+        parameters: {
+            query: {
+                /** @description Inicio del periodo (AAAA-MM-DD) */
+                from: string;
+                /** @description Fin del periodo (AAAA-MM-DD); hasta 93 días después del inicio */
+                to: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     getEmploymentsEmploymentIdAssignments: {

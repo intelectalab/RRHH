@@ -12,6 +12,8 @@ use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\Resolution\TenantDirectory;
 use App\Shared\Tenancy\TenancyScope;
+use App\Shared\Time\DisconnectionWindow;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -36,6 +38,7 @@ final class NotificationDispatcher implements Notifier
         private readonly TenantDirectory $tenants,
         private readonly MessageSender $messages,
         private readonly PushDevices $push,
+        private readonly DisconnectionWindow $disconnection,
     ) {}
 
     public function notify(string $category, array $userIds, array $variables, ?string $subjectType = null, ?string $subjectId = null): int
@@ -56,10 +59,18 @@ final class NotificationDispatcher implements Notifier
             $organization = $tenant['name'];
             $orgLocale = $this->catalog->setting('org.idioma_defecto');
             $link = (string) preg_replace_callback('/\{([a-z_]+)\}/', fn ($m) => rawurlencode((string) ($variables[$m[1]] ?? '')), $cat['link']);
-            $quietUntil = $cat['urgent'] ? null : $this->catalog->quietUntil(now());
+            $orgQuietUntil = $cat['urgent'] ? null : $this->catalog->quietUntil(now());
             $count = 0;
 
             foreach ($users as $user) {
+                // AUS-5 · Desconexión digital: a un teletrabajador fuera de su jornada, lo no urgente espera.
+                $quietUntil = $orgQuietUntil;
+                if (! $cat['urgent']) {
+                    $resume = $this->disconnection->resumeAt((string) $user->id, CarbonImmutable::now());
+                    if ($resume !== null && ($quietUntil === null || $resume->greaterThan($quietUntil))) {
+                        $quietUntil = $resume->toMutable();
+                    }
+                }
                 $locale = (string) ($user->locale ?? (is_string($orgLocale) ? $orgLocale : 'es'));
                 $vars = array_intersect_key($variables, array_flip($this->catalog->variables($category)))
                     + ['name' => (string) $user->display_name, 'organization' => $organization, 'link' => $this->absoluteLink($tenant['slug'], $link)];

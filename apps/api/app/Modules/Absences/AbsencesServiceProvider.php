@@ -2,6 +2,8 @@
 
 namespace App\Modules\Absences;
 
+use App\Modules\Absences\Application\AbsencePeriodSummary;
+use App\Modules\Absences\Application\DigitalDisconnection;
 use App\Modules\Absences\Console\AdvanceAbsences;
 use App\Modules\Absences\Infrastructure\Calendar\AbsenceCalendarSource;
 use App\Modules\Absences\Infrastructure\Documents\AbsenceLinkedDocuments;
@@ -15,7 +17,9 @@ use App\Shared\Documents\LinkedDocumentRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Setup\CountryPackRegistry;
+use App\Shared\Time\AbsenceIncidents;
 use App\Shared\Time\ApprovedAbsences;
+use App\Shared\Time\DisconnectionWindow;
 use App\Shared\Workflow\ApprovalOutcomeRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +33,10 @@ final class AbsencesServiceProvider extends ServiceProvider
     {
         // AUS-2 · Asistencia y planilla consultan las ausencias aprobadas sin importar este módulo.
         $this->app->bind(ApprovedAbsences::class, ApprovedAbsencesQuery::class);
+        // AUS-6 · La planilla (NOM-5) lee el resumen de ausencias del periodo por este puerto.
+        $this->app->bind(AbsenceIncidents::class, AbsencePeriodSummary::class);
+        // AUS-5 · Notificaciones difiere lo no urgente fuera de la jornada de un teletrabajador.
+        $this->app->bind(DisconnectionWindow::class, DigitalDisconnection::class);
     }
 
     public function boot(): void

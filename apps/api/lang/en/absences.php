@@ -93,4 +93,21 @@ return [
         'closed' => 'The absence is closed: the certificate cannot be recorded.',
         'forbidden' => 'Recording the certificate requires permission to view health data.',
     ],
+    'summary' => [
+        'invalid_date' => 'Use a valid date (YYYY-MM-DD).',
+        'to_before_from' => 'The end date cannot be before the start date.',
+        'too_long' => 'The period can be up to :days days long.',
+        'confidential' => 'Justified absence (confidential)',
+        'effects' => ['paid' => 'paid', 'unpaid' => 'unpaid', 'employer_paid' => 'paid by the employer', 'subsidy' => 'subsidized'],
+        'days' => [
+            'outside_employment' => 'Outside the employment period.',
+            'rest_day' => 'Weekly rest day.',
+            'holiday' => 'Holiday.',
+            'worked' => 'Working day with no absences.',
+            'remote_agreement' => 'Worked remotely under the remote work agreement.',
+            'remote_absence' => 'Worked remotely (approved remote work).',
+            'absence' => ':type (:effect).',
+            'hours' => 'With :hours h of :type (:effect).',
+        ],
+    ],
 ];

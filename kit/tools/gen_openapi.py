@@ -682,6 +682,9 @@ EXTRA = [
     ("AUS", 2, "get", "/absences/{id}/medical-certificate", "time.absences.medical_certificate.view", "AUS-3 · Certificado médico del descanso (CITT o particular): tipo, número y diagnóstico (sensibles, x-sensitive-fields de AbsenceMedicalCertificate: certificate_number, diagnosis; la lectura queda en data_access_logs), emisor, fecha, días otorgados frente a los días del descanso y origen laboral", False),
     ("AUS", 2, "put", "/absences/{id}/medical-certificate", "time.absences.create_for_others", "AUS-3 · Registrar o corregir el certificado médico (kind citt|private, certificate_number, issuer, diagnosis, issued_on, days_granted, is_work_related, validated). Exige además time.absences.medical_certificate.view (403); 422 not_medical_absence si el tipo no genera subsidio. Número y diagnóstico se guardan cifrados y no van a la auditoría", False),
     ("AUS", 2, "get", "/employments/{employment_id}/medical-leave-summary", "time.absences.manage_subsidy", "AUS-3 · Acumulado anual de descansos médicos del trabajador: umbral a cargo del empleador (parámetro descanso_medico_dias_cargo_empleador, «por validar» si no tiene valor), días acumulados, del empleador y de subsidio, si se alcanzó el umbral y cada descanso con su expediente", False),
+    # AUS-5 · AUS-6 · Resumen de ausencias del periodo (incidencias para planilla) con cada día explicado y los días remotos.
+    ("AUS", 2, "get", "/employments/{employment_id}/absence-summary", "time.absences.view", "AUS-6 · Resumen de ausencias del trabajador en el periodo (hasta 93 días): cada día explicado (fuera de la relación, descanso, feriado, laborado, laborado en remoto por acuerdo o por trabajo remoto aprobado, ausencia con su efecto: pagada, sin goce, a cargo del empleador o subsidio; permisos por horas), totales por tipo con su concepto de planilla, incidencias importadas, huella reproducible y, si el periodo se cerró, las diferencias contra el último cierre. Un tipo confidencial se muestra genérico sin permiso de datos de salud", False),
+    ("AUS", 2, "post", "/absence-summaries/close", "time.absences.create_for_others", "AUS-6 · Cerrar (congelar) el resumen de ausencias de un periodo para las relaciones laborales del alcance (opcional: empresa o lista de relaciones); volver a cerrar sin cambios no agrega nada y un cambio posterior se informa como diferencia", False),
     ("AUS", 2, "get", "/absence-subsidies", "time.absences.manage_subsidy", "AUS-3 · Expedientes de subsidio (reembolso ante la seguridad social) en el alcance: estado, días de subsidio, plazo de presentación (parámetro subsidio_reembolso_plazo_meses), montos {amount, currency} y acciones permitidas", False),
     ("AUS", 2, "get", "/absence-subsidies/{id}", "time.absences.manage_subsidy", "AUS-3 · Ver un expediente de subsidio", False),
     ("AUS", 2, "post", "/absence-subsidies/{id}/file", "time.absences.manage_subsidy", "AUS-3 · Presentar el expediente (filed_on, filing_reference, amount_requested {amount, currency}); también vuelve a presentar uno observado. 409 invalid_transition fuera de por presentar u observado", False),
@@ -768,6 +771,10 @@ QUERY = {
         _q("filter[overdue]", "true: solo los por presentar con el plazo vencido"),
         _q("page", "Página (desde 1)"),
         _q("per_page", "Tamaño de página (hasta 100)"),
+    ],
+    ("get", "/employments/{employment_id}/absence-summary"): [
+        _q("from", "Inicio del periodo (AAAA-MM-DD)", True, "date"),
+        _q("to", "Fin del periodo (AAAA-MM-DD); hasta 93 días después del inicio", True, "date"),
     ],
     ("get", "/employments/{employment_id}/medical-leave-summary"): [
         _q("year", "Año calendario (AAAA); por defecto el actual"),
@@ -948,7 +955,7 @@ ERRS = {
 }
 
 # Consultas que pueden responder 422 por una regla de negocio (CFG-7: falta el tipo de cambio).
-GET_RULES = {("get", "/exchange-rates/convert"), ("get", "/headcount"), ("get", "/platform/activity-events"), ("get", "/platform/technical-logs"), ("get", "/platform/support-sessions"), ("get", "/platform/health"), ("get", "/platform/health/failed-jobs"), ("get", "/platform/health/outbox-events"), ("get", "/platform/backups"), ("get", "/platform/backup-restores"), ("get", "/platform/audit-events")}
+GET_RULES = {("get", "/employments/{employment_id}/absence-summary"), ("get", "/exchange-rates/convert"), ("get", "/headcount"), ("get", "/platform/activity-events"), ("get", "/platform/technical-logs"), ("get", "/platform/support-sessions"), ("get", "/platform/health"), ("get", "/platform/health/failed-jobs"), ("get", "/platform/health/outbox-events"), ("get", "/platform/backups"), ("get", "/platform/backup-restores"), ("get", "/platform/audit-events")}
 # Operaciones que dependen de un proveedor externo por su puerto (503 upstream_unavailable).
 UPSTREAM = {("post", "/exchange-rates/import")}
 

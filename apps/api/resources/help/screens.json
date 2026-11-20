@@ -229,6 +229,12 @@
       "permissions": [
         "contracts.remote_work.view"
       ]
+    },
+    "time.period_summary": {
+      "module": "time_off",
+      "permissions": [
+        "time.absences.view"
+      ]
     }
   }
 }

@@ -5658,6 +5658,29 @@ ALTER TABLE absence_subsidy_cases FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON absence_subsidy_cases USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_absence_subsidy_cases_touch BEFORE UPDATE ON absence_subsidy_cases FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
+CREATE TABLE absence_period_closings (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  employment_id uuid NOT NULL,
+  period_from date NOT NULL,
+  period_to date NOT NULL,
+  fingerprint text NOT NULL,
+  summary jsonb NOT NULL,
+  closed_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_absence_period_closings_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_absence_period_closings_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_absence_period_closings_closed_by_user_id FOREIGN KEY (tenant_id, closed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE absence_period_closings IS 'AUS-6 · Resumen de ausencias de un trabajador para un periodo, congelado al cerrar el periodo (solo inserción). Un cambio posterior se informa como diferencia contra el último cierre; cerrar otra vez con cambios agrega otra fila.';
+CREATE INDEX ix_absence_period_closings_closed_by_user_id ON absence_period_closings (tenant_id, closed_by_user_id);
+CREATE INDEX ix_absence_period_closings_employment_id_period_from_period_to ON absence_period_closings (tenant_id, employment_id, period_from, period_to);
+ALTER TABLE absence_period_closings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE absence_period_closings FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON absence_period_closings USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_absence_period_closings_inmutable BEFORE UPDATE OR DELETE ON absence_period_closings FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_absence_period_closings_no_truncate BEFORE TRUNCATE ON absence_period_closings FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
+
 -- --------------------------------------------------------------------------------------------------
 -- BHO · Horas extra y bolsa de horas
 -- --------------------------------------------------------------------------------------------------
@@ -18606,6 +18629,8 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('notificaciones.canales_activos', 'base', 'Canales de notificación', 'Canales habilitados para la organización.', 'list', '["in_app", "email", "push"]'::jsonb, ARRAY['organization'], '["in_app", "email", "push", "whatsapp", "sms"]'::jsonb),
   ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
+  ('jornada.hora_inicio', 'core', 'Inicio de la jornada', 'AUS-5 · Hora local de inicio de la jornada. Con el fin de la jornada define la desconexión digital del teletrabajador (los avisos no urgentes esperan al inicio de la siguiente jornada) hasta que el módulo de turnos asigne un horario por trabajador. Vacío: no se difieren avisos.', 'time', 'null'::jsonb, ARRAY['organization','legal_entity','site'], NULL),
+  ('jornada.hora_fin', 'core', 'Fin de la jornada', 'AUS-5 · Hora local de fin de la jornada. Desde aquí corre la desconexión mínima (la mayor entre la del acuerdo de teletrabajo y el parámetro legal teletrabajo_desconexion_horas).', 'time', 'null'::jsonb, ARRAY['organization','legal_entity','site'], NULL),
   ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),
   ('notificaciones.canal_sin_correo', 'base', 'Canal para quien no tiene correo', 'Canal externo por el que salen los avisos a quien no tiene correo válido (RN-NOT-07): un mensaje corto con el enlace, sin datos sensibles. none: solo en la aplicación.', 'select', '"sms"'::jsonb, ARRAY['organization'], '["sms", "whatsapp", "none"]'::jsonb),
   ('directorio.campos_contacto', 'core', 'Contacto visible en el directorio', 'Datos de contacto laboral que todos ven en el directorio y el organigrama (RN-ORG-08). Nunca incluye correo ni celular personal ni datos sensibles.', 'list', '["work_email", "work_phone"]'::jsonb, ARRAY['organization'], '["work_email", "work_phone", "work_phone_ext"]'::jsonb),
@@ -19173,7 +19198,7 @@ GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
-REVOKE UPDATE, DELETE ON ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
+REVOKE UPDATE, DELETE ON absence_period_closings, ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
 -- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
 -- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
 REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;

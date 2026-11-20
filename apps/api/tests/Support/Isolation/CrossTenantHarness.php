@@ -113,6 +113,8 @@ final class CrossTenantHarness
         // AUS-3: certificado médico de una ausencia de A, acumulado de su relación y expedientes de subsidio de A.
         '/absences/{id}/medical-certificate' => AbsenceRequest::class,
         '/employments/{employment_id}/medical-leave-summary' => AbsenceRequest::class,
+        // AUS-6: resumen de ausencias del periodo de una relación laboral de A.
+        '/employments/{employment_id}/absence-summary' => AbsenceRequest::class,
         '/absence-subsidies/{id}' => AbsenceSubsidyCase::class,
         '/absence-subsidies/{id}/file' => AbsenceSubsidyCase::class,
         '/absence-subsidies/{id}/observe' => AbsenceSubsidyCase::class,

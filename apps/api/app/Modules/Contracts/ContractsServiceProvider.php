@@ -7,11 +7,13 @@ use App\Modules\Contracts\Console\ApplyDueContracts;
 use App\Modules\Contracts\Console\RemindRemoteWorkResponses;
 use App\Modules\Contracts\Infrastructure\Calendar\ContractCalendarSource;
 use App\Modules\Contracts\Infrastructure\Home\ContractDatesCard;
+use App\Modules\Contracts\Infrastructure\Labor\RemoteWorkAgreementsQuery;
 use App\Modules\Contracts\Infrastructure\Setup\ContractTypesPackComponent;
 use App\Modules\Contracts\Infrastructure\Team\ContractTeamDates;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\ContractTypeSource;
+use App\Shared\Labor\RemoteWorkAgreements;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Team\TeamDateRegistry;
 use Illuminate\Console\Scheduling\Schedule;
@@ -26,6 +28,8 @@ final class ContractsServiceProvider extends ServiceProvider
     {
         // COL-2 · El ingreso pide la precarga de tipos de contrato sin importar este módulo.
         $this->app->singleton(ContractTypeSource::class, ContractTypeCatalog::class);
+        // AUS-5 · Ausencias y notificaciones leen el acuerdo de teletrabajo vigente por este puerto.
+        $this->app->bind(RemoteWorkAgreements::class, RemoteWorkAgreementsQuery::class);
     }
 
     public function boot(): void

@@ -138,6 +138,9 @@
   subsidized_days numeric(6,2)! ; starts_on date ; ends_on date ; year smallint ; filing_due_on date ; filed_on date
   filing_reference ; amount_requested money ; amount_approved money ; amount_reimbursed money ; currency cur?
   reimbursed_on date ; observation ; decision_reason ; uniq absence_request_id ; idx status, filing_due_on
+@absence_period_closings imm | AUS-6 · Resumen de ausencias de un trabajador para un periodo, congelado al cerrar el periodo (solo inserción). Un cambio posterior se informa como diferencia contra el último cierre; cerrar otra vez con cambios agrega otra fila.
+  employment_id -> employments ; period_from date! ; period_to date! ; fingerprint text! ; summary j!
+  closed_by_user_id ?-> users ; idx employment_id, period_from, period_to
 
 #E BHO | Horas extra y bolsa de horas
 @overtime_requests soft lock | Autorización previa de sobretiempo.

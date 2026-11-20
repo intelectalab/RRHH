@@ -421,6 +421,36 @@ paths:
       x-phase: 2
       x-permission: time.absences.manage_subsidy
       operationId: postAbsenceSubsidiesIdReject
+  /absence-summaries/close:
+    post:
+      summary: 'AUS-6 · Cerrar (congelar) el resumen de ausencias de un periodo para las relaciones laborales del alcance
+        (opcional: empresa o lista de relaciones); volver a cerrar sin cambios no agrega nada y un cambio posterior se informa
+        como diferencia'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+        '429': *id007
+      tags:
+      - AUS
+      x-phase: 2
+      x-permission: time.absences.create_for_others
+      operationId: postAbsenceSummariesClose
   /absence-types:
     get:
       summary: Listar AbsenceType
@@ -12880,6 +12910,50 @@ paths:
       x-phase: 1
       x-permission: people.employments.create
       operationId: postEmployments
+  /employments/{employment_id}/absence-summary:
+    get:
+      summary: 'AUS-6 · Resumen de ausencias del trabajador en el periodo (hasta 93 días): cada día explicado (fuera de la
+        relación, descanso, feriado, laborado, laborado en remoto por acuerdo o por trabajo remoto aprobado, ausencia con
+        su efecto: pagada, sin goce, a cargo del empleador o subsidio; permisos por horas), totales por tipo con su concepto
+        de planilla, incidencias importadas, huella reproducible y, si el periodo se cerró, las diferencias contra el último
+        cierre. Un tipo confidencial se muestra genérico sin permiso de datos de salud'
+      parameters:
+      - name: employment_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: true
+        description: Inicio del periodo (AAAA-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        description: Fin del periodo (AAAA-MM-DD); hasta 93 días después del inicio
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+      tags:
+      - AUS
+      x-phase: 2
+      x-permission: time.absences.view
+      operationId: getEmploymentsEmploymentIdAbsenceSummary
   /employments/{employment_id}/assignments:
     get:
       summary: Listar Assignment

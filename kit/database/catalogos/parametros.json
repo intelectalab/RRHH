@@ -537,6 +537,34 @@
       "opciones": null
     },
     {
+      "codigo": "jornada.hora_inicio",
+      "modulo": "core",
+      "nombre": "Inicio de la jornada",
+      "tipo": "time",
+      "valor_por_defecto": null,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site"
+      ],
+      "descripcion": "AUS-5 · Hora local de inicio de la jornada. Con el fin de la jornada define la desconexión digital del teletrabajador (los avisos no urgentes esperan al inicio de la siguiente jornada) hasta que el módulo de turnos asigne un horario por trabajador. Vacío: no se difieren avisos.",
+      "opciones": null
+    },
+    {
+      "codigo": "jornada.hora_fin",
+      "modulo": "core",
+      "nombre": "Fin de la jornada",
+      "tipo": "time",
+      "valor_por_defecto": null,
+      "alcances": [
+        "organization",
+        "legal_entity",
+        "site"
+      ],
+      "descripcion": "AUS-5 · Hora local de fin de la jornada. Desde aquí corre la desconexión mínima (la mayor entre la del acuerdo de teletrabajo y el parámetro legal teletrabajo_desconexion_horas).",
+      "opciones": null
+    },
+    {
       "codigo": "notificaciones.obligatorias",
       "modulo": "base",
       "nombre": "Avisos obligatorios",
