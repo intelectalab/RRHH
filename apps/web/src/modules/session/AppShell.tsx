@@ -59,8 +59,11 @@ const MENU: NavLink[] = [
   { href: '/tiempo/vacaciones/acuerdos', key: 'shell.modules_vacation_agreements', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.vacation_balances.adjust') },
   { href: '/tiempo/subsidios', key: 'shell.modules_subsidies', group: 'time', icon: 'file', module: 'time_off', visible: (can) => can('time.absences.manage_subsidy') },
   { href: '/tiempo/resumen-periodo', key: 'shell.modules_period_summary', group: 'time', icon: 'calendar', module: 'time_off', visible: (can) => can('time.absences.create_for_others') },
-  { href: '/planilla/calculos', key: 'shell.modules_payroll_runs', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.view') },
-  { href: '/planilla/micro-pequena-empresa', key: 'shell.modules_small_business', group: 'payroll', icon: 'building', module: 'payroll', visible: (can) => can('payroll.entity_annual_figures.view') },
+  { href: '/nomina/periodos', key: 'shell.modules_payroll_periods', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.view') },
+  { href: '/nomina/conceptos', key: 'shell.modules_payroll_concepts', group: 'payroll', icon: 'sliders', module: 'payroll', visible: (can) => can('payroll.concepts.view') },
+  { href: '/nomina/parametros', key: 'shell.modules_legal_parameters', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.legal_parameters.view') },
+  { href: '/nomina/calculos', key: 'shell.modules_payroll_runs', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.periods.view') },
+  { href: '/nomina/micro-pequena-empresa', key: 'shell.modules_small_business', group: 'payroll', icon: 'building', module: 'payroll', visible: (can) => can('payroll.entity_annual_figures.view') },
 ]
 
 const SETTINGS_PERMS = ['settings.catalogs.update', 'identity.users.view', 'identity.roles.view', 'workflow.approval_flows.view', 'workflow.workflows.view', 'notifications.templates.view', 'settings.parameters.view', 'time.holiday_calendars.view', 'audit.trash.view', 'settings.custom_fields.view', 'settings.exchange_rates.view', 'audit.logs.view', 'contracts.contract_types.view', 'time.absence_types.view', 'time.vacation_policies.view', 'audit.activity.view', 'imports.imports.view', 'imports.setup.use', 'settings.organization.view']

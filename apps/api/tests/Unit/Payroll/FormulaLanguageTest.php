@@ -40,6 +40,11 @@ function nomScope(array $vars = [], array $concepts = [], array $params = []): F
         {
             return BigDecimal::of($field === 'amount' ? '120.50' : '3');
         }
+
+        public function base(string $code): BigDecimal
+        {
+            return BigDecimal::of($code === 'pension' ? '1500' : '0');
+        }
     };
 }
 
@@ -120,4 +125,9 @@ test('NOM-4 · el orden respeta dependencias y es determinista; un ciclo indica 
     } catch (CycleDetected $e) {
         expect($e->concepts)->toBe(['A', 'B', 'C']);
     }
+});
+
+test('CPT-3 · una fórmula lee una base de cálculo con el prefijo base.', function (): void {
+    expect(nomEval('base.pension * 2', nomScope()))->toBe('3000')
+        ->and(Parser::references((new Parser)->parse('base.pension + base.essalud'))['base'])->toBe(['pension', 'essalud']);
 });

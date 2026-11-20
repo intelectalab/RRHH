@@ -99,6 +99,9 @@ final class ContextBuilder
                 $param = (new PayrollParameters($this->legal, $country, $regimeAtEnd, (string) $emp->legal_entity_id, $end))->resolve($strategy['proration_parameter']);
                 if ($param === null || $param['value'] === null || ! is_numeric($param['value']) || BigDecimal::of($param['value'])->isZero()) {
                     $errors[] = self::error('missing_parameter', ['parameter' => $strategy['proration_parameter']]);
+                } elseif (($missing = $this->missingRequired($country, $regimeAtEnd, (string) $emp->legal_entity_id, $end, $strategy['required_parameters'])) !== []) {
+                    // PAR-5 · RN-PAR-04 · Sin un parámetro requerido del régimen no se calcula; se informa cuál falta.
+                    $errors[] = self::error('missing_parameter', ['parameter' => implode(', ', $missing)]);
                 } else {
                     $base = BigDecimal::of($param['value']);
                     $sources['proration_parameter'] = $param;
@@ -171,6 +174,10 @@ final class ContextBuilder
         $health = DB::table('employment_labor_regimes')->where('employment_id', $employmentId)->whereNull('deleted_at');
         EffectiveDated::applyAsOf($health, $end);
         $flags = $health->first(['health_scheme', 'has_family_allowance', 'has_risk_insurance']);
+        // CPT-5 · Sistema previsional vigente al fin del tramo (afp, onp, none, other): lo usan las condiciones de los aportes.
+        $pension = DB::table('employment_pension_affiliations')->where('employment_id', $employmentId);
+        EffectiveDated::applyAsOf($pension, $end);
+        $pensionSystem = (string) ($pension->value('pension_system') ?? '');
         $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
 
         $variables = [
@@ -193,6 +200,7 @@ final class ContextBuilder
             'fecha_cese' => $termination ?? '',
             'regimen' => $regime,
             'sistema_salud' => (string) ($flags->health_scheme ?? ''),
+            'sistema_pension' => $pensionSystem,
             'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
             'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
         ];
@@ -271,6 +279,27 @@ final class ContextBuilder
     private static function days(string $from, string $to): int
     {
         return (int) CarbonImmutable::parse($from)->diffInDays(CarbonImmutable::parse($to)) + 1;
+    }
+
+    /**
+     * PAR-5 · Parámetros requeridos del régimen sin valor vigente a la fecha (propio de la organización o del país).
+     *
+     * @param  list<string>  $codes
+     * @return list<string>
+     */
+    private function missingRequired(string $country, string $regime, string $legalEntityId, string $date, array $codes): array
+    {
+        // Sin el catálogo del país cargado (base recién creada, pruebas del núcleo) solo rigen los parámetros propios.
+        if ($codes === [] || ! DB::table('legal_parameters')->where('country_code', $country)->exists()) {
+            return [];
+        }
+        $params = new PayrollParameters($this->legal, $country, $regime, $legalEntityId, $date);
+
+        return array_values(array_filter($codes, function (string $code) use ($params): bool {
+            $p = $params->resolve($code);
+
+            return $p === null || $p['value'] === null || $p['value'] === '';
+        }));
     }
 
     /**

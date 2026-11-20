@@ -226,13 +226,19 @@
   code ; name ; kind enum(earning,deduction,employee_contribution,employer_contribution,tax,benefit,provision,informative)!
   category ; country_code ; statutory_code ; is_system ; is_remunerative bool=t
   calculation_method enum(fixed,formula,input,percentage,table)=input ; print_on_payslip bool=t ; sort_order
-  status enum(draft,active,inactive)=active ; uniq code
-@payroll_concept_versions lock | Versión con vigencia de un concepto: fórmula, condiciones, redondeo y regímenes a los que aplica. Permite recálculo retroactivo.
-  payroll_concept_id -> payroll_concepts ; formula ; conditions j ; rounding enum(none,half_up,down,up)=half_up
-  applies_to_regimes text[] ; applies_to_period_kinds text[] ; parameters_used text[] ; notes ; vig payroll_concept_id
-@payroll_concept_affectations | Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades).
+  status enum(draft,active,inactive)=active ; pack_version ; statutory_code_verified bool=f ; created_by_user_id ?-> users
+  archived_at ; archive_reason ; uniq code
+@payroll_concept_versions lock | Versión con vigencia de un concepto: fórmula, condición de aplicación, redondeo y regímenes a los que aplica. Publicar cierra la vigente e inserta otra (RN-CPT-01); la anterior no cambia.
+  payroll_concept_id -> payroll_concepts ; formula ; condition ; conditions j ; rounding enum(none,half_up,down,up)=half_up
+  applies_to_regimes text[] ; applies_to_period_kinds text[] ; parameters_used text[] ; depends_on text[] ; notes
+  edited_by_user_id ?-> users ; published_by_user_id ?-> users ; published_at ; vig payroll_concept_id
+@payroll_concept_drafts lock | CPT-2 · Borrador de la próxima versión de un concepto (uno por concepto): se edita, se prueba y se publica; no entra al cálculo hasta publicarse.
+  payroll_concept_id -> payroll_concepts ; formula ; condition ; rounding enum(none,half_up,down,up)=half_up
+  applies_to_regimes text[] ; applies_to_period_kinds text[] ; affectations j=[] ; valid_from date! ; notes
+  validation j ; edited_by_user_id ?-> users ; uniq payroll_concept_id
+@payroll_concept_affectations | Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades). justification: sustento de una afectación de un concepto no remunerativo (RN-CPT-06).
   payroll_concept_version_id -> payroll_concept_versions ; base_code text! ; affects bool=t
-  projection_kind enum(ordinary,gratification,extraordinary)
+  projection_kind enum(ordinary,gratification,extraordinary) ; justification
   uniq payroll_concept_version_id, base_code
 
 #E PAR | Parámetros legales con vigencia
@@ -247,6 +253,20 @@
   approved_by_user_id ?-> users ; vigcols
   raw EXCLUDE USING gist (tenant_id WITH =, parameter_code WITH =, (COALESCE(legal_entity_id, '00000000-0000-0000-0000-000000000000'::uuid)) WITH =, daterange(valid_from, valid_to, '[]') WITH &&)
 
+@legal_parameter_publications P | PAR-4 · Actualización normativa preparada en la consola: cambios de parámetros legales de un país con su norma; la publica una segunda persona del equipo del producto (ADR 0023). Publicar inserta las vigencias nuevas y cierra las anteriores, nunca las modifica.
+  country_code ~> countries.code ; title text! ; summary ; legal_source text! ; changes j! ; status enum(draft,in_review,published,rejected)=draft
+  prepared_by_platform_user_id ?=> platform_users ; reviewed_by_platform_user_id ?=> platform_users ; review_note ; submitted_at ts ; published_at ts
+  idx country_code, status
+@legal_parameter_changes P cat | PAR-7 · Registro de novedades normativas: cada vigencia nueva o valor completado de un parámetro legal, con el valor anterior y el nuevo, la norma y su origen (publicación de la consola o paquete de país). Lo leen las organizaciones del país.
+  legal_parameter_publication_id ?=> legal_parameter_publications ; country_code ~> countries.code ; labor_regime_code ?~> labor_regimes.code
+  code text! ; name ; unit text! ; previous_value j ; new_value j ; valid_from date! ; valid_to date ; legal_source
+  origin enum(publication,country_pack)! ; published_at ts=now ; idx country_code, published_at ; idx code
+@legal_parameter_confirmations imm | PAR-1 · RN-PAR-03 · Confirmación expresa de la organización de un parámetro legal «por validar» antes de cerrar un periodo que lo usa (solo inserción).
+  legal_parameter_id uuid! ; parameter_code text! ; confirmed_by_user_id -> users ; note ; idx legal_parameter_id
+@wage_table_verifications imm | PAR-6 · RN-PAR-10 · Verificación de la organización de una tabla salarial por convenio (lote de parámetros con la misma vigencia) contra el acta (solo inserción).
+  table_code text! ; labor_regime_code ~> labor_regimes.code ; valid_from date! ; verified_by_user_id -> users ; acta_reference text! ; note
+  uniq table_code, valid_from
+
 #E PER | Periodos, incidencias, cálculo, simulación y cierre
 @payroll_periods main lock | Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.
   payroll_group_id -> payroll_groups ; period_year smallint! ; period_number smallint!
@@ -255,12 +275,19 @@
   check statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$' ; idx payroll_group_id, statutory_period_code
   status enum(open,incidents_closed,calculated,in_review,approved,closed,paid,accounted)=open ; closed_at
   closed_by_user_id ?-> users ; uniq payroll_group_id, kind, period_year, period_number
+  opened_by_user_id ?-> users ; submitted_by_user_id ?-> users ; submitted_at ; approved_by_user_id ?-> users ; approved_at
+  return_reason ; reopen_reason ; time_consumed_at ; time_consumed_by_user_id ?-> users
 @payroll_incidents main soft lock | Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).
   payroll_period_id -> payroll_periods ; employment_id -> employments ; payroll_concept_id -> payroll_concepts
   quantity numeric(12,4) ; rate numeric(14,6) ; amount money ; currency cur?
   source enum(manual,import,attendance,absence,overtime,loan,advance,expense,retroactive,benefit,union,system)=manual
   source_type ; source_id uuid ; retro_period_id ?-> payroll_periods ; notes
   status enum(pending,approved,applied,rejected)=pending
+  created_by_user_id ?-> users ; updated_by_user_id ?-> users ; decided_by_user_id ?-> users ; decided_at ; decision_reason
+  idx payroll_period_id, employment_id
+@payroll_period_time_cutoffs imm | PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.
+  payroll_period_id -> payroll_periods ; employment_id -> employments ; period_from date! ; period_to date! ; fingerprint text! ; summary j!
+  consumed_by_user_id ?-> users ; idx payroll_period_id, employment_id
 @payroll_runs main lock | Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica. NOM-8: scope (todas, relaciones o grupo calculado), avance (total, hechas, con error) y motivo si falló; se reanuda sin repetir lo hecho.
   payroll_period_id -> payroll_periods ; run_number integer! ; kind enum(simulation,calculation,recalculation)=calculation
   status enum(queued,running,completed,failed,discarded,approved,closed)=queued ; engine_version ; parameters_snapshot j
@@ -419,7 +446,7 @@
   raw UNIQUE NULLS NOT DISTINCT (tenant_id, legal_entity_id, code)
 @concept_account_mappings lock | Contabilización de un concepto: cuentas de debe y haber por empresa y centro de costo.
   payroll_concept_id -> payroll_concepts ; legal_entity_id ?-> legal_entities ; cost_center_id ?-> cost_centers
-  debit_account_id ?-> accounting_accounts ; credit_account_id ?-> accounting_accounts ; vigcols
+  worker_category enum(executive,employee,worker) ; debit_account_id ?-> accounting_accounts ; credit_account_id ?-> accounting_accounts ; vigcols
 @provision_runs lock | Cálculo mensual de provisiones (CTS, gratificaciones, vacaciones) por empresa (E-03).
   legal_entity_id -> legal_entities ; payroll_period_id ?-> payroll_periods ; period_code text!
   status enum(draft,calculated,approved,posted)=draft ; calculated_at

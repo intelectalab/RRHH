@@ -5,6 +5,7 @@ namespace App\Modules\Payroll\Application;
 use App\Modules\Payroll\Domain\Engine\CalculationContext;
 use App\Modules\Payroll\Domain\Engine\CalculationEngine;
 use App\Modules\Payroll\Domain\Engine\ConceptDefinition;
+use App\Modules\Payroll\Domain\Engine\ConceptDependencies;
 use App\Modules\Payroll\Domain\Engine\CycleDetected;
 use App\Modules\Payroll\Domain\Engine\DependencyGraph;
 use App\Modules\Payroll\Domain\Formula\FormulaError;
@@ -52,7 +53,7 @@ final class PayrollEngine
         foreach ($concepts as $code => $c) {
             $sort[$code] = $c->sortOrder;
             try {
-                $deps[$code] = $c->formula === null || trim($c->formula) === '' ? [] : Parser::references($parser->parse($c->formula))['concept'];
+                $deps[$code] = ConceptDependencies::of($c, $concepts, $parser)['depends_on'];
             } catch (FormulaError $e) {
                 throw new AyniException('formula_invalid', 422, (string) trans('payroll.formula_invalid', ['concept' => $code]), [], ['concept' => $code] + $e->toArray());
             }
@@ -81,24 +82,29 @@ final class PayrollEngine
      *
      * @param  array<string, string|bool>  $overrides
      * @param  array<string, array{amount?: string, quantity?: string}>  $incidents
+     * @param  ConceptDefinition|null  $candidate  CPT-2 · versión en borrador de un concepto que reemplaza a la vigente (probador)
      * @return array{employment_id: string, from: string, to: string, period_kind: string, context: array<string, mixed>, result: array<string, mixed>}
      */
-    public function calculate(string $employmentId, string $from, string $to, string $periodKind = 'regular', ?string $periodId = null, array $overrides = [], array $incidents = []): array
+    public function calculate(string $employmentId, string $from, string $to, string $periodKind = 'regular', ?string $periodId = null, array $overrides = [], array $incidents = [], ?ConceptDefinition $candidate = null): array
     {
         $built = $this->contexts->build($employmentId, $from, $to, $periodKind, $periodId, $overrides, $incidents);
         $context = $built['context'];
         $pack = new DataPayrollCountryPack($built['country']);
         $strategy = $context->regime === null ? null : $pack->regime($context->regime);
         $concepts = $this->catalog->at($context->to);
+        if ($candidate !== null) {
+            $concepts = array_values(array_filter($concepts, fn (ConceptDefinition $c) => $c->code !== $candidate->code));
+            $concepts[] = $candidate;
+        }
 
         if ($context->errors === [] && $strategy !== null && ! in_array($periodKind, $strategy['processes'], true)) {
             $result = ['status' => 'excluded', 'errors' => [], 'order' => [], 'lines' => [], 'totals' => [], 'engine_version' => CalculationEngine::VERSION,
                 'warnings' => [['code' => 'process_not_applicable', 'message' => (string) trans('payroll.process_not_applicable', ['kind' => $periodKind, 'regime' => (string) $context->regime])]]];
         } elseif ($built['tramos'] === []) {
-            $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $context->to);
+            $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $context->to, $employmentId);
             $result = $this->engine->run($context, $concepts, $params, $built['decimals']);
         } else {
-            $result = $this->byTramos($built['tramos'], $built, $concepts);
+            $result = $this->byTramos($built['tramos'], $built, $concepts, $employmentId);
         }
         if ($periodId !== null && $result['status'] === 'calculated') {
             $retro = $this->retroactiveLines($employmentId, $periodId, $context->currency);
@@ -123,14 +129,14 @@ final class PayrollEngine
      * @param  list<ConceptDefinition>  $concepts
      * @return array<string, mixed>
      */
-    private function byTramos(array $tramos, array $built, array $concepts): array
+    private function byTramos(array $tramos, array $built, array $concepts, string $employmentId): array
     {
         $merged = [];
         $order = [];
         $warnings = [];
         $errors = [];
         foreach ($tramos as $i => $t) {
-            $params = new PayrollParameters($this->legal, $built['country'], $t->regime, $built['legal_entity_id'], (string) $t->variables['fecha_fin']);
+            $params = new PayrollParameters($this->legal, $built['country'], $t->regime, $built['legal_entity_id'], (string) $t->variables['fecha_fin'], $employmentId);
             $r = $this->engine->run($t, $concepts, $params, $built['decimals']);
             $tramo = ['index' => $i + 1, 'from' => (string) $t->variables['fecha_inicio'], 'to' => (string) $t->variables['fecha_fin'], 'regime' => (string) $t->regime];
             foreach ($r['errors'] as $e) {

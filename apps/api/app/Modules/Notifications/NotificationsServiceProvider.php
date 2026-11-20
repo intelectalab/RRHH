@@ -12,6 +12,7 @@ use App\Modules\Notifications\Infrastructure\Subscribers\NotifyBilling;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyContractEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyDocumentEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyEmailBounce;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyLegalUpdates;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyOrganizationStatus;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyPeopleChanges;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifySignatures;
@@ -43,6 +44,7 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(NotifyOrganizationStatus::class));
         $outbox->subscribe($this->app->make(NotifyUsageLimit::class));
         $outbox->subscribe($this->app->make(NotifyBilling::class));
+        $outbox->subscribe($this->app->make(NotifyLegalUpdates::class));
         $outbox->subscribe($this->app->make(NotifySignatures::class));
         $outbox->subscribe($this->app->make(VerifyEmailSender::class));
         $outbox->subscribe($this->app->make(NotifyEmailBounce::class));

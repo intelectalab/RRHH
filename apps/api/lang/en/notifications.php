@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'You have an overdue invoice', 'body' => 'Invoice {number} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}.'],
             'email' => ['subject' => 'Overdue invoice: {number}', 'body' => "Hi {name},\n\nInvoice {number} for {organization} for {total} was due on {due_on}. If it stays unpaid, the organization is suspended on {suspend_on}: nobody can work until it is settled, and the data is kept.\n\nSee your account statement here: {link}"],
         ],
+        'payroll.legal_update' => [
+            'in_app' => ['subject' => 'Regulatory update: {title}', 'body' => 'Effective from {valid_from} ({legal_source}). See the details in Legal parameters.'],
+            'email' => ['subject' => 'Regulatory update: {title}', 'body' => "Hello {name}:\n\nA legal parameter update that applies to {organization} was published: {title}, effective from {valid_from} ({legal_source}).\n\nSee the details here: {link}"],
+        ],
+        'payroll.legal_update_open_period' => [
+            'in_app' => ['subject' => 'Regulatory update in an open period', 'body' => '{title}, effective from {valid_from}, affects {open_periods} open payroll period(s). Simulate before closing.'],
+            'email' => ['subject' => 'Regulatory update in an open period: {title}', 'body' => "Hello {name}:\n\n{title} ({legal_source}) was published, effective from {valid_from}. It affects {open_periods} open payroll period(s) of {organization}: simulate the difference before closing. Closed periods are not recalculated.\n\nSee the details here: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'You are close to a plan limit', 'body' => '{metric}: {current} of {limit} ({percent}%). Check your usage before reaching the cap.'],
             'email' => ['subject' => 'Your organization is close to a plan limit', 'body' => "Hi {name},\n\nAt {organization}, {metric} is at {current} of {limit} ({percent}%). Once the cap is reached, new additions or uploads will be blocked; everything already stored keeps working.\n\nCheck your usage and how to raise it here: {link}"],

@@ -21,12 +21,12 @@ interface PayrollCountryPack
      * calculan igual con parámetros distintos (micro y pequeña usan la general); `processes` son los tipos
      * de periodo que el régimen genera (un régimen sin gratificación no tiene ese proceso).
      *
-     * @return array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool}|null
+     * @return array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool, required_parameters: list<string>}|null
      */
     public function regime(string $code): ?array;
 
     /**
-     * @return list<array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool}>
+     * @return list<array{code: string, kind: string, strategy: string, pay_unit: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, processes: list<string>, gratifications: bool, pending_validation: bool, required_parameters: list<string>}>
      */
     public function regimes(): array;
 

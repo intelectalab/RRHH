@@ -1003,23 +1003,50 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 |---|---|---|---|
 | GET, POST | `/payroll-concepts` | `payroll.concepts.{view,create}` | 3 |
 | GET, PATCH | `/payroll-concepts/{id}` | `payroll.concepts.{view,update}` | 3 |
-| POST | `/payroll-concepts/{id}/{publish,retire,test}` | `payroll.concepts.{publish,retire,test}` | 3 |
+| POST | `/payroll-concepts/{id}/{publish,retire}` | `payroll.concepts.{publish,retire}` | 3 |
+| POST | `/payroll-concepts/{id}/validate` | `payroll.concepts.update` | 3 |
+| POST | `/payroll-concepts/{id}/test` | `payroll.concepts.test` | 3 |
+| POST | `/payroll-concepts/{id}/duplicate` | `payroll.concepts.create` | 3 |
+| PUT | `/payroll-concepts/{id}/accounting` | `payroll.concepts.map` | 3 |
+| GET | `/payroll-concept-bases` | `payroll.concepts.view` | 3 |
+| GET | `/payroll-affectation-matrix` | `payroll.concepts.view` | 3 |
+| GET | `/payroll-accounting-check` | `payroll.concepts.view` | 3 |
+| GET | `/accounting-accounts` | `payroll.concepts.view` | 3 |
+| POST | `/accounting-accounts` | `payroll.accounting_accounts.update` | 3 |
+| PATCH | `/accounting-accounts/{id}` | `payroll.accounting_accounts.update` | 3 |
 
 **PAR · Parámetros legales**
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
-| GET, POST | `/legal-parameters` | `payroll.legal_parameters.{view,create}` | 3 |
+| GET | `/legal-parameters` | `payroll.legal_parameters.view` | 3 |
 | GET | `/legal-parameters/{id}` | `payroll.legal_parameters.view` | 3 |
 | POST | `/legal-parameters/{id}/add-value` | `payroll.legal_parameters.add_value` | 3 |
-| GET, POST | `/wage-tables` | `payroll.wage_tables.{view,create}` | 3 |
+| POST | `/legal-parameters/{id}/confirm` | `payroll.legal_parameters.confirm` | 3 |
+| GET | `/pension-fund-rates` | `payroll.legal_parameters.view` | 3 |
+| GET | `/fifth-category-scale` | `payroll.legal_parameters.view` | 3 |
+| GET | `/payroll-regimes/{id}/parameters` | `payroll.regimes.view` | 3 |
+| GET | `/wage-tables` | `payroll.wage_tables.view` | 3 |
 | GET | `/wage-tables/{id}` | `payroll.wage_tables.view` | 3 |
 | POST | `/wage-tables/{id}/verify` | `payroll.wage_tables.verify` | 3 |
+| GET | `/legal-updates` | `payroll.legal_parameters.view` | 3 |
+| GET | `/platform/legal-parameter-publications` | `platform.country_packs.view` | 3 |
+| POST | `/platform/legal-parameter-publications` | `platform.country_packs.publish` | 3 |
+| GET | `/platform/legal-parameter-publications/{id}` | `platform.country_packs.view` | 3 |
+| PATCH | `/platform/legal-parameter-publications/{id}` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/submit` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/publish` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/reject` | `platform.country_packs.publish` | 3 |
+| GET | `/platform/pension-fund-rates` | `platform.country_packs.view` | 3 |
+| POST | `/platform/pension-fund-rates` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/pension-fund-rates/import` | `platform.country_packs.publish` | 3 |
 
 **PER · Periodos de planilla**
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET | `/payroll-groups` | `payroll.periods.view` | 3 |
+| GET | `/payroll-groups/{id}` | `payroll.periods.view` | 3 |
 | GET, POST | `/payroll-periods` | `payroll.periods.{view,create}` | 3 |
 | GET | `/payroll-periods/{id}` | `payroll.periods.view` | 3 |
 | POST | `/payroll-periods/{id}/{calculate,simulate,submit,approve,reject,close,reopen,mark-paid}` | `payroll.periods.{calculate,simulate,submit,approve,reject,close,reopen,mark_paid}` | 3 |
@@ -1027,6 +1054,18 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH, DELETE | `/payroll-incidents/{id}` | `payroll.incidents.{view,update,delete}` | 3 |
 | GET | `/payroll-results` | `payroll.results.view` | 3 |
 | GET | `/payroll-results/{id}` | `payroll.results.view` | 3 |
+| POST | `/payroll-groups` | `payroll.payroll_groups.update` | 3 |
+| PATCH | `/payroll-groups/{id}` | `payroll.payroll_groups.update` | 3 |
+| POST | `/payroll-groups/{id}/members` | `payroll.payroll_groups.update` | 3 |
+| GET | `/payroll-periods/{id}/population` | `payroll.periods.view` | 3 |
+| POST | `/payroll-periods/{id}/close-incidents` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-periods/{id}/reopen-incidents` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-periods/{id}/reopen-calculation` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-incidents/{id}/approve` | `payroll.incidents.approve` | 3 |
+| POST | `/payroll-incidents/{id}/reject` | `payroll.incidents.approve` | 3 |
+| POST | `/payroll-periods/{id}/incidents/bulk` | `payroll.incidents.create` | 3 |
+| POST | `/payroll-periods/{id}/consume-time` | `payroll.incidents.create` | 3 |
+| GET | `/payroll-periods/{id}/time-summary` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/variance` | `payroll.periods.view` | 3 |
 
 **BOL · Boletas**

@@ -42,23 +42,25 @@ final class CalculationEngine
         }
         $parser = new Parser;
         $trees = [];
+        $conditions = [];
         $deps = [];
         $sort = [];
         foreach ($applicable as $code => $c) {
             $sort[$code] = $c->sortOrder;
-            if ($c->formula === null || trim($c->formula) === '') {
-                $deps[$code] = [];
-
-                continue;
-            }
             try {
-                $trees[$code] = $parser->parse($c->formula);
+                $d = ConceptDependencies::of($c, $applicable, $parser);
             } catch (FormulaError $e) {
                 $result['errors'][] = ['code' => 'formula_invalid', 'concept' => $code] + $e->toArray();
 
                 continue;
             }
-            $deps[$code] = Parser::references($trees[$code])['concept'];
+            if ($d['formula'] !== null) {
+                $trees[$code] = $d['formula'];
+            }
+            if ($d['condition'] !== null) {
+                $conditions[$code] = $d['condition'];
+            }
+            $deps[$code] = $d['depends_on'];
         }
         if ($result['errors'] !== []) {
             return $result;
@@ -78,6 +80,12 @@ final class CalculationEngine
             $c = $applicable[$code];
             $scope->startTrace();
             try {
+                // CPT-2 · Una condición falsa deja el concepto en cero y sin línea (no aplica a esta persona).
+                if (isset($conditions[$code]) && $evaluator->eval($conditions[$code]) !== true) {
+                    $scope->setResult($code, BigDecimal::zero());
+
+                    continue;
+                }
                 $raw = isset($trees[$code]) ? $evaluator->number($trees[$code]) : $scope->incident($code, 'amount');
             } catch (FormulaError $e) {
                 $result['errors'][] = ['code' => 'evaluation_failed', 'concept' => $code] + $e->toArray();
@@ -98,7 +106,7 @@ final class CalculationEngine
                 'concept_code' => $code, 'concept_name' => $c->name, 'kind' => $c->kind,
                 'concept_id' => $c->conceptId, 'concept_version_id' => $c->versionId,
                 'amount' => ['amount' => (string) $amount, 'currency' => $context->currency],
-                'trace' => ['formula' => $c->formula, 'source' => isset($trees[$code]) ? 'formula' : 'incidents', 'raw' => (string) $raw,
+                'trace' => ['formula' => $c->formula, 'condition' => $c->condition, 'source' => isset($trees[$code]) ? 'formula' : 'incidents', 'raw' => (string) $raw,
                     'rounding' => $c->rounding, 'decimals' => $decimals, 'version_valid_from' => $c->validFrom] + $trace,
             ];
         }

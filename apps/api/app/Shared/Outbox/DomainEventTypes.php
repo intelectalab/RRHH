@@ -11,6 +11,13 @@ final class DomainEventTypes
 
     public const EMPLOYEE_UPDATED = 'employee.updated.v1';
 
+    // CPT-1 · CPT-2 · Conceptos de planilla: alta, publicación de una versión con vigencia y retiro (M-CPT §11).
+    public const PAYROLL_CONCEPT_CREATED = 'payroll_concept.created.v1';
+
+    public const PAYROLL_CONCEPT_VERSION_PUBLISHED = 'payroll_concept.version_published.v1';
+
+    public const PAYROLL_CONCEPT_ARCHIVED = 'payroll_concept.archived.v1';
+
     public const EMPLOYEE_TERMINATED = 'employee.terminated.v1';
 
     public const EMPLOYEE_COMPENSATION_CHANGED = 'employment.compensation_changed.v1';
@@ -111,6 +118,15 @@ final class DomainEventTypes
 
     // Planilla / Nómina
     public const PAYROLL_CALCULATED = 'payroll.calculated.v1';
+
+    // PER-1 · Periodo abierto, enviado, devuelto y reabierto.
+    public const PAYROLL_PERIOD_OPENED = 'payroll.period_opened.v1';
+
+    public const PAYROLL_SUBMITTED = 'payroll.submitted.v1';
+
+    public const PAYROLL_RETURNED = 'payroll.returned.v1';
+
+    public const PAYROLL_REOPENED = 'payroll.reopened.v1';
 
     public const PAYROLL_APPROVED = 'payroll.approved.v1';
 
@@ -295,6 +311,9 @@ final class DomainEventTypes
     public const SAAS_INVOICE_ISSUE_REQUESTED = 'saas_invoice.issue_requested.v1';
 
     public const SAAS_BILLING_NOTICE = 'saas_billing.notice.v1';
+
+    // Actualización normativa publicada desde la consola (PAR-4, RN-PAR-06): un evento por organización del país.
+    public const LEGAL_PARAMETERS_PUBLISHED = 'legal_parameters.published.v1';
 
     // Límites y consumo (SAS-6): el consumo se acercó al tope del plan o llegó a él (RN-SAS-02, RN-SAS-03).
     public const LIMIT_WARNING = 'limit.warning.v1';
@@ -489,6 +508,26 @@ final class DomainEventTypes
             'required_fields' => ['payroll_run_id', 'total_net', 'currency'],
             'description' => 'Cálculo de periodo de planilla completado',
         ],
+        self::PAYROLL_PERIOD_OPENED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'payroll_group_id'],
+            'description' => 'Periodo de planilla abierto',
+        ],
+        self::PAYROLL_SUBMITTED => [
+            'version' => 1,
+            'required_fields' => ['period_id'],
+            'description' => 'Periodo de planilla enviado a aprobación',
+        ],
+        self::PAYROLL_RETURNED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'reason'],
+            'description' => 'Periodo de planilla devuelto al cálculo con observaciones',
+        ],
+        self::PAYROLL_REOPENED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'reason'],
+            'description' => 'Periodo de planilla cerrado reabierto (sin declaración presentada ni pago)',
+        ],
         self::PAYROLL_APPROVED => [
             'version' => 1,
             'required_fields' => ['payroll_run_id', 'approved_by'],
@@ -663,6 +702,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['invoice_id', 'kind', 'number', 'total', 'currency', 'due_on'],
             'description' => 'Aviso del estado de cuenta a la organización: comprobante emitido, vence pronto o vencido',
+        ],
+        self::LEGAL_PARAMETERS_PUBLISHED => [
+            'version' => 1,
+            'required_fields' => ['publication_id', 'title', 'legal_source', 'valid_from', 'codes'],
+            'description' => 'Se publicó una actualización de parámetros legales del país: aviso a Payroll y Administrador con la norma y la fecha',
         ],
         self::LIMIT_WARNING => [
             'version' => 1,
@@ -841,6 +885,9 @@ final class DomainEventTypes
         self::DOCUMENT_GENERATED => ['version' => 1, 'required_fields' => ['document_id', 'category_id', 'template_version_id'], 'description' => 'Se generó un documento PDF desde una plantilla y entró al legajo con la versión de la plantilla con que se emitió (DOC-5 · RN-DOC-11)'],
         self::SIGNATURE_SENT => ['version' => 1, 'required_fields' => ['signature_request_id', 'user_ids'], 'description' => 'Documento enviado a firma (o recordatorio): avisa a los firmantes de turno (DOC-6)'],
         self::SIGNATURE_DECLINED => ['version' => 1, 'required_fields' => ['signature_request_id', 'reason'], 'description' => 'Un firmante rechazó la firma con su motivo; la solicitud termina (DOC-6)'],
+        self::PAYROLL_CONCEPT_CREATED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code'], 'description' => 'Se creó un concepto de planilla propio de la organización (CPT-1)'],
+        self::PAYROLL_CONCEPT_VERSION_PUBLISHED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code', 'version_id', 'valid_from'], 'description' => 'Se publicó una versión de un concepto con su vigencia; los periodos anteriores siguen con la versión de su fecha (CPT-2 · RN-CPT-01)'],
+        self::PAYROLL_CONCEPT_ARCHIVED => ['version' => 1, 'required_fields' => ['payroll_concept_id', 'code'], 'description' => 'Se retiró un concepto: deja de usarse en los cálculos y su historia se conserva (RN-CPT-02)'],
         self::SIGNATURE_COMPLETED => [
             'version' => 1,
             'required_fields' => ['signature_request_id', 'completed_at'],

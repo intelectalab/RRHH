@@ -375,6 +375,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/accounting-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CPT-4 · Cuentas contables de la planilla (opcional legal_entity_id: las comunes y las de esa empresa) */
+        get: operations["getAccountingAccounts"];
+        put?: never;
+        /** CPT-4 · Crear una cuenta contable (code, name, kind: expense, liability, asset u other; legal_entity_id? para una sola empresa) */
+        post: operations["postAccountingAccounts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/accounting-accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** CPT-4 · Editar nombre o tipo de una cuenta contable */
+        patch: operations["patchAccountingAccountsId"];
+        trace?: never;
+    };
     "/accounting-entries": {
         parameters: {
             query?: never;
@@ -6692,6 +6727,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/fifth-category-scale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-3 · Escala progresiva, deducción en UIT, divisores, cortes y tasas de la renta de quinta vigentes a ?as_of, con su norma y lo que falta */
+        get: operations["getFifthCategoryScale"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/fifth-category/simulate": {
         parameters: {
             query?: never;
@@ -8921,11 +8973,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Listar LegalParameter */
+        /** PAR-1 · Parámetros legales del país de la organización vigentes a ?as_of (por defecto hoy): valor, unidad, vigencia, norma, «por validar» y si la organización lo confirmó; ?filter[code]=&filter[regime]=&filter[pending]=1&q= */
         get: operations["getLegalParameters"];
         put?: never;
-        /** Crear LegalParameter */
-        post: operations["postLegalParameters"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8939,7 +8990,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Ver LegalParameter */
+        /** PAR-1 · Un parámetro con su historial de valores (cada vigencia con su norma), los valores propios de la organización, las confirmaciones y si admite valor propio (adjustable: mayor, menor o null) */
         get: operations["getLegalParametersId"];
         put?: never;
         post?: never;
@@ -8958,11 +9009,42 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «add-value» sobre LegalParameter
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** RN-PAR-07 · Valor propio de la organización o de una empresa con vigencia (value, valid_from, reason, legal_entity_id?): solo donde la norma lo permite y solo más favorable que el legal (422); cierra el propio anterior e inserta (409 si ya hay uno desde esa fecha) */
         post: operations["postLegalParametersIdAddValue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-parameters/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** RN-PAR-03 · Confirmación expresa de un parámetro «por validar» antes de cerrar un periodo que lo usa (note?); 409 si ya está verificado, si no tiene valor o si ya se confirmó */
+        post: operations["postLegalParametersIdConfirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/legal-updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-7 · Novedades normativas del país: parámetro, valor anterior y nuevo, vigencia, norma, origen y periodos que toca (abiertos: simular; cerrados: proponer planilla complementaria); ?filter[legal_entity_id]=&filter[regime]=&from=&to= */
+        get: operations["getLegalUpdates"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10639,6 +10721,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-accounting-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CPT-4 · Conceptos activos con efecto contable que aún no tienen cuentas para la empresa (legal_entity_id) a la fecha (as_of): el cierre los exige */
+        get: operations["getPayrollAccountingCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-affectation-matrix": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CPT-3 · Matriz conceptos × bases de cálculo a una fecha (as_of) */
+        get: operations["getPayrollAffectationMatrix"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-calculation-order": {
         parameters: {
             query?: never;
@@ -10648,6 +10764,23 @@ export interface paths {
         };
         /** NOM-4 · Orden determinista de cálculo de los conceptos vigentes a la fecha con sus dependencias (opcional: régimen y tipo de proceso); 422 cycle con los conceptos del ciclo */
         get: operations["getPayrollCalculationOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-concept-bases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** CPT-3 · Bases de cálculo del paquete de país a las que un concepto puede sumar (pensión, salud, quinta, CTS, gratificación, vacaciones, utilidades) */
+        get: operations["getPayrollConceptBases"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10690,6 +10823,40 @@ export interface paths {
         head?: never;
         /** Actualizar PayrollConcept */
         patch: operations["patchPayrollConceptsId"];
+        trace?: never;
+    };
+    "/payroll-concepts/{id}/accounting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** CPT-4 · Reemplazar las reglas de contabilización desde una fecha (valid_from, rules: [{legal_entity_id?, cost_center_id?, worker_category?, debit_account_id, credit_account_id}]); exige una regla general; cierra las vigentes el día anterior */
+        put: operations["putPayrollConceptsIdAccounting"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-concepts/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** CPT-1 · Duplicar como concepto propio (code, name) con su fórmula, condición y afectaciones: la vía para cambiar la afectación legal de uno del paquete de país (RN-CPT-03) */
+        post: operations["postPayrollConceptsIdDuplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/payroll-concepts/{id}/publish": {
@@ -10741,11 +10908,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «test» sobre PayrollConcept
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** CPT-2 · Probador: calcula el concepto (su borrador, o la versión vigente) sobre una relación laboral real en un periodo (employment_id, from, to, variables?, incidents?) sin guardar nada; devuelve la línea del concepto con su traza, sus dependencias y errores. Montos y traza solo con payroll.results.view */
         post: operations["postPayrollConceptsIdTest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-concepts/{id}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** CPT-2 · Revisar el borrador del concepto: fórmula y condición (sintaxis, referencias, ciclos con las bases), naturaleza en la proyección de quinta (RN-CPT-09) y sustento de afectaciones de un no remunerativo (RN-CPT-06); devuelve valid, errors, warnings y depends_on. 409 si no hay borrador */
+        post: operations["postPayrollConceptsIdValidate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10763,6 +10944,59 @@ export interface paths {
         put?: never;
         /** NOM-3 · Revisar una fórmula antes de guardarla (formula, concept_code?, as_of?): sintaxis, funciones, datos, conceptos, incidencias y parámetros existentes y que no forme un ciclo; devuelve valid, errors con posición, references y el orden resultante */
         post: operations["postPayrollFormulasValidate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar PayrollGroup */
+        get: operations["getPayrollGroups"];
+        put?: never;
+        /** Crear un grupo de planilla de una empresa (code, name, legal_entity_id, pay_frequency, currency, payment_day, cutoff_day, labor_regime_code); 409 si el código ya existe */
+        post: operations["postPayrollGroups"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver PayrollGroup */
+        get: operations["getPayrollGroupsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Editar nombre, días de pago y corte, régimen o estado del grupo */
+        patch: operations["patchPayrollGroupsId"];
+        trace?: never;
+    };
+    "/payroll-groups/{id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Asignar un trabajador de la empresa al grupo desde una fecha (cierra su pertenencia anterior); sin miembros explícitos el grupo incluye a toda la empresa */
+        post: operations["postPayrollGroupsIdMembers"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10804,6 +11038,40 @@ export interface paths {
         head?: never;
         /** Actualizar PayrollIncident */
         patch: operations["patchPayrollIncidentsId"];
+        trace?: never;
+    };
+    "/payroll-incidents/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dar visto bueno a una incidencia pendiente para que entre al cálculo */
+        post: operations["postPayrollIncidentsIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-incidents/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rechazar una incidencia pendiente con motivo */
+        post: operations["postPayrollIncidentsIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/payroll-periods": {
@@ -10901,6 +11169,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-periods/{id}/close-incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cerrar la recepción de incidencias del periodo (abierto → incidencias cerradas) */
+        post: operations["postPayrollPeriodsIdCloseIncidents"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/consume-time": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tomar ausencias y vacaciones del periodo hasta la fecha de corte: crea o actualiza sus incidencias, registra el corte y trae como diferencia lo ocurrido después del corte del periodo anterior */
+        post: operations["postPayrollPeriodsIdConsumeTime"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/incidents/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Carga masiva de incidencias del periodo (rows: employment_id o employee_code, concept_code, quantity, rate, amount, notes); todo o nada, con el error de cada fila */
+        post: operations["postPayrollPeriodsIdIncidentsBulk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-periods/{id}/mark-paid": {
         parameters: {
             query?: never;
@@ -10915,6 +11234,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPayrollPeriodsIdMarkPaid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/population": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Población del periodo: relaciones del grupo con vínculo en alguna fecha del periodo */
+        get: operations["getPayrollPeriodsIdPopulation"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10961,6 +11297,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll-periods/{id}/reopen-calculation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Volver a calcular un periodo aprobado (invalida la aprobación); exige motivo */
+        post: operations["postPayrollPeriodsIdReopenCalculation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/reopen-incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Volver a recibir incidencias (incidencias cerradas → abierto) */
+        post: operations["postPayrollPeriodsIdReopenIncidents"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll-periods/{id}/simulate": {
         parameters: {
             query?: never;
@@ -10995,6 +11365,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPayrollPeriodsIdSubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-periods/{id}/time-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Corte de tiempo del periodo por trabajador: lo tomado, lo que quedó fuera de corte y las diferencias desde el corte */
+        get: operations["getPayrollPeriodsIdTimeSummary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -11044,6 +11431,23 @@ export interface paths {
         };
         /** Ver PayrollRegime */
         get: operations["getPayrollRegimesId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-regimes/{id}/parameters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-5 · Parámetros del régimen a ?as_of: los requeridos por el paquete de país y los propios del régimen, con valor, origen (organización, país o AFP) y missing; can_calculate=false si falta un requerido */
+        get: operations["getPayrollRegimesIdParameters"];
         put?: never;
         post?: never;
         delete?: never;
@@ -11311,6 +11715,23 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postPayslipsIdVoid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pension-fund-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-2 · Tasas de cada AFP vigentes a ?as_of (aporte, comisión sobre flujo y mixta, prima de seguro, remuneración máxima asegurable, fuente); las AFP sin tabla del periodo salen con missing=true */
+        get: operations["getPensionFundRates"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -12284,6 +12705,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/legal-parameter-publications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-4 · Actualizaciones normativas preparadas en la consola (?status=draft|in_review|published|rejected) */
+        get: operations["getPlatformLegalParameterPublications"];
+        put?: never;
+        /** PAR-4 · Preparar una actualización normativa en borrador: country, title, summary?, legal_source y changes[] (code, regime?, name?, unit?, value o value_json, valid_from, valid_to?, legal_source?, verified?) */
+        post: operations["postPlatformLegalParameterPublications"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/legal-parameter-publications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-4 · Detalle de una actualización normativa con sus cambios y las acciones permitidas */
+        get: operations["getPlatformLegalParameterPublicationsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** PAR-4 · Corregir una actualización en borrador o devuelta (vuelve a borrador); 409 si ya está en revisión o publicada */
+        patch: operations["patchPlatformLegalParameterPublicationsId"];
+        trace?: never;
+    };
+    "/platform/legal-parameter-publications/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** PAR-4 · Publicar (otra persona distinta de quien la preparó, 409 same_reviewer): inserta cada vigencia y cierra la anterior, registra la novedad y avisa a las organizaciones del país; si un cambio choca con la historia no se publica nada (422) */
+        post: operations["postPlatformLegalParameterPublicationsIdPublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/legal-parameter-publications/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** PAR-4 · Devolver con observación (note) */
+        post: operations["postPlatformLegalParameterPublicationsIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/legal-parameter-publications/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** PAR-4 · Enviar a revisión */
+        post: operations["postPlatformLegalParameterPublicationsIdSubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/me": {
         parameters: {
             query?: never;
@@ -12415,6 +12923,41 @@ export interface paths {
         put?: never;
         /** Consola SaaS: cancelar un aviso (deja de mostrarse) */
         post: operations["postPlatformNoticesIdCancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/pension-fund-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PAR-2 · Tablas de las AFP vigentes a ?as_of por país (?country=PE) */
+        get: operations["getPlatformPensionFundRates"];
+        put?: never;
+        /** PAR-2 · Cargar la tabla de una AFP para un periodo (fund_code, valid_from, tasas, max_insurable_remuneration, source): inserta la vigencia y cierra la anterior; 422 si ya hay una desde esa fecha */
+        post: operations["postPlatformPensionFundRates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/pension-fund-rates/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** PAR-2 · Cargar tablas de AFP por archivo CSV (fund_code, valid_from, contribution_rate, commission_flow_rate, commission_mixed_rate, insurance_premium_rate, max_insurable_remuneration, source); todo o nada */
+        post: operations["postPlatformPensionFundRatesImport"];
         delete?: never;
         options?: never;
         head?: never;
@@ -19134,11 +19677,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Listar WageTable */
+        /** PAR-6 · Tablas salariales por convenio del paquete de país vigentes a ?as_of: lote de parámetros con la misma vigencia y norma, si venció sin tabla nueva (expired) y si la organización la verificó contra el acta */
         get: operations["getWageTables"];
         put?: never;
-        /** Crear WageTable */
-        post: operations["postWageTables"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -19152,7 +19694,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Ver WageTable */
+        /** PAR-6 · Una tabla salarial con sus valores y los periodos cerrados que tocaría una vigencia retroactiva (reintegros propuestos, sin reabrir periodos) */
         get: operations["getWageTablesId"];
         put?: never;
         post?: never;
@@ -19171,10 +19713,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Acción «verify» sobre WageTable
-         * @description Transición explícita; valida la máquina de estados y deja auditoría.
-         */
+        /** RN-PAR-10 · La organización verifica la tabla contra el acta (acta_reference, note?); solo inserción, 409 si ya la verificó */
         post: operations["postWageTablesIdVerify"];
         delete?: never;
         options?: never;
@@ -21156,9 +21695,6 @@ export interface components {
             updated_at?: string;
         };
         CorrectiveActionInput: {
-            source_type?: string;
-            /** @description Identificador opaco */
-            source_id?: string;
             description?: string;
             /** @description Identificador opaco */
             owner_id?: string;
@@ -22318,7 +22854,6 @@ export interface components {
             assumptions?: {
                 [key: string]: unknown;
             } | null;
-            created_by_name?: string | null;
             approved_by_name?: string | null;
             /** Format: date-time */
             applied_at?: string | null;
@@ -22538,7 +23073,6 @@ export interface components {
             error_message?: string | null;
             /** @description Identificador opaco */
             created_by_user_id?: string | null;
-            created_by_name?: string | null;
             /** Format: date-time */
             started_at?: string | null;
             /** Format: date-time */
@@ -22871,34 +23405,6 @@ export interface components {
             custom_fields?: {
                 [key: string]: unknown;
             } | null;
-        };
-        LegalParameter: {
-            /** @description Identificador opaco */
-            id: string;
-            key: string;
-            country: string;
-            regime?: string | null;
-            description: string;
-            /** @enum {string} */
-            unit: "amount" | "percent" | "days" | "count";
-            values: {
-                [key: string]: unknown;
-            };
-            source_reference?: string | null;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-        };
-        LegalParameterInput: {
-            key?: string;
-            country?: string;
-            regime?: string | null;
-            description?: string;
-            values?: {
-                [key: string]: unknown;
-            };
-            source_reference?: string | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): principal, schedule, balance */
         Loan: {
@@ -23349,25 +23855,57 @@ export interface components {
             code: string;
             name: string;
             /** @enum {string} */
-            kind: "earning" | "deduction" | "employer_contribution" | "tax" | "provision" | "informative";
-            formula: string;
-            conditions?: {
+            kind: "earning" | "deduction" | "employee_contribution" | "employer_contribution" | "tax" | "benefit" | "provision" | "informative";
+            category?: string | null;
+            is_system?: boolean | null;
+            is_remunerative?: boolean | null;
+            /** @enum {string|null} */
+            calculation_method?: "fixed" | "formula" | "input" | "percentage" | "table" | null;
+            print_on_payslip?: boolean | null;
+            sort_order?: number | null;
+            statutory_code?: string | null;
+            statutory_code_verified?: boolean | null;
+            pack_version?: string | null;
+            /** @enum {string|null} */
+            status?: "draft" | "active" | "inactive" | null;
+            formula?: string | null;
+            condition?: string | null;
+            /** @enum {string|null} */
+            rounding?: "none" | "half_up" | "down" | "up" | null;
+            applies_to_regimes?: string[] | null;
+            applies_to_period_kinds?: string[] | null;
+            affectations?: {
                 [key: string]: unknown;
-            } | null;
-            affects: {
-                [key: string]: unknown;
-            };
-            accounting?: {
-                [key: string]: unknown;
-            } | null;
-            official_code?: string | null;
+            }[] | null;
+            depends_on?: string[] | null;
+            /** @description Identificador opaco */
+            version_id?: string | null;
             /** Format: date */
-            valid_from: string;
+            valid_from?: string | null;
             /** Format: date */
             valid_to?: string | null;
-            /** @enum {string} */
-            status: "draft" | "published" | "retired";
-            version: number;
+            has_draft?: boolean | null;
+            draft?: {
+                [key: string]: unknown;
+            } | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
+            accounting?: {
+                [key: string]: unknown;
+            }[] | null;
+            statutory_mappings?: {
+                [key: string]: unknown;
+            }[] | null;
+            template?: {
+                [key: string]: unknown;
+            } | null;
+            notes?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            archive_reason?: string | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -23377,36 +23915,104 @@ export interface components {
             code?: string;
             name?: string;
             /** @enum {string} */
-            kind?: "earning" | "deduction" | "employer_contribution" | "tax" | "provision" | "informative";
-            formula?: string;
-            conditions?: {
+            kind?: "earning" | "deduction" | "employee_contribution" | "employer_contribution" | "tax" | "benefit" | "provision" | "informative";
+            category?: string | null;
+            is_system?: boolean | null;
+            is_remunerative?: boolean | null;
+            /** @enum {string|null} */
+            calculation_method?: "fixed" | "formula" | "input" | "percentage" | "table" | null;
+            print_on_payslip?: boolean | null;
+            sort_order?: number | null;
+            statutory_code?: string | null;
+            statutory_code_verified?: boolean | null;
+            pack_version?: string | null;
+            formula?: string | null;
+            condition?: string | null;
+            /** @enum {string|null} */
+            rounding?: "none" | "half_up" | "down" | "up" | null;
+            applies_to_regimes?: string[] | null;
+            applies_to_period_kinds?: string[] | null;
+            affectations?: {
                 [key: string]: unknown;
-            } | null;
-            affects?: {
-                [key: string]: unknown;
-            };
-            accounting?: {
-                [key: string]: unknown;
-            } | null;
-            official_code?: string | null;
+            }[] | null;
+            depends_on?: string[] | null;
+            /** @description Identificador opaco */
+            version_id?: string | null;
             /** Format: date */
-            valid_from?: string;
+            valid_from?: string | null;
             /** Format: date */
             valid_to?: string | null;
+            draft?: {
+                [key: string]: unknown;
+            } | null;
+            versions?: {
+                [key: string]: unknown;
+            }[] | null;
+            accounting?: {
+                [key: string]: unknown;
+            }[] | null;
+            statutory_mappings?: {
+                [key: string]: unknown;
+            }[] | null;
+            template?: {
+                [key: string]: unknown;
+            } | null;
+            notes?: string | null;
+        };
+        PayrollGroup: {
+            /** @description Identificador opaco */
+            id: string;
+            code: string;
+            name: string;
+            /** @description Identificador opaco */
+            legal_entity_id: string;
+            legal_entity_name?: string | null;
+            /** @enum {string} */
+            pay_frequency: "monthly" | "biweekly" | "weekly";
+            labor_regime_code?: string | null;
+            currency: string;
+            payment_day?: number | null;
+            cutoff_day?: number | null;
+            /** @enum {string} */
+            status: "active" | "inactive";
+            members_count?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
         };
         PayrollIncident: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            period_id: string;
+            payroll_period_id: string;
             /** @description Identificador opaco */
             employment_id: string;
-            concept_code: string;
-            quantity?: number | null;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            payroll_concept_id?: string | null;
+            concept_code?: string | null;
+            concept_name?: string | null;
+            quantity?: string | null;
+            rate?: string | null;
             amount?: components["schemas"]["Money"];
             /** @enum {string} */
-            source: "manual" | "attendance" | "absence" | "loan" | "import" | "retroactive";
-            note?: string | null;
+            source: "manual" | "import" | "attendance" | "absence" | "overtime" | "loan" | "advance" | "expense" | "retroactive" | "benefit" | "union" | "system";
+            source_type?: string | null;
+            /** @description Identificador opaco */
+            source_id?: string | null;
+            /** @description Identificador opaco */
+            retro_period_id?: string | null;
+            notes?: string | null;
+            /** @enum {string} */
+            status: "pending" | "approved" | "applied" | "rejected";
+            created_by_name?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            decision_reason?: string | null;
+            editable?: boolean | null;
+            allowed_actions: string[];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -23414,33 +24020,62 @@ export interface components {
         };
         PayrollIncidentInput: {
             /** @description Identificador opaco */
-            period_id?: string;
+            payroll_period_id?: string;
             /** @description Identificador opaco */
             employment_id?: string;
-            concept_code?: string;
-            quantity?: number | null;
+            /** @description Identificador opaco */
+            payroll_concept_id?: string | null;
+            concept_code?: string | null;
+            quantity?: string | null;
+            rate?: string | null;
             amount?: components["schemas"]["Money"];
             /** @enum {string} */
-            source?: "manual" | "attendance" | "absence" | "loan" | "import" | "retroactive";
-            note?: string | null;
+            source?: "manual" | "import" | "attendance" | "absence" | "overtime" | "loan" | "advance" | "expense" | "retroactive" | "benefit" | "union" | "system";
+            notes?: string | null;
         };
         /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): totals */
         PayrollPeriod: {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            legal_entity_id: string;
-            period: string;
+            payroll_group_id: string;
+            payroll_group_name?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** @enum {string} */
-            kind: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "off_cycle";
+            kind: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "special";
+            period_year: number;
+            period_number: number;
             /** Format: date */
-            pay_date: string;
+            starts_on: string;
+            /** Format: date */
+            ends_on: string;
+            /** Format: date */
+            payment_date?: string | null;
+            /** Format: date */
+            attendance_from?: string | null;
+            /** Format: date */
+            attendance_to?: string | null;
+            statutory_period_code?: string | null;
             /** @enum {string} */
-            status: "open" | "calculated" | "in_review" | "approved" | "closed" | "paid";
+            status: "open" | "incidents_closed" | "calculated" | "in_review" | "approved" | "closed" | "paid" | "accounted";
+            /** Format: date-time */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            approved_at?: string | null;
+            /** Format: date-time */
+            closed_at?: string | null;
+            /** Format: date-time */
+            time_consumed_at?: string | null;
+            return_reason?: string | null;
+            reopen_reason?: string | null;
+            counts?: {
+                [key: string]: unknown;
+            } | null;
+            allowed_actions: string[];
             totals?: {
                 [key: string]: unknown;
             } | null;
-            engine_version?: string | null;
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -23448,13 +24083,26 @@ export interface components {
         };
         PayrollPeriodInput: {
             /** @description Identificador opaco */
-            legal_entity_id?: string;
-            period?: string;
+            payroll_group_id?: string;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
             /** @enum {string} */
-            kind?: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "off_cycle";
+            kind?: "regular" | "gratification" | "cts" | "profit_sharing" | "settlement" | "special";
+            period_year?: number;
+            period_number?: number;
             /** Format: date */
-            pay_date?: string;
-            engine_version?: string | null;
+            starts_on?: string;
+            /** Format: date */
+            ends_on?: string;
+            /** Format: date */
+            payment_date?: string | null;
+            /** Format: date */
+            attendance_from?: string | null;
+            /** Format: date */
+            attendance_to?: string | null;
+            statutory_period_code?: string | null;
+            /** Format: date-time */
+            closed_at?: string | null;
         };
         PayrollRegime: {
             /** @description Identificador opaco */
@@ -25174,7 +25822,6 @@ export interface components {
             /** @description Identificador opaco */
             assignee_role_id?: string | null;
             assignee_name?: string | null;
-            created_by_name?: string | null;
             /** Format: date */
             due_on?: string | null;
             /** @enum {string} */
@@ -25356,9 +26003,6 @@ export interface components {
             minutes?: number;
             /** @enum {string} */
             kind?: "credit" | "debit" | "expiry" | "adjustment";
-            source_type?: string | null;
-            /** @description Identificador opaco */
-            source_id?: string | null;
         };
         TimePunch: {
             /** @description Identificador opaco */
@@ -25802,40 +26446,6 @@ export interface components {
             created_at?: string;
             /** Format: date-time */
             updated_at?: string;
-        };
-        WageTable: {
-            /** @description Identificador opaco */
-            id: string;
-            country: string;
-            regime: string;
-            name: string;
-            legal_source: string;
-            /** Format: date */
-            valid_from: string;
-            /** Format: date */
-            valid_to?: string | null;
-            values: {
-                [key: string]: unknown;
-            };
-            verified: boolean;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-        };
-        WageTableInput: {
-            country?: string;
-            regime?: string;
-            name?: string;
-            legal_source?: string;
-            /** Format: date */
-            valid_from?: string;
-            /** Format: date */
-            valid_to?: string | null;
-            values?: {
-                [key: string]: unknown;
-            };
-            verified?: boolean;
         };
         WebComplaint: {
             /** @description Identificador opaco */
@@ -27105,6 +27715,97 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getAccountingAccounts: {
+        parameters: {
+            query?: {
+                /** @description Empresa (uuid): las cuentas comunes y las de esa empresa */
+                legal_entity_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    postAccountingAccounts: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    patchAccountingAccountsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getAccountingEntries: {
@@ -42940,6 +43641,33 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    getFifthCategoryScale: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     postFifthCategorySimulate: {
         parameters: {
             query?: never;
@@ -48345,20 +49073,16 @@ export interface operations {
     getLegalParameters: {
         parameters: {
             query?: {
-                page?: components["parameters"]["Page"];
-                per_page?: components["parameters"]["PerPage"];
-                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
-                cursor?: components["parameters"]["Cursor"];
-                /** @description Campos separados por coma; prefijo - para descendente. */
-                sort?: components["parameters"]["Sort"];
-                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
-                filter?: components["parameters"]["Filter"];
-                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
-                q?: components["parameters"]["Q"];
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+                /** @description Código del parámetro */
+                "filter[code]"?: string;
+                /** @description Régimen laboral (incluye los generales del país) */
+                "filter[regime]"?: string;
+                /** @description Solo los «por validar» (1) */
+                "filter[pending]"?: string;
+                /** @description Buscar por código o nombre */
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -48372,61 +49096,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["LegalParameter"][];
-                        meta: components["schemas"]["PageMeta"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    postLegalParameters: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LegalParameterInput"];
-            };
-        };
-        responses: {
-            /** @description Creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["LegalParameter"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
         };
     };
     getLegalParametersId: {
         parameters: {
-            query?: {
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
-            };
+            query?: never;
             header?: never;
             path: {
                 id: string;
@@ -48441,9 +49122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["LegalParameter"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -48465,7 +49144,43 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postLegalParametersIdConfirm: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -48475,15 +49190,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["LegalParameter"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getLegalUpdates: {
+        parameters: {
+            query?: {
+                /** @description Empresa (sus regímenes) */
+                "filter[legal_entity_id]"?: string;
+                /** @description Régimen laboral */
+                "filter[regime]"?: string;
+                /** @description Publicadas desde (AAAA-MM-DD) */
+                from?: string;
+                /** @description Publicadas hasta (AAAA-MM-DD) */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             422: components["responses"]["Unprocessable"];
         };
     };
@@ -52284,6 +53032,61 @@ export interface operations {
             403: components["responses"]["Forbidden"];
         };
     };
+    getPayrollAccountingCheck: {
+        parameters: {
+            query: {
+                /** @description Empresa (uuid) */
+                legal_entity_id: string;
+                /** @description Fecha (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPayrollAffectationMatrix: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
     getPayrollCalculationOrder: {
         parameters: {
             query?: {
@@ -52313,6 +53116,28 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPayrollConceptBases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getPayrollConcepts: {
@@ -52461,6 +53286,74 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    putPayrollConceptsIdAccounting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollConceptsIdDuplicate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPayrollConceptsIdPublish: {
         parameters: {
             query?: never;
@@ -52547,7 +53440,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -52557,16 +53450,51 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["PayrollConcept"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollConceptsIdValidate: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     postPayrollFormulasValidate: {
@@ -52597,6 +53525,182 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayrollGroups: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PayrollGroup"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollGroups: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayrollGroupsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PayrollGroup"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPayrollGroupsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollGroupsIdMembers: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -52769,6 +53873,78 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPayrollIncidentsIdApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollIncidentsIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getPayrollPeriods: {
@@ -52988,6 +54164,114 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postPayrollPeriodsIdCloseIncidents: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollPeriodsIdConsumeTime: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollPeriodsIdIncidentsBulk: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPayrollPeriodsIdMarkPaid: {
         parameters: {
             query?: never;
@@ -53022,6 +54306,31 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPayrollPeriodsIdPopulation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     postPayrollPeriodsIdReject: {
@@ -53096,6 +54405,78 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    postPayrollPeriodsIdReopenCalculation: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPayrollPeriodsIdReopenIncidents: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     postPayrollPeriodsIdSimulate: {
         parameters: {
             query?: never;
@@ -53166,6 +54547,31 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPayrollPeriodsIdTimeSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     getPayrollPeriodsIdVariance: {
@@ -53265,6 +54671,38 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+        };
+    };
+    getPayrollRegimesIdParameters: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+                /** @description Empresa (para sus valores propios) */
+                legal_entity_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     getPayrollResults: {
@@ -53789,6 +55227,33 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    getPensionFundRates: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             422: components["responses"]["Unprocessable"];
         };
     };
@@ -56175,6 +57640,232 @@ export interface operations {
             429: components["responses"]["TooManyRequests"];
         };
     };
+    getPlatformLegalParameterPublications: {
+        parameters: {
+            query?: {
+                /** @description draft, in_review, published o rejected */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postPlatformLegalParameterPublications: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformLegalParameterPublicationsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchPlatformLegalParameterPublicationsId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformLegalParameterPublicationsIdPublish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformLegalParameterPublicationsIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformLegalParameterPublicationsIdSubmit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getPlatformMe: {
         parameters: {
             query?: never;
@@ -56443,6 +58134,106 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPlatformPensionFundRates: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
+                /** @description País (ISO 3166-1 alfa-2) */
+                country?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postPlatformPensionFundRates: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postPlatformPensionFundRatesImport: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    source?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
         };
@@ -73150,20 +74941,8 @@ export interface operations {
     getWageTables: {
         parameters: {
             query?: {
-                page?: components["parameters"]["Page"];
-                per_page?: components["parameters"]["PerPage"];
-                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
-                cursor?: components["parameters"]["Cursor"];
-                /** @description Campos separados por coma; prefijo - para descendente. */
-                sort?: components["parameters"]["Sort"];
-                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
-                filter?: components["parameters"]["Filter"];
-                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
-                q?: components["parameters"]["Q"];
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
             };
             header?: never;
             path?: never;
@@ -73177,60 +74956,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["WageTable"][];
-                        meta: components["schemas"]["PageMeta"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    postWageTables: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
-                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["WageTableInput"];
-            };
-        };
-        responses: {
-            /** @description Creado */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["WageTable"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
-            429: components["responses"]["TooManyRequests"];
         };
     };
     getWageTablesId: {
         parameters: {
             query?: {
-                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
-                as_of?: components["parameters"]["AsOf"];
-                /** @description Lista de campos a devolver. */
-                fields?: components["parameters"]["Fields"];
+                /** @description Fecha de vigencia (AAAA-MM-DD); por defecto hoy */
+                as_of?: string;
             };
             header?: never;
             path: {
@@ -73246,14 +74985,14 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["WageTable"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
         };
     };
     postWageTablesIdVerify: {
@@ -73270,7 +75009,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ActionRequest"];
+                "application/json": components["schemas"]["GenericInput"];
             };
         };
         responses: {
@@ -73280,16 +75019,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        data: components["schemas"]["WageTable"];
-                    };
+                    "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getWebhookDeliveries: {

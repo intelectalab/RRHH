@@ -6343,14 +6343,21 @@ CREATE TABLE payroll_concepts (
   print_on_payslip boolean NOT NULL DEFAULT true,
   sort_order integer NOT NULL DEFAULT 0,
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('draft','active','inactive')),
+  pack_version text,
+  statutory_code_verified boolean NOT NULL DEFAULT false,
+  created_by_user_id uuid,
+  archived_at timestamptz,
+  archive_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
-  CONSTRAINT uq_payroll_concepts_tenant_id UNIQUE (tenant_id, id)
+  CONSTRAINT uq_payroll_concepts_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_payroll_concepts_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_concepts IS 'Concepto de planilla (ingreso, descuento, aporte, impuesto, provisión). Los personalizados conviven con los del paquete de país.';
 CREATE UNIQUE INDEX uq_payroll_concepts_code ON payroll_concepts (tenant_id, code) WHERE deleted_at IS NULL;
+CREATE INDEX ix_payroll_concepts_created_by_user_id ON payroll_concepts (tenant_id, created_by_user_id);
 ALTER TABLE payroll_concepts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concepts FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concepts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -6361,12 +6368,17 @@ CREATE TABLE payroll_concept_versions (
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   payroll_concept_id uuid NOT NULL,
   formula text,
+  condition text,
   conditions jsonb,
   rounding text NOT NULL DEFAULT 'half_up' CHECK (rounding IN ('none','half_up','down','up')),
   applies_to_regimes text[],
   applies_to_period_kinds text[],
   parameters_used text[],
+  depends_on text[],
   notes text,
+  edited_by_user_id uuid,
+  published_by_user_id uuid,
+  published_at timestamptz,
   valid_from date NOT NULL,
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -6375,13 +6387,46 @@ CREATE TABLE payroll_concept_versions (
   CONSTRAINT uq_payroll_concept_versions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_payroll_concept_versions_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
   CONSTRAINT ex_payroll_concept_versions_vigencia EXCLUDE USING gist (tenant_id WITH =, payroll_concept_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
-  CONSTRAINT fk_payroll_concept_versions_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id)
+  CONSTRAINT fk_payroll_concept_versions_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_versions_edited_by_user_id FOREIGN KEY (tenant_id, edited_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_versions_published_by_user_id FOREIGN KEY (tenant_id, published_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE payroll_concept_versions IS 'Versión con vigencia de un concepto: fórmula, condiciones, redondeo y regímenes a los que aplica. Permite recálculo retroactivo.';
+COMMENT ON TABLE payroll_concept_versions IS 'Versión con vigencia de un concepto: fórmula, condición de aplicación, redondeo y regímenes a los que aplica. Publicar cierra la vigente e inserta otra (RN-CPT-01); la anterior no cambia.';
+CREATE INDEX ix_payroll_concept_versions_edited_by_user_id ON payroll_concept_versions (tenant_id, edited_by_user_id);
+CREATE INDEX ix_payroll_concept_versions_published_by_user_id ON payroll_concept_versions (tenant_id, published_by_user_id);
 ALTER TABLE payroll_concept_versions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concept_versions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concept_versions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_concept_versions_touch BEFORE UPDATE ON payroll_concept_versions FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE payroll_concept_drafts (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  payroll_concept_id uuid NOT NULL,
+  formula text,
+  condition text,
+  rounding text NOT NULL DEFAULT 'half_up' CHECK (rounding IN ('none','half_up','down','up')),
+  applies_to_regimes text[],
+  applies_to_period_kinds text[],
+  affectations jsonb NOT NULL DEFAULT '[]'::jsonb,
+  valid_from date NOT NULL,
+  notes text,
+  validation jsonb,
+  edited_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_payroll_concept_drafts_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_payroll_concept_drafts_payroll_concept_id UNIQUE (tenant_id, payroll_concept_id),
+  CONSTRAINT fk_payroll_concept_drafts_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_drafts_edited_by_user_id FOREIGN KEY (tenant_id, edited_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE payroll_concept_drafts IS 'CPT-2 · Borrador de la próxima versión de un concepto (uno por concepto): se edita, se prueba y se publica; no entra al cálculo hasta publicarse.';
+CREATE INDEX ix_payroll_concept_drafts_edited_by_user_id ON payroll_concept_drafts (tenant_id, edited_by_user_id);
+ALTER TABLE payroll_concept_drafts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_concept_drafts FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_concept_drafts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_concept_drafts_touch BEFORE UPDATE ON payroll_concept_drafts FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE payroll_concept_affectations (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -6390,13 +6435,14 @@ CREATE TABLE payroll_concept_affectations (
   base_code text NOT NULL,
   affects boolean NOT NULL DEFAULT true,
   projection_kind text CHECK (projection_kind IN ('ordinary','gratification','extraordinary')),
+  justification text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_payroll_concept_affectations_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_payroll_concept_affectations_payroll_concept_versio_8606a630 UNIQUE (tenant_id, payroll_concept_version_id, base_code),
   CONSTRAINT fk_payroll_concept_affectations_payroll_concept_version_id FOREIGN KEY (tenant_id, payroll_concept_version_id) REFERENCES payroll_concept_versions (tenant_id, id)
 );
-COMMENT ON TABLE payroll_concept_affectations IS 'Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades).';
+COMMENT ON TABLE payroll_concept_affectations IS 'Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades). justification: sustento de una afectación de un concepto no remunerativo (RN-CPT-06).';
 ALTER TABLE payroll_concept_affectations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concept_affectations FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concept_affectations USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -6461,6 +6507,103 @@ ALTER TABLE legal_parameter_overrides FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON legal_parameter_overrides USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_legal_parameter_overrides_touch BEFORE UPDATE ON legal_parameter_overrides FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
+CREATE TABLE legal_parameter_publications (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  country_code text NOT NULL,
+  title text NOT NULL,
+  summary text,
+  legal_source text NOT NULL,
+  changes jsonb NOT NULL,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','in_review','published','rejected')),
+  prepared_by_platform_user_id uuid,
+  reviewed_by_platform_user_id uuid,
+  review_note text,
+  submitted_at timestamptz,
+  published_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fk_legal_parameter_publications_country_code FOREIGN KEY (country_code) REFERENCES countries (code),
+  CONSTRAINT fk_legal_parameter_publications_prepared_by_platform_user_id FOREIGN KEY (prepared_by_platform_user_id) REFERENCES platform_users (id),
+  CONSTRAINT fk_legal_parameter_publications_reviewed_by_platform_user_id FOREIGN KEY (reviewed_by_platform_user_id) REFERENCES platform_users (id)
+);
+COMMENT ON TABLE legal_parameter_publications IS 'PAR-4 · Actualización normativa preparada en la consola: cambios de parámetros legales de un país con su norma; la publica una segunda persona del equipo del producto (ADR 0023). Publicar inserta las vigencias nuevas y cierra las anteriores, nunca las modifica.';
+CREATE INDEX ix_legal_parameter_publications_prepared_by_platform_user_id ON legal_parameter_publications (prepared_by_platform_user_id);
+CREATE INDEX ix_legal_parameter_publications_reviewed_by_platform_user_id ON legal_parameter_publications (reviewed_by_platform_user_id);
+CREATE INDEX ix_legal_parameter_publications_country_code_status ON legal_parameter_publications (country_code, status);
+CREATE TRIGGER trg_legal_parameter_publications_touch BEFORE UPDATE ON legal_parameter_publications FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE legal_parameter_changes (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  legal_parameter_publication_id uuid,
+  country_code text NOT NULL,
+  labor_regime_code text,
+  code text NOT NULL,
+  name text NOT NULL,
+  unit text NOT NULL,
+  previous_value jsonb,
+  new_value jsonb,
+  valid_from date NOT NULL,
+  valid_to date,
+  legal_source text,
+  origin text NOT NULL CHECK (origin IN ('publication','country_pack')),
+  published_at timestamptz NOT NULL DEFAULT now(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fk_legal_parameter_changes_legal_parameter_publication_id FOREIGN KEY (legal_parameter_publication_id) REFERENCES legal_parameter_publications (id),
+  CONSTRAINT fk_legal_parameter_changes_country_code FOREIGN KEY (country_code) REFERENCES countries (code),
+  CONSTRAINT fk_legal_parameter_changes_labor_regime_code FOREIGN KEY (labor_regime_code) REFERENCES labor_regimes (code)
+);
+COMMENT ON TABLE legal_parameter_changes IS 'PAR-7 · Registro de novedades normativas: cada vigencia nueva o valor completado de un parámetro legal, con el valor anterior y el nuevo, la norma y su origen (publicación de la consola o paquete de país). Lo leen las organizaciones del país.';
+CREATE INDEX ix_legal_parameter_changes_legal_parameter_publication_id ON legal_parameter_changes (legal_parameter_publication_id);
+CREATE INDEX ix_legal_parameter_changes_labor_regime_code ON legal_parameter_changes (labor_regime_code);
+CREATE INDEX ix_legal_parameter_changes_country_code_published_at ON legal_parameter_changes (country_code, published_at);
+CREATE INDEX ix_legal_parameter_changes_code ON legal_parameter_changes (code);
+CREATE TRIGGER trg_legal_parameter_changes_touch BEFORE UPDATE ON legal_parameter_changes FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE legal_parameter_confirmations (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  legal_parameter_id uuid NOT NULL,
+  parameter_code text NOT NULL,
+  confirmed_by_user_id uuid NOT NULL,
+  note text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_legal_parameter_confirmations_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_legal_parameter_confirmations_confirmed_by_user_id FOREIGN KEY (tenant_id, confirmed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE legal_parameter_confirmations IS 'PAR-1 · RN-PAR-03 · Confirmación expresa de la organización de un parámetro legal «por validar» antes de cerrar un periodo que lo usa (solo inserción).';
+CREATE INDEX ix_legal_parameter_confirmations_confirmed_by_user_id ON legal_parameter_confirmations (tenant_id, confirmed_by_user_id);
+CREATE INDEX ix_legal_parameter_confirmations_legal_parameter_id ON legal_parameter_confirmations (tenant_id, legal_parameter_id);
+ALTER TABLE legal_parameter_confirmations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE legal_parameter_confirmations FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON legal_parameter_confirmations USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_legal_parameter_confirmations_inmutable BEFORE UPDATE OR DELETE ON legal_parameter_confirmations FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_legal_parameter_confirmations_no_truncate BEFORE TRUNCATE ON legal_parameter_confirmations FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
+
+CREATE TABLE wage_table_verifications (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  table_code text NOT NULL,
+  labor_regime_code text NOT NULL,
+  valid_from date NOT NULL,
+  verified_by_user_id uuid NOT NULL,
+  acta_reference text NOT NULL,
+  note text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_wage_table_verifications_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_wage_table_verifications_table_code_valid_from UNIQUE (tenant_id, table_code, valid_from),
+  CONSTRAINT fk_wage_table_verifications_labor_regime_code FOREIGN KEY (labor_regime_code) REFERENCES labor_regimes (code),
+  CONSTRAINT fk_wage_table_verifications_verified_by_user_id FOREIGN KEY (tenant_id, verified_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE wage_table_verifications IS 'PAR-6 · RN-PAR-10 · Verificación de la organización de una tabla salarial por convenio (lote de parámetros con la misma vigencia) contra el acta (solo inserción).';
+CREATE INDEX ix_wage_table_verifications_labor_regime_code ON wage_table_verifications (tenant_id, labor_regime_code);
+CREATE INDEX ix_wage_table_verifications_verified_by_user_id ON wage_table_verifications (tenant_id, verified_by_user_id);
+ALTER TABLE wage_table_verifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wage_table_verifications FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON wage_table_verifications USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_wage_table_verifications_inmutable BEFORE UPDATE OR DELETE ON wage_table_verifications FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_wage_table_verifications_no_truncate BEFORE TRUNCATE ON wage_table_verifications FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
+
 -- --------------------------------------------------------------------------------------------------
 -- PER · Periodos, incidencias, cálculo, simulación y cierre
 -- --------------------------------------------------------------------------------------------------
@@ -6481,6 +6624,15 @@ CREATE TABLE payroll_periods (
   status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','incidents_closed','calculated','in_review','approved','closed','paid','accounted')),
   closed_at timestamptz,
   closed_by_user_id uuid,
+  opened_by_user_id uuid,
+  submitted_by_user_id uuid,
+  submitted_at timestamptz,
+  approved_by_user_id uuid,
+  approved_at timestamptz,
+  return_reason text,
+  reopen_reason text,
+  time_consumed_at timestamptz,
+  time_consumed_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -6488,10 +6640,18 @@ CREATE TABLE payroll_periods (
   CONSTRAINT uq_payroll_periods_payroll_group_id_kind_period_year_p_426abc7e UNIQUE (tenant_id, payroll_group_id, kind, period_year, period_number),
   CONSTRAINT ck_payroll_periods_1 CHECK (statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$'),
   CONSTRAINT fk_payroll_periods_payroll_group_id FOREIGN KEY (tenant_id, payroll_group_id) REFERENCES payroll_groups (tenant_id, id),
-  CONSTRAINT fk_payroll_periods_closed_by_user_id FOREIGN KEY (tenant_id, closed_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_payroll_periods_closed_by_user_id FOREIGN KEY (tenant_id, closed_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_opened_by_user_id FOREIGN KEY (tenant_id, opened_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_time_consumed_by_user_id FOREIGN KEY (tenant_id, time_consumed_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_periods IS 'Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.';
 CREATE INDEX ix_payroll_periods_closed_by_user_id ON payroll_periods (tenant_id, closed_by_user_id);
+CREATE INDEX ix_payroll_periods_opened_by_user_id ON payroll_periods (tenant_id, opened_by_user_id);
+CREATE INDEX ix_payroll_periods_submitted_by_user_id ON payroll_periods (tenant_id, submitted_by_user_id);
+CREATE INDEX ix_payroll_periods_approved_by_user_id ON payroll_periods (tenant_id, approved_by_user_id);
+CREATE INDEX ix_payroll_periods_time_consumed_by_user_id ON payroll_periods (tenant_id, time_consumed_by_user_id);
 CREATE INDEX ix_payroll_periods_payroll_group_id_statutory_period_code ON payroll_periods (tenant_id, payroll_group_id, statutory_period_code);
 ALTER TABLE payroll_periods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_periods FORCE ROW LEVEL SECURITY;
@@ -6514,6 +6674,11 @@ CREATE TABLE payroll_incidents (
   retro_period_id uuid,
   notes text,
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','applied','rejected')),
+  created_by_user_id uuid,
+  updated_by_user_id uuid,
+  decided_by_user_id uuid,
+  decided_at timestamptz,
+  decision_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -6522,17 +6687,49 @@ CREATE TABLE payroll_incidents (
   CONSTRAINT fk_payroll_incidents_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
   CONSTRAINT fk_payroll_incidents_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_payroll_incidents_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
-  CONSTRAINT fk_payroll_incidents_retro_period_id FOREIGN KEY (tenant_id, retro_period_id) REFERENCES payroll_periods (tenant_id, id)
+  CONSTRAINT fk_payroll_incidents_retro_period_id FOREIGN KEY (tenant_id, retro_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_updated_by_user_id FOREIGN KEY (tenant_id, updated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_decided_by_user_id FOREIGN KEY (tenant_id, decided_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_incidents IS 'Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).';
-CREATE INDEX ix_payroll_incidents_payroll_period_id ON payroll_incidents (tenant_id, payroll_period_id);
 CREATE INDEX ix_payroll_incidents_employment_id ON payroll_incidents (tenant_id, employment_id);
 CREATE INDEX ix_payroll_incidents_payroll_concept_id ON payroll_incidents (tenant_id, payroll_concept_id);
 CREATE INDEX ix_payroll_incidents_retro_period_id ON payroll_incidents (tenant_id, retro_period_id);
+CREATE INDEX ix_payroll_incidents_created_by_user_id ON payroll_incidents (tenant_id, created_by_user_id);
+CREATE INDEX ix_payroll_incidents_updated_by_user_id ON payroll_incidents (tenant_id, updated_by_user_id);
+CREATE INDEX ix_payroll_incidents_decided_by_user_id ON payroll_incidents (tenant_id, decided_by_user_id);
+CREATE INDEX ix_payroll_incidents_payroll_period_id_employment_id ON payroll_incidents (tenant_id, payroll_period_id, employment_id);
 ALTER TABLE payroll_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_incidents FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_incidents USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_incidents_touch BEFORE UPDATE ON payroll_incidents FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE payroll_period_time_cutoffs (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  payroll_period_id uuid NOT NULL,
+  employment_id uuid NOT NULL,
+  period_from date NOT NULL,
+  period_to date NOT NULL,
+  fingerprint text NOT NULL,
+  summary jsonb NOT NULL,
+  consumed_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_payroll_period_time_cutoffs_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_consumed_by_user_id FOREIGN KEY (tenant_id, consumed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE payroll_period_time_cutoffs IS 'PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.';
+CREATE INDEX ix_payroll_period_time_cutoffs_employment_id ON payroll_period_time_cutoffs (tenant_id, employment_id);
+CREATE INDEX ix_payroll_period_time_cutoffs_consumed_by_user_id ON payroll_period_time_cutoffs (tenant_id, consumed_by_user_id);
+CREATE INDEX ix_payroll_period_time_cutoffs_payroll_period_id_employment_id ON payroll_period_time_cutoffs (tenant_id, payroll_period_id, employment_id);
+ALTER TABLE payroll_period_time_cutoffs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_period_time_cutoffs FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_period_time_cutoffs USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_period_time_cutoffs_inmutable BEFORE UPDATE OR DELETE ON payroll_period_time_cutoffs FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_payroll_period_time_cutoffs_no_truncate BEFORE TRUNCATE ON payroll_period_time_cutoffs FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
 
 CREATE TABLE payroll_runs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -7526,6 +7723,7 @@ CREATE TABLE concept_account_mappings (
   payroll_concept_id uuid NOT NULL,
   legal_entity_id uuid,
   cost_center_id uuid,
+  worker_category text CHECK (worker_category IN ('executive','employee','worker')),
   debit_account_id uuid,
   credit_account_id uuid,
   valid_from date NOT NULL,
@@ -18852,7 +19050,9 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('nomina.variacion_neto_alerta_pct', 'payroll', 'Variación de neto para alertar (%)', 'Variación frente al periodo anterior que genera una anomalía a revisar.', 'decimal', '20'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.publicar_boletas_al_cerrar', 'payroll', 'Publicar boletas al cerrar', 'Publica las boletas en el portal al cerrar el periodo.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'El trabajador confirma la recepción de su boleta.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('nomina.incidencia_monto_visto_bueno', 'payroll', 'Monto de incidencia que requiere visto bueno', 'PER-2 · RN-PER-10: una incidencia manual cuyo monto supera este valor necesita el visto bueno de alguien con payroll.incidents.approve antes de entrar al cálculo. 0: sin visto bueno. Política de la organización, no valor legal.', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0}'::jsonb),
   ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'Quien procesa no puede aprobar ni cerrar.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('nomina.doble_control_conceptos', 'payroll', 'Doble control de conceptos', 'CPT-2 · RN-CPT-07 · Quien edita un concepto no puede publicarlo: lo publica otra persona con permiso de publicar.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('prestamos.adelanto_tope_pct_devengado', 'advances', 'Tope de adelanto sobre lo devengado (%)', 'Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).', 'decimal', '50'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('prestamos.adelantos_por_periodo', 'advances', 'Adelantos por periodo', 'Número máximo de adelantos por periodo de planilla.', 'integer', '2'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('reclutamiento.retencion_candidatos_meses', 'recruiting', 'Retención de candidatos (meses)', 'Meses que se conservan los datos de candidatos no contratados, según el consentimiento.', 'integer', '24'::jsonb, ARRAY['organization'], NULL),
@@ -19365,14 +19565,14 @@ GRANT EXECUTE ON FUNCTION seed_tenant_defaults(uuid) TO gestia_platform;
 -- gestia_app: aplicación de las organizaciones. Todas las tablas de organización, siempre bajo RLS.
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO gestia_app;
 -- Catálogos de plataforma: solo lectura para la aplicación.
-REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, platform_notices, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
+REVOKE INSERT, UPDATE, DELETE ON compliance_obligation_templates, countries, country_concept_templates, country_document_templates, country_holidays, country_pack_versions, country_packs, currencies, feature_flag_rules, feature_flags, help_article_versions, help_articles, integration_connectors, labor_regimes, legal_parameter_changes, legal_parameters, master_catalog_items, master_catalogs, metric_definitions, module_dependencies, modules, parameter_definitions, pe_parametric_items, pe_parametric_tables, pension_fund_rates, pension_funds, permissions, platform_notices, statutory_file_layouts, system_role_permissions, system_roles, web_product_modules, web_products FROM gestia_app;
 -- Tablas internas de la plataforma: sin acceso para la aplicación.
-REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, saas_payments, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
+REVOKE ALL ON addon_modules, addons, backup_restores, backup_runs, legal_parameter_publications, partner_firm_tenants, partner_firm_users, partner_firms, plan_features, plan_limits, plan_modules, plans, platform_audit_events, platform_incidents, platform_sessions, platform_settings, platform_usage_snapshots, platform_users, saas_invoice_lines, saas_invoices, saas_payments, subscription_addons, subscriptions, support_ticket_messages, support_tickets, tenant_domains, tenant_status_events, tenants, web_chat_sessions, web_complaints, web_demo_bookings, web_leads, web_signups FROM gestia_app;
 GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
-REVOKE UPDATE, DELETE ON absence_period_closings, ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
+REVOKE UPDATE, DELETE ON absence_period_closings, ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, legal_parameter_confirmations, payroll_period_time_cutoffs, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, wage_table_verifications, workflow_decisions FROM gestia_app, gestia_platform;
 -- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
 -- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
 REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;

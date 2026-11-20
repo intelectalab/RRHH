@@ -2,9 +2,13 @@
 
 namespace App\Modules\Payroll;
 
+use App\Modules\Payroll\Application\ConceptAccounting;
+use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
 use App\Shared\Outbox\OutboxService;
+use App\Shared\Payroll\ConceptAccounts;
+use App\Shared\Setup\CountryPackRegistry;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -12,12 +16,21 @@ use Illuminate\Support\ServiceProvider;
  * Núcleo genérico (Domain: fórmulas, dependencias y cálculo) + paquete de país (packages/country-xx/data/
  * motor_planilla.php) + régimen laboral por empresa y por trabajador. Se usa solo por servicios y por la API.
  * NOM-8: corridas en segundo plano; NOM-7: recálculo retroactivo al cambiar datos con fecha pasada.
+ * Módulo CPT · Conceptos y fórmulas (M-CPT): catálogo con versiones, borrador y publicación, afectaciones,
+ * contabilización por concepto (puerto ConceptAccounts) y conceptos del paquete de país.
  */
 final class PayrollServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(ConceptAccounts::class, ConceptAccounting::class);
+    }
+
     public function boot(): void
     {
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+        // CPT-5 · Conceptos peruanos precargados como parte del paquete de país (IMP-4).
+        $this->app->make(CountryPackRegistry::class)->register($this->app->make(PayrollConceptsPackComponent::class));
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(ProcessPayrollRun::class));
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));

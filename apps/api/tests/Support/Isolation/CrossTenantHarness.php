@@ -46,6 +46,7 @@ use App\Modules\Organization\Infrastructure\Models\OrgUnit;
 use App\Modules\Organization\Infrastructure\Models\OrgUnitType;
 use App\Modules\Organization\Infrastructure\Models\Position;
 use App\Modules\Organization\Infrastructure\Models\PositionRequest;
+use App\Modules\Payroll\Infrastructure\Models\AccountingAccount;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRun;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunEmployment;
 use App\Modules\Payroll\Infrastructure\Models\PayrollRunLine;
@@ -165,6 +166,8 @@ final class CrossTenantHarness
         '/payroll-runs/{id}/employments' => PayrollRun::class,
         '/payroll-run-employments/{id}/lines' => PayrollRunEmployment::class,
         '/payroll-run-lines/{id}/explanation' => PayrollRunLine::class,
+        // CPT-4 · Editar una cuenta contable de A.
+        '/accounting-accounts/{id}' => AccountingAccount::class,
         '/employments/{employment_id}/insurance-coverages' => InsuranceCoverage::class,
         '/employments/{employment_id}/insurance-coverages/{id}/end' => InsuranceCoverage::class,
         '/employments/{employment_id}/life-insurance-declarations' => LifeInsuranceBeneficiary::class,
@@ -273,10 +276,14 @@ final class CrossTenantHarness
      * ven (módulos contratados, roles y pantallas, RN-AYU-01), y eso se prueba en HelpCenterTest.
      * NOM-2: los regímenes laborales son catálogo del país (labor_regimes sin tenant_id) con la estrategia
      * del paquete; el régimen de cada relación sí se aísla (/employments/{employment_id}/payroll-regime).
+     * PAR-1 · PAR-6: los parámetros legales y las tablas salariales son catálogo del país (legal_parameters sin
+     * tenant_id); lo propio de la organización (valores propios, confirmaciones y verificaciones) tiene RLS y su
+     * aislamiento se prueba en LegalParametersTest.
      *
      * @var array<int, string>
      */
-    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete', '/payroll-regimes', '/payroll-regimes/{id}'];
+    public const SHARED_PRODUCT_CONTENT = ['/help/articles/{id}', '/help/screens/{screen_key}', '/help/tours/{tour_key}/complete', '/payroll-regimes', '/payroll-regimes/{id}', '/payroll-regimes/{id}/parameters',
+        '/legal-parameters/{id}', '/legal-parameters/{id}/add-value', '/legal-parameters/{id}/confirm', '/wage-tables/{id}', '/wage-tables/{id}/verify'];
 
     /** @var array<int, string> Permisos de operaciones que no requieren aislamiento por id */
     private const EXEMPT_PERMISSIONS = ['public', 'platform'];

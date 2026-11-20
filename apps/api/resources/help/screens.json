@@ -236,6 +236,12 @@
         "time.absences.view"
       ]
     },
+    "payroll.concepts": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.concepts.view"
+      ]
+    },
     "people.renewal_batches": {
       "module": "core",
       "permissions": [
@@ -264,6 +270,18 @@
       "module": "time_off",
       "permissions": [
         "time.vacation_balances.view"
+      ]
+    },
+    "payroll.periods": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.periods.view"
+      ]
+    },
+    "payroll.legal_parameters": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.legal_parameters.view"
       ]
     },
     "payroll.runs": {

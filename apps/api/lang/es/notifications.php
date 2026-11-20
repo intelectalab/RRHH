@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'Tienes un comprobante vencido', 'body' => 'El comprobante {number} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}.'],
             'email' => ['subject' => 'Comprobante vencido: {number}', 'body' => "Hola {name}:\n\nEl comprobante {number} de {organization} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}: nadie podrá operar hasta regularizar, y los datos se conservan.\n\nRevisa tu estado de cuenta aquí: {link}"],
         ],
+        'payroll.legal_update' => [
+            'in_app' => ['subject' => 'Novedad normativa: {title}', 'body' => 'Vigente desde el {valid_from} ({legal_source}). Revisa el detalle en Parámetros legales.'],
+            'email' => ['subject' => 'Novedad normativa: {title}', 'body' => "Hola {name}:\n\nSe publicó una actualización de parámetros legales que aplica a {organization}: {title}, vigente desde el {valid_from} ({legal_source}).\n\nRevisa el detalle aquí: {link}"],
+        ],
+        'payroll.legal_update_open_period' => [
+            'in_app' => ['subject' => 'Novedad normativa en un periodo abierto', 'body' => '{title}, vigente desde el {valid_from}, toca {open_periods} periodo(s) de planilla abierto(s). Simula antes de cerrar.'],
+            'email' => ['subject' => 'Novedad normativa en un periodo abierto: {title}', 'body' => "Hola {name}:\n\nSe publicó {title} ({legal_source}), vigente desde el {valid_from}. Toca {open_periods} periodo(s) de planilla abierto(s) de {organization}: simula la diferencia antes de cerrar. Los periodos cerrados no se recalculan.\n\nRevisa el detalle aquí: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],
