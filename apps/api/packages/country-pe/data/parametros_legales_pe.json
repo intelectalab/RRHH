@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 186,
-    "verificados": 131,
-    "sin_verificar": 55
+    "parametros": 188,
+    "verificados": 132,
+    "sin_verificar": 56
   },
   "parametros": [
     {
@@ -648,6 +648,36 @@
       "verificado": false,
       "base_legal": "DL 892",
       "nota": "La norma tiene más sectores que los citados; verificar."
+    },
+    {
+      "codigo": "utilidades_pct_por_dias",
+      "nombre": "Parte de la participación en utilidades que se reparte por días laborados",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "percent",
+      "valor": 50,
+      "valor_json": null,
+      "vigente_desde": "2025-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": true,
+      "base_legal": "DL 892 art. 2",
+      "nota": "La otra parte se reparte en proporción a las remuneraciones. Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
+    },
+    {
+      "codigo": "utilidades_tope_remuneraciones",
+      "nombre": "Tope individual de la participación en utilidades (remuneraciones mensuales)",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "count",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "DL 892 art. 5",
+      "nota": "Sin valor validado no se aplica tope y el cálculo lo advierte."
     },
     {
       "codigo": "vacaciones_dias",

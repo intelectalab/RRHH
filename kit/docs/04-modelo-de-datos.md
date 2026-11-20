@@ -20,27 +20,27 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 528 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 461 |
+| Tablas | 530 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 463 |
 | Tablas de plataforma (sin RLS de organización) | 67 |
-| Políticas RLS | 464 |
-| Claves foráneas | 1703 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1121 |
-| — simples `tenant_id` → `tenants(id)` | 474 |
+| Políticas RLS | 466 |
+| Claves foráneas | 1719 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1135 |
+| — simples `tenant_id` → `tenants(id)` | 476 |
 | — resto (hacia catálogos y tablas de plataforma) | 108 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2413 |
-| — creados con `CREATE INDEX` | 1225 |
-| Triggers | 552 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2431 |
+| — creados con `CREATE INDEX` | 1239 |
+| Triggers | 554 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 648 |
-| Restricciones `UNIQUE` | 630 |
-| Columnas | 7158 |
-| Columnas marcadas `-- SENSIBLE` | 168 |
+| Restricciones `CHECK` | 652 |
+| Restricciones `UNIQUE` | 632 |
+| Columnas | 7210 |
+| Columnas marcadas `-- SENSIBLE` | 169 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 44 |
 | Tablas inalterables (solo inserción, por trigger) | 27 |
-| Tablas con borrado lógico (`deleted_at`) | 171 |
-| Tablas con concurrencia optimista (`lock_version`) | 253 |
+| Tablas con borrado lógico (`deleted_at`) | 173 |
+| Tablas con concurrencia optimista (`lock_version`) | 255 |
 | Funciones | 30 |
 | Vistas | 1 |
 | Permisos en el catálogo | 924 |
@@ -83,7 +83,7 @@ Tablas por épica:
 | 3 | NOM | Motor de nómina | 10 |
 | 3 | CPT | Conceptos y fórmulas | 4 |
 | 3 | PAR | Parámetros legales con vigencia | 6 |
-| 3 | PER | Periodos, incidencias, cálculo, simulación y cierre | 9 |
+| 3 | PER | Periodos, incidencias, cálculo, simulación y cierre | 11 |
 | 3 | BOL | Boletas | 2 |
 | 3 | BSO | Beneficios sociales, seguros y derechohabientes | 6 |
 | 3 | PRE | Préstamos, adelantos y adelanto de sueldo | 5 |
@@ -234,7 +234,7 @@ Códigos de error propios del esquema:
 - `-- SENSIBLE` en `schema.sql` y **(S)** en este documento marcan columnas que exigen permiso por campo y cuyo acceso se registra en `data_access_logs`.
 - Las columnas `_enc` guardan texto cifrado por la aplicación (la base nunca ve el dato en claro). Cuando hay que buscar por valor exacto existe una columna `_hash` con una huella con clave (documento de identidad, teléfono, RUC del locador).
 - Los montos de sueldo y de planilla se marcan sensibles pero **no** van cifrados por campo, porque la planilla, las provisiones y la analítica necesitan operar con ellos en SQL; los protege el permiso por campo, RLS y el cifrado del almacenamiento. Es una decisión a confirmar (sección final).
-- Tablas completas tratadas como sensibles: `absence_medical_certificates`, `ai_interactions`, `attrition_risk_scores`, `background_checks`, `biometric_enrollments`, `compensation_review_proposals`, `complaint_attachments`, `complaint_events`, `complaint_identities`, `complaint_messages`, `complaint_protection_measures`, `complaints`, `compliance_ledger_entries`, `cts_deposits`, `disciplinary_case_events`, `disciplinary_cases`, `disciplinary_sanctions`, `employment_compensation_items`, `employment_compensations`, `exit_interviews`, `external_income_declarations`, `fifth_category_ledger`, `fifth_category_refunds`, `insurance_beneficiaries`, `job_offers`, `judicial_withholdings`, `loans`, `occupational_exams`, `pay_equity_report_lines`, `payroll_payment_items`, `payroll_run_employments`, `payroll_run_lines`, `payslips`, `person_bank_accounts`, `person_sensitive_data`, `peruvian_dependent_profiles`, `peruvian_employee_profiles`, `peruvian_person_addresses`, `preboarding_submissions`, `privacy_incidents`, `profit_sharing_items`, `provision_lines`, `salary_advances`, `salary_bands`, `settlement_lines`, `settlements`, `sst_incident_people`, `sst_incidents`, `talent_assessments`, `union_memberships`, `withholding_certificates`.
+- Tablas completas tratadas como sensibles: `absence_medical_certificates`, `ai_interactions`, `attrition_risk_scores`, `background_checks`, `biometric_enrollments`, `compensation_review_proposals`, `complaint_attachments`, `complaint_events`, `complaint_identities`, `complaint_messages`, `complaint_protection_measures`, `complaints`, `compliance_ledger_entries`, `cts_deposits`, `disciplinary_case_events`, `disciplinary_cases`, `disciplinary_sanctions`, `employment_compensation_items`, `employment_compensations`, `exit_interviews`, `external_income_declarations`, `fifth_category_ledger`, `fifth_category_refunds`, `insurance_beneficiaries`, `job_offers`, `judicial_withholdings`, `loans`, `occupational_exams`, `pay_equity_report_lines`, `payroll_opening_balances`, `payroll_payment_items`, `payroll_run_employments`, `payroll_run_lines`, `payslips`, `person_bank_accounts`, `person_sensitive_data`, `peruvian_dependent_profiles`, `peruvian_employee_profiles`, `peruvian_person_addresses`, `preboarding_submissions`, `privacy_incidents`, `profit_sharing_items`, `provision_lines`, `salary_advances`, `salary_bands`, `settlement_lines`, `settlements`, `sst_incident_people`, `sst_incidents`, `talent_assessments`, `union_memberships`, `withholding_certificates`.
 - **Denuncias (C-06).** `complaints` no tiene columnas de usuario, persona, IP, agente de navegador ni marcas de hora: solo fecha, huellas del código de seguimiento y contenido cifrado. La identidad, cuando la denuncia es identificada, vive cifrada en `complaint_identities`, sin clave foránea a persona, y un trigger impide crearla en una denuncia anónima.
 - **Encuestas (C-06).** `survey_responses` y `survey_answers` no tienen clave foránea a persona ni marcas de hora. Quién respondió se sabe por `survey_participations`, que no enlaza con la respuesta. El umbral mínimo por segmento está en `surveys.min_responses_per_segment` y se aplica al mostrar resultados.
 
@@ -2192,8 +2192,8 @@ erDiagram
 #### `payroll_periods`
 
 - **Propósito:** Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.
-- **Columnas clave:** `period_year`, `period_number`, `kind`, `starts_on`, `ends_on`, `payment_date`, `attendance_from`, `attendance_to`, `statutory_period_code`, `status`, `closed_at`, `submitted_at`, `approved_at`, `return_reason`, `reopen_reason`, `time_consumed_at`.
-- **Relaciones:** `payroll_group_id` → `payroll_groups`; `closed_by_user_id` → `users` (opcional); `opened_by_user_id` → `users` (opcional); `submitted_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional); `time_consumed_by_user_id` → `users` (opcional).
+- **Columnas clave:** `period_year`, `period_number`, `kind`, `starts_on`, `ends_on`, `payment_date`, `attendance_from`, `attendance_to`, `statutory_period_code`, `status`, `closed_at`, `submitted_at`, `approved_at`, `return_reason`, `reopen_reason`, `time_consumed_at`, `paid_at`, `payment_method`.
+- **Relaciones:** `payroll_group_id` → `payroll_groups`; `closed_by_user_id` → `users` (opcional); `opened_by_user_id` → `users` (opcional); `submitted_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional); `time_consumed_by_user_id` → `users` (opcional); `complements_period_id` → `payroll_periods` (opcional); `paid_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); único: `payroll_group_id`, `kind`, `period_year`, `period_number`; `CHECK (statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$')`.
 
 #### `payroll_incidents`
@@ -2209,6 +2209,13 @@ erDiagram
 - **Columnas clave:** `period_from`, `period_to`, `fingerprint`, `summary`.
 - **Relaciones:** `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `consumed_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; **inalterable**: solo inserción; UPDATE, DELETE y TRUNCATE fallan (AY001).
+
+#### `payroll_opening_balances`
+
+- **Propósito:** PER-12 · Acumulados del ejercicio traídos del sistema anterior (organización que empieza a mitad de año): saldo de apertura por trabajador con fecha de corte y sustento, nunca boletas inventadas. Lo leen la proyección de quinta (ingresos y retenciones previas) y la gratificación y CTS del semestre en curso. Se revierte con su importación mientras ningún periodo cerrado del ejercicio lo use.
+- **Columnas clave:** `fiscal_year`, `cutoff_date`, `period_month`, `kind`, `semester`, `concept_code`, `amount` (S), `currency`, `evidence`.
+- **Relaciones:** `employment_id` → `employments`; `import_job_id` → `import_jobs` (opcional); `created_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; `CHECK (period_month IS NULL OR period_month BETWEEN 1 AND 12)`; `CHECK (semester IS NULL OR semester IN (1, 2))`.
 
 #### `payroll_runs`
 
@@ -2234,15 +2241,22 @@ erDiagram
 #### `payroll_run_anomalies`
 
 - **Propósito:** Anomalía detectada al comparar con el periodo anterior, siempre con explicación (p. ej. «el neto cayó 32 %»).
-- **Columnas clave:** `rule_code`, `severity`, `explanation`, `previous_value`, `current_value`, `variation_pct`, `status`, `review_note`.
-- **Relaciones:** `payroll_run_id` → `payroll_runs`; `employment_id` → `employments` (opcional); `reviewed_by_user_id` → `users` (opcional).
+- **Columnas clave:** `rule_code`, `severity`, `explanation`, `previous_value`, `current_value`, `variation_pct`, `status`, `review_note`, `causes`, `reviewed_at`.
+- **Relaciones:** `payroll_run_id` → `payroll_runs`; `employment_id` → `employments` (opcional); `reviewed_by_user_id` → `users` (opcional); `payroll_concept_id` → `payroll_concepts` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
+
+#### `payroll_variance_thresholds`
+
+- **Propósito:** PER-7 · RN-PER-05 · Umbral de variación (%) contra el periodo anterior por empresa y concepto; sin concepto aplica al neto. Sin fila rige el parámetro nomina.variacion_neto_alerta_pct.
+- **Columnas clave:** `threshold_pct`.
+- **Relaciones:** `legal_entity_id` → `legal_entities` (opcional); `payroll_concept_id` → `payroll_concepts` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; borrado lógico (`deleted_at`, papelera); concurrencia optimista (`lock_version`); único: `legal_entity_id`, `payroll_concept_id`.
 
 #### `payroll_payment_batches`
 
 - **Propósito:** Lote de pago (archivo bancario o billetera) de haberes, adelantos, CTS, liquidaciones, locadores o gastos.
-- **Columnas clave:** `kind`, `channel`, `bank_code`, `status`, `total_amount`, `currency`, `payment_date`, `external_reference`.
-- **Relaciones:** `payroll_period_id` → `payroll_periods` (opcional); `legal_entity_id` → `legal_entities`; `file_id` → `stored_files` (opcional).
+- **Columnas clave:** `kind`, `channel`, `bank_code`, `status`, `total_amount`, `currency`, `payment_date`, `external_reference`, `file_format`, `generated_at`, `confirmed_at`, `cancel_reason`, `items_count`.
+- **Relaciones:** `payroll_period_id` → `payroll_periods` (opcional); `legal_entity_id` → `legal_entities`; `file_id` → `stored_files` (opcional); `generated_by_user_id` → `users` (opcional); `confirmed_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `payroll_payment_items`
@@ -2275,15 +2289,15 @@ erDiagram
 #### `cts_deposits`
 
 - **Propósito:** Depósito semestral de CTS por trabajador: remuneración computable, monto, entidad depositaria y constancia.
-- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`.
-- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional).
+- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`, `deposit_reference`.
+- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional); `payroll_period_id` → `payroll_periods` (opcional); `deposited_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; único: `employment_id`, `period_code`.
 
 #### `profit_sharing_distributions`
 
 - **Propósito:** Distribución anual de utilidades por empresa (E-21).
-- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`.
-- **Relaciones:** `legal_entity_id` → `legal_entities`.
+- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`, `activity`, `workers_count`, `calculated_at`, `warnings`, `approved_at`, `excess_amount`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`; `created_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); contiene columnas sensibles (S); único: `legal_entity_id`, `fiscal_year`.
 
 #### `profit_sharing_items`

@@ -348,10 +348,13 @@
   person_bank_account_id ?-> person_bank_accounts ; due_on ; deposited_on
   status enum(calculated,approved,deposited,notified)=calculated ; payroll_run_employment_id ?-> payroll_run_employments
   statement_document_id ?-> documents ; uniq employment_id, period_code
+  payroll_period_id ?-> payroll_periods ; deposit_reference ; deposited_by_user_id ?-> users
 @profit_sharing_distributions lock | Distribución anual de utilidades por empresa (E-21).
   legal_entity_id -> legal_entities ; fiscal_year smallint! ; net_income_before_tax money #S ; participation_rate numeric(7,4)
   total_amount money ; currency cur ; total_days_worked numeric(12,2) ; total_remunerations numeric(16,2)
   status enum(draft,calculated,approved,paid)=draft ; due_on ; uniq legal_entity_id, fiscal_year
+  activity enum(industria,comercio_restaurantes,otras_actividades)=otras_actividades ; workers_count integer ; calculated_at ; warnings j
+  created_by_user_id ?-> users ; approved_by_user_id ?-> users ; approved_at ; excess_amount money
 @profit_sharing_items sens | Liquidación individual de utilidades: parte por días y parte por remuneraciones.
   profit_sharing_distribution_id -> profit_sharing_distributions ; employment_id -> employments ; days_worked numeric(8,2)
   remunerations numeric(14,2) #S ; amount_by_days money ; amount_by_remuneration money ; amount money! #S ; cap_applied bool=f

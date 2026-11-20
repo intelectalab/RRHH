@@ -1,0 +1,12 @@
+status: calculated
+segments:
+  - { from: "2026-07-01", to: "2026-07-31", days: 30 }
+lines:
+  gratificacion: "800.00"
+  bonif_extraordinaria: "72.00"
+totals:
+  earnings: "872.00"
+  deductions: "0.00"
+  net: "872.00"
+  employer_contributions: "0.00"
+  employer_cost: "872.00"

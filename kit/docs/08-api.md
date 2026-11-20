@@ -1102,6 +1102,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, POST | `/benefit-runs` | `payroll.benefit_runs.{view,create}` | 3 |
 | GET | `/benefit-runs/{id}` | `payroll.benefit_runs.view` | 3 |
 | POST | `/benefit-runs/{id}/{calculate,approve,close}` | `payroll.benefit_runs.{calculate,approve,close}` | 3 |
+| GET | `/payroll-periods/{id}/cts-deposits` | `payroll.benefit_runs.view` | 3 |
+| POST | `/cts-deposits/{id}/deposit` | `payroll.benefit_runs.manage_cts` | 3 |
+| GET | `/profit-sharing-distributions` | `payroll.benefit_runs.view` | 3 |
+| POST | `/profit-sharing-distributions` | `payroll.benefit_runs.configure_profit_sharing` | 3 |
+| GET | `/profit-sharing-distributions/{id}` | `payroll.benefit_runs.view` | 3 |
+| POST | `/profit-sharing-distributions/{id}/calculate` | `payroll.benefit_runs.configure_profit_sharing` | 3 |
+| POST | `/profit-sharing-distributions/{id}/approve` | `payroll.benefit_runs.approve` | 3 |
 
 **PRE · Préstamos y adelantos**
 

@@ -1,0 +1,9 @@
+# Valores fijados para el caso (organización), no son valores legales.
+- { code: dias_base_mes, value: "30", valid_from: "2020-01-01" }
+- { code: rmv, value: "1130", valid_from: "2020-01-01" }
+- { code: asignacion_familiar_pct_rmv, value: "10", valid_from: "2020-01-01" }
+- { code: asignacion_familiar_aplica, value: "1", valid_from: "2020-01-01" }
+- { code: gratificacion_aplica, value: "1", valid_from: "2020-01-01" }
+- { code: gratificacion_factor, value: "0.5", valid_from: "2020-01-01" }
+- { code: gratificacion_bonificacion_extraordinaria_pct, value: "9", valid_from: "2020-01-01" }
+- { code: gratificacion_bonificacion_extraordinaria_eps_pct, value: "6.75", valid_from: "2020-01-01" }

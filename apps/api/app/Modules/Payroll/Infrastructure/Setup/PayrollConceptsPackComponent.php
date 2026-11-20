@@ -66,6 +66,8 @@ final class PayrollConceptsPackComponent implements CountryPackComponent
                     'tenant_id' => $tenant, 'payroll_concept_id' => $id, 'formula' => $formula,
                     'condition' => isset($c['condicion_motor']) && $c['condicion_motor'] !== '' ? (string) $c['condicion_motor'] : null,
                     'applies_to_regimes' => '{'.implode(',', array_map('strval', (array) ($c['regimenes'] ?? []))).'}',
+                    // BSO-1 a BSO-3 · Procesos en los que corre (los del mes no entran a la gratificación, la CTS ni las utilidades).
+                    'applies_to_period_kinds' => isset($c['procesos']) ? '{'.implode(',', array_map('strval', (array) $c['procesos'])).'}' : null,
                     'parameters_used' => '{'.implode(',', array_map('strval', (array) ($c['parametros_legales'] ?? []))).'}',
                     'notes' => (string) ($c['nota'] ?? '') !== '' ? (string) $c['nota'] : null, 'published_by_user_id' => $userId, 'published_at' => now(),
                     'valid_from' => self::SINCE,

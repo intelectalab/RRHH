@@ -1,0 +1,12 @@
+period: { from: "2026-05-01", to: "2026-05-31", kind: cts }
+employment:
+  hire_date: "2025-12-16"
+  regime: pe_pequena
+  cts_account: true
+  compensations:
+    - { amount: "3600.00", valid_from: "2025-12-16" }
+incidents: {}
+variables:
+  gratificacion_ultima: "1800"
+concepts:
+  - { code: "cts", kind: "benefit", formula: "((sueldo + si(tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1, param.rmv * param.asignacion_familiar_pct_rmv / 100, 0)) + gratificacion_ultima * param.cts_fraccion_gratificacion) / param.dias_base_mes * param.cts_dias_por_anio * (meses_computables / 12 + dias_computables / (12 * param.dias_base_mes))", sort_order: 70, kinds: [cts], condition: "param.cts_aplica = 1 y meses_computables + dias_computables > 0" }

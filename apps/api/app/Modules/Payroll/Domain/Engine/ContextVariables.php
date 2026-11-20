@@ -25,6 +25,11 @@ final class ContextVariables
         'horas_ausencia' => 'number',
         'dias_vacaciones' => 'number',
         'hijos_asignacion_familiar' => 'number',
+        // BSO-1 a BSO-3 · Procesos de beneficios sociales (cero en los demás procesos).
+        'meses_computables' => 'number',
+        'dias_computables' => 'number',
+        'gratificacion_ultima' => 'number',
+        'utilidades_asignadas' => 'number',
         'fecha_inicio' => 'date',
         'fecha_fin' => 'date',
         'fecha_ingreso' => 'date',

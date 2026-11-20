@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use App\Shared\Security\FieldCipher;
 use App\Shared\Tenancy\TenancyScope;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -49,7 +50,7 @@ final class PayrollFixtures
     }
 
     /**
-     * @param  array{code: string, kind: string, formula?: string|null, condition?: string|null, sort_order?: int, regimes?: list<string>|null, affects?: list<string>}  $c
+     * @param  array{code: string, kind: string, formula?: string|null, condition?: string|null, sort_order?: int, regimes?: list<string>|null, kinds?: list<string>|null, affects?: list<string>}  $c
      */
     public static function concept(array $c, string $validFrom = '2020-01-01'): string
     {
@@ -62,6 +63,7 @@ final class PayrollFixtures
             'tenant_id' => $tenant, 'payroll_concept_id' => $id, 'formula' => $c['formula'] ?? null, 'valid_from' => $validFrom,
             'condition' => $c['condition'] ?? null,
             'applies_to_regimes' => isset($c['regimes']) ? '{'.implode(',', $c['regimes']).'}' : null,
+            'applies_to_period_kinds' => isset($c['kinds']) ? '{'.implode(',', $c['kinds']).'}' : null,
         ]);
         // CPT-3 · Bases a las que suma («quinta:ordinary» indica además su naturaleza en la proyección).
         foreach ((array) ($c['affects'] ?? []) as $a) {
@@ -95,6 +97,15 @@ final class PayrollFixtures
             ['hasta_uit' => 45, 'tasa' => 20], ['hasta_uit' => null, 'tasa' => 30]], $validFrom);
         self::parameterJson('quinta_divisores', ['1' => 12, '2' => 12, '3' => 12, '4' => 9, '5' => 8, '6' => 8, '7' => 8, '8' => 5, '9' => 4, '10' => 4, '11' => 4, '12' => 1], $validFrom);
         self::parameterJson('quinta_cortes_retenciones', ['1' => 0, '2' => 0, '3' => 0, '4' => 3, '5' => 4, '6' => 4, '7' => 4, '8' => 7, '9' => 8, '10' => 8, '11' => 8, '12' => 11], $validFrom);
+    }
+
+    /** BSO-2 · Cuenta de CTS activa (entidad depositaria, COL-8) de la relación laboral. */
+    public static function ctsAccount(string $employment, string $bank = 'BCP', string $validFrom = '2020-01-01'): string
+    {
+        return (string) DB::table('person_bank_accounts')->insertGetId(['tenant_id' => TenancyScope::requireTenant(),
+            'person_id' => DB::table('employments')->where('id', $employment)->value('person_id'), 'employment_id' => $employment, 'purpose' => 'cts',
+            'bank_code' => $bank, 'account_type' => 'savings', 'account_number_enc' => FieldCipher::encrypt('19100000000099'),
+            'currency' => 'PEN', 'status' => 'active', 'valid_from' => $validFrom]);
     }
 
     public static function parameter(string $code, string $value, string $validFrom = '2020-01-01'): void

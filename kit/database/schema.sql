@@ -7139,6 +7139,9 @@ CREATE TABLE cts_deposits (
   status text NOT NULL DEFAULT 'calculated' CHECK (status IN ('calculated','approved','deposited','notified')),
   payroll_run_employment_id uuid,
   statement_document_id uuid,
+  payroll_period_id uuid,
+  deposit_reference text,
+  deposited_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -7147,12 +7150,16 @@ CREATE TABLE cts_deposits (
   CONSTRAINT fk_cts_deposits_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_cts_deposits_person_bank_account_id FOREIGN KEY (tenant_id, person_bank_account_id) REFERENCES person_bank_accounts (tenant_id, id),
   CONSTRAINT fk_cts_deposits_payroll_run_employment_id FOREIGN KEY (tenant_id, payroll_run_employment_id) REFERENCES payroll_run_employments (tenant_id, id),
-  CONSTRAINT fk_cts_deposits_statement_document_id FOREIGN KEY (tenant_id, statement_document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_cts_deposits_statement_document_id FOREIGN KEY (tenant_id, statement_document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_cts_deposits_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_cts_deposits_deposited_by_user_id FOREIGN KEY (tenant_id, deposited_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE cts_deposits IS 'Depósito semestral de CTS por trabajador: remuneración computable, monto, entidad depositaria y constancia. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_cts_deposits_person_bank_account_id ON cts_deposits (tenant_id, person_bank_account_id);
 CREATE INDEX ix_cts_deposits_payroll_run_employment_id ON cts_deposits (tenant_id, payroll_run_employment_id);
 CREATE INDEX ix_cts_deposits_statement_document_id ON cts_deposits (tenant_id, statement_document_id);
+CREATE INDEX ix_cts_deposits_payroll_period_id ON cts_deposits (tenant_id, payroll_period_id);
+CREATE INDEX ix_cts_deposits_deposited_by_user_id ON cts_deposits (tenant_id, deposited_by_user_id);
 ALTER TABLE cts_deposits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cts_deposits FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON cts_deposits USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -7171,14 +7178,26 @@ CREATE TABLE profit_sharing_distributions (
   total_remunerations numeric(16,2),
   status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','calculated','approved','paid')),
   due_on date,
+  activity text NOT NULL DEFAULT 'otras_actividades' CHECK (activity IN ('industria','comercio_restaurantes','otras_actividades')),
+  workers_count integer,
+  calculated_at timestamptz,
+  warnings jsonb,
+  created_by_user_id uuid,
+  approved_by_user_id uuid,
+  approved_at timestamptz,
+  excess_amount numeric(14,2),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_profit_sharing_distributions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_profit_sharing_distributions_legal_entity_id_fiscal_year UNIQUE (tenant_id, legal_entity_id, fiscal_year),
-  CONSTRAINT fk_profit_sharing_distributions_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id)
+  CONSTRAINT fk_profit_sharing_distributions_legal_entity_id FOREIGN KEY (tenant_id, legal_entity_id) REFERENCES legal_entities (tenant_id, id),
+  CONSTRAINT fk_profit_sharing_distributions_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_profit_sharing_distributions_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE profit_sharing_distributions IS 'Distribución anual de utilidades por empresa (E-21).';
+CREATE INDEX ix_profit_sharing_distributions_created_by_user_id ON profit_sharing_distributions (tenant_id, created_by_user_id);
+CREATE INDEX ix_profit_sharing_distributions_approved_by_user_id ON profit_sharing_distributions (tenant_id, approved_by_user_id);
 ALTER TABLE profit_sharing_distributions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profit_sharing_distributions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON profit_sharing_distributions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);

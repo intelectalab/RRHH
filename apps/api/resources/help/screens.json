@@ -313,6 +313,12 @@
       "permissions": [
         "payroll.fifth_category_ledger.view"
       ]
+    },
+    "payroll.benefits": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.benefit_runs.view"
+      ]
     }
   }
 }

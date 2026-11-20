@@ -35,6 +35,7 @@ return [
         'invalid_scale' => 'A quantidade de decimais deve ser um inteiro positivo.',
     ],
     'context' => [
+        'cts_account_missing' => 'O trabalhador não tem conta de CTS ativa registrada; cadastre-a na ficha antes de calcular.',
         'country_not_supported' => 'Não há pacote de folha para o país :country.',
         'outside_employment' => 'O vínculo não esteve vigente no período.',
         'missing_salary' => 'Falta o salário vigente em :date.',
@@ -202,5 +203,24 @@ return [
         'kind_refund' => 'Devolução',
         'kind_prior_employer' => 'Empregador anterior',
         'kind_correction' => 'Correção',
+    ],
+    'benefits' => [
+        'not_cts_period' => 'O período não é um processo de CTS.',
+        'distribution_exists' => 'Já existe a distribuição de participação nos lucros do exercício :year.',
+        'below_threshold' => 'A empresa teve :count trabalhadores no exercício; a norma exige mais de :minimum para distribuir lucros.',
+        'cap_pending' => 'O teto individual de participação nos lucros não tem valor validado e não foi aplicado. Revise antes de aprovar.',
+        'unknown_entity' => 'A empresa não existe ou está fora do seu alcance.',
+        'statement' => [
+            'title' => 'Extrato de depósito de CTS',
+            'category' => 'Extratos de CTS',
+            'employer' => 'Empregador: :name (RUC :tax_id)',
+            'worker' => 'Trabalhador: :name (código :code)',
+            'period' => 'Período: :period',
+            'time' => 'Tempo computável: :months meses e :days dias',
+            'base' => 'Remuneração computável: :salary :currency · última gratificação: :gratification :currency',
+            'amount' => 'Valor depositado: :amount :currency',
+            'bank' => 'Entidade depositária: :bank · data: :date · operação: :reference',
+            'footer' => 'Documento gerado pelo GestiaHR.',
+        ],
     ],
 ];

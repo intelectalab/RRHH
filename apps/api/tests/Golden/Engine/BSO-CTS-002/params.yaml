@@ -1,0 +1,8 @@
+# Valores fijados para el caso (organización), no son valores legales.
+- { code: dias_base_mes, value: "30", valid_from: "2020-01-01" }
+- { code: rmv, value: "1130", valid_from: "2020-01-01" }
+- { code: asignacion_familiar_pct_rmv, value: "10", valid_from: "2020-01-01" }
+- { code: asignacion_familiar_aplica, value: "1", valid_from: "2020-01-01" }
+- { code: cts_aplica, value: "1", valid_from: "2020-01-01" }
+- { code: cts_fraccion_gratificacion, value: "0.166667", valid_from: "2020-01-01" }
+- { code: cts_dias_por_anio, value: "15", valid_from: "2020-01-01" }

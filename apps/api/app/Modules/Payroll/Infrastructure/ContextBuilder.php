@@ -36,6 +36,7 @@ final class ContextBuilder
         private readonly RegimeResolver $regimes,
         private readonly LegalParameters $legal,
         private readonly VacationPayrollIncidents $vacations,
+        private readonly BenefitBases $benefits,
     ) {}
 
     /**
@@ -118,6 +119,12 @@ final class ContextBuilder
         if ($errors === []) {
             /** @var BigDecimal $base */
             $variables = $this->variables($employmentId, $segments, $base, $from, $to, $start, $end, $hire, $termination, (string) $regimeAtEnd, $overrides, $sources);
+            // BSO-1 a BSO-3 · Meses y días computables del semestre, última gratificación y utilidades asignadas.
+            $benefit = $this->benefits->variables($employmentId, (string) $emp->legal_entity_id, $periodKind, $to, $hire, $termination, $errors, $sources);
+            foreach ($benefit as $name => $value) {
+                $benefit[$name] = isset($overrides[$name]) ? BigDecimal::of((string) $overrides[$name]) : $value;
+            }
+            $variables += $benefit;
             $incidents = $this->incidents($employmentId, $periodId, $extraIncidents);
             // NOM-9 · Un cambio de régimen dentro del periodo: un contexto por tramo de régimen, cada uno con sus
             // días, su sueldo proporcional y sus ausencias; las incidencias del periodo van al último tramo.
@@ -135,7 +142,7 @@ final class ContextBuilder
                     $gFrom = (string) $g['segments'][0]['from'];
                     $gTo = (string) $g['segments'][count($g['segments']) - 1]['to'];
                     $gSources = $sources;
-                    $gVars = $this->variables($employmentId, $g['segments'], $base, $from, $to, $gFrom, $gTo, $hire, $termination, $g['regime'], $overrides, $gSources);
+                    $gVars = $this->variables($employmentId, $g['segments'], $base, $from, $to, $gFrom, $gTo, $hire, $termination, $g['regime'], $overrides, $gSources) + $benefit;
                     $isLast = $i === count($groups) - 1;
                     $tramos[] = new CalculationContext($employmentId, $from, $to, $periodKind, $currency, $g['regime'], $gVars,
                         $isLast ? $incidents : [], $g['segments'], [], $gSources + ['tramo' => ['index' => $i + 1, 'from' => $gFrom, 'to' => $gTo, 'regime' => $g['regime']]]);
