@@ -277,6 +277,12 @@
       "permissions": [
         "payroll.periods.view"
       ]
+    },
+    "payroll.legal_parameters": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.legal_parameters.view"
+      ]
     }
   }
 }

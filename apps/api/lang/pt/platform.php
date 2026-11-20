@@ -170,4 +170,22 @@ return [
             'tax_pending' => 'O imposto é confirmado ao emitir a nota fiscal.',
         ],
     ],
+    // PAR-4 · Atualizações normativas publicadas pelo console com dupla revisão.
+    'legal_updates' => [
+        'not_found' => 'Essa atualização normativa não existe.',
+        'unknown_country' => 'O país não existe.',
+        'required' => 'Preencha o campo :field.',
+        'changes_required' => 'Adicione ao menos uma mudança de parâmetro.',
+        'invalid_change' => 'Cada mudança deve indicar parâmetro, valor e vigência.',
+        'invalid_code' => 'O código do parâmetro só aceita minúsculas, números e sublinhado.',
+        'invalid_date' => 'A vigência deve ter o formato AAAA-MM-DD e não terminar antes de começar.',
+        'unknown_regime' => 'O regime trabalhista não existe.',
+        'new_parameter' => 'Um parâmetro novo precisa de nome e unidade.',
+        'invalid_unit' => 'A unidade não é válida.',
+        'invalid_value' => 'O valor deve ser um número.',
+        'value_required' => 'Informe o valor ou a tabela do parâmetro.',
+        'note_required' => 'Explique por que a atualização é devolvida.',
+        'same_reviewer' => 'Quem publica deve ser uma pessoa diferente de quem preparou.',
+        'overlap' => 'O parâmetro :code já tem uma vigência a partir dessa data ou de uma posterior; a história não é reescrita.',
+    ],
 ];

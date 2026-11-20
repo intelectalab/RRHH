@@ -6,6 +6,7 @@ use App\Modules\Platform\Http\Controllers\ConsoleController;
 use App\Modules\Platform\Http\Controllers\ConsoleOperationsController as Ops;
 use App\Modules\Platform\Http\Controllers\FeatureFlagController;
 use App\Modules\Platform\Http\Controllers\HelpArticleController;
+use App\Modules\Platform\Http\Controllers\LegalUpdatesController;
 use App\Modules\Platform\Http\Controllers\ModuleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\PublicCatalogController;
@@ -147,6 +148,18 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::post('/notices/{id}/cancel', [Ops::class, 'noticeCancel'])->middleware('platform.permission:platform.settings.update');
             Route::get('/activity-events', [Ops::class, 'activity'])->middleware('platform.permission:platform.logs.view');
             Route::get('/technical-logs', [Ops::class, 'technicalLogs'])->middleware('platform.permission:platform.logs.view');
+
+            // PAR-4 · Actualizaciones normativas con doble revisión (ADR 0023); PAR-2 · tablas de las AFP por periodo.
+            Route::get('/legal-parameter-publications', [LegalUpdatesController::class, 'index'])->middleware('platform.permission:platform.country_packs.view');
+            Route::post('/legal-parameter-publications', [LegalUpdatesController::class, 'store'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::get('/legal-parameter-publications/{id}', [LegalUpdatesController::class, 'show'])->middleware('platform.permission:platform.country_packs.view');
+            Route::patch('/legal-parameter-publications/{id}', [LegalUpdatesController::class, 'update'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::post('/legal-parameter-publications/{id}/submit', [LegalUpdatesController::class, 'submit'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::post('/legal-parameter-publications/{id}/publish', [LegalUpdatesController::class, 'publish'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::post('/legal-parameter-publications/{id}/reject', [LegalUpdatesController::class, 'reject'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::get('/pension-fund-rates', [LegalUpdatesController::class, 'rates'])->middleware('platform.permission:platform.country_packs.view');
+            Route::post('/pension-fund-rates', [LegalUpdatesController::class, 'storeRate'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::post('/pension-fund-rates/import', [LegalUpdatesController::class, 'importRates'])->middleware('platform.permission:platform.country_packs.publish');
 
             // AYU-1 · Ayuda del producto: artículos por módulo, rol y pantalla con versiones (RN-AYU-02).
             Route::get('/help-articles', [HelpArticleController::class, 'index'])->middleware('platform.permission:platform.help_articles.view');

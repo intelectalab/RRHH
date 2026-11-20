@@ -19,12 +19,12 @@ interface PayrollCountryPack
     /**
      * Estrategia del régimen; null si el paquete aún no lo soporta.
      *
-     * @return array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool}|null
+     * @return array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool, required_parameters: list<string>}|null
      */
     public function regime(string $code): ?array;
 
     /**
-     * @return list<array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool}>
+     * @return list<array{code: string, kind: string, proration_parameter: string, full_month_equals_base: bool, requires_accreditation: bool, pending_validation: bool, required_parameters: list<string>}>
      */
     public function regimes(): array;
 }

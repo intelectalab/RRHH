@@ -1008,12 +1008,27 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
-| GET, POST | `/legal-parameters` | `payroll.legal_parameters.{view,create}` | 3 |
+| GET | `/legal-parameters` | `payroll.legal_parameters.view` | 3 |
 | GET | `/legal-parameters/{id}` | `payroll.legal_parameters.view` | 3 |
 | POST | `/legal-parameters/{id}/add-value` | `payroll.legal_parameters.add_value` | 3 |
-| GET, POST | `/wage-tables` | `payroll.wage_tables.{view,create}` | 3 |
+| POST | `/legal-parameters/{id}/confirm` | `payroll.legal_parameters.confirm` | 3 |
+| GET | `/pension-fund-rates` | `payroll.legal_parameters.view` | 3 |
+| GET | `/fifth-category-scale` | `payroll.legal_parameters.view` | 3 |
+| GET | `/payroll-regimes/{id}/parameters` | `payroll.regimes.view` | 3 |
+| GET | `/wage-tables` | `payroll.wage_tables.view` | 3 |
 | GET | `/wage-tables/{id}` | `payroll.wage_tables.view` | 3 |
 | POST | `/wage-tables/{id}/verify` | `payroll.wage_tables.verify` | 3 |
+| GET | `/legal-updates` | `payroll.legal_parameters.view` | 3 |
+| GET | `/platform/legal-parameter-publications` | `platform.country_packs.view` | 3 |
+| POST | `/platform/legal-parameter-publications` | `platform.country_packs.publish` | 3 |
+| GET | `/platform/legal-parameter-publications/{id}` | `platform.country_packs.view` | 3 |
+| PATCH | `/platform/legal-parameter-publications/{id}` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/submit` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/publish` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/legal-parameter-publications/{id}/reject` | `platform.country_packs.publish` | 3 |
+| GET | `/platform/pension-fund-rates` | `platform.country_packs.view` | 3 |
+| POST | `/platform/pension-fund-rates` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/pension-fund-rates/import` | `platform.country_packs.publish` | 3 |
 
 **PER · Periodos de planilla**
 

@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 178 | 0 | 73,9 % |
-| Backlog completo | 512 | 182 | 0 | 35,5 % |
+| Primer corte comercial (MVP) | 241 | 190 | 0 | 78,8 % |
+| Backlog completo | 512 | 194 | 0 | 37,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -233,20 +233,20 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | NOM-10 | Micro y pequeña empresa: acreditación, ventas y permanencia | NOM | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | NOM-11 | Construcción civil: obras, categorías y planilla semanal | NOM | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | NOM-12 | Régimen agrario | NOM | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
-| CPT-1 | Catálogo de conceptos | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| CPT-2 | Editor de fórmulas y condiciones | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| CPT-3 | Afectaciones de cada concepto | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| CPT-4 | Contabilización por concepto | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| CPT-5 | Conceptos peruanos precargados | CPT | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
+| CPT-1 | Catálogo de conceptos | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Catálogo de conceptos con borrador, revisión, publicación con vigencia, baja, duplicado e historial de versiones; Nómina → Conceptos. |
+| CPT-2 | Editor de fórmulas y condiciones | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Editor de fórmula y condición con revisión en vivo, sugerencias, dependencias, detección de ciclos y probador sin guardar. |
+| CPT-3 | Afectaciones de cada concepto | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Afectaciones por datos con sustento y naturaleza en la proyección; matriz conceptos × bases. |
+| CPT-4 | Contabilización por concepto | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Plan de cuentas de planilla y reglas contables por concepto (general, empresa, centro de costo o categoría; gana la más específica), ADR 0020. |
+| CPT-5 | Conceptos peruanos precargados | CPT | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Paquete country-pe 1.1.0 con conceptos peruanos precargados, fórmulas solo con parámetros y códigos de Tabla 22 «por validar». |
 | CPT-6 | Importación de conceptos e incidencias | CPT | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | CPT-7 | Códigos de la tabla de conceptos y naturaleza en la proyección de quinta | CPT | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| PAR-1 | Parámetros legales generales | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PAR-2 | Tablas de AFP | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PAR-3 | Escala y deducciones de renta de quinta | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PAR-4 | Publicación de actualizaciones normativas | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PAR-5 | Parámetros por régimen laboral | PAR | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| PAR-6 | Tabla salarial anual por convenio | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PAR-7 | Novedades normativas visibles para el cliente | PAR | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| PAR-1 | Parámetros legales generales | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Catálogo de parámetros legales con historial y norma; valor propio solo si es más favorable; confirmación de lo «por validar» antes del cierre. |
+| PAR-2 | Tablas de AFP | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Tablas de AFP por periodo cargadas desde la consola o por CSV; el motor las usa. |
+| PAR-3 | Escala y deducciones de renta de quinta | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Escala y deducciones de renta de quinta con vigencia. |
+| PAR-4 | Publicación de actualizaciones normativas | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Publicación normativa desde la consola con segunda revisión (ADR 0023) y aviso a las organizaciones del país. |
+| PAR-5 | Parámetros por régimen laboral | PAR | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Parámetros requeridos por régimen; si falta uno, el cálculo da error con su nombre. |
+| PAR-6 | Tabla salarial anual por convenio | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Tabla salarial por convenio como lote con vigencia, verificable contra el acta; aviso al vencer. |
+| PAR-7 | Novedades normativas visibles para el cliente | PAR | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Novedades normativas con valor anterior y nuevo y los periodos que afectan; Nómina → Parámetros legales. |
 | PER-1 | Periodos de planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Grupos y periodos de planilla por tipo con estados solo por acciones (cerrar incidencias, enviar, aprobar con segregación, devolver, cerrar, reabrir sin declaración); pantalla Nómina → Periodos. |
 | PER-2 | Incidencias del periodo | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Incidencias por formulario, carga masiva todo o nada y desde módulos; visto bueno sobre umbral parametrizado; bloqueo desde el envío y aplicadas al cerrar. |
 | PER-3 | Consumo de asistencia y ausencias | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Toma de ausencias y ventas de vacaciones hasta el corte por los puertos de AUS-6 y VAC-6, con corte registrado (solo inserción) y diferencias posteriores como retroactivo. |

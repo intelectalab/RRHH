@@ -3,7 +3,7 @@
 Tasas, topes y tablas legales por país y régimen, con vigencia por fecha y actualización controlada.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 7 (6 historias y 1 tareas); 7 del MVP. **Operaciones de API:** 8.
+- **Actividades:** 7 (6 historias y 1 tareas); 7 del MVP. **Operaciones de API:** 21.
 - **Especificación:** `kit/docs/modulos/M-PAR.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: repositorio de parámetros con vigencia; 166 parámetros de Perú en el catálogo.
 

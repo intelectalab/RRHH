@@ -84,7 +84,7 @@ final class PayrollEngine
         $built = $this->contexts->build($employmentId, $from, $to, $periodKind, $periodId, $overrides, $incidents);
         $context = $built['context'];
         $date = $context->to;
-        $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date);
+        $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date, $employmentId);
         $concepts = $this->catalog->at($date);
         if ($candidate !== null) {
             $concepts = array_values(array_filter($concepts, fn (ConceptDefinition $c) => $c->code !== $candidate->code));

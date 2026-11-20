@@ -40,6 +40,9 @@ return [
         'billing.invoice_issued' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
         'billing.due_soon' => ['variables' => ['number', 'total', 'due_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
         'billing.overdue' => ['variables' => ['number', 'total', 'due_on', 'suspend_on'], 'link' => '/configuracion/facturacion', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => true],
+        // PAR-4 · PAR-7 · RN-PAR-06: se publicó una actualización normativa (y si toca un periodo abierto, simularlo).
+        'payroll.legal_update' => ['variables' => ['title', 'legal_source', 'valid_from', 'open_periods'], 'link' => '/nomina/parametros?vista=novedades', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        'payroll.legal_update_open_period' => ['variables' => ['title', 'legal_source', 'valid_from', 'open_periods'], 'link' => '/nomina/parametros?vista=novedades', 'channels' => ['in_app', 'email'], 'mandatory' => true, 'urgent' => false],
         // SAS-6 · RN-SAS-02 · RN-SAS-03: el consumo se acerca al tope del plan o llega a él.
         'limits.warning' => ['variables' => ['metric', 'current', 'limit', 'percent'], 'link' => '/configuracion/consumo', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // COL-6: un hijo derechohabiente cumplió la mayoría de edad; RRHH lo revisa en la ficha.

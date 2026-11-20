@@ -170,4 +170,22 @@ return [
             'tax_pending' => 'Tax is confirmed when the invoice is issued.',
         ],
     ],
+    // PAR-4 · Regulatory updates published from the console with double review.
+    'legal_updates' => [
+        'not_found' => 'That regulatory update does not exist.',
+        'unknown_country' => 'The country does not exist.',
+        'required' => 'Fill in :field.',
+        'changes_required' => 'Add at least one parameter change.',
+        'invalid_change' => 'Each change must give the parameter, value and validity.',
+        'invalid_code' => 'The parameter code only allows lowercase letters, numbers and underscores.',
+        'invalid_date' => 'The validity must use YYYY-MM-DD and cannot end before it starts.',
+        'unknown_regime' => 'The labor regime does not exist.',
+        'new_parameter' => 'A new parameter needs a name and a unit.',
+        'invalid_unit' => 'The unit is not valid.',
+        'invalid_value' => 'The value must be a number.',
+        'value_required' => 'Give the value or the table of the parameter.',
+        'note_required' => 'Explain why the update is sent back.',
+        'same_reviewer' => 'It must be published by someone other than who prepared it.',
+        'overlap' => 'Parameter :code already has a validity from that date or a later one; history is not rewritten.',
+    ],
 ];

@@ -3,7 +3,7 @@
 Catálogo de conceptos de nómina con fórmula, condiciones, vigencia, afectaciones y contabilización.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 7.
+- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 16.
 - **Especificación:** `kit/docs/modulos/M-CPT.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: líneas remunerativas y computables; 62 conceptos en `catalogos/conceptos_pe.json`.
 
