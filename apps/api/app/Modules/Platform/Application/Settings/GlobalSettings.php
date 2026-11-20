@@ -30,6 +30,11 @@ final class GlobalSettings
         'backups.test_restore_every_days' => ['type' => 'integer', 'rules' => ['integer', 'min:1', 'max:90']],
         'dashboard.report_currency' => ['type' => 'string', 'rules' => ['string', 'size:3'], 'item' => 'currency'],
         'dashboard.exchange_rates' => ['type' => 'map', 'rules' => ['array'], 'item' => 'rates'],
+        'billing.due_days' => ['type' => 'integer', 'rules' => ['integer', 'min:0', 'max:120']],
+        'billing.reminder_days_before_due' => ['type' => 'integer', 'rules' => ['integer', 'min:0', 'max:60']],
+        'billing.suspend_after_overdue_days' => ['type' => 'integer', 'rules' => ['integer', 'min:0', 'max:365']],
+        'billing.einvoice_series' => ['type' => 'string', 'rules' => ['string', 'regex:/^[A-Z0-9]{4}$/']],
+        'billing.foreign_tax_treatment' => ['type' => 'string', 'rules' => ['string', 'in:pending,taxed,export_exempt']],
     ];
 
     public function __construct(

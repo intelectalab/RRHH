@@ -229,6 +229,8 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 | `platform.settings.view` **(+)** | Ver configuraciones globales y avisos de la plataforma | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.health.manage` **(+)** | Reintentar trabajos y eventos fallidos desde el monitoreo | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.logs.view` **(+)** | Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH) | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `platform.billing.view` **(+)** | Ver cargos, comprobantes electrónicos, pagos y estado de cuenta de las organizaciones | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `platform.billing.manage` **(+)** | Generar cargos, emitir comprobantes electrónicos, registrar pagos y anular comprobantes | ✓ |  |  |  |  |  |  |  |  |  |  |
 
 #### AUD · Auditoría, actividad y logs
 

@@ -162,6 +162,18 @@ return [
             'in_app' => ['subject' => 'Tu solicitud {number} cambió', 'body' => '{number} · {subject}: {status}.'],
             'email' => ['subject' => 'Tu solicitud {number} cambió', 'body' => "Hola {name}:\n\nEn {organization}, tu solicitud {number} ({subject}) ahora está: {status}.\n\nRevisa el detalle aquí: {link}"],
         ],
+        'billing.invoice_issued' => [
+            'in_app' => ['subject' => 'Nuevo comprobante de GestiaHR', 'body' => 'Comprobante {number} por {total}, vence el {due_on}.'],
+            'email' => ['subject' => 'Tu comprobante de GestiaHR {number}', 'body' => "Hola {name}:\n\nEmitimos el comprobante electrónico {number} de {organization} por {total}, con vencimiento el {due_on}.\n\nRevisa tu estado de cuenta aquí: {link}"],
+        ],
+        'billing.due_soon' => [
+            'in_app' => ['subject' => 'Un comprobante vence pronto', 'body' => 'El comprobante {number} por {total} vence el {due_on}.'],
+            'email' => ['subject' => 'Tu comprobante {number} vence el {due_on}', 'body' => "Hola {name}:\n\nEl comprobante {number} de {organization} por {total} vence el {due_on}. Si ya pagaste, no hace falta hacer nada.\n\nRevisa tu estado de cuenta aquí: {link}"],
+        ],
+        'billing.overdue' => [
+            'in_app' => ['subject' => 'Tienes un comprobante vencido', 'body' => 'El comprobante {number} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}.'],
+            'email' => ['subject' => 'Comprobante vencido: {number}', 'body' => "Hola {name}:\n\nEl comprobante {number} de {organization} por {total} venció el {due_on}. Si sigue sin pagarse, la organización se suspende el {suspend_on}: nadie podrá operar hasta regularizar, y los datos se conservan.\n\nRevisa tu estado de cuenta aquí: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Te acercas al límite del plan', 'body' => '{metric}: {current} de {limit} ({percent} %). Revisa el consumo antes de llegar al tope.'],
             'email' => ['subject' => 'Tu organización se acerca a un límite del plan', 'body' => "Hola {name}:\n\nEn {organization}, {metric} va en {current} de {limit} ({percent} %). Al llegar al tope no se podrán hacer nuevas altas o subidas; lo que ya existe sigue funcionando.\n\nRevisa el consumo y cómo ampliarlo aquí: {link}"],

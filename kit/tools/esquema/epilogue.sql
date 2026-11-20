@@ -553,3 +553,28 @@ CREATE OR REPLACE FUNCTION support_ticket_status(p_id uuid) RETURNS text
 $$;
 REVOKE ALL ON FUNCTION support_ticket_status(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION support_ticket_status(uuid) TO gestia_app;
+-- SAS-11 · Estado de cuenta del SaaS para la organización activa. La suscripción, los comprobantes y los pagos son
+-- tablas de la plataforma (el rol de aplicación no las toca): esta función devuelve solo los de la organización
+-- activa y nunca los borradores (un cargo aún no emitido no es parte del estado de cuenta).
+CREATE OR REPLACE FUNCTION current_tenant_billing() RETURNS jsonb
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT jsonb_build_object(
+    'subscription', (SELECT jsonb_build_object('plan', p.name, 'status', s.status, 'billing_cycle', s.billing_cycle,
+        'price', COALESCE(s.price, p.price)::text, 'currency', COALESCE(s.currency, p.currency), 'starts_on', s.starts_on,
+        'trial_ends_on', s.trial_ends_on)
+      FROM subscriptions s JOIN plans p ON p.id = s.plan_id WHERE s.tenant_id = app_tenant_id() LIMIT 1),
+    'invoices', COALESCE((SELECT jsonb_agg(jsonb_build_object('id', i.id, 'number', i.number, 'status', i.status,
+        'period_start', i.period_start, 'period_end', i.period_end, 'subtotal', i.subtotal::text, 'tax', i.tax::text,
+        'total', i.total::text, 'amount_paid', i.amount_paid::text, 'currency', i.currency, 'issued_at', i.issued_at,
+        'due_on', i.due_on, 'paid_at', i.paid_at, 'einvoice_status', i.einvoice_status, 'einvoice_series', i.einvoice_series,
+        'einvoice_number', i.einvoice_number, 'einvoice_hash', i.einvoice_hash, 'einvoice_accepted_at', i.einvoice_accepted_at,
+        'einvoice_message', i.einvoice_message) ORDER BY i.period_start DESC, i.number DESC)
+      FROM saas_invoices i WHERE i.tenant_id = app_tenant_id() AND i.status <> 'draft'), '[]'::jsonb),
+    'payments', COALESCE((SELECT jsonb_agg(jsonb_build_object('id', y.id, 'invoice_id', y.saas_invoice_id, 'amount', y.amount::text,
+        'currency', y.currency, 'paid_on', y.paid_on, 'method', y.method, 'status', y.status) ORDER BY y.paid_on DESC)
+      FROM saas_payments y WHERE y.tenant_id = app_tenant_id()), '[]'::jsonb),
+    'settings', COALESCE((SELECT jsonb_object_agg(key, value) FROM platform_settings
+      WHERE key IN ('billing.reminder_days_before_due', 'billing.suspend_after_overdue_days')), '{}'::jsonb))
+$$;
+REVOKE ALL ON FUNCTION current_tenant_billing() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION current_tenant_billing() TO gestia_app;

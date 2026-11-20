@@ -70,6 +70,8 @@ Dar al propietario de la plataforma un panel separado para administrar organizac
 | `platform.settings.view` **(+)** | Ver configuraciones globales y avisos de la plataforma | Superadmin SaaS |
 | `platform.health.manage` **(+)** | Reintentar trabajos y eventos fallidos desde el monitoreo | Superadmin SaaS |
 | `platform.logs.view` **(+)** | Ver la actividad y los logs técnicos de la plataforma (sin datos de RRHH) | Superadmin SaaS |
+| `platform.billing.view` **(+)** | Ver cargos, comprobantes electrónicos, pagos y estado de cuenta de las organizaciones | Superadmin SaaS |
+| `platform.billing.manage` **(+)** | Generar cargos, emitir comprobantes electrónicos, registrar pagos y anular comprobantes | Superadmin SaaS |
 
 **(S)** sensible · **(+)** por añadir a `api/openapi.yaml`. Alcance, permisos por campo y matriz completa: `07-permisos-y-roles.md`.
 

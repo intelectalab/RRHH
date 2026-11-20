@@ -65,6 +65,7 @@ final class DatabaseConventionsChecker
         'platform_users',
         'saas_invoice_lines',
         'saas_invoices',
+        'saas_payments',
         'statutory_file_layouts',
         'subscription_addons',
         'subscriptions',

@@ -8,6 +8,7 @@ use App\Modules\Notifications\Console\PurgeNotifications;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverMessage;
 use App\Modules\Notifications\Infrastructure\Subscribers\DeliverNotification;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyAbsenceSubsidy;
+use App\Modules\Notifications\Infrastructure\Subscribers\NotifyBilling;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyContractEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyDocumentEvents;
 use App\Modules\Notifications\Infrastructure\Subscribers\NotifyEmailBounce;
@@ -40,6 +41,7 @@ final class NotificationsServiceProvider extends ServiceProvider
         $outbox->subscribe($this->app->make(SubmitTemplateApproval::class));
         $outbox->subscribe($this->app->make(NotifyOrganizationStatus::class));
         $outbox->subscribe($this->app->make(NotifyUsageLimit::class));
+        $outbox->subscribe($this->app->make(NotifyBilling::class));
         $outbox->subscribe($this->app->make(VerifyEmailSender::class));
         $outbox->subscribe($this->app->make(NotifyEmailBounce::class));
         $outbox->subscribe($this->app->make(NotifyPeopleChanges::class));

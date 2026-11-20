@@ -698,7 +698,10 @@
     "notifications_email_bounced": "Email bounced",
     "notifications_notice": "Text notice for people without email",
     "limits_warning": "Close to a plan limit",
-    "limits_reached": "Plan limit reached"
+    "limits_reached": "Plan limit reached",
+    "billing_invoice_issued": "GestiaHR invoice issued",
+    "billing_due_soon": "Invoice due soon",
+    "billing_overdue": "Overdue invoice"
   },
   "nchannel": {
     "in_app": "In the app",
@@ -903,7 +906,9 @@
     "card_support": "Support access",
     "card_support_help": "Turn GestiaHR support access on or off and review its sessions.",
     "card_builder": "Flow builder",
-    "card_builder_help": "Flows with condition, approval, task, notice and wait nodes, with a test mode."
+    "card_builder_help": "Flows with condition, approval, task, notice and wait nodes, with a test mode.",
+    "card_billing": "Plan and billing",
+    "card_billing_help": "Your plan, GestiaHR electronic invoices, payments and balance."
   },
   "cfgroup": {
     "analitica": "Analytics",
@@ -1992,6 +1997,42 @@
       "missing_rates": "No exchange rate for {list}: those amounts are not added to the consolidated total. Set them in Settings (dashboard.exchange_rates).",
       "modules": "Most used modules",
       "incidents_period": "Incidents started in the period: {n}"
+    },
+    "tab_billing": "Billing",
+    "billing": {
+      "title": "Billing",
+      "sub": "Subscription charges, electronic invoices, payments and overdue accounts.",
+      "filter_status": "Status",
+      "all": "All",
+      "subscription": "Subscription",
+      "choose_subscription": "Choose a subscription",
+      "generate": "Generate period charge",
+      "empty_title": "No invoices",
+      "empty": "Generate the period charge from a subscription.",
+      "einvoice": "Electronic invoice",
+      "open": "View",
+      "detail": "{number} · {tenant}",
+      "buyer": "Buyer",
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "issue": "Issue invoice",
+      "void_reason": "Reason for voiding",
+      "void": "Void",
+      "payment": "Record payment",
+      "amount": "Amount ({currency})",
+      "paid_on": "Payment date",
+      "method": "Method",
+      "reference": "Reference",
+      "gateway_ref": "Gateway reference",
+      "gateway_help": "If the payment came through the gateway, its reference is enough: it is verified with the provider.",
+      "record_payment": "Record payment",
+      "from_gateway": "gateway",
+      "est": {
+        "not_sent": "Not sent",
+        "pending": "Being validated",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      }
     }
   },
   "ui": {
@@ -5042,5 +5083,55 @@
     "kind_worked": "Worked",
     "kind_remote": "Remote",
     "kind_absence": "Absence"
+  },
+  "billing": {
+    "title": "Plan and billing",
+    "sub": "Your plan, GestiaHR electronic invoices, payments and balance.",
+    "back": "← Settings",
+    "load_error": "The account statement could not be loaded.",
+    "overdue_title": "You have overdue invoices",
+    "overdue_text": "If they remain unpaid {days} days after their due date, the organization is suspended: nobody can work until it is settled, and the data is kept.",
+    "overdue_text_no_suspend": "Settle the payment to keep your account up to date.",
+    "next_due_title": "Next due date",
+    "next_due_text": "Your next invoice is due on {date}.",
+    "plan": "Contracted plan",
+    "no_plan": "The organization has no plan registered yet.",
+    "plan_name": "Plan",
+    "cycle": "Cycle",
+    "cycle_monthly": "Monthly",
+    "cycle_annual": "Annual",
+    "price": "Plan price",
+    "balance": "Outstanding balance",
+    "no_balance": "No outstanding balance",
+    "invoices": "Invoices",
+    "invoices_empty_title": "No invoices",
+    "invoices_empty": "Your subscription electronic invoices will appear here.",
+    "invoice": "Invoice",
+    "period": "Period",
+    "total": "Total",
+    "due_on": "Due",
+    "status": "Status",
+    "acceptance": "Acceptance record",
+    "pending_amount": "Outstanding: {amount}",
+    "accepted_on": "Accepted on {date}",
+    "einvoice_pending": "Being validated",
+    "payments": "Payments",
+    "payments_empty": "No payments recorded yet.",
+    "rule": "We remind you {days} days before each due date. An invoice flagged by the tax authority is not payable until it is corrected.",
+    "st": {
+      "draft": "Draft",
+      "observed": "Flagged",
+      "issued": "Issued",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "method": {
+      "transfer": "Transfer",
+      "card": "Card",
+      "wallet": "Wallet",
+      "cash": "Cash",
+      "other": "Other"
+    }
   }
 }

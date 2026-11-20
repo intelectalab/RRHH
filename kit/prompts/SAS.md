@@ -3,7 +3,7 @@
 Consola del propietario del SaaS, separada de la aplicación del cliente: organizaciones, planes, módulos, límites, feature flags, soporte y salud.
 
 - **Fase:** Fase 0 · Cimientos. **Módulo comercial:** —.
-- **Actividades:** 13 (12 historias y 1 tareas); 13 del MVP. **Operaciones de API:** 90.
+- **Actividades:** 13 (12 historias y 1 tareas); 13 del MVP. **Operaciones de API:** 98.
 - **Especificación:** `kit/docs/modulos/M-SAS.md`.
 - **Ya avanzado en el kit:** Planes y complementos como datos iniciales (`docs/01` §4.2, ADR 0013).
 

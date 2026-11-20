@@ -60,7 +60,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 0 | [PLT](../prompts/PLT.md) · Plataforma técnica | Plataforma base | 0 | 14 | 14 | 4 | Sí | A-13, D-22 |
 | 0 | [TEN](../prompts/TEN.md) · Multiempresa y aislamiento | Plataforma base | 1 | 5 | 6 | 3 | Sí | — |
 | 0 | [SEG](../prompts/SEG.md) · Identidad, roles, permisos por campo y alcance | Plataforma base | 9 | 3 | 12 | 41 | Sí | D-23, D-24 |
-| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 90 | Sí | D-19 |
+| 0 | [SAS](../prompts/SAS.md) · Consola SaaS | — | 12 | 1 | 13 | 98 | Sí | D-19 |
 | 0 | [AUD](../prompts/AUD.md) · Auditoría | Plataforma base | 1 | 4 | 5 | 11 | Sí | — |
 | 0 | [UI](../prompts/UI.md) · Sistema de diseño y armazón | Plataforma base | 3 | 9 | 12 | 0 | Sí | — |
 | 0 | [WFL](../prompts/WFL.md) · Motor de aprobaciones y workflows | Plataforma base | 5 | 4 | 9 | 42 | — | — |
@@ -188,7 +188,7 @@ El MVP puede empezar con todas: se aplica la recomendación detrás de un parám
 
 ## 8. Lo que aporta el negocio
 
-- **Parámetros legales:** 56 sin valor verificado, 49 de ellos del MVP (`kit/docs/19`). Los valida el especialista laboral y se cargan en `kit/tools/esquema/catalogos.py`.
+- **Parámetros legales:** 57 sin valor verificado, 50 de ellos del MVP (`kit/docs/19`). Los valida el especialista laboral y se cargan en `kit/tools/esquema/catalogos.py`.
 - **Textos legales:** revisión del abogado de lo marcado [validar] y datos de la empresa marcados [por definir] (`kit/tools/sitio/legales.py`).
 - **Precios definitivos**, razón social, RUC, dominio `gestiahr.com` y registro de la marca.
 - **Clientes, logos y testimonios reales**, con su permiso.

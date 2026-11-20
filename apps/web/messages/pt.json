@@ -698,7 +698,10 @@
     "notifications_email_bounced": "E-mail devolvido",
     "notifications_notice": "Aviso por mensagem para quem não tem e-mail",
     "limits_warning": "Perto de um limite do plano",
-    "limits_reached": "Limite do plano atingido"
+    "limits_reached": "Limite do plano atingido",
+    "billing_invoice_issued": "Fatura do GestiaHR emitida",
+    "billing_due_soon": "Fatura a vencer",
+    "billing_overdue": "Fatura vencida"
   },
   "nchannel": {
     "in_app": "No aplicativo",
@@ -903,7 +906,9 @@
     "card_support": "Acesso do suporte",
     "card_support_help": "Ative ou desative o acesso do suporte do GestiaHR e revise suas sessões.",
     "card_builder": "Construtor de fluxos",
-    "card_builder_help": "Fluxos com nós de condição, aprovação, tarefa, aviso e espera, com modo de teste."
+    "card_builder_help": "Fluxos com nós de condição, aprovação, tarefa, aviso e espera, com modo de teste.",
+    "card_billing": "Plano e faturamento",
+    "card_billing_help": "Seu plano, as faturas eletrônicas do GestiaHR, os pagamentos e o saldo."
   },
   "cfgroup": {
     "analitica": "Análise",
@@ -1992,6 +1997,42 @@
       "missing_rates": "Sem taxa de câmbio para {list}: esses valores não entram no consolidado. Cadastre-as em Configurações (dashboard.exchange_rates).",
       "modules": "Módulos mais usados",
       "incidents_period": "Incidentes iniciados no período: {n}"
+    },
+    "tab_billing": "Cobranças",
+    "billing": {
+      "title": "Cobranças",
+      "sub": "Cobranças das assinaturas, faturas eletrônicas, pagamentos e inadimplência.",
+      "filter_status": "Situação",
+      "all": "Todas",
+      "subscription": "Assinatura",
+      "choose_subscription": "Escolha uma assinatura",
+      "generate": "Gerar cobrança do período",
+      "empty_title": "Sem faturas",
+      "empty": "Gere a cobrança do período a partir de uma assinatura.",
+      "einvoice": "Fatura eletrônica",
+      "open": "Ver",
+      "detail": "{number} · {tenant}",
+      "buyer": "Adquirente",
+      "subtotal": "Subtotal",
+      "tax": "Imposto",
+      "issue": "Emitir fatura",
+      "void_reason": "Motivo da anulação",
+      "void": "Anular",
+      "payment": "Registrar pagamento",
+      "amount": "Valor ({currency})",
+      "paid_on": "Data do pagamento",
+      "method": "Meio",
+      "reference": "Referência",
+      "gateway_ref": "Referência do gateway",
+      "gateway_help": "Se o pagamento veio pelo gateway, basta a referência: ela é verificada com o provedor.",
+      "record_payment": "Registrar pagamento",
+      "from_gateway": "gateway",
+      "est": {
+        "not_sent": "Não enviada",
+        "pending": "Em validação",
+        "accepted": "Aceita",
+        "rejected": "Rejeitada"
+      }
     }
   },
   "ui": {
@@ -5042,5 +5083,55 @@
     "kind_worked": "Trabalhado",
     "kind_remote": "Remoto",
     "kind_absence": "Ausência"
+  },
+  "billing": {
+    "title": "Plano e faturamento",
+    "sub": "Seu plano, as faturas eletrônicas do GestiaHR, os pagamentos e o saldo.",
+    "back": "← Configurações",
+    "load_error": "Não foi possível carregar o extrato.",
+    "overdue_title": "Você tem faturas vencidas",
+    "overdue_text": "Se continuarem sem pagamento {days} dias após o vencimento, a organização é suspensa: ninguém poderá operar até regularizar, e os dados são mantidos.",
+    "overdue_text_no_suspend": "Regularize o pagamento para manter sua conta em dia.",
+    "next_due_title": "Próximo vencimento",
+    "next_due_text": "Sua próxima fatura vence em {date}.",
+    "plan": "Plano contratado",
+    "no_plan": "A organização ainda não tem um plano registrado.",
+    "plan_name": "Plano",
+    "cycle": "Ciclo",
+    "cycle_monthly": "Mensal",
+    "cycle_annual": "Anual",
+    "price": "Preço do plano",
+    "balance": "Saldo pendente",
+    "no_balance": "Sem saldo pendente",
+    "invoices": "Faturas",
+    "invoices_empty_title": "Sem faturas",
+    "invoices_empty": "Aqui aparecerão as faturas eletrônicas da sua assinatura.",
+    "invoice": "Fatura",
+    "period": "Período",
+    "total": "Total",
+    "due_on": "Vence",
+    "status": "Situação",
+    "acceptance": "Comprovante de aceitação",
+    "pending_amount": "Pendente: {amount}",
+    "accepted_on": "Aceita em {date}",
+    "einvoice_pending": "Em validação",
+    "payments": "Pagamentos",
+    "payments_empty": "Ainda não há pagamentos registrados.",
+    "rule": "Avisamos {days} dias antes de cada vencimento. Uma fatura com observação da administração tributária não é exigível até ser corrigida.",
+    "st": {
+      "draft": "Rascunho",
+      "observed": "Com observação",
+      "issued": "Emitida",
+      "paid": "Paga",
+      "overdue": "Vencida",
+      "void": "Anulada"
+    },
+    "method": {
+      "transfer": "Transferência",
+      "card": "Cartão",
+      "wallet": "Carteira",
+      "cash": "Dinheiro",
+      "other": "Outro"
+    }
   }
 }

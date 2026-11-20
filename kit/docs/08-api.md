@@ -318,6 +318,14 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/platform/backup-restores` | `platform.backups.view` | 0 |
 | POST | `/platform/backup-restores/{id}/approve` | `platform.backups.restore` | 0 |
 | POST | `/platform/backup-restores/{id}/cancel` | `platform.backups.restore` | 0 |
+| GET | `/platform/invoices` | `platform.billing.view` | 0 |
+| GET | `/platform/invoices/{id}` | `platform.billing.view` | 0 |
+| POST | `/platform/subscriptions/{id}/invoices` | `platform.billing.manage` | 0 |
+| POST | `/platform/invoices/{id}/issue` | `platform.billing.manage` | 0 |
+| POST | `/platform/invoices/{id}/void` | `platform.billing.manage` | 0 |
+| POST | `/platform/invoices/{id}/payments` | `platform.billing.manage` | 0 |
+| GET | `/platform/tenants/{id}/account-statement` | `platform.billing.view` | 0 |
+| GET | `/billing/account` | `settings.organization.view` | 0 |
 | GET | `/platform/settings` | `platform.settings.view` | 0 |
 | PATCH | `/platform/settings/{key}` | `platform.settings.update` | 0 |
 | GET | `/platform/notices` | `platform.settings.view` | 0 |

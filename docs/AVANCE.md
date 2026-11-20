@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 162 | 0 | 67,2 % |
-| Backlog completo | 512 | 162 | 0 | 31,6 % |
+| Primer corte comercial (MVP) | 241 | 163 | 0 | 67,6 % |
+| Backlog completo | 512 | 163 | 0 | 31,8 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -54,7 +54,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | SAS-8 | Acceso de soporte auditado | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Sesión de soporte con motivo, ticket, duración máxima y enlace de un solo uso; requiere habilitación de la organización; sin campos sensibles salvo autorización «full»; auditada en ambos lados; RLS en support_sessions. |
 | SAS-9 | Salud y monitoreo de la plataforma | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Monitoreo: estado de servicios, colas, trabajos y eventos fallidos con reintento auditado, uso por organización (solo metadatos). |
 | SAS-10 | Tablero del negocio SaaS | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Tablero del negocio en la consola: organizaciones, usuarios, colaboradores, almacenamiento, ingreso recurrente por moneda, pruebas, conversiones, cancelaciones, módulos e incidencias, con definición de cada indicador. |
-| SAS-11 | Facturación de la suscripción y estado de cuenta | SAS | Fase 0 · Cimientos | Story | sí | pendiente | — |  |
+| SAS-11 | Facturación de la suscripción y estado de cuenta | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Cargo del periodo desde los precios guardados, comprobante por puerto OSE/PSE (falso), pagos manuales o por pasarela sin duplicar, cobranza diaria con mora y suspensión parametrizadas; IGV como parámetro legal por validar (sin emitir hasta validarlo). |
 | SAS-12 | Copias de seguridad y restauración | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Copias: historial, copia manual, restauración por puerto (falso en desarrollo), siempre en aislado primero y a producción con doble confirmación; backups:run diario con prueba de restauración. |
 | SAS-13 | Configuración global y registros de la consola | SAS | Fase 0 · Cimientos | Story | sí | hecha | 2026-11-20 | Consola → Configuración global validada y auditada (países, valores por defecto de organizaciones nuevas), avisos de mantenimiento y registros separados (auditoría, actividad, logs técnicos). |
 | AUD-1 | Bitácora de auditoría de solo inserción | AUD | Fase 0 · Cimientos | Task | sí | hecha | 2026-11-10 | audit_events de solo inserción: triggers reject_mutation y REVOKE UPDATE/DELETE al rol de la aplicación (prueba con ayni_app); no existe ruta que la modifique (prueba sobre todas las rutas); cada entrada guarda organización, actor, acción, entidad, id, IP, agente, request_id y momento con microsegundos. |

@@ -698,7 +698,10 @@
     "notifications_email_bounced": "Correo rebotado",
     "notifications_notice": "Aviso por mensaje a quien no tiene correo",
     "limits_warning": "Cerca de un límite del plan",
-    "limits_reached": "Límite del plan alcanzado"
+    "limits_reached": "Límite del plan alcanzado",
+    "billing_invoice_issued": "Comprobante de GestiaHR emitido",
+    "billing_due_soon": "Comprobante por vencer",
+    "billing_overdue": "Comprobante vencido"
   },
   "nchannel": {
     "in_app": "En la aplicación",
@@ -903,7 +906,9 @@
     "card_support": "Acceso del soporte",
     "card_support_help": "Habilita o desactiva el ingreso del soporte de GestiaHR y revisa sus sesiones.",
     "card_builder": "Constructor de flujos",
-    "card_builder_help": "Flujos con nodos de condición, aprobación, tarea, aviso y espera, con modo de prueba."
+    "card_builder_help": "Flujos con nodos de condición, aprobación, tarea, aviso y espera, con modo de prueba.",
+    "card_billing": "Plan y facturación",
+    "card_billing_help": "Tu plan, los comprobantes electrónicos de GestiaHR, los pagos y el saldo."
   },
   "cfgroup": {
     "analitica": "Analítica",
@@ -1992,6 +1997,42 @@
       "missing_rates": "Sin tipo de cambio para {list}: esos montos no se suman al consolidado. Regístralos en Configuración (dashboard.exchange_rates).",
       "modules": "Módulos más usados",
       "incidents_period": "Incidencias iniciadas en el periodo: {n}"
+    },
+    "tab_billing": "Cobros",
+    "billing": {
+      "title": "Cobros",
+      "sub": "Cargos de las suscripciones, comprobantes electrónicos, pagos y mora.",
+      "filter_status": "Estado",
+      "all": "Todos",
+      "subscription": "Suscripción",
+      "choose_subscription": "Elige una suscripción",
+      "generate": "Generar cargo del periodo",
+      "empty_title": "Sin comprobantes",
+      "empty": "Genera el cargo del periodo desde una suscripción.",
+      "einvoice": "Comprobante electrónico",
+      "open": "Ver",
+      "detail": "{number} · {tenant}",
+      "buyer": "Adquiriente",
+      "subtotal": "Subtotal",
+      "tax": "Impuesto",
+      "issue": "Emitir comprobante",
+      "void_reason": "Motivo de la anulación",
+      "void": "Anular",
+      "payment": "Registrar pago",
+      "amount": "Monto ({currency})",
+      "paid_on": "Fecha de pago",
+      "method": "Medio",
+      "reference": "Referencia",
+      "gateway_ref": "Referencia de la pasarela",
+      "gateway_help": "Si el pago llegó por la pasarela, basta su referencia: se verifica con el proveedor.",
+      "record_payment": "Registrar pago",
+      "from_gateway": "pasarela",
+      "est": {
+        "not_sent": "Sin enviar",
+        "pending": "En validación",
+        "accepted": "Aceptado",
+        "rejected": "Rechazado"
+      }
     }
   },
   "ui": {
@@ -5042,5 +5083,55 @@
     "kind_worked": "Laborado",
     "kind_remote": "En remoto",
     "kind_absence": "Ausencia"
+  },
+  "billing": {
+    "title": "Plan y facturación",
+    "sub": "Tu plan, los comprobantes electrónicos de GestiaHR, los pagos y el saldo.",
+    "back": "← Configuración",
+    "load_error": "No se pudo cargar el estado de cuenta.",
+    "overdue_title": "Tienes comprobantes vencidos",
+    "overdue_text": "Si siguen sin pagarse {days} días después de su vencimiento, la organización se suspende: nadie podrá operar hasta regularizar, y los datos se conservan.",
+    "overdue_text_no_suspend": "Regulariza el pago para mantener tu cuenta al día.",
+    "next_due_title": "Próximo vencimiento",
+    "next_due_text": "Tu próximo comprobante vence el {date}.",
+    "plan": "Plan contratado",
+    "no_plan": "La organización aún no tiene un plan registrado.",
+    "plan_name": "Plan",
+    "cycle": "Ciclo",
+    "cycle_monthly": "Mensual",
+    "cycle_annual": "Anual",
+    "price": "Precio del plan",
+    "balance": "Saldo pendiente",
+    "no_balance": "Sin saldo pendiente",
+    "invoices": "Comprobantes",
+    "invoices_empty_title": "Sin comprobantes",
+    "invoices_empty": "Aquí aparecerán los comprobantes electrónicos de tu suscripción.",
+    "invoice": "Comprobante",
+    "period": "Periodo",
+    "total": "Total",
+    "due_on": "Vence",
+    "status": "Estado",
+    "acceptance": "Constancia de aceptación",
+    "pending_amount": "Pendiente: {amount}",
+    "accepted_on": "Aceptado el {date}",
+    "einvoice_pending": "En validación",
+    "payments": "Pagos",
+    "payments_empty": "Aún no hay pagos registrados.",
+    "rule": "Te avisamos {days} días antes de cada vencimiento. Un comprobante observado por la administración tributaria no es exigible hasta corregirse.",
+    "st": {
+      "draft": "Borrador",
+      "observed": "Observado",
+      "issued": "Emitido",
+      "paid": "Pagado",
+      "overdue": "Vencido",
+      "void": "Anulado"
+    },
+    "method": {
+      "transfer": "Transferencia",
+      "card": "Tarjeta",
+      "wallet": "Billetera",
+      "cash": "Efectivo",
+      "other": "Otro"
+    }
   }
 }

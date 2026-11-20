@@ -55,6 +55,15 @@ return [
         // de la moneda de reporte); una moneda sin tipo se informa aparte, nunca se convierte con un valor inventado.
         'dashboard.report_currency' => 'PEN',
         'dashboard.exchange_rates' => [],
+        // SAS-11 · ADR 0010 · Cobro de la suscripción: días para pagar desde la emisión, aviso previo al vencimiento,
+        // días de mora tras los que se suspende la organización (0 = no se suspende sola), serie del comprobante electrónico
+        // y tratamiento del impuesto para organizaciones fuera del Perú («pending» hasta que lo confirme el contador:
+        // mientras tanto no se emite a esas organizaciones).
+        'billing.due_days' => 15,
+        'billing.reminder_days_before_due' => 3,
+        'billing.suspend_after_overdue_days' => 7,
+        'billing.einvoice_series' => 'F001',
+        'billing.foreign_tax_treatment' => 'pending',
     ],
 
     'roles' => [
@@ -67,11 +76,11 @@ return [
         'billing' => [
             'platform.tenants.view', 'platform.plans.view', 'platform.subscriptions.view',
             'platform.subscriptions.update', 'platform.subscriptions.change_plan', 'platform.subscriptions.suspend',
-            'platform.subscriptions.reactivate', 'platform.metrics.view',
+            'platform.subscriptions.reactivate', 'platform.metrics.view', 'platform.billing.view', 'platform.billing.manage',
         ],
         'readonly' => [
             'platform.tenants.view', 'platform.plans.view', 'platform.subscriptions.view',
-            'platform.health.view', 'platform.metrics.view',
+            'platform.health.view', 'platform.metrics.view', 'platform.billing.view',
         ],
     ],
 ];
