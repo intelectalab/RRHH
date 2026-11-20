@@ -3,7 +3,7 @@
 Plazas presupuestadas, solicitud y aprobación de posiciones, presupuesto, escenarios y organigrama por posiciones.
 
 - **Fase:** Fase 1 · Core HR. **Módulo comercial:** Core HR.
-- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 35.
+- **Actividades:** 7 (5 historias y 2 tareas); 7 del MVP. **Operaciones de API:** 47.
 - **Especificación:** `kit/docs/modulos/M-POS.md`.
 
 ## Prompt para una sesión nueva de Claude Code

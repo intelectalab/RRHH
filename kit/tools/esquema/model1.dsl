@@ -384,11 +384,14 @@
   position_id -> positions ; action ; from_status ; to_status text! ; reason ; changed_by_user_id ?-> users ; effective_on date!
 @headcount_plans soft lock | Plan de dotación por ejercicio.
   name ; fiscal_year integer! ; legal_entity_id ?-> legal_entities ; status enum(draft,in_review,approved,closed)=draft
-@headcount_scenarios | Escenarios de un plan: actual, conservador, crecimiento o personalizado.
+@headcount_scenarios lock | Escenarios de un plan: actual, conservador, crecimiento o personalizado (POS-5). Copian la dotación vigente a base_as_of (líneas «baseline») y suman, congelan o quitan plazas sin tocar las posiciones reales (RN-POS-08) hasta aplicarse con aprobación: aplicar crea solicitudes de posición en borrador para lo agregado y congela o cierra las plazas marcadas (applied_summary).
   headcount_plan_id -> headcount_plans ; name ; kind enum(current,conservative,growth,custom)! ; is_baseline ; assumptions j
-@headcount_plan_lines | Dotación planificada por unidad y puesto dentro de un escenario, con costo proyectado.
+  legal_entity_id ?-> legal_entities ; base_as_of date! ; status enum(draft,in_review,approved,applied,archived)=draft
+  created_by_user_id ?-> users ; approved_by_user_id ?-> users ; approved_at ts ; applied_at ts ; applied_summary j
+@headcount_plan_lines | Dotación planificada por unidad y puesto dentro de un escenario, con costo proyectado. change: baseline (copia de una posición real), add (plaza nueva), freeze (congelar la posición real) o remove (cerrarla); position_request_id: solicitud creada al aplicar.
   headcount_scenario_id -> headcount_scenarios ; org_unit_id -> org_units ; job_profile_id -> job_profiles
   site_id ?-> sites ; planned_count integer! ; planned_start_on ; projected_cost money #S ; currency cur? ; notes
+  position_id ?-> positions ; change enum(baseline,add,freeze,remove)=add ; title text ; position_request_id ?-> position_requests
 @position_requests soft lock | Solicitud de posición (nueva, reemplazo o temporal) sujeta a aprobación antes de reclutar (POS-3, ME-04). Al aprobarse por el motor de aprobaciones crea sus posiciones en «aprobada» (positions.position_request_id). over_budget: al enviarla superaba el presupuesto disponible de la unidad (RN-POS-05).
   requested_by_user_id -> users ; legal_entity_id ?-> legal_entities ; org_unit_id -> org_units ; job_profile_id -> job_profiles ; site_id ?-> sites
   title text ; cost_center_id ?-> cost_centers ; reports_to_position_id ?-> positions ; salary_band_id ?-> salary_bands
@@ -501,11 +504,13 @@
   contract_renewal_batch_id -> contract_renewal_batches ; contract_id -> contracts
   decision enum(renew,not_renew,convert_indefinite,pending)=pending ; new_valid_to date ; new_contract_id ?-> contracts
   accumulated_days_after integer ; exceeds_limit ; notes ; uniq contract_renewal_batch_id, contract_id
-@remote_work_agreements soft lock | Acuerdo de teletrabajo con su contenido mínimo (E-20, Ley 31572).
+@remote_work_agreements soft lock | Acuerdo de teletrabajo con su contenido mínimo (E-20, Ley 31572; CON-6). Nace como solicitud de cambio de modalidad con su plazo de respuesta (response_due_on, parámetro); aprobada, se emite solo con el contenido mínimo completo (RN-CON-10), se registra firmada y queda vigente hasta terminarse.
   employment_id -> employments ; modality enum(total,partial)! ; starts_on date! ; ends_on ; work_place ; schedule_description
   disconnection_hours smallint ; supervision_mechanism ; equipment_provided_by enum(employer,worker,mixed)
   expense_compensation money ; currency cur? ; payroll_concept_id ?-> payroll_concepts ; requested_on ; responded_on
-  status enum(requested,approved,rejected,active,ended)=requested ; document_id ?-> documents
+  status enum(requested,approved,rejected,pending_signature,active,ended)=requested ; document_id ?-> documents
+  request_reason ; requested_by enum(employee,employer)=employee ; requested_by_user_id ?-> users ; response_due_on date ; decided_by_user_id ?-> users ; decision_reason
+  signed_at ; signature_origin enum(physical_scan,electronic) ; end_reason ; due_reminder_sent_at ts
 
 #E DOC | Gestión documental, plantillas y firma
 @document_categories soft | Carpetas o categorías documentales (personal, contratos, boletas, SST...), con permiso requerido y retención. DOC-1: las carpetas no tienen parent_id; los tipos documentales cuelgan de una carpeta y definen confidencialidad, visibilidad para el colaborador, revisión y, con DOC-2, si exigen vencimiento y con qué anticipación se avisa (RN-DOC-09).

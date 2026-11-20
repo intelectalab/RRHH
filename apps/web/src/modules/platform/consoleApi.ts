@@ -15,10 +15,20 @@ export type ConsoleMe = {
   permissions: string[]
 }
 
+type MetricMoney = { amount: string; currency: string }
+/** SAS-10 · Tablero del negocio: cada indicador viene calculado por la API con su definición. */
 export type ConsoleMetrics = {
-  tenants: { total: number; by_status: Record<string, number>; new_last_30_days: number; demo: number }
+  period: { from: string; to: string; plan_id: string | null }
+  tenants: { total: number; by_status: Record<string, number>; active: number; trial: number; suspended: number; new: number; new_last_30_days: number; demo: number }
   users: { active: number }
   console_users: number
+  employees_managed: number
+  storage_mb: string
+  subscriptions: { trials_started: number; conversions: number; conversion_rate_pct: string | null; cancellations: number }
+  revenue: { mrr: MetricMoney[]; arr: MetricMoney[]; consolidated: { currency: string; mrr: MetricMoney; arr: MetricMoney; missing_rates: string[] } }
+  modules: Array<{ code: string; name: string; tenants: number }>
+  incidents: { open: number; in_period: number }
+  definitions: Record<string, string>
   generated_at: string
 }
 

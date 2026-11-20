@@ -102,6 +102,8 @@ return [
             'support_max_session_minutes' => 'Duración máxima de una sesión de soporte en minutos (RN-SAS-08).',
             'backups_retention_days' => 'Días que se conserva cada copia de seguridad.',
             'backups_test_restore_every_days' => 'Cada cuántos días se prueba una restauración en aislado.',
+            'dashboard_report_currency' => 'Moneda en que el tablero del negocio consolida los ingresos.',
+            'dashboard_exchange_rates' => 'Tipos de cambio del tablero del negocio: unidades de la moneda de reporte por cada moneda.',
         ],
     ],
     'notices' => [
@@ -111,5 +113,26 @@ return [
     ],
     'health' => [
         'retry_failed' => 'No se pudo reintentar el trabajo.',
+    ],
+    'metrics' => [
+        'definitions' => [
+            'tenants_active' => 'Organizaciones en estado activo.',
+            'tenants_trial' => 'Organizaciones en periodo de prueba.',
+            'tenants_suspended' => 'Organizaciones suspendidas, bloqueadas o en gracia.',
+            'tenants_new' => 'Organizaciones creadas dentro del periodo.',
+            'users_active' => 'Usuarios activos de todas las organizaciones (sin la consola).',
+            'employees_managed' => 'Colaboradores de la última medición de consumo de cada organización.',
+            'storage_mb' => 'Almacenamiento de la última medición de cada organización, en MB.',
+            'mrr' => 'Ingreso recurrente mensual: precio de las suscripciones activas o con pago pendiente (el anual dividido entre doce), por moneda.',
+            'arr' => 'Ingreso recurrente anual: el mensual por doce.',
+            'consolidated' => 'Ingresos convertidos a la moneda de reporte con los tipos de cambio de la configuración global; las monedas sin tipo se listan aparte.',
+            'trials_started' => 'Suscripciones con prueba creadas dentro del periodo.',
+            'conversions' => 'Pruebas convertidas en suscripción pagada dentro del periodo (auditoría de la consola).',
+            'conversion_rate_pct' => 'Conversiones sobre pruebas iniciadas en el periodo, en porcentaje.',
+            'cancellations' => 'Suscripciones canceladas dentro del periodo.',
+            'modules' => 'Módulos activos en más organizaciones.',
+            'incidents_open' => 'Incidencias de la plataforma sin resolver.',
+            'incidents_in_period' => 'Incidencias que empezaron dentro del periodo.',
+        ],
     ],
 ];

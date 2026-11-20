@@ -49,6 +49,8 @@ return [
         'contracts.probation_ending' => ['variables' => ['employee', 'ends_on'], 'link' => '/personas/colaboradores/{employment_id}', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // CON-4 · RN-CON-04: un contrato vence pronto (con el acumulado frente al tope) o el acumulado se acerca al tope.
         'contracts.expiring' => ['variables' => ['employee', 'ends_on', 'days_left', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
+        // CON-6 · Solicitud de teletrabajo cuyo plazo legal de respuesta vence pronto.
+        'remote_work.response_due' => ['variables' => ['employee', 'due_on'], 'link' => '/personas/teletrabajo', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         'contracts.cap_approaching' => ['variables' => ['employee', 'ends_on', 'explanation'], 'link' => '/personas/contratos', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],
         // AUS-3: un descanso pasó a subsidio; quien gestiona subsidios presenta el reembolso (sin datos de salud).
         'absences.subsidy_started' => ['variables' => ['employee', 'days', 'starts_on'], 'link' => '/tiempo/subsidios', 'channels' => ['in_app', 'email'], 'mandatory' => false, 'urgent' => false],

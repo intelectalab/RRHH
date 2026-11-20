@@ -43,6 +43,8 @@ return [
     'pantalla-contratos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.contracts']],
     'pantalla-movimientos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.movements']],
     'pantalla-cambios-de-datos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.changes']],
+    'pantalla-escenarios' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['org.scenarios']],
+    'pantalla-teletrabajo' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.remote_work']],
     'pantalla-constancias' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.certificates']],
     'pantalla-solicitudes-rrhh' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['people.requests']],
     'pantalla-mi-equipo' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['my_team']],

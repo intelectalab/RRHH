@@ -4,6 +4,7 @@ use App\Modules\Organization\Http\Controllers\CostCenterController;
 use App\Modules\Organization\Http\Controllers\CostDistributionController;
 use App\Modules\Organization\Http\Controllers\DirectoryController;
 use App\Modules\Organization\Http\Controllers\HeadcountController;
+use App\Modules\Organization\Http\Controllers\HeadcountScenarioController;
 use App\Modules\Organization\Http\Controllers\JobCatalogController;
 use App\Modules\Organization\Http\Controllers\JobProfileController;
 use App\Modules\Organization\Http\Controllers\LegalEntityController;
@@ -112,6 +113,19 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     // POS-4 · Tablero de dotación, desviación por posición y presupuestos por unidad.
     Route::get('/headcount', [HeadcountController::class, 'index'])->middleware('permission:org.positions.view');
     Route::get('/headcount/positions', [HeadcountController::class, 'positions'])->middleware('permission:org.positions.view');
+    // POS-5 · Escenarios de planificación (compare antes de {id}).
+    Route::get('/headcount-scenarios', [HeadcountScenarioController::class, 'index'])->middleware('permission:org.headcount_plans.view');
+    Route::get('/headcount-scenarios/compare', [HeadcountScenarioController::class, 'compare'])->middleware('permission:org.headcount_plans.view');
+    Route::post('/headcount-scenarios', [HeadcountScenarioController::class, 'store'])->middleware('permission:org.headcount_plans.create');
+    Route::get('/headcount-scenarios/{id}', [HeadcountScenarioController::class, 'show'])->middleware('permission:org.headcount_plans.view');
+    Route::patch('/headcount-scenarios/{id}', [HeadcountScenarioController::class, 'update'])->middleware('permission:org.headcount_plans.update');
+    Route::post('/headcount-scenarios/{id}/lines', [HeadcountScenarioController::class, 'storeLine'])->middleware('permission:org.headcount_plans.update');
+    Route::patch('/headcount-scenario-lines/{id}', [HeadcountScenarioController::class, 'updateLine'])->middleware('permission:org.headcount_plans.update');
+    Route::post('/headcount-scenarios/{id}/submit', [HeadcountScenarioController::class, 'submit'])->middleware('permission:org.headcount_plans.submit');
+    Route::post('/headcount-scenarios/{id}/approve', [HeadcountScenarioController::class, 'approve'])->middleware('permission:org.headcount_plans.approve');
+    Route::post('/headcount-scenarios/{id}/return', [HeadcountScenarioController::class, 'returnToDraft'])->middleware('permission:org.headcount_plans.approve');
+    Route::post('/headcount-scenarios/{id}/apply', [HeadcountScenarioController::class, 'apply'])->middleware('permission:org.headcount_plans.approve');
+    Route::post('/headcount-scenarios/{id}/archive', [HeadcountScenarioController::class, 'archive'])->middleware('permission:org.headcount_plans.close');
     Route::get('/headcount-budgets', [HeadcountController::class, 'budgets'])->middleware('permission:org.headcount_plans.view');
     Route::post('/headcount-budgets', [HeadcountController::class, 'storeBudget'])->middleware('permission:org.headcount_plans.create');
     Route::get('/headcount-budgets/{id}', [HeadcountController::class, 'showBudget'])->middleware('permission:org.headcount_plans.view');

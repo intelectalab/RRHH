@@ -137,4 +137,13 @@ return [
             'none' => 'Sin costo: no tiene ocupante, banda ni costo presupuestado.',
         ],
     ],
+    'scenarios' => [
+        'entity_required' => 'Indica una empresa de tu alcance para el escenario.',
+        'unit_other_entity' => 'La unidad pertenece a otra empresa que la del escenario.',
+        'change_not_allowed' => 'Ese cambio no aplica a esta línea: una posición real se mantiene, se congela o se quita; una plaza nueva se agrega o se quita.',
+        'reason_required' => 'Indica el motivo para devolver el escenario.',
+        'not_editable' => 'Solo se edita un escenario en borrador.',
+        'applied_reason' => 'Aplicación del escenario «:name».',
+        'plan_name' => 'Planificación de dotación :year',
+    ],
 ];

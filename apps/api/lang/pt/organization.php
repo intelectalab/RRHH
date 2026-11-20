@@ -137,4 +137,13 @@ return [
             'none' => 'Sem custo: não tem ocupante, faixa nem custo orçado.',
         ],
     ],
+    'scenarios' => [
+        'entity_required' => 'Indique uma empresa do seu escopo para o cenário.',
+        'unit_other_entity' => 'A unidade pertence a outra empresa diferente da do cenário.',
+        'change_not_allowed' => 'Essa mudança não se aplica a esta linha: uma posição real é mantida, congelada ou retirada; uma vaga nova é adicionada ou retirada.',
+        'reason_required' => 'Informe o motivo para devolver o cenário.',
+        'not_editable' => 'Só um cenário em rascunho pode ser editado.',
+        'applied_reason' => 'Aplicação do cenário «:name».',
+        'plan_name' => 'Planejamento de quadro :year',
+    ],
 ];

@@ -102,6 +102,8 @@ return [
             'support_max_session_minutes' => 'Maximum length of a support session in minutes (RN-SAS-08).',
             'backups_retention_days' => 'Days each backup is kept.',
             'backups_test_restore_every_days' => 'How often, in days, an isolated restore is tested.',
+            'dashboard_report_currency' => 'Currency in which the business dashboard consolidates revenue.',
+            'dashboard_exchange_rates' => 'Business dashboard exchange rates: units of the report currency per unit of each currency.',
         ],
     ],
     'notices' => [
@@ -111,5 +113,26 @@ return [
     ],
     'health' => [
         'retry_failed' => 'The job could not be retried.',
+    ],
+    'metrics' => [
+        'definitions' => [
+            'tenants_active' => 'Organizations in active status.',
+            'tenants_trial' => 'Organizations in their trial period.',
+            'tenants_suspended' => 'Organizations suspended, blocked or in grace period.',
+            'tenants_new' => 'Organizations created within the period.',
+            'users_active' => 'Active users across all organizations (excluding the console).',
+            'employees_managed' => 'Employees in the latest usage measurement of each organization.',
+            'storage_mb' => 'Storage in the latest measurement of each organization, in MB.',
+            'mrr' => 'Monthly recurring revenue: price of active or past-due subscriptions (annual divided by twelve), per currency.',
+            'arr' => 'Annual recurring revenue: monthly times twelve.',
+            'consolidated' => 'Revenue converted to the report currency with the exchange rates in the global settings; currencies without a rate are listed separately.',
+            'trials_started' => 'Subscriptions with a trial created within the period.',
+            'conversions' => 'Trials converted into a paid subscription within the period (console audit log).',
+            'conversion_rate_pct' => 'Conversions over trials started in the period, as a percentage.',
+            'cancellations' => 'Subscriptions cancelled within the period.',
+            'modules' => 'Modules active in the most organizations.',
+            'incidents_open' => 'Unresolved platform incidents.',
+            'incidents_in_period' => 'Incidents that started within the period.',
+        ],
     ],
 ];

@@ -7032,6 +7032,178 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/headcount-scenario-lines/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Cambiar una línea del escenario en borrador: change (baseline, freeze o remove en las posiciones reales; add o remove en las nuevas), planned_count, planned_start_on, projected_cost, notes */
+        patch: operations["patchHeadcountScenarioLinesId"];
+        trace?: never;
+    };
+    "/headcount-scenarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar HeadcountScenario */
+        get: operations["getHeadcountScenarios"];
+        put?: never;
+        /** Crear HeadcountScenario */
+        post: operations["postHeadcountScenarios"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Comparar escenarios lado a lado (ids=a,b,...): plazas, ocupadas, vacantes, congeladas, agregadas y quitadas por escenario y por unidad; el costo proyectado solo con org.positions.budget.view */
+        get: operations["getHeadcountScenariosCompare"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver HeadcountScenario */
+        get: operations["getHeadcountScenariosId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar HeadcountScenario */
+        patch: operations["patchHeadcountScenariosId"];
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aplicar el escenario aprobado (RN-POS-08): crea solicitudes de posición en borrador por lo agregado y congela o cierra las posiciones marcadas; lo que no se pudo aplicar queda en applied_summary con su motivo */
+        post: operations["postHeadcountScenariosIdApply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aprobar el escenario (no cambia posiciones reales) */
+        post: operations["postHeadcountScenariosIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archivar el escenario */
+        post: operations["postHeadcountScenariosIdArchive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/lines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Agregar plazas nuevas al escenario en borrador (org_unit_id, job_profile_id, site_id, planned_count, planned_start_on, title, projected_cost) */
+        post: operations["postHeadcountScenariosIdLines"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Devolver el escenario a borrador (reason) */
+        post: operations["postHeadcountScenariosIdReturn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/headcount-scenarios/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enviar el escenario a revisión */
+        post: operations["postHeadcountScenariosIdSubmit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/headcount/positions": {
         parameters: {
             query?: never;
@@ -11486,7 +11658,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Indicadores de la consola SaaS */
+        /** Indicadores de la consola SaaS (SAS-10), calculados desde suscripciones, consumo y auditoría, cada uno con su definición: organizaciones activas, nuevas y suspendidas, usuarios, colaboradores administrados, ingresos recurrentes mensuales y anuales por moneda y consolidados, cancelaciones, pruebas, conversiones, almacenamiento, módulos más usados e incidencias; filtros from, to y plan_id */
         get: operations["getPlatformMetrics"];
         put?: never;
         post?: never;
@@ -13900,6 +14072,144 @@ export interface paths {
          * @description Transición explícita; valida la máquina de estados y deja auditoría.
          */
         post: operations["postRecognitionsIdHide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar RemoteWorkAgreement */
+        get: operations["getRemoteWorkAgreements"];
+        put?: never;
+        /** Crear RemoteWorkAgreement */
+        post: operations["postRemoteWorkAgreements"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver RemoteWorkAgreement */
+        get: operations["getRemoteWorkAgreementsId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Actualizar RemoteWorkAgreement */
+        patch: operations["patchRemoteWorkAgreementsId"];
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aprobar la solicitud de teletrabajo (responded_on = hoy) */
+        post: operations["postRemoteWorkAgreementsIdApprove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el documento vigente del acuerdo de teletrabajo */
+        get: operations["getRemoteWorkAgreementsIdDocument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Terminar el acuerdo vigente (ends_on, reason) */
+        post: operations["postRemoteWorkAgreementsIdEnd"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/issue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Emitir el acuerdo: exige el contenido mínimo completo (RN-CON-10, 422 con missing_content), genera su documento y lo deja en firma */
+        post: operations["postRemoteWorkAgreementsIdIssue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/register-signature": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registrar el acuerdo firmado (multipart: file, signed_on, origin); queda vigente */
+        post: operations["postRemoteWorkAgreementsIdRegisterSignature"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/remote-work-agreements/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rechazar la solicitud de teletrabajo con su motivo (reason) */
+        post: operations["postRemoteWorkAgreementsIdReject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -20861,6 +21171,69 @@ export interface components {
             scenario?: "current" | "conservative" | "growth" | "custom";
             year?: number;
         };
+        /** @description Campos sensibles (requieren permiso por campo; se omiten si no se tiene): projected_cost */
+        HeadcountScenario: {
+            /** @description Identificador opaco */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            kind: "current" | "conservative" | "growth" | "custom";
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            legal_entity_name?: string | null;
+            /** Format: date */
+            base_as_of: string;
+            assumptions?: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            status: "draft" | "in_review" | "approved" | "applied" | "archived";
+            created_by_name?: string | null;
+            approved_by_name?: string | null;
+            /** Format: date-time */
+            approved_at?: string | null;
+            /** Format: date-time */
+            applied_at?: string | null;
+            applied_summary?: {
+                [key: string]: unknown;
+            } | null;
+            totals?: {
+                [key: string]: unknown;
+            } | null;
+            projected_cost?: components["schemas"]["Money"];
+            lines?: {
+                [key: string]: unknown;
+            }[] | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        HeadcountScenarioInput: {
+            name?: string;
+            /** @enum {string} */
+            kind?: "current" | "conservative" | "growth" | "custom";
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** Format: date */
+            base_as_of?: string;
+            assumptions?: {
+                [key: string]: unknown;
+            } | null;
+            created_by_name?: string | null;
+            approved_by_name?: string | null;
+            /** Format: date-time */
+            applied_at?: string | null;
+            applied_summary?: {
+                [key: string]: unknown;
+            } | null;
+            projected_cost?: components["schemas"]["Money"];
+            lines?: {
+                [key: string]: unknown;
+            }[] | null;
+        };
         HelpArticle: {
             /** @description Identificador opaco */
             id: string;
@@ -22514,6 +22887,88 @@ export interface components {
             valid_from?: string;
             /** Format: date */
             valid_to?: string | null;
+        };
+        RemoteWorkAgreement: {
+            /** @description Identificador opaco */
+            id: string;
+            /** @description Identificador opaco */
+            employment_id: string;
+            person_name?: string | null;
+            employee_code?: string | null;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @enum {string} */
+            modality: "total" | "partial";
+            /** Format: date */
+            starts_on: string;
+            /** Format: date */
+            ends_on?: string | null;
+            work_place?: string | null;
+            schedule_description?: string | null;
+            disconnection_hours?: number | null;
+            supervision_mechanism?: string | null;
+            /** @enum {string|null} */
+            equipment_provided_by?: "employer" | "worker" | "mixed" | null;
+            expense_compensation?: components["schemas"]["Money"];
+            /** @enum {string} */
+            requested_by: "employee" | "employer";
+            request_reason?: string | null;
+            /** Format: date */
+            requested_on?: string | null;
+            /** Format: date */
+            response_due_on?: string | null;
+            /** Format: date */
+            responded_on?: string | null;
+            due_soon?: boolean | null;
+            overdue?: boolean | null;
+            decision_reason?: string | null;
+            /** @enum {string} */
+            status: "requested" | "approved" | "rejected" | "pending_signature" | "active" | "ended";
+            missing_content?: string[] | null;
+            has_document?: boolean | null;
+            /** Format: date-time */
+            signed_at?: string | null;
+            /** @enum {string|null} */
+            signature_origin?: "physical_scan" | "electronic" | null;
+            end_reason?: string | null;
+            allowed_actions?: string[] | null;
+            version?: number | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        RemoteWorkAgreementInput: {
+            /** @description Identificador opaco */
+            employment_id?: string;
+            /** @description Identificador opaco */
+            legal_entity_id?: string | null;
+            /** @enum {string} */
+            modality?: "total" | "partial";
+            /** Format: date */
+            starts_on?: string;
+            /** Format: date */
+            ends_on?: string | null;
+            work_place?: string | null;
+            schedule_description?: string | null;
+            disconnection_hours?: number | null;
+            supervision_mechanism?: string | null;
+            /** @enum {string|null} */
+            equipment_provided_by?: "employer" | "worker" | "mixed" | null;
+            expense_compensation?: components["schemas"]["Money"];
+            /** @enum {string} */
+            requested_by?: "employee" | "employer";
+            request_reason?: string | null;
+            /** Format: date */
+            requested_on?: string | null;
+            /** Format: date */
+            response_due_on?: string | null;
+            /** Format: date */
+            responded_on?: string | null;
+            due_soon?: boolean | null;
+            overdue?: boolean | null;
+            missing_content?: string[] | null;
+            end_reason?: string | null;
         };
         Report: {
             /** @description Identificador opaco */
@@ -42173,6 +42628,427 @@ export interface operations {
             422: components["responses"]["Unprocessable"];
         };
     };
+    patchHeadcountScenarioLinesId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHeadcountScenarios: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HeadcountScenario"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenarios: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeadcountScenarioInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HeadcountScenario"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getHeadcountScenariosCompare: {
+        parameters: {
+            query: {
+                /** @description Identificadores de los escenarios separados por coma (de 2 a 4) */
+                ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getHeadcountScenariosId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HeadcountScenario"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchHeadcountScenariosId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeadcountScenarioInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["HeadcountScenario"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postHeadcountScenariosIdApply: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenariosIdApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenariosIdArchive: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenariosIdLines: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenariosIdReturn: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postHeadcountScenariosIdSubmit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
     getHeadcountPositions: {
         parameters: {
             query: {
@@ -52841,7 +53717,14 @@ export interface operations {
     };
     getPlatformMetrics: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Inicio del periodo (AAAA-MM-DD); por defecto, hace 30 días */
+                from?: string;
+                /** @description Fin del periodo (AAAA-MM-DD); por defecto, hoy */
+                to?: string;
+                /** @description Solo las organizaciones suscritas a ese plan */
+                plan_id?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -52857,6 +53740,7 @@ export interface operations {
                     "application/json": components["schemas"]["GenericEnvelope"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
@@ -58471,6 +59355,366 @@ export interface operations {
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
+        };
+    };
+    getRemoteWorkAgreements: {
+        parameters: {
+            query?: {
+                page?: components["parameters"]["Page"];
+                per_page?: components["parameters"]["PerPage"];
+                /** @description Cursor opaco; sustituye a page en colecciones de solo inserción. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Campos separados por coma; prefijo - para descendente. */
+                sort?: components["parameters"]["Sort"];
+                /** @description filter[campo]=valor, filter[campo][gte]=valor. Operadores: eq, ne, in, gte, lte, like, null. */
+                filter?: components["parameters"]["Filter"];
+                /** @description Búsqueda de texto sobre los campos indexados del recurso. */
+                q?: components["parameters"]["Q"];
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RemoteWorkAgreement"][];
+                        meta: components["schemas"]["PageMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postRemoteWorkAgreements: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteWorkAgreementInput"];
+            };
+        };
+        responses: {
+            /** @description Creado */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RemoteWorkAgreement"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getRemoteWorkAgreementsId: {
+        parameters: {
+            query?: {
+                /** @description Fecha de vigencia con la que se resuelven los datos (por defecto hoy en la zona horaria de la empresa). */
+                as_of?: components["parameters"]["AsOf"];
+                /** @description Lista de campos a devolver. */
+                fields?: components["parameters"]["Fields"];
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RemoteWorkAgreement"];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    patchRemoteWorkAgreementsId: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Versión del registro (ETag) para control de concurrencia. */
+                "If-Match"?: components["parameters"]["IfMatch"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoteWorkAgreementInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RemoteWorkAgreement"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
+    postRemoteWorkAgreementsIdApprove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getRemoteWorkAgreementsIdDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archivo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                    "image/png": string;
+                    "image/jpeg": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    postRemoteWorkAgreementsIdEnd: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postRemoteWorkAgreementsIdIssue: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postRemoteWorkAgreementsIdRegisterSignature: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                    /** Format: date */
+                    signed_on: string;
+                    /** @enum {string} */
+                    origin?: "physical_scan" | "electronic";
+                };
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    postRemoteWorkAgreementsIdReject: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Clave única por intento lógico; repetirla devuelve la respuesta original. */
+                "Idempotency-Key"?: components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenericInput"];
+            };
+        };
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["Unprocessable"];
+            429: components["responses"]["TooManyRequests"];
         };
     };
     getReports: {

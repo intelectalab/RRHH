@@ -4,6 +4,7 @@ namespace App\Modules\Contracts\Application;
 
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
+use App\Modules\Contracts\Infrastructure\Models\RemoteWorkAgreement;
 use App\Shared\Documents\DocumentArchive;
 use App\Shared\Documents\SimplePdf;
 use App\Shared\Documents\TemplateRenderer;
@@ -53,6 +54,15 @@ final class ContractDocuments
         $pdf = SimplePdf::render($title, $body, $vars['employer'].' · '.$vars['number']);
 
         return $this->store($addendum->document_id, $contract->employment_id, 'contract_addendum', $addendum->id, $title, $pdf, 'adenda-'.$vars['number'].'.pdf', $userId, 'generated');
+    }
+
+    /** CON-6 · Documento del acuerdo de teletrabajo (versión nueva si ya se había emitido). */
+    public function generateRemoteWork(RemoteWorkAgreement $agreement, string $title, string $body, string $footer, ?string $userId): string
+    {
+        $pdf = SimplePdf::render($title, $body, $footer);
+
+        return $this->store($agreement->document_id, $agreement->employment_id, 'remote_work_agreement', $agreement->id, $title, $pdf,
+            (string) trans('contracts.remote_work.document_name').'.pdf', $userId, 'generated');
     }
 
     /** Archiva el ejemplar firmado como versión nueva (o como documento nuevo si no se había generado). */
