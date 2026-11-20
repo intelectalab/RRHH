@@ -226,6 +226,8 @@ test('SAS-9 · el monitoreo muestra componentes, errores por organización y rei
         'aggregate_id' => (string) Str::uuid(), 'payload' => '{}', 'status' => 'dead', 'attempts' => 5, 'last_error' => "Timeout\nstack",
     ]));
     $jobUuid = (string) Str::uuid();
+    // En CI la base nace de schema.sql, sin las tablas de infraestructura de Laravel: se crean como en producción.
+    (require database_path('migrations/2026_11_02_000001_create_laravel_infrastructure_tables.php'))->up();
     DB::table('failed_jobs')->insert(['uuid' => $jobUuid, 'connection' => 'redis', 'queue' => 'default',
         'payload' => json_encode(['displayName' => 'App\\Jobs\\Demo', 'tenant_id' => SX_TENANT]), 'exception' => "RuntimeException: caída\n#0 trace"]);
 

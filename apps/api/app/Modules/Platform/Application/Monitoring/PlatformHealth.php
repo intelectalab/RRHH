@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 /**
@@ -113,7 +114,8 @@ final class PlatformHealth
 
     public function retryFailedJob(string $id, PlatformUser $actor): void
     {
-        $job = DB::table('failed_jobs')->where('uuid', $id)->first(['uuid', 'queue', 'payload']);
+        // La tabla de trabajos fallidos la crea la migración de infraestructura de Laravel; sin ella no hay nada que reintentar.
+        $job = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->where('uuid', $id)->first(['uuid', 'queue', 'payload']) : null;
         if ($job === null) {
             throw new AyniException('not_found', 404);
         }
@@ -224,6 +226,9 @@ final class PlatformHealth
      */
     private function failedJobRows(?string $tenantId): array
     {
+        if (! Schema::hasTable('failed_jobs')) {
+            return [];
+        }
         $rows = DB::table('failed_jobs')->orderByDesc('failed_at')->limit(1000)->get(['uuid', 'queue', 'payload', 'exception', 'failed_at']);
         $out = [];
         foreach ($rows as $r) {
