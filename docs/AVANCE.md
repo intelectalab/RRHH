@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 190 | 0 | 78,8 % |
-| Backlog completo | 512 | 194 | 0 | 37,9 % |
+| Primer corte comercial (MVP) | 241 | 195 | 0 | 80,9 % |
+| Backlog completo | 512 | 199 | 0 | 38,9 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -226,11 +226,11 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | NOM-3 | Intérprete de fórmulas seguro | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Lenguaje de fórmulas propio sin eval (ADR 0015) con validación de sintaxis, datos y ciclos indicando la posición del error. |
 | NOM-4 | Orden de cálculo y dependencias entre conceptos | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Orden de cálculo determinista por dependencias, consultable; un ciclo responde 422 con los conceptos involucrados. |
 | NOM-5 | Contexto de cálculo por relación laboral | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Contexto por relación y periodo desde MasterData, resumen de ausencias e incidencias; tramos prorrateados por cambio de sueldo o régimen; banco de pruebas sin guardar. |
-| NOM-6 | Trazabilidad del cálculo | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-7 | Recálculo retroactivo | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-8 | Cálculo masivo en segundo plano | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-9 | Estrategia por régimen laboral | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-10 | Micro y pequeña empresa: acreditación, ventas y permanencia | NOM | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| NOM-6 | Trazabilidad del cálculo | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Explicación de cada línea en lenguaje claro (versión, fórmula, datos, parámetros con vigencia, redondeo, tramos); lectura registrada; Nómina → Cálculos. |
+| NOM-7 | Recálculo retroactivo | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Recálculo retroactivo en sombra de periodos cerrados; la diferencia entra como incidencia retroactiva en el periodo abierto sin modificar el cerrado. |
+| NOM-8 | Cálculo masivo en segundo plano | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Corridas en segundo plano por relación con avance, reanudación idempotente y descarte; una relación con error no detiene a las demás. |
+| NOM-9 | Estrategia por régimen laboral | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Estrategia por régimen desde el paquete de país, cálculo por tramos ante cambio de régimen y procesos no aplicables excluidos con motivo. |
+| NOM-10 | Micro y pequeña empresa: acreditación, ventas y permanencia | NOM | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Ventas y dotación por ejercicio, estado MYPE con alerta y permanencia, cambio masivo de régimen con fecha efectiva; Nómina → Micro y pequeña empresa. |
 | NOM-11 | Construcción civil: obras, categorías y planilla semanal | NOM | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | NOM-12 | Régimen agrario | NOM | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | CPT-1 | Catálogo de conceptos | CPT | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Catálogo de conceptos con borrador, revisión, publicación con vigencia, baja, duplicado e historial de versiones; Nómina → Conceptos. |
