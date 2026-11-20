@@ -8,6 +8,7 @@ use App\Modules\Absences\Infrastructure\Models\AbsenceType;
 use App\Modules\Certificates\Infrastructure\Models\CertificateRequest;
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
+use App\Modules\Contracts\Infrastructure\Models\ContractRenewalBatch;
 use App\Modules\CoreHR\Infrastructure\Models\BankAccount;
 use App\Modules\CoreHR\Infrastructure\Models\Compensation;
 use App\Modules\CoreHR\Infrastructure\Models\CompensationChange;
@@ -24,6 +25,7 @@ use App\Modules\Documents\Infrastructure\Models\Document;
 use App\Modules\Documents\Infrastructure\Models\DocumentCategory;
 use App\Modules\Documents\Infrastructure\Models\DocumentRequest;
 use App\Modules\Documents\Infrastructure\Models\DocumentTemplate;
+use App\Modules\Documents\Infrastructure\Models\SignatureRequest;
 use App\Modules\HelpCenter\Infrastructure\Models\HelpOrgArticle;
 use App\Modules\Helpdesk\Infrastructure\Models\Ticket;
 use App\Modules\Helpdesk\Infrastructure\Models\TicketCategory;
@@ -211,6 +213,16 @@ final class CrossTenantHarness
         '/employments/{employment_id}/documents' => Document::class,
         '/employments/{employment_id}/linked-documents/{ref}/file' => Document::class,
         // DOC-3 · DOC-4 · DOC-5: entregar y cancelar una solicitud de A; vista previa y generación con una plantilla de A.
+        // DOC-6 · CON-5: el firmante (portal) y los lotes de renovación de A.
+        '/me/signature-requests/{id}' => SignatureRequest::class,
+        '/me/signature-requests/{id}/code' => SignatureRequest::class,
+        '/me/signature-requests/{id}/decline' => SignatureRequest::class,
+        '/me/signature-requests/{id}/document' => SignatureRequest::class,
+        '/me/signature-requests/{id}/sign' => SignatureRequest::class,
+        '/me/signature-requests/{id}/view' => SignatureRequest::class,
+        '/contract-renewal-batches/{id}' => ContractRenewalBatch::class,
+        '/contract-renewal-batches/{id}/cancel' => ContractRenewalBatch::class,
+        '/contract-renewal-batches/{id}/send' => ContractRenewalBatch::class,
         '/document-requests/{id}/submit' => DocumentRequest::class,
         '/document-requests/{id}/cancel' => DocumentRequest::class,
         '/document-templates/{id}/preview' => DocumentTemplate::class,

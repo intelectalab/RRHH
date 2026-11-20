@@ -25,6 +25,7 @@ use App\Shared\Security\SupportContext;
 use App\Shared\SelfService\HomeCardRegistry;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Setup\SetupStepRegistry;
+use App\Shared\Signatures\SignatureSubjectRegistry;
 use App\Shared\Team\TeamDateRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
 use App\Shared\Tenancy\Queue\TenantQueueContext;
@@ -59,6 +60,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(DataScope::class);
         $this->app->singleton(SearchRegistry::class);
         $this->app->singleton(InboxRegistry::class);
+        // DOC-6 · Dueños de documentos que se firman con el flujo común.
+        $this->app->singleton(SignatureSubjectRegistry::class);
         // ESS-1 · Tarjetas del inicio del colaborador que registra cada módulo.
         $this->app->singleton(HomeCardRegistry::class);
         $this->app->singleton(ExportRegistry::class);

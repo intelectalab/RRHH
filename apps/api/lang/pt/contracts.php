@@ -6,6 +6,7 @@ return [
         'system_read_only' => 'Os tipos de contrato do pacote do país não podem ser alterados: crie um tipo próprio.',
     ],
     'contracts' => [
+        'not_pending_signature' => 'Só se envia para assinatura o que está «Em assinatura»: emita primeiro.',
         'type_invalid' => 'Escolha um tipo de contrato válido.',
         'end_required' => 'Este tipo de contrato exige data de término (RN-CON-01).',
         'end_before_start' => 'A data de término não pode ser anterior ao início.',
@@ -84,5 +85,12 @@ return [
         'body' => "Entre :employer (o empregador) e :employee (o trabalhador) acorda-se a prestação de serviços na modalidade de teletrabalho.\n\nModalidade: :modality.\nVigência: a partir de :starts_on:ends_on.\nLocal habitual de trabalho: :work_place.\nJornada: :schedule.\nDesconexão digital: pelo menos :disconnection horas contínuas em cada período de vinte e quatro horas.\nMecanismo de supervisão: :supervision.\nEquipamentos: :equipment.\nCompensação de despesas: :compensation.",
         'ends_on_text' => ' até :date',
         'due_soon_title' => 'Solicitação de teletrabalho a vencer',
+    ],
+    'renewal_batches' => [
+        'unknown_contract' => 'Um contrato não existe ou está fora do seu alcance.',
+        'default_name' => 'Renovações até :date',
+        'not_renewable' => 'Não se renova: o contrato não está vigente ou não tem data de término.',
+        'end_before_start' => 'A nova data de término é anterior ao início da renovação.',
+        'exceeds' => 'Excluído: ultrapassa o limite acumulado. :explanation',
     ],
 ];

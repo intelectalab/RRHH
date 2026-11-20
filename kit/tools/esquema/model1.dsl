@@ -510,7 +510,7 @@
   signature_origin enum(physical_scan,electronic) ; cancellation_reason
 @contract_renewal_batches lock | Lote de renovación masiva de contratos con firma (E-08).
   name ; legal_entity_id ?-> legal_entities ; status enum(draft,in_review,approved,sent_to_signature,completed,cancelled)=draft
-  new_end_date date ; created_by_user_id -> users
+  new_end_date date ; created_by_user_id -> users ; sent_at ; completed_at
 @contract_renewal_batch_items | Decisión por contrato dentro de un lote de renovación, con el control de tope acumulado.
   contract_renewal_batch_id -> contract_renewal_batches ; contract_id -> contracts
   decision enum(renew,not_renew,convert_indefinite,pending)=pending ; new_valid_to date ; new_contract_id ?-> contracts
@@ -568,15 +568,16 @@
   signature_level enum(simple,advanced,digital_certificate)=simple ; provider enum(internal,external)=internal
   integration_id ?-> integrations ; provider_envelope_id
   status enum(draft,sent,in_progress,completed,declined,expired,cancelled,viewed)=draft ; sent_at ; completed_at ; expires_at
-  requested_by_user_id ?-> users ; final_file_id ?-> stored_files ; final_hash
+  requested_by_user_id ?-> users ; final_file_id ?-> stored_files ; final_hash ; cancellation_reason
 @signature_request_signers lock | Firmantes de una solicitud y su estado.
   signature_request_id -> signature_requests ; user_id ?-> users ; person_id ?-> people ; signer_name text! ; signer_role
   sort_order integer=1 ; status enum(pending,sent,viewed,signed,declined)=pending ; viewed_at ; signed_at ; declined_reason
+  last_reminded_at ts
 @signature_events imm | Evidencia inalterable de firma (C-12): huella del documento, sello de tiempo, IP, verificación por OTP y evidencia del proveedor.
   signature_request_id -> signature_requests ; signer_id ?-> signature_request_signers
   event enum(created,sent,viewed,otp_sent,otp_verified,signed,declined,completed,expired,cancelled)! ; document_hash text!
   hash_algorithm text=SHA-256 ; ip inet ; user_agent ; otp_channel enum(email,sms,whatsapp) ; otp_reference_hash
-  timestamp_token ; provider_evidence j ; occurred_at ts=now
+  timestamp_token ; provider_evidence j ; occurred_at ts=now ; previous_hash ; event_hash
 
 #E ESS | Portal del colaborador
 @profile_change_requests lock | Cambio de datos personales pedido por el colaborador, pendiente de validación de RRHH.

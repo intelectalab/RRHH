@@ -8,6 +8,8 @@ export const PORTAL_NAV: ReadonlyArray<{ href: string; key: string; icon: 'home'
   { href: '/tiempo/ausencias', key: 'portal.nav_absences', icon: 'file', exact: false, permission: 'time.absences.view', module: 'time_off' },
   // ESS-3 · ESS-4 · ESS-5: documentos y trámites (constancias y solicitudes a RRHH).
   { href: '/mi/documentos', key: 'portal.nav_documents', icon: 'file', exact: true, permission: 'documents.documents.view', module: 'core' },
+  // DOC-6: firmar desde el teléfono.
+  { href: '/mi/firmas', key: 'portal.nav_signatures', icon: 'checkSquare', exact: true, permission: 'documents.signature_requests.sign', module: 'core' },
   { href: '/mi/solicitudes', key: 'portal.nav_requests', icon: 'checkSquare', exact: false, permission: ['people.certificates.request', 'helpdesk.tickets.create'], module: 'core' },
   { href: '/mi/perfil', key: 'portal.nav_profile', icon: 'user', exact: true, permission: 'people.employments.view', module: 'core' },
   { href: '/pendientes', key: 'portal.nav_pending', icon: 'inbox', exact: false, permission: null, module: 'base' },

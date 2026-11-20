@@ -130,6 +130,18 @@ return [
             'in_app' => ['subject' => 'Tu documento {document} fue observado', 'body' => 'Recursos Humanos observó {document} ({type}): {reason} Sube una versión corregida.'],
             'email' => ['subject' => 'Tu documento {document} fue observado', 'body' => "Hola {name}:\n\nEn {organization}, Recursos Humanos observó {document} ({type}): {reason}\n\nSube una versión corregida: {link}"],
         ],
+        'signatures.requested' => [
+            'in_app' => ['subject' => 'Documento por firmar: {document}', 'body' => 'Tienes un documento por firmar: {document}.'],
+            'email' => ['subject' => 'Documento por firmar: {document}', 'body' => "Hola {name}:\n\nEn {organization} tienes un documento por firmar: {document}.\n\nRevísalo y fírmalo aquí: {link}"],
+        ],
+        'signatures.completed' => [
+            'in_app' => ['subject' => 'Firma completada: {document}', 'body' => 'Todos firmaron {document}. La constancia de firma quedó en el legajo.'],
+            'email' => ['subject' => 'Firma completada: {document}', 'body' => "Hola {name}:\n\nEn {organization}, todos firmaron {document}. La constancia de firma quedó en el legajo.\n\nVer: {link}"],
+        ],
+        'signatures.declined' => [
+            'in_app' => ['subject' => 'Firma rechazada: {document}', 'body' => '{signer} rechazó firmar {document}: {reason}'],
+            'email' => ['subject' => 'Firma rechazada: {document}', 'body' => "Hola {name}:\n\nEn {organization}, {signer} rechazó firmar {document}.\nMotivo: {reason}\n\nVer: {link}"],
+        ],
         'certificates.requested' => [
             'in_app' => ['subject' => 'Constancia por emitir: {certificate}', 'body' => '{employee} pidió una {certificate}. Revísala y emítela o recházala.'],
             'email' => ['subject' => 'Constancia por emitir: {certificate}', 'body' => "Hola {name}:\n\nEn {organization}, {employee} pidió una {certificate} desde su portal.\n\nEmítela o recházala aquí: {link}"],

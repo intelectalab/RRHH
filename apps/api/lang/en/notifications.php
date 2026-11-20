@@ -130,6 +130,18 @@ return [
             'in_app' => ['subject' => 'Your document {document} needs changes', 'body' => 'Human Resources returned {document} ({type}): {reason} Upload a corrected version.'],
             'email' => ['subject' => 'Your document {document} needs changes', 'body' => "Hello {name}:\n\nIn {organization}, Human Resources returned {document} ({type}): {reason}\n\nUpload a corrected version: {link}"],
         ],
+        'signatures.requested' => [
+            'in_app' => ['subject' => 'Document to sign: {document}', 'body' => 'You have a document to sign: {document}.'],
+            'email' => ['subject' => 'Document to sign: {document}', 'body' => "Hello {name}:\n\nAt {organization} you have a document to sign: {document}.\n\nReview and sign it here: {link}"],
+        ],
+        'signatures.completed' => [
+            'in_app' => ['subject' => 'Signing completed: {document}', 'body' => 'Everyone signed {document}. The signature certificate is in the file.'],
+            'email' => ['subject' => 'Signing completed: {document}', 'body' => "Hello {name}:\n\nAt {organization}, everyone signed {document}. The signature certificate is in the file.\n\nView: {link}"],
+        ],
+        'signatures.declined' => [
+            'in_app' => ['subject' => 'Signature declined: {document}', 'body' => '{signer} declined to sign {document}: {reason}'],
+            'email' => ['subject' => 'Signature declined: {document}', 'body' => "Hello {name}:\n\nAt {organization}, {signer} declined to sign {document}.\nReason: {reason}\n\nView: {link}"],
+        ],
         'certificates.requested' => [
             'in_app' => ['subject' => 'Certificate to issue: {certificate}', 'body' => '{employee} requested a {certificate}. Review it and issue or reject it.'],
             'email' => ['subject' => 'Certificate to issue: {certificate}', 'body' => "Hi {name}:\n\nAt {organization}, {employee} requested a {certificate} from their portal.\n\nIssue or reject it here: {link}"],

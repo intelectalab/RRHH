@@ -130,6 +130,18 @@ return [
             'in_app' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => 'Recursos Humanos devolveu {document} ({type}): {reason} Envie uma versão corrigida.'],
             'email' => ['subject' => 'Seu documento {document} foi devolvido', 'body' => "Olá {name}:\n\nEm {organization}, Recursos Humanos devolveu {document} ({type}): {reason}\n\nEnvie uma versão corrigida: {link}"],
         ],
+        'signatures.requested' => [
+            'in_app' => ['subject' => 'Documento para assinar: {document}', 'body' => 'Você tem um documento para assinar: {document}.'],
+            'email' => ['subject' => 'Documento para assinar: {document}', 'body' => "Olá {name}:\n\nEm {organization} você tem um documento para assinar: {document}.\n\nRevise e assine aqui: {link}"],
+        ],
+        'signatures.completed' => [
+            'in_app' => ['subject' => 'Assinatura concluída: {document}', 'body' => 'Todos assinaram {document}. O comprovante de assinatura ficou no dossiê.'],
+            'email' => ['subject' => 'Assinatura concluída: {document}', 'body' => "Olá {name}:\n\nEm {organization}, todos assinaram {document}. O comprovante de assinatura ficou no dossiê.\n\nVer: {link}"],
+        ],
+        'signatures.declined' => [
+            'in_app' => ['subject' => 'Assinatura recusada: {document}', 'body' => '{signer} recusou assinar {document}: {reason}'],
+            'email' => ['subject' => 'Assinatura recusada: {document}', 'body' => "Olá {name}:\n\nEm {organization}, {signer} recusou assinar {document}.\nMotivo: {reason}\n\nVer: {link}"],
+        ],
         'certificates.requested' => [
             'in_app' => ['subject' => 'Declaração para emitir: {certificate}', 'body' => '{employee} pediu uma {certificate}. Revise e emita ou recuse.'],
             'email' => ['subject' => 'Declaração para emitir: {certificate}', 'body' => "Olá {name}:\n\nEm {organization}, {employee} pediu uma {certificate} pelo portal.\n\nEmita ou recuse aqui: {link}"],

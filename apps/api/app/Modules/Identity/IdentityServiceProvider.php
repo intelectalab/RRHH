@@ -8,6 +8,7 @@ use App\Modules\Identity\Infrastructure\Exports\UsersExportSource;
 use App\Modules\Identity\Infrastructure\Provisioning\InviteFirstAdmin;
 use App\Modules\Identity\Infrastructure\Search\RoleSearchSource;
 use App\Modules\Identity\Infrastructure\Search\UserSearchSource;
+use App\Modules\Identity\Infrastructure\Security\MessageStepUpCodes;
 use App\Modules\Identity\Infrastructure\Setup\RolesPackComponent;
 use App\Modules\Identity\Infrastructure\Subscribers\SendInvitation;
 use App\Modules\Identity\Infrastructure\Subscribers\SendMessageCode;
@@ -17,6 +18,7 @@ use App\Modules\Identity\Infrastructure\Usage\AdminsUsageSource;
 use App\Shared\Exports\ExportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Search\SearchRegistry;
+use App\Shared\Security\StepUpCodes;
 use App\Shared\Security\SupportContext;
 use App\Shared\Setup\CountryPackRegistry;
 use App\Shared\Tenancy\Provisioning\ProvisioningRegistry;
@@ -34,6 +36,8 @@ final class IdentityServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(SessionManager::class);
+        // DOC-7 · Código de un solo uso para firmar documentos.
+        $this->app->bind(StepUpCodes::class, MessageStepUpCodes::class);
     }
 
     public function boot(): void

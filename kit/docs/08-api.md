@@ -686,6 +686,11 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/contract-addenda/{id}/register-signature` | `contracts.addenda.issue` | 1 |
 | POST | `/contract-addenda/{id}/cancel` | `contracts.addenda.cancel` | 1 |
 | GET | `/contract-addenda/{id}/document` | `contracts.addenda.view` | 1 |
+| GET | `/contract-renewal-batches` | `contracts.contracts.view` | 1 |
+| POST | `/contract-renewal-batches` | `contracts.contracts.bulk_renew` | 1 |
+| GET | `/contract-renewal-batches/{id}` | `contracts.contracts.view` | 1 |
+| POST | `/contract-renewal-batches/{id}/send` | `contracts.contracts.bulk_renew` | 1 |
+| POST | `/contract-renewal-batches/{id}/cancel` | `contracts.contracts.bulk_renew` | 1 |
 | POST | `/remote-work-agreements/{id}/approve` | `contracts.remote_work.decide` | 1 |
 | POST | `/remote-work-agreements/{id}/reject` | `contracts.remote_work.decide` | 1 |
 | POST | `/remote-work-agreements/{id}/issue` | `contracts.remote_work.issue` | 1 |
@@ -709,7 +714,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/document-requests/{id}` | `documents.documents.view` | 1 |
 | GET, POST | `/signature-requests` | `documents.signature_requests.{view,create}` | 1 |
 | GET | `/signature-requests/{id}` | `documents.signature_requests.view` | 1 |
-| POST | `/signature-requests/{id}/{send,sign,decline,cancel,remind}` | `documents.signature_requests.{send,sign,decline,cancel,remind}` | 1 |
+| POST | `/signature-requests/{id}/{send,cancel,remind}` | `documents.signature_requests.{send,cancel,remind}` | 1 |
 | GET | `/document-categories` | `documents.documents.view` | 1 |
 | POST | `/document-categories` | `documents.document_types.update` | 1 |
 | PATCH | `/document-categories/{id}` | `documents.document_types.update` | 1 |
@@ -732,6 +737,16 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/document-templates/variables` | `documents.templates.view` | 1 |
 | POST | `/document-templates/{id}/preview` | `documents.templates.generate` | 1 |
 | POST | `/document-templates/{id}/generate` | `documents.templates.generate` | 1 |
+| GET | `/signature-requests/{id}/evidence` | `documents.signature_requests.evidence` | 1 |
+| GET | `/signature-requests/{id}/document` | `documents.signature_requests.view` | 1 |
+| GET | `/signature-requests/{id}/certificate` | `documents.signature_requests.view` | 1 |
+| GET | `/me/signature-requests` | `documents.signature_requests.sign` | 1 |
+| GET | `/me/signature-requests/{id}` | `documents.signature_requests.sign` | 1 |
+| GET | `/me/signature-requests/{id}/document` | `documents.signature_requests.sign` | 1 |
+| POST | `/me/signature-requests/{id}/view` | `documents.signature_requests.sign` | 1 |
+| POST | `/me/signature-requests/{id}/code` | `documents.signature_requests.sign` | 1 |
+| POST | `/me/signature-requests/{id}/sign` | `documents.signature_requests.sign` | 1 |
+| POST | `/me/signature-requests/{id}/decline` | `documents.signature_requests.decline` | 1 |
 
 **ESS · Portal del colaborador**
 

@@ -9,12 +9,14 @@ use App\Modules\Contracts\Infrastructure\Calendar\ContractCalendarSource;
 use App\Modules\Contracts\Infrastructure\Home\ContractDatesCard;
 use App\Modules\Contracts\Infrastructure\Labor\RemoteWorkAgreementsQuery;
 use App\Modules\Contracts\Infrastructure\Setup\ContractTypesPackComponent;
+use App\Modules\Contracts\Infrastructure\Signature\ContractSignatureSubjects;
 use App\Modules\Contracts\Infrastructure\Team\ContractTeamDates;
 use App\Shared\Calendar\CalendarRegistry;
 use App\Shared\Home\HomeRegistry;
 use App\Shared\Labor\ContractTypeSource;
 use App\Shared\Labor\RemoteWorkAgreements;
 use App\Shared\Setup\CountryPackRegistry;
+use App\Shared\Signatures\SignatureSubjectRegistry;
 use App\Shared\Team\TeamDateRegistry;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +39,11 @@ final class ContractsServiceProvider extends ServiceProvider
         // IMP-4 · Parte del paquete de país que siembra este módulo.
         $this->app->make(CountryPackRegistry::class)->register($this->app->make(ContractTypesPackComponent::class));
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+        // DOC-6 · Contrato, adenda y teletrabajo se firman con el flujo común de firma.
+        $signatures = $this->app->make(SignatureSubjectRegistry::class);
+        $signatures->register(ContractSignatureSubjects::contract());
+        $signatures->register(ContractSignatureSubjects::addendum());
+        $signatures->register(ContractSignatureSubjects::remoteWork());
         // CON-4 · Vencimientos de contratos en el calendario central.
         $this->app->make(CalendarRegistry::class)->register($this->app->make(ContractCalendarSource::class));
         $this->app->make(HomeRegistry::class)->register(ContractDatesCard::expiring());
