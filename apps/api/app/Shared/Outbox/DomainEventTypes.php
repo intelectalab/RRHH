@@ -112,6 +112,15 @@ final class DomainEventTypes
     // Planilla / Nómina
     public const PAYROLL_CALCULATED = 'payroll.calculated.v1';
 
+    // PER-1 · Periodo abierto, enviado, devuelto y reabierto.
+    public const PAYROLL_PERIOD_OPENED = 'payroll.period_opened.v1';
+
+    public const PAYROLL_SUBMITTED = 'payroll.submitted.v1';
+
+    public const PAYROLL_RETURNED = 'payroll.returned.v1';
+
+    public const PAYROLL_REOPENED = 'payroll.reopened.v1';
+
     public const PAYROLL_APPROVED = 'payroll.approved.v1';
 
     public const PAYROLL_CLOSED = 'payroll.closed.v1';
@@ -485,6 +494,26 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['payroll_run_id', 'total_net', 'currency'],
             'description' => 'Cálculo de periodo de planilla completado',
+        ],
+        self::PAYROLL_PERIOD_OPENED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'payroll_group_id'],
+            'description' => 'Periodo de planilla abierto',
+        ],
+        self::PAYROLL_SUBMITTED => [
+            'version' => 1,
+            'required_fields' => ['period_id'],
+            'description' => 'Periodo de planilla enviado a aprobación',
+        ],
+        self::PAYROLL_RETURNED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'reason'],
+            'description' => 'Periodo de planilla devuelto al cálculo con observaciones',
+        ],
+        self::PAYROLL_REOPENED => [
+            'version' => 1,
+            'required_fields' => ['period_id', 'reason'],
+            'description' => 'Periodo de planilla cerrado reabierto (sin declaración presentada ni pago)',
         ],
         self::PAYROLL_APPROVED => [
             'version' => 1,

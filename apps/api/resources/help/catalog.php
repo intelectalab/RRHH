@@ -58,6 +58,7 @@ return [
     'pantalla-ausencias' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.absences']],
     'pantalla-programacion-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_planning']],
     'pantalla-acuerdos-vacaciones' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.vacation_agreements']],
+    'pantalla-planilla-periodos' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.periods']],
     'pantalla-resumen-periodo' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.period_summary']],
     'pantalla-subsidios' => ['kind' => 'screen', 'module' => 'time_off', 'roles' => [], 'screens' => ['time.subsidies']],
     'pantalla-portal' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['portal.home']],

@@ -1009,6 +1009,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 
 | Método | Ruta | Permiso | Fase |
 |---|---|---|---|
+| GET | `/payroll-groups` | `payroll.periods.view` | 3 |
+| GET | `/payroll-groups/{id}` | `payroll.periods.view` | 3 |
 | GET, POST | `/payroll-periods` | `payroll.periods.{view,create}` | 3 |
 | GET | `/payroll-periods/{id}` | `payroll.periods.view` | 3 |
 | POST | `/payroll-periods/{id}/{calculate,simulate,submit,approve,reject,close,reopen,mark-paid}` | `payroll.periods.{calculate,simulate,submit,approve,reject,close,reopen,mark_paid}` | 3 |
@@ -1016,6 +1018,18 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH, DELETE | `/payroll-incidents/{id}` | `payroll.incidents.{view,update,delete}` | 3 |
 | GET | `/payroll-results` | `payroll.results.view` | 3 |
 | GET | `/payroll-results/{id}` | `payroll.results.view` | 3 |
+| POST | `/payroll-groups` | `payroll.payroll_groups.update` | 3 |
+| PATCH | `/payroll-groups/{id}` | `payroll.payroll_groups.update` | 3 |
+| POST | `/payroll-groups/{id}/members` | `payroll.payroll_groups.update` | 3 |
+| GET | `/payroll-periods/{id}/population` | `payroll.periods.view` | 3 |
+| POST | `/payroll-periods/{id}/close-incidents` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-periods/{id}/reopen-incidents` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-periods/{id}/reopen-calculation` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-incidents/{id}/approve` | `payroll.incidents.approve` | 3 |
+| POST | `/payroll-incidents/{id}/reject` | `payroll.incidents.approve` | 3 |
+| POST | `/payroll-periods/{id}/incidents/bulk` | `payroll.incidents.create` | 3 |
+| POST | `/payroll-periods/{id}/consume-time` | `payroll.incidents.create` | 3 |
+| GET | `/payroll-periods/{id}/time-summary` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/variance` | `payroll.periods.view` | 3 |
 
 **BOL · Boletas**

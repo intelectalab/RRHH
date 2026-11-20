@@ -6481,6 +6481,15 @@ CREATE TABLE payroll_periods (
   status text NOT NULL DEFAULT 'open' CHECK (status IN ('open','incidents_closed','calculated','in_review','approved','closed','paid','accounted')),
   closed_at timestamptz,
   closed_by_user_id uuid,
+  opened_by_user_id uuid,
+  submitted_by_user_id uuid,
+  submitted_at timestamptz,
+  approved_by_user_id uuid,
+  approved_at timestamptz,
+  return_reason text,
+  reopen_reason text,
+  time_consumed_at timestamptz,
+  time_consumed_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -6488,10 +6497,18 @@ CREATE TABLE payroll_periods (
   CONSTRAINT uq_payroll_periods_payroll_group_id_kind_period_year_p_426abc7e UNIQUE (tenant_id, payroll_group_id, kind, period_year, period_number),
   CONSTRAINT ck_payroll_periods_1 CHECK (statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$'),
   CONSTRAINT fk_payroll_periods_payroll_group_id FOREIGN KEY (tenant_id, payroll_group_id) REFERENCES payroll_groups (tenant_id, id),
-  CONSTRAINT fk_payroll_periods_closed_by_user_id FOREIGN KEY (tenant_id, closed_by_user_id) REFERENCES users (tenant_id, id)
+  CONSTRAINT fk_payroll_periods_closed_by_user_id FOREIGN KEY (tenant_id, closed_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_opened_by_user_id FOREIGN KEY (tenant_id, opened_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_approved_by_user_id FOREIGN KEY (tenant_id, approved_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_periods_time_consumed_by_user_id FOREIGN KEY (tenant_id, time_consumed_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_periods IS 'Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.';
 CREATE INDEX ix_payroll_periods_closed_by_user_id ON payroll_periods (tenant_id, closed_by_user_id);
+CREATE INDEX ix_payroll_periods_opened_by_user_id ON payroll_periods (tenant_id, opened_by_user_id);
+CREATE INDEX ix_payroll_periods_submitted_by_user_id ON payroll_periods (tenant_id, submitted_by_user_id);
+CREATE INDEX ix_payroll_periods_approved_by_user_id ON payroll_periods (tenant_id, approved_by_user_id);
+CREATE INDEX ix_payroll_periods_time_consumed_by_user_id ON payroll_periods (tenant_id, time_consumed_by_user_id);
 CREATE INDEX ix_payroll_periods_payroll_group_id_statutory_period_code ON payroll_periods (tenant_id, payroll_group_id, statutory_period_code);
 ALTER TABLE payroll_periods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_periods FORCE ROW LEVEL SECURITY;
@@ -6514,6 +6531,11 @@ CREATE TABLE payroll_incidents (
   retro_period_id uuid,
   notes text,
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','applied','rejected')),
+  created_by_user_id uuid,
+  updated_by_user_id uuid,
+  decided_by_user_id uuid,
+  decided_at timestamptz,
+  decision_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
@@ -6522,17 +6544,49 @@ CREATE TABLE payroll_incidents (
   CONSTRAINT fk_payroll_incidents_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
   CONSTRAINT fk_payroll_incidents_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_payroll_incidents_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
-  CONSTRAINT fk_payroll_incidents_retro_period_id FOREIGN KEY (tenant_id, retro_period_id) REFERENCES payroll_periods (tenant_id, id)
+  CONSTRAINT fk_payroll_incidents_retro_period_id FOREIGN KEY (tenant_id, retro_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_updated_by_user_id FOREIGN KEY (tenant_id, updated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_incidents_decided_by_user_id FOREIGN KEY (tenant_id, decided_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_incidents IS 'Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).';
-CREATE INDEX ix_payroll_incidents_payroll_period_id ON payroll_incidents (tenant_id, payroll_period_id);
 CREATE INDEX ix_payroll_incidents_employment_id ON payroll_incidents (tenant_id, employment_id);
 CREATE INDEX ix_payroll_incidents_payroll_concept_id ON payroll_incidents (tenant_id, payroll_concept_id);
 CREATE INDEX ix_payroll_incidents_retro_period_id ON payroll_incidents (tenant_id, retro_period_id);
+CREATE INDEX ix_payroll_incidents_created_by_user_id ON payroll_incidents (tenant_id, created_by_user_id);
+CREATE INDEX ix_payroll_incidents_updated_by_user_id ON payroll_incidents (tenant_id, updated_by_user_id);
+CREATE INDEX ix_payroll_incidents_decided_by_user_id ON payroll_incidents (tenant_id, decided_by_user_id);
+CREATE INDEX ix_payroll_incidents_payroll_period_id_employment_id ON payroll_incidents (tenant_id, payroll_period_id, employment_id);
 ALTER TABLE payroll_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_incidents FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_incidents USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_incidents_touch BEFORE UPDATE ON payroll_incidents FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE payroll_period_time_cutoffs (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  payroll_period_id uuid NOT NULL,
+  employment_id uuid NOT NULL,
+  period_from date NOT NULL,
+  period_to date NOT NULL,
+  fingerprint text NOT NULL,
+  summary jsonb NOT NULL,
+  consumed_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_payroll_period_time_cutoffs_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_payroll_period_id FOREIGN KEY (tenant_id, payroll_period_id) REFERENCES payroll_periods (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
+  CONSTRAINT fk_payroll_period_time_cutoffs_consumed_by_user_id FOREIGN KEY (tenant_id, consumed_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE payroll_period_time_cutoffs IS 'PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.';
+CREATE INDEX ix_payroll_period_time_cutoffs_employment_id ON payroll_period_time_cutoffs (tenant_id, employment_id);
+CREATE INDEX ix_payroll_period_time_cutoffs_consumed_by_user_id ON payroll_period_time_cutoffs (tenant_id, consumed_by_user_id);
+CREATE INDEX ix_payroll_period_time_cutoffs_payroll_period_id_employment_id ON payroll_period_time_cutoffs (tenant_id, payroll_period_id, employment_id);
+ALTER TABLE payroll_period_time_cutoffs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_period_time_cutoffs FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_period_time_cutoffs USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_period_time_cutoffs_inmutable BEFORE UPDATE OR DELETE ON payroll_period_time_cutoffs FOR EACH ROW EXECUTE FUNCTION reject_mutation();
+CREATE TRIGGER trg_payroll_period_time_cutoffs_no_truncate BEFORE TRUNCATE ON payroll_period_time_cutoffs FOR EACH STATEMENT EXECUTE FUNCTION reject_mutation();
 
 CREATE TABLE payroll_runs (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -18847,6 +18901,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('nomina.variacion_neto_alerta_pct', 'payroll', 'Variación de neto para alertar (%)', 'Variación frente al periodo anterior que genera una anomalía a revisar.', 'decimal', '20'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.publicar_boletas_al_cerrar', 'payroll', 'Publicar boletas al cerrar', 'Publica las boletas en el portal al cerrar el periodo.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'El trabajador confirma la recepción de su boleta.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('nomina.incidencia_monto_visto_bueno', 'payroll', 'Monto de incidencia que requiere visto bueno', 'PER-2 · RN-PER-10: una incidencia manual cuyo monto supera este valor necesita el visto bueno de alguien con payroll.incidents.approve antes de entrar al cálculo. 0: sin visto bueno. Política de la organización, no valor legal.', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0}'::jsonb),
   ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'Quien procesa no puede aprobar ni cerrar.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('prestamos.adelanto_tope_pct_devengado', 'advances', 'Tope de adelanto sobre lo devengado (%)', 'Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).', 'decimal', '50'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('prestamos.adelantos_por_periodo', 'advances', 'Adelantos por periodo', 'Número máximo de adelantos por periodo de planilla.', 'integer', '2'::jsonb, ARRAY['organization','legal_entity'], NULL),
@@ -19367,7 +19422,7 @@ GRANT SELECT ON current_tenant TO gestia_app;
 REVOKE INSERT, UPDATE, DELETE ON current_tenant FROM gestia_app, gestia_platform;
 
 -- Tablas inalterables: además del trigger, ningún rol de aplicación tiene UPDATE ni DELETE.
-REVOKE UPDATE, DELETE ON absence_period_closings, ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
+REVOKE UPDATE, DELETE ON absence_period_closings, ai_interactions, application_stage_events, asset_events, attendance_punches, audit_events, calibration_adjustments, complaint_events, compliance_ledger_anchors, compliance_ledger_entries, data_access_logs, employment_status_events, evidence_exports, fifth_category_ledger, help_article_versions, job_profile_versions, kb_article_versions, payroll_period_time_cutoffs, platform_audit_events, position_status_events, signature_events, tenant_status_events, time_bank_entries, vacation_ledger_entries, workflow_decisions FROM gestia_app, gestia_platform;
 -- AUD-5: la cabeza de la cadena solo la mueve el trigger; manifiestos de archivo y verificaciones no se
 -- reescriben desde la aplicación (el borrado vencido del archivo lo hace la tarea programada sin rol de aplicación).
 REVOKE INSERT, UPDATE, DELETE ON audit_chain_heads FROM gestia_app;

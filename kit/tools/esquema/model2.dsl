@@ -255,12 +255,19 @@
   check statutory_period_code IS NULL OR statutory_period_code ~ '^[0-9]{4}(0[1-9]|1[0-2])$' ; idx payroll_group_id, statutory_period_code
   status enum(open,incidents_closed,calculated,in_review,approved,closed,paid,accounted)=open ; closed_at
   closed_by_user_id ?-> users ; uniq payroll_group_id, kind, period_year, period_number
+  opened_by_user_id ?-> users ; submitted_by_user_id ?-> users ; submitted_at ; approved_by_user_id ?-> users ; approved_at
+  return_reason ; reopen_reason ; time_consumed_at ; time_consumed_by_user_id ?-> users
 @payroll_incidents main soft lock | Incidencia o novedad del periodo: valores variables por trabajador y concepto, con su origen (asistencia, ausencia, préstamo, retroactivo...).
   payroll_period_id -> payroll_periods ; employment_id -> employments ; payroll_concept_id -> payroll_concepts
   quantity numeric(12,4) ; rate numeric(14,6) ; amount money ; currency cur?
   source enum(manual,import,attendance,absence,overtime,loan,advance,expense,retroactive,benefit,union,system)=manual
   source_type ; source_id uuid ; retro_period_id ?-> payroll_periods ; notes
   status enum(pending,approved,applied,rejected)=pending
+  created_by_user_id ?-> users ; updated_by_user_id ?-> users ; decided_by_user_id ?-> users ; decided_at ; decision_reason
+  idx payroll_period_id, employment_id
+@payroll_period_time_cutoffs imm | PER-3 · Corte de tiempo de un trabajador para un periodo: resumen de ausencias y vacaciones tomado por la planilla (solo inserción). Permite reproducir el cálculo y detectar lo ocurrido después del corte.
+  payroll_period_id -> payroll_periods ; employment_id -> employments ; period_from date! ; period_to date! ; fingerprint text! ; summary j!
+  consumed_by_user_id ?-> users ; idx payroll_period_id, employment_id
 @payroll_runs main lock | Corrida de cálculo o simulación de un periodo; guarda la versión del motor y los parámetros usados. Cerrada, no se modifica.
   payroll_period_id -> payroll_periods ; run_number integer! ; kind enum(simulation,calculation,recalculation)=calculation
   status enum(queued,running,completed,failed,discarded,approved,closed)=queued ; engine_version ; parameters_snapshot j

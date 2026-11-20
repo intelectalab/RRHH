@@ -256,6 +256,7 @@ PARAMS = [
  ('nomina.variacion_neto_alerta_pct', 'payroll', 'Variación de neto para alertar (%)', 'decimal', 20, [O, E], 'Variación frente al periodo anterior que genera una anomalía a revisar.', None),
  ('nomina.publicar_boletas_al_cerrar', 'payroll', 'Publicar boletas al cerrar', 'boolean', True, [O, E], 'Publica las boletas en el portal al cerrar el periodo.', None),
  ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'boolean', False, [O, E], 'El trabajador confirma la recepción de su boleta.', None),
+ ('nomina.incidencia_monto_visto_bueno', 'payroll', 'Monto de incidencia que requiere visto bueno', 'decimal', 0, [O, E], 'PER-2 · RN-PER-10: una incidencia manual cuyo monto supera este valor necesita el visto bueno de alguien con payroll.incidents.approve antes de entrar al cálculo. 0: sin visto bueno. Política de la organización, no valor legal.', {'min': 0}),
  ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'boolean', True, [O, E], 'Quien procesa no puede aprobar ni cerrar.', None),
  ('prestamos.adelanto_tope_pct_devengado', 'advances', 'Tope de adelanto sobre lo devengado (%)', 'decimal', 50, [O, E], 'Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).', None),
  ('prestamos.adelantos_por_periodo', 'advances', 'Adelantos por periodo', 'integer', 2, [O, E], 'Número máximo de adelantos por periodo de planilla.', None),
