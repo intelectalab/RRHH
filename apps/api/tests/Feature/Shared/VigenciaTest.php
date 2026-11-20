@@ -127,6 +127,8 @@ const VIG_WITHOUT_EXCLUSION = [
     'master_catalog_items',
     // POS-1: valid_from / valid_to es la vigencia de la plaza misma (una fila por posición), no una historia por relación.
     'positions',
+    // PAR-7: registro de novedades (solo lectura para la organización); copia la vigencia publicada, que ya tiene EXCLUDE en legal_parameters.
+    'legal_parameter_changes',
 ];
 
 test('toda tabla con vigencia tiene restricción de exclusión o está justificada', function (): void {

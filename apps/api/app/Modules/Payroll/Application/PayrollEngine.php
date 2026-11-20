@@ -81,7 +81,7 @@ final class PayrollEngine
         $built = $this->contexts->build($employmentId, $from, $to, $periodKind, $periodId, $overrides, $incidents);
         $context = $built['context'];
         $date = $context->to;
-        $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date);
+        $params = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $date, $employmentId);
         $result = $this->engine->run($context, $this->catalog->at($date), $params, $built['decimals']);
         $result['pack_version'] = $built['pack_version'];
 

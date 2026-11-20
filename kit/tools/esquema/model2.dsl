@@ -247,6 +247,20 @@
   approved_by_user_id ?-> users ; vigcols
   raw EXCLUDE USING gist (tenant_id WITH =, parameter_code WITH =, (COALESCE(legal_entity_id, '00000000-0000-0000-0000-000000000000'::uuid)) WITH =, daterange(valid_from, valid_to, '[]') WITH &&)
 
+@legal_parameter_publications P | PAR-4 · Actualización normativa preparada en la consola: cambios de parámetros legales de un país con su norma; la publica una segunda persona del equipo del producto (ADR 0023). Publicar inserta las vigencias nuevas y cierra las anteriores, nunca las modifica.
+  country_code ~> countries.code ; title text! ; summary ; legal_source text! ; changes j! ; status enum(draft,in_review,published,rejected)=draft
+  prepared_by_platform_user_id ?=> platform_users ; reviewed_by_platform_user_id ?=> platform_users ; review_note ; submitted_at ts ; published_at ts
+  idx country_code, status
+@legal_parameter_changes P cat | PAR-7 · Registro de novedades normativas: cada vigencia nueva o valor completado de un parámetro legal, con el valor anterior y el nuevo, la norma y su origen (publicación de la consola o paquete de país). Lo leen las organizaciones del país.
+  legal_parameter_publication_id ?=> legal_parameter_publications ; country_code ~> countries.code ; labor_regime_code ?~> labor_regimes.code
+  code text! ; name ; unit text! ; previous_value j ; new_value j ; valid_from date! ; valid_to date ; legal_source
+  origin enum(publication,country_pack)! ; published_at ts=now ; idx country_code, published_at ; idx code
+@legal_parameter_confirmations imm | PAR-1 · RN-PAR-03 · Confirmación expresa de la organización de un parámetro legal «por validar» antes de cerrar un periodo que lo usa (solo inserción).
+  legal_parameter_id uuid! ; parameter_code text! ; confirmed_by_user_id -> users ; note ; idx legal_parameter_id
+@wage_table_verifications imm | PAR-6 · RN-PAR-10 · Verificación de la organización de una tabla salarial por convenio (lote de parámetros con la misma vigencia) contra el acta (solo inserción).
+  table_code text! ; labor_regime_code ~> labor_regimes.code ; valid_from date! ; verified_by_user_id -> users ; acta_reference text! ; note
+  uniq table_code, valid_from
+
 #E PER | Periodos, incidencias, cálculo, simulación y cierre
 @payroll_periods main lock | Periodo de planilla de un grupo, con su máquina de estados hasta el cierre, pago y contabilización.
   payroll_group_id -> payroll_groups ; period_year smallint! ; period_number smallint!

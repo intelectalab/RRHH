@@ -265,6 +265,12 @@
       "permissions": [
         "time.vacation_balances.view"
       ]
+    },
+    "payroll.legal_parameters": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.legal_parameters.view"
+      ]
     }
   }
 }

@@ -190,6 +190,14 @@ return [
             'in_app' => ['subject' => 'Você tem uma fatura vencida', 'body' => 'A fatura {number} de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}.'],
             'email' => ['subject' => 'Fatura vencida: {number}', 'body' => "Olá {name}:\n\nA fatura {number} de {organization} no valor de {total} venceu em {due_on}. Se continuar sem pagamento, a organização será suspensa em {suspend_on}: ninguém poderá operar até regularizar, e os dados são mantidos.\n\nVeja seu extrato aqui: {link}"],
         ],
+        'payroll.legal_update' => [
+            'in_app' => ['subject' => 'Novidade normativa: {title}', 'body' => 'Vigente desde {valid_from} ({legal_source}). Veja o detalhe em Parâmetros legais.'],
+            'email' => ['subject' => 'Novidade normativa: {title}', 'body' => "Olá {name}:\n\nFoi publicada uma atualização de parâmetros legais que se aplica a {organization}: {title}, vigente desde {valid_from} ({legal_source}).\n\nVeja o detalhe aqui: {link}"],
+        ],
+        'payroll.legal_update_open_period' => [
+            'in_app' => ['subject' => 'Novidade normativa em um período aberto', 'body' => '{title}, vigente desde {valid_from}, afeta {open_periods} período(s) de folha aberto(s). Simule antes de fechar.'],
+            'email' => ['subject' => 'Novidade normativa em um período aberto: {title}', 'body' => "Olá {name}:\n\nFoi publicada {title} ({legal_source}), vigente desde {valid_from}. Afeta {open_periods} período(s) de folha aberto(s) de {organization}: simule a diferença antes de fechar. Períodos fechados não são recalculados.\n\nVeja o detalhe aqui: {link}"],
+        ],
         'limits.warning' => [
             'in_app' => ['subject' => 'Você está perto de um limite do plano', 'body' => '{metric}: {current} de {limit} ({percent} %). Revise o consumo antes de chegar ao limite.'],
             'email' => ['subject' => 'Sua organização está perto de um limite do plano', 'body' => "Olá {name}:\n\nEm {organization}, {metric} está em {current} de {limit} ({percent} %). Ao chegar ao limite, não será possível fazer novos cadastros ou envios; o que já existe continua funcionando.\n\nVeja o consumo e como ampliá-lo aqui: {link}"],

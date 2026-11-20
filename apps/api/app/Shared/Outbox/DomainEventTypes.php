@@ -293,6 +293,9 @@ final class DomainEventTypes
 
     public const SAAS_BILLING_NOTICE = 'saas_billing.notice.v1';
 
+    // Actualización normativa publicada desde la consola (PAR-4, RN-PAR-06): un evento por organización del país.
+    public const LEGAL_PARAMETERS_PUBLISHED = 'legal_parameters.published.v1';
+
     // Límites y consumo (SAS-6): el consumo se acercó al tope del plan o llegó a él (RN-SAS-02, RN-SAS-03).
     public const LIMIT_WARNING = 'limit.warning.v1';
 
@@ -660,6 +663,11 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['invoice_id', 'kind', 'number', 'total', 'currency', 'due_on'],
             'description' => 'Aviso del estado de cuenta a la organización: comprobante emitido, vence pronto o vencido',
+        ],
+        self::LEGAL_PARAMETERS_PUBLISHED => [
+            'version' => 1,
+            'required_fields' => ['publication_id', 'title', 'legal_source', 'valid_from', 'codes'],
+            'description' => 'Se publicó una actualización de parámetros legales del país: aviso a Payroll y Administrador con la norma y la fecha',
         ],
         self::LIMIT_WARNING => [
             'version' => 1,

@@ -37,6 +37,8 @@ final class DatabaseConventionsChecker
         'feature_flags',
         'integration_connectors',
         'labor_regimes',
+        'legal_parameter_changes',
+        'legal_parameter_publications',
         'legal_parameters',
         'master_catalog_items',
         'master_catalogs',
