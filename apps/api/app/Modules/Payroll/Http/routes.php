@@ -58,6 +58,7 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/payroll-periods/{id}/reject', [PayrollPeriodController::class, 'reject'])->middleware('permission:payroll.periods.reject');
     Route::post('/payroll-periods/{id}/close', [PayrollPeriodController::class, 'close'])->middleware('permission:payroll.periods.close');
     Route::post('/payroll-periods/{id}/reopen', [PayrollPeriodController::class, 'reopen'])->middleware('permission:payroll.periods.reopen');
+    Route::post('/payroll-periods/{id}/calculate', [PayrollPeriodController::class, 'calculate'])->middleware('permission:payroll.periods.calculate');
     Route::post('/payroll-periods/{id}/reopen-calculation', [PayrollPeriodController::class, 'reopenCalculation'])->middleware('permission:payroll.periods.calculate');
 
     // PER-2 · Incidencias del periodo.

@@ -171,6 +171,22 @@ final class PayrollPeriodController
         return $this->act($request, $id, 'reopen-incidents', 'payroll.periods.calculate');
     }
 
+    /**
+     * PER-4 · Calcular o recalcular el periodo (completo, unas relaciones o una unidad). La corrida corre en
+     * segundo plano; el periodo queda «calculado» y last_run muestra su avance.
+     */
+    public function calculate(Request $request, string $id): JsonResponse
+    {
+        $p = $this->find($request, $id, 'payroll.periods.calculate');
+        $data = $request->validate([
+            'employment_ids' => ['sometimes', 'nullable', 'array', 'max:5000'], 'employment_ids.*' => ['uuid'],
+            'org_unit_id' => ['sometimes', 'nullable', 'uuid'],
+        ]);
+        $out = $this->periods->calculate($p, $this->userId($request), ['employment_ids' => $data['employment_ids'] ?? null, 'org_unit_id' => $data['org_unit_id'] ?? null]);
+
+        return response()->json(['data' => $this->periods->present($out['period'])]);
+    }
+
     public function submit(Request $request, string $id): JsonResponse
     {
         return $this->act($request, $id, 'submit', 'payroll.periods.submit');

@@ -74,6 +74,17 @@ final class PayrollRuns
     }
 
     /**
+     * Relaciones que abarcaría una corrida del periodo con ese alcance.
+     *
+     * @param  array{employment_ids?: list<string>|null, org_unit_id?: string|null}  $scope
+     * @return list<string>
+     */
+    public function resolve(string $periodId, array $scope): array
+    {
+        return $this->resolveEmployments($this->period($periodId), $scope);
+    }
+
+    /**
      * Procesa lo que falta de la corrida. Idempotente: una corrida terminada o descartada no cambia.
      */
     public function process(string $runId): void
@@ -183,6 +194,8 @@ final class PayrollRuns
                     'deductions' => ['amount' => (string) $r->deductions_amount, 'currency' => (string) $r->currency],
                     'net' => ['amount' => (string) $r->net_amount, 'currency' => (string) $r->currency],
                     'employer_cost' => ['amount' => (string) $r->employer_cost, 'currency' => (string) $r->currency],
+                    // PER-4 · Aportes del empleador = costo total − ingresos (lo que el empleador paga además del bruto).
+                    'employer_contributions' => ['amount' => (string) BigDecimal::of((string) $r->employer_cost)->minus((string) $r->gross_amount), 'currency' => (string) $r->currency],
                 ] : null,
             ])->all());
     }
@@ -297,12 +310,48 @@ final class PayrollRuns
                         'payroll_incident_id' => $line['incident_id'] ?? null, 'trace' => json_encode($line['trace']),
                     ]);
                 }
+                if (isset($r['income_tax'])) {
+                    $this->recordIncomeTax($runId, $employmentId, $tenant, $r['income_tax']);
+                }
             }
             DB::table('payroll_runs')->where('id', $runId)->update([
                 $status === 'error' ? 'employments_failed' : 'employments_done' => DB::raw(($status === 'error' ? 'employments_failed' : 'employments_done').' + 1'),
                 'updated_at' => now(),
             ]);
         });
+    }
+
+    /**
+     * PER-5 · Libro de retenciones (solo inserción): cada cálculo deja una fila con sus entradas, parámetros y
+     * traza; un recálculo del mismo mes es otra fila con la secuencia siguiente. Las simulaciones no escriben.
+     *
+     * @param  array<string, mixed>  $tax
+     */
+    private function recordIncomeTax(string $runId, string $employmentId, string $tenant, array $tax): void
+    {
+        if (DB::table('payroll_runs')->where('id', $runId)->value('kind') === 'simulation') {
+            return;
+        }
+        $c = $tax['result'];
+        // La regularización de diciembre negativa es un exceso a devolver: se asienta como corrección (el libro solo
+        // admite montos negativos en ajustes, devoluciones y correcciones).
+        $kind = $c['kind'] === 'final_adjustment' ? 'final_adjustment' : (str_starts_with((string) $c['withholding'], '-') ? 'correction' : 'monthly');
+        $sequence = (int) DB::table('fifth_category_ledger')->where('employment_id', $employmentId)->where('fiscal_year', $tax['fiscal_year'])
+            ->where('period_month', $tax['month'])->where('entry_kind', $kind)->max('sequence') + 1;
+        DB::table('fifth_category_ledger')->insert([
+            'tenant_id' => $tenant, 'employment_id' => $employmentId, 'fiscal_year' => $tax['fiscal_year'], 'period_month' => $tax['month'],
+            'sequence' => $sequence, 'entry_kind' => $kind, 'payroll_run_id' => $runId,
+            'ordinary_remuneration' => $c['ordinary_remuneration'] ?? '0', 'remaining_months' => $c['remaining_months'] ?? 0,
+            'projected_gratifications' => $c['pending_gratifications'] ?? '0', 'prior_income' => $c['prior_income'] ?? '0',
+            'external_income' => $c['external_income'] ?? '0', 'extraordinary_income' => $c['extraordinary_income'] ?? '0',
+            'gross_annual_income' => $c['gross_annual_income'] ?? '0', 'deduction_amount' => $c['deduction'] ?? '0',
+            'net_annual_income' => $c['net_annual_income'] ?? '0', 'annual_tax' => $c['annual_tax'] ?? '0', 'credits' => $c['credits'] ?? '0',
+            'prior_withholdings_deducted' => $c['prior_withholdings'] ?? '0', 'divisor' => $c['divisor'] ?? null,
+            'ordinary_withholding' => $c['ordinary_withholding'] ?? '0', 'additional_withholding' => $c['additional_withholding'] ?? '0',
+            'withholding_amount' => $c['withholding'], 'currency' => $tax['currency'], 'uit_value' => $tax['parameters']['uit'],
+            'parameters' => json_encode($tax['parameters_used']), 'trace' => json_encode(['input' => $tax['input'], 'reason' => $c['reason'] ?? null]),
+            'engine_version' => $c['engine_version'],
+        ]);
     }
 
     private function finish(string $runId, string $currency): void

@@ -3,6 +3,8 @@
 return [
     'cycle' => 'The formulas of these concepts depend on each other in a circle: :concepts.',
     'formula_invalid' => 'The formula of concept :concept is not valid.',
+    'parameter_missing' => 'Legal parameter :code is missing for the period date: the employment is not calculated until it is loaded.',
+    'income_tax_refund' => 'The year-end adjustment leaves :amount withheld in excess: it is recorded as a refund pending to the employee.',
     'parameter_pending' => 'Parameter :code is pending validation: the result used the loaded value.',
     'regime_unknown' => 'The labor regime does not exist for the organization\'s country.',
     'regime_before_hire' => 'The regime change cannot be earlier than the hire date.',
@@ -43,6 +45,7 @@ return [
     ],
     'process_not_applicable' => 'The :regime regime does not have the :kind process: the employment is left out of this calculation.',
     'explain' => [
+        'income_tax' => 'Fifth-category withholding: projected annual gross income :gross, net income :net, annual tax :tax, withheld before :prior, divisor :divisor; withholding for the month :amount :currency.',
         'formula' => 'The formula «:formula» was applied.',
         'incidents' => 'The amount comes from the incidents recorded in the period.',
         'variable' => 'Data «:name»: :value.',
@@ -87,6 +90,7 @@ return [
         'reason_required' => 'Enter the reason.',
         'with_errors' => 'Some employees have errors in the last calculation: fix them before sending for approval.',
         'segregation' => 'Whoever calculated, submitted or loaded incidents for this period cannot approve it.',
+        'run_in_progress' => 'A calculation is already running for this period: wait for it to finish or discard it.',
         'declared' => 'The period was already filed: corrections go as an adjustment in the next period.',
     ],
     'incidents' => [

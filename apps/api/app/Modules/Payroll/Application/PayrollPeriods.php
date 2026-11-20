@@ -10,6 +10,7 @@ use App\Shared\Audit\AuditLogger;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Outbox\DomainEventTypes;
 use App\Shared\Outbox\OutboxService;
+use App\Shared\Tenancy\TenancyScope;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\DB;
 final class PayrollPeriods
 {
     /** Acciones que ya tienen ruta; el resto de la máquina llega con PER-4 y PER-10. */
-    public const ROUTED_ACTIONS = ['close-incidents', 'reopen-incidents', 'submit', 'approve', 'reject', 'close', 'reopen', 'reopen-calculation'];
+    public const ROUTED_ACTIONS = ['close-incidents', 'reopen-incidents', 'calculate', 'submit', 'approve', 'reject', 'close', 'reopen', 'reopen-calculation'];
 
     /** Estados en que se reciben y corrigen incidencias (se bloquean desde el envío a aprobación). */
     public const EDITABLE_STATUSES = ['open', 'calculated'];
@@ -40,7 +41,71 @@ final class PayrollPeriods
         private readonly PayrollPeriodStateMachine $machine,
         private readonly AuditLogger $audit,
         private readonly OutboxService $outbox,
+        private readonly PayrollRuns $runs,
     ) {}
+
+    /**
+     * PER-4 · Calcular (o recalcular) el periodo: abre una corrida en segundo plano (NOM-8) sobre su población,
+     * sus incidencias y cortes de tiempo (PER-2/3), los conceptos vigentes (CPT) y los parámetros (PAR). Recalcular
+     * reemplaza el resultado anterior mientras el periodo no esté aprobado (las corridas previas quedan
+     * descartadas, no se borran). Con alcance parcial (algunas relaciones o una unidad) solo se recalculan esas:
+     * el resultado vigente de las demás pasa a la corrida nueva sin cambios.
+     *
+     * @param  array{employment_ids?: list<string>|null, org_unit_id?: string|null}  $scope
+     * @return array{period: PayrollPeriod, run_id: string}
+     */
+    public function calculate(PayrollPeriod $p, ?string $userId, array $scope = []): array
+    {
+        $next = $this->machine->getNextState($p->status, 'calculate');
+        if (DB::table('payroll_runs')->where('payroll_period_id', $p->id)->whereIn('status', ['queued', 'running'])->whereIn('kind', ['calculation', 'recalculation'])->exists()) {
+            throw new AyniException('run_in_progress', 409, (string) trans('payroll.periods.run_in_progress'));
+        }
+        $partial = ! empty($scope['employment_ids']) || ! empty($scope['org_unit_id']);
+        $previous = DB::table('payroll_runs')->where('payroll_period_id', $p->id)->whereIn('kind', ['calculation', 'recalculation'])
+            ->whereIn('status', ['completed', 'failed'])->orderByDesc('run_number')->first(['id']);
+        $selected = $partial ? $this->runs->resolve($p->id, $scope) : [];
+        $runId = DB::transaction(function () use ($p, $next, $previous, $partial, $selected, $userId): string {
+            $tenant = TenancyScope::requireTenant();
+            $runId = $this->runs->open($p->id, [], $previous === null ? 'calculation' : 'recalculation', $userId, false);
+            if ($previous !== null) {
+                if ($partial) {
+                    $this->carryOver((string) $previous->id, $runId, $selected, $tenant);
+                }
+                DB::table('payroll_runs')->where('id', $previous->id)->update(['status' => 'discarded', 'updated_at' => now()]);
+            }
+            $before = $p->status;
+            $p->fill(['status' => $next])->save();
+            $this->audit->record('payroll_period.calculate', 'payroll_period', $p->id, ['status' => $before], ['status' => $p->status, 'payroll_run_id' => $runId]);
+            $this->outbox->record(DomainEventTypes::PAYROLL_RUN_REQUESTED, 'payroll_run', $runId, ['payroll_run_id' => $runId, 'requested_by' => $userId]);
+
+            return $runId;
+        });
+
+        return ['period' => $p, 'run_id' => $runId];
+    }
+
+    /**
+     * Copia a la corrida nueva el resultado vigente de las relaciones que no se recalculan (filas y líneas con su
+     * traza); el procesamiento de la corrida solo calcula las que faltan.
+     *
+     * @param  list<string>  $recalculate
+     */
+    private function carryOver(string $fromRun, string $toRun, array $recalculate, string $tenant): void
+    {
+        $rows = DB::table('payroll_run_employments')->where('payroll_run_id', $fromRun)->whereNotIn('employment_id', $recalculate)->get();
+        foreach ($rows as $row) {
+            $data = (array) $row;
+            $oldId = (string) $data['id'];
+            unset($data['id'], $data['created_at'], $data['updated_at']);
+            $newId = (string) DB::table('payroll_run_employments')->insertGetId(['payroll_run_id' => $toRun] + $data);
+            foreach (DB::table('payroll_run_lines')->where('payroll_run_employment_id', $oldId)->get() as $line) {
+                $l = (array) $line;
+                unset($l['id'], $l['created_at'], $l['updated_at']);
+                DB::table('payroll_run_lines')->insert(['payroll_run_id' => $toRun, 'payroll_run_employment_id' => $newId] + $l);
+            }
+            DB::table('payroll_runs')->where('id', $toRun)->update([$row->status === 'error' ? 'employments_failed' : 'employments_done' => DB::raw(($row->status === 'error' ? 'employments_failed' : 'employments_done').' + 1')]);
+        }
+    }
 
     /**
      * @param  array<string, mixed>  $data
@@ -181,6 +246,9 @@ final class PayrollPeriods
         switch ($action) {
             case 'submit':
                 $this->assertNoErrors($p);
+                if (DB::table('payroll_runs')->where('payroll_period_id', $p->id)->whereIn('status', ['queued', 'running'])->whereIn('kind', ['calculation', 'recalculation'])->exists()) {
+                    throw new AyniException('run_in_progress', 409, (string) trans('payroll.periods.run_in_progress'));
+                }
                 $changes += ['submitted_by_user_id' => $userId, 'submitted_at' => now(), 'return_reason' => null];
                 $event = [DomainEventTypes::PAYROLL_SUBMITTED, ['period_id' => $p->id]];
                 break;
@@ -281,6 +349,7 @@ final class PayrollPeriods
             'return_reason' => $p->return_reason, 'reopen_reason' => $p->reopen_reason,
             'counts' => ['incidents' => collect(['pending', 'approved', 'applied', 'rejected'])->mapWithKeys(fn ($k) => [$k => (int) ($counts[$k] ?? 0)])->all()],
             'allowed_actions' => array_values(array_intersect($this->machine->allowedActions($p->status), self::ROUTED_ACTIONS)),
+            'last_run' => $this->lastRunSummary($p),
         ], fn ($v) => $v !== null);
     }
 
@@ -311,9 +380,23 @@ final class PayrollPeriods
         return sprintf('%04d-%02d', $p->period_year, $p->period_number);
     }
 
+    /**
+     * PER-4 · Última corrida de cálculo vigente del periodo (no simulación ni descartada) con su avance y totales.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function lastRunSummary(PayrollPeriod $p): ?array
+    {
+        $id = DB::table('payroll_runs')->where('payroll_period_id', $p->id)->whereIn('kind', ['calculation', 'recalculation'])
+            ->where('status', '<>', 'discarded')->orderByDesc('run_number')->value('id');
+
+        return $id === null ? null : $this->runs->show((string) $id);
+    }
+
     private function lastRun(PayrollPeriod $p): ?string
     {
-        $id = DB::table('payroll_runs')->where('payroll_period_id', $p->id)->orderByDesc('run_number')->value('id');
+        $id = DB::table('payroll_runs')->where('payroll_period_id', $p->id)->where('status', '<>', 'discarded')->where('kind', '<>', 'simulation')
+            ->orderByDesc('run_number')->value('id');
 
         return $id === null ? null : (string) $id;
     }

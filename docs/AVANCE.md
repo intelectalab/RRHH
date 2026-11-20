@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 197 | 0 | 81,7 % |
-| Backlog completo | 512 | 204 | 0 | 39,8 % |
+| Primer corte comercial (MVP) | 241 | 200 | 0 | 83,0 % |
+| Backlog completo | 512 | 207 | 0 | 40,4 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -250,9 +250,9 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PER-1 | Periodos de planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Grupos y periodos de planilla por tipo con estados solo por acciones (cerrar incidencias, enviar, aprobar con segregación, devolver, cerrar, reabrir sin declaración); pantalla Nómina → Periodos. |
 | PER-2 | Incidencias del periodo | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Incidencias por formulario, carga masiva todo o nada y desde módulos; visto bueno sobre umbral parametrizado; bloqueo desde el envío y aplicadas al cerrar. |
 | PER-3 | Consumo de asistencia y ausencias | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Toma de ausencias y ventas de vacaciones hasta el corte por los puertos de AUS-6 y VAC-6, con corte registrado (solo inserción) y diferencias posteriores como retroactivo. |
-| PER-4 | Cálculo de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| PER-5 | Renta de quinta categoría | PER | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| PER-6 | Aportes previsionales y de salud | PER | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
+| PER-4 | Cálculo de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Cálculo del periodo completo o parcial con arrastre; el periodo pasa a calculado; 409 si hay una corrida en curso. |
+| PER-5 | Renta de quinta categoría | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Retención de quinta por proyección anual con libro de solo inserción, certificados previos, no domiciliado, exonerado y ajuste por cese; cuatro casos dorados. |
+| PER-6 | Aportes previsionales y de salud | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Aportes AFP (comisión por tipo y prima con tope), ONP y EsSalud salvo SIS con crédito por EPS; tasas por periodo. |
 | PER-7 | Simulación y detección de anomalías | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | PER-8 | Revisión, aprobación y cierre | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | PER-9 | Reapertura controlada y planilla complementaria | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |

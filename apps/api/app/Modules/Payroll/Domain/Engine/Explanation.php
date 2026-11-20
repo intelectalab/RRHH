@@ -37,7 +37,13 @@ final class Explanation
             $origin = (array) ($trace['origin_period'] ?? []);
             $steps[] = self::t('retroactive', ['period' => (string) ($origin['label'] ?? ''), 'amount' => $amount, 'currency' => $currency]);
         } else {
-            if ($source === 'formula') {
+            if ($source === 'income_tax') {
+                // PER-5 · Retención de quinta: la proyección anual guardada en la traza, paso por paso.
+                $tax = (array) ($trace['income_tax'] ?? []);
+                $steps[] = self::t('income_tax', ['gross' => (string) ($tax['gross_annual_income'] ?? ''), 'net' => (string) ($tax['net_annual_income'] ?? ''),
+                    'tax' => (string) ($tax['annual_tax'] ?? ''), 'prior' => (string) ($tax['prior_withholdings'] ?? ''), 'divisor' => (string) ($tax['divisor'] ?? ''),
+                    'amount' => (string) ($tax['withholding'] ?? $amount), 'currency' => $currency]);
+            } elseif ($source === 'formula') {
                 $steps[] = self::t('formula', ['formula' => (string) ($trace['formula'] ?? '')]);
             } else {
                 $steps[] = self::t('incidents');
@@ -85,6 +91,7 @@ final class Explanation
                 'decimals' => $trace['decimals'] ?? null, 'amount' => ['amount' => $amount, 'currency' => $currency]],
             'tramos' => $tramos,
             'origin_period' => $trace['origin_period'] ?? null,
+            'income_tax' => $trace['income_tax'] ?? null,
             'steps' => $steps,
         ];
     }

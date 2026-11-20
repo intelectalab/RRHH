@@ -857,9 +857,9 @@
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
       "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "formula_motor": "si(afp_comision_tipo = \"mixed\", base.pension * param.afp_comision_mixta_pct / 100, base.pension * param.afp_comision_flujo_pct / 100)",
+      "condicion_motor": "sistema_pension = \"afp\"",
+      "orden": 100
     },
     {
       "codigo": "afp_prima",
@@ -893,9 +893,9 @@
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
       "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "formula_motor": "min(base.pension, param.afp_remuneracion_maxima_asegurable) * param.afp_prima_seguro_pct / 100",
+      "condicion_motor": "sistema_pension = \"afp\"",
+      "orden": 100
     },
     {
       "codigo": "onp_aporte",
@@ -1002,8 +1002,43 @@
       "rol_monto": "accrued_and_paid",
       "nota": "CPT-7 · El código de la serie 0800 de la Tabla 22 (aportes del empleador) no se pudo leer en la revisión del 01-10-2025: se carga cuando el especialista lo coteje (docs/18 §3.2).",
       "formula_motor": "max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100",
-      "condicion_motor": null,
+      "condicion_motor": "sistema_salud <> \"sis\"",
       "orden": 200
+    },
+    {
+      "codigo": "essalud_credito_eps",
+      "nombre": "Crédito por EPS contra el aporte de salud",
+      "tipo": "employer_contribution",
+      "metodo": "formula",
+      "remunerativo": true,
+      "afectaciones": {
+        "essalud": false,
+        "pension": false,
+        "quinta": false,
+        "cts": false,
+        "gratificacion": false,
+        "vacaciones": false,
+        "utilidades": false
+      },
+      "formula": "-(aporte_essalud * param(eps_credito_pct) / 100)",
+      "parametros_legales": [
+        "eps_credito_pct"
+      ],
+      "codigo_plame": null,
+      "codigo_plame_verificado": false,
+      "regimenes": [
+        "pe_general",
+        "pe_micro",
+        "pe_pequena",
+        "pe_construccion",
+        "pe_agrario"
+      ],
+      "proyeccion_quinta": null,
+      "rol_monto": "accrued_and_paid",
+      "nota": "PER-6 · Resta del aporte de salud el crédito por EPS cuando el trabajador está en una EPS; porcentaje y tope por validar (Ley 26790).",
+      "formula_motor": "0 - concepto.essalud * param.eps_credito_pct / 100",
+      "condicion_motor": "sistema_salud = \"eps\"",
+      "orden": 210
     },
     {
       "codigo": "sctr",

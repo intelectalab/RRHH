@@ -1,0 +1,15 @@
+# Por mes: remuneración ordinaria (R), gratificaciones por percibir proyectadas (G), lo pagado en el mes
+# fuera de lo ordinario (gratificación o extraordinario) y el extraordinario del mes (X).
+months:
+  - { month: 1, ordinary: "8000", pending_gratifications: "17440", paid_other: "0", extraordinary: "0" }
+  - { month: 2, ordinary: "8000", pending_gratifications: "17440", paid_other: "0", extraordinary: "0" }
+  - { month: 3, ordinary: "8000", pending_gratifications: "17440", paid_other: "20000", extraordinary: "20000" }
+  - { month: 4, ordinary: "8000", pending_gratifications: "17440", paid_other: "0", extraordinary: "0" }
+  - { month: 5, ordinary: "8000", pending_gratifications: "17440", paid_other: "0", extraordinary: "0" }
+  - { month: 6, ordinary: "8000", pending_gratifications: "17440", paid_other: "0", extraordinary: "0" }
+  - { month: 7, ordinary: "8000", pending_gratifications: "17440", paid_other: "8720", extraordinary: "0" }
+  - { month: 8, ordinary: "8000", pending_gratifications: "8720", paid_other: "0", extraordinary: "0" }
+  - { month: 9, ordinary: "8000", pending_gratifications: "8720", paid_other: "0", extraordinary: "0" }
+  - { month: 10, ordinary: "8000", pending_gratifications: "8720", paid_other: "0", extraordinary: "0" }
+  - { month: 11, ordinary: "8000", pending_gratifications: "8720", paid_other: "0", extraordinary: "0" }
+  - { month: 12, ordinary: "8000", pending_gratifications: "8720", paid_other: "8720", extraordinary: "0" }

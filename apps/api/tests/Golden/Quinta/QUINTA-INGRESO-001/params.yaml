@@ -1,0 +1,11 @@
+# Parámetros del caso (kit/docs/18 §2.9): UIT del ejercicio como dato del caso; no son constantes del código.
+uit: "5500"
+deduction_uit: "7"
+scale:
+  - { hasta_uit: 5, tasa: 8 }
+  - { hasta_uit: 20, tasa: 14 }
+  - { hasta_uit: 35, tasa: 17 }
+  - { hasta_uit: 45, tasa: 20 }
+  - { hasta_uit: null, tasa: 30 }
+divisors: { 1: 12, 2: 12, 3: 12, 4: 9, 5: 8, 6: 8, 7: 8, 8: 5, 9: 4, 10: 4, 11: 4, 12: 1 }
+cutoffs: { 1: 0, 2: 0, 3: 0, 4: 3, 5: 4, 6: 4, 7: 4, 8: 7, 9: 8, 10: 8, 11: 8, 12: 11 }
