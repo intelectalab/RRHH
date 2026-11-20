@@ -20,27 +20,27 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 
 | Medida | Cantidad |
 |---|---:|
-| Tablas | 530 |
-| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 463 |
+| Tablas | 531 |
+| Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 464 |
 | Tablas de plataforma (sin RLS de organización) | 67 |
-| Políticas RLS | 466 |
-| Claves foráneas | 1719 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1135 |
-| — simples `tenant_id` → `tenants(id)` | 476 |
+| Políticas RLS | 467 |
+| Claves foráneas | 1718 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1133 |
+| — simples `tenant_id` → `tenants(id)` | 477 |
 | — resto (hacia catálogos y tablas de plataforma) | 108 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2431 |
-| — creados con `CREATE INDEX` | 1239 |
-| Triggers | 554 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2432 |
+| — creados con `CREATE INDEX` | 1237 |
+| Triggers | 555 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 652 |
-| Restricciones `UNIQUE` | 632 |
-| Columnas | 7210 |
+| Restricciones `CHECK` | 654 |
+| Restricciones `UNIQUE` | 634 |
+| Columnas | 7218 |
 | Columnas marcadas `-- SENSIBLE` | 169 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 44 |
 | Tablas inalterables (solo inserción, por trigger) | 27 |
-| Tablas con borrado lógico (`deleted_at`) | 173 |
-| Tablas con concurrencia optimista (`lock_version`) | 255 |
+| Tablas con borrado lógico (`deleted_at`) | 174 |
+| Tablas con concurrencia optimista (`lock_version`) | 256 |
 | Funciones | 30 |
 | Vistas | 1 |
 | Permisos en el catálogo | 924 |
@@ -87,7 +87,7 @@ Tablas por épica:
 | 3 | BOL | Boletas | 2 |
 | 3 | BSO | Beneficios sociales, seguros y derechohabientes | 6 |
 | 3 | PRE | Préstamos, adelantos y adelanto de sueldo | 5 |
-| 3 | DEC | Declaraciones y archivos | 9 |
+| 3 | DEC | Declaraciones y archivos | 10 |
 | 3 | PRV | Provisiones y asientos | 7 |
 | 3 | LIQ | Liquidación de beneficios | 3 |
 | 3 | LOC | Locadores | 3 |
@@ -2027,6 +2027,7 @@ erDiagram
   legal_entities ||--o{ statutory_filings : "legal_entity_id"
   payroll_periods |o--o{ statutory_filings : "payroll_period_id"
   users |o--o{ statutory_filings : "submitted_by_user_id"
+  documents |o--o{ statutory_filings : "submission_document_id"
   legal_entities ||--o{ journal_entries : "legal_entity_id"
   payroll_periods |o--o{ journal_entries : "payroll_period_id"
   employments ||--o{ settlements : "employment_id"
@@ -2289,15 +2290,15 @@ erDiagram
 #### `cts_deposits`
 
 - **Propósito:** Depósito semestral de CTS por trabajador: remuneración computable, monto, entidad depositaria y constancia.
-- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`, `deposit_reference`.
-- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional); `payroll_period_id` → `payroll_periods` (opcional); `deposited_by_user_id` → `users` (opcional).
+- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`.
+- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; único: `employment_id`, `period_code`.
 
 #### `profit_sharing_distributions`
 
 - **Propósito:** Distribución anual de utilidades por empresa (E-21).
-- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`, `activity`, `workers_count`, `calculated_at`, `warnings`, `approved_at`, `excess_amount`.
-- **Relaciones:** `legal_entity_id` → `legal_entities`; `created_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional).
+- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`.
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); contiene columnas sensibles (S); único: `legal_entity_id`, `fiscal_year`.
 
 #### `profit_sharing_items`
@@ -2372,8 +2373,8 @@ erDiagram
 #### `statutory_filings`
 
 - **Propósito:** Declaración o archivo oficial por empresa y periodo (planilla electrónica, registro laboral, aportes previsionales), con validación previa y rectificatorias.
-- **Columnas clave:** `kind`, `period_code`, `is_rectification`, `status`, `validation_report`, `submitted_at`, `external_reference`, `due_on`.
-- **Relaciones:** `legal_entity_id` → `legal_entities`; `payroll_period_id` → `payroll_periods` (opcional); `rectifies_filing_id` → `statutory_filings` (opcional); `submitted_by_user_id` → `users` (opcional).
+- **Columnas clave:** `kind`, `period_code`, `is_rectification`, `status`, `validation_report`, `submitted_at`, `external_reference`, `due_on`, `accepted_at`, `observation`, `rectification_reason`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`; `payroll_period_id` → `payroll_periods` (opcional); `rectifies_filing_id` → `statutory_filings` (opcional); `submitted_by_user_id` → `users` (opcional); `created_by_user_id` → `users` (opcional); `submission_document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `statutory_filing_files`
@@ -2396,6 +2397,13 @@ erDiagram
 - **Columnas clave:** `kind`, `event_date`, `due_on`, `status`.
 - **Relaciones:** `legal_entity_id` → `legal_entities`; `employment_id` → `employments` (opcional); `dependent_id` → `dependents` (opcional); `statutory_filing_id` → `statutory_filings` (opcional); `confirmation_document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
+
+#### `bank_file_templates`
+
+- **Propósito:** DEC-5 · Plantilla de archivo de pago de un banco (haberes, CTS y otros) definida como datos: separador o ancho fijo, cabecera, detalle y validación de cuentas. Las del paquete de país quedan por validar con cada banco.
+- **Columnas clave:** `code`, `bank_code`, `name`, `kind`, `definition`, `verified`, `status`, `source`, `deleted_at`.
+- **Relaciones:** ninguna además de la organización.
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); único: `code`; `CHECK (jsonb_typeof(definition) = 'object')`.
 
 #### `concept_statutory_mappings`
 

@@ -3,7 +3,7 @@
 Archivos de PLAME, T-Registro, AFPnet, bancos y certificados, con validación previa.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 11 (9 historias y 2 tareas); 11 del MVP. **Operaciones de API:** 32.
+- **Actividades:** 11 (9 historias y 2 tareas); 11 del MVP. **Operaciones de API:** 47.
 - **Especificación:** `kit/docs/modulos/M-DEC.md`.
 
 ## Prompt para una sesión nueva de Claude Code

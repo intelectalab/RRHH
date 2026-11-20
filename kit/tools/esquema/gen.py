@@ -263,8 +263,8 @@ def seeds():
     o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)})" for c, n, k in C.REGIMES_PE) + ';')
     # IMP-4 · Paquete de configuración inicial del país (su contenido vive en packages/country-pe/data/paquete.php).
     o.append("INSERT INTO country_packs (country_code, code, name, status, current_version) VALUES ('PE', 'pe-base', 'Perú · configuración inicial', 'available', '1.0.0');")
-    o.append('INSERT INTO pension_funds (code, country_code, name, kind, status) VALUES')  # COL-7
-    o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)}, 'active')" for c, n, k in C.PENSION_FUNDS_PE) + ';')
+    o.append('INSERT INTO pension_funds (code, country_code, name, kind, afpnet_code, status) VALUES')  # COL-7 · DEC-4
+    o.append(',\n'.join(f"  ({q(c)}, 'PE', {q(n)}, {q(k)}, {q(C.AFPNET_CODES_PE[c]) if c in C.AFPNET_CODES_PE else 'NULL'}, 'active')" for c, n, k in C.PENSION_FUNDS_PE) + ';')
     o.append('INSERT INTO system_roles (code, name, description, realm, mfa_required_default) VALUES')
     o.append(',\n'.join(f"  ({q(c)}, {q(n)}, {q(d)}, {q(r)}, {str(c in C.MFA_REQUIRED_ROLES).lower()})" for c, n, r, d, _, _ in C.ROLES) + ';')
     perms = C.permissions()
@@ -283,6 +283,9 @@ def seeds():
     o.append("INSERT INTO pe_parametric_tables (table_number, name, source_annex) VALUES (22, 'Ingresos, tributos y descuentos', 'Anexo 2');")
     o.append('INSERT INTO pe_parametric_items (table_number, code, description, private_sector, source, verified, valid_from) VALUES')
     o.append(',\n'.join(f"  (22, {q(c)}, {q(d)}, true, {q(C.TABLA22_PE_VERSION)}, true, '2000-01-01')" for c, d in C.TABLA22_PE) + ';')
+    # DEC-10 · Estructuras de los archivos oficiales (PLAME, T-Registro, AFPnet) con vigencia; sin verificar (AR-11).
+    o.append('INSERT INTO statutory_file_layouts (country_code, filing_kind, structure_code, name, file_name_pattern, file_extension, layout_version, field_separator, encoding, line_ending, has_header, trailing_separator, fields, source, verified, valid_from) VALUES')
+    o.append(',\n'.join(f"  ('PE', {q(e['filing_kind'])}, {q(e['structure_code'])}, {q(e['name'])}, {q(e['file_name_pattern'])}, {q(e['file_extension'])}, {q(e['layout_version'])}, {('NULL' if e['field_separator'] is None else q(e['field_separator']))}, {q(e['encoding'])}, {q(e['line_ending'])}, {str(e['has_header']).lower()}, {str(e['trailing_separator']).lower()}, {q(json.dumps(e['fields'], ensure_ascii=False))}::jsonb, {q(e['source'])}, false, {q(e['valid_from'])})" for e in C.ESTRUCTURAS_PE) + ';')
     return '\n'.join(o)
 
 def build_schema(phases, epics, tables):
@@ -346,6 +349,9 @@ def build_json():
     for c in C.CONCEPTS_PE:
         assert c['codigo_plame'] is None or c['codigo_plame'] in t22, f"{c['codigo']}: código {c['codigo_plame']} fuera de la Tabla 22"
         assert not c['afectaciones']['quinta'] or c['proyeccion_quinta'] in ('ordinary', 'gratification', 'extraordinary'), f"{c['codigo']}: afecta a quinta sin naturaleza en la proyección"
+    write_json('estructuras_archivos_pe.json', dict(pais='PE',
+        nota='DEC-10 · Estructuras de PLAME, T-Registro y AFPnet como datos con vigencia (docs/18 §3). Ninguna está verificada: el archivo solo sale como borrador hasta que el especialista acepte un archivo dorado importado sin errores en la herramienta oficial (AR-11).',
+        codigos_afpnet=C.AFPNET_CODES_PE, estructuras=C.ESTRUCTURAS_PE))
     write_json('tabla22_pe.json', dict(tabla=22, nombre='Ingresos, tributos y descuentos', fuente=C.TABLA22_PE_VERSION,
         nota='CPT-7 · Códigos cotejados de la Tabla 22 (docs/18 §3.2). La serie 0800 (aportes del empleador) no se pudo leer y queda por confirmar.',
         codigos=[dict(codigo=c, descripcion=d) for c, d in C.TABLA22_PE]))

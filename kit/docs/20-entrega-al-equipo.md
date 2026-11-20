@@ -88,9 +88,9 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 21 | Sí | D-36 |
 | 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 49 | Sí | — |
 | 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 17 | — | A-11 |
-| 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 6 | Sí | — |
+| 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 13 | Sí | — |
 | 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
-| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 32 | — | D-35 |
+| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 47 | — | D-35 |
 | 3 | [PRV](../prompts/PRV.md) · Provisiones y asientos contables | Nómina Perú | 4 | 1 | 0 | 6 | — | — |
 | 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 9 | Sí | — |
 | 3 | [LOC](../prompts/LOC.md) · Locadores y cuarta categoría | Locadores | 3 | 1 | 0 | 12 | — | — |

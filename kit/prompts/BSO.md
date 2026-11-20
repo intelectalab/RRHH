@@ -3,7 +3,7 @@
 Gratificaciones, CTS, utilidades, asignación familiar y remuneración vacacional.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 5 (3 historias y 2 tareas); 5 del MVP. **Operaciones de API:** 6.
+- **Actividades:** 5 (3 historias y 2 tareas); 5 del MVP. **Operaciones de API:** 13.
 - **Especificación:** `kit/docs/modulos/M-BSO.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: provisiones de gratificación, bonificación extraordinaria y CTS.
 

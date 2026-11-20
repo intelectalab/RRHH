@@ -65,6 +65,13 @@ return [
         'tax_withheld' => ['payroll.external_income_declarations.view', 'salary'],
         'monthly_detail' => ['payroll.external_income_declarations.view', 'salary'],
     ],
+    'WithholdingCertificate' => [
+        'total_income' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'external_income' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'annual_tax' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'total_withheld' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'refunded_amount' => ['payroll.fifth_category_ledger.view', 'salary'],
+    ],
     'FifthCategoryLedgerEntry' => [
         'gross_annual_income' => ['payroll.fifth_category_ledger.view', 'salary'],
         'net_annual_income' => ['payroll.fifth_category_ledger.view', 'salary'],

@@ -329,6 +329,12 @@
       "permissions": [
         "payroll.benefit_runs.view"
       ]
+    },
+    "payroll.declarations": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.declaration_files.view"
+      ]
     }
   }
 }

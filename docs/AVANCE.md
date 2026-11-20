@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 213 | 0 | 88,4 % |
-| Backlog completo | 512 | 220 | 0 | 43,0 % |
+| Primer corte comercial (MVP) | 241 | 222 | 0 | 92,1 % |
+| Backlog completo | 512 | 229 | 0 | 44,7 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -265,9 +265,9 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | BOL-3 | Historial y descarga masiva | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Historial propio y de nómina con alcance y permiso por campo; descarga masiva por enlace temporal registrada. |
 | BOL-4 | Conservación de boletas y constancias | BOL | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Boleta inmutable y no borrable; conservación por parámetro legal (por validar: no vence). |
 | BOL-5 | Explicación del cambio de neto en la boleta | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Explicación del cambio de neto desde la traza del cálculo con tolerancia parametrizada. |
-| BSO-1 | Gratificaciones | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BSO-2 | CTS | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BSO-3 | Utilidades | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| BSO-1 | Gratificaciones | BSO | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Gratificaciones de julio y diciembre con bonificación extraordinaria por régimen (micro sin gratificación, pequeña con la mitad); casos dorados. |
+| BSO-2 | CTS | BSO | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | CTS semestral con fracción de la gratificación, entidad depositaria obligatoria, depósito y liquidación al legajo y portal; tope de pequeña empresa por validar. |
+| BSO-3 | Utilidades | BSO | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Utilidades por días laborados y remuneraciones, cesados incluidos, con aprobación y monto al proceso de planilla; tope individual por validar. |
 | BSO-4 | Asignación familiar | BSO | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Asignación familiar por derechohabientes con sustento vigente; edad máxima por estudios «por validar». |
 | BSO-5 | Remuneración vacacional e indemnización vacacional | BSO | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Remuneración vacacional por días gozados, venta e indemnización vacacional (con visto bueno); caso dorado MOTOR-VACACIONES-001. |
 | PRE-1 | Préstamos con cronograma | PRE | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
@@ -275,12 +275,12 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PRE-3 | Descuento automático en planilla | PRE | Fase 3 · Nómina Perú | Task | — | pendiente | — |  |
 | PRE-4 | Adelanto de sueldo sobre lo devengado | PRE | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRE-5 | Pago por billeteras digitales | PRE | Fase 3 · Nómina Perú | Task | — | pendiente | — |  |
-| DEC-1 | Mapeo de conceptos a tablas SUNAT | DEC | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| DEC-2 | Archivos de PLAME | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-3 | T-Registro | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-4 | Planilla de aportes para AFPnet | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-5 | Archivos bancarios | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-6 | Certificados de renta y de retenciones | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| DEC-1 | Mapeo de conceptos a tablas SUNAT | DEC | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Verificación del mapeo de conceptos a la Tabla 22 por periodo con historia; bloquea la PLAME e informa el concepto. |
+| DEC-2 | Archivos de PLAME | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | PLAME: validación previa por trabajador, totales contra la planilla cerrada, archivo con huella y versión (borrador mientras la estructura esté por validar), presentación, observación y rectificatoria; pendiente .jor. |
+| DEC-3 | T-Registro | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | T-Registro: altas y bajas pendientes con plazo, datos faltantes y conciliación con la relación laboral; derechohabientes pendientes. |
+| DEC-4 | Planilla de aportes para AFPnet | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | AFPnet: línea por trabajador con indicadores de inicio, cese y excepción, reporte sin CUSPP, vencimiento y conciliación. |
+| DEC-5 | Archivos bancarios | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Plantillas de archivos bancarios como datos (paquete y propias) con validación de cuentas, conectadas al pago de planilla. |
+| DEC-6 | Certificados de renta y de retenciones | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Certificados de quinta al cese, al cierre o a solicitud desde el libro, PDF al legajo visible en el portal; Nómina → Declaraciones. |
 | DEC-7 | Bitácora de declaraciones | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | DEC-8 | Ficha del registro laboral y validación previa al alta | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | DEC-9 | Declaración jurada de rentas de otros empleadores | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
