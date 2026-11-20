@@ -5502,6 +5502,7 @@
     "status_accounted": "Contabilizado",
     "action_close-incidents": "Fechar ocorrências",
     "action_reopen-incidents": "Reabrir ocorrências",
+    "action_calculate": "Calcular folha",
     "action_submit": "Enviar para aprovação",
     "action_approve": "Aprovar",
     "action_reject": "Devolver",

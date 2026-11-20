@@ -13,6 +13,7 @@ use App\Modules\Payroll\Domain\Formula\Parser;
 use App\Modules\Payroll\Infrastructure\ConceptCatalog;
 use App\Modules\Payroll\Infrastructure\ContextBuilder;
 use App\Modules\Payroll\Infrastructure\Country\DataPayrollCountryPack;
+use App\Modules\Payroll\Infrastructure\IncomeTaxWithholding;
 use App\Modules\Payroll\Infrastructure\PayrollParameters;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\LegalParameters\LegalParameters;
@@ -31,6 +32,7 @@ final class PayrollEngine
         private readonly ContextBuilder $contexts,
         private readonly LegalParameters $legal,
         private readonly CalculationEngine $engine,
+        private readonly IncomeTaxWithholding $incomeTax,
     ) {}
 
     /**
@@ -112,6 +114,12 @@ final class PayrollEngine
                 $result['lines'] = array_values(array_merge($result['lines'], $retro));
                 $result['totals'] = CalculationEngine::totals($result['lines'], $built['decimals']);
             }
+        }
+        if ($result['status'] === 'calculated') {
+            // PER-5 · Retención del impuesto a la renta del trabajador con la planilla ya calculada (sus bases).
+            $taxParams = new PayrollParameters($this->legal, $built['country'], $context->regime, $built['legal_entity_id'], $context->to, $employmentId);
+            $result = $this->incomeTax->apply($result, $built['country'], $employmentId, $periodId, $from, $to, $periodKind, $context->regime,
+                $context->variables, $taxParams, $built['decimals']);
         }
         $result['pack_version'] = $built['pack_version'];
         $result['strategy'] = $strategy === null ? null : ['regime' => $strategy['code'], 'strategy' => $strategy['strategy'], 'pay_unit' => $strategy['pay_unit']];

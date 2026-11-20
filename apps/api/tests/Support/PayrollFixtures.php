@@ -49,7 +49,7 @@ final class PayrollFixtures
     }
 
     /**
-     * @param  array{code: string, kind: string, formula?: string|null, sort_order?: int, regimes?: list<string>|null}  $c
+     * @param  array{code: string, kind: string, formula?: string|null, condition?: string|null, sort_order?: int, regimes?: list<string>|null, affects?: list<string>}  $c
      */
     public static function concept(array $c, string $validFrom = '2020-01-01'): string
     {
@@ -58,12 +58,43 @@ final class PayrollFixtures
             'tenant_id' => $tenant, 'code' => $c['code'], 'name' => 'Concepto '.$c['code'], 'kind' => $c['kind'],
             'calculation_method' => isset($c['formula']) ? 'formula' : 'input', 'sort_order' => $c['sort_order'] ?? 0,
         ]);
-        DB::table('payroll_concept_versions')->insert([
+        $version = (string) DB::table('payroll_concept_versions')->insertGetId([
             'tenant_id' => $tenant, 'payroll_concept_id' => $id, 'formula' => $c['formula'] ?? null, 'valid_from' => $validFrom,
+            'condition' => $c['condition'] ?? null,
             'applies_to_regimes' => isset($c['regimes']) ? '{'.implode(',', $c['regimes']).'}' : null,
         ]);
+        // CPT-3 · Bases a las que suma («quinta:ordinary» indica además su naturaleza en la proyección).
+        foreach ((array) ($c['affects'] ?? []) as $a) {
+            [$base, $kind] = array_pad(explode(':', (string) $a, 2), 2, null);
+            DB::table('payroll_concept_affectations')->insert(['tenant_id' => $tenant, 'payroll_concept_version_id' => $version,
+                'base_code' => $base, 'affects' => true, 'projection_kind' => $kind]);
+        }
 
         return $id;
+    }
+
+    /**
+     * Valor propio en JSON (escalas y tablas) de un parámetro, fijado para la prueba.
+     *
+     * @param  array<int|string, mixed>  $value
+     */
+    public static function parameterJson(string $code, array $value, string $validFrom = '2020-01-01'): void
+    {
+        DB::table('legal_parameter_overrides')->insert(['tenant_id' => TenancyScope::requireTenant(), 'parameter_code' => $code,
+            'value_json' => json_encode($value), 'reason' => 'Valor fijado para la prueba', 'valid_from' => $validFrom]);
+    }
+
+    /**
+     * PER-5 · Parámetros de la retención de quinta fijados para la prueba (UIT y escala del caso, no constantes).
+     */
+    public static function incomeTaxParameters(string $uit, string $validFrom = '2020-01-01'): void
+    {
+        self::parameter('uit', $uit, $validFrom);
+        self::parameter('quinta_deduccion_uit', '7', $validFrom);
+        self::parameterJson('quinta_escala', [['hasta_uit' => 5, 'tasa' => 8], ['hasta_uit' => 20, 'tasa' => 14], ['hasta_uit' => 35, 'tasa' => 17],
+            ['hasta_uit' => 45, 'tasa' => 20], ['hasta_uit' => null, 'tasa' => 30]], $validFrom);
+        self::parameterJson('quinta_divisores', ['1' => 12, '2' => 12, '3' => 12, '4' => 9, '5' => 8, '6' => 8, '7' => 8, '8' => 5, '9' => 4, '10' => 4, '11' => 4, '12' => 1], $validFrom);
+        self::parameterJson('quinta_cortes_retenciones', ['1' => 0, '2' => 0, '3' => 0, '4' => 3, '5' => 4, '6' => 4, '7' => 4, '8' => 7, '9' => 8, '10' => 8, '11' => 8, '12' => 11], $validFrom);
     }
 
     public static function parameter(string $code, string $value, string $validFrom = '2020-01-01'): void

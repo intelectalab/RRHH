@@ -135,7 +135,7 @@ test('PER-1 · el estado solo cambia por acciones con permiso; segregación al a
 
     $closed = perCall($this->payroll, 'POST', "/payroll-periods/{$p}/close-incidents")->assertOk();
     $this->assertMatchesOpenApi($closed, 'post', '/payroll-periods/{id}/close-incidents', 200);
-    expect($closed->json('data.status'))->toBe('incidents_closed')->and($closed->json('data.allowed_actions'))->toBe(['reopen-incidents']);
+    expect($closed->json('data.status'))->toBe('incidents_closed')->and($closed->json('data.allowed_actions'))->toBe(['reopen-incidents', 'calculate']);
     $this->assertMatchesOpenApi(perCall($this->payroll, 'POST', "/payroll-periods/{$p}/reopen-incidents")->assertOk(), 'post', '/payroll-periods/{id}/reopen-incidents', 200);
 
     $bad = perCall($this->payroll, 'POST', "/payroll-periods/{$p}/submit")->assertStatus(409);

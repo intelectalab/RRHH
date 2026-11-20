@@ -24072,6 +24072,9 @@ export interface components {
             counts?: {
                 [key: string]: unknown;
             } | null;
+            last_run?: {
+                [key: string]: unknown;
+            } | null;
             allowed_actions: string[];
             totals?: {
                 [key: string]: unknown;
@@ -24103,6 +24106,9 @@ export interface components {
             statutory_period_code?: string | null;
             /** Format: date-time */
             closed_at?: string | null;
+            last_run?: {
+                [key: string]: unknown;
+            } | null;
         };
         PayrollRegime: {
             /** @description Identificador opaco */

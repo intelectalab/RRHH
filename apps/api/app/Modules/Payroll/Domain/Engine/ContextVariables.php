@@ -30,6 +30,7 @@ final class ContextVariables
         'regimen' => 'text',
         'sistema_salud' => 'text',
         'sistema_pension' => 'text',
+        'afp_comision_tipo' => 'text',
         'tiene_asignacion_familiar' => 'boolean',
         'tiene_seguro_riesgo' => 'boolean',
     ];

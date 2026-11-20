@@ -5502,6 +5502,7 @@
     "status_accounted": "Accounted",
     "action_close-incidents": "Close incidents",
     "action_reopen-incidents": "Reopen incidents",
+    "action_calculate": "Calculate payroll",
     "action_submit": "Send for approval",
     "action_approve": "Approve",
     "action_reject": "Return",

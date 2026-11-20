@@ -177,7 +177,10 @@ final class ContextBuilder
         // CPT-5 · Sistema previsional vigente al fin del tramo (afp, onp, none, other): lo usan las condiciones de los aportes.
         $pension = DB::table('employment_pension_affiliations')->where('employment_id', $employmentId);
         EffectiveDated::applyAsOf($pension, $end);
-        $pensionSystem = (string) ($pension->value('pension_system') ?? '');
+        $affiliation = $pension->first(['pension_system', 'commission_scheme']);
+        $pensionSystem = (string) ($affiliation->pension_system ?? '');
+        // PER-6 · Tipo de comisión de la AFP (flujo o mixta) vigente al fin del tramo: decide qué tasa de comisión aplica.
+        $commissionScheme = (string) ($affiliation->commission_scheme ?? '');
         $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
 
         $variables = [
@@ -201,6 +204,7 @@ final class ContextBuilder
             'regimen' => $regime,
             'sistema_salud' => (string) ($flags->health_scheme ?? ''),
             'sistema_pension' => $pensionSystem,
+            'afp_comision_tipo' => $commissionScheme,
             'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
             'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
         ];

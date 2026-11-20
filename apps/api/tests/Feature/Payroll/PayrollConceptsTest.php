@@ -254,6 +254,8 @@ test('CPT-5 · el paquete Perú precarga conceptos con código SUNAT y calcula u
             'essalud_aporte_pct' => '9', 'gratificacion_bonificacion_extraordinaria_pct' => '9'] as $code => $value) {
             PayrollFixtures::parameter($code, $value);
         }
+        // PER-5 · La retención de quinta exige sus parámetros (sin ellos la relación queda con error, RN-PAR-04).
+        PayrollFixtures::incomeTaxParameters('5500');
         app(PayrollConceptsPackComponent::class)->apply('PE', null);
         app(PayrollConceptsPackComponent::class)->apply('PE', null);
         DB::table('employment_pension_affiliations')->insert(['tenant_id' => CPT_TENANT, 'employment_id' => $this->employment, 'pension_system' => 'onp', 'valid_from' => '2025-01-01']);

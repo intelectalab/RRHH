@@ -3,6 +3,8 @@
 return [
     'cycle' => 'As fórmulas destes conceitos dependem umas das outras em círculo: :concepts.',
     'formula_invalid' => 'A fórmula do conceito :concept não é válida.',
+    'parameter_missing' => 'Falta o parâmetro legal :code vigente na data do período: o vínculo não é calculado até carregá-lo.',
+    'income_tax_refund' => 'O ajuste final deixa :amount retido em excesso: fica como devolução pendente ao trabalhador.',
     'parameter_pending' => 'O parâmetro :code está pendente de validação: o resultado usou o valor carregado.',
     'regime_unknown' => 'O regime trabalhista não existe para o país da organização.',
     'regime_before_hire' => 'A mudança de regime não pode ser anterior à data de admissão.',
@@ -43,6 +45,7 @@ return [
     ],
     'process_not_applicable' => 'O regime :regime não gera o processo :kind: o vínculo fica fora deste cálculo.',
     'explain' => [
+        'income_tax' => 'Retenção de quinta categoria: renda bruta anual projetada :gross, renda líquida :net, imposto anual :tax, retido antes :prior, divisor :divisor; retenção do mês :amount :currency.',
         'formula' => 'Foi aplicada a fórmula «:formula».',
         'incidents' => 'O valor vem das ocorrências registradas no período.',
         'variable' => 'Dado «:name»: :value.',
@@ -87,6 +90,7 @@ return [
         'reason_required' => 'Informe o motivo.',
         'with_errors' => 'Há trabalhadores com erro no último cálculo: corrija-os antes de enviar para aprovação.',
         'segregation' => 'Quem calculou, enviou ou lançou ocorrências deste período não pode aprová-lo.',
+        'run_in_progress' => 'Há um cálculo em andamento para este período: aguarde terminar ou descarte-o.',
         'declared' => 'O período já foi declarado: as correções vão como ajuste no período seguinte.',
     ],
     'incidents' => [

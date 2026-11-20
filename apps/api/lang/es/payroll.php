@@ -3,6 +3,8 @@
 return [
     'cycle' => 'Las fórmulas de estos conceptos dependen unas de otras en círculo: :concepts.',
     'formula_invalid' => 'La fórmula del concepto :concept no es válida.',
+    'parameter_missing' => 'Falta el parámetro legal :code vigente a la fecha del periodo: la relación no se calcula hasta cargarlo.',
+    'income_tax_refund' => 'La regularización deja un exceso de retención de :amount: queda como devolución pendiente al trabajador.',
     'parameter_pending' => 'El parámetro :code está por validar: el resultado se calculó con el valor cargado.',
     'regime_unknown' => 'El régimen laboral no existe para el país de la organización.',
     'regime_before_hire' => 'El cambio de régimen no puede ser anterior a la fecha de ingreso.',
@@ -43,6 +45,7 @@ return [
     ],
     'process_not_applicable' => 'El régimen :regime no genera el proceso :kind: la relación queda fuera de este cálculo.',
     'explain' => [
+        'income_tax' => 'Retención de quinta: renta bruta anual proyectada :gross, renta neta :net, impuesto anual :tax, retenido antes :prior, divisor :divisor; retención del mes :amount :currency.',
         'formula' => 'Se aplicó la fórmula «:formula».',
         'incidents' => 'El monto viene de las incidencias registradas en el periodo.',
         'variable' => 'Dato «:name»: :value.',
@@ -87,6 +90,7 @@ return [
         'reason_required' => 'Indica el motivo.',
         'with_errors' => 'Hay trabajadores con error en el último cálculo: corrígelos antes de enviar a aprobación.',
         'segregation' => 'Quien calculó, envió o cargó incidencias de este periodo no puede aprobarlo.',
+        'run_in_progress' => 'Hay un cálculo en curso para este periodo: espera a que termine o descártalo.',
         'declared' => 'El periodo ya fue declarado: las correcciones van como ajuste en el periodo siguiente.',
     ],
     'incidents' => [

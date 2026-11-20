@@ -35,7 +35,7 @@ una fórmula, el editor de conceptos la revisa con `POST /payroll-formulas/valid
 `sueldo` (vigente al final del periodo), `sueldo_tramos` (suma de cada tramo de sueldo por sus días sobre la base
 del régimen), `dias_base`, `dias_periodo`, `dias_relacion`, `dias_laborados`, `dias_remotos`, `dias_ausencia`,
 `dias_ausencia_pagada`, `dias_sin_goce`, `dias_cargo_empleador`, `dias_subsidio`, `horas_ausencia`, `fecha_inicio`,
-`fecha_fin`, `fecha_ingreso`, `fecha_cese` (vacía si no cesó), `regimen`, `sistema_salud`,
+`fecha_fin`, `fecha_ingreso`, `fecha_cese` (vacía si no cesó), `regimen`, `sistema_salud`, `sistema_pension`, `afp_comision_tipo` (flow o mixed),
 `tiene_asignacion_familiar` y `tiene_seguro_riesgo`. Los días y ausencias salen del resumen de ausencias del periodo
 (AUS-6).
 
@@ -47,3 +47,13 @@ del régimen), `dias_base`, `dias_periodo`, `dias_relacion`, `dias_laborados`, `
 - Un concepto que no aplica al régimen o al tipo de proceso vale cero para los demás.
 - Ninguna tasa ni tope legal se escribe en la fórmula: se lee con `param.` (con vigencia y estado «por validar»).
 - Cada resultado guarda su traza: la fórmula, los datos, los conceptos y los parámetros usados con su vigencia.
+
+## Retención del impuesto a la renta (PER-5)
+
+La retención de quinta categoría no es una fórmula del lenguaje: es un paso del motor que corre después de los
+conceptos del periodo, porque proyecta el año con lo pagado en meses anteriores y lo retenido en el libro. El
+concepto de retención del paquete de país (en Perú, `renta_quinta`) recibe el monto y su traza: remuneración
+ordinaria del mes, meses que faltan, gratificaciones por percibir, ingresos anteriores y de otros empleadores,
+renta bruta y neta proyectadas, impuesto anual, retenciones deducidas según el corte del mes, divisor y
+retención adicional por el extraordinario del mes. La escala, la deducción, los divisores y los cortes son
+parámetros legales con vigencia (kit/docs/18 §2.3). Una incidencia en ese concepto prevalece (retención manual).
