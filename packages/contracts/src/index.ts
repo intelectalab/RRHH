@@ -5596,6 +5596,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/employments/{employment_id}/fifth-category-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PER-11 · Resumen del ejercicio (?fiscal_year) del libro de quinta del trabajador: retención vigente de cada mes (última secuencia, sin corridas descartadas) y su acumulado, acumulados traídos del sistema anterior (PER-12) y conciliación con las boletas de los periodos cerrados (closed_payslips frente a closed_ledger, reconciled). Montos sensibles con registro de accesos */
+        get: operations["getEmploymentsEmploymentIdFifthCategorySummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employments/{employment_id}/health-regimes": {
         parameters: {
             query?: never;
@@ -11068,6 +11085,23 @@ export interface paths {
         put?: never;
         /** Rechazar una incidencia pendiente con motivo */
         post: operations["postPayrollIncidentsIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll-opening-balances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** PER-12 · Acumulados del ejercicio traídos del sistema anterior (saldos de apertura por trabajador con fecha de corte y sustento) para revisarlos contra el reporte de origen; entran y se revierten con la importación payroll_balances. El monto viaja con payroll.results.view */
+        get: operations["getPayrollOpeningBalances"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -41093,6 +41127,36 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    getEmploymentsEmploymentIdFifthCategorySummary: {
+        parameters: {
+            query: {
+                /** @description Ejercicio (AAAA) */
+                fiscal_year: string;
+            };
+            header?: never;
+            path: {
+                employment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["Unprocessable"];
+        };
+    };
     getEmploymentsEmploymentIdHealthRegimes: {
         parameters: {
             query?: never;
@@ -54208,6 +54272,38 @@ export interface operations {
             409: components["responses"]["Conflict"];
             422: components["responses"]["Unprocessable"];
             429: components["responses"]["TooManyRequests"];
+        };
+    };
+    getPayrollOpeningBalances: {
+        parameters: {
+            query?: {
+                /** @description Relación laboral */
+                "filter[employment_id]"?: string;
+                /** @description Ejercicio (AAAA) */
+                "filter[fiscal_year]"?: string;
+                /** @description Tipo: fifth_income, fifth_withheld, pension_contribution, health_contribution, gratification_base, cts_base, cts_deposit */
+                "filter[kind]"?: string;
+                /** @description Importación que lo trajo */
+                "filter[import_job_id]"?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     getPayrollPaymentBatchesId: {

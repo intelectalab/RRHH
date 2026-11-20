@@ -2,7 +2,7 @@
 
 Lista de trabajo para el especialista laboral (decisiones D-15 y D-36). Se genera con `kit/tools/esquema/gen_pendientes.py` desde `database/catalogos/parametros_legales_pe.json`; no se edita a mano.
 
-Hay **54 parámetros sin valor verificado**; **47** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
+Hay **55 parámetros sin valor verificado**; **48** afectan al primer corte comercial (régimen general, micro y pequeña empresa) y bloquean su salida (QA-17). Mientras un parámetro no tenga valor, la regla RN-PAR-03 impide cerrar una planilla que lo use.
 
 Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y la norma oficial (no una fuente secundaria). Luego se carga en `catalogos.py` con `verified=True` y se regenera.
 
@@ -14,6 +14,7 @@ Para cada fila, el especialista anota el valor, la fecha de inicio de vigencia y
 | `afp_comision_mixta_pct` | Comisión mixta por AFP | Todos | percent | SBS | Sí | Varía por AFP; cargar en pension_fund_rates cada periodo. | |
 | `afp_prima_seguro_pct` | Prima de seguro previsional | Todos | percent | SBS | Sí | Cargar desde la fuente oficial cada periodo. | |
 | `afp_remuneracion_maxima_asegurable` | Remuneración máxima asegurable | Todos | amount | SBS | Sí | Cargar desde la fuente oficial cada periodo. | |
+| `asignacion_familiar_edad_max_estudios` | Asignación familiar: edad máxima del hijo que cursa estudios superiores | Todos | years | Ley 25129 art. 2 | Sí | Hijos mayores de edad que cursan estudios superiores hasta los 24 años; por confirmar. Sin valor, los hijos mayores que estudian no dan asignación familiar. | |
 | `boletas_conservacion_anios` | Conservación de documentos de pago | Todos | years | DL 1310 | Sí | Citado de memoria en la investigación; validar con el texto vigente. | |
 | `contrato_modalidad_tope_acumulado_anios` | Tope acumulado de contratos a modalidad | Todos | years | DS 003-97-TR | Sí | El tope general no consta en la investigación. | |
 | `discapacidad_cuota_minimo_trabajadores` | Trabajadores desde los que aplica la cuota | Todos | count | Ley 29973 | Sí | No confirmado en el texto. | |

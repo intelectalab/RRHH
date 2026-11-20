@@ -40,8 +40,8 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio)",
+      "nota": "BSO-5 · Los días de descanso vacacional se pagan con la remuneración vacacional, no con la básica.",
+      "formula_motor": "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio + dias_vacaciones)",
       "condicion_motor": null,
       "orden": 10
     },
@@ -63,7 +63,8 @@
       "formula": "param(rmv) * param(asignacion_familiar_pct_rmv) / 100",
       "parametros_legales": [
         "rmv",
-        "asignacion_familiar_pct_rmv"
+        "asignacion_familiar_pct_rmv",
+        "asignacion_familiar_aplica"
       ],
       "codigo_plame": "0201",
       "codigo_plame_verificado": true,
@@ -76,9 +77,9 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
+      "nota": "BSO-4 · Solo con hijos con sustento vigente en derechohabientes (COL-6) y en los regímenes donde corresponde; el monto cambia solo con la RMV.",
       "formula_motor": "param.rmv * param.asignacion_familiar_pct_rmv / 100",
-      "condicion_motor": "tiene_asignacion_familiar",
+      "condicion_motor": "tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1",
       "orden": 20
     },
     {
@@ -412,10 +413,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "BSO-5 · Días gozados del libro de vacaciones con su periodo vacacional en la traza. Base: sueldo vigente (la asignación familiar se paga aparte en el mes); remuneración computable con promedios por validar con el especialista.",
+      "formula_motor": "sueldo / dias_base * dias_vacaciones",
+      "condicion_motor": "dias_vacaciones > 0",
+      "orden": 15
     },
     {
       "codigo": "vacaciones_compra",
@@ -445,10 +446,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "BSO-5 · Días vendidos con acuerdo firmado (VAC-6) que la planilla toma como incidencia; base por validar.",
+      "formula_motor": "sueldo / dias_base * cantidad.vacaciones_compra",
+      "condicion_motor": "cantidad.vacaciones_compra > 0",
+      "orden": 16
     },
     {
       "codigo": "subsidio_incapacidad",
@@ -740,7 +741,9 @@
         "utilidades": false
       },
       "formula": "remuneracion_computable",
-      "parametros_legales": [],
+      "parametros_legales": [
+        "indemnizacion_vacacional_aplica"
+      ],
       "codigo_plame": "0504",
       "codigo_plame_verificado": true,
       "regimenes": [
@@ -752,10 +755,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "",
-      "formula_motor": null,
-      "condicion_motor": null,
-      "orden": null
+      "nota": "BSO-5 · Días sin gozar de periodos vencidos; entra como incidencia pendiente de visto bueno para revisión de RRHH (no alcanza a quien decidió no gozarlas: por validar).",
+      "formula_motor": "sueldo / dias_base * cantidad.indemnizacion_vacacional * param.indemnizacion_vacacional_aplica",
+      "condicion_motor": "cantidad.indemnizacion_vacacional > 0",
+      "orden": 17
     },
     {
       "codigo": "indemnizacion_despido",

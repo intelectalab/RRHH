@@ -298,6 +298,16 @@ test('PER-3 · toma ausencias y vacaciones hasta el corte, lo registra y trae lo
         {
             return [['agreement_id' => '0195f000-0000-7000-8000-00000000aaaa', 'days' => '5', 'effective_on' => $from, 'concept_code' => 'VAC_COMPRA']];
         }
+
+        public function taken(string $employmentId, string $from, string $to): array
+        {
+            return [];
+        }
+
+        public function expired(string $employmentId, string $asOf): array
+        {
+            return [];
+        }
     };
     app()->instance(AbsenceIncidents::class, $absences);
     app()->instance(VacationPayrollIncidents::class, $vacations);

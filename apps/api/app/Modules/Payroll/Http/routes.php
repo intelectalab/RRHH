@@ -1,9 +1,11 @@
 <?php
 
+use App\Modules\Payroll\Http\Controllers\FifthCategoryLedgerController;
 use App\Modules\Payroll\Http\Controllers\LegalParametersController;
 use App\Modules\Payroll\Http\Controllers\PayrollConceptController;
 use App\Modules\Payroll\Http\Controllers\PayrollEngineController;
 use App\Modules\Payroll\Http\Controllers\PayrollIncidentController;
+use App\Modules\Payroll\Http\Controllers\PayrollOpeningBalanceController;
 use App\Modules\Payroll\Http\Controllers\PayrollPeriodController;
 use App\Modules\Payroll\Http\Controllers\PayrollReviewController;
 use App\Modules\Payroll\Http\Controllers\PayrollRunController;
@@ -129,4 +131,10 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::post('/wage-tables/{id}/verify', [LegalParametersController::class, 'verifyWageTable'])->middleware('permission:payroll.wage_tables.verify');
     // PAR-7 · Novedades normativas con los periodos que tocan.
     Route::get('/legal-updates', [LegalParametersController::class, 'legalUpdates'])->middleware('permission:payroll.legal_parameters.view');
+    // PER-11 · Libro de retenciones de quinta (solo lectura) y resumen del ejercicio con su conciliación.
+    Route::get('/fifth-category-ledger', [FifthCategoryLedgerController::class, 'index'])->middleware('permission:payroll.fifth_category_ledger.view');
+    Route::get('/fifth-category-ledger/{id}', [FifthCategoryLedgerController::class, 'show'])->whereUuid('id')->middleware('permission:payroll.fifth_category_ledger.view');
+    Route::get('/employments/{employment_id}/fifth-category-summary', [FifthCategoryLedgerController::class, 'summary'])->middleware('permission:payroll.fifth_category_ledger.view');
+    // PER-12 · Acumulados del ejercicio traídos del sistema anterior (se cargan con el importador payroll_balances).
+    Route::get('/payroll-opening-balances', [PayrollOpeningBalanceController::class, 'index'])->middleware('permission:payroll.incidents.view');
 });

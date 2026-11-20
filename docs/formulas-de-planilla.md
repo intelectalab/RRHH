@@ -36,8 +36,10 @@ una fórmula, el editor de conceptos la revisa con `POST /payroll-formulas/valid
 del régimen), `dias_base`, `dias_periodo`, `dias_relacion`, `dias_laborados`, `dias_remotos`, `dias_ausencia`,
 `dias_ausencia_pagada`, `dias_sin_goce`, `dias_cargo_empleador`, `dias_subsidio`, `horas_ausencia`, `fecha_inicio`,
 `fecha_fin`, `fecha_ingreso`, `fecha_cese` (vacía si no cesó), `regimen`, `sistema_salud`, `sistema_pension`, `afp_comision_tipo` (flow o mixed),
-`tiene_asignacion_familiar` y `tiene_seguro_riesgo`. Los días y ausencias salen del resumen de ausencias del periodo
-(AUS-6).
+`tiene_asignacion_familiar`, `hijos_asignacion_familiar`, `dias_vacaciones` y `tiene_seguro_riesgo`. Los días y
+ausencias salen del resumen de ausencias del periodo (AUS-6). `dias_vacaciones` son los días de descanso vacacional
+del tramo tomados del libro de vacaciones (BSO-5); `tiene_asignacion_familiar` y `hijos_asignacion_familiar` salen de
+los derechohabientes con sustento vigente al fin del tramo (BSO-4), no de una marca manual.
 
 ## Reglas
 

@@ -73,6 +73,16 @@ return [
         'additional_withholding' => ['payroll.fifth_category_ledger.view', 'salary'],
         'withholding_amount' => ['payroll.fifth_category_ledger.view', 'salary'],
     ],
+    // PER-12 · Acumulados del ejercicio traídos del sistema anterior.
+    'PayrollOpeningBalance' => ['amount' => ['payroll.results.view', 'salary']],
+    // PER-11 · Resumen del ejercicio del libro de quinta (retención por mes, acumulado y conciliación).
+    'FifthCategorySummary' => [
+        'months' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'accumulated' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'opening' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'closed_payslips' => ['payroll.fifth_category_ledger.view', 'salary'],
+        'closed_ledger' => ['payroll.fifth_category_ledger.view', 'salary'],
+    ],
     'FifthCategoryRefund' => ['amount' => ['payroll.fifth_category_refunds.view', 'salary']],
     'Grievance' => [
         'description' => ['grievances.cases.view', 'complaint'],

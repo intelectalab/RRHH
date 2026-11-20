@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 204 | 0 | 84,6 % |
-| Backlog completo | 512 | 211 | 0 | 41,2 % |
+| Primer corte comercial (MVP) | 241 | 208 | 0 | 86,3 % |
+| Backlog completo | 512 | 215 | 0 | 42,0 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -257,8 +257,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PER-8 | Revisión, aprobación y cierre | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Envío con confirmación de anomalías, aprobación por flujo WFL o directa con segregación, cierre bloqueado por críticas o parámetros por validar. |
 | PER-9 | Reapertura controlada y planilla complementaria | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Planilla complementaria enlazada al periodo cerrado o pagado (ADR 0017); reapertura bloqueada con lotes de pago. |
 | PER-10 | Pago de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Lotes de pago por banco con las cuentas de haberes, archivo genérico por puerto (ADR 0020), confirmación idempotente, anulación con motivo y estado pagado; Nómina → Pagos. |
-| PER-11 | Libro de retenciones de quinta | PER | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| PER-12 | Importación de acumulados de planilla del ejercicio | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| PER-11 | Libro de retenciones de quinta | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Libro de retenciones de quinta con consulta, detalle, resumen conciliado con boletas cerradas y exportación; Nómina → Retenciones de quinta. |
+| PER-12 | Importación de acumulados de planilla del ejercicio | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Importación de acumulados del ejercicio con fecha de corte y sustento que alimentan la proyección de quinta; revertible y bloqueada si hay periodo cerrado. |
 | PER-13 | Comparación con el sistema anterior durante la planilla en paralelo | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | BOL-1 | Generación de boletas en PDF | BOL | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
 | BOL-2 | Publicación en el portal y constancia de entrega | BOL | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
@@ -268,8 +268,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | BSO-1 | Gratificaciones | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | BSO-2 | CTS | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
 | BSO-3 | Utilidades | BSO | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| BSO-4 | Asignación familiar | BSO | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| BSO-5 | Remuneración vacacional e indemnización vacacional | BSO | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
+| BSO-4 | Asignación familiar | BSO | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Asignación familiar por derechohabientes con sustento vigente; edad máxima por estudios «por validar». |
+| BSO-5 | Remuneración vacacional e indemnización vacacional | BSO | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Remuneración vacacional por días gozados, venta e indemnización vacacional (con visto bueno); caso dorado MOTOR-VACACIONES-001. |
 | PRE-1 | Préstamos con cronograma | PRE | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRE-2 | Adelantos | PRE | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRE-3 | Descuento automático en planilla | PRE | Fase 3 · Nómina Perú | Task | — | pendiente | — |  |

@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 185,
+    "parametros": 186,
     "verificados": 131,
-    "sin_verificar": 54
+    "sin_verificar": 55
   },
   "parametros": [
     {
@@ -175,6 +175,21 @@
       "verificado": true,
       "base_legal": "Fuentes secundarias 2026",
       "nota": "Vigencia extendida al 1-1-2025 para periodos de 2025: el valor no cambió entre 2025 y 2026; su fecha real de inicio es anterior."
+    },
+    {
+      "codigo": "asignacion_familiar_edad_max_estudios",
+      "nombre": "Asignación familiar: edad máxima del hijo que cursa estudios superiores",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "years",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Ley 25129 art. 2",
+      "nota": "Hijos mayores de edad que cursan estudios superiores hasta los 24 años; por confirmar. Sin valor, los hijos mayores que estudian no dan asignación familiar."
     },
     {
       "codigo": "mayoria_edad_anios",

@@ -23,6 +23,8 @@ final class ContextVariables
         'dias_cargo_empleador' => 'number',
         'dias_subsidio' => 'number',
         'horas_ausencia' => 'number',
+        'dias_vacaciones' => 'number',
+        'hijos_asignacion_familiar' => 'number',
         'fecha_inicio' => 'date',
         'fecha_fin' => 'date',
         'fecha_ingreso' => 'date',

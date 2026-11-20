@@ -1067,6 +1067,8 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/payroll-incidents/{id}/reject` | `payroll.incidents.approve` | 3 |
 | POST | `/payroll-periods/{id}/incidents/bulk` | `payroll.incidents.create` | 3 |
 | POST | `/payroll-periods/{id}/consume-time` | `payroll.incidents.create` | 3 |
+| GET | `/employments/{employment_id}/fifth-category-summary` | `payroll.fifth_category_ledger.view` | 3 |
+| GET | `/payroll-opening-balances` | `payroll.incidents.view` | 3 |
 | GET | `/payroll-periods/{id}/time-summary` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/variance` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/anomalies` | `payroll.periods.view` | 3 |

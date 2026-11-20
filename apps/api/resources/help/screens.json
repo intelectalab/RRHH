@@ -307,6 +307,12 @@
       "permissions": [
         "payroll.periods.mark_paid"
       ]
+    },
+    "payroll.fifth_ledger": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.fifth_category_ledger.view"
+      ]
     }
   }
 }

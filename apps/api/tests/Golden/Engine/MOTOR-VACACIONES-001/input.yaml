@@ -1,0 +1,18 @@
+period: { from: "2026-03-01", to: "2026-03-31", kind: regular }
+employment:
+  hire_date: "2025-01-01"
+  regime: pe_general
+  compensations:
+    - { amount: "3000.00", valid_from: "2025-01-01" }
+incidents:
+  vacaciones_compra: { amount: "0", quantity: "5" }
+  indemnizacion_vacacional: { amount: "0", quantity: "3" }
+variables:
+  dias_vacaciones: "10"
+  tiene_asignacion_familiar: true
+concepts:
+  - { code: rem_basica, kind: earning, formula: "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio + dias_vacaciones)", sort_order: 10 }
+  - { code: rem_vacacional, kind: earning, formula: "sueldo / dias_base * dias_vacaciones", condition: "dias_vacaciones > 0", sort_order: 15 }
+  - { code: vacaciones_compra, kind: earning, formula: "sueldo / dias_base * cantidad.vacaciones_compra", condition: "cantidad.vacaciones_compra > 0", sort_order: 16 }
+  - { code: indemnizacion_vacacional, kind: earning, formula: "sueldo / dias_base * cantidad.indemnizacion_vacacional * param.indemnizacion_vacacional_aplica", condition: "cantidad.indemnizacion_vacacional > 0", sort_order: 17 }
+  - { code: asig_familiar, kind: earning, formula: "param.rmv * param.asignacion_familiar_pct_rmv / 100", condition: "tiene_asignacion_familiar y param.asignacion_familiar_aplica = 1", sort_order: 20 }

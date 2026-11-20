@@ -14,6 +14,7 @@ return [
         'dependents' => 'Dependents',
         'positions' => 'Positions',
         'payroll_incidents' => 'Payroll incidents',
+        'payroll_balances' => 'Year-to-date payroll balances',
         'job_profiles' => 'Jobs',
     ],
     'columns' => [
@@ -28,6 +29,19 @@ return [
             'category' => 'Category',
             'print_on_payslip' => 'Printed on the payslip',
             'notes' => 'Note',
+        ],
+        'payroll_balances' => [
+            'document_type' => 'Document type',
+            'document_number' => 'Document number',
+            'legal_entity' => 'Company (tax ID)',
+            'fiscal_year' => 'Fiscal year',
+            'cutoff_date' => 'Cutoff date',
+            'kind' => 'Balance type',
+            'amount' => 'Amount',
+            'period_month' => 'Month',
+            'semester' => 'Semester',
+            'concept_code' => 'Concept code',
+            'evidence' => 'Supporting source',
         ],
         'payroll_incidents' => [
             'payroll_group' => 'Payroll group',

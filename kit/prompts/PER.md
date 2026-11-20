@@ -3,7 +3,7 @@
 Proceso de planilla de punta a punta: periodo, incidencias, cálculo, simulación, revisión, aprobación, cierre y pago.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 13 (9 historias y 4 tareas); 13 del MVP. **Operaciones de API:** 47.
+- **Actividades:** 13 (9 historias y 4 tareas); 13 del MVP. **Operaciones de API:** 49.
 - **Especificación:** `kit/docs/modulos/M-PER.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: quinta proyectada, pagos extraordinarios y regularización de diciembre.
 
