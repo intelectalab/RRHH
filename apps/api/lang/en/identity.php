@@ -58,4 +58,10 @@ return [
         'device_label' => 'GestiaHR support session',
         'grant_not_active' => 'The authorization is no longer active.',
     ],
+    'quick_unlock' => [
+        'disabled' => 'PIN sign-in is turned off in your organization.',
+        'unavailable' => 'This phone no longer has PIN sign-in. Sign in with your password or a code.',
+        'wrong_pin' => 'The PIN is not correct.',
+        'weak_pin' => 'Use 4 to 8 digits, not a single repeated number or a sequence.',
+    ],
 ];

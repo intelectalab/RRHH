@@ -3,6 +3,8 @@
 namespace App\Modules\Reports\Application;
 
 use App\Shared\Audit\AuditLogger;
+use App\Shared\CustomFields\CustomFieldValues;
+use App\Shared\CustomFields\HasCustomFields;
 use App\Shared\Documents\SimplePdf;
 use App\Shared\Exceptions\AyniException;
 use App\Shared\Exports\ExportRegistry;
@@ -81,8 +83,13 @@ final class ExportService
             throw ValidationException::withMessages(['filters' => [trans('exports.filter_invalid', ['filter' => 'filters'], $locale)]]);
         }
         $filters = [];
+        // CFG-5: una fuente con campos personalizados admite además custom.clave de los campos visibles.
+        $allowed = $source->filters();
+        if ($source instanceof HasCustomFields) {
+            $allowed = array_merge($allowed, app(CustomFieldValues::class)->filterKeys($source->customFieldEntity(), $permissions));
+        }
         foreach ($rawFilters as $key => $value) {
-            if (! in_array($key, $source->filters(), true) || ! (is_string($value) || is_int($value))) {
+            if (! in_array($key, $allowed, true) || ! (is_string($value) || is_int($value))) {
                 throw ValidationException::withMessages(['filters.'.$key => [trans('exports.filter_invalid', ['filter' => (string) $key], $locale)]]);
             }
             $filters[(string) $key] = trim((string) $value);

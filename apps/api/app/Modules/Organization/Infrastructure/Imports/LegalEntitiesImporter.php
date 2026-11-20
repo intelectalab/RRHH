@@ -4,6 +4,7 @@ namespace App\Modules\Organization\Infrastructure\Imports;
 
 use App\Modules\Organization\Application\LegalEntityService;
 use App\Modules\Organization\Infrastructure\Models\LegalEntity;
+use App\Shared\CustomFields\HasCustomFields;
 use App\Shared\Imports\ImportColumn;
 use App\Shared\Imports\ImportContext;
 use App\Shared\Imports\Importer;
@@ -18,12 +19,18 @@ use Illuminate\Support\Facades\Schema;
  * (RN-IMP-06). País, moneda y zona horaria toman los de la organización si vienen vacíos; el
  * régimen acepta el código (pe_general) o el nombre («Régimen general»).
  */
-final class LegalEntitiesImporter implements Importer
+final class LegalEntitiesImporter implements HasCustomFields, Importer
 {
     /** Tablas que, si apuntan a la empresa, impiden deshacer su importación (RN-IMP-07). */
     private const DEPENDENTS = ['employments', 'sites', 'org_units', 'positions', 'contracts', 'payroll_periods'];
 
     public function __construct(private readonly LegalEntityService $entities) {}
+
+    /** CFG-5 · Sus columnas custom.clave las maneja el tratamiento común (CustomFieldsImporter). */
+    public function customFieldEntity(): string
+    {
+        return 'legal_entity';
+    }
 
     public function entity(): string
     {

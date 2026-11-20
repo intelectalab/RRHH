@@ -1034,7 +1034,8 @@
     "no": "No",
     "save": "Save",
     "cancel": "Cancel",
-    "pick": "Choose…"
+    "pick": "Choose…",
+    "entity_employment": "Employees"
   },
   "fx": {
     "title": "Currencies and exchange rates",
@@ -4050,7 +4051,8 @@
     "no_certificates": "You have not requested certificates yet.",
     "card_hr_requests": "Requests to HR",
     "waiting_your_reply": "{n} waiting for your reply",
-    "no_hr_requests": "You have no open requests."
+    "no_hr_requests": "You have no open requests.",
+    "nav_more": "More"
   },
   "home_board": {
     "card_pending_approvals": "Pending approvals",
@@ -4707,5 +4709,39 @@
     "entering": "Opening the support session…",
     "entry_failed_title": "The support session could not be opened",
     "entry_failed": "The link is invalid, already used, expired, or the organization turned off support access."
+  },
+  "push": {
+    "title": "Push notifications",
+    "text": "Get a notice on this phone or browser that invites you to open GestiaHR; it never shows names or amounts. You can turn it off per notice type in the table.",
+    "enable": "Turn on for this device",
+    "enabled": "Push notifications turned on for this device.",
+    "removed": "Device removed: it will no longer get push notifications.",
+    "remove": "Remove",
+    "denied": "The browser did not allow notifications.",
+    "error": "Push could not be turned on for this device.",
+    "unavailable": "Push notifications are not available in this environment yet.",
+    "unsupported": "This browser does not support push notifications. Install the app or use another browser.",
+    "devices": "Devices with push notifications",
+    "this_phone": "Phone",
+    "this_browser": "Browser",
+    "since": "since {date}"
+  },
+  "pin": {
+    "title": "Sign in with your PIN",
+    "hello": "Hi, {name}",
+    "text": "This phone remembers your account. Enter your PIN to sign in.",
+    "label": "PIN",
+    "enter": "Sign in",
+    "other": "Sign in with password or code",
+    "forget": "Forget this phone",
+    "setup_title": "Quick sign-in with PIN",
+    "setup_text": "Sign in to GestiaHR on this phone with a 4 to 8 digit PIN for {days} days, without typing your password.",
+    "setup_active": "This phone already signs in with a PIN. You can change or forget it.",
+    "new": "New PIN",
+    "confirm": "Repeat the PIN",
+    "activate": "Turn on PIN",
+    "change": "Change PIN",
+    "saved": "PIN saved on this phone.",
+    "forgotten": "This phone no longer signs in with a PIN."
   }
 }

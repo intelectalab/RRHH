@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { formatDate } from '@/lib/format'
 import { useT } from '@/lib/useT'
+import { useCustomFields } from '@/modules/customfields/CustomFieldsEditor'
+import { customColumns, customFilters, exportFilters } from '@/modules/customfields/customTable'
 import { ExportButton } from '@/modules/exports/ExportButton'
 import { useSession } from '@/modules/session/SessionProvider'
 import { DataTable, type TableColumn, type TableFilter, type TablePreset } from '@/ui/components/DataTable'
@@ -27,6 +29,8 @@ export function EmployeesScreen() {
   const { toast, node: toastNode } = useToast()
   const [total, setTotal] = useState<number | null>(null)
   const [options, setOptions] = useState<HireOptions | null>(null)
+  // CFG-5: los campos personalizados de la ficha son columnas y filtros más, sin código propio.
+  const custom = useCustomFields('employment')
 
   useEffect(() => {
     if (!can('people.employments.create')) return
@@ -50,6 +54,7 @@ export function EmployeesScreen() {
     { key: 'company', label: t('emp.col_company'), hiddenByDefault: true, render: (e) => e.legal_entity_name ?? '—' },
     { key: 'hire_date', label: t('emp.col_hire_date'), sort: 'hire_date', render: (e) => formatDate(locale, e.hire_date) },
     { key: 'status', label: t('emp.col_status'), sort: 'status', render: (e) => <StatusBadge tone={STATUS_TONE[e.status]}>{t(`emp.status_${e.status}`)}</StatusBadge> },
+    ...customColumns<Employment>(custom.fields, t),
   ]
 
   const filters: TableFilter[] = [
@@ -59,6 +64,7 @@ export function EmployeesScreen() {
       { key: 'site_id', label: t('emp.filter_site'), options: options.sites.map((s) => ({ value: s.id, label: s.name })) },
       { key: 'job_profile_id', label: t('emp.filter_job'), options: options.job_profiles.map((j) => ({ value: j.id, label: j.name })) },
     ] : []),
+    ...customFilters(custom.fields, t),
   ]
 
   const presets: TablePreset[] = [
@@ -94,7 +100,7 @@ export function EmployeesScreen() {
           toolbar={(state) => (
             <ExportButton
               resource="employments"
-              filters={{ q: state.q.trim(), ...Object.fromEntries(Object.entries(state.filters).filter(([k]) => ['status', 'org_unit_id', 'site_id', 'job_profile_id'].includes(k))) }}
+              filters={{ q: state.q.trim(), ...exportFilters(state.filters, ['status', 'org_unit_id', 'site_id', 'job_profile_id']) }}
               onError={(m) => toast(m, 'error')}
               onQueued={(m) => toast(m)}
             />

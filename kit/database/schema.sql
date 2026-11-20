@@ -1461,6 +1461,31 @@ ALTER TABLE user_sessions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON user_sessions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_user_sessions_touch BEFORE UPDATE ON user_sessions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+CREATE TABLE user_quick_unlocks (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  user_id uuid NOT NULL,
+  device_token_hash text NOT NULL,
+  pin_hash text NOT NULL,  -- SENSIBLE
+  device_label text,
+  mfa_passed boolean NOT NULL DEFAULT false,
+  failed_attempts integer NOT NULL DEFAULT 0,
+  last_used_at timestamptz,
+  expires_at timestamptz NOT NULL,
+  revoked_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT uq_user_quick_unlocks_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_user_quick_unlocks_device_token_hash UNIQUE (tenant_id, device_token_hash),
+  CONSTRAINT fk_user_quick_unlocks_user_id FOREIGN KEY (tenant_id, user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE user_quick_unlocks IS 'Reingreso rápido en un teléfono (ESS-6): token de dispositivo (solo su SHA-256, en cookie HttpOnly) más PIN con hash; caduca, se olvida tras varios PIN errados y se revoca.';
+CREATE INDEX ix_user_quick_unlocks_user_id ON user_quick_unlocks (tenant_id, user_id);
+ALTER TABLE user_quick_unlocks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_quick_unlocks FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON user_quick_unlocks USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_user_quick_unlocks_touch BEFORE UPDATE ON user_quick_unlocks FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
 CREATE TABLE login_attempts (
   id uuid NOT NULL DEFAULT uuid_v7(),
   tenant_id uuid NOT NULL REFERENCES tenants (id),
@@ -2281,6 +2306,7 @@ CREATE TABLE push_devices (
   platform text NOT NULL CHECK (platform IN ('ios','android','web')),
   token_enc text NOT NULL,  -- SENSIBLE (cifrado en la aplicación)
   token_hash text NOT NULL,
+  label text,
   last_seen_at timestamptz,
   revoked_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -18503,6 +18529,8 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('seguridad.otp_intentos', 'base', 'Intentos por código', 'Intentos fallidos que admite un código antes de anularse.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
   ('seguridad.otp_reenvio_segundos', 'base', 'Espera para pedir otro código (segundos)', 'Tiempo mínimo entre dos envíos de código al mismo usuario.', 'integer', '60'::jsonb, ARRAY['organization'], '{"min": 30, "max": 600}'::jsonb),
   ('seguridad.marca_agua_descargas', 'base', 'Marca de agua en exportaciones', 'Agrega a cada archivo exportado el nombre de quien lo descargó y la fecha.', 'boolean', 'false'::jsonb, ARRAY['organization'], NULL),
+  ('seguridad.pin_dias_vigencia', 'base', 'Vigencia del PIN de reingreso (días)', 'ESS-6 · Días que dura el reingreso rápido con PIN en un teléfono; al vencer se vuelve a ingresar con clave o código. 0: el PIN no se ofrece.', 'integer', '30'::jsonb, ARRAY['organization'], '{"min": 0, "max": 180}'::jsonb),
+  ('seguridad.pin_intentos', 'base', 'Intentos de PIN antes de olvidarlo', 'ESS-6 · PIN incorrectos seguidos tras los cuales el teléfono olvida el reingreso rápido.', 'integer', '5'::jsonb, ARRAY['organization'], '{"min": 3, "max": 10}'::jsonb),
   ('exportaciones.umbral_segundo_plano', 'base', 'Filas para exportar en segundo plano', 'UI-11 · RN-UI-08: una exportación con más filas que este número se genera en segundo plano y avisa con un enlace cuando está lista; las más chicas se descargan al instante.', 'integer', '1000'::jsonb, ARRAY['organization'], '{"min": 100, "max": 50000}'::jsonb),
   ('seguridad.acceso_soporte', 'base', 'Acceso del soporte de GestiaHR', 'Permite que el soporte de GestiaHR entre a la organización con motivo registrado y por tiempo limitado (RN-SAS-08). Desactivado, ninguna sesión de soporte puede abrirse.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('seguridad.registrar_acceso_sensible', 'base', 'Registrar accesos a datos sensibles', 'Deja constancia de cada consulta de sueldo, salud, denuncias, sanciones o biometría.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
@@ -18515,7 +18543,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('aprobaciones.permitir_masivas', 'base', 'Aprobaciones masivas', 'Permite aprobar varias solicitudes a la vez cuando el tipo lo admite.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('automatizaciones.max_ejecuciones_hora', 'base', 'Ejecuciones por hora de una regla', 'Ejecuciones de una misma regla en una hora a partir de las cuales se pausa sola y se avisa al administrador (protección contra bucles, RN-WFL-11).', 'integer', '100'::jsonb, ARRAY['organization'], '{"min": 10, "max": 10000}'::jsonb),
   ('automatizaciones.reintentos', 'base', 'Reintentos de una acción fallida', 'Veces que se reintenta automáticamente una ejecución fallida antes de dejarla para revisión manual (RN-WFL-10).', 'integer', '3'::jsonb, ARRAY['organization'], '{"min": 0, "max": 10}'::jsonb),
-  ('notificaciones.canales_activos', 'base', 'Canales de notificación', 'Canales habilitados para la organización.', 'list', '["in_app", "email"]'::jsonb, ARRAY['organization'], '["in_app", "email", "push", "whatsapp", "sms"]'::jsonb),
+  ('notificaciones.canales_activos', 'base', 'Canales de notificación', 'Canales habilitados para la organización.', 'list', '["in_app", "email", "push"]'::jsonb, ARRAY['organization'], '["in_app", "email", "push", "whatsapp", "sms"]'::jsonb),
   ('notificaciones.silencio_desde', 'base', 'Inicio del horario de silencio', 'Hora local desde la que los avisos no urgentes por correo se envían al terminar el silencio. Vacío: sin silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.silencio_hasta', 'base', 'Fin del horario de silencio', 'Hora local en que se entregan los avisos que esperaron por el silencio.', 'time', 'null'::jsonb, ARRAY['organization'], NULL),
   ('notificaciones.obligatorias', 'base', 'Avisos obligatorios', 'Tipos de aviso que el usuario no puede desactivar en la aplicación, además de los del producto.', 'list', '[]'::jsonb, ARRAY['organization'], '["approval.pending", "approval.reminder", "approval.escalated", "approval.approved", "approval.rejected", "task.assigned", "task.overdue"]'::jsonb),

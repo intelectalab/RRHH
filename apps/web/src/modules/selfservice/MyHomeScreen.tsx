@@ -16,7 +16,7 @@ import { EmptyState, ErrorState } from '@/ui/components/States'
 import { StatusBadge } from '@/ui/components/Status'
 import { MyDocumentRequests } from '@/modules/documents/MyDocumentRequests'
 import { EmploymentSwitch } from './EmploymentSwitch'
-import { cardOf, certificateTone, days, ticketTone } from './portal'
+import { cardOf, certificateTone, days, portalActions, ticketTone } from './portal'
 import type { MeHome } from './types'
 
 /**
@@ -70,21 +70,10 @@ export function MyHomeScreen() {
 
             {home.employment && (
               <div className="portal-actions" role="group" aria-label={t('portal.quick_actions')}>
-                {vacations && can('time.vacation_requests.create') && !readOnly && (
-                  <Link className="portal-action" href="/tiempo/vacaciones"><Icon name="calendar" size={22} /><span>{t('portal.request_vacation')}</span></Link>
-                )}
-                {absences && can('time.absences.create') && !readOnly && (
-                  <Link className="portal-action" href="/tiempo/ausencias"><Icon name="file" size={22} /><span>{t('portal.request_absence')}</span></Link>
-                )}
-                {profile && (
-                  <Link className="portal-action" href="/mi/perfil"><Icon name="user" size={22} /><span>{t('portal.my_profile')}</span></Link>
-                )}
-                {certificates && (
-                  <Link className="portal-action" href="/mi/solicitudes"><Icon name="file" size={22} /><span>{t('portal.request_certificate')}</span></Link>
-                )}
-                {hrRequests && !readOnly && (
-                  <Link className="portal-action" href="/mi/solicitudes"><Icon name="checkSquare" size={22} /><span>{t('portal.request_hr')}</span></Link>
-                )}
+                {/* ESS-6: acciones a un toque registradas por los módulos activos (PORTAL_ACTIONS). */}
+                {portalActions(home.cards, can, readOnly).map((a) => (
+                  <Link key={a.key} className="portal-action" href={a.href}><Icon name={a.icon} size={22} /><span>{t(a.key)}</span></Link>
+                ))}
               </div>
             )}
 

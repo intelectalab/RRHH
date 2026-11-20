@@ -181,6 +181,9 @@
 @user_sessions | Sesiones activas, revocables, con marca de suplantación por soporte.
   user_id -> users ; session_hash text! ; ip inet ; user_agent ; device_label ; mfa_passed bool=f ; last_seen_at
   expires_at ts! ; revoked_at ; impersonated_by_platform_user_id ?=> platform_users ; uniq session_hash
+@user_quick_unlocks | Reingreso rápido en un teléfono (ESS-6): token de dispositivo (solo su SHA-256, en cookie HttpOnly) más PIN con hash; caduca, se olvida tras varios PIN errados y se revoca.
+  user_id -> users ; device_token_hash text! ; pin_hash text! #S ; device_label ; mfa_passed bool=f ; failed_attempts integer=0
+  last_used_at ; expires_at ts! ; revoked_at ; uniq device_token_hash
 @login_attempts ao part | Intentos de inicio de sesión (éxito o fallo) para bloqueo y detección de abuso.
   identifier_hash ; user_id ?-> users ; succeeded boolean! ; failure_reason ; ip inet ; user_agent ; occurred_at ts=now
   idx identifier_hash, occurred_at
@@ -292,7 +295,7 @@
 @notification_preferences | Preferencias del usuario por categoría y canal.
   user_id -> users ; category text! ; channel enum(in_app,email,push,whatsapp,sms)! ; enabled bool=t ; uniq user_id, category, channel
 @push_devices | Dispositivos registrados para notificaciones push.
-  user_id -> users ; platform enum(ios,android,web)! ; token_enc text! ; token_hash text! ; last_seen_at ; revoked_at ; uniq token_hash
+  user_id -> users ; platform enum(ios,android,web)! ; token_enc text! ; token_hash text! ; label ; last_seen_at ; revoked_at ; uniq token_hash
 @message_channels lock | Configuración de cada canal de mensajería de la organización (proveedor, remitente, credenciales cifradas). El remitente propio de correo solo se usa verificado (NOT-3); mientras tanto sale el de la plataforma.
   channel enum(email,push,whatsapp,sms)! ; provider text! ; config_enc ; sender_identity ; status enum(active,inactive)=inactive
   verification_status enum(not_required,pending,verified,failed)=not_required ; verified_at ; verification_error

@@ -213,4 +213,6 @@ return [
         'nothing_to_clear' => 'Esta entrega no tiene una dirección rebotada que reactivar.',
         'invalid_signature' => 'La firma del proveedor no es válida.',
     ],
+    // NOT-4 · El aviso push solo invita a abrir la aplicación (RN-NOT-02).
+    'push' => ['title' => 'Novedad en :organization', 'body' => 'Tienes un aviso nuevo. Ábrelo en GestiaHR.'],
 ];

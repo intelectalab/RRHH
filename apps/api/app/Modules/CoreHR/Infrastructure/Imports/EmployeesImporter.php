@@ -8,6 +8,7 @@ use App\Modules\CoreHR\Application\PersonService;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
 use App\Modules\CoreHR\Infrastructure\Models\Person;
 use App\Shared\Audit\AuditLogger;
+use App\Shared\CustomFields\HasCustomFields;
 use App\Shared\Imports\ImportColumn;
 use App\Shared\Imports\ImportContext;
 use App\Shared\Imports\ImportDryRun;
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Schema;
  * (POS-6) y vigencias sin solape. Una persona que ya existe por documento se reutiliza (aviso) y una
  * repetida en el archivo es error. El sueldo exige el permiso por campo (RN-IMP-04).
  */
-final class EmployeesImporter implements Importer
+final class EmployeesImporter implements HasCustomFields, Importer
 {
     /** Filas que el propio ingreso crea; cualquier otra fila que apunte a la relación impide deshacer. */
     private const CREATED_BY_HIRE = ['employment_assignments', 'employment_labor_regimes', 'contracts', 'employment_compensations', 'employment_status_events'];
@@ -47,6 +48,12 @@ final class EmployeesImporter implements Importer
         private readonly PositionOccupancy $occupancy,
         private readonly AuditLogger $audit,
     ) {}
+
+    /** CFG-5 · Sus columnas custom.clave las maneja el tratamiento común (CustomFieldsImporter). */
+    public function customFieldEntity(): string
+    {
+        return 'employment';
+    }
 
     public function entity(): string
     {

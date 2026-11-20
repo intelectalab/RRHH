@@ -8,6 +8,8 @@
 return [
     'session_cookie' => env('IDENTITY_SESSION_COOKIE', 'gestia_session'),
     'xsrf_cookie' => 'XSRF-TOKEN',
+    // ESS-6 · Cookie HttpOnly del reingreso rápido con PIN en el teléfono.
+    'device_cookie' => env('IDENTITY_DEVICE_COOKIE', 'gestia_device'),
     'session_lifetime_minutes' => (int) env('IDENTITY_SESSION_LIFETIME', 480),
     'password_reset_ttl_minutes' => (int) env('IDENTITY_PASSWORD_RESET_TTL', 30),
     'invitation_ttl_hours' => (int) env('IDENTITY_INVITATION_TTL', 72),

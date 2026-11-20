@@ -46,13 +46,17 @@ final class TaskController
         if ($q !== '') {
             $query->where('title', 'ilike', '%'.addcslashes($q, '%_\\').'%');
         }
+        // CFG-5: filter[custom.clave] con el tratamiento común de campos personalizados.
+        $this->customFields->applyFilters($query, 'task', 'tasks.id', $request, $this->permissions($request));
 
         $page = CursorPaginator::paginate($query, $params->perPage, $params->cursor, 'id', 'desc');
         $ids = array_column($page['data'], 'id');
         $models = Task::query()->whereIn('id', $ids)->get()->keyBy('id');
+        $custom = $this->customFields->readMany('task', array_map('strval', $ids), $this->permissions($request));
 
         return response()->json([
-            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()->map(fn (Task $t) => $this->tasks->present($t, $userId))->all(),
+            'data' => collect($ids)->map(fn ($id) => $models->get($id))->filter()->values()
+                ->map(fn (Task $t) => $this->tasks->present($t, $userId) + ['custom_fields' => (object) ($custom[$t->id] ?? [])])->all(),
             'meta' => ['per_page' => $page['meta']['per_page'], 'next_cursor' => $page['meta']['next_cursor']],
         ]);
     }

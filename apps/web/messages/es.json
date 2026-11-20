@@ -1034,7 +1034,8 @@
     "no": "No",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "pick": "Elige…"
+    "pick": "Elige…",
+    "entity_employment": "Colaboradores"
   },
   "fx": {
     "title": "Monedas y tipos de cambio",
@@ -4050,7 +4051,8 @@
     "no_certificates": "Aún no pediste constancias.",
     "card_hr_requests": "Solicitudes a RRHH",
     "waiting_your_reply": "{n} esperan tu respuesta",
-    "no_hr_requests": "No tienes solicitudes abiertas."
+    "no_hr_requests": "No tienes solicitudes abiertas.",
+    "nav_more": "Más"
   },
   "home_board": {
     "card_pending_approvals": "Aprobaciones pendientes",
@@ -4707,5 +4709,39 @@
     "entering": "Abriendo la sesión de soporte…",
     "entry_failed_title": "No se pudo abrir la sesión de soporte",
     "entry_failed": "El enlace no es válido, ya se usó, venció o la organización desactivó el acceso del soporte."
+  },
+  "push": {
+    "title": "Avisos push",
+    "text": "Recibe en este teléfono o navegador un aviso que te invita a abrir GestiaHR; no muestra nombres ni montos. Puedes apagarlo por tipo de aviso en la tabla.",
+    "enable": "Activar en este dispositivo",
+    "enabled": "Avisos push activados en este dispositivo.",
+    "removed": "Dispositivo quitado: ya no recibirá avisos push.",
+    "remove": "Quitar",
+    "denied": "El navegador no dio permiso para mostrar avisos.",
+    "error": "No se pudo activar push en este dispositivo.",
+    "unavailable": "Los avisos push todavía no están disponibles en este entorno.",
+    "unsupported": "Este navegador no admite avisos push. Instala la aplicación o usa otro navegador.",
+    "devices": "Dispositivos con avisos push",
+    "this_phone": "Teléfono",
+    "this_browser": "Navegador",
+    "since": "desde el {date}"
+  },
+  "pin": {
+    "title": "Ingresa con tu PIN",
+    "hello": "Hola, {name}",
+    "text": "Este teléfono recuerda tu cuenta. Escribe tu PIN para entrar.",
+    "label": "PIN",
+    "enter": "Entrar",
+    "other": "Ingresar con clave o código",
+    "forget": "Olvidar este teléfono",
+    "setup_title": "Reingreso rápido con PIN",
+    "setup_text": "Entra a GestiaHR en este teléfono con un PIN de 4 a 8 dígitos durante {days} días, sin escribir tu clave.",
+    "setup_active": "Este teléfono ya entra con PIN. Puedes cambiarlo u olvidarlo.",
+    "new": "PIN nuevo",
+    "confirm": "Repite el PIN",
+    "activate": "Activar PIN",
+    "change": "Cambiar PIN",
+    "saved": "PIN guardado en este teléfono.",
+    "forgotten": "Este teléfono ya no entra con PIN."
   }
 }

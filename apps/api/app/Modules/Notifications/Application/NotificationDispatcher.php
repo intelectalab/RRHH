@@ -2,6 +2,7 @@
 
 namespace App\Modules\Notifications\Application;
 
+use App\Modules\Notifications\Application\Push\PushDevices;
 use App\Modules\Notifications\Infrastructure\Models\Notification;
 use App\Modules\Notifications\Infrastructure\Models\NotificationDelivery;
 use App\Shared\Messaging\MessageSender;
@@ -34,6 +35,7 @@ final class NotificationDispatcher implements Notifier
         private readonly OutboxWriter $outbox,
         private readonly TenantDirectory $tenants,
         private readonly MessageSender $messages,
+        private readonly PushDevices $push,
     ) {}
 
     public function notify(string $category, array $userIds, array $variables, ?string $subjectType = null, ?string $subjectId = null): int
@@ -80,6 +82,23 @@ final class NotificationDispatcher implements Notifier
 
                 foreach (array_diff($this->catalog->channels(), ['in_app']) as $channel) {
                     if (! $this->preferences->enabled((string) $user->id, $category, $channel)) {
+                        continue;
+                    }
+                    if ($channel === 'push') {
+                        // NOT-4: un aviso por dispositivo registrado; el contenido no lleva datos (RN-NOT-02).
+                        foreach ($this->push->activeIds((string) $user->id) as $deviceId) {
+                            $delivery = NotificationDelivery::create([
+                                'notification_id' => $notificationId, 'channel' => 'push',
+                                'recipient_address_enc' => FieldCipher::encrypt($deviceId), 'status' => 'queued',
+                            ]);
+                            $event = $this->outbox->record(DomainEventTypes::NOTIFICATION_DELIVERY_REQUESTED, 'notification_delivery', $delivery->id, [
+                                'delivery_id' => $delivery->id, 'category' => $category, 'locale' => $locale, 'variables' => ['organization' => $organization], 'link' => $link,
+                            ]);
+                            if ($quietUntil !== null) {
+                                $event->forceFill(['next_attempt_at' => $quietUntil])->save();
+                            }
+                        }
+
                         continue;
                     }
                     $address = $this->address((string) $user->id, $channel);

@@ -49,8 +49,17 @@ final class ImportContext
         if ($this->userId === null) {
             return false;
         }
-        $this->permissions ??= app(PermissionResolver::class)->for($this->userId);
 
-        return $this->permissions->has($permission);
+        return $this->permissions()?->has($permission) ?? false;
+    }
+
+    /** Permisos de quien creó la importación (null si la creó el sistema). */
+    public function permissions(): ?EffectivePermissions
+    {
+        if ($this->userId === null) {
+            return null;
+        }
+
+        return $this->permissions ??= app(PermissionResolver::class)->for($this->userId);
     }
 }

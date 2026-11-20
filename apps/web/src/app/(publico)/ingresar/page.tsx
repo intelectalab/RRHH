@@ -1,10 +1,10 @@
 import { AuthShell } from '@/modules/identity/AuthShell'
-import { LoginForm } from '@/modules/identity/LoginForm'
+import { SignInEntry } from '@/modules/identity/QuickUnlock'
 
 export default function IngresarPage() {
   return (
     <AuthShell>
-      <LoginForm />
+      <SignInEntry />
     </AuthShell>
   )
 }
