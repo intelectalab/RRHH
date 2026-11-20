@@ -83,7 +83,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 2 | [AUS](../prompts/AUS.md) · Ausencias y permisos | Vacaciones y ausencias | 5 | 1 | 6 | 28 | — | — |
 | 2 | [BHO](../prompts/BHO.md) · Horas extra y bolsa de horas | Asistencia y turnos | 3 | 2 | 0 | 8 | — | — |
 | 2 | [TSH](../prompts/TSH.md) · Hojas de tiempo por proyecto | Hojas de tiempo | 4 | 0 | 0 | 12 | — | — |
-| 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 15 | Sí | A-10 |
+| 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 20 | Sí | A-10 |
 | 3 | [CPT](../prompts/CPT.md) · Conceptos y fórmulas | Nómina Perú | 5 | 2 | 7 | 7 | Sí | — |
 | 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 8 | Sí | D-36 |
 | 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 19 | Sí | — |

@@ -3,7 +3,7 @@
 Motor de cálculo independiente: reglas, paquete de país y régimen laboral, con trazabilidad y retroactivos.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 12 (3 historias y 9 tareas); 10 del MVP. **Operaciones de API:** 15.
+- **Actividades:** 12 (3 historias y 9 tareas); 10 del MVP. **Operaciones de API:** 20.
 - **Especificación:** `kit/docs/modulos/M-NOM.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: pasos configurables, mes, prorrateo y regímenes agrario y de construcción civil.
 

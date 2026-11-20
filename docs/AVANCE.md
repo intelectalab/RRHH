@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 163 | 0 | 67,6 % |
-| Backlog completo | 512 | 163 | 0 | 31,8 % |
+| Primer corte comercial (MVP) | 241 | 168 | 0 | 69,7 % |
+| Backlog completo | 512 | 168 | 0 | 32,8 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -221,11 +221,11 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | TSH-2 | Hoja de tiempo | TSH | Fase 2 · Tiempo | Story | — | pendiente | — |  |
 | TSH-3 | Aprobación de hojas de tiempo | TSH | Fase 2 · Tiempo | Story | — | pendiente | — |  |
 | TSH-4 | Costeo y reporte por proyecto | TSH | Fase 2 · Tiempo | Story | — | pendiente | — |  |
-| NOM-1 | Arquitectura del motor: núcleo, paquete de país y régimen | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-2 | Regímenes laborales por empresa y por trabajador | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-3 | Intérprete de fórmulas seguro | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-4 | Orden de cálculo y dependencias entre conceptos | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| NOM-5 | Contexto de cálculo por relación laboral | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
+| NOM-1 | Arquitectura del motor: núcleo, paquete de país y régimen | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Núcleo genérico de cálculo (fórmulas, dependencias, traza) sin reglas de país; paquete Perú por datos; parámetros con vigencia; prueba de arquitectura contra literales legales; casos dorados de la mecánica. |
+| NOM-2 | Regímenes laborales por empresa y por trabajador | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Régimen por relación con vigencia, heredado de la empresa; micro y pequeña exigen acreditación vigente; catálogo de regímenes. |
+| NOM-3 | Intérprete de fórmulas seguro | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Lenguaje de fórmulas propio sin eval (ADR 0015) con validación de sintaxis, datos y ciclos indicando la posición del error. |
+| NOM-4 | Orden de cálculo y dependencias entre conceptos | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Orden de cálculo determinista por dependencias, consultable; un ciclo responde 422 con los conceptos involucrados. |
+| NOM-5 | Contexto de cálculo por relación laboral | NOM | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Contexto por relación y periodo desde MasterData, resumen de ausencias e incidencias; tramos prorrateados por cambio de sueldo o régimen; banco de pruebas sin guardar. |
 | NOM-6 | Trazabilidad del cálculo | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
 | NOM-7 | Recálculo retroactivo | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
 | NOM-8 | Cálculo masivo en segundo plano | NOM | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
