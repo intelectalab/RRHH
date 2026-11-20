@@ -1376,6 +1376,18 @@
       "opciones": null
     },
     {
+      "codigo": "nomina.doble_control_conceptos",
+      "modulo": "payroll",
+      "nombre": "Doble control de conceptos",
+      "tipo": "boolean",
+      "valor_por_defecto": true,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "CPT-2 · RN-CPT-07 · Quien edita un concepto no puede publicarlo: lo publica otra persona con permiso de publicar.",
+      "opciones": null
+    },
+    {
       "codigo": "prestamos.adelanto_tope_pct_devengado",
       "modulo": "advances",
       "nombre": "Tope de adelanto sobre lo devengado (%)",

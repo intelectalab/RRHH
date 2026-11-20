@@ -35,4 +35,6 @@ return [
     'invalid_token' => 'O link é inválido ou expirou. Solicite um novo.',
     'csrf_mismatch' => 'Não foi possível verificar a sessão. Recarregue a página e tente novamente.',
     'invalid_signature' => 'A assinatura da chamada não é válida.',
+    'dual_control_required' => 'Outra pessoa deve publicar o que você editou (controle duplo).',
+    'concept_invalid' => 'O conceito tem erros e não pode ser publicado.',
 ];

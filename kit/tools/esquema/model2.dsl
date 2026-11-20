@@ -226,13 +226,19 @@
   code ; name ; kind enum(earning,deduction,employee_contribution,employer_contribution,tax,benefit,provision,informative)!
   category ; country_code ; statutory_code ; is_system ; is_remunerative bool=t
   calculation_method enum(fixed,formula,input,percentage,table)=input ; print_on_payslip bool=t ; sort_order
-  status enum(draft,active,inactive)=active ; uniq code
-@payroll_concept_versions lock | Versión con vigencia de un concepto: fórmula, condiciones, redondeo y regímenes a los que aplica. Permite recálculo retroactivo.
-  payroll_concept_id -> payroll_concepts ; formula ; conditions j ; rounding enum(none,half_up,down,up)=half_up
-  applies_to_regimes text[] ; applies_to_period_kinds text[] ; parameters_used text[] ; notes ; vig payroll_concept_id
-@payroll_concept_affectations | Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades).
+  status enum(draft,active,inactive)=active ; pack_version ; statutory_code_verified bool=f ; created_by_user_id ?-> users
+  archived_at ; archive_reason ; uniq code
+@payroll_concept_versions lock | Versión con vigencia de un concepto: fórmula, condición de aplicación, redondeo y regímenes a los que aplica. Publicar cierra la vigente e inserta otra (RN-CPT-01); la anterior no cambia.
+  payroll_concept_id -> payroll_concepts ; formula ; condition ; conditions j ; rounding enum(none,half_up,down,up)=half_up
+  applies_to_regimes text[] ; applies_to_period_kinds text[] ; parameters_used text[] ; depends_on text[] ; notes
+  edited_by_user_id ?-> users ; published_by_user_id ?-> users ; published_at ; vig payroll_concept_id
+@payroll_concept_drafts lock | CPT-2 · Borrador de la próxima versión de un concepto (uno por concepto): se edita, se prueba y se publica; no entra al cálculo hasta publicarse.
+  payroll_concept_id -> payroll_concepts ; formula ; condition ; rounding enum(none,half_up,down,up)=half_up
+  applies_to_regimes text[] ; applies_to_period_kinds text[] ; affectations j=[] ; valid_from date! ; notes
+  validation j ; edited_by_user_id ?-> users ; uniq payroll_concept_id
+@payroll_concept_affectations | Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades). justification: sustento de una afectación de un concepto no remunerativo (RN-CPT-06).
   payroll_concept_version_id -> payroll_concept_versions ; base_code text! ; affects bool=t
-  projection_kind enum(ordinary,gratification,extraordinary)
+  projection_kind enum(ordinary,gratification,extraordinary) ; justification
   uniq payroll_concept_version_id, base_code
 
 #E PAR | Parámetros legales con vigencia
@@ -425,7 +431,7 @@
   raw UNIQUE NULLS NOT DISTINCT (tenant_id, legal_entity_id, code)
 @concept_account_mappings lock | Contabilización de un concepto: cuentas de debe y haber por empresa y centro de costo.
   payroll_concept_id -> payroll_concepts ; legal_entity_id ?-> legal_entities ; cost_center_id ?-> cost_centers
-  debit_account_id ?-> accounting_accounts ; credit_account_id ?-> accounting_accounts ; vigcols
+  worker_category enum(executive,employee,worker) ; debit_account_id ?-> accounting_accounts ; credit_account_id ?-> accounting_accounts ; vigcols
 @provision_runs lock | Cálculo mensual de provisiones (CTS, gratificaciones, vacaciones) por empresa (E-03).
   legal_entity_id -> legal_entities ; payroll_period_id ?-> payroll_periods ; period_code text!
   status enum(draft,calculated,approved,posted)=draft ; calculated_at

@@ -21,4 +21,7 @@ interface FormulaScope
 
     /** Suma de los montos (incident) o de las cantidades (quantity) de las incidencias del concepto. */
     public function incident(string $code, string $field): BigDecimal;
+
+    /** CPT-3 · Suma de los conceptos ya calculados que afectan a esa base de cálculo (pensión, salud, quinta…). */
+    public function base(string $code): BigDecimal;
 }

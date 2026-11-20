@@ -127,6 +127,10 @@ final class ContextBuilder
             $health = DB::table('employment_labor_regimes')->where('employment_id', $employmentId)->whereNull('deleted_at');
             EffectiveDated::applyAsOf($health, $end);
             $flags = $health->first(['health_scheme', 'has_family_allowance', 'has_risk_insurance']);
+            // CPT-5 · Sistema previsional vigente al fin del periodo (afp, onp, none, other): lo usan las condiciones de los aportes.
+            $pension = DB::table('employment_pension_affiliations')->where('employment_id', $employmentId);
+            EffectiveDated::applyAsOf($pension, $end);
+            $pensionSystem = (string) ($pension->value('pension_system') ?? '');
             $sources['absences'] = ['fingerprint' => $summary['fingerprint'] ?? null, 'source' => $summary['source'] ?? null];
 
             $variables = [
@@ -149,6 +153,7 @@ final class ContextBuilder
                 'fecha_cese' => $termination ?? '',
                 'regimen' => (string) $regimeAtEnd,
                 'sistema_salud' => (string) ($flags->health_scheme ?? ''),
+                'sistema_pension' => $pensionSystem,
                 'tiene_asignacion_familiar' => (bool) ($flags->has_family_allowance ?? false),
                 'tiene_seguro_riesgo' => (bool) ($flags->has_risk_insurance ?? false),
             ];

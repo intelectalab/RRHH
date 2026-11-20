@@ -40,7 +40,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio)",
+      "condicion_motor": null,
+      "orden": 10
     },
     {
       "codigo": "asig_familiar",
@@ -73,7 +76,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "param.rmv * param.asignacion_familiar_pct_rmv / 100",
+      "condicion_motor": "tiene_asignacion_familiar",
+      "orden": 20
     },
     {
       "codigo": "he_tramo1",
@@ -105,7 +111,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "he_tramo2",
@@ -137,7 +146,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "trabajo_nocturno",
@@ -167,9 +179,12 @@
         "pe_construccion",
         "pe_agrario"
       ],
-      "proyeccion_quinta": null,
+      "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "feriado_trabajado",
@@ -199,7 +214,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "comisiones",
@@ -229,7 +247,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "bono_productividad",
@@ -259,7 +280,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "bono_extraordinario",
@@ -289,7 +313,10 @@
       ],
       "proyeccion_quinta": "extraordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "A título de liberalidad, no regular."
+      "nota": "A título de liberalidad, no regular.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "movilidad",
@@ -319,7 +346,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Condición de trabajo; validar tratamiento tributario según el caso."
+      "nota": "Condición de trabajo; validar tratamiento tributario según el caso.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "teletrabajo_gastos",
@@ -349,7 +379,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Concepto no remunerativo (Ley 31572)."
+      "nota": "Concepto no remunerativo (Ley 31572).",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "rem_vacacional",
@@ -379,7 +412,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "vacaciones_compra",
@@ -407,9 +443,12 @@
         "pe_construccion",
         "pe_agrario"
       ],
-      "proyeccion_quinta": null,
+      "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "subsidio_incapacidad",
@@ -439,7 +478,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "A cargo de la seguridad social; el empleador adelanta y recupera."
+      "nota": "A cargo de la seguridad social; el empleador adelanta y recupera.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "subsidio_maternidad",
@@ -469,7 +511,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "gratificacion",
@@ -502,7 +547,10 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": "Inafecta a aportes por Ley 30334."
+      "nota": "Inafecta a aportes por Ley 30334.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "bonif_extraordinaria",
@@ -534,7 +582,10 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "concepto.gratificacion * param.gratificacion_bonificacion_extraordinaria_pct / 100",
+      "condicion_motor": null,
+      "orden": 60
     },
     {
       "codigo": "gratificacion_trunca",
@@ -564,7 +615,10 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cts",
@@ -597,7 +651,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "utilidades",
@@ -629,7 +686,10 @@
       ],
       "proyeccion_quinta": "extraordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "vacaciones_truncas",
@@ -659,7 +719,10 @@
       ],
       "proyeccion_quinta": "extraordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "indemnizacion_vacacional",
@@ -689,7 +752,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "indemnizacion_despido",
@@ -719,7 +785,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "afp_aporte",
@@ -751,7 +820,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "base.pension * param.afp_aporte_obligatorio_pct / 100",
+      "condicion_motor": "sistema_pension = \"afp\"",
+      "orden": 100
     },
     {
       "codigo": "afp_comision",
@@ -784,7 +856,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "afp_prima",
@@ -817,7 +892,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "onp_aporte",
@@ -849,7 +927,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "base.pension * param.onp_aporte_pct / 100",
+      "condicion_motor": "sistema_pension = \"onp\"",
+      "orden": 100
     },
     {
       "codigo": "renta_quinta",
@@ -883,7 +964,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "essalud",
@@ -916,7 +1000,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100",
+      "condicion_motor": null,
+      "orden": 200
     },
     {
       "codigo": "sctr",
@@ -946,7 +1033,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "vida_ley",
@@ -976,7 +1066,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "dscto_prestamo",
@@ -1006,7 +1099,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "dscto_adelanto",
@@ -1036,7 +1132,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "dscto_judicial",
@@ -1066,7 +1165,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cuota_sindical",
@@ -1096,7 +1198,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "tardanzas",
@@ -1126,7 +1231,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "faltas",
@@ -1156,7 +1264,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "eps_copago",
@@ -1186,7 +1297,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "prov_cts",
@@ -1216,7 +1330,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "prov_gratificacion",
@@ -1246,7 +1363,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "prov_vacaciones",
@@ -1276,7 +1396,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "renta_quinta_devolucion",
@@ -1306,7 +1429,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "No es ingreso: devuelve una retención. Ver docs/18 §2.7."
+      "nota": "No es ingreso: devuelve una retención. Ver docs/18 §2.7.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "bonif_extraordinaria_trunca",
@@ -1338,7 +1464,10 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": "concepto.gratificacion_trunca * param.gratificacion_bonificacion_extraordinaria_pct / 100",
+      "condicion_motor": null,
+      "orden": 60
     },
     {
       "codigo": "cc_jornal",
@@ -1366,7 +1495,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_dominical",
@@ -1394,7 +1526,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_buc",
@@ -1422,7 +1557,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Afectaciones por confirmar."
+      "nota": "Afectaciones por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_movilidad",
@@ -1450,7 +1588,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_escolar",
@@ -1479,7 +1620,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Afectaciones por confirmar."
+      "nota": "Afectaciones por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_altura",
@@ -1507,7 +1651,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Afectaciones por confirmar."
+      "nota": "Afectaciones por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_agua",
@@ -1535,7 +1682,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Afectaciones por confirmar."
+      "nota": "Afectaciones por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_nocturno",
@@ -1563,7 +1713,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Porcentaje por confirmar."
+      "nota": "Porcentaje por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_altas_temperaturas",
@@ -1591,7 +1744,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_bae",
@@ -1619,7 +1775,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_gratificacion",
@@ -1649,7 +1808,10 @@
       ],
       "proyeccion_quinta": "gratification",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_comp_vacacional",
@@ -1678,7 +1840,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_comp_tiempo_servicios",
@@ -1707,7 +1872,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "cc_conafovicer",
@@ -1735,7 +1903,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "agr_rb",
@@ -1761,7 +1932,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "agr_gratif_pror",
@@ -1789,7 +1963,10 @@
       ],
       "proyeccion_quinta": "ordinary",
       "rol_monto": "accrued_and_paid",
-      "nota": "Solo con opción de prorrateo."
+      "nota": "Solo con opción de prorrateo.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "agr_cts_pror",
@@ -1817,7 +1994,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "Solo con opción de prorrateo."
+      "nota": "Solo con opción de prorrateo.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "agr_beta",
@@ -1846,7 +2026,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "No remunerativa. Tratamiento en quinta por confirmar."
+      "nota": "No remunerativa. Tratamiento en quinta por confirmar.",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     },
     {
       "codigo": "agr_essalud",
@@ -1874,7 +2057,10 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": ""
+      "nota": "",
+      "formula_motor": null,
+      "condicion_motor": null,
+      "orden": null
     }
   ]
 }

@@ -58,6 +58,7 @@ final class Evaluator
             'param' => $this->scope->parameter($node[2]),
             'incident' => $this->scope->incident($node[2], 'amount'),
             'quantity' => $this->scope->incident($node[2], 'quantity'),
+            'base' => $this->scope->base($node[2]),
             default => throw new FormulaError('unknown_prefix', (int) $node[3], ['name' => (string) $node[2]]),
         };
     }

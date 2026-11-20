@@ -29,6 +29,7 @@ final class ContextVariables
         'fecha_cese' => 'date',
         'regimen' => 'text',
         'sistema_salud' => 'text',
+        'sistema_pension' => 'text',
         'tiene_asignacion_familiar' => 'boolean',
         'tiene_seguro_riesgo' => 'boolean',
     ];

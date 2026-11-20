@@ -6343,14 +6343,21 @@ CREATE TABLE payroll_concepts (
   print_on_payslip boolean NOT NULL DEFAULT true,
   sort_order integer NOT NULL DEFAULT 0,
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('draft','active','inactive')),
+  pack_version text,
+  statutory_code_verified boolean NOT NULL DEFAULT false,
+  created_by_user_id uuid,
+  archived_at timestamptz,
+  archive_reason text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
   lock_version integer NOT NULL DEFAULT 1,
-  CONSTRAINT uq_payroll_concepts_tenant_id UNIQUE (tenant_id, id)
+  CONSTRAINT uq_payroll_concepts_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT fk_payroll_concepts_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE payroll_concepts IS 'Concepto de planilla (ingreso, descuento, aporte, impuesto, provisión). Los personalizados conviven con los del paquete de país.';
 CREATE UNIQUE INDEX uq_payroll_concepts_code ON payroll_concepts (tenant_id, code) WHERE deleted_at IS NULL;
+CREATE INDEX ix_payroll_concepts_created_by_user_id ON payroll_concepts (tenant_id, created_by_user_id);
 ALTER TABLE payroll_concepts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concepts FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concepts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -6361,12 +6368,17 @@ CREATE TABLE payroll_concept_versions (
   tenant_id uuid NOT NULL REFERENCES tenants (id),
   payroll_concept_id uuid NOT NULL,
   formula text,
+  condition text,
   conditions jsonb,
   rounding text NOT NULL DEFAULT 'half_up' CHECK (rounding IN ('none','half_up','down','up')),
   applies_to_regimes text[],
   applies_to_period_kinds text[],
   parameters_used text[],
+  depends_on text[],
   notes text,
+  edited_by_user_id uuid,
+  published_by_user_id uuid,
+  published_at timestamptz,
   valid_from date NOT NULL,
   valid_to date,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -6375,13 +6387,46 @@ CREATE TABLE payroll_concept_versions (
   CONSTRAINT uq_payroll_concept_versions_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_payroll_concept_versions_vigencia CHECK (valid_to IS NULL OR valid_to >= valid_from),
   CONSTRAINT ex_payroll_concept_versions_vigencia EXCLUDE USING gist (tenant_id WITH =, payroll_concept_id WITH =, daterange(valid_from, valid_to, '[]') WITH &&) DEFERRABLE INITIALLY IMMEDIATE,
-  CONSTRAINT fk_payroll_concept_versions_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id)
+  CONSTRAINT fk_payroll_concept_versions_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_versions_edited_by_user_id FOREIGN KEY (tenant_id, edited_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_versions_published_by_user_id FOREIGN KEY (tenant_id, published_by_user_id) REFERENCES users (tenant_id, id)
 );
-COMMENT ON TABLE payroll_concept_versions IS 'Versión con vigencia de un concepto: fórmula, condiciones, redondeo y regímenes a los que aplica. Permite recálculo retroactivo.';
+COMMENT ON TABLE payroll_concept_versions IS 'Versión con vigencia de un concepto: fórmula, condición de aplicación, redondeo y regímenes a los que aplica. Publicar cierra la vigente e inserta otra (RN-CPT-01); la anterior no cambia.';
+CREATE INDEX ix_payroll_concept_versions_edited_by_user_id ON payroll_concept_versions (tenant_id, edited_by_user_id);
+CREATE INDEX ix_payroll_concept_versions_published_by_user_id ON payroll_concept_versions (tenant_id, published_by_user_id);
 ALTER TABLE payroll_concept_versions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concept_versions FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concept_versions USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
 CREATE TRIGGER trg_payroll_concept_versions_touch BEFORE UPDATE ON payroll_concept_versions FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
+
+CREATE TABLE payroll_concept_drafts (
+  id uuid PRIMARY KEY DEFAULT uuid_v7(),
+  tenant_id uuid NOT NULL REFERENCES tenants (id),
+  payroll_concept_id uuid NOT NULL,
+  formula text,
+  condition text,
+  rounding text NOT NULL DEFAULT 'half_up' CHECK (rounding IN ('none','half_up','down','up')),
+  applies_to_regimes text[],
+  applies_to_period_kinds text[],
+  affectations jsonb NOT NULL DEFAULT '[]'::jsonb,
+  valid_from date NOT NULL,
+  notes text,
+  validation jsonb,
+  edited_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  lock_version integer NOT NULL DEFAULT 1,
+  CONSTRAINT uq_payroll_concept_drafts_tenant_id UNIQUE (tenant_id, id),
+  CONSTRAINT uq_payroll_concept_drafts_payroll_concept_id UNIQUE (tenant_id, payroll_concept_id),
+  CONSTRAINT fk_payroll_concept_drafts_payroll_concept_id FOREIGN KEY (tenant_id, payroll_concept_id) REFERENCES payroll_concepts (tenant_id, id),
+  CONSTRAINT fk_payroll_concept_drafts_edited_by_user_id FOREIGN KEY (tenant_id, edited_by_user_id) REFERENCES users (tenant_id, id)
+);
+COMMENT ON TABLE payroll_concept_drafts IS 'CPT-2 · Borrador de la próxima versión de un concepto (uno por concepto): se edita, se prueba y se publica; no entra al cálculo hasta publicarse.';
+CREATE INDEX ix_payroll_concept_drafts_edited_by_user_id ON payroll_concept_drafts (tenant_id, edited_by_user_id);
+ALTER TABLE payroll_concept_drafts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_concept_drafts FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON payroll_concept_drafts USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
+CREATE TRIGGER trg_payroll_concept_drafts_touch BEFORE UPDATE ON payroll_concept_drafts FOR EACH ROW EXECUTE FUNCTION set_updated_at_and_lock();
 
 CREATE TABLE payroll_concept_affectations (
   id uuid PRIMARY KEY DEFAULT uuid_v7(),
@@ -6390,13 +6435,14 @@ CREATE TABLE payroll_concept_affectations (
   base_code text NOT NULL,
   affects boolean NOT NULL DEFAULT true,
   projection_kind text CHECK (projection_kind IN ('ordinary','gratification','extraordinary')),
+  justification text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_payroll_concept_affectations_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT uq_payroll_concept_affectations_payroll_concept_versio_8606a630 UNIQUE (tenant_id, payroll_concept_version_id, base_code),
   CONSTRAINT fk_payroll_concept_affectations_payroll_concept_version_id FOREIGN KEY (tenant_id, payroll_concept_version_id) REFERENCES payroll_concept_versions (tenant_id, id)
 );
-COMMENT ON TABLE payroll_concept_affectations IS 'Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades).';
+COMMENT ON TABLE payroll_concept_affectations IS 'Afectaciones de una versión de concepto: a qué bases suma (salud, pensión, renta, CTS, gratificación, vacaciones, utilidades). justification: sustento de una afectación de un concepto no remunerativo (RN-CPT-06).';
 ALTER TABLE payroll_concept_affectations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payroll_concept_affectations FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON payroll_concept_affectations USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -7575,6 +7621,7 @@ CREATE TABLE concept_account_mappings (
   payroll_concept_id uuid NOT NULL,
   legal_entity_id uuid,
   cost_center_id uuid,
+  worker_category text CHECK (worker_category IN ('executive','employee','worker')),
   debit_account_id uuid,
   credit_account_id uuid,
   valid_from date NOT NULL,
@@ -18903,6 +18950,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('nomina.exigir_acuse_boleta', 'payroll', 'Exigir acuse de boleta', 'El trabajador confirma la recepción de su boleta.', 'boolean', 'false'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('nomina.incidencia_monto_visto_bueno', 'payroll', 'Monto de incidencia que requiere visto bueno', 'PER-2 · RN-PER-10: una incidencia manual cuyo monto supera este valor necesita el visto bueno de alguien con payroll.incidents.approve antes de entrar al cálculo. 0: sin visto bueno. Política de la organización, no valor legal.', 'decimal', '0'::jsonb, ARRAY['organization','legal_entity'], '{"min": 0}'::jsonb),
   ('nomina.doble_aprobacion_cierre', 'payroll', 'Doble aprobación de cierre', 'Quien procesa no puede aprobar ni cerrar.', 'boolean', 'true'::jsonb, ARRAY['organization','legal_entity'], NULL),
+  ('nomina.doble_control_conceptos', 'payroll', 'Doble control de conceptos', 'CPT-2 · RN-CPT-07 · Quien edita un concepto no puede publicarlo: lo publica otra persona con permiso de publicar.', 'boolean', 'true'::jsonb, ARRAY['organization'], NULL),
   ('prestamos.adelanto_tope_pct_devengado', 'advances', 'Tope de adelanto sobre lo devengado (%)', 'Porcentaje máximo de lo ya devengado que puede adelantarse (E-09).', 'decimal', '50'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('prestamos.adelantos_por_periodo', 'advances', 'Adelantos por periodo', 'Número máximo de adelantos por periodo de planilla.', 'integer', '2'::jsonb, ARRAY['organization','legal_entity'], NULL),
   ('reclutamiento.retencion_candidatos_meses', 'recruiting', 'Retención de candidatos (meses)', 'Meses que se conservan los datos de candidatos no contratados, según el consentimiento.', 'integer', '24'::jsonb, ARRAY['organization'], NULL),

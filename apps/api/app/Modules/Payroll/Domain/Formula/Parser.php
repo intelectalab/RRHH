@@ -24,7 +24,7 @@ final class Parser
 {
     public const FUNCTIONS = ['si' => [3, 3], 'min' => [1, 20], 'max' => [1, 20], 'redondear' => [2, 2], 'truncar' => [2, 2], 'abs' => [1, 1], 'dias_entre' => [2, 2]];
 
-    public const PREFIXES = ['concepto' => 'concept', 'param' => 'param', 'incidencia' => 'incident', 'cantidad' => 'quantity'];
+    public const PREFIXES = ['concepto' => 'concept', 'param' => 'param', 'incidencia' => 'incident', 'cantidad' => 'quantity', 'base' => 'base'];
 
     private const KEYWORDS = ['o' => 'or', 'or' => 'or', 'y' => 'and', 'and' => 'and', 'no' => 'not', 'not' => 'not'];
 
@@ -53,14 +53,14 @@ final class Parser
     }
 
     /**
-     * Referencias de un árbol: concept, param, incident, quantity y var (sin repetir, en orden de aparición).
+     * Referencias de un árbol: concept, param, incident, quantity, base (CPT-3) y var (sin repetir, en orden de aparición).
      *
      * @param  array<int, mixed>  $node
      * @return array<string, list<string>>
      */
     public static function references(array $node): array
     {
-        $out = ['concept' => [], 'param' => [], 'incident' => [], 'quantity' => [], 'var' => []];
+        $out = ['concept' => [], 'param' => [], 'incident' => [], 'quantity' => [], 'base' => [], 'var' => []];
         $walk = function (array $n) use (&$walk, &$out): void {
             if ($n[0] === 'ref') {
                 if (! in_array($n[2], $out[$n[1]], true)) {

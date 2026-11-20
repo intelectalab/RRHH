@@ -992,7 +992,17 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 |---|---|---|---|
 | GET, POST | `/payroll-concepts` | `payroll.concepts.{view,create}` | 3 |
 | GET, PATCH | `/payroll-concepts/{id}` | `payroll.concepts.{view,update}` | 3 |
-| POST | `/payroll-concepts/{id}/{publish,retire,test}` | `payroll.concepts.{publish,retire,test}` | 3 |
+| POST | `/payroll-concepts/{id}/{publish,retire}` | `payroll.concepts.{publish,retire}` | 3 |
+| POST | `/payroll-concepts/{id}/validate` | `payroll.concepts.update` | 3 |
+| POST | `/payroll-concepts/{id}/test` | `payroll.concepts.test` | 3 |
+| POST | `/payroll-concepts/{id}/duplicate` | `payroll.concepts.create` | 3 |
+| PUT | `/payroll-concepts/{id}/accounting` | `payroll.concepts.map` | 3 |
+| GET | `/payroll-concept-bases` | `payroll.concepts.view` | 3 |
+| GET | `/payroll-affectation-matrix` | `payroll.concepts.view` | 3 |
+| GET | `/payroll-accounting-check` | `payroll.concepts.view` | 3 |
+| GET | `/accounting-accounts` | `payroll.concepts.view` | 3 |
+| POST | `/accounting-accounts` | `payroll.accounting_accounts.update` | 3 |
+| PATCH | `/accounting-accounts/{id}` | `payroll.accounting_accounts.update` | 3 |
 
 **PAR · Parámetros legales**
 
