@@ -111,6 +111,7 @@ return [
         'copy_of' => 'Copia de :code.',
         'projection_required' => 'Si suma a la base de quinta, indica su naturaleza en la proyección (ordinario, gratificación o extraordinario).',
         'justification_required' => 'Es no remunerativo: para sumar a la base :base deja el sustento.',
+        'statutory_unknown' => 'El código :code no existe en la Tabla 22 vigente de la Planilla Electrónica.',
         'statutory_missing' => 'Falta el código de la declaración (Tabla 22): la validación previa de la declaración lo reportará.',
         'account_taken' => 'Ya existe la cuenta :code.',
         'rule_duplicate' => 'Hay dos reglas para la misma empresa, centro de costo y categoría.',
@@ -147,5 +148,11 @@ return [
         'acta_required' => 'Indica el acta del convenio contra la que se verificó la tabla.',
         'wage_table_verified' => 'La organización ya verificó esta tabla salarial.',
         'invalid_file' => 'El archivo debe ser un CSV con las columnas fund_code, valid_from y las tasas.',
+    ],
+    'import' => [
+        'period_missing' => 'No hay un periodo de planilla con ese grupo y periodo (usa AAAAMM o AAAA-NN).',
+        'code_format' => 'El código va en minúsculas, sin espacios: letras, números y guion bajo.',
+        'kind_invalid' => 'La naturaleza no es válida. Usa una de: :options.',
+        'concept_note' => 'Importado en el lote :job.',
     ],
 ];

@@ -36,8 +36,9 @@ final class PayrollIncidents
 
     /**
      * @param  array<string, mixed>  $data  employment_id, payroll_concept_id o concept_code, quantity, rate, amount, notes
+     * @param  array<string, string|null>  $origin  source_type y source_id (p. ej. el lote de importación de CPT-6)
      */
-    public function create(PayrollPeriod $p, array $data, ?string $userId, string $source = 'manual'): PayrollIncident
+    public function create(PayrollPeriod $p, array $data, ?string $userId, string $source = 'manual', array $origin = []): PayrollIncident
     {
         $this->assertOpen($p);
         $row = $this->normalize($p, $data, $this->periods->population($p));
@@ -45,8 +46,8 @@ final class PayrollIncidents
             throw new AyniException('validation_failed', 422, $row['error']['message'], [$row['error']]);
         }
 
-        return DB::transaction(function () use ($p, $row, $userId, $source): PayrollIncident {
-            $i = PayrollIncident::query()->create($row['values'] + [
+        return DB::transaction(function () use ($p, $row, $userId, $source, $origin): PayrollIncident {
+            $i = PayrollIncident::query()->create($row['values'] + array_intersect_key($origin, ['source_type' => 1, 'source_id' => 1]) + [
                 'payroll_period_id' => $p->id, 'source' => $source, 'created_by_user_id' => $userId,
                 'status' => $this->initialStatus($p, $row['values']['amount'] ?? null),
             ]);
@@ -121,6 +122,34 @@ final class PayrollIncidents
 
             return $i;
         });
+    }
+
+    /**
+     * CPT-6 · Revisa una fila con las mismas reglas que el alta manual, sin guardar: periodo que recibe cambios,
+     * trabajador de la población, concepto activo y valores numéricos.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  list<string>|null  $population  población del periodo ya calculada (para no repetirla por fila)
+     * @return array{values?: array<string, mixed>, error?: array{field: string, rule: string, message: string}}
+     */
+    public function check(PayrollPeriod $p, array $data, ?array $population = null): array
+    {
+        if (! $this->periods->isEditable($p)) {
+            return ['error' => ['field' => 'period', 'rule' => 'locked', 'message' => (string) trans('payroll.incidents.period_locked')]];
+        }
+
+        return $this->normalize($p, $data, $population ?? $this->periods->population($p));
+    }
+
+    /** CPT-6 · Motivo por el que una incidencia ya no se puede quitar (periodo cerrado o ya aplicada), o null. */
+    public function lockReason(PayrollIncident $i): ?string
+    {
+        $p = PayrollPeriod::query()->find($i->payroll_period_id);
+        if (! $p instanceof PayrollPeriod || ! $this->periods->isEditable($p) || $i->status === 'applied') {
+            return (string) trans('payroll.incidents.period_locked');
+        }
+
+        return null;
     }
 
     /** Pasa a la papelera (nunca se borra físicamente). */

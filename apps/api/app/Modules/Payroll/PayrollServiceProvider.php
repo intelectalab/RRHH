@@ -3,9 +3,12 @@
 namespace App\Modules\Payroll;
 
 use App\Modules\Payroll\Application\ConceptAccounting;
+use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
+use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
 use App\Modules\Payroll\Infrastructure\Setup\PayrollConceptsPackComponent;
 use App\Modules\Payroll\Infrastructure\Subscribers\ProcessPayrollRun;
 use App\Modules\Payroll\Infrastructure\Subscribers\RecalculateRetroactively;
+use App\Shared\Imports\ImportRegistry;
 use App\Shared\Outbox\OutboxService;
 use App\Shared\Payroll\ConceptAccounts;
 use App\Shared\Setup\CountryPackRegistry;
@@ -31,6 +34,10 @@ final class PayrollServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
         // CPT-5 · Conceptos peruanos precargados como parte del paquete de país (IMP-4).
         $this->app->make(CountryPackRegistry::class)->register($this->app->make(PayrollConceptsPackComponent::class));
+        // CPT-6 · Importación de conceptos propios y de incidencias del periodo (motor de IMP-1).
+        $imports = $this->app->make(ImportRegistry::class);
+        $imports->register($this->app->make(PayrollConceptsImporter::class));
+        $imports->register($this->app->make(PayrollIncidentsImporter::class));
         $outbox = $this->app->make(OutboxService::class);
         $outbox->subscribe($this->app->make(ProcessPayrollRun::class));
         $outbox->subscribe($this->app->make(RecalculateRetroactively::class));

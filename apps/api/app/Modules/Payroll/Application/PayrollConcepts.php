@@ -108,6 +108,7 @@ final class PayrollConcepts
             throw self::invalid('code', 'unique', (string) trans('payroll.concepts.code_taken', ['code' => $code]));
         }
         $this->assertRegimes($input['applies_to_regimes'] ?? null);
+        $this->assertStatutoryCode($input['statutory_code'] ?? null, (string) ($input['valid_from'] ?? CarbonImmutable::today()->toDateString()));
         $affects = $this->normalizeAffectations((array) ($input['affectations'] ?? []));
 
         return DB::transaction(function () use ($input, $code, $userId, $affects): array {
@@ -160,6 +161,7 @@ final class PayrollConcepts
                 DB::table('payroll_concepts')->where('id', $id)->update($data);
             }
             if (array_key_exists('statutory_code', $data)) {
+                $this->assertStatutoryCode($data['statutory_code'], CarbonImmutable::today()->toDateString());
                 $this->syncStatutory($id, $data['statutory_code'], CarbonImmutable::today()->toDateString(), false);
             }
             $draftKeys = ['formula', 'condition', 'rounding', 'applies_to_regimes', 'applies_to_period_kinds', 'affectations', 'valid_from', 'notes'];
@@ -403,6 +405,11 @@ final class PayrollConcepts
                     'message' => (string) trans('payroll.concepts.justification_required', ['base' => $a['base_code']])];
             }
         }
+        // CPT-7 · RN-CPT-07 · El código declarado debe existir en la Tabla 22 vigente a la fecha de la versión.
+        if ($c->statutory_code !== null && ! $this->statutoryCodeExists((string) $c->statutory_code, $asOf)) {
+            $errors[] = ['part' => 'statutory_code', 'code' => 'statutory_unknown', 'position' => 0,
+                'message' => (string) trans('payroll.concepts.statutory_unknown', ['code' => (string) $c->statutory_code])];
+        }
         $warnings = [];
         if ($c->statutory_code === null && in_array($c->kind, ['earning', 'deduction', 'employee_contribution', 'employer_contribution', 'tax'], true)) {
             $warnings[] = ['code' => 'statutory_code_missing', 'message' => (string) trans('payroll.concepts.statutory_missing')];
@@ -629,6 +636,29 @@ final class PayrollConcepts
             DB::table('concept_statutory_mappings')->insert(['tenant_id' => TenancyScope::requireTenant(), 'payroll_concept_id' => $id,
                 'filing_kind' => 'plame', 'statutory_code' => $code, 'verified' => $verified, 'valid_from' => $from]);
         }
+    }
+
+    /**
+     * CPT-7 · El código de la declaración se coteja con la tabla paramétrica 22 de la Planilla Electrónica a la
+     * fecha. Sin esa tabla cargada (otro país o catálogo aún vacío) no se bloquea: lo reporta la validación previa.
+     */
+    private function assertStatutoryCode(mixed $code, string $on): void
+    {
+        if ($code === null || $code === '') {
+            return;
+        }
+        if (! $this->statutoryCodeExists((string) $code, $on)) {
+            throw self::invalid('statutory_code', 'exists', (string) trans('payroll.concepts.statutory_unknown', ['code' => (string) $code]));
+        }
+    }
+
+    public function statutoryCodeExists(string $code, string $on): bool
+    {
+        if ($this->country() !== 'PE' || ! DB::table('pe_parametric_items')->where('table_number', 22)->exists()) {
+            return true;
+        }
+
+        return (bool) DB::selectOne('SELECT pe_param_ok(22::smallint, ?, ?::date) AS ok', [$code, $on])->ok;
     }
 
     private function country(): string

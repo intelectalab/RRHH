@@ -534,6 +534,33 @@ def cp(code, name, kind, method, afecta, formula=None, rem=True, sunat=None, not
                 parametros_legales=params or [], codigo_plame=sunat, codigo_plame_verificado=bool(ok and sunat), regimenes=reg or ['pe_general', 'pe_micro', 'pe_pequena', 'pe_construccion', 'pe_agrario'], proyeccion_quinta=proy, rol_monto=rol, nota=note,
                 formula_motor=motor, condicion_motor=cond, orden=orden)
 ALL = BASES
+# CPT-7 · Tabla 22 de la Planilla Electrónica (ingresos, tributos y descuentos): solo los códigos cotejados con la
+# «Tabla 22 – Definición de conceptos PLAME» publicada por SUNAT (versión del 01-10-2025, docs/18 §3.2). Ningún
+# concepto de la plantilla usa un código que no esté aquí; los que faltan (serie 0800) quedan por confirmar.
+TABLA22_PE_VERSION = 'SUNAT · Tabla 22 – Definición de conceptos PLAME, versión del 01-10-2025'
+TABLA22_PE = [
+ ('0103', 'Comisiones o destajo'), ('0105', 'Trabajo en sobretiempo (horas extras) 25 %'), ('0106', 'Trabajo en sobretiempo (horas extras) 35 %'),
+ ('0107', 'Trabajo en día feriado o día de descanso'), ('0114', 'Vacaciones truncas'), ('0115', 'Remuneración día de descanso y feriados'),
+ ('0117', 'Compensación vacacional'), ('0118', 'Remuneración vacacional'), ('0121', 'Remuneración o jornal básico'),
+ ('0201', 'Asignación familiar'), ('0211', 'Asignación por escolaridad 30 jornales básicos por año'),
+ ('0303', 'Bonificación por producción, altura, turno, etc.'), ('0309', 'Bonificación por turno nocturno 20 % jornal básico'),
+ ('0310', 'Bonificación contacto directo con agua 20 % jornal básico'), ('0311', 'Bonificación unificada de construcción'),
+ ('0312', 'Bonificación extraordinaria temporal – Ley 29351'), ('0313', 'Bonificación extraordinaria proporcional – Ley 29351'),
+ ('0314', 'Bonificación especial por trabajo agrario Ley 31110 – BETA'), ('0403', 'Gratificaciones extraordinarias'),
+ ('0406', 'Gratificaciones de Fiestas Patrias y Navidad – Ley 29351'), ('0407', 'Gratificaciones proporcionales – Ley 29351'),
+ ('0501', 'Indemnización por despido injustificado u hostilidad'), ('0504', 'Indemnización por vacaciones no gozadas'),
+ ('0601', 'SPP – comisión porcentual'), ('0602', 'CONAFOVICER'), ('0605', 'Renta de quinta categoría – retenciones'),
+ ('0606', 'Prima de seguro AFP'), ('0607', 'Sistema Nacional de Pensiones – DL 19990'), ('0608', 'SPP – aportación obligatoria'),
+ ('0701', 'Adelanto'), ('0702', 'Cuota sindical'), ('0703', 'Descuento autorizado u ordenado por mandato judicial'),
+ ('0704', 'Tardanzas'), ('0705', 'Inasistencias'), ('0706', 'Otros descuentos no deducibles de la base imponible'),
+ ('0707', 'Otros descuentos deducibles de la base imponible'), ('0902', 'Bono de productividad'),
+ ('0904', 'Compensación por tiempo de servicios'), ('0909', 'Movilidad supeditada a asistencia y que cubre solo el traslado'),
+ ('0910', 'Participación en las utilidades – pagadas antes de la declaración anual'),
+ ('0911', 'Participación en las utilidades – pagadas después de la declaración anual'),
+ ('0915', 'Subsidios por maternidad'), ('0916', 'Subsidios de incapacidad por enfermedad'), ('0917', 'Condiciones de trabajo'),
+ ('0928', 'Devolución de retención en exceso de quinta categoría'),
+]
+
 CONCEPTS_PE = [
  cp('rem_basica', 'Remuneración básica', 'earning', 'formula', ALL, 'sueldo_base * dias_trabajados / dias_periodo', sunat='0121', ok=True, proy='ordinary', motor='sueldo_tramos - sueldo / dias_base * (dias_sin_goce + dias_subsidio)', orden=10),
  cp('asig_familiar', 'Asignación familiar', 'earning', 'formula', ALL, 'param(rmv) * param(asignacion_familiar_pct_rmv) / 100', sunat='0201', params=['rmv', 'asignacion_familiar_pct_rmv'], ok=True, proy='ordinary', motor='param.rmv * param.asignacion_familiar_pct_rmv / 100', cond='tiene_asignacion_familiar', orden=20),
@@ -563,7 +590,7 @@ CONCEPTS_PE = [
  cp('afp_prima', 'Prima de seguro AFP', 'employee_contribution', 'formula', [], 'min(base_pension, param(afp_remuneracion_maxima_asegurable)) * tasa_afp(prima)', sunat='0606', params=['afp_prima_seguro_pct', 'afp_remuneracion_maxima_asegurable'], ok=True),
  cp('onp_aporte', 'Aporte ONP', 'employee_contribution', 'formula', [], 'base_pension * param(onp_aporte_pct) / 100', sunat='0607', params=['onp_aporte_pct'], ok=True, motor='base.pension * param.onp_aporte_pct / 100', cond='sistema_pension = "onp"', orden=100),
  cp('renta_quinta', 'Retención de renta de quinta categoría', 'tax', 'formula', [], 'retencion_quinta(proyeccion_anual, param(uit), param(quinta_deduccion_uit), param(quinta_escala))', sunat='0605', params=['uit', 'quinta_deduccion_uit', 'quinta_escala'], ok=True),
- cp('essalud', 'Aporte EsSalud', 'employer_contribution', 'formula', [], 'max(base_essalud, param(rmv)) * param(essalud_aporte_pct) / 100', sunat='0804', params=['essalud_aporte_pct', 'rmv'], motor='max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100', orden=200),
+ cp('essalud', 'Aporte EsSalud', 'employer_contribution', 'formula', [], 'max(base_essalud, param(rmv)) * param(essalud_aporte_pct) / 100', note='CPT-7 · El código de la serie 0800 de la Tabla 22 (aportes del empleador) no se pudo leer en la revisión del 01-10-2025: se carga cuando el especialista lo coteje (docs/18 §3.2).', params=['essalud_aporte_pct', 'rmv'], motor='max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100', orden=200),
  cp('sctr', 'Seguro complementario de trabajo de riesgo', 'employer_contribution', 'formula', [], 'base * tasa_poliza'),
  cp('vida_ley', 'Seguro de vida de ley', 'employer_contribution', 'formula', [], 'base * tasa_poliza'),
  cp('dscto_prestamo', 'Descuento de préstamo', 'deduction', 'input', []),

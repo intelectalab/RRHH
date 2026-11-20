@@ -111,6 +111,7 @@ return [
         'copy_of' => 'Copy of :code.',
         'projection_required' => 'If it adds to the fifth-category income tax base, state its nature in the projection (ordinary, bonus or extraordinary).',
         'justification_required' => 'It is non-remunerative: record the justification to add it to the :base base.',
+        'statutory_unknown' => 'Code :code does not exist in the current Table 22 of the Electronic Payroll.',
         'statutory_missing' => 'The filing code (Table 22) is missing: the filing pre-check will report it.',
         'account_taken' => 'Account :code already exists.',
         'rule_duplicate' => 'Two rules target the same company, cost center and category.',
@@ -147,5 +148,11 @@ return [
         'acta_required' => 'Give the collective agreement record the table was checked against.',
         'wage_table_verified' => 'The organization already verified this wage table.',
         'invalid_file' => 'The file must be a CSV with the columns fund_code, valid_from and the rates.',
+    ],
+    'import' => [
+        'period_missing' => 'There is no payroll period for that group and period (use YYYYMM or YYYY-NN).',
+        'code_format' => 'The code is lowercase with no spaces: letters, numbers and underscore.',
+        'kind_invalid' => 'The kind is not valid. Use one of: :options.',
+        'concept_note' => 'Imported in batch :job.',
     ],
 ];

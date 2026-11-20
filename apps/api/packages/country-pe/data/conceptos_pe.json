@@ -989,7 +989,7 @@
         "essalud_aporte_pct",
         "rmv"
       ],
-      "codigo_plame": "0804",
+      "codigo_plame": null,
       "codigo_plame_verificado": false,
       "regimenes": [
         "pe_general",
@@ -1000,7 +1000,7 @@
       ],
       "proyeccion_quinta": null,
       "rol_monto": "accrued_and_paid",
-      "nota": "",
+      "nota": "CPT-7 · El código de la serie 0800 de la Tabla 22 (aportes del empleador) no se pudo leer en la revisión del 01-10-2025: se carga cuando el especialista lo coteje (docs/18 §3.2).",
       "formula_motor": "max(base.essalud, param.rmv) * param.essalud_aporte_pct / 100",
       "condicion_motor": null,
       "orden": 200

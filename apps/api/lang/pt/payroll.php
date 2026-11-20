@@ -111,6 +111,7 @@ return [
         'copy_of' => 'Cópia de :code.',
         'projection_required' => 'Se soma à base do imposto de quinta categoria, indique sua natureza na projeção (ordinário, gratificação ou extraordinário).',
         'justification_required' => 'É não remuneratório: registre a justificativa para somá-lo à base :base.',
+        'statutory_unknown' => 'O código :code não existe na Tabela 22 vigente da Folha Eletrônica.',
         'statutory_missing' => 'Falta o código da declaração (Tabela 22): a validação prévia da declaração vai apontá-lo.',
         'account_taken' => 'A conta :code já existe.',
         'rule_duplicate' => 'Há duas regras para a mesma empresa, centro de custo e categoria.',
@@ -147,5 +148,11 @@ return [
         'acta_required' => 'Informe a ata do acordo contra a qual a tabela foi verificada.',
         'wage_table_verified' => 'A organização já verificou esta tabela salarial.',
         'invalid_file' => 'O arquivo deve ser um CSV com as colunas fund_code, valid_from e as taxas.',
+    ],
+    'import' => [
+        'period_missing' => 'Não há período de folha com esse grupo e período (use AAAAMM ou AAAA-NN).',
+        'code_format' => 'O código vai em minúsculas, sem espaços: letras, números e sublinhado.',
+        'kind_invalid' => 'A natureza não é válida. Use uma de: :options.',
+        'concept_note' => 'Importado no lote :job.',
     ],
 ];

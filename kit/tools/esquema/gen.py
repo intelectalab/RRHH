@@ -279,6 +279,10 @@ def seeds():
         rows.append(f"  ({q(code)}, {q(mod)}, {q(name)}, {q(desc)}, {q(typ)}, {q(json.dumps(dflt, ensure_ascii=False))}::jsonb, ARRAY[{','.join(q(s) for s in scopes)}], {('NULL' if opts is None else q(json.dumps(opts, ensure_ascii=False)) + '::jsonb')})")
     o.append(',\n'.join(rows) + ';')
     o.append(M.seed_sql(q))  # CFG-10 · catálogos maestros
+    # CPT-7 · Tabla 22 de la Planilla Electrónica: los códigos cotejados que valida pe_param_ok(22, …).
+    o.append("INSERT INTO pe_parametric_tables (table_number, name, source_annex) VALUES (22, 'Ingresos, tributos y descuentos', 'Anexo 2');")
+    o.append('INSERT INTO pe_parametric_items (table_number, code, description, private_sector, source, verified, valid_from) VALUES')
+    o.append(',\n'.join(f"  (22, {q(c)}, {q(d)}, true, {q(C.TABLA22_PE_VERSION)}, true, '2000-01-01')" for c, d in C.TABLA22_PE) + ';')
     return '\n'.join(o)
 
 def build_schema(phases, epics, tables):
@@ -336,6 +340,15 @@ def build_json():
         regimenes=[dict(codigo=c, nombre=n, tipo=k) for c, n, k in C.REGIMES_PE],
         totales=dict(parametros=len(C.LEGAL_PE), verificados=sum(1 for p in C.LEGAL_PE if p['verificado']), sin_verificar=sum(1 for p in C.LEGAL_PE if not p['verificado'])),
         parametros=C.LEGAL_PE))
+    # CPT-7 · Ningún concepto conserva un código que no exista en la Tabla 22 vigente, y todo concepto que afecta
+    # a quinta declara su naturaleza en la proyección (ordinario, gratificación o extraordinario).
+    t22 = {c for c, _ in C.TABLA22_PE}
+    for c in C.CONCEPTS_PE:
+        assert c['codigo_plame'] is None or c['codigo_plame'] in t22, f"{c['codigo']}: código {c['codigo_plame']} fuera de la Tabla 22"
+        assert not c['afectaciones']['quinta'] or c['proyeccion_quinta'] in ('ordinary', 'gratification', 'extraordinary'), f"{c['codigo']}: afecta a quinta sin naturaleza en la proyección"
+    write_json('tabla22_pe.json', dict(tabla=22, nombre='Ingresos, tributos y descuentos', fuente=C.TABLA22_PE_VERSION,
+        nota='CPT-7 · Códigos cotejados de la Tabla 22 (docs/18 §3.2). La serie 0800 (aportes del empleador) no se pudo leer y queda por confirmar.',
+        codigos=[dict(codigo=c, descripcion=d) for c, d in C.TABLA22_PE]))
     write_json('conceptos_pe.json', dict(
         pais='PE',
         nota='Plantilla de conceptos de planilla del paquete Perú. Las fórmulas son seudocódigo del motor y solo referencian parámetros legales por código (nunca valores). Las afectaciones NO están verificadas: son una propuesta inicial que un especialista en planillas debe validar concepto por concepto. Los códigos con «codigo_plame_verificado»: true se cotejaron con la Tabla 22 publicada por SUNAT (versión del 01-10-2025, docs/18 §3.2); los demás siguen por confirmar. «regimenes» indica a qué regímenes aplica el concepto, «proyeccion_quinta» su naturaleza en la proyección de quinta categoría (ordinary, gratification, extraordinary) y «rol_monto» qué monto se declara.',

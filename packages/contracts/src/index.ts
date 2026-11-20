@@ -23003,7 +23003,7 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @enum {string} */
-            entity: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles";
+            entity: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles" | "payroll_incidents";
             file_name?: string | null;
             /** @description Identificador opaco */
             file_id?: string | null;
@@ -23046,7 +23046,7 @@ export interface components {
         };
         ImportJobInput: {
             /** @enum {string} */
-            entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles";
+            entity?: "legal_entities" | "employees" | "contracts" | "vacation_balances" | "salaries" | "attendance" | "concepts" | "history" | "org_structure" | "dependents" | "positions" | "job_profiles" | "payroll_incidents";
             /** @description Identificador opaco */
             file_id?: string | null;
             headers?: string[] | null;

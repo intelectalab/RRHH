@@ -1,0 +1,188 @@
+{
+  "tabla": 22,
+  "nombre": "Ingresos, tributos y descuentos",
+  "fuente": "SUNAT · Tabla 22 – Definición de conceptos PLAME, versión del 01-10-2025",
+  "nota": "CPT-7 · Códigos cotejados de la Tabla 22 (docs/18 §3.2). La serie 0800 (aportes del empleador) no se pudo leer y queda por confirmar.",
+  "codigos": [
+    {
+      "codigo": "0103",
+      "descripcion": "Comisiones o destajo"
+    },
+    {
+      "codigo": "0105",
+      "descripcion": "Trabajo en sobretiempo (horas extras) 25 %"
+    },
+    {
+      "codigo": "0106",
+      "descripcion": "Trabajo en sobretiempo (horas extras) 35 %"
+    },
+    {
+      "codigo": "0107",
+      "descripcion": "Trabajo en día feriado o día de descanso"
+    },
+    {
+      "codigo": "0114",
+      "descripcion": "Vacaciones truncas"
+    },
+    {
+      "codigo": "0115",
+      "descripcion": "Remuneración día de descanso y feriados"
+    },
+    {
+      "codigo": "0117",
+      "descripcion": "Compensación vacacional"
+    },
+    {
+      "codigo": "0118",
+      "descripcion": "Remuneración vacacional"
+    },
+    {
+      "codigo": "0121",
+      "descripcion": "Remuneración o jornal básico"
+    },
+    {
+      "codigo": "0201",
+      "descripcion": "Asignación familiar"
+    },
+    {
+      "codigo": "0211",
+      "descripcion": "Asignación por escolaridad 30 jornales básicos por año"
+    },
+    {
+      "codigo": "0303",
+      "descripcion": "Bonificación por producción, altura, turno, etc."
+    },
+    {
+      "codigo": "0309",
+      "descripcion": "Bonificación por turno nocturno 20 % jornal básico"
+    },
+    {
+      "codigo": "0310",
+      "descripcion": "Bonificación contacto directo con agua 20 % jornal básico"
+    },
+    {
+      "codigo": "0311",
+      "descripcion": "Bonificación unificada de construcción"
+    },
+    {
+      "codigo": "0312",
+      "descripcion": "Bonificación extraordinaria temporal – Ley 29351"
+    },
+    {
+      "codigo": "0313",
+      "descripcion": "Bonificación extraordinaria proporcional – Ley 29351"
+    },
+    {
+      "codigo": "0314",
+      "descripcion": "Bonificación especial por trabajo agrario Ley 31110 – BETA"
+    },
+    {
+      "codigo": "0403",
+      "descripcion": "Gratificaciones extraordinarias"
+    },
+    {
+      "codigo": "0406",
+      "descripcion": "Gratificaciones de Fiestas Patrias y Navidad – Ley 29351"
+    },
+    {
+      "codigo": "0407",
+      "descripcion": "Gratificaciones proporcionales – Ley 29351"
+    },
+    {
+      "codigo": "0501",
+      "descripcion": "Indemnización por despido injustificado u hostilidad"
+    },
+    {
+      "codigo": "0504",
+      "descripcion": "Indemnización por vacaciones no gozadas"
+    },
+    {
+      "codigo": "0601",
+      "descripcion": "SPP – comisión porcentual"
+    },
+    {
+      "codigo": "0602",
+      "descripcion": "CONAFOVICER"
+    },
+    {
+      "codigo": "0605",
+      "descripcion": "Renta de quinta categoría – retenciones"
+    },
+    {
+      "codigo": "0606",
+      "descripcion": "Prima de seguro AFP"
+    },
+    {
+      "codigo": "0607",
+      "descripcion": "Sistema Nacional de Pensiones – DL 19990"
+    },
+    {
+      "codigo": "0608",
+      "descripcion": "SPP – aportación obligatoria"
+    },
+    {
+      "codigo": "0701",
+      "descripcion": "Adelanto"
+    },
+    {
+      "codigo": "0702",
+      "descripcion": "Cuota sindical"
+    },
+    {
+      "codigo": "0703",
+      "descripcion": "Descuento autorizado u ordenado por mandato judicial"
+    },
+    {
+      "codigo": "0704",
+      "descripcion": "Tardanzas"
+    },
+    {
+      "codigo": "0705",
+      "descripcion": "Inasistencias"
+    },
+    {
+      "codigo": "0706",
+      "descripcion": "Otros descuentos no deducibles de la base imponible"
+    },
+    {
+      "codigo": "0707",
+      "descripcion": "Otros descuentos deducibles de la base imponible"
+    },
+    {
+      "codigo": "0902",
+      "descripcion": "Bono de productividad"
+    },
+    {
+      "codigo": "0904",
+      "descripcion": "Compensación por tiempo de servicios"
+    },
+    {
+      "codigo": "0909",
+      "descripcion": "Movilidad supeditada a asistencia y que cubre solo el traslado"
+    },
+    {
+      "codigo": "0910",
+      "descripcion": "Participación en las utilidades – pagadas antes de la declaración anual"
+    },
+    {
+      "codigo": "0911",
+      "descripcion": "Participación en las utilidades – pagadas después de la declaración anual"
+    },
+    {
+      "codigo": "0915",
+      "descripcion": "Subsidios por maternidad"
+    },
+    {
+      "codigo": "0916",
+      "descripcion": "Subsidios de incapacidad por enfermedad"
+    },
+    {
+      "codigo": "0917",
+      "descripcion": "Condiciones de trabajo"
+    },
+    {
+      "codigo": "0928",
+      "descripcion": "Devolución de retención en exceso de quinta categoría"
+    }
+  ]
+}
