@@ -539,6 +539,10 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 | `help.escalations.create` | Crear consultas derivadas desde la ayuda |  | ○ | ○ | ○ | ○ | ○ | ○ |  | ○ | ○ | ○ |
 | `help.escalations.support` **(+)** | Escribir al soporte de GestiaHR desde la ayuda |  | ✓ |  |  |  |  |  |  |  |  |  |
 | `help.insights.view` | Ver indicadores de uso de la ayuda |  | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `ai.usage_logs.view` | Ver el registro de usos de IA |  | ✓ |  |  |  |  |  | ✓ |  |  |  |
+| `ai.use_case_settings.view` | Ver la activación del asistente de ayuda y de cada caso de uso |  | ✓ |  |  |  |  |  | ✓ |  |  |  |
+| `ai.use_case_settings.update` | Editar la activación del asistente de ayuda y de cada caso de uso |  | ✓ |  |  |  |  |  |  |  |  |  |
+| `ai.help_assistant.use` | Usar el asistente de ayuda |  | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `platform.help_articles.view` | Ver la ayuda del producto | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.help_articles.archive` | Archivar la ayuda del producto | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `platform.help_articles.create` | Crear la ayuda del producto | ✓ |  |  |  |  |  |  |  |  |  |  |
@@ -1370,11 +1374,7 @@ Totales: 912 permisos · 772 tomados de `api/openapi.yaml` · 28 de campo · 112
 | `ai.conversations.send_message` | Enviar mensajes en conversaciones con el asistente |  | ✓ | ✓ | ✓ | ✓ | ✓ |  |  | ✓ |  |  |
 | `ai.conversations.query_data` **(+)** | Consultar datos en lenguaje natural dentro de sus permisos |  | ✓ | ✓ | ✓ |  | ✓ |  |  |  |  |  |
 | `ai.mcp.use` | Usar asistentes externos por MCP |  | ✓ | ✓ | ✓ |  | ✓ |  |  |  |  |  |
-| `ai.usage_logs.view` | Ver el registro de usos de IA |  | ✓ |  |  |  |  |  | ✓ |  |  |  |
 | `ai.policies.update` **(+)** | Activar casos de uso, proveedor y exclusiones |  | ✓ |  |  |  |  |  |  |  |  |  |
-| `ai.use_case_settings.view` | Ver la activación del asistente de ayuda y de cada caso de uso |  | ✓ |  |  |  |  |  | ✓ |  |  |  |
-| `ai.use_case_settings.update` | Editar la activación del asistente de ayuda y de cada caso de uso |  | ✓ |  |  |  |  |  |  |  |  |  |
-| `ai.help_assistant.use` | Usar el asistente de ayuda |  | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `ai.help_assistant.use_personal_data` **(+)** | Preguntar al asistente de ayuda por sus propios datos (fase 8) |  | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |
 
 ### Fase 9 · Ecosistema y expansión

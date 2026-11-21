@@ -15,8 +15,10 @@ import { StatusBadge } from '@/ui/components/Status'
 import { Tabs } from '@/ui/components/Tabs'
 import { helpBlocks, loadScreenHelp, tourSteps, type HelpArticle, type HelpEscalation, type HelpTour, type ScreenHelp } from './help'
 import { helpScreenFor } from './screens'
+import { HelpAssistantTab } from '@/modules/ai/HelpAssistantTab'
+import type { AssistantAvailability } from '@/modules/ai/ai'
 
-type HelpTab = 'screen' | 'guides' | 'queries'
+type HelpTab = 'screen' | 'guides' | 'assistant' | 'queries'
 
 type HelpState = { available: boolean; screenKey: string | null; open: (tab?: HelpTab) => void; startTour: () => void }
 
@@ -133,6 +135,19 @@ function HelpPanel({ screenKey, initialTab, hasTours, onClose }: { screenKey: st
   const [q, setQ] = useState('')
   const [results, setResults] = useState<HelpArticle[] | null>(null)
   const canAsk = can('help.escalations.create') || can('help.escalations.view')
+  const [assistant, setAssistant] = useState<AssistantAvailability | null>(null)
+
+  // IAR-9 · IAR-10 · El asistente solo aparece si la API dice que está disponible para este usuario.
+  useEffect(() => {
+    if (!can('ai.help_assistant.use')) return
+    let alive = true
+    api.get<{ data: AssistantAvailability }>('/ai/help-assistant/availability').then((r) => { if (alive) setAssistant(r.data) }).catch(() => undefined)
+    return () => { alive = false }
+  }, [can])
+
+  async function openArticle(id: string) {
+    try { read((await api.get<{ data: HelpArticle }>(`/help/articles/${id}`)).data) } catch { setFailed(true) }
+  }
 
   useEffect(() => {
     if (!screenKey) return
@@ -230,6 +245,7 @@ function HelpPanel({ screenKey, initialTab, hasTours, onClose }: { screenKey: st
               items={[
                 { id: 'screen', label: t('help.tab_screen'), disabled: !screenKey, content: list(screen?.articles ?? (screen === null ? [] : undefined), t('help.empty_screen')) },
                 { id: 'guides', label: t('help.tab_guides'), content: guidesContent },
+                ...(assistant?.available ? [{ id: 'assistant', label: t('ai.tab'), content: <HelpAssistantTab screenKey={screenKey} availability={assistant} onOpenArticle={(id) => void openArticle(id)} onEscalate={canAsk ? () => setTab('queries') : undefined} /> }] : []),
                 ...(canAsk ? [{ id: 'queries', label: t('help.tab_queries'), content: <MyQueries screenKey={screenKey} consulted={consulted} /> }] : []),
               ]}
             />

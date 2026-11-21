@@ -2,6 +2,7 @@
 
 namespace App\Modules\HelpCenter\Application;
 
+use App\Shared\Help\HelpCorpus;
 use App\Shared\Help\HelpScreens;
 use App\Shared\Permissions\EffectivePermissions;
 use App\Shared\Tenancy\TenancyScope;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * En el idioma del usuario o, si falta la traducción, en español con aviso (RN-AYU-07). No depende del
  * asistente de IA.
  */
-final class HelpLibrary
+final class HelpLibrary implements HelpCorpus
 {
     private const FIELD_PREFIX = 'campo.';
 
@@ -250,6 +251,18 @@ final class HelpLibrary
         });
 
         return ['article_id' => $id, 'source' => (string) $article['source'], 'is_helpful' => $helpful];
+    }
+
+    /**
+     * IAR-9 · Fuentes del asistente de ayuda: exactamente lo que el usuario puede abrir en el centro de ayuda
+     * (ayuda del producto y de la organización, con las reglas de visibilidad RN-AYU-01 y RN-AYU-03).
+     *
+     * @param  array<int, string>  $modules
+     * @return list<array<string, mixed>>
+     */
+    public function corpus(EffectivePermissions $permissions, array $modules, string $locale): array
+    {
+        return $this->all($permissions, $modules, $locale);
     }
 
     /**

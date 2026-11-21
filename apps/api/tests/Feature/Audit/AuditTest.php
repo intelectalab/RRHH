@@ -188,7 +188,9 @@ test('el Auditor consulta todo y no puede modificar nada en el sistema', functio
     // catálogo da settings.saved_views.* a todos los roles, solo sobre lo propio.
     // AYU-5 · AYU-7: valorar un artículo de ayuda y marcar el recorrido propio como visto son registros del
     // propio usuario sobre la ayuda (no datos del sistema); el catálogo los deja con help.articles.view.
-    $readOnlyPosts = ['api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}', 'api/v1/help/articles/{id}/feedback', 'api/v1/help/tours/{tour_key}/complete'];
+    // IAR-9 · IAR-11: preguntar al asistente de ayuda es una lectura de la ayuda y valorar su respuesta es un
+    // registro propio; el catálogo le da ai.help_assistant.use a todos los roles.
+    $readOnlyPosts = ['api/v1/ai/help-assistant/ask', 'api/v1/ai/help-assistant/answers/{id}/feedback', 'api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}', 'api/v1/help/articles/{id}/feedback', 'api/v1/help/tours/{tour_key}/complete'];
 
     $writes = [];
     foreach (Route::getRoutes()->getRoutes() as $route) {

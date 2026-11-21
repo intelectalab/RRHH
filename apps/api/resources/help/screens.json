@@ -212,6 +212,12 @@
         "help.org_articles.view"
       ]
     },
+    "settings.ai_assistant": {
+      "module": "core",
+      "permissions": [
+        "ai.use_case_settings.view"
+      ]
+    },
     "settings.flow_builder": {
       "module": "base",
       "permissions": [

@@ -2,7 +2,9 @@
 
 namespace App\Modules\HelpCenter;
 
+use App\Modules\HelpCenter\Application\HelpLibrary;
 use App\Modules\HelpCenter\Console\MarkArticlesForReview;
+use App\Shared\Help\HelpCorpus;
 use App\Shared\Help\HelpScreens;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -17,6 +19,7 @@ final class HelpCenterServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HelpScreens::class);
+        $this->app->bind(HelpCorpus::class, HelpLibrary::class);
     }
 
     public function boot(): void

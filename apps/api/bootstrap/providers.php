@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Absences\AbsencesServiceProvider;
+use App\Modules\Ai\AiServiceProvider;
 use App\Modules\Audit\AuditServiceProvider;
 use App\Modules\Certificates\CertificatesServiceProvider;
 use App\Modules\Contracts\ContractsServiceProvider;
@@ -40,6 +41,7 @@ return [
     CertificatesServiceProvider::class,
     HelpdeskServiceProvider::class,
     HelpCenterServiceProvider::class,
+    AiServiceProvider::class,
     DocumentsServiceProvider::class,
     PayrollServiceProvider::class,
 ];

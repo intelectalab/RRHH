@@ -15,6 +15,7 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/cuenta/notificaciones', key: 'account.notifications' },
   { route: '/configuracion', key: 'settings' },
   { route: '/configuracion/ayuda', key: 'settings.help' },
+  { route: '/configuracion/asistente', key: 'settings.ai_assistant' },
   { route: '/configuracion/constructor', key: 'settings.flow_builder' },
   { route: '/primeros-pasos', key: 'setup' },
   { route: '/organizacion', key: 'org' },

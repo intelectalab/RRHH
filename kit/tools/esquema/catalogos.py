@@ -272,6 +272,7 @@ PARAMS = [
  ('compensaciones.tamano_minimo_grupo', 'compensation', 'Tamaño mínimo de grupo', 'integer', 3, [O], 'Grupo mínimo para mostrar promedios salariales en el reporte de brecha.', None),
  ('encuestas.umbral_anonimato', 'engagement', 'Umbral de anonimato', 'integer', 5, [O], 'Mínimo de respuestas por segmento para mostrar resultados (C-06).', None),
  ('ayuda.revision_anticipacion_dias', 'core', 'Aviso de revisión de artículos (días)', 'integer', 7, [O], 'AYU-4 · RN-AYU-04: días antes de la fecha de revisión de un artículo de la organización en que se avisa a su responsable y el artículo pasa a «por revisar» (sigue visible).', {'min': 0, 'max': 90}),
+ ('ia.retencion_bitacora_dias', 'core', 'Retención del contenido de la bitácora de IA (días)', 'integer', 365, [O], 'IAR-2 · RN-IAR: días que se conserva el texto cifrado de la pregunta y la respuesta de cada uso de IA. Pasado el plazo se vacía el contenido; la fila (quién, cuándo, propósito, consumo) se conserva.', {'min': 30, 'max': 3650}),
  ('mesa_ayuda.sla_respuesta_horas', 'helpdesk', 'Primera respuesta (horas)', 'integer', 8, [O], 'Plazo por defecto de primera respuesta.', None),
  ('mesa_ayuda.sla_resolucion_horas', 'helpdesk', 'Resolución (horas)', 'integer', 48, [O], 'Plazo por defecto de resolución.', None),
  ('sst.aviso_examen_dias', 'sst', 'Aviso de examen médico', 'integer', 30, [O, E], 'Días de anticipación del aviso de examen ocupacional por vencer.', None),

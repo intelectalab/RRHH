@@ -1556,6 +1556,21 @@
       }
     },
     {
+      "codigo": "ia.retencion_bitacora_dias",
+      "modulo": "core",
+      "nombre": "Retención del contenido de la bitácora de IA (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 365,
+      "alcances": [
+        "organization"
+      ],
+      "descripcion": "IAR-2 · RN-IAR: días que se conserva el texto cifrado de la pregunta y la respuesta de cada uso de IA. Pasado el plazo se vacía el contenido; la fila (quién, cuándo, propósito, consumo) se conserva.",
+      "opciones": {
+        "min": 30,
+        "max": 3650
+      }
+    },
+    {
       "codigo": "mesa_ayuda.sla_respuesta_horas",
       "modulo": "helpdesk",
       "nombre": "Primera respuesta (horas)",
