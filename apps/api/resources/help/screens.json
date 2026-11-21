@@ -341,6 +341,28 @@
       "permissions": [
         "payroll.settlements.view"
       ]
+    },
+    "payroll.declaration_log": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.declaration_files.view"
+      ]
+    },
+    "payroll.registry_profiles": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.registry_profiles.view"
+      ]
+    },
+    "payroll.fifth_refunds": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.fifth_category_refunds.view"
+      ]
+    },
+    "portal.external_income": {
+      "module": "payroll",
+      "permissions": []
     }
   }
 }

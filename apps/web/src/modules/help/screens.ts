@@ -57,9 +57,13 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/nomina/micro-pequena-empresa', key: 'payroll.small_business' },
   { route: '/nomina/retenciones-quinta', key: 'payroll.fifth_ledger' },
   { route: '/nomina/declaraciones', key: 'payroll.declarations' },
+  { route: '/nomina/bitacora-declaraciones', key: 'payroll.declaration_log' },
+  { route: '/nomina/registro-laboral', key: 'payroll.registry_profiles' },
+  { route: '/nomina/devoluciones-quinta', key: 'payroll.fifth_refunds' },
   { route: '/mi', key: 'portal.home' },
   { route: '/mi/documentos', key: 'portal.documents' },
   { route: '/mi/boletas', key: 'portal.payslips' },
+  { route: '/mi/rentas-otros-empleadores', key: 'portal.external_income' },
   { route: '/mi/perfil', key: 'portal.profile' },
   { route: '/mi/solicitudes', key: 'portal.requests' },
 ]

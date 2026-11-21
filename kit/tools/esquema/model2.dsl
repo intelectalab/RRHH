@@ -407,6 +407,7 @@
   status enum(draft,generated,validated,with_errors,submitted,accepted,rejected,observed,rectified)=draft ; validation_report j ; submitted_at
   submitted_by_user_id ?-> users ; external_reference ; due_on
   created_by_user_id ?-> users ; accepted_at ; observation ; rectification_reason ; submission_document_id ?-> documents
+  responsible_user_id ?-> users ; paid_at ; paid_by_user_id ?-> users ; payment_reference ; payment_document_id ?-> documents
 @statutory_filing_files | Archivos generados de una declaración.
   statutory_filing_id -> statutory_filings ; file_kind text! ; stored_file_id -> stored_files ; record_count integer ; checksum
   statutory_file_layout_id ?=> statutory_file_layouts ; file_name ; sha256 ; byte_size bigint ; control_totals j ; generator_version
@@ -435,8 +436,10 @@
   tax_withheld money #S ; currency cur ; document_id ?-> documents ; declared_on
   kind enum(previous_employer,concurrent_employer)=previous_employer ; period_from date ; period_to date ; exempt_income money #S
   monthly_detail j #S ; this_employer_withholds boolean ; status enum(received,validated,superseded,rejected)=received
-  superseded_by_id ?-> external_income_declarations ; received_on
+  superseded_by_id ?-> external_income_declarations ; received_on ; validated_on ; validated_by_user_id ?-> users
+  applies_from_month smallint ; rejection_reason ; submitted_by_user_id ?-> users
   check period_to IS NULL OR period_from IS NULL OR period_to >= period_from ; check employer_tax_id IS NULL OR employer_tax_id ~ '^[0-9]{11}$'
+  check applies_from_month IS NULL OR applies_from_month BETWEEN 1 AND 12
 @withholding_certificates sens | Certificado de rentas y retenciones por trabajador y ejercicio: al cierre, al cese o a solicitud (puede haber más de uno).
   employment_id -> employments ; fiscal_year smallint! ; total_income money #S ; total_withheld money #S ; currency cur
   document_id ?-> documents ; issued_on ; reason enum(annual,termination,on_request)=on_request ; period_from date ; period_to date
@@ -458,7 +461,9 @@
   amount money! #S ; currency cur ; refunded_on ; payroll_run_id ?-> payroll_runs ; compensated_amount money=0
   compensation_period_code ; authority_refund_reference ; worker_declaration_document_id ?-> documents
   status enum(pending,refunded,compensated,authority_requested,closed)=pending ; idx employment_id, fiscal_year
+  calculated_by_user_id ?-> users ; refunded_by_user_id ?-> users ; compensations j
   check amount > 0 ; check compensated_amount >= 0 AND compensated_amount <= amount
+  check refunded_by_user_id IS NULL OR calculated_by_user_id IS NULL OR refunded_by_user_id <> calculated_by_user_id
 
 #E PRV | Provisiones y asientos
 @accounting_accounts soft | Cuentas contables usadas en la centralización de planilla.

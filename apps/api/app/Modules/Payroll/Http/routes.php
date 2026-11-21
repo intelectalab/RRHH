@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Payroll\Http\Controllers\DeclarationComplianceController as Compliance;
 use App\Modules\Payroll\Http\Controllers\DeclarationController;
 use App\Modules\Payroll\Http\Controllers\FifthCategoryLedgerController;
 use App\Modules\Payroll\Http\Controllers\LegalParametersController;
@@ -203,6 +204,33 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/registry-events', [DeclarationController::class, 'registryEvents'])->middleware('permission:payroll.declaration_files.view');
     Route::post('/registry-events/sync', [DeclarationController::class, 'syncRegistry'])->middleware('permission:payroll.declaration_files.create');
     Route::get('/registry-reconciliation', [DeclarationController::class, 'reconciliation'])->middleware('permission:payroll.declaration_files.view');
+    // DEC-7 · Bitácora de declaraciones: lo que falta por empresa y periodo, responsable, pago y constancia.
+    Route::get('/declaration-log', [Compliance::class, 'log'])->middleware('permission:payroll.declaration_files.view');
+    Route::patch('/declaration-files/{id}', [Compliance::class, 'updateFiling'])->middleware('permission:payroll.declaration_files.mark_submitted');
+    Route::post('/declaration-files/{id}/register-payment', [Compliance::class, 'registerPayment'])->middleware('permission:payroll.declaration_files.mark_submitted');
+    // DEC-8 · Ficha del registro laboral con vigencia y validación previa al alta (TR-01 a TR-22).
+    Route::get('/employments/{employment_id}/registry-profiles', [Compliance::class, 'profiles'])->middleware('permission:payroll.registry_profiles.view');
+    Route::post('/employments/{employment_id}/registry-profiles', [Compliance::class, 'saveProfile'])->middleware('permission:payroll.registry_profiles.create');
+    Route::get('/employments/{employment_id}/registry-profiles/{id}', [Compliance::class, 'profile'])->middleware('permission:payroll.registry_profiles.view');
+    Route::post('/employments/{employment_id}/registry-profiles/{id}/validate', [Compliance::class, 'validateProfile'])->middleware('permission:payroll.registry_profiles.validate');
+    Route::post('/employments/{employment_id}/registry-validation', [Compliance::class, 'registryValidation'])->middleware('permission:payroll.registry_profiles.view');
+    // DEC-9 · Declaración jurada de rentas de otros empleadores (RRHH y portal).
+    Route::get('/external-income-declarations', [Compliance::class, 'incomeIndex'])->middleware('permission:payroll.external_income_declarations.view');
+    Route::post('/external-income-declarations', [Compliance::class, 'incomeStore'])->middleware('permission:payroll.external_income_declarations.create');
+    Route::get('/external-income-declarations/{id}', [Compliance::class, 'incomeShow'])->middleware('permission:payroll.external_income_declarations.view');
+    Route::post('/external-income-declarations/{id}/validate', [Compliance::class, 'incomeValidate'])->middleware('permission:payroll.external_income_declarations.validate');
+    Route::post('/external-income-declarations/{id}/reject', [Compliance::class, 'incomeReject'])->middleware('permission:payroll.external_income_declarations.reject');
+    Route::post('/external-income-declarations/{id}/supersede', [Compliance::class, 'incomeSupersede'])->middleware('permission:payroll.external_income_declarations.supersede');
+    Route::get('/me/external-income-declarations', [Compliance::class, 'myIncome']);
+    Route::post('/me/external-income-declarations', [Compliance::class, 'myIncomeStore']);
+    // DEC-11 · Devoluciones de excesos de retención de quinta (ME-49).
+    Route::get('/fifth-category-refunds', [Compliance::class, 'refundIndex'])->middleware('permission:payroll.fifth_category_refunds.view');
+    Route::post('/fifth-category-refunds', [Compliance::class, 'refundStore'])->middleware('permission:payroll.fifth_category_refunds.create');
+    Route::get('/fifth-category-refunds/{id}', [Compliance::class, 'refundShow'])->middleware('permission:payroll.fifth_category_refunds.view');
+    Route::post('/fifth-category-refunds/{id}/refund', [Compliance::class, 'refundRefund'])->middleware('permission:payroll.fifth_category_refunds.refund');
+    Route::post('/fifth-category-refunds/{id}/compensate', [Compliance::class, 'refundCompensate'])->middleware('permission:payroll.fifth_category_refunds.compensate');
+    Route::post('/fifth-category-refunds/{id}/request-authority-refund', [Compliance::class, 'refundRequestAuthority'])->middleware('permission:payroll.fifth_category_refunds.request_authority_refund');
+    Route::post('/fifth-category-refunds/{id}/close', [Compliance::class, 'refundClose'])->middleware('permission:payroll.fifth_category_refunds.close');
     // DEC-5 · Plantillas de archivo bancario (ADR 0020): un banco nuevo es una plantilla, sin programar.
     Route::get('/bank-file-templates', [DeclarationController::class, 'bankTemplates'])->middleware('permission:payroll.declaration_files.view');
     Route::post('/bank-file-templates', [DeclarationController::class, 'createBankTemplate'])->middleware('permission:payroll.file_formats.update');

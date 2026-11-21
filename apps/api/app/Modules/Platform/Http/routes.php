@@ -11,6 +11,7 @@ use App\Modules\Platform\Http\Controllers\ModuleController;
 use App\Modules\Platform\Http\Controllers\PlanController;
 use App\Modules\Platform\Http\Controllers\PublicCatalogController;
 use App\Modules\Platform\Http\Controllers\PublicSiteController;
+use App\Modules\Platform\Http\Controllers\StatutoryLayoutsController;
 use App\Modules\Platform\Http\Controllers\SubscriptionController;
 use App\Modules\Platform\Http\Controllers\SystemNoticesController;
 use App\Modules\Platform\Http\Controllers\TenantController;
@@ -168,6 +169,9 @@ Route::prefix('api/v1/platform')->middleware(['api', ConsoleBoundary::ALIAS])->g
             Route::get('/pension-fund-rates', [LegalUpdatesController::class, 'rates'])->middleware('platform.permission:platform.country_packs.view');
             Route::post('/pension-fund-rates', [LegalUpdatesController::class, 'storeRate'])->middleware('platform.permission:platform.country_packs.publish');
             Route::post('/pension-fund-rates/import', [LegalUpdatesController::class, 'importRates'])->middleware('platform.permission:platform.country_packs.publish');
+            // DEC-10 · Estructuras de archivos oficiales como datos versionados: cargar una versión y verificarla.
+            Route::post('/statutory-file-layouts', [StatutoryLayoutsController::class, 'store'])->middleware('platform.permission:platform.country_packs.publish');
+            Route::post('/statutory-file-layouts/{id}/verify', [StatutoryLayoutsController::class, 'verify'])->middleware('platform.permission:platform.country_packs.publish');
 
             // AYU-1 · Ayuda del producto: artículos por módulo, rol y pantalla con versiones (RN-AYU-02).
             Route::get('/help-articles', [HelpArticleController::class, 'index'])->middleware('platform.permission:platform.help_articles.view');

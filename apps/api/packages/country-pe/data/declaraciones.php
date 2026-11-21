@@ -26,4 +26,9 @@ return [
     'tipo_trabajo_afpnet' => ['pe_construccion' => 'C', '*' => 'N'],
     'conciliacion_afpnet' => ['contribution' => 'afp_aporte', 'commission' => 'afp_comision', 'premium' => 'afp_prima'],
     'tolerancia_conciliacion' => '1.00',
+    // DEC-8 · Comprobaciones previas al alta (TR-09, TR-12, TR-16): régimen laboral propio → código de la tabla 33
+    // (mapa 4.7), longitud del CUSPP y códigos de la tabla 16 que exigen cuenta bancaria. Por validar (AR-11).
+    'regimen_tabla33' => ['pe_general' => '01', 'pe_micro' => '16', 'pe_pequena' => '17'],
+    'cuspp_longitud' => '12',
+    'tipo_pago_con_cuenta' => ['2' => '1'],
 ];

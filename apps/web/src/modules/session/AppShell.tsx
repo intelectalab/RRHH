@@ -70,6 +70,9 @@ const MENU: NavLink[] = [
   { href: '/nomina/liquidaciones', key: 'shell.modules_payroll_settlements', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.settlements.view') },
   { href: '/nomina/retenciones-quinta', key: 'shell.modules_fifth_ledger', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.fifth_category_ledger.view') && can('payroll.periods.view') },
   { href: '/nomina/declaraciones', key: 'shell.modules_declarations', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.declaration_files.view') },
+  { href: '/nomina/bitacora-declaraciones', key: 'shell.modules_declaration_log', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.declaration_files.view') },
+  { href: '/nomina/registro-laboral', key: 'shell.modules_registry_profiles', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.registry_profiles.view') && can('payroll.declaration_files.view') },
+  { href: '/nomina/devoluciones-quinta', key: 'shell.modules_fifth_refunds', group: 'payroll', icon: 'file', module: 'payroll', visible: (can) => can('payroll.fifth_category_refunds.view') && can('payroll.fifth_category_ledger.view') },
   { href: '/nomina/micro-pequena-empresa', key: 'shell.modules_small_business', group: 'payroll', icon: 'building', module: 'payroll', visible: (can) => can('payroll.entity_annual_figures.view') },
 ]
 

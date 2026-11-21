@@ -7549,6 +7549,11 @@ CREATE TABLE statutory_filings (
   observation text,
   rectification_reason text,
   submission_document_id uuid,
+  responsible_user_id uuid,
+  paid_at timestamptz,
+  paid_by_user_id uuid,
+  payment_reference text,
+  payment_document_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
@@ -7558,7 +7563,10 @@ CREATE TABLE statutory_filings (
   CONSTRAINT fk_statutory_filings_rectifies_filing_id FOREIGN KEY (tenant_id, rectifies_filing_id) REFERENCES statutory_filings (tenant_id, id),
   CONSTRAINT fk_statutory_filings_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id),
   CONSTRAINT fk_statutory_filings_created_by_user_id FOREIGN KEY (tenant_id, created_by_user_id) REFERENCES users (tenant_id, id),
-  CONSTRAINT fk_statutory_filings_submission_document_id FOREIGN KEY (tenant_id, submission_document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_statutory_filings_submission_document_id FOREIGN KEY (tenant_id, submission_document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_statutory_filings_responsible_user_id FOREIGN KEY (tenant_id, responsible_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_statutory_filings_paid_by_user_id FOREIGN KEY (tenant_id, paid_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_statutory_filings_payment_document_id FOREIGN KEY (tenant_id, payment_document_id) REFERENCES documents (tenant_id, id)
 );
 COMMENT ON TABLE statutory_filings IS 'Declaración o archivo oficial por empresa y periodo (planilla electrónica, registro laboral, aportes previsionales), con validación previa y rectificatorias.';
 CREATE INDEX ix_statutory_filings_legal_entity_id ON statutory_filings (tenant_id, legal_entity_id);
@@ -7567,6 +7575,9 @@ CREATE INDEX ix_statutory_filings_rectifies_filing_id ON statutory_filings (tena
 CREATE INDEX ix_statutory_filings_submitted_by_user_id ON statutory_filings (tenant_id, submitted_by_user_id);
 CREATE INDEX ix_statutory_filings_created_by_user_id ON statutory_filings (tenant_id, created_by_user_id);
 CREATE INDEX ix_statutory_filings_submission_document_id ON statutory_filings (tenant_id, submission_document_id);
+CREATE INDEX ix_statutory_filings_responsible_user_id ON statutory_filings (tenant_id, responsible_user_id);
+CREATE INDEX ix_statutory_filings_paid_by_user_id ON statutory_filings (tenant_id, paid_by_user_id);
+CREATE INDEX ix_statutory_filings_payment_document_id ON statutory_filings (tenant_id, payment_document_id);
 ALTER TABLE statutory_filings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE statutory_filings FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON statutory_filings USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -7744,20 +7755,30 @@ CREATE TABLE external_income_declarations (
   status text NOT NULL DEFAULT 'received' CHECK (status IN ('received','validated','superseded','rejected')),
   superseded_by_id uuid,
   received_on date,
+  validated_on date,
+  validated_by_user_id uuid,
+  applies_from_month smallint,
+  rejection_reason text,
+  submitted_by_user_id uuid,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_external_income_declarations_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_external_income_declarations_1 CHECK (period_to IS NULL OR period_from IS NULL OR period_to >= period_from),
   CONSTRAINT ck_external_income_declarations_2 CHECK (employer_tax_id IS NULL OR employer_tax_id ~ '^[0-9]{11}$'),
+  CONSTRAINT ck_external_income_declarations_3 CHECK (applies_from_month IS NULL OR applies_from_month BETWEEN 1 AND 12),
   CONSTRAINT fk_external_income_declarations_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_external_income_declarations_document_id FOREIGN KEY (tenant_id, document_id) REFERENCES documents (tenant_id, id),
-  CONSTRAINT fk_external_income_declarations_superseded_by_id FOREIGN KEY (tenant_id, superseded_by_id) REFERENCES external_income_declarations (tenant_id, id)
+  CONSTRAINT fk_external_income_declarations_superseded_by_id FOREIGN KEY (tenant_id, superseded_by_id) REFERENCES external_income_declarations (tenant_id, id),
+  CONSTRAINT fk_external_income_declarations_validated_by_user_id FOREIGN KEY (tenant_id, validated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_external_income_declarations_submitted_by_user_id FOREIGN KEY (tenant_id, submitted_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE external_income_declarations IS 'Ingresos y retenciones de otros empleadores declarados por el trabajador (renta de quinta categoría). -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_external_income_declarations_employment_id ON external_income_declarations (tenant_id, employment_id);
 CREATE INDEX ix_external_income_declarations_document_id ON external_income_declarations (tenant_id, document_id);
 CREATE INDEX ix_external_income_declarations_superseded_by_id ON external_income_declarations (tenant_id, superseded_by_id);
+CREATE INDEX ix_external_income_declarations_validated_by_user_id ON external_income_declarations (tenant_id, validated_by_user_id);
+CREATE INDEX ix_external_income_declarations_submitted_by_user_id ON external_income_declarations (tenant_id, submitted_by_user_id);
 ALTER TABLE external_income_declarations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE external_income_declarations FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON external_income_declarations USING (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid);
@@ -7864,19 +7885,27 @@ CREATE TABLE fifth_category_refunds (
   authority_refund_reference text,
   worker_declaration_document_id uuid,
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','refunded','compensated','authority_requested','closed')),
+  calculated_by_user_id uuid,
+  refunded_by_user_id uuid,
+  compensations jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   lock_version integer NOT NULL DEFAULT 1,
   CONSTRAINT uq_fifth_category_refunds_tenant_id UNIQUE (tenant_id, id),
   CONSTRAINT ck_fifth_category_refunds_1 CHECK (amount > 0),
   CONSTRAINT ck_fifth_category_refunds_2 CHECK (compensated_amount >= 0 AND compensated_amount <= amount),
+  CONSTRAINT ck_fifth_category_refunds_3 CHECK (refunded_by_user_id IS NULL OR calculated_by_user_id IS NULL OR refunded_by_user_id <> calculated_by_user_id),
   CONSTRAINT fk_fifth_category_refunds_employment_id FOREIGN KEY (tenant_id, employment_id) REFERENCES employments (tenant_id, id),
   CONSTRAINT fk_fifth_category_refunds_payroll_run_id FOREIGN KEY (tenant_id, payroll_run_id) REFERENCES payroll_runs (tenant_id, id),
-  CONSTRAINT fk_fifth_category_refunds_worker_declaration_document_id FOREIGN KEY (tenant_id, worker_declaration_document_id) REFERENCES documents (tenant_id, id)
+  CONSTRAINT fk_fifth_category_refunds_worker_declaration_document_id FOREIGN KEY (tenant_id, worker_declaration_document_id) REFERENCES documents (tenant_id, id),
+  CONSTRAINT fk_fifth_category_refunds_calculated_by_user_id FOREIGN KEY (tenant_id, calculated_by_user_id) REFERENCES users (tenant_id, id),
+  CONSTRAINT fk_fifth_category_refunds_refunded_by_user_id FOREIGN KEY (tenant_id, refunded_by_user_id) REFERENCES users (tenant_id, id)
 );
 COMMENT ON TABLE fifth_category_refunds IS 'Excesos de retención de quinta devueltos al trabajador y su compensación contra las retenciones del periodo o su devolución ante la administración tributaria. -- SENSIBLE: acceso por permiso de campo y registrado en data_access_logs.';
 CREATE INDEX ix_fifth_category_refunds_payroll_run_id ON fifth_category_refunds (tenant_id, payroll_run_id);
 CREATE INDEX ix_fifth_category_refunds_worker_declaration_document_id ON fifth_category_refunds (tenant_id, worker_declaration_document_id);
+CREATE INDEX ix_fifth_category_refunds_calculated_by_user_id ON fifth_category_refunds (tenant_id, calculated_by_user_id);
+CREATE INDEX ix_fifth_category_refunds_refunded_by_user_id ON fifth_category_refunds (tenant_id, refunded_by_user_id);
 CREATE INDEX ix_fifth_category_refunds_employment_id_fiscal_year ON fifth_category_refunds (tenant_id, employment_id, fiscal_year);
 ALTER TABLE fifth_category_refunds ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fifth_category_refunds FORCE ROW LEVEL SECURITY;

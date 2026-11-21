@@ -1173,6 +1173,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET | `/withholding-certificates/{id}/certificate` | `payroll.fifth_category_ledger.view` | 3 |
 | POST | `/fifth-category/simulate` | `payroll.fifth_category_ledger.view` | 3 |
 | POST | `/employments/{employment_id}/registry-validation` | `payroll.registry_profiles.view` | 3 |
+| GET | `/declaration-log` | `payroll.declaration_files.view` | 3 |
+| PATCH | `/declaration-files/{id}` | `payroll.declaration_files.mark_submitted` | 3 |
+| POST | `/declaration-files/{id}/register-payment` | `payroll.declaration_files.mark_submitted` | 3 |
+| GET | `/me/external-income-declarations` | sesión | 3 |
+| POST | `/me/external-income-declarations` | sesión | 3 |
+| POST | `/platform/statutory-file-layouts` | `platform.country_packs.publish` | 3 |
+| POST | `/platform/statutory-file-layouts/{id}/verify` | `platform.country_packs.publish` | 3 |
 
 **PRV · Provisiones y asientos**
 
