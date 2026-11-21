@@ -236,8 +236,12 @@ jobs:
       QUEUE_CONNECTION: sync
       FILESYSTEM_DISK: local
       TRUSTED_PROXIES: '*'
+      # Correo de desarrollo a la bitácora de la API: los recorridos leen de ahí invitaciones y códigos.
+      MAIL_MAILER: log
+      INTEGRATIONS_DEV_INBOX: mailpit
       NEXT_PUBLIC_API_URL: http://127.0.0.1:8000/api
       E2E_BASE_URL: http://demo.localhost:3000
+      E2E_PLATFORM_EMAIL: e2e-consola@gestiahr.test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -265,11 +269,17 @@ jobs:
           PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_e2e -v ON_ERROR_STOP=1 -q -f kit/database/schema.sql
           # La clave del administrador demo se genera en cada corrida: nunca vive en el repositorio.
           echo "E2E_ADMIN_PASSWORD=E2e-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
+          echo "E2E_PLATFORM_PASSWORD=Pl-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
 
       - name: Seed demo and start API and web
         run: |
           (cd apps/api && DEMO_ADMIN_PASSWORD="$E2E_ADMIN_PASSWORD" php artisan db:seed --force)
+          # Usuario de la consola de plataforma con clave de la corrida (QA-2: alta de organización desde la consola).
+          (cd apps/api && PLATFORM_ADMIN_PASSWORD="$E2E_PLATFORM_PASSWORD" php artisan platform:create-admin "$E2E_PLATFORM_EMAIL" "Consola E2E")
+          # Los eventos de la siembra salen antes de empezar; luego el programador despacha el outbox cada minuto.
+          (cd apps/api && php artisan outbox:dispatch --limit=1000)
           (cd apps/api && nohup php artisan serve --host=127.0.0.1 --port=8000 > ../../api-e2e.log 2>&1 &)
+          (cd apps/api && nohup php artisan schedule:work > ../../scheduler-e2e.log 2>&1 &)
           (cd apps/web && npm run build && nohup npx next start -p 3000 > ../../web-e2e.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf http://127.0.0.1:3000/ingresar >/dev/null && curl -s -o /dev/null http://127.0.0.1:8000/up && break; sleep 2; done
 
@@ -287,4 +297,6 @@ jobs:
             apps/web/test-results/
             api-e2e.log
             web-e2e.log
+            scheduler-e2e.log
+            apps/api/storage/logs/laravel.log
           retention-days: 7

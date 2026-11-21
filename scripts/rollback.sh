@@ -1,24 +1,13 @@
 #!/usr/bin/env bash
+# QA-17 · Volver a una versión anterior en el servidor. Uso: scripts/rollback.sh <commit o tag> (por defecto HEAD~1).
+# Las migraciones se escriben compatibles hacia atrás (expandir → migrar), así que la versión anterior funciona
+# sobre la base actual. Si hace falta volver también los datos: scripts/restore.sh <copia> (ver docs/despliegue.md).
 set -euo pipefail
-
+cd "$(dirname "$0")/.."
 TARGET_VERSION="${1:-HEAD~1}"
-echo "==> Iniciando procedimiento de reversión hacia versión: ${TARGET_VERSION}"
-
-# 1. Detener despachadores en caso de emergencia si se requiere
-php apps/api/artisan down --render="errors.503" --secret="ayni-maintenance-bypass" || true
-
-# 2. Revertir código al commit o tag objetivo
-git checkout "${TARGET_VERSION}"
-
-# 3. Instalar dependencias exactas de la versión previa
-(cd apps/api && composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction)
-
-# 4. Reiniciar trabajadores de colas
-php apps/api/artisan horizon:terminate || true
-php apps/api/artisan queue:restart
-
-# 5. Levantar aplicación tras validar salud
-php apps/api/artisan up
-
-echo "==> Reversión completada con éxito."
-
+TARGET_VERSION="$(git rev-parse --short "$TARGET_VERSION")"
+echo "==> Reversión a ${TARGET_VERSION}"
+git checkout --quiet "${TARGET_VERSION}"
+scripts/deploy.sh "${TARGET_VERSION}"
+docker compose -f docker-compose.prod.yml exec -T api php artisan queue:restart || true
+echo "==> Reversión completada. Para volver a la última versión: scripts/deploy.sh"

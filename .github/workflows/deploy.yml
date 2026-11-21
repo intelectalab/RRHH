@@ -1,5 +1,9 @@
 name: CD Deploy & Rollback
 
+# QA-17 · Despliegue manual al VPS por SSH. Corre scripts/deploy.sh en el servidor (git pull, imágenes,
+# copia previa, php artisan migrate --force, parámetros legales, servicios y salud) o scripts/rollback.sh.
+# Secretos del entorno de GitHub (Settings → Environments → staging / production):
+#   VPS_HOST, VPS_USER, VPS_SSH_KEY (clave privada) y VPS_PATH (carpeta del repositorio en el servidor).
 on:
   workflow_dispatch:
     inputs:
@@ -35,55 +39,25 @@ jobs:
     if: ${{ github.event.inputs.action != 'rollback' }}
     environment: ${{ github.event.inputs.environment || 'staging' }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Validate environment secrets
-        id: check_secrets
+      - name: Check CI of this commit
         env:
-          APP_KEY: ${{ secrets.APP_KEY }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -z "$APP_KEY" ] || [ -z "$DB_PASSWORD" ]; then
-            echo "::warning::Secretos de despliegue no configurados. Omitiendo pasos de conexión real."
-            echo "has_secrets=false" >> $GITHUB_OUTPUT
-          else
-            echo "has_secrets=true" >> $GITHUB_OUTPUT
-          fi
+          state=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/check-runs" --jq '[.check_runs[] | select(.name != "Automated Deployment") | .conclusion] | if length == 0 then "none" elif all(. == "success" or . == "skipped") then "success" else "failure" end')
+          echo "CI: $state"
+          [ "$state" = "success" ] || { echo "::error::El commit no tiene CI en verde; no se despliega."; exit 1; }
 
-      - name: Set up PHP 8.4
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
-          coverage: none
-
-      - name: Install API dependencies (Production)
-        working-directory: apps/api
-        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
-
-      - name: Run Zero-Downtime Database Migrations
-        if: steps.check_secrets.outputs.has_secrets == 'true'
-        working-directory: apps/api
+      - name: Deploy on server (git pull, build, migrate --force, up)
         env:
-          APP_ENV: ${{ github.event.inputs.environment || 'staging' }}
-          APP_KEY: ${{ secrets.APP_KEY }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
         run: |
-          echo "Ejecutando migraciones de base de datos compatibles hacia atrás..."
-          php artisan migrate --force --no-interaction
-
-      - name: Skip Migrations (No Secrets)
-        if: steps.check_secrets.outputs.has_secrets != 'true'
-        run: |
-          echo "Omitiendo php artisan migrate --force por falta de secretos en el entorno."
-
-      - name: Health Check post-deployment
-        run: |
-          echo "Ejecutando comprobación de salud automatizada..."
+          [ -n "$VPS_HOST" ] && [ -n "$VPS_SSH_KEY" ] || { echo "::error::Faltan los secretos VPS_HOST / VPS_SSH_KEY del entorno."; exit 1; }
+          mkdir -p ~/.ssh && echo "$VPS_SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/id_deploy "${VPS_USER:-deploy}@$VPS_HOST" "cd '${VPS_PATH:-/opt/gestiahr}' && scripts/deploy.sh ${{ github.sha }}"
 
   rollback:
     name: Version Rollback
@@ -91,12 +65,16 @@ jobs:
     if: ${{ github.event.inputs.action == 'rollback' }}
     environment: ${{ github.event.inputs.environment || 'staging' }}
     steps:
-      - name: Checkout target version
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.target_version || 'HEAD~1' }}
-
-      - name: Execute Rollback Script
+      - name: Rollback on server
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+          TARGET: ${{ github.event.inputs.target_version || 'HEAD~1' }}
         run: |
-          echo "Ejecutando reversión controlada a versión anterior..."
-          bash scripts/rollback.sh "${{ github.event.inputs.target_version || 'HEAD~1' }}"
+          [ -n "$VPS_HOST" ] && [ -n "$VPS_SSH_KEY" ] || { echo "::error::Faltan los secretos VPS_HOST / VPS_SSH_KEY del entorno."; exit 1; }
+          case "$TARGET" in *[!A-Za-z0-9._~^/-]*) echo "::error::Versión inválida"; exit 1;; esac
+          mkdir -p ~/.ssh && echo "$VPS_SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/id_deploy "${VPS_USER:-deploy}@$VPS_HOST" "cd '${VPS_PATH:-/opt/gestiahr}' && scripts/rollback.sh '$TARGET'"

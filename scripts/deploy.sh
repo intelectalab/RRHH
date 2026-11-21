@@ -1,25 +1,50 @@
 #!/usr/bin/env bash
+# QA-17 · Despliegue en el servidor (VPS con Docker). Uso, desde la carpeta del repositorio:
+#   scripts/deploy.sh            # trae main, construye, migra y levanta
+#   scripts/deploy.sh <commit>   # despliega una versión concreta (lo usa scripts/rollback.sh)
+#   SEED_DEMO=1 scripts/deploy.sh   # además siembra la organización demo (solo en el ambiente de prueba)
 set -euo pipefail
+cd "$(dirname "$0")/.."
 
-ENVIRONMENT="${1:-staging}"
-echo "==> Iniciando despliegue automatizado para el entorno: ${ENVIRONMENT}"
+TARGET="${1:-}"
+[ -f .env ] || { echo "Falta .env: copia .env.staging.example a .env y complétalo."; exit 1; }
+COMPOSE="docker compose -f docker-compose.prod.yml"
 
-# 1. Verificar variables obligatorias y secretos
-php apps/api/artisan env:verify --environment="${ENVIRONMENT}"
+echo "==> 1/7 Código"
+git fetch --quiet origin
+if [ -n "$TARGET" ]; then git checkout --quiet "$TARGET"; else git checkout --quiet main && git pull --quiet --ff-only origin main; fi
+export RELEASE="$(git rev-parse --short HEAD)"
+echo "    versión ${RELEASE}"
 
-# 2. Migraciones sin corte (expandir -> migrar)
-echo "==> Ejecutando migraciones de base de datos..."
-php apps/api/artisan migrate --force --no-interaction
+echo "==> 2/7 Copia de seguridad previa"
+if $COMPOSE ps --status running postgres 2>/dev/null | grep -q postgres; then scripts/backup.sh pre-deploy; else echo "    (primera instalación, sin base aún)"; fi
 
-# 3. Reiniciar colas y Horizon suavemente
-echo "==> Reiniciando colas y Horizon..."
-php apps/api/artisan horizon:terminate || true
-php apps/api/artisan queue:restart
+echo "==> 3/7 Imágenes"
+$COMPOSE build --pull
 
-# 4. Limpiar y optimizar cachés
-echo "==> Optimizando cachés de configuración y rutas..."
-php apps/api/artisan config:cache
-php apps/api/artisan route:cache
+echo "==> 4/7 Base de datos"
+$COMPOSE up -d postgres redis
+$COMPOSE run --rm --no-deps api php artisan env:verify
+$COMPOSE run --rm api php artisan migrate --force --no-interaction
 
-echo "==> Despliegue completado con éxito."
+echo "==> 5/7 Parámetros legales, catálogos y ayuda"
+$COMPOSE run --rm api php artisan gestia:legal-parameters:sync
+$COMPOSE run --rm api php artisan help:sync-bundled
+if [ "${SEED_DEMO:-0}" = "1" ]; then
+  [ -n "$(grep -E '^DEMO_ADMIN_PASSWORD=.+' .env || true)" ] || { echo "Define DEMO_ADMIN_PASSWORD en .env para sembrar la demo."; exit 1; }
+  $COMPOSE run --rm api php artisan db:seed --force
+fi
 
+echo "==> 6/7 Servicios"
+$COMPOSE up -d --remove-orphans
+# Las colas toman el código nuevo al reiniciar (queue:restart avisa a los trabajadores en curso).
+$COMPOSE exec -T api php artisan queue:restart || true
+
+echo "==> 7/7 Salud"
+for i in $(seq 1 40); do
+  if $COMPOSE exec -T api wget -qO- http://127.0.0.1:8000/up >/dev/null 2>&1; then echo "    API en línea"; break; fi
+  [ "$i" = 40 ] && { echo "La API no respondió; revisa: $COMPOSE logs api"; exit 1; }
+  sleep 3
+done
+docker image prune -f >/dev/null
+echo "==> Despliegue ${RELEASE} completado."

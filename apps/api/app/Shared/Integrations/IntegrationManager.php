@@ -4,6 +4,7 @@ namespace App\Shared\Integrations;
 
 use App\Shared\Integrations\DevInbox\DevInboxEmailAdapter;
 use App\Shared\Integrations\DevInbox\DevInboxMessagingAdapter;
+use App\Shared\Integrations\Email\SmtpEmailAdapter;
 use App\Shared\Integrations\Fake\FakeAiAdapter;
 use App\Shared\Integrations\Fake\FakeBackupStorageAdapter;
 use App\Shared\Integrations\Fake\FakeBankingAdapter;
@@ -68,6 +69,11 @@ final class IntegrationManager
     {
         if ($this->emailAdapter !== null) {
             return $this->emailAdapter;
+        }
+
+        // QA-17 · Correo real por SMTP (EMAIL_PROVIDER=smtp) en producción y en el ambiente de prueba.
+        if (config('integrations.email_provider') === 'smtp') {
+            return $this->emailAdapter = new SmtpEmailAdapter($this->recorder);
         }
 
         if (! app()->isProduction()) {

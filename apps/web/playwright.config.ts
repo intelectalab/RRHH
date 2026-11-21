@@ -7,6 +7,9 @@ import { defineConfig } from 'playwright/test'
 export default defineConfig({
   testDir: './e2e',
   timeout: 120_000,
+  // Los recorridos comparten la organización demo y el segundo factor de su administrador: uno a la vez.
+  workers: 1,
+  fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
@@ -14,5 +17,9 @@ export default defineConfig({
     locale: 'es-PE',
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  // E2E_CHROMIUM_PATH: usar un Chromium ya instalado (p. ej. un entorno sin descarga de navegadores).
+  projects: [{
+    name: 'chromium',
+    use: { browserName: 'chromium', launchOptions: process.env.E2E_CHROMIUM_PATH ? { executablePath: process.env.E2E_CHROMIUM_PATH } : {} },
+  }],
 })

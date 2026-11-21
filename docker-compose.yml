@@ -101,6 +101,8 @@ services:
     environment:
       APP_NAME: "GestiaHR"
       APP_ENV: local
+      # Archivos subidos en storage/app (la librería de S3 no está instalada; MinIO queda para cuando se agregue).
+      FILESYSTEM_DISK: local
       TENANCY_BASE_DOMAIN: localhost
       # El web (Next.js) reenvía /api con X-Forwarded-Host: la organización sale de ese host.
       TRUSTED_PROXIES: "*"
@@ -198,6 +200,8 @@ services:
     command: php artisan queue:work --tries=3
     environment:
       APP_ENV: local
+      # Archivos subidos en storage/app (la librería de S3 no está instalada; MinIO queda para cuando se agregue).
+      FILESYSTEM_DISK: local
       # Misma clave que la API: los trabajos descifran lo que la API cifró.
       APP_KEY: ${APP_KEY:-base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=}
       TENANCY_BASE_DOMAIN: localhost
@@ -237,6 +241,8 @@ services:
     command: php artisan schedule:work
     environment:
       APP_ENV: local
+      # Archivos subidos en storage/app (la librería de S3 no está instalada; MinIO queda para cuando se agregue).
+      FILESYSTEM_DISK: local
       APP_KEY: ${APP_KEY:-base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=}
       TENANCY_BASE_DOMAIN: localhost
       TENANCY_APP_URL: http://{slug}.localhost:3000

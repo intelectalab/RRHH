@@ -27,11 +27,15 @@ class EnvironmentCheckCommand extends Command
         ];
 
         if (in_array($env, ['production', 'staging'], true)) {
-            $criticalKeys = array_merge($criticalKeys, [
-                'AWS_ACCESS_KEY_ID',
-                'AWS_SECRET_ACCESS_KEY',
-                'AWS_BUCKET',
-            ]);
+            $criticalKeys = array_merge($criticalKeys, ['TENANCY_BASE_DOMAIN', 'TENANCY_APP_URL']);
+            // QA-17 · Las credenciales de S3 solo se exigen si los archivos van a S3 (FILESYSTEM_DISK=s3).
+            if ((getenv('FILESYSTEM_DISK') ?: 's3') === 's3') {
+                $criticalKeys = array_merge($criticalKeys, [
+                    'AWS_ACCESS_KEY_ID',
+                    'AWS_SECRET_ACCESS_KEY',
+                    'AWS_BUCKET',
+                ]);
+            }
         }
 
         $missing = [];
@@ -47,6 +51,19 @@ class EnvironmentCheckCommand extends Command
             $dbPass = getenv('DB_PASSWORD');
             if ($dbPass === 'secret' || $dbPass === 'postgres') {
                 $this->error('Error de seguridad: DB_PASSWORD no puede usar valores por defecto en producción o staging.');
+
+                return self::FAILURE;
+            }
+
+            // QA-17 · La clave de desarrollo de docker-compose.yml nunca sirve fuera de la PC del equipo.
+            if (getenv('APP_KEY') === 'base64:J8S6fN2wP0vR4yT7uK1mE9qL3zX5cB8aV4nC2mD1fG0=') {
+                $this->error('Error de seguridad: APP_KEY no puede ser la clave de desarrollo en producción o staging.');
+
+                return self::FAILURE;
+            }
+
+            if (in_array(getenv('TENANCY_BASE_DOMAIN'), ['localhost', '127.0.0.1'], true)) {
+                $this->error('Error de configuración: TENANCY_BASE_DOMAIN debe ser el dominio público (p. ej. staging.gestiahr.com).');
 
                 return self::FAILURE;
             }

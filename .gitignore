@@ -59,3 +59,6 @@ Thumbs.db
 # QA-2 · Resultados de Playwright
 apps/web/test-results/
 apps/web/playwright-report/
+
+# QA-17 · copias de seguridad del servidor
+backups/

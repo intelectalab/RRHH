@@ -1,13 +1,13 @@
 # AVANCE — GestiaHR
 
-Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
+Actualizado el **2026-11-21** con `python3 scripts/gen_avance.py` desde `kit/backlog/backlog.json` (kit v1.13). El estado, la fecha y la nota de cada actividad se editan aquí al cerrarla; al regenerar se conservan.
 
 > **Leyenda de estado:** `pendiente` · `en_curso` · `hecha` · `bloqueada`. La columna MVP marca el primer corte comercial (`kit/backlog/ruta-mvp.md`).
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 239 | 1 | 99,2 % |
-| Backlog completo | 512 | 246 | 1 | 48,0 % |
+| Primer corte comercial (MVP) | 241 | 240 | 1 | 99,6 % |
+| Backlog completo | 512 | 247 | 1 | 48,2 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -508,7 +508,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | EST-4 | Tablero de obligaciones por cliente | EST | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
 | EST-5 | Portal de la empresa cliente | EST | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
 | QA-1 | Estrategia de pruebas y definición de hecho | QA | Transversal · Calidad | Task | sí | hecha | 2026-11-20 | Estrategia de pruebas y definición de hecho; CI sin cobertura y cobertura semanal aparte con mínimo 70 %. |
-| QA-2 | Recorrido de extremo a extremo de cimientos y Core HR | QA | Transversal · Calidad | Task | sí | en_curso | 2026-11-20 | Recorrido e2e Playwright (ingreso con segundo factor, alta, contrato firmado, portal) en CI; pendientes en docs/estrategia-de-pruebas.md §5. |
+| QA-2 | Recorrido de extremo a extremo de cimientos y Core HR | QA | Transversal · Calidad | Task | sí | hecha | 2026-11-21 | Recorridos e2e Playwright en CI sobre base limpia: consola crea organización y su admin entra por su subdominio; ingreso con correo y con documento; alta con contrato firmado; vacaciones aprobadas por jefe y RR.HH. con saldo; firma por /mi/firmas; un rol sin permiso de sueldos no los ve en pantalla, API ni exportación (docs/estrategia-de-pruebas.md §5). |
 | QA-3 | Recorrido de extremo a extremo de tiempo | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-4 | Recorrido de extremo a extremo de nómina | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-5 | Pruebas doradas de planilla validadas por especialista laboral | QA | Transversal · Calidad | Task | — | pendiente | — |  |
@@ -523,7 +523,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | QA-14 | Migración de los datos de una empresa | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-15 | Material de ayuda | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-16 | Salida a producción | QA | Transversal · Calidad | Task | — | pendiente | — |  |
-| QA-17 | Salida a producción del primer corte comercial | QA | Transversal · Calidad | Task | sí | pendiente | — |  |
+| QA-17 | Salida a producción del primer corte comercial | QA | Transversal · Calidad | Task | sí | en_curso | 2026-11-21 | Infraestructura lista: docker-compose.prod.yml con Caddy (HTTPS automático y certificados bajo demanda solo para hosts autorizados por la API), imágenes de producción, correo real por SMTP, scripts de despliegue, reversión, copia y prueba de restauración, despliegue por SSH desde GitHub y guía docs/despliegue.md. Falta para cerrarla: piloto con planilla en paralelo, parámetros y casos dorados validados por el especialista y proveedores reales. |
 <!-- TABLE_END -->
 
 **Total:** 512 actividades

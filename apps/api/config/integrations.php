@@ -9,6 +9,12 @@ return [
     'dev_inbox' => env('INTEGRATIONS_DEV_INBOX'),
 
     /*
+     * QA-17 · Proveedor real de correo. 'smtp' envía por el SMTP configurado en config/mail.php (MAIL_*),
+     * en producción y en el ambiente de prueba. Sin valor, fuera de producción se usa el falso o el buzón local.
+     */
+    'email_provider' => env('EMAIL_PROVIDER'),
+
+    /*
      * NOT-5 · Proveedores de SMS/WhatsApp disponibles: nombre (message_channels.provider) → clase que
      * implementa App\Shared\Integrations\Ports\MessagingPort. Agregar un proveedor es registrar aquí su
      * adaptador; los módulos que envían mensajes no cambian.
