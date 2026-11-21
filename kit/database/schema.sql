@@ -15915,6 +15915,10 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('help.escalations.create', 'core', 'escalations', 'create', 'action', false, 'Crear consultas derivadas desde la ayuda'),
   ('help.escalations.support', 'core', 'escalations', 'support', 'action', false, 'Escribir al soporte de GestiaHR desde la ayuda'),
   ('help.insights.view', 'core', 'insights', 'view', 'action', false, 'Ver indicadores de uso de la ayuda'),
+  ('ai.usage_logs.view', 'core', 'usage_logs', 'view', 'action', false, 'Ver el registro de usos de IA'),
+  ('ai.use_case_settings.view', 'core', 'use_case_settings', 'view', 'action', false, 'Ver la activación del asistente de ayuda y de cada caso de uso'),
+  ('ai.use_case_settings.update', 'core', 'use_case_settings', 'update', 'action', false, 'Editar la activación del asistente de ayuda y de cada caso de uso'),
+  ('ai.help_assistant.use', 'core', 'help_assistant', 'use', 'action', false, 'Usar el asistente de ayuda'),
   ('platform.help_articles.view', 'core', 'help_articles', 'view', 'action', false, 'Ver la ayuda del producto'),
   ('platform.help_articles.archive', 'core', 'help_articles', 'archive', 'action', false, 'Archivar la ayuda del producto'),
   ('platform.help_articles.create', 'core', 'help_articles', 'create', 'action', false, 'Crear la ayuda del producto'),
@@ -16507,11 +16511,7 @@ INSERT INTO permissions (code, module_code, resource, action, kind, is_sensitive
   ('ai.conversations.send_message', 'ai', 'conversations', 'send_message', 'action', false, 'Enviar mensajes en conversaciones con el asistente'),
   ('ai.conversations.query_data', 'ai', 'conversations', 'query_data', 'action', false, 'Consultar datos en lenguaje natural dentro de sus permisos'),
   ('ai.mcp.use', 'ai', 'mcp', 'use', 'action', false, 'Usar asistentes externos por MCP'),
-  ('ai.usage_logs.view', 'ai', 'usage_logs', 'view', 'action', false, 'Ver el registro de usos de IA'),
   ('ai.policies.update', 'ai', 'policies', 'update', 'action', false, 'Activar casos de uso, proveedor y exclusiones'),
-  ('ai.use_case_settings.view', 'ai', 'use_case_settings', 'view', 'action', false, 'Ver la activación del asistente de ayuda y de cada caso de uso'),
-  ('ai.use_case_settings.update', 'ai', 'use_case_settings', 'update', 'action', false, 'Editar la activación del asistente de ayuda y de cada caso de uso'),
-  ('ai.help_assistant.use', 'ai', 'help_assistant', 'use', 'action', false, 'Usar el asistente de ayuda'),
   ('ai.help_assistant.use_personal_data', 'ai', 'help_assistant', 'use_personal_data', 'action', false, 'Preguntar al asistente de ayuda por sus propios datos (fase 8)'),
   ('identity.api_tokens.view', 'integrations', 'api_tokens', 'view', 'action', false, 'Ver credenciales de API y sus alcances'),
   ('identity.api_tokens.create', 'integrations', 'api_tokens', 'create', 'action', false, 'Crear credenciales de API y sus alcances'),
@@ -16849,6 +16849,10 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('admin_empresa', 'help.escalations.create', 'assigned'),
   ('admin_empresa', 'help.escalations.support', 'organization'),
   ('admin_empresa', 'help.insights.view', 'organization'),
+  ('admin_empresa', 'ai.usage_logs.view', 'organization'),
+  ('admin_empresa', 'ai.use_case_settings.view', 'organization'),
+  ('admin_empresa', 'ai.use_case_settings.update', 'organization'),
+  ('admin_empresa', 'ai.help_assistant.use', 'organization'),
   ('admin_empresa', 'time.punches.view', 'organization'),
   ('admin_empresa', 'time.punches.create', 'assigned'),
   ('admin_empresa', 'time.attendance_days.view', 'organization'),
@@ -17402,11 +17406,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('admin_empresa', 'ai.conversations.send_message', 'organization'),
   ('admin_empresa', 'ai.conversations.query_data', 'organization'),
   ('admin_empresa', 'ai.mcp.use', 'organization'),
-  ('admin_empresa', 'ai.usage_logs.view', 'organization'),
   ('admin_empresa', 'ai.policies.update', 'organization'),
-  ('admin_empresa', 'ai.use_case_settings.view', 'organization'),
-  ('admin_empresa', 'ai.use_case_settings.update', 'organization'),
-  ('admin_empresa', 'ai.help_assistant.use', 'organization'),
   ('admin_empresa', 'ai.help_assistant.use_personal_data', 'organization'),
   ('admin_empresa', 'identity.api_tokens.view', 'organization'),
   ('admin_empresa', 'identity.api_tokens.create', 'organization'),
@@ -17623,6 +17623,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('rrhh', 'help.escalations.view', 'organization'),
   ('rrhh', 'help.escalations.create', 'assigned'),
   ('rrhh', 'help.insights.view', 'organization'),
+  ('rrhh', 'ai.help_assistant.use', 'organization'),
   ('rrhh', 'time.punches.view', 'organization'),
   ('rrhh', 'time.punches.create', 'assigned'),
   ('rrhh', 'time.attendance_days.view', 'organization'),
@@ -18019,7 +18020,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('rrhh', 'ai.conversations.send_message', 'organization'),
   ('rrhh', 'ai.conversations.query_data', 'organization'),
   ('rrhh', 'ai.mcp.use', 'organization'),
-  ('rrhh', 'ai.help_assistant.use', 'organization'),
   ('rrhh', 'ai.help_assistant.use_personal_data', 'organization'),
   ('rrhh', 'integrations.connections.view', 'organization'),
   ('rrhh', 'integrations.connections.sync', 'organization'),
@@ -18099,6 +18099,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('payroll', 'help.articles.view', 'organization'),
   ('payroll', 'help.escalations.view', 'assigned'),
   ('payroll', 'help.escalations.create', 'assigned'),
+  ('payroll', 'ai.help_assistant.use', 'organization'),
   ('payroll', 'time.punches.view', 'organization'),
   ('payroll', 'time.punches.create', 'assigned'),
   ('payroll', 'time.attendance_days.view', 'organization'),
@@ -18281,7 +18282,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('payroll', 'ai.conversations.send_message', 'organization'),
   ('payroll', 'ai.conversations.query_data', 'organization'),
   ('payroll', 'ai.mcp.use', 'organization'),
-  ('payroll', 'ai.help_assistant.use', 'organization'),
   ('payroll', 'ai.help_assistant.use_personal_data', 'organization'),
   ('payroll', 'integrations.connections.view', 'organization'),
   ('payroll', 'integrations.connections.sync', 'organization'),
@@ -18323,6 +18323,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('recruiter', 'help.articles.view', 'organization'),
   ('recruiter', 'help.escalations.view', 'assigned'),
   ('recruiter', 'help.escalations.create', 'assigned'),
+  ('recruiter', 'ai.help_assistant.use', 'organization'),
   ('recruiter', 'time.punches.create', 'assigned'),
   ('recruiter', 'time.vacation_requests.cancel', 'assigned'),
   ('recruiter', 'time.vacation_requests.create', 'assigned'),
@@ -18402,7 +18403,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('recruiter', 'ai.conversations.view', 'assigned'),
   ('recruiter', 'ai.conversations.create', 'organization'),
   ('recruiter', 'ai.conversations.send_message', 'organization'),
-  ('recruiter', 'ai.help_assistant.use', 'organization'),
   ('recruiter', 'ai.help_assistant.use_personal_data', 'organization');
 INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'org.legal_entities.view', 'team'),
@@ -18457,6 +18457,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'help.articles.view', 'team'),
   ('manager', 'help.escalations.view', 'own'),
   ('manager', 'help.escalations.create', 'own'),
+  ('manager', 'ai.help_assistant.use', 'team'),
   ('manager', 'time.punches.view', 'team'),
   ('manager', 'time.punches.create', 'own'),
   ('manager', 'time.punches.create_for_crew', 'team'),
@@ -18626,7 +18627,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('manager', 'ai.conversations.send_message', 'team'),
   ('manager', 'ai.conversations.query_data', 'team'),
   ('manager', 'ai.mcp.use', 'team'),
-  ('manager', 'ai.help_assistant.use', 'team'),
   ('manager', 'ai.help_assistant.use_personal_data', 'team'),
   ('manager', 'integrations.whatsapp.use', 'team');
 INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
@@ -18666,6 +18666,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('empleado', 'help.articles.view', 'own'),
   ('empleado', 'help.escalations.view', 'own'),
   ('empleado', 'help.escalations.create', 'own'),
+  ('empleado', 'ai.help_assistant.use', 'own'),
   ('empleado', 'time.punches.view', 'own'),
   ('empleado', 'time.punches.create', 'own'),
   ('empleado', 'time.attendance_days.view', 'own'),
@@ -18763,7 +18764,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('empleado', 'privacy.consents.revoke', 'own'),
   ('empleado', 'privacy.subject_requests.view', 'own'),
   ('empleado', 'privacy.subject_requests.create', 'own'),
-  ('empleado', 'ai.help_assistant.use', 'own'),
   ('empleado', 'ai.help_assistant.use_personal_data', 'own'),
   ('empleado', 'integrations.whatsapp.use', 'own');
 INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
@@ -18823,6 +18823,9 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('auditor', 'help.articles.view', 'organization'),
   ('auditor', 'help.org_articles.view', 'organization'),
   ('auditor', 'help.escalations.view', 'assigned'),
+  ('auditor', 'ai.usage_logs.view', 'organization'),
+  ('auditor', 'ai.use_case_settings.view', 'organization'),
+  ('auditor', 'ai.help_assistant.use', 'organization'),
   ('auditor', 'time.punches.view', 'organization'),
   ('auditor', 'time.attendance_days.view', 'organization'),
   ('auditor', 'time.attendance_days.export_legal', 'organization'),
@@ -18920,9 +18923,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('auditor', 'reports.reports.run', 'organization'),
   ('auditor', 'alerts.alerts.view', 'organization'),
   ('auditor', 'alerts.rules.view', 'organization'),
-  ('auditor', 'ai.usage_logs.view', 'organization'),
-  ('auditor', 'ai.use_case_settings.view', 'organization'),
-  ('auditor', 'ai.help_assistant.use', 'organization'),
   ('auditor', 'identity.api_tokens.view', 'organization'),
   ('auditor', 'integrations.webhooks.view', 'organization'),
   ('auditor', 'integrations.webhook_deliveries.view', 'organization'),
@@ -18967,6 +18967,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('sst', 'help.articles.view', 'organization'),
   ('sst', 'help.escalations.view', 'assigned'),
   ('sst', 'help.escalations.create', 'assigned'),
+  ('sst', 'ai.help_assistant.use', 'organization'),
   ('sst', 'time.punches.create', 'assigned'),
   ('sst', 'time.vacation_requests.cancel', 'assigned'),
   ('sst', 'time.vacation_requests.create', 'assigned'),
@@ -19081,7 +19082,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('sst', 'ai.conversations.view', 'assigned'),
   ('sst', 'ai.conversations.create', 'organization'),
   ('sst', 'ai.conversations.send_message', 'organization'),
-  ('sst', 'ai.help_assistant.use', 'organization'),
   ('sst', 'ai.help_assistant.use_personal_data', 'organization');
 INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('investigador_denuncias', 'settings.saved_views.view', 'assigned'),
@@ -19091,6 +19091,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('investigador_denuncias', 'help.articles.view', 'assigned'),
   ('investigador_denuncias', 'help.escalations.view', 'assigned'),
   ('investigador_denuncias', 'help.escalations.create', 'assigned'),
+  ('investigador_denuncias', 'ai.help_assistant.use', 'assigned'),
   ('investigador_denuncias', 'grievances.cases.view', 'assigned'),
   ('investigador_denuncias', 'grievances.cases.add_protection_measure', 'assigned'),
   ('investigador_denuncias', 'grievances.cases.admit', 'assigned'),
@@ -19113,8 +19114,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('investigador_denuncias', 'compliance.authority_communications.mark_sent', 'assigned'),
   ('investigador_denuncias', 'compliance.authority_communications.update', 'assigned'),
   ('investigador_denuncias', 'compliance.evidence_exports.view', 'assigned'),
-  ('investigador_denuncias', 'compliance.evidence_exports.create', 'assigned'),
-  ('investigador_denuncias', 'ai.help_assistant.use', 'assigned');
+  ('investigador_denuncias', 'compliance.evidence_exports.create', 'assigned');
 INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('contador', 'reports.exports.view', 'organization'),
   ('contador', 'reports.exports.create', 'organization'),
@@ -19150,6 +19150,7 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('contador', 'help.articles.view', 'organization'),
   ('contador', 'help.escalations.view', 'assigned'),
   ('contador', 'help.escalations.create', 'assigned'),
+  ('contador', 'ai.help_assistant.use', 'organization'),
   ('contador', 'time.punches.create', 'assigned'),
   ('contador', 'time.vacation_requests.cancel', 'assigned'),
   ('contador', 'time.vacation_requests.create', 'assigned'),
@@ -19224,7 +19225,6 @@ INSERT INTO system_role_permissions (role_code, permission_code, scope) VALUES
   ('contador', 'reports.reports.view', 'organization'),
   ('contador', 'reports.reports.run', 'organization'),
   ('contador', 'alerts.alerts.view', 'organization'),
-  ('contador', 'ai.help_assistant.use', 'organization'),
   ('contador', 'ai.help_assistant.use_personal_data', 'organization'),
   ('contador', 'partner.clients.view', 'organization'),
   ('contador', 'partner.clients.enter', 'organization');
@@ -19335,6 +19335,7 @@ INSERT INTO parameter_definitions (code, module_code, name, description, data_ty
   ('compensaciones.tamano_minimo_grupo', 'compensation', 'Tamaño mínimo de grupo', 'Grupo mínimo para mostrar promedios salariales en el reporte de brecha.', 'integer', '3'::jsonb, ARRAY['organization'], NULL),
   ('encuestas.umbral_anonimato', 'engagement', 'Umbral de anonimato', 'Mínimo de respuestas por segmento para mostrar resultados (C-06).', 'integer', '5'::jsonb, ARRAY['organization'], NULL),
   ('ayuda.revision_anticipacion_dias', 'core', 'Aviso de revisión de artículos (días)', 'AYU-4 · RN-AYU-04: días antes de la fecha de revisión de un artículo de la organización en que se avisa a su responsable y el artículo pasa a «por revisar» (sigue visible).', 'integer', '7'::jsonb, ARRAY['organization'], '{"min": 0, "max": 90}'::jsonb),
+  ('ia.retencion_bitacora_dias', 'core', 'Retención del contenido de la bitácora de IA (días)', 'IAR-2 · RN-IAR: días que se conserva el texto cifrado de la pregunta y la respuesta de cada uso de IA. Pasado el plazo se vacía el contenido; la fila (quién, cuándo, propósito, consumo) se conserva.', 'integer', '365'::jsonb, ARRAY['organization'], '{"min": 30, "max": 3650}'::jsonb),
   ('mesa_ayuda.sla_respuesta_horas', 'helpdesk', 'Primera respuesta (horas)', 'Plazo por defecto de primera respuesta.', 'integer', '8'::jsonb, ARRAY['organization'], NULL),
   ('mesa_ayuda.sla_resolucion_horas', 'helpdesk', 'Resolución (horas)', 'Plazo por defecto de resolución.', 'integer', '48'::jsonb, ARRAY['organization'], NULL),
   ('sst.aviso_examen_dias', 'sst', 'Aviso de examen médico', 'Días de anticipación del aviso de examen ocupacional por vencer.', 'integer', '30'::jsonb, ARRAY['organization','legal_entity'], NULL),
@@ -20055,4 +20056,43 @@ CREATE OR REPLACE FUNCTION current_tenant_billing() RETURNS jsonb
 $$;
 REVOKE ALL ON FUNCTION current_tenant_billing() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION current_tenant_billing() TO gestia_app;
+
+-- IAR-2 · Retención de la bitácora de IA (parámetro ia.retencion_bitacora_dias). La bitácora es de solo
+-- inserción; pasado el plazo solo se vacía el contenido cifrado (pregunta, respuesta y entidades citadas) y se
+-- conserva quién, cuándo, para qué y cuánto consumió. El único camino es purge_ai_interactions(), que corre con
+-- los privilegios del dueño y marca la transacción; cualquier otro UPDATE, DELETE o TRUNCATE sigue rechazado.
+CREATE FUNCTION ai_interactions_guard() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF TG_OP = 'UPDATE' AND current_setting('app.ai_purge', true) = 'on'
+     AND NEW.prompt_enc = '' AND NEW.response_enc IS NULL AND NEW.referenced_entities IS NULL
+     AND (NEW.id, NEW.tenant_id, NEW.user_id, NEW.use_case, NEW.data_scopes, NEW.provider, NEW.model, NEW.input_tokens, NEW.output_tokens, NEW.was_blocked, NEW.occurred_at)
+         IS NOT DISTINCT FROM (OLD.id, OLD.tenant_id, OLD.user_id, OLD.use_case, OLD.data_scopes, OLD.provider, OLD.model, OLD.input_tokens, OLD.output_tokens, OLD.was_blocked, OLD.occurred_at) THEN
+    RETURN NEW;
+  END IF;
+  RAISE EXCEPTION 'La tabla % es de solo inserción: % no está permitido. Una corrección se registra como una fila nueva.', TG_TABLE_NAME, TG_OP
+    USING ERRCODE = 'AY001';
+END
+$$;
+COMMENT ON FUNCTION ai_interactions_guard() IS 'IAR-2: bitácora de IA de solo inserción; solo purge_ai_interactions() vacía el contenido vencido.';
+CREATE OR REPLACE TRIGGER trg_ai_interactions_inmutable BEFORE UPDATE OR DELETE ON ai_interactions FOR EACH ROW EXECUTE FUNCTION ai_interactions_guard();
+
+CREATE FUNCTION purge_ai_interactions(p_before timestamptz) RETURNS integer
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp
+AS $$
+DECLARE n integer;
+BEGIN
+  PERFORM set_config('app.ai_purge', 'on', true);
+  UPDATE ai_interactions SET prompt_enc = '', response_enc = NULL, referenced_entities = NULL
+   WHERE tenant_id = NULLIF(current_setting('app.tenant_id', true), '')::uuid
+     AND occurred_at < p_before AND prompt_enc <> '';
+  GET DIAGNOSTICS n = ROW_COUNT;
+  PERFORM set_config('app.ai_purge', 'off', true);
+  RETURN n;
+END
+$$;
+COMMENT ON FUNCTION purge_ai_interactions(timestamptz) IS 'IAR-2: vacía el contenido de la bitácora de IA de la organización activa anterior a la fecha (retención).';
+REVOKE ALL ON FUNCTION purge_ai_interactions(timestamptz) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION purge_ai_interactions(timestamptz) TO gestia_app;
 

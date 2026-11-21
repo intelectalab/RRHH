@@ -5,6 +5,7 @@ namespace Tests\Support\Isolation;
 use App\Modules\Absences\Infrastructure\Models\AbsenceRequest;
 use App\Modules\Absences\Infrastructure\Models\AbsenceSubsidyCase;
 use App\Modules\Absences\Infrastructure\Models\AbsenceType;
+use App\Modules\Ai\Infrastructure\Models\AiInteraction;
 use App\Modules\Certificates\Infrastructure\Models\CertificateRequest;
 use App\Modules\Contracts\Infrastructure\Models\Contract;
 use App\Modules\Contracts\Infrastructure\Models\ContractAddendum;
@@ -316,6 +317,9 @@ final class CrossTenantHarness
         '/settlements/{id}/documents' => Settlement::class,
         '/settlements/{id}/deliver-documents' => Settlement::class,
         '/settlements/{id}/void' => Settlement::class,
+        // IAR-2 · IAR-11: la bitácora de IA de A y la valoración de una respuesta de A.
+        'AiUsageLog' => AiInteraction::class,
+        '/ai/help-assistant/answers/{id}/feedback' => AiInteraction::class,
     ];
 
     /**

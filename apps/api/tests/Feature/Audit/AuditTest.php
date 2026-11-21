@@ -191,6 +191,9 @@ test('el Auditor consulta todo y no puede modificar nada en el sistema', functio
     // DEC-8: la validación previa al alta del registro laboral solo lee y devuelve las comprobaciones (no guarda nada).
     $readOnlyPosts = ['api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}', 'api/v1/help/articles/{id}/feedback', 'api/v1/help/tours/{tour_key}/complete',
         'api/v1/employments/{employment_id}/registry-validation'];
+    // IAR-9 · IAR-11: preguntar al asistente de ayuda es una lectura de la ayuda y valorar su respuesta es un
+    // registro propio; el catálogo le da ai.help_assistant.use a todos los roles.
+    $readOnlyPosts = ['api/v1/ai/help-assistant/ask', 'api/v1/ai/help-assistant/answers/{id}/feedback', 'api/v1/exports', 'api/v1/saved-views', 'api/v1/saved-views/{id}', 'api/v1/help/articles/{id}/feedback', 'api/v1/help/tours/{tour_key}/complete'];
 
     $writes = [];
     foreach (Route::getRoutes()->getRoutes() as $route) {

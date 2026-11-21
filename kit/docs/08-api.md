@@ -1581,6 +1581,7 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/ai/use-case-settings/{id}` | `ai.use_case_settings.{view,update}` | 8 |
 | POST | `/ai/help-assistant/ask` | `ai.help_assistant.use` | 8 |
 | POST | `/ai/help-assistant/answers/{id}/feedback` | `ai.help_assistant.use` | 8 |
+| GET | `/ai/help-assistant/quality` | `ai.usage_logs.view` | 8 |
 | GET | `/ai/help-assistant/availability` | sesión | 8 |
 
 ### Fase 9 · Ecosistema y expansión

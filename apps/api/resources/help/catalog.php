@@ -32,6 +32,7 @@ return [
     'pantalla-mis-notificaciones' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['account.notifications']],
     'pantalla-primeros-pasos' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['setup']],
     'pantalla-ayuda-organizacion' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['settings.help']],
+    'pantalla-asistente-ayuda' => ['kind' => 'screen', 'module' => 'core', 'roles' => [], 'screens' => ['settings.ai_assistant']],
     'pantalla-constructor-flujos' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['settings.flow_builder']],
     'pantalla-configuracion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['settings']],
     'pantalla-organizacion' => ['kind' => 'screen', 'module' => 'base', 'roles' => [], 'screens' => ['org']],

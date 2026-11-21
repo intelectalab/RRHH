@@ -639,7 +639,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Preguntar al asistente de ayuda; responde solo con artículos visibles para el usuario y los cita (404 si el asistente no está habilitado para el usuario) */
+        /** Preguntar al asistente de ayuda; responde solo con artículos visibles para el usuario y los cita (403 feature_not_enabled si el asistente no está habilitado para el usuario; 429 al llegar al límite de preguntas) */
         post: operations["postAiHelpAssistantAsk"];
         delete?: never;
         options?: never;
@@ -656,6 +656,23 @@ export interface paths {
         };
         /** Si el asistente de ayuda está disponible para el usuario actual (plan, organización y rol) */
         get: operations["getAiHelpAssistantAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/help-assistant/quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Calidad del asistente de ayuda: preguntas sin respuesta y respuestas mal valoradas (IAR-11) */
+        get: operations["getAiHelpAssistantQuality"];
         put?: never;
         post?: never;
         delete?: never;
@@ -21444,14 +21461,18 @@ export interface components {
             /** @description Identificador opaco */
             id: string;
             /** @description Identificador opaco */
-            user_id: string;
+            user_id?: string | null;
+            user_name?: string | null;
             use_case: string;
-            provider: string;
-            model: string;
+            provider?: string | null;
+            model?: string | null;
             data_scopes: string[];
-            tools_called: string[];
-            input_ref: string;
-            output_ref: string;
+            input_tokens?: number | null;
+            output_tokens?: number | null;
+            was_blocked: boolean;
+            block_reason?: string | null;
+            citations: string[];
+            content_purged: boolean;
             /** Format: date-time */
             occurred_at: string;
             /** Format: date-time */
@@ -21466,6 +21487,8 @@ export interface components {
             enabled: boolean;
             role_ids: string[];
             question_limit?: number | null;
+            /** @enum {string} */
+            limit_period: "day" | "week" | "month";
             notice?: string | null;
             plan_allows: boolean;
             /** Format: date-time */
@@ -21478,6 +21501,8 @@ export interface components {
             enabled?: boolean;
             role_ids?: string[];
             question_limit?: number | null;
+            /** @enum {string} */
+            limit_period?: "day" | "week" | "month";
             notice?: string | null;
             plan_allows?: boolean;
         };
@@ -29593,6 +29618,28 @@ export interface operations {
         };
     };
     getAiHelpAssistantAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Correcto */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getAiHelpAssistantQuality: {
         parameters: {
             query?: never;
             header?: never;

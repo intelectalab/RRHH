@@ -3530,6 +3530,54 @@
       "descripcion": "Ver indicadores de uso de la ayuda"
     },
     {
+      "codigo": "ai.usage_logs.view",
+      "epica": "AYU",
+      "modulo": "core",
+      "recurso": "usage_logs",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver el registro de usos de IA"
+    },
+    {
+      "codigo": "ai.use_case_settings.view",
+      "epica": "AYU",
+      "modulo": "core",
+      "recurso": "use_case_settings",
+      "accion": "view",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Ver la activación del asistente de ayuda y de cada caso de uso"
+    },
+    {
+      "codigo": "ai.use_case_settings.update",
+      "epica": "AYU",
+      "modulo": "core",
+      "recurso": "use_case_settings",
+      "accion": "update",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Editar la activación del asistente de ayuda y de cada caso de uso"
+    },
+    {
+      "codigo": "ai.help_assistant.use",
+      "epica": "AYU",
+      "modulo": "core",
+      "recurso": "help_assistant",
+      "accion": "use",
+      "tipo": "accion",
+      "sensible": false,
+      "en_contrato_api": true,
+      "ambito": "organizacion",
+      "descripcion": "Usar el asistente de ayuda"
+    },
+    {
       "codigo": "platform.help_articles.view",
       "epica": "AYU",
       "modulo": "core",
@@ -10634,18 +10682,6 @@
       "descripcion": "Usar asistentes externos por MCP"
     },
     {
-      "codigo": "ai.usage_logs.view",
-      "epica": "IAR",
-      "modulo": "ai",
-      "recurso": "usage_logs",
-      "accion": "view",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Ver el registro de usos de IA"
-    },
-    {
       "codigo": "ai.policies.update",
       "epica": "IAR",
       "modulo": "ai",
@@ -10656,42 +10692,6 @@
       "en_contrato_api": false,
       "ambito": "organizacion",
       "descripcion": "Activar casos de uso, proveedor y exclusiones"
-    },
-    {
-      "codigo": "ai.use_case_settings.view",
-      "epica": "IAR",
-      "modulo": "ai",
-      "recurso": "use_case_settings",
-      "accion": "view",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Ver la activación del asistente de ayuda y de cada caso de uso"
-    },
-    {
-      "codigo": "ai.use_case_settings.update",
-      "epica": "IAR",
-      "modulo": "ai",
-      "recurso": "use_case_settings",
-      "accion": "update",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Editar la activación del asistente de ayuda y de cada caso de uso"
-    },
-    {
-      "codigo": "ai.help_assistant.use",
-      "epica": "IAR",
-      "modulo": "ai",
-      "recurso": "help_assistant",
-      "accion": "use",
-      "tipo": "accion",
-      "sensible": false,
-      "en_contrato_api": true,
-      "ambito": "organizacion",
-      "descripcion": "Usar el asistente de ayuda"
     },
     {
       "codigo": "ai.help_assistant.use_personal_data",
@@ -12345,6 +12345,22 @@
         },
         {
           "codigo": "help.insights.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.usage_logs.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.use_case_settings.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.use_case_settings.update",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
           "alcance": "organization"
         },
         {
@@ -14560,23 +14576,7 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.usage_logs.view",
-          "alcance": "organization"
-        },
-        {
           "codigo": "ai.policies.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.use_case_settings.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.use_case_settings.update",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.help_assistant.use",
           "alcance": "organization"
         },
         {
@@ -15446,6 +15446,10 @@
         },
         {
           "codigo": "help.insights.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
           "alcance": "organization"
         },
         {
@@ -17033,10 +17037,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "organization"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "organization"
         },
@@ -17356,6 +17356,10 @@
         {
           "codigo": "help.escalations.create",
           "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "organization"
         },
         {
           "codigo": "time.punches.view",
@@ -18086,10 +18090,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "organization"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "organization"
         },
@@ -18257,6 +18257,10 @@
         {
           "codigo": "help.escalations.create",
           "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "organization"
         },
         {
           "codigo": "time.punches.create",
@@ -18575,10 +18579,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "organization"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "organization"
         }
@@ -18798,6 +18798,10 @@
         {
           "codigo": "help.escalations.create",
           "alcance": "own"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "team"
         },
         {
           "codigo": "time.punches.view",
@@ -19476,10 +19480,6 @@
           "alcance": "team"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "team"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "team"
         },
@@ -19638,6 +19638,10 @@
         },
         {
           "codigo": "help.escalations.create",
+          "alcance": "own"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
           "alcance": "own"
         },
         {
@@ -20029,10 +20033,6 @@
           "alcance": "own"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "own"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "own"
         },
@@ -20272,6 +20272,18 @@
         {
           "codigo": "help.escalations.view",
           "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.usage_logs.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.use_case_settings.view",
+          "alcance": "organization"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "organization"
         },
         {
           "codigo": "time.punches.view",
@@ -20662,18 +20674,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.usage_logs.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.use_case_settings.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "organization"
-        },
-        {
           "codigo": "identity.api_tokens.view",
           "alcance": "organization"
         },
@@ -20853,6 +20853,10 @@
         {
           "codigo": "help.escalations.create",
           "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "organization"
         },
         {
           "codigo": "time.punches.create",
@@ -21311,10 +21315,6 @@
           "alcance": "organization"
         },
         {
-          "codigo": "ai.help_assistant.use",
-          "alcance": "organization"
-        },
-        {
           "codigo": "ai.help_assistant.use_personal_data",
           "alcance": "organization"
         }
@@ -21353,6 +21353,10 @@
         },
         {
           "codigo": "help.escalations.create",
+          "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
           "alcance": "assigned"
         },
         {
@@ -21445,10 +21449,6 @@
         },
         {
           "codigo": "compliance.evidence_exports.create",
-          "alcance": "assigned"
-        },
-        {
-          "codigo": "ai.help_assistant.use",
           "alcance": "assigned"
         }
       ]
@@ -21595,6 +21595,10 @@
         {
           "codigo": "help.escalations.create",
           "alcance": "assigned"
+        },
+        {
+          "codigo": "ai.help_assistant.use",
+          "alcance": "organization"
         },
         {
           "codigo": "time.punches.create",
@@ -21890,10 +21894,6 @@
         },
         {
           "codigo": "alerts.alerts.view",
-          "alcance": "organization"
-        },
-        {
-          "codigo": "ai.help_assistant.use",
           "alcance": "organization"
         },
         {
