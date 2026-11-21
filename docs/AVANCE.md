@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 236 | 0 | 97,9 % |
-| Backlog completo | 512 | 243 | 0 | 47,5 % |
+| Primer corte comercial (MVP) | 241 | 239 | 1 | 99,2 % |
+| Backlog completo | 512 | 246 | 1 | 48,0 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -259,7 +259,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | PER-10 | Pago de la planilla | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Lotes de pago por banco con las cuentas de haberes, archivo genérico por puerto (ADR 0020), confirmación idempotente, anulación con motivo y estado pagado; Nómina → Pagos. |
 | PER-11 | Libro de retenciones de quinta | PER | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Libro de retenciones de quinta con consulta, detalle, resumen conciliado con boletas cerradas y exportación; Nómina → Retenciones de quinta. |
 | PER-12 | Importación de acumulados de planilla del ejercicio | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Importación de acumulados del ejercicio con fecha de corte y sustento que alimentan la proyección de quinta; revertible y bloqueada si hay periodo cerrado. |
-| PER-13 | Comparación con el sistema anterior durante la planilla en paralelo | PER | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| PER-13 | Comparación con el sistema anterior durante la planilla en paralelo | PER | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Planilla en paralelo: importación del sistema anterior, comparación por trabajador y concepto con tolerancia, diferencias clasificadas e informe archivado; Nómina → Paralelo. |
 | BOL-1 | Generación de boletas en PDF | BOL | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Boletas PDF al legajo desde la corrida aprobada o cerrada, idempotentes y con versión al corregir. |
 | BOL-2 | Publicación en el portal y constancia de entrega | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Publicación en el portal con constancia de vista y descarga, acuse con evidencia, entrega física y recordatorio diario. |
 | BOL-3 | Historial y descarga masiva | BOL | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Historial propio y de nómina con alcance y permiso por campo; descarga masiva por enlace temporal registrada. |
@@ -438,7 +438,7 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | CUM-6 | Expediente de inspección SUNAFIL | CUM | Fase 7 · Operación y cumplimiento | Story | — | pendiente | — |  |
 | CUM-7 | Bandeja de casilla electrónica | CUM | Fase 7 · Operación y cumplimiento | Story | — | pendiente | — |  |
 | CUM-8 | Libro inalterable de cumplimiento encadenado por huella | CUM | Fase 7 · Operación y cumplimiento | Task | — | pendiente | — |  |
-| CUM-9 | Tablero mínimo de obligaciones de planilla | CUM | Fase 7 · Operación y cumplimiento | Story | sí | pendiente | — |  |
+| CUM-9 | Tablero mínimo de obligaciones de planilla | CUM | Fase 7 · Operación y cumplimiento | Story | sí | hecha | 2026-11-20 | Tablero de obligaciones de planilla con vencimientos por parámetro, responsable, evidencia y avisos; Nómina → Obligaciones. |
 | PRI-1 | Consentimientos y finalidades | PRI | Fase 7 · Operación y cumplimiento | Story | — | pendiente | — |  |
 | PRI-2 | Solicitudes de derechos del titular | PRI | Fase 7 · Operación y cumplimiento | Story | — | pendiente | — |  |
 | PRI-3 | Banco de datos y registro de tratamientos | PRI | Fase 7 · Operación y cumplimiento | Story | — | pendiente | — |  |
@@ -507,8 +507,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | EST-3 | Procesos de planilla en lote | EST | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
 | EST-4 | Tablero de obligaciones por cliente | EST | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
 | EST-5 | Portal de la empresa cliente | EST | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
-| QA-1 | Estrategia de pruebas y definición de hecho | QA | Transversal · Calidad | Task | sí | pendiente | — |  |
-| QA-2 | Recorrido de extremo a extremo de cimientos y Core HR | QA | Transversal · Calidad | Task | sí | pendiente | — |  |
+| QA-1 | Estrategia de pruebas y definición de hecho | QA | Transversal · Calidad | Task | sí | hecha | 2026-11-20 | Estrategia de pruebas y definición de hecho; CI sin cobertura y cobertura semanal aparte con mínimo 70 %. |
+| QA-2 | Recorrido de extremo a extremo de cimientos y Core HR | QA | Transversal · Calidad | Task | sí | en_curso | 2026-11-20 | Recorrido e2e Playwright (ingreso con segundo factor, alta, contrato firmado, portal) en CI; pendientes en docs/estrategia-de-pruebas.md §5. |
 | QA-3 | Recorrido de extremo a extremo de tiempo | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-4 | Recorrido de extremo a extremo de nómina | QA | Transversal · Calidad | Task | — | pendiente | — |  |
 | QA-5 | Pruebas doradas de planilla validadas por especialista laboral | QA | Transversal · Calidad | Task | — | pendiente | — |  |

@@ -6,8 +6,10 @@ use App\Modules\Payroll\Application\ConceptAccounting;
 use App\Modules\Payroll\Application\PayrollOpeningBalances;
 use App\Modules\Payroll\Application\Settlements\SettlementDocuments;
 use App\Modules\Payroll\Console\AlertSettlementDeadlines;
+use App\Modules\Payroll\Console\NotifyPayrollObligations;
 use App\Modules\Payroll\Console\RemindPayslipAcknowledgement;
 use App\Modules\Payroll\Infrastructure\Exports\FifthCategoryLedgerExportSource;
+use App\Modules\Payroll\Infrastructure\Imports\LegacyPayrollResultsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollBalancesImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
@@ -56,6 +58,8 @@ final class PayrollServiceProvider extends ServiceProvider
         $imports->register($this->app->make(PayrollIncidentsImporter::class));
         // PER-12 · Acumulados del ejercicio traídos del sistema anterior.
         $imports->register($this->app->make(PayrollBalancesImporter::class));
+        // PER-13 · Resultados del sistema anterior para la planilla en paralelo.
+        $imports->register($this->app->make(LegacyPayrollResultsImporter::class));
         // PER-11 · Libro de retenciones de quinta exportable con el servicio común (UI-11).
         $this->app->make(ExportRegistry::class)->register($this->app->make(FifthCategoryLedgerExportSource::class));
         $outbox = $this->app->make(OutboxService::class);
@@ -66,12 +70,14 @@ final class PayrollServiceProvider extends ServiceProvider
         // LIQ-1 · RN-LIQ-01 · Liquidación en borrador al registrarse el cese; anulada si se revierte.
         $outbox->subscribe($this->app->make(OpenSettlementOnTermination::class));
         if ($this->app->runningInConsole()) {
-            $this->commands([RemindPayslipAcknowledgement::class, AlertSettlementDeadlines::class]);
+            $this->commands([RemindPayslipAcknowledgement::class, AlertSettlementDeadlines::class, NotifyPayrollObligations::class]);
             $this->app->booted(function (): void {
                 // BOL-2 · RN-BOL-03 · Recordatorio diario del acuse pendiente.
                 $this->app->make(Schedule::class)->command('payslips:remind-acknowledgement')->dailyAt('09:20')->withoutOverlapping();
                 // LIQ-3 · RN-LIQ-02 · Aviso del plazo de pago de las liquidaciones.
                 $this->app->make(Schedule::class)->command('settlements:alert-deadlines')->hourly()->withoutOverlapping();
+                // CUM-9 · Avisos de obligaciones de planilla por vencer y vencidas (NOT-2).
+                $this->app->make(Schedule::class)->command('payroll:obligation-alerts')->dailyAt('08:40')->withoutOverlapping();
             });
         }
         // PER-8 · Aprobación del periodo por el flujo configurado (WFL-2).

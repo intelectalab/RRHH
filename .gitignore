@@ -55,3 +55,7 @@ Thumbs.db
 
 # Copias de trabajo de sesiones paralelas de Claude Code
 .claude/worktrees/
+
+# QA-2 · Resultados de Playwright
+apps/web/test-results/
+apps/web/playwright-report/

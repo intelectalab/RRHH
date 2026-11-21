@@ -57,6 +57,8 @@ export const HELP_SCREENS: ReadonlyArray<{ route: string; key: string }> = [
   { route: '/nomina/liquidaciones', key: 'payroll.settlements' },
   { route: '/nomina/micro-pequena-empresa', key: 'payroll.small_business' },
   { route: '/nomina/retenciones-quinta', key: 'payroll.fifth_ledger' },
+  { route: '/nomina/paralelo', key: 'payroll.parallel' },
+  { route: '/nomina/obligaciones', key: 'payroll.obligations' },
   { route: '/nomina/declaraciones', key: 'payroll.declarations' },
   { route: '/nomina/bitacora-declaraciones', key: 'payroll.declaration_log' },
   { route: '/nomina/registro-laboral', key: 'payroll.registry_profiles' },

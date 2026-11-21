@@ -104,7 +104,7 @@ jobs:
           git diff --exit-code kit/api/openapi.yaml packages/contracts/src/index.ts
 
   tests:
-    name: Automated Tests & Coverage
+    name: Automated Tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -140,7 +140,8 @@ jobs:
         with:
           php-version: '8.4'
           extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
-          coverage: xdebug
+          # QA-1 · Sin cobertura: el paso normal corre rápido; la cobertura va en coverage.yml (programado o manual).
+          coverage: none
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
@@ -178,7 +179,7 @@ jobs:
           DB_PASSWORD: secret
         run: php artisan db:verify-conventions
 
-      - name: Run Backend Tests with Coverage
+      - name: Run Backend Tests
         working-directory: apps/api
         env:
           APP_ENV: testing
@@ -190,7 +191,7 @@ jobs:
           DB_USERNAME: ayni
           DB_PASSWORD: secret
           REDIS_HOST: 127.0.0.1
-        run: ./vendor/bin/pest --coverage --coverage-clover=coverage-api.xml --min=70 || ./vendor/bin/pest
+        run: ./vendor/bin/pest
 
       - name: Run Frontend Tests
         working-directory: apps/web
@@ -200,13 +201,90 @@ jobs:
         working-directory: apps/site
         run: npm ci && npm test
 
-      - name: Upload Test Coverage Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-coverage-report
-          path: |
-            apps/api/coverage-api.xml
-            apps/api/coverage/
-          retention-days: 14
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: aynihr_e2e
+          POSTGRES_USER: ayni
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ayni -d aynihr_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    env:
+      APP_ENV: local
+      APP_KEY: base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: aynihr_e2e
+      DB_USERNAME: ayni
+      DB_PASSWORD: secret
+      REDIS_HOST: 127.0.0.1
+      QUEUE_CONNECTION: sync
+      FILESYSTEM_DISK: local
+      TRUSTED_PROXIES: '*'
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8000/api
+      E2E_BASE_URL: http://demo.localhost:3000
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
+          coverage: none
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          (cd apps/api && composer install --prefer-dist --no-interaction --no-progress)
+          (cd apps/web && npm ci && npx playwright install --with-deps chromium)
+
+      - name: Clean database with the demo organization
+        run: |
+          command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_e2e -v ON_ERROR_STOP=1 -q -f kit/database/schema.sql
+          # La clave del administrador demo se genera en cada corrida: nunca vive en el repositorio.
+          echo "E2E_ADMIN_PASSWORD=E2e-$(openssl rand -hex 12)" >> "$GITHUB_ENV"
+
+      - name: Seed demo and start API and web
+        run: |
+          (cd apps/api && DEMO_ADMIN_PASSWORD="$E2E_ADMIN_PASSWORD" php artisan db:seed --force)
+          (cd apps/api && nohup php artisan serve --host=127.0.0.1 --port=8000 > ../../api-e2e.log 2>&1 &)
+          (cd apps/web && npm run build && nohup npx next start -p 3000 > ../../web-e2e.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:3000/ingresar >/dev/null && curl -s -o /dev/null http://127.0.0.1:8000/up && break; sleep 2; done
+
+      - name: Run Playwright
+        working-directory: apps/web
+        run: npm run test:e2e
+
+      - name: Upload e2e report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+            api-e2e.log
+            web-e2e.log
+          retention-days: 7

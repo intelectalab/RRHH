@@ -68,8 +68,10 @@ test-isolation:
 	$(DOCKER_COMPOSE) exec -T postgres psql -U ayni -d aynihr -v ON_ERROR_STOP=1 -f /kit/database/pruebas_aislamiento.sql
 	$(DOCKER_COMPOSE) run --rm api ./vendor/bin/pest tests/Feature/TenancyIsolationTest.php
 
+# QA-2 · Recorrido de extremo a extremo (Playwright) contra la API y la web levantadas con la demo sembrada.
+# Requiere E2E_ADMIN_PASSWORD (la DEMO_ADMIN_PASSWORD de la siembra); E2E_BASE_URL por defecto http://demo.localhost:3000.
 test-e2e:
-	$(DOCKER_COMPOSE) run --rm web npm run test:e2e
+	$(DOCKER_COMPOSE) run --rm -e E2E_ADMIN_PASSWORD -e E2E_BASE_URL web npm run test:e2e
 
 lint: lint-api lint-web lint-site
 

@@ -86,7 +86,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 3 | [NOM](../prompts/NOM.md) · Motor de nómina | Nómina Perú | 3 | 9 | 10 | 31 | Sí | A-10 |
 | 3 | [CPT](../prompts/CPT.md) · Conceptos y fórmulas | Nómina Perú | 5 | 2 | 7 | 16 | Sí | — |
 | 3 | [PAR](../prompts/PAR.md) · Parámetros legales con vigencia | Nómina Perú | 6 | 1 | 7 | 21 | Sí | D-36 |
-| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 49 | Sí | — |
+| 3 | [PER](../prompts/PER.md) · Periodos, incidencias, cálculo, simulación y cierre | Nómina Perú | 9 | 4 | 13 | 56 | Sí | — |
 | 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 17 | — | A-11 |
 | 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 13 | Sí | — |
 | 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
@@ -115,7 +115,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 7 | [DIS](../prompts/DIS.md) · Casos disciplinarios | Denuncias | 4 | 0 | 0 | 8 | — | — |
 | 7 | [ACT](../prompts/ACT.md) · Activos, EPP y uniformes | Activos y EPP | 6 | 0 | 0 | 13 | — | — |
 | 7 | [GAS](../prompts/GAS.md) · Gastos, viáticos y reembolsos | Gastos y viáticos | 6 | 0 | 0 | 20 | — | — |
-| 7 | [CUM](../prompts/CUM.md) · Cumplimiento Perú y SUNAFIL | Cumplimiento Perú | 7 | 2 | 1 | 29 | — | D-34, D-37 |
+| 7 | [CUM](../prompts/CUM.md) · Cumplimiento Perú y SUNAFIL | Cumplimiento Perú | 7 | 2 | 1 | 31 | — | D-34, D-37 |
 | 7 | [PRI](../prompts/PRI.md) · Privacidad y retención | Cumplimiento Perú | 6 | 1 | 0 | 22 | — | D-14 |
 | 7 | [SIN](../prompts/SIN.md) · Sindicatos y convenios | Cumplimiento Perú | 3 | 1 | 0 | 14 | — | D-33 |
 | 8 | [ANA](../prompts/ANA.md) · People analytics y tableros | Analítica y reportes | 4 | 2 | 0 | 7 | — | A-07, D-20 |

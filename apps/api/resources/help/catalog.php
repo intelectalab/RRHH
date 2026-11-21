@@ -67,6 +67,8 @@ return [
     'pantalla-liquidaciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.settlements']],
     'pantalla-pagos-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.payments']],
     'pantalla-retenciones-quinta' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.fifth_ledger']],
+    'pantalla-planilla-paralelo' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.parallel']],
+    'pantalla-obligaciones-planilla' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.obligations']],
     'pantalla-declaraciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.declarations']],
     'pantalla-bitacora-declaraciones' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.declaration_log']],
     'pantalla-registro-laboral' => ['kind' => 'screen', 'module' => 'payroll', 'roles' => [], 'screens' => ['payroll.registry_profiles']],

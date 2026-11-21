@@ -3,7 +3,7 @@
 Tablero de obligaciones laborales por empresa, pólizas, expediente de inspección y casilla electrónica.
 
 - **Fase:** Fase 7 · Operación y cumplimiento. **Módulo comercial:** Cumplimiento Perú.
-- **Actividades:** 9 (7 historias y 2 tareas); 1 del MVP. **Operaciones de API:** 29.
+- **Actividades:** 9 (7 historias y 2 tareas); 1 del MVP. **Operaciones de API:** 31.
 - **Especificación:** `kit/docs/modulos/M-CUM.md`.
 
 ## Prompt para una sesión nueva de Claude Code
