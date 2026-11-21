@@ -3,7 +3,7 @@
 Cálculo y simulación de la liquidación por cese y documentos de salida.
 
 - **Fase:** Fase 3 · Nómina Perú. **Módulo comercial:** Nómina Perú.
-- **Actividades:** 4 (3 historias y 1 tareas); 4 del MVP. **Operaciones de API:** 9.
+- **Actividades:** 4 (3 historias y 1 tareas); 4 del MVP. **Operaciones de API:** 13.
 - **Especificación:** `kit/docs/modulos/M-LIQ.md`.
 - **Ya avanzado en el kit:** `kit/referencia/calculadora-planilla/`: liquidación con truncos, indemnizaciones y quinta del cese.
 

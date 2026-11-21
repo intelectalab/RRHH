@@ -92,7 +92,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
 | 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 47 | — | D-35 |
 | 3 | [PRV](../prompts/PRV.md) · Provisiones y asientos contables | Nómina Perú | 4 | 1 | 0 | 6 | — | — |
-| 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 9 | Sí | — |
+| 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 13 | Sí | — |
 | 3 | [LOC](../prompts/LOC.md) · Locadores y cuarta categoría | Locadores | 3 | 1 | 0 | 12 | — | — |
 | 4 | [ATS](../prompts/ATS.md) · Reclutamiento, portal de empleos y base de talento | Reclutamiento | 9 | 0 | 0 | 30 | — | D-05 |
 | 4 | [ENT](../prompts/ENT.md) · Entrevistas y ofertas | Reclutamiento | 6 | 0 | 0 | 19 | — | — |
