@@ -126,6 +126,33 @@ Revisa en el navegador:
 
 La primera visita a cada subdominio tarda unos segundos más, porque es cuando Caddy obtiene su certificado.
 
+## 6b. Servidor que ya tiene Nginx con otros sitios
+
+Si el VPS ya sirve otras webs con Nginx en los puertos 80 y 443, GestiaHR no usa Caddy. El Nginx del servidor reparte por dominio a los contenedores, que escuchan solo en `127.0.0.1`:
+- **3410:** app y consola.
+- **3411:** sitio.
+- **8410:** API.
+
+Postgres y Redis de GestiaHR quedan dentro de Docker, sin puertos, así que no chocan con los que ya tenga el servidor.
+
+1. **DNS:** dos registros A hacia la IP del VPS, el dominio base y su comodín. Ejemplo para `rrhh.intelectalab.com`: `rrhh` y `*.rrhh`.
+2. **`.env`:** borra la línea `COMPOSE_PROFILES=caddy`, pon `BASE_DOMAIN=rrhh.intelectalab.com` y deja `ACME_EMAIL` vacío. Si 3410, 3411 u 8410 ya están ocupados (`ss -tlnp`), cambia `WEB_PORT`, `SITE_PORT` o `API_PORT`.
+3. **Instalación:** `SEED_DEMO=1 scripts/deploy.sh`, igual que en el paso 6.
+4. **Nginx:**
+   ```bash
+   cp docker/prod/nginx-gestiahr-proxy.conf /etc/nginx/gestiahr-proxy.conf
+   cp docker/prod/nginx-gestiahr.conf /etc/nginx/sites-available/gestiahr
+   # Si el dominio no es rrhh.intelectalab.com: reemplázalo en ese archivo (en la línea «~^…$» con los puntos escapados)
+   ln -s /etc/nginx/sites-available/gestiahr /etc/nginx/sites-enabled/gestiahr
+   nginx -t && systemctl reload nginx
+   ```
+   Si ya existía otro sitio de Nginx con el mismo dominio, desactívalo antes: quita su enlace de `sites-enabled` y guarda una copia.
+5. **Certificados con certbot**, uno por nombre:
+   ```bash
+   certbot --nginx -d rrhh.intelectalab.com -d admin.rrhh.intelectalab.com -d api.rrhh.intelectalab.com -d demo.rrhh.intelectalab.com
+   ```
+   Cada organización nueva que crees en este ambiente necesita su nombre en el certificado. Agrégalo con `certbot --nginx --expand` y la lista completa de `-d`. Para no hacerlo a mano habría que usar un certificado comodín (`*.rrhh…`), que exige validar por DNS con la API del proveedor del dominio.
+
 ## 7. Actualizar a una versión nueva
 
 Por SSH, como `deploy`, en `/opt/gestiahr`:

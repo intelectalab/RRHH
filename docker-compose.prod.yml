@@ -2,7 +2,11 @@
 # Uso (en el servidor, desde la carpeta del repositorio):
 #   cp .env.staging.example .env   # y completar los valores
 #   scripts/deploy.sh             # construye, migra y levanta todo
-# Solo Caddy publica puertos (80 y 443). Postgres, Redis, la API y las aplicaciones quedan en la red interna.
+# Dos modos (docs/despliegue.md):
+#  - Servidor dedicado: COMPOSE_PROFILES=caddy en .env. Caddy toma los puertos 80 y 443 y emite los certificados.
+#  - Servidor con Nginx propio (otros sitios): sin perfil. La app, el sitio y la API se publican solo en
+#    127.0.0.1 (WEB_PORT, SITE_PORT, API_PORT) y el Nginx del servidor reparte por dominio con sus certificados.
+# Postgres y Redis nunca publican puertos: no chocan con un Postgres o Redis que ya tenga el servidor.
 name: gestiahr
 
 x-api-env: &api-env
@@ -94,6 +98,8 @@ services:
 
   api:
     <<: *api
+    ports:
+      - "127.0.0.1:${API_PORT:-8410}:8000"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8000/up >/dev/null || exit 1"]
       interval: 15s
@@ -119,6 +125,8 @@ services:
         NEXT_PUBLIC_API_URL: http://api:8000/api
     image: gestiahr/web:${RELEASE:-latest}
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3410}:3000"
     depends_on: [api]
     networks: [interna]
 
@@ -133,6 +141,8 @@ services:
         SITE_URL: https://${BASE_DOMAIN}
     image: gestiahr/site:${RELEASE:-latest}
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:${SITE_PORT:-3411}:3001"
     environment:
       # staging: el sitio responde noindex en todas sus páginas (WEB-1). Solo «production» se indexa.
       SITE_ENV: ${SITE_ENV:-staging}
@@ -144,6 +154,7 @@ services:
 
   caddy:
     image: caddy:2-alpine
+    profiles: [caddy]
     restart: unless-stopped
     ports:
       - "80:80"
@@ -151,7 +162,7 @@ services:
       - "443:443/udp"
     environment:
       BASE_DOMAIN: ${BASE_DOMAIN:?Falta BASE_DOMAIN}
-      ACME_EMAIL: ${ACME_EMAIL:?Falta ACME_EMAIL}
+      ACME_EMAIL: ${ACME_EMAIL:-}
     volumes:
       - ./docker/prod/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddydata:/data
