@@ -15,7 +15,7 @@ on:
 
 jobs:
   esquema-y-generadores:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
@@ -62,7 +62,7 @@ jobs:
           git diff --stat --exit-code -- kit/database kit/backlog kit/api kit/docs/20-entrega-al-equipo.md kit/prompts GestiaHR_backlog_jira.csv
 
   diagramas:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -73,7 +73,7 @@ jobs:
         run: node kit/tools/verificar_mermaid.js kit/docs
 
   calculadora-de-referencia:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17

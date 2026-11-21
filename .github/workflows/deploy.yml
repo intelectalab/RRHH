@@ -31,7 +31,7 @@ concurrency:
 jobs:
   deploy:
     name: Automated Deployment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ github.event.inputs.action != 'rollback' }}
     environment: ${{ github.event.inputs.environment || 'staging' }}
     steps:
@@ -87,7 +87,7 @@ jobs:
 
   rollback:
     name: Version Rollback
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ github.event.inputs.action == 'rollback' }}
     environment: ${{ github.event.inputs.environment || 'staging' }}
     steps:
