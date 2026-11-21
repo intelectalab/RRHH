@@ -27671,6 +27671,76 @@ paths:
       x-phase: 3
       x-permission: payroll.incidents.approve
       operationId: postPayrollIncidentsIdReject
+  /payroll-obligations:
+    get:
+      summary: 'CUM-9 · Tablero mínimo de obligaciones de planilla de la empresa (PLAME, AFPnet, T-Registro, depósito de CTS,
+        pago de gratificación, contratos por vencer, umbral del comité de SST): vencimiento calculado con parámetros legales
+        con vigencia, estado (met, pending, due_soon, overdue, no_data, attention, not_applicable), evidencia, explicación,
+        parámetro faltante y responsable'
+      parameters:
+      - name: legal_entity_id
+        in: query
+        required: true
+        description: Empresa (uuid)
+        schema:
+          type: string
+      - name: as_of
+        in: query
+        required: false
+        description: Fecha de evaluación (AAAA-MM-DD); por defecto hoy
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '422': *id006
+      tags:
+      - CUM
+      x-phase: 2
+      x-permission: payroll.periods.view
+      operationId: getPayrollObligations
+  /payroll-obligations/{code}/responsible:
+    put:
+      summary: CUM-9 · Asigna el responsable de una obligación de planilla en una empresa (recibe los avisos de vencimiento
+        NOT-2)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '422': *id006
+        '429': *id007
+      tags:
+      - CUM
+      x-phase: 2
+      x-permission: payroll.payroll_groups.update
+      operationId: putPayrollObligationsCodeResponsible
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
   /payroll-opening-balances:
     get:
       summary: PER-12 · Acumulados del ejercicio traídos del sistema anterior (saldos de apertura por trabajador con fecha
@@ -27718,6 +27788,170 @@ paths:
       x-phase: 3
       x-permission: payroll.incidents.view
       operationId: getPayrollOpeningBalances
+  /payroll-parallel-comparisons/{id}:
+    get:
+      summary: PER-13 · Comparación con sus diferencias por trabajador y concepto dentro del alcance; legacy_amount, product_amount
+        y difference son sensibles (payroll.results.view, registrados en data_access_logs). filter[explained]=0|1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: filter[explained]
+        in: query
+        required: false
+        description: Solo explicadas (1) o sin explicar (0)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollParallelComparisonsId
+  /payroll-parallel-comparisons/{id}/download:
+    get:
+      summary: PER-13 · Informe de la comparación en CSV (exige además payroll.results.view)
+      responses:
+        '200':
+          description: Archivo
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollParallelComparisonsIdDownload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /payroll-parallel-comparisons/{id}/mark-ready:
+    post:
+      summary: PER-13 · Marca la comparación como lista y archiva el informe; 409 unexplained_differences si queda alguna
+        diferencia sin explicar, 409 invalid_transition si no está abierta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollParallelComparisonsIdMarkReady
+  /payroll-parallel-comparisons/{id}/reopen:
+    post:
+      summary: PER-13 · Reabre una comparación lista para revisar de nuevo sus explicaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollParallelComparisonsIdReopen
+  /payroll-parallel-differences/{id}/explain:
+    post:
+      summary: PER-13 · Clasifica una diferencia (input, parameter, rule, rounding) con comentario (obligatorio salvo redondeo);
+        409 si la comparación ya está lista
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollParallelDifferencesIdExplain
   /payroll-payment-batches/{id}:
     get:
       summary: Detalle de un lote de pago con sus partidas
@@ -28340,6 +28574,68 @@ paths:
       x-phase: 3
       x-permission: payroll.periods.mark_paid
       operationId: postPayrollPeriodsIdMarkPaid
+  /payroll-periods/{id}/parallel-comparisons:
+    get:
+      summary: 'PER-13 · Comparaciones de la planilla en paralelo del periodo (historia): corrida comparada, sistema anterior,
+        tolerancia, estado (open, ready), resumen (trabajadores, diferencias, sin explicar; totales por concepto solo con
+        payroll.results.view) e informe archivado'
+      responses:
+        '200':
+          description: Correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '401': *id001
+        '403': *id002
+        '404': *id004
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.view
+      operationId: getPayrollPeriodsIdParallelComparisons
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      summary: PER-13 · Compara la corrida vigente del periodo con los resultados del sistema anterior importados (legacy_payroll_results)
+        por trabajador y concepto. Las diferencias dentro de la tolerancia (nomina.paralelo_tolerancia o la indicada) quedan
+        como redondeo explicado; 409 no_payroll_run sin corrida vigente y 409 no_legacy_results sin importación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericEnvelope'
+        '400': *id003
+        '401': *id001
+        '403': *id002
+        '404': *id004
+        '409': *id005
+        '422': *id006
+        '429': *id007
+      tags:
+      - PER
+      x-phase: 3
+      x-permission: payroll.periods.calculate
+      operationId: postPayrollPeriodsIdParallelComparisons
   /payroll-periods/{id}/payment-batches:
     get:
       summary: Lotes de pago del periodo; los importes solo con payroll.results.view

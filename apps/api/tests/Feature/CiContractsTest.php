@@ -65,8 +65,13 @@ class CiContractsTest extends TestCase
         $content = (string) file_get_contents($ciPath);
         $this->assertStringContainsString('Lint & Static Analysis', $content);
         $this->assertStringContainsString('OpenAPI Contracts & Types Sync', $content);
-        $this->assertStringContainsString('Automated Tests & Coverage', $content);
+        $this->assertStringContainsString('Automated Tests', $content);
         $this->assertStringContainsString('upload-artifact', $content);
+        // QA-1 · El CI normal corre sin cobertura; la cobertura (con su mínimo) va en un workflow aparte.
+        $this->assertStringNotContainsString('--coverage', $content);
+        $coverage = (string) file_get_contents($this->resolvePath('.github/workflows/coverage.yml'));
+        $this->assertStringContainsString('workflow_dispatch', $coverage);
+        $this->assertStringContainsString('--min=70', $coverage);
     }
 
     public function test_repository_work_guide_exists_and_contains_rules(): void

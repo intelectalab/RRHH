@@ -1389,6 +1389,38 @@
       }
     },
     {
+      "codigo": "nomina.paralelo_tolerancia",
+      "modulo": "payroll",
+      "nombre": "Tolerancia de redondeo en la planilla en paralelo",
+      "tipo": "decimal",
+      "valor_por_defecto": 0.1,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "PER-13 · Una diferencia con el sistema anterior igual o menor que este monto se clasifica sola como redondeo.",
+      "opciones": {
+        "min": 0,
+        "max": 100
+      }
+    },
+    {
+      "codigo": "cumplimiento.aviso_dias",
+      "modulo": "payroll",
+      "nombre": "Aviso previo de vencimientos de planilla (días)",
+      "tipo": "integer",
+      "valor_por_defecto": 5,
+      "alcances": [
+        "organization",
+        "legal_entity"
+      ],
+      "descripcion": "CUM-9 · Días antes del vencimiento en que se avisa al responsable de cada obligación de planilla. 0: solo al vencer.",
+      "opciones": {
+        "min": 0,
+        "max": 60
+      }
+    },
+    {
       "codigo": "nomina.incidencia_monto_visto_bueno",
       "modulo": "payroll",
       "nombre": "Monto de incidencia que requiere visto bueno",

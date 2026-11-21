@@ -4,8 +4,10 @@ namespace App\Modules\Payroll;
 
 use App\Modules\Payroll\Application\ConceptAccounting;
 use App\Modules\Payroll\Application\PayrollOpeningBalances;
+use App\Modules\Payroll\Console\NotifyPayrollObligations;
 use App\Modules\Payroll\Console\RemindPayslipAcknowledgement;
 use App\Modules\Payroll\Infrastructure\Exports\FifthCategoryLedgerExportSource;
+use App\Modules\Payroll\Infrastructure\Imports\LegacyPayrollResultsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollBalancesImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollConceptsImporter;
 use App\Modules\Payroll\Infrastructure\Imports\PayrollIncidentsImporter;
@@ -51,6 +53,8 @@ final class PayrollServiceProvider extends ServiceProvider
         $imports->register($this->app->make(PayrollIncidentsImporter::class));
         // PER-12 · Acumulados del ejercicio traídos del sistema anterior.
         $imports->register($this->app->make(PayrollBalancesImporter::class));
+        // PER-13 · Resultados del sistema anterior para la planilla en paralelo.
+        $imports->register($this->app->make(LegacyPayrollResultsImporter::class));
         // PER-11 · Libro de retenciones de quinta exportable con el servicio común (UI-11).
         $this->app->make(ExportRegistry::class)->register($this->app->make(FifthCategoryLedgerExportSource::class));
         $outbox = $this->app->make(OutboxService::class);
@@ -59,10 +63,12 @@ final class PayrollServiceProvider extends ServiceProvider
         // BOL-1 · Boletas al cerrar el periodo.
         $outbox->subscribe($this->app->make(GeneratePayslips::class));
         if ($this->app->runningInConsole()) {
-            $this->commands([RemindPayslipAcknowledgement::class]);
+            $this->commands([RemindPayslipAcknowledgement::class, NotifyPayrollObligations::class]);
             $this->app->booted(function (): void {
                 // BOL-2 · RN-BOL-03 · Recordatorio diario del acuse pendiente.
                 $this->app->make(Schedule::class)->command('payslips:remind-acknowledgement')->dailyAt('09:20')->withoutOverlapping();
+                // CUM-9 · Avisos de obligaciones de planilla por vencer y vencidas (NOT-2).
+                $this->app->make(Schedule::class)->command('payroll:obligation-alerts')->dailyAt('08:40')->withoutOverlapping();
             });
         }
         // PER-8 · Aprobación del periodo por el flujo configurado (WFL-2).

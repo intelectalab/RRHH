@@ -36,9 +36,9 @@
     }
   ],
   "totales": {
-    "parametros": 188,
-    "verificados": 132,
-    "sin_verificar": 56
+    "parametros": 191,
+    "verificados": 134,
+    "sin_verificar": 57
   },
   "parametros": [
     {
@@ -1773,6 +1773,51 @@
       "verificado": true,
       "base_legal": "SUNAT, cartilla de derechohabientes (2012)",
       "nota": "Confirmar vigencia."
+    },
+    {
+      "codigo": "cts_deposito_dia_limite",
+      "nombre": "CTS: último día del mes de depósito",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": 15,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": true,
+      "base_legal": "DS 001-97-TR art. 22",
+      "nota": "Depósito dentro de la primera quincena de mayo y de noviembre (cts_meses_deposito)."
+    },
+    {
+      "codigo": "gratificacion_pago_dia_limite",
+      "nombre": "Gratificación: último día del mes de pago",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "days",
+      "valor": 15,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": true,
+      "base_legal": "Ley 27735 art. 5",
+      "nota": "Pago a más tardar el 15 de julio y el 15 de diciembre (gratificacion_meses)."
+    },
+    {
+      "codigo": "plame_vencimiento_dia_habil",
+      "nombre": "PLAME: día hábil de vencimiento del mes siguiente",
+      "pais": "PE",
+      "regimen": null,
+      "unidad": "business_days",
+      "valor": null,
+      "valor_json": null,
+      "vigente_desde": "2026-01-01",
+      "vigente_hasta": null,
+      "inicio_vigencia_verificado": false,
+      "verificado": false,
+      "base_legal": "Cronograma de obligaciones mensuales SUNAT",
+      "nota": "Depende del último dígito del RUC según el cronograma anual de SUNAT; por cargar."
     },
     {
       "codigo": "afpnet_plazo_dias_habiles",

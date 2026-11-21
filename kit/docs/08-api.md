@@ -965,6 +965,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | GET, PATCH | `/timesheets/{id}` | `time.timesheets.{view,update}` | 2 |
 | POST | `/timesheets/{id}/{submit,approve,reject}` | `time.timesheets.{submit,approve,reject}` | 2 |
 
+**CUM · Cumplimiento Perú**
+
+| Método | Ruta | Permiso | Fase |
+|---|---|---|---|
+| GET | `/payroll-obligations` | `payroll.periods.view` | 2 |
+| PUT | `/payroll-obligations/{code}/responsible` | `payroll.payroll_groups.update` | 2 |
+
 ### Fase 3 · Nómina Perú
 
 
@@ -1069,6 +1076,13 @@ Generada desde el mismo origen que `openapi.yaml` (no editar a mano; ejecutar `p
 | POST | `/payroll-periods/{id}/consume-time` | `payroll.incidents.create` | 3 |
 | GET | `/employments/{employment_id}/fifth-category-summary` | `payroll.fifth_category_ledger.view` | 3 |
 | GET | `/payroll-opening-balances` | `payroll.incidents.view` | 3 |
+| GET | `/payroll-periods/{id}/parallel-comparisons` | `payroll.periods.view` | 3 |
+| POST | `/payroll-periods/{id}/parallel-comparisons` | `payroll.periods.calculate` | 3 |
+| GET | `/payroll-parallel-comparisons/{id}` | `payroll.periods.view` | 3 |
+| GET | `/payroll-parallel-comparisons/{id}/download` | `payroll.periods.view` | 3 |
+| POST | `/payroll-parallel-comparisons/{id}/mark-ready` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-parallel-comparisons/{id}/reopen` | `payroll.periods.calculate` | 3 |
+| POST | `/payroll-parallel-differences/{id}/explain` | `payroll.periods.calculate` | 3 |
 | GET | `/payroll-periods/{id}/time-summary` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/variance` | `payroll.periods.view` | 3 |
 | GET | `/payroll-periods/{id}/anomalies` | `payroll.periods.view` | 3 |

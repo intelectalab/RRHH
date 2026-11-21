@@ -182,6 +182,14 @@ final class CrossTenantHarness
         '/payroll-run-anomalies/{id}/review' => PayrollRunAnomaly::class,
         '/payroll-run-anomalies/{id}/dismiss' => PayrollRunAnomaly::class,
         '/payroll-variance-thresholds/{id}' => PayrollVarianceThreshold::class,
+        // PER-13 · Comparaciones de la planilla en paralelo y sus diferencias (otra tabla de A: 404 igual).
+        '/payroll-parallel-comparisons/{id}' => PayrollRun::class,
+        '/payroll-parallel-comparisons/{id}/download' => PayrollRun::class,
+        '/payroll-parallel-comparisons/{id}/mark-ready' => PayrollRun::class,
+        '/payroll-parallel-comparisons/{id}/reopen' => PayrollRun::class,
+        '/payroll-parallel-differences/{id}/explain' => PayrollRun::class,
+        // CUM-9 · El código de obligación no es un recurso de A: una ruta con código ajeno responde 404.
+        '/payroll-obligations/{code}/responsible' => Catalog::class,
         // DEC-2 a DEC-6 · Declaraciones, plantillas bancarias y certificados de quinta de A.
         'DeclarationFile' => StatutoryFiling::class,
         '/declaration-files/{id}/accept' => StatutoryFiling::class,

@@ -1,0 +1,79 @@
+name: Coverage
+
+# QA-1 · La cobertura con xdebug tarda mucho: sale del CI normal y corre aquí, programada o a pedido.
+# Mantiene el mínimo de cobertura del backend (--min=70) y publica el informe como artefacto.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: Backend coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: aynihr_testing
+          POSTGRES_USER: ayni
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ayni -d aynihr_testing"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_pgsql, pgsql, bcmath, redis, intl, pcntl, opcache, zip
+          coverage: xdebug
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Initialize PostgreSQL database schema
+        run: |
+          command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          PGPASSWORD=secret psql -h 127.0.0.1 -U ayni -d aynihr_testing -v ON_ERROR_STOP=1 -f kit/database/schema.sql
+
+      - name: Run Backend Tests with Coverage
+        working-directory: apps/api
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: aynihr_testing
+          DB_USERNAME: ayni
+          DB_PASSWORD: secret
+          REDIS_HOST: 127.0.0.1
+          XDEBUG_MODE: coverage
+        run: ./vendor/bin/pest --coverage --coverage-clover=coverage-api.xml --min=70
+
+      - name: Upload Test Coverage Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-coverage-report
+          path: apps/api/coverage-api.xml
+          retention-days: 14

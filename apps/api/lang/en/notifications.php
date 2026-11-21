@@ -198,6 +198,14 @@ return [
             'in_app' => ['subject' => 'Confirm receipt of your {period} payslip', 'body' => 'Your company asks you to confirm you received your {period} payslip.'],
             'email' => ['subject' => 'Confirm receipt of your {period} payslip', 'body' => "Hello {name}:\n\nAt {organization}, please confirm receipt of your {period} payslip.\n\nConfirm it here: {link}"],
         ],
+        'payroll.obligation_due' => [
+            'in_app' => ['subject' => '{obligation} for {company} is due soon', 'body' => '{obligation} for {company} is due on {due_on}.'],
+            'email' => ['subject' => '{obligation} for {company} is due soon', 'body' => "Hello {name}:\n\nAt {organization}, {obligation} for {company} is due on {due_on}. Check the obligations board: {link}"],
+        ],
+        'payroll.obligation_overdue' => [
+            'in_app' => ['subject' => '{obligation} for {company} is overdue', 'body' => '{obligation} for {company} was due on {due_on} and is not marked as met.'],
+            'email' => ['subject' => '{obligation} for {company} is overdue', 'body' => "Hello {name}:\n\nAt {organization}, {obligation} for {company} was due on {due_on} and is not marked as met. Check it here: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Regulatory update: {title}', 'body' => 'Effective from {valid_from} ({legal_source}). See the details in Legal parameters.'],
             'email' => ['subject' => 'Regulatory update: {title}', 'body' => "Hello {name}:\n\nA legal parameter update that applies to {organization} was published: {title}, effective from {valid_from} ({legal_source}).\n\nSee the details here: {link}"],

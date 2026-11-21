@@ -15,6 +15,7 @@ return [
         'positions' => 'Positions',
         'payroll_incidents' => 'Payroll incidents',
         'payroll_balances' => 'Year-to-date payroll balances',
+        'legacy_payroll_results' => 'Previous system results (parallel payroll)',
         'job_profiles' => 'Jobs',
     ],
     'columns' => [
@@ -29,6 +30,14 @@ return [
             'category' => 'Category',
             'print_on_payslip' => 'Printed on the payslip',
             'notes' => 'Note',
+        ],
+        'legacy_payroll_results' => [
+            'payroll_group' => 'Payroll group',
+            'period' => 'Period',
+            'document_type' => 'Document type',
+            'document_number' => 'Document number',
+            'concept_code' => 'Concept code',
+            'amount' => 'Amount',
         ],
         'payroll_balances' => [
             'document_type' => 'Document type',

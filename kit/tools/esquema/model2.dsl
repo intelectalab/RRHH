@@ -327,6 +327,23 @@
   payroll_payment_batch_id -> payroll_payment_batches ; employment_id ?-> employments
   person_bank_account_id ?-> person_bank_accounts ; amount money! #S ; currency cur
   status enum(pending,paid,rejected,returned)=pending ; payslip_id ?-> payslips ; reference ; rejection_reason
+@payroll_legacy_results soft sens | PER-13 · Resultado del sistema anterior por trabajador y concepto, importado (perfil de origen de IMP-7) para la planilla en paralelo durante la migración.
+  payroll_period_id -> payroll_periods ; employment_id -> employments ; concept_code text! ; amount money! #S ; currency cur
+  import_job_id ?-> import_jobs ; idx payroll_period_id, employment_id
+@payroll_parallel_comparisons lock | PER-13 · Comparación de una corrida del periodo con el resultado del sistema anterior: tolerancia de redondeo, estado (abierta o lista para salir), resumen e informe guardado en el legajo de la migración.
+  payroll_period_id -> payroll_periods ; payroll_run_id -> payroll_runs ; legacy_system ; tolerance numeric(14,2)! ; currency cur
+  status enum(open,ready)=open ; summary j ; report_document_id ?-> documents ; created_by_user_id ?-> users
+  ready_by_user_id ?-> users ; ready_at ; ready_note
+@payroll_parallel_differences sens | PER-13 · Diferencia por trabajador y concepto entre el sistema anterior y el producto, clasificada (dato de entrada, parámetro, regla o redondeo) y explicada con comentario.
+  payroll_parallel_comparison_id -> payroll_parallel_comparisons ; employment_id -> employments ; concept_code text!
+  legacy_amount numeric(14,2) #S ; product_amount numeric(14,2) #S ; difference numeric(14,2)! #S ; currency cur
+  classification enum(input,parameter,rule,rounding,unclassified)=unclassified ; explained bool=f ; comment
+  explained_by_user_id ?-> users ; explained_at ; uniq payroll_parallel_comparison_id, employment_id, concept_code
+@payroll_obligation_assignments | CUM-9 · Responsable de cada obligación de planilla por empresa (T-Registro, PLAME, AFPnet, CTS, gratificación, contratos por vencer, comité de SST).
+  legal_entity_id -> legal_entities ; obligation_code text! ; responsible_user_id -> users ; uniq legal_entity_id, obligation_code
+@payroll_obligation_alerts imm | CUM-9 · Avisos enviados por obligación y vencimiento (antes de vencer y al vencer sin cumplir), solo inserción, para no repetirlos.
+  legal_entity_id -> legal_entities ; obligation_code text! ; period_key text! ; kind enum(before_due,overdue)! ; sent_at ts=now
+  uniq legal_entity_id, obligation_code, period_key, kind
 
 #E BOL | Boletas
 @payslips main lock sens | Boleta de pago. Generada, su contenido, montos y archivo no cambian ni se borra; una corrección la anula y genera otra versión que la referencia (RN-BOL-04). BOL-1 a BOL-5: estados por acciones (ME-20), documento del legajo y conservación por parámetro legal.

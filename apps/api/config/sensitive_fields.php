@@ -82,6 +82,12 @@ return [
     ],
     // PER-12 · Acumulados del ejercicio traídos del sistema anterior.
     'PayrollOpeningBalance' => ['amount' => ['payroll.results.view', 'salary']],
+    // PER-13 · Diferencias de la planilla en paralelo por trabajador y concepto.
+    'PayrollParallelDifference' => [
+        'legacy_amount' => ['payroll.results.view', 'salary'],
+        'product_amount' => ['payroll.results.view', 'salary'],
+        'difference' => ['payroll.results.view', 'salary'],
+    ],
     // PER-11 · Resumen del ejercicio del libro de quinta (retención por mes, acumulado y conciliación).
     'FifthCategorySummary' => [
         'months' => ['payroll.fifth_category_ledger.view', 'salary'],

@@ -15,6 +15,7 @@ return [
         'positions' => 'Posições',
         'payroll_incidents' => 'Ocorrências da folha',
         'payroll_balances' => 'Acumulados da folha do exercício',
+        'legacy_payroll_results' => 'Resultados do sistema anterior (folha em paralelo)',
         'job_profiles' => 'Cargos',
     ],
     'columns' => [
@@ -29,6 +30,14 @@ return [
             'category' => 'Categoria',
             'print_on_payslip' => 'Impresso no holerite',
             'notes' => 'Nota',
+        ],
+        'legacy_payroll_results' => [
+            'payroll_group' => 'Grupo da folha',
+            'period' => 'Período',
+            'document_type' => 'Tipo de documento',
+            'document_number' => 'Número do documento',
+            'concept_code' => 'Código do conceito',
+            'amount' => 'Valor',
         ],
         'payroll_balances' => [
             'document_type' => 'Tipo de documento',

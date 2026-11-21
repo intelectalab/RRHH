@@ -198,6 +198,14 @@ return [
             'in_app' => ['subject' => 'Confirma la recepción de tu boleta de {period}', 'body' => 'Tu empresa pide que confirmes que recibiste tu boleta de {period}.'],
             'email' => ['subject' => 'Confirma la recepción de tu boleta de {period}', 'body' => "Hola {name}:\n\nEn {organization}, falta que confirmes la recepción de tu boleta de {period}.\n\nConfírmala aquí: {link}"],
         ],
+        'payroll.obligation_due' => [
+            'in_app' => ['subject' => 'Vence {obligation} de {company}', 'body' => '{obligation} de {company} vence el {due_on}.'],
+            'email' => ['subject' => 'Vence {obligation} de {company}', 'body' => "Hola {name}:\n\nEn {organization}, {obligation} de {company} vence el {due_on}. Revisa el tablero de obligaciones: {link}"],
+        ],
+        'payroll.obligation_overdue' => [
+            'in_app' => ['subject' => '{obligation} de {company} está vencida', 'body' => '{obligation} de {company} venció el {due_on} y no figura como cumplida.'],
+            'email' => ['subject' => '{obligation} de {company} está vencida', 'body' => "Hola {name}:\n\nEn {organization}, {obligation} de {company} venció el {due_on} y no figura como cumplida. Revísala aquí: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Novedad normativa: {title}', 'body' => 'Vigente desde el {valid_from} ({legal_source}). Revisa el detalle en Parámetros legales.'],
             'email' => ['subject' => 'Novedad normativa: {title}', 'body' => "Hola {name}:\n\nSe publicó una actualización de parámetros legales que aplica a {organization}: {title}, vigente desde el {valid_from} ({legal_source}).\n\nRevisa el detalle aquí: {link}"],

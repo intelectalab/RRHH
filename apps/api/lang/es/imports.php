@@ -15,6 +15,7 @@ return [
         'positions' => 'Posiciones',
         'payroll_incidents' => 'Incidencias de planilla',
         'payroll_balances' => 'Acumulados de planilla del ejercicio',
+        'legacy_payroll_results' => 'Resultados del sistema anterior (planilla en paralelo)',
         'job_profiles' => 'Puestos',
     ],
     'columns' => [
@@ -29,6 +30,14 @@ return [
             'category' => 'Categoría',
             'print_on_payslip' => 'Se imprime en la boleta',
             'notes' => 'Nota',
+        ],
+        'legacy_payroll_results' => [
+            'payroll_group' => 'Grupo de planilla',
+            'period' => 'Periodo',
+            'document_type' => 'Tipo de documento',
+            'document_number' => 'Número de documento',
+            'concept_code' => 'Código del concepto',
+            'amount' => 'Monto',
         ],
         'payroll_balances' => [
             'document_type' => 'Tipo de documento',

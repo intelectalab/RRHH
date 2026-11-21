@@ -198,6 +198,14 @@ return [
             'in_app' => ['subject' => 'Confirme o recebimento do holerite de {period}', 'body' => 'Sua empresa pede que confirme que recebeu o holerite de {period}.'],
             'email' => ['subject' => 'Confirme o recebimento do holerite de {period}', 'body' => "Olá {name}:\n\nEm {organization}, falta confirmar o recebimento do seu holerite de {period}.\n\nConfirme aqui: {link}"],
         ],
+        'payroll.obligation_due' => [
+            'in_app' => ['subject' => '{obligation} de {company} vence em breve', 'body' => '{obligation} de {company} vence em {due_on}.'],
+            'email' => ['subject' => '{obligation} de {company} vence em breve', 'body' => "Olá {name}:\n\nEm {organization}, {obligation} de {company} vence em {due_on}. Veja o painel de obrigações: {link}"],
+        ],
+        'payroll.obligation_overdue' => [
+            'in_app' => ['subject' => '{obligation} de {company} está vencida', 'body' => '{obligation} de {company} venceu em {due_on} e não consta como cumprida.'],
+            'email' => ['subject' => '{obligation} de {company} está vencida', 'body' => "Olá {name}:\n\nEm {organization}, {obligation} de {company} venceu em {due_on} e não consta como cumprida. Veja aqui: {link}"],
+        ],
         'payroll.legal_update' => [
             'in_app' => ['subject' => 'Novidade normativa: {title}', 'body' => 'Vigente desde {valid_from} ({legal_source}). Veja o detalhe em Parâmetros legais.'],
             'email' => ['subject' => 'Novidade normativa: {title}', 'body' => "Olá {name}:\n\nFoi publicada uma atualização de parâmetros legais que se aplica a {organization}: {title}, vigente desde {valid_from} ({legal_source}).\n\nVeja o detalhe aqui: {link}"],

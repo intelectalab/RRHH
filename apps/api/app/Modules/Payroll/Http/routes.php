@@ -4,6 +4,7 @@ use App\Modules\Payroll\Http\Controllers\DeclarationController;
 use App\Modules\Payroll\Http\Controllers\FifthCategoryLedgerController;
 use App\Modules\Payroll\Http\Controllers\LegalParametersController;
 use App\Modules\Payroll\Http\Controllers\MyPayslipController;
+use App\Modules\Payroll\Http\Controllers\ParallelPayrollController;
 use App\Modules\Payroll\Http\Controllers\PayrollConceptController;
 use App\Modules\Payroll\Http\Controllers\PayrollEngineController;
 use App\Modules\Payroll\Http\Controllers\PayrollIncidentController;
@@ -149,6 +150,17 @@ Route::prefix('api/v1')->middleware(['api', 'auth:ayni'])->group(function (): vo
     Route::get('/employments/{employment_id}/fifth-category-summary', [FifthCategoryLedgerController::class, 'summary'])->middleware('permission:payroll.fifth_category_ledger.view');
     // PER-12 · Acumulados del ejercicio traídos del sistema anterior (se cargan con el importador payroll_balances).
     Route::get('/payroll-opening-balances', [PayrollOpeningBalanceController::class, 'index'])->middleware('permission:payroll.incidents.view');
+    // PER-13 · Planilla en paralelo: comparación con el resultado del sistema anterior (importación legacy_payroll_results).
+    Route::get('/payroll-periods/{id}/parallel-comparisons', [ParallelPayrollController::class, 'index'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-periods/{id}/parallel-comparisons', [ParallelPayrollController::class, 'store'])->middleware('permission:payroll.periods.calculate');
+    Route::get('/payroll-parallel-comparisons/{id}', [ParallelPayrollController::class, 'show'])->middleware('permission:payroll.periods.view');
+    Route::get('/payroll-parallel-comparisons/{id}/download', [ParallelPayrollController::class, 'export'])->middleware('permission:payroll.periods.view');
+    Route::post('/payroll-parallel-comparisons/{id}/mark-ready', [ParallelPayrollController::class, 'markReady'])->middleware('permission:payroll.periods.calculate');
+    Route::post('/payroll-parallel-comparisons/{id}/reopen', [ParallelPayrollController::class, 'reopen'])->middleware('permission:payroll.periods.calculate');
+    Route::post('/payroll-parallel-differences/{id}/explain', [ParallelPayrollController::class, 'explain'])->middleware('permission:payroll.periods.calculate');
+    // CUM-9 · Tablero mínimo de obligaciones de planilla y su responsable por empresa.
+    Route::get('/payroll-obligations', [ParallelPayrollController::class, 'obligations'])->middleware('permission:payroll.periods.view');
+    Route::put('/payroll-obligations/{code}/responsible', [ParallelPayrollController::class, 'assign'])->middleware('permission:payroll.payroll_groups.update');
     // BOL-1 a BOL-5 · Boletas de pago: generación y publicación del periodo, historial, PDF, entrega y explicación.
     Route::post('/payroll-periods/{id}/payslips', [PayslipController::class, 'generate'])->middleware('permission:payroll.payslips.publish');
     Route::post('/payroll-periods/{id}/payslips/publish', [PayslipController::class, 'publishPeriod'])->middleware('permission:payroll.payslips.publish');

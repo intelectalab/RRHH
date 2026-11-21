@@ -314,6 +314,19 @@
         "payroll.fifth_category_ledger.view"
       ]
     },
+    "payroll.parallel": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.periods.view",
+        "payroll.results.view"
+      ]
+    },
+    "payroll.obligations": {
+      "module": "payroll",
+      "permissions": [
+        "payroll.periods.view"
+      ]
+    },
     "payroll.payslips": {
       "module": "payroll",
       "permissions": [
