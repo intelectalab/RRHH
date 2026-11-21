@@ -3,7 +3,7 @@
 Capa de IA opcional con registro de uso, permisos del usuario y sin decisiones automáticas de alto impacto.
 
 - **Fase:** Fase 8 · Inteligencia. **Módulo comercial:** Asistente de IA.
-- **Actividades:** 12 (7 historias y 5 tareas); 5 del MVP. **Operaciones de API:** 12.
+- **Actividades:** 12 (7 historias y 5 tareas); 5 del MVP. **Operaciones de API:** 13.
 - **Especificación:** `kit/docs/modulos/M-IAR.md`.
 
 ## Prompt para una sesión nueva de Claude Code

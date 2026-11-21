@@ -6,8 +6,8 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 
 | Medida | Actividades | Hechas | En curso | Avance |
 |---|---|---|---|---|
-| Primer corte comercial (MVP) | 241 | 226 | 0 | 93,8 % |
-| Backlog completo | 512 | 233 | 0 | 45,5 % |
+| Primer corte comercial (MVP) | 241 | 236 | 0 | 97,9 % |
+| Backlog completo | 512 | 243 | 0 | 47,5 % |
 
 <!-- TABLE_START -->
 | Código | Título | Épica | Fase | Tipo | MVP | Estado | Fecha | Nota |
@@ -281,11 +281,11 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | DEC-4 | Planilla de aportes para AFPnet | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | AFPnet: línea por trabajador con indicadores de inicio, cese y excepción, reporte sin CUSPP, vencimiento y conciliación. |
 | DEC-5 | Archivos bancarios | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Plantillas de archivos bancarios como datos (paquete y propias) con validación de cuentas, conectadas al pago de planilla. |
 | DEC-6 | Certificados de renta y de retenciones | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Certificados de quinta al cese, al cierre o a solicitud desde el libro, PDF al legajo visible en el portal; Nómina → Declaraciones. |
-| DEC-7 | Bitácora de declaraciones | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-8 | Ficha del registro laboral y validación previa al alta | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-9 | Declaración jurada de rentas de otros empleadores | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
-| DEC-10 | Generador de archivos con estructuras versionadas | DEC | Fase 3 · Nómina Perú | Task | sí | pendiente | — |  |
-| DEC-11 | Devolución de retenciones de quinta en exceso | DEC | Fase 3 · Nómina Perú | Story | sí | pendiente | — |  |
+| DEC-7 | Bitácora de declaraciones | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Bitácora de declaraciones por empresa y periodo con estados, responsable y constancia de pago; Nómina → Bitácora de declaraciones. |
+| DEC-8 | Ficha del registro laboral y validación previa al alta | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Ficha del registro laboral con vigencia y validación previa al alta (15 de 22 comprobaciones TR) con faltantes y pantalla de origen. |
+| DEC-9 | Declaración jurada de rentas de otros empleadores | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Declaración jurada de rentas de otros empleadores desde el portal que alimenta la quinta, sin sobrescribir. |
+| DEC-10 | Generador de archivos con estructuras versionadas | DEC | Fase 3 · Nómina Perú | Task | sí | hecha | 2026-11-20 | Estructuras de archivos como datos versionados, verificadas desde la consola; borrador mientras no estén verificadas. |
+| DEC-11 | Devolución de retenciones de quinta en exceso | DEC | Fase 3 · Nómina Perú | Story | sí | hecha | 2026-11-20 | Devoluciones de quinta en exceso con segregación, asiento en el libro y compensación parcial con saldo. |
 | PRV-1 | Provisiones mensuales | PRV | Fase 3 · Nómina Perú | Task | — | pendiente | — |  |
 | PRV-2 | Asiento contable de planilla | PRV | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
 | PRV-3 | Exportación contable configurable | PRV | Fase 3 · Nómina Perú | Story | — | pendiente | — |  |
@@ -465,17 +465,17 @@ Actualizado el **2026-11-20** con `python3 scripts/gen_avance.py` desde `kit/bac
 | ALE-2 | Catálogo de alertas | ALE | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | ALE-3 | Explicación obligatoria y gestión de la alerta | ALE | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | ALE-4 | Riesgo de rotación explicable | ALE | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
-| IAR-1 | Capa de proveedor de IA | IAR | Fase 8 · Inteligencia | Task | sí | pendiente | — |  |
-| IAR-2 | Registro de uso de IA | IAR | Fase 8 · Inteligencia | Task | sí | pendiente | — |  |
+| IAR-1 | Capa de proveedor de IA | IAR | Fase 8 · Inteligencia | Task | sí | hecha | 2026-11-20 | Puerto de proveedor de IA con adaptador simulado determinista; proveedor real pendiente (A-09). |
+| IAR-2 | Registro de uso de IA | IAR | Fase 8 · Inteligencia | Task | sí | hecha | 2026-11-20 | Bitácora de IA de solo inserción con usuario, propósito, tokens y citas; contenido cifrado con retención y purga. |
 | IAR-3 | La IA respeta los permisos del usuario | IAR | Fase 8 · Inteligencia | Task | — | pendiente | — |  |
 | IAR-4 | Redacción asistida | IAR | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | IAR-5 | Resúmenes de CV y de encuestas | IAR | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | IAR-6 | Consulta en lenguaje natural | IAR | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | IAR-7 | Explicación de métricas y detección de anomalías | IAR | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | IAR-8 | Salvaguardas contra decisiones automáticas | IAR | Fase 8 · Inteligencia | Task | — | pendiente | — |  |
-| IAR-9 | Asistente de ayuda documental | IAR | Fase 8 · Inteligencia | Story | sí | pendiente | — |  |
-| IAR-10 | Activación del asistente de ayuda desde la administración | IAR | Fase 8 · Inteligencia | Story | sí | pendiente | — |  |
-| IAR-11 | Calidad de las respuestas del asistente de ayuda | IAR | Fase 8 · Inteligencia | Task | sí | pendiente | — |  |
+| IAR-9 | Asistente de ayuda documental | IAR | Fase 8 · Inteligencia | Story | sí | hecha | 2026-11-20 | Asistente de ayuda que responde solo con artículos visibles y cita fuentes; sin fuente ofrece derivar a RRHH; no consulta datos de colaboradores. |
+| IAR-10 | Activación del asistente de ayuda desde la administración | IAR | Fase 8 · Inteligencia | Story | sí | hecha | 2026-11-20 | Activación del asistente por plan, organización, roles y límite, auditada; Configuración → Asistente. |
+| IAR-11 | Calidad de las respuestas del asistente de ayuda | IAR | Fase 8 · Inteligencia | Task | sí | hecha | 2026-11-20 | Valoración de respuestas, tablero de calidad y casos de evaluación por rol en CI. |
 | IAR-12 | Asistente de ayuda con los datos del propio usuario | IAR | Fase 8 · Inteligencia | Story | — | pendiente | — |  |
 | API-1 | API pública con tokens y scopes | API | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |
 | API-2 | Portal de desarrolladores | API | Fase 9 · Ecosistema y expansión | Story | — | pendiente | — |  |

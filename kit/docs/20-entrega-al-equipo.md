@@ -90,7 +90,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 3 | [BOL](../prompts/BOL.md) · Boletas de pago | Nómina Perú | 3 | 2 | 5 | 17 | — | A-11 |
 | 3 | [BSO](../prompts/BSO.md) · Beneficios sociales | Nómina Perú | 3 | 2 | 5 | 13 | Sí | — |
 | 3 | [PRE](../prompts/PRE.md) · Préstamos, adelantos y adelanto de sueldo | Préstamos y adelanto de sueldo | 3 | 2 | 0 | 15 | — | — |
-| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 47 | — | D-35 |
+| 3 | [DEC](../prompts/DEC.md) · Declaraciones y archivos | Nómina Perú | 9 | 2 | 11 | 54 | — | D-35 |
 | 3 | [PRV](../prompts/PRV.md) · Provisiones y asientos contables | Nómina Perú | 4 | 1 | 0 | 6 | — | — |
 | 3 | [LIQ](../prompts/LIQ.md) · Liquidación de beneficios sociales | Nómina Perú | 3 | 1 | 4 | 13 | Sí | — |
 | 3 | [LOC](../prompts/LOC.md) · Locadores y cuarta categoría | Locadores | 3 | 1 | 0 | 12 | — | — |
@@ -121,7 +121,7 @@ Todas las épicas tienen especificación, tablas, operaciones de API e historias
 | 8 | [ANA](../prompts/ANA.md) · People analytics y tableros | Analítica y reportes | 4 | 2 | 0 | 7 | — | A-07, D-20 |
 | 8 | [RPT](../prompts/RPT.md) · Reportes y constructor | Analítica y reportes | 4 | 1 | 0 | 10 | — | A-07 |
 | 8 | [ALE](../prompts/ALE.md) · Alertas explicadas | Analítica y reportes | 3 | 1 | 0 | 12 | — | D-20 |
-| 8 | [IAR](../prompts/IAR.md) · Asistente de IA y gobierno | Asistente de IA | 7 | 5 | 5 | 12 | — | A-09, D-21, D-38 |
+| 8 | [IAR](../prompts/IAR.md) · Asistente de IA y gobierno | Asistente de IA | 7 | 5 | 5 | 13 | — | A-09, D-21, D-38 |
 | 9 | [API](../prompts/API.md) · API pública, webhooks y MCP | API e integraciones | 3 | 2 | 0 | 14 | — | D-17, D-18, D-19, D-21 |
 | 9 | [INT](../prompts/INT.md) · Integraciones | API e integraciones | 7 | 0 | 0 | 9 | — | — |
 | 9 | [WHA](../prompts/WHA.md) · Autoservicio por WhatsApp | WhatsApp | 4 | 1 | 0 | 3 | — | D-11 |
