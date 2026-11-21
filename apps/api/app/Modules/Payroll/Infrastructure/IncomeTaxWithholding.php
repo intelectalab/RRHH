@@ -107,7 +107,9 @@ final class IncomeTaxWithholding
         EffectiveDated::applyAsOf($profile, $to);
         $profile = $profile->first(['is_tax_resident', 'fifth_category_exempt']);
         $declarations = DB::table('external_income_declarations')->where('employment_id', $employmentId)->where('fiscal_year', $year)
-            ->where('status', 'validated')->get(['kind', 'gross_income', 'exempt_income', 'tax_withheld', 'monthly_detail', 'this_employer_withholds']);
+            ->where('status', 'validated')
+            // DEC-9 · Una declaración aplica desde el mes en que se validó: no rectifica los meses ya calculados.
+            ->where(fn ($q) => $q->whereNull('applies_from_month')->orWhere('applies_from_month', '<=', $month))->get(['kind', 'gross_income', 'exempt_income', 'tax_withheld', 'monthly_detail', 'this_employer_withholds']);
         $received = BigDecimal::zero();
         $projectedExternal = BigDecimal::zero();
         $withholds = true;

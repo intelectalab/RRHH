@@ -24,17 +24,17 @@ Conteos obtenidos del catálogo de PostgreSQL (16.15 (Ubuntu 16.15-0ubuntu0.24.0
 | Tablas de organización (con `tenant_id`, RLS activado y forzado, política `tenant_isolation`) | 464 |
 | Tablas de plataforma (sin RLS de organización) | 67 |
 | Políticas RLS | 467 |
-| Claves foráneas | 1718 |
-| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1133 |
+| Claves foráneas | 1734 |
+| — compuestas `(tenant_id, x_id)` → `(tenant_id, id)` entre tablas de organización | 1149 |
 | — simples `tenant_id` → `tenants(id)` | 477 |
 | — resto (hacia catálogos y tablas de plataforma) | 108 |
-| Índices (incluye los de claves primarias, únicas y exclusiones) | 2432 |
-| — creados con `CREATE INDEX` | 1237 |
+| Índices (incluye los de claves primarias, únicas y exclusiones) | 2448 |
+| — creados con `CREATE INDEX` | 1253 |
 | Triggers | 555 |
 | Restricciones de exclusión (vigencias sin solapamiento) | 30 |
-| Restricciones `CHECK` | 654 |
+| Restricciones `CHECK` | 656 |
 | Restricciones `UNIQUE` | 634 |
-| Columnas | 7218 |
+| Columnas | 7258 |
 | Columnas marcadas `-- SENSIBLE` | 169 |
 | — de ellas, cifradas en la aplicación (`_enc`) | 62 |
 | Tablas con vigencia (`valid_from` / `valid_to`) | 44 |
@@ -2020,6 +2020,8 @@ erDiagram
   payroll_periods ||--o{ payslips : "payroll_period_id"
   employments ||--o{ payslips : "employment_id"
   legal_entities ||--o{ payslips : "legal_entity_id"
+  documents |o--o{ payslips : "document_id"
+  users |o--o{ payslips : "voided_by_user_id"
   employments ||--o{ loans : "employment_id"
   payroll_concepts |o--o{ loans : "payroll_concept_id"
   users |o--o{ loans : "approved_by_user_id"
@@ -2272,16 +2274,16 @@ erDiagram
 
 #### `payslips`
 
-- **Propósito:** Boleta de pago. Una vez cerrada no admite cambios ni borrado; una rectificación es una boleta nueva que referencia a la anterior.
-- **Columnas clave:** `number`, `kind`, `status`, `gross_amount` (S), `deductions_amount` (S), `net_amount` (S), `employer_contributions` (S), `currency`, `content` (S), `content_hash`, `closed_at`.
-- **Relaciones:** `payroll_run_employment_id` → `payroll_run_employments` (opcional); `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `legal_entity_id` → `legal_entities`; `file_id` → `stored_files` (opcional); `rectifies_payslip_id` → `payslips` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; único: `legal_entity_id`, `number`; `CHECK ((status = 'closed') = (closed_at IS NOT NULL))`; cerrada (`closed_at`), no admite UPDATE ni DELETE (AY002); la rectificación es otra boleta.
+- **Propósito:** Boleta de pago. Generada, su contenido, montos y archivo no cambian ni se borra; una corrección la anula y genera otra versión que la referencia (RN-BOL-04). BOL-1 a BOL-5: estados por acciones (ME-20), documento del legajo y conservación por parámetro legal.
+- **Columnas clave:** `number`, `kind`, `status`, `gross_amount` (S), `deductions_amount` (S), `net_amount` (S), `employer_contributions` (S), `currency`, `content` (S), `content_hash`, `closed_at`, `version`, `requires_acknowledgement`, `is_imported`, `published_at`, `voided_at`, `void_reason`.
+- **Relaciones:** `payroll_run_employment_id` → `payroll_run_employments` (opcional); `payroll_period_id` → `payroll_periods`; `employment_id` → `employments`; `legal_entity_id` → `legal_entities`; `file_id` → `stored_files` (opcional); `rectifies_payslip_id` → `payslips` (opcional); `document_id` → `documents` (opcional); `voided_by_user_id` → `users` (opcional); `generated_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; único: `legal_entity_id`, `number`; cerrada (`closed_at`), no admite UPDATE ni DELETE (AY002); la rectificación es otra boleta.
 
 #### `payslip_deliveries`
 
-- **Propósito:** Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse.
-- **Columnas clave:** `channel`, `status`, `published_at`, `first_viewed_at`, `downloaded_at`, `acknowledged_at`.
-- **Relaciones:** `payslip_id` → `payslips`; `employment_id` → `employments`; `signature_request_id` → `signature_requests` (opcional).
+- **Propósito:** Entrega de la boleta al trabajador: publicación, primera vista, descarga y acuse; o entrega en físico con cargo escaneado (RN-BOL-07).
+- **Columnas clave:** `channel`, `status`, `published_at`, `first_viewed_at`, `downloaded_at`, `acknowledged_at`, `first_viewed_ip`, `acknowledged_ip`, `acknowledged_user_agent`, `last_reminded_at`, `note`.
+- **Relaciones:** `payslip_id` → `payslips`; `employment_id` → `employments`; `signature_request_id` → `signature_requests` (opcional); `delivered_by_user_id` → `users` (opcional); `evidence_document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; único: `payslip_id`, `channel`.
 
 
@@ -2290,15 +2292,15 @@ erDiagram
 #### `cts_deposits`
 
 - **Propósito:** Depósito semestral de CTS por trabajador: remuneración computable, monto, entidad depositaria y constancia.
-- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`.
-- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional).
+- **Columnas clave:** `period_code`, `computable_remuneration` (S), `sixth_of_bonus`, `computable_months`, `computable_days`, `amount` (S), `currency`, `deposit_bank_code`, `due_on`, `deposited_on`, `status`, `deposit_reference`.
+- **Relaciones:** `employment_id` → `employments`; `person_bank_account_id` → `person_bank_accounts` (opcional); `payroll_run_employment_id` → `payroll_run_employments` (opcional); `statement_document_id` → `documents` (opcional); `payroll_period_id` → `payroll_periods` (opcional); `deposited_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; único: `employment_id`, `period_code`.
 
 #### `profit_sharing_distributions`
 
 - **Propósito:** Distribución anual de utilidades por empresa (E-21).
-- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`.
-- **Relaciones:** `legal_entity_id` → `legal_entities`.
+- **Columnas clave:** `fiscal_year`, `net_income_before_tax` (S), `participation_rate`, `total_amount`, `currency`, `total_days_worked`, `total_remunerations`, `status`, `due_on`, `activity`, `workers_count`, `calculated_at`, `warnings`, `approved_at`, `excess_amount`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`; `created_by_user_id` → `users` (opcional); `approved_by_user_id` → `users` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); contiene columnas sensibles (S); único: `legal_entity_id`, `fiscal_year`.
 
 #### `profit_sharing_items`
@@ -2373,8 +2375,8 @@ erDiagram
 #### `statutory_filings`
 
 - **Propósito:** Declaración o archivo oficial por empresa y periodo (planilla electrónica, registro laboral, aportes previsionales), con validación previa y rectificatorias.
-- **Columnas clave:** `kind`, `period_code`, `is_rectification`, `status`, `validation_report`, `submitted_at`, `external_reference`, `due_on`, `accepted_at`, `observation`, `rectification_reason`.
-- **Relaciones:** `legal_entity_id` → `legal_entities`; `payroll_period_id` → `payroll_periods` (opcional); `rectifies_filing_id` → `statutory_filings` (opcional); `submitted_by_user_id` → `users` (opcional); `created_by_user_id` → `users` (opcional); `submission_document_id` → `documents` (opcional).
+- **Columnas clave:** `kind`, `period_code`, `is_rectification`, `status`, `validation_report`, `submitted_at`, `external_reference`, `due_on`, `accepted_at`, `observation`, `rectification_reason`, `paid_at`, `payment_reference`.
+- **Relaciones:** `legal_entity_id` → `legal_entities`; `payroll_period_id` → `payroll_periods` (opcional); `rectifies_filing_id` → `statutory_filings` (opcional); `submitted_by_user_id` → `users` (opcional); `created_by_user_id` → `users` (opcional); `submission_document_id` → `documents` (opcional); `responsible_user_id` → `users` (opcional); `paid_by_user_id` → `users` (opcional); `payment_document_id` → `documents` (opcional).
 - **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`).
 
 #### `statutory_filing_files`
@@ -2415,9 +2417,9 @@ erDiagram
 #### `external_income_declarations`
 
 - **Propósito:** Ingresos y retenciones de otros empleadores declarados por el trabajador (renta de quinta categoría).
-- **Columnas clave:** `fiscal_year`, `employer_tax_id`, `employer_name`, `gross_income` (S), `tax_withheld` (S), `currency`, `declared_on`, `kind`, `period_from`, `period_to`, `exempt_income` (S), `monthly_detail` (S), `this_employer_withholds`, `status`, `received_on`.
-- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional); `superseded_by_id` → `external_income_declarations` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; `CHECK (period_to IS NULL OR period_from IS NULL OR period_to >= period_from)`; `CHECK (employer_tax_id IS NULL OR employer_tax_id ~ '^[0-9]{11}$')`.
+- **Columnas clave:** `fiscal_year`, `employer_tax_id`, `employer_name`, `gross_income` (S), `tax_withheld` (S), `currency`, `declared_on`, `kind`, `period_from`, `period_to`, `exempt_income` (S), `monthly_detail` (S), `this_employer_withholds`, `status`, `received_on`, `validated_on`, `applies_from_month`, `rejection_reason`.
+- **Relaciones:** `employment_id` → `employments`; `document_id` → `documents` (opcional); `superseded_by_id` → `external_income_declarations` (opcional); `validated_by_user_id` → `users` (opcional); `submitted_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; `CHECK (period_to IS NULL OR period_from IS NULL OR period_to >= period_from)`; `CHECK (employer_tax_id IS NULL OR employer_tax_id ~ '^[0-9]{11}$')`; `CHECK (applies_from_month IS NULL OR applies_from_month BETWEEN 1 AND 12)`.
 
 #### `withholding_certificates`
 
@@ -2436,9 +2438,9 @@ erDiagram
 #### `fifth_category_refunds`
 
 - **Propósito:** Excesos de retención de quinta devueltos al trabajador y su compensación contra las retenciones del periodo o su devolución ante la administración tributaria.
-- **Columnas clave:** `fiscal_year`, `origin`, `amount` (S), `currency`, `refunded_on`, `compensated_amount`, `compensation_period_code`, `authority_refund_reference`, `status`.
-- **Relaciones:** `employment_id` → `employments`; `payroll_run_id` → `payroll_runs` (opcional); `worker_declaration_document_id` → `documents` (opcional).
-- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; `CHECK (amount > 0)`; `CHECK (compensated_amount >= 0 AND compensated_amount <= amount)`.
+- **Columnas clave:** `fiscal_year`, `origin`, `amount` (S), `currency`, `refunded_on`, `compensated_amount`, `compensation_period_code`, `authority_refund_reference`, `status`, `compensations`.
+- **Relaciones:** `employment_id` → `employments`; `payroll_run_id` → `payroll_runs` (opcional); `worker_declaration_document_id` → `documents` (opcional); `calculated_by_user_id` → `users` (opcional); `refunded_by_user_id` → `users` (opcional).
+- **Reglas:** tabla de organización: `tenant_id`, RLS forzado y claves foráneas compuestas; concurrencia optimista (`lock_version`); **sensible**: permiso por campo y acceso registrado; `CHECK (amount > 0)`; `CHECK (compensated_amount >= 0 AND compensated_amount <= amount)`; `CHECK (refunded_by_user_id IS NULL OR calculated_by_user_id IS NULL OR refunded_by_user_id <> calculated_by_user_id)`.
 
 
 ### PRV · Provisiones y asientos

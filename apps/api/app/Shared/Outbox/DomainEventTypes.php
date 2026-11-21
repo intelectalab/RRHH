@@ -141,6 +141,18 @@ final class DomainEventTypes
     // DEC-3 · RN-DEC-04 · Novedad del T-Registro pendiente con su plazo.
     public const TREGISTRO_PENDING = 'tregistro.pending.v1';
 
+    // DEC-9 · Declaración jurada de rentas de otros empleadores validada: la proyección de quinta la usa desde su mes.
+    public const EXTERNAL_INCOME_VALIDATED = 'external_income.validated.v1';
+
+    // DEC-11 · ME-49 · Devolución de un exceso de retención de quinta.
+    public const FIFTH_REFUND_PAID = 'fifth_category.refund_paid.v1';
+
+    public const FIFTH_REFUND_COMPENSATED = 'fifth_category.refund_compensated.v1';
+
+    public const FIFTH_REFUND_REQUESTED = 'fifth_category.refund_requested.v1';
+
+    public const FIFTH_REFUND_CLOSED = 'fifth_category.refund_closed.v1';
+
     // PER-7 · Anomalías detectadas al comparar el cálculo con el periodo anterior.
     public const PAYROLL_ANOMALY_DETECTED = 'payroll.anomaly_detected.v1';
 
@@ -554,6 +566,31 @@ final class DomainEventTypes
             'version' => 1,
             'required_fields' => ['period_id', 'paid_at', 'batches'],
             'description' => 'Pago del periodo de planilla registrado con sus lotes confirmados',
+        ],
+        self::EXTERNAL_INCOME_VALIDATED => [
+            'version' => 1,
+            'required_fields' => ['declaration_id', 'employment_id', 'fiscal_year', 'applies_from_month'],
+            'description' => 'Declaración jurada de rentas de otros empleadores validada; aplica desde el mes indicado y no rectifica meses cerrados',
+        ],
+        self::FIFTH_REFUND_PAID => [
+            'version' => 1,
+            'required_fields' => ['refund_id', 'employment_id', 'fiscal_year', 'amount'],
+            'description' => 'Exceso de retención de quinta devuelto al trabajador (asiento refund en el libro de retenciones)',
+        ],
+        self::FIFTH_REFUND_COMPENSATED => [
+            'version' => 1,
+            'required_fields' => ['refund_id', 'compensated_amount', 'compensation_period'],
+            'description' => 'Devolución de quinta compensada contra las retenciones del periodo tributario',
+        ],
+        self::FIFTH_REFUND_REQUESTED => [
+            'version' => 1,
+            'required_fields' => ['refund_id', 'authority_refund_reference'],
+            'description' => 'Saldo no compensado de una devolución de quinta solicitado a la administración tributaria',
+        ],
+        self::FIFTH_REFUND_CLOSED => [
+            'version' => 1,
+            'required_fields' => ['refund_id'],
+            'description' => 'Devolución de quinta cerrada (saldo en cero o resolución de la autoridad)',
         ],
         self::FILING_STATUS_CHANGED => [
             'version' => 1,

@@ -190,6 +190,12 @@ final class CrossTenantHarness
         '/declaration-files/{id}/files/{file_id}/file' => StatutoryFiling::class,
         '/bank-file-templates/{id}' => BankFileTemplate::class,
         '/withholding-certificates/{id}/certificate' => WithholdingCertificate::class,
+        // DEC-8 · La ficha del registro laboral y su validación cuelgan de la relación laboral de A (sus códigos dependen
+        // de las tablas paramétricas, que la prueba de aislamiento no siembra).
+        '/employments/{employment_id}/registry-profiles' => Employment::class,
+        '/employments/{employment_id}/registry-profiles/{id}' => Employment::class,
+        '/employments/{employment_id}/registry-profiles/{id}/validate' => Employment::class,
+        '/employments/{employment_id}/registry-validation' => Employment::class,
         '/payroll-payment-batches/{id}' => PayrollPaymentBatch::class,
         '/payroll-payment-batches/{id}/generate' => PayrollPaymentBatch::class,
         '/payroll-payment-batches/{id}/file' => PayrollPaymentBatch::class,

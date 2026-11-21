@@ -395,6 +395,11 @@ final class StatutoryFilings
             'observation' => $f->observation === null ? null : (string) $f->observation,
             'rectification_reason' => $f->rectification_reason === null ? null : (string) $f->rectification_reason,
             'submission_document_id' => $f->submission_document_id === null ? null : (string) $f->submission_document_id,
+            // DEC-7 · Bitácora: responsable, pago y constancia de pago.
+            'responsible_user_id' => $f->responsible_user_id === null ? null : (string) $f->responsible_user_id,
+            'paid_at' => $f->paid_at === null ? null : CarbonImmutable::parse((string) $f->paid_at)->toIso8601ZuluString(),
+            'payment_reference' => $f->payment_reference === null ? null : (string) $f->payment_reference,
+            'payment_document_id' => $f->payment_document_id === null ? null : (string) $f->payment_document_id,
             'files' => $this->filesOf($id),
             'created_at' => CarbonImmutable::parse((string) $f->created_at)->toIso8601ZuluString(),
         ];

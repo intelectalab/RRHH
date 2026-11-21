@@ -10,6 +10,8 @@ export const PORTAL_NAV: ReadonlyArray<{ href: string; key: string; icon: 'home'
   { href: '/mi/documentos', key: 'portal.nav_documents', icon: 'file', exact: true, permission: 'documents.documents.view', module: 'core' },
   // BOL-2 · BOL-3: mis boletas de pago.
   { href: '/mi/boletas', key: 'portal.nav_payslips', icon: 'file', exact: true, permission: null, module: 'payroll' },
+  // DEC-9: declaración jurada de rentas de otros empleadores.
+  { href: '/mi/rentas-otros-empleadores', key: 'portal.nav_external_income', icon: 'file', exact: true, permission: null, module: 'payroll' },
   // DOC-6: firmar desde el teléfono.
   { href: '/mi/firmas', key: 'portal.nav_signatures', icon: 'checkSquare', exact: true, permission: 'documents.signature_requests.sign', module: 'core' },
   { href: '/mi/solicitudes', key: 'portal.nav_requests', icon: 'checkSquare', exact: false, permission: ['people.certificates.request', 'helpdesk.tickets.create'], module: 'core' },

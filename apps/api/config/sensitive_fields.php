@@ -90,7 +90,12 @@ return [
         'closed_payslips' => ['payroll.fifth_category_ledger.view', 'salary'],
         'closed_ledger' => ['payroll.fifth_category_ledger.view', 'salary'],
     ],
-    'FifthCategoryRefund' => ['amount' => ['payroll.fifth_category_refunds.view', 'salary']],
+    'FifthCategoryRefund' => [
+        'amount' => ['payroll.fifth_category_refunds.view', 'salary'],
+        'compensated_amount' => ['payroll.fifth_category_refunds.view', 'salary'],
+        'balance' => ['payroll.fifth_category_refunds.view', 'salary'],
+        'compensations' => ['payroll.fifth_category_refunds.view', 'salary'],
+    ],
     'Grievance' => [
         'description' => ['grievances.cases.view', 'complaint'],
         'protection_measures' => ['grievances.cases.view', 'complaint'],

@@ -48,6 +48,19 @@ final class RegistryEvents
         return ['created' => $created];
     }
 
+    /**
+     * DEC-8 · Novedad de modificación por un cambio en un dato declarable de un trabajador ya dado de alta, con el
+     * plazo del parámetro treg_modificacion_dias_habiles. Una modificación pendiente de la misma fecha no se duplica.
+     */
+    public function addUpdate(string $legalEntityId, string $employmentId, string $date): int
+    {
+        if (DB::table('registry_events')->where('employment_id', $employmentId)->where('kind', 'worker_update')->where('event_date', $date)->where('status', 'pending')->exists()) {
+            return 0;
+        }
+
+        return $this->add($legalEntityId, $employmentId, 'worker_update', $date, 'treg_modificacion_dias_habiles');
+    }
+
     private function has(string $employmentId, string $kind): bool
     {
         return DB::table('registry_events')->where('employment_id', $employmentId)->where('kind', $kind)->exists();
