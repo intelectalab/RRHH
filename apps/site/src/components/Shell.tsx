@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { PRODUCT_COLOR, PRODUCT_SLUGS, type Catalog } from '@/lib/catalog'
+import { PRODUCT_SLUGS, type Catalog } from '@/lib/catalog'
 import { LOCALES, content, href, type Locale } from '@/lib/i18n'
 
 /** Cabecera y pie del sitio: los productos se leen del catálogo; los textos, del contenido del idioma. */
 export function SiteShell({ lang, catalog, path, children }: { lang: Locale; catalog: Catalog | null; path: string; children: ReactNode }) {
   const t = content(lang)
-  const products = (catalog?.products ?? []).filter((p) => (PRODUCT_SLUGS as readonly string[]).includes(p.slug))
+  // Solo los productos que ya están a la venta (los «Próximamente» no ocupan el menú; su página sigue existiendo).
+  const products = (catalog?.products ?? []).filter((p) => (PRODUCT_SLUGS as readonly string[]).includes(p.slug) && p.status !== 'coming_soon')
   return (
     <>
       <a className="skip" href="#contenido">{t.nav.skip}</a>
@@ -17,10 +18,8 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
             <span className="wm">{t.nav.brand_a}<span>{t.nav.brand_b}</span></span>
           </Link>
           <nav className="menu" aria-label={t.nav.products}>
-            {products.map((p) => (
-              <Link key={p.code} href={href(lang, `/${p.slug}`)}>{p.name}</Link>
-            ))}
-            <Link href={href(lang, '/suite')}>{t.nav.suite}</Link>
+            <Link href={`${href(lang, '/')}#como-funciona`}>{t.nav.how}</Link>
+            <Link href={`${href(lang, '/')}#incluye`}>{t.nav.included}</Link>
             <Link href={href(lang, '/precios')}>{t.nav.pricing}</Link>
           </nav>
           <div className="nav-r">
@@ -30,18 +29,14 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
               ))}
             </nav>
             <Link className="nav-login" href={href(lang, '/ingresar')}>{t.nav.login}</Link>
-            <Link className="btn btn-line" href={href(lang, '/demo')}>{t.nav.demo}</Link>
-            <Link className="btn btn-primary" href={`${href(lang, '/precios')}#planes`}>{t.nav.trial}</Link>
+            <Link className="btn btn-primary" href={href(lang, '/demo')}>{t.nav.demo}</Link>
             <details className="mnav">
               <summary aria-label={t.nav.menu}>{'☰'}</summary>
               <div className="mnav-p">
                 <b>{t.nav.products}</b>
                 {products.map((p) => (
-                  <Link key={p.code} href={href(lang, `/${p.slug}`)}>
-                    <span className="sig" style={{ color: PRODUCT_COLOR[p.acronym] }}>{p.acronym}</span> {p.name}
-                  </Link>
+                  <Link key={p.code} href={href(lang, `/${p.slug}`)}>{p.name}</Link>
                 ))}
-                <Link href={href(lang, '/suite')}>{t.nav.suite}</Link>
                 <Link href={href(lang, '/precios')}>{t.nav.pricing}</Link>
                 <Link href={href(lang, '/demo')}>{t.nav.demo}</Link>
                 <Link href={href(lang, '/contacto')}>{t.nav.contact}</Link>
@@ -64,7 +59,6 @@ export function SiteShell({ lang, catalog, path, children }: { lang: Locale; cat
               {products.map((p) => (
                 <li key={p.code}><Link href={href(lang, `/${p.slug}`)}>{p.name}</Link></li>
               ))}
-              <li><Link href={href(lang, '/suite')}>{t.nav.suite}</Link></li>
               <li><Link href={href(lang, '/precios')}>{t.nav.pricing}</Link></li>
             </ul>
           </div>

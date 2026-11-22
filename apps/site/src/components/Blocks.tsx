@@ -43,7 +43,7 @@ export function ProductCard({ lang, catalog, product }: { lang: Locale; catalog:
         </div>
       )}
       <div className="pc-acts">
-        <Link className="btn btn-primary" href={href(lang, `/${product.slug}`)}>{content(lang).home.see_product}</Link>
+        <Link className="btn btn-primary" href={href(lang, `/${product.slug}`)}>{content(lang).home.see_more}</Link>
       </div>
     </article>
   )
@@ -86,12 +86,14 @@ export function Faq({ title, items }: { title: string; items: { q: string; a: st
     <section className="sec-sm" id="preguntas">
       <div className="wrap faq-wrap">
         <h2 className="h2">{title}</h2>
-        {items.map((item) => (
-          <details key={item.q} className="faq">
-            <summary>{item.q}</summary>
-            <p>{item.a}</p>
-          </details>
-        ))}
+        <div>
+          {items.map((item) => (
+            <details key={item.q} className="faq">
+              <summary>{item.q}</summary>
+              <p>{item.a}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   )

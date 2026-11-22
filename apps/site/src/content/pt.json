@@ -1,8 +1,8 @@
 {
   "meta": {
     "home": {
-      "title": "GestiaHR · Software de folha de pagamento e RH para o Peru",
-      "description": "Pessoas, Tempo, Folha, Talentos e Formação em um só sistema. Escolha o produto que precisa hoje e some os demais quando crescer."
+      "title": "GestiaHR · Folha e RH para empresas do Peru",
+      "description": "Calcule a folha com as taxas vigentes, entregue holerites assinados no celular e gere PLAME, AFPnet e T-Registro. Férias, prontuário e contratos no mesmo sistema."
     },
     "suite": {
       "title": "Suíte GestiaHR · HCM · Todos os produtos integrados",
@@ -47,7 +47,9 @@
     "demo": "Agendar demo",
     "contact": "Contato",
     "login": "Entrar",
-    "partners": "Parceiros"
+    "partners": "Parceiros",
+    "how": "Como funciona",
+    "included": "O que inclui"
   },
   "status": {
     "available": "Disponível",
@@ -68,38 +70,134 @@
     "catalog_unavailable": "Os preços não estão disponíveis agora. Tente de novo em alguns minutos."
   },
   "home": {
-    "kicker": "Software de folha de pagamento e RH para o Peru",
-    "title": "Toda a gestão da sua equipe, da contratação ao holerite, em um só sistema.",
-    "subtitle": "Escolha o produto que precisa hoje e some os demais quando crescer. Todos compartilham a mesma ficha do colaborador.",
-    "cta_primary": "Ver planos e preços",
-    "cta_secondary": "Conhecer a Suíte",
-    "fine": "Teste sem cartão · Ajudamos na migração · Suporte em espanhol",
-    "needs_title": "O que você quer resolver?",
-    "products_kicker": "Produtos",
-    "products_title": "Um produto para cada necessidade",
-    "products_lead": "Contrate dentro de um plano ou some depois. Abra cada um para ver as funções e quais planos o incluem.",
-    "see_product": "Ver funções e planos",
-    "plans_kicker": "Planos",
-    "plans_title": "Um plano para cada etapa da sua empresa",
-    "plans_lead": "Todos incluem Gestia Pessoas. Valores e limites vêm sempre do nosso catálogo vigente.",
-    "compare_all": "Comparar tudo",
+    "title": "A folha de pagamento da sua empresa, calculada, entregue e declarada sem planilhas.",
+    "subtitle": "O GestiaHR calcula AFP ou ONP, EsSalud, imposto de quinta categoria, gratificações e CTS com as taxas vigentes, entrega o holerite no celular de cada trabalhador e deixa prontos os arquivos para PLAME e AFPnet.",
+    "cta_demo": "Agendar uma demo",
+    "cta_pricing": "Ver preços",
+    "fine": "Ajudamos você a trazer sua folha atual do Excel ou do seu sistema anterior.",
+    "slip": {
+      "example": "Holerite de exemplo",
+      "company": "Distribuidora Ejemplo S.A.C.",
+      "doc": "Holerite",
+      "period": "Outubro 2026",
+      "worker": "María Quispe Huamán",
+      "position": "Assistente de almoxarifado · Regime geral",
+      "currency": "Valores em soles",
+      "income": "Proventos",
+      "basic": "Salário base",
+      "overtime": "Horas extras a 25 % (6 h)",
+      "total_income": "Total de proventos",
+      "deductions": "Descontos",
+      "pension": "ONP (13 %)",
+      "net": "Líquido a pagar",
+      "employer": "Contribuição do empregador",
+      "health": "EsSalud (9 %)",
+      "signed": "Assinado pela trabalhadora no celular",
+      "amounts": {
+        "basic": "2.400,00",
+        "overtime": "75,00",
+        "total_income": "2.475,00",
+        "pension": "−321,75",
+        "net": "2.153,25",
+        "health": "222,75"
+      }
+    },
+    "month_title": "Como se fecha um mês de folha",
+    "month_lead": "Os mesmos quatro passos todo mês, com todo o detalhe guardado caso a SUNAFIL ou um trabalhador peça.",
+    "steps": [
+      {
+        "t": "Você registra o que aconteceu no mês",
+        "d": "Admissões, desligamentos, faltas, horas extras e férias. Lance no sistema ou envie pelo Excel."
+      },
+      {
+        "t": "O GestiaHR calcula a folha",
+        "d": "Contribuições, descontos, quinta categoria, gratificações e CTS com as taxas vigentes. Antes de fechar mostra o que mudou em relação ao mês anterior e por quê."
+      },
+      {
+        "t": "Você aprova e os holerites são publicados",
+        "d": "Cada trabalhador vê e assina o holerite no celular. A entrega fica registrada."
+      },
+      {
+        "t": "Você declara e paga",
+        "d": "Baixe os arquivos para PLAME, AFPnet e T-Registro, e o arquivo de pagamentos do seu banco."
+      }
+    ],
+    "modules_title": "O que você já pode usar",
+    "modules_lead": "Comece pelo que é mais urgente. Os três usam a mesma ficha de cada trabalhador, então nada é cadastrado duas vezes.",
+    "modules": [
+      {
+        "slug": "personas",
+        "name": "Pessoas e prontuário",
+        "d": "A ficha de cada trabalhador com contratos, documentos e mudanças de cargo ou salário.",
+        "points": [
+          "Contratos e aditivos com aviso antes do vencimento",
+          "Prontuário digital por trabalhador",
+          "Organograma e diretório da empresa"
+        ]
+      },
+      {
+        "slug": "tiempo",
+        "name": "Férias e ausências",
+        "d": "Solicitações pelo celular, aprovação do gestor e saldos que se atualizam sozinhos.",
+        "points": [
+          "Saldo de férias em dia por trabalhador",
+          "Atestados e licenças com comprovante",
+          "Calendário da equipe para ver quem falta"
+        ]
+      },
+      {
+        "slug": "planilla",
+        "name": "Folha Peru",
+        "d": "Regime geral e MYPE, do cálculo ao holerite assinado e à declaração.",
+        "points": [
+          "Gratificações, CTS e rescisões",
+          "Holerites assinados no celular",
+          "Arquivos para PLAME, AFPnet, T-Registro e bancos"
+        ]
+      }
+    ],
+    "see_more": "Ver o que inclui",
+    "portal_title": "Seus trabalhadores resolvem tudo pelo celular",
+    "portal_text": "Veem e assinam o holerite, pedem férias, baixam a declaração de vínculo e atualizam seus dados sem escrever para o RH. Entram com o documento mesmo sem e-mail.",
+    "trust_title": "Os dados da sua folha, bem protegidos",
+    "trust": [
+      {
+        "t": "Cada empresa vê apenas o que é seu",
+        "d": "Os dados da sua organização ficam separados dos de qualquer outra no banco de dados, não só na tela."
+      },
+      {
+        "t": "Salários só para quem deve ver",
+        "d": "Você define quem vê remunerações. Sem a permissão, não chegam nem na tela nem nas exportações."
+      },
+      {
+        "t": "Toda mudança fica registrada",
+        "d": "Quem mudou o quê, quando e de onde, com o valor anterior. Esse registro não pode ser apagado."
+      }
+    ],
+    "plans_title": "Preços",
+    "plans_lead": "Você paga pela quantidade de trabalhadores e pelo que ativar. Pode começar com um teste.",
+    "compare_all": "Ver todos os preços",
     "faq_title": "Perguntas frequentes",
     "faq": [
       {
-        "q": "Posso começar com um produto e somar outros depois?",
-        "a": "Sim. Todos os produtos compartilham a mesma ficha do colaborador, então somar um novo não exige carregar dados de novo."
+        "q": "Preciso instalar algo?",
+        "a": "Não. O GestiaHR funciona no navegador e seus trabalhadores entram pelo celular."
       },
       {
-        "q": "E o que está em breve?",
-        "a": "Você pode pedir que avisemos. Não é cobrado até estar disponível e você ativar."
+        "q": "Posso trazer minha folha atual?",
+        "a": "Sim. Importe trabalhadores, salários e acumulados do ano pelo Excel ou do seu sistema anterior, e calcule um mês em paralelo para comparar antes de mudar."
       },
       {
-        "q": "Meus dados ficam separados dos de outras empresas?",
-        "a": "Sim. Cada organização tem seus dados isolados e todo acesso a dados sensíveis fica registrado."
+        "q": "O que acontece quando muda uma taxa, a UIT ou o salário mínimo?",
+        "a": "Taxas e tetos ficam guardados com a data de vigência e nós os atualizamos. Os meses fechados não mudam."
+      },
+      {
+        "q": "Serve para uma empresa MYPE?",
+        "a": "Sim. Cada trabalhador é calculado conforme o regime da empresa: geral, micro ou pequena empresa."
       }
     ],
-    "closing_title": "Comece a organizar sua equipe hoje",
-    "closing_text": "Escolha um plano, some o que precisar e crie sua organização em minutos."
+    "closing_title": "Veja funcionando com dados como os seus",
+    "closing_text": "Em uma demo de 30 minutos mostramos um mês completo de folha, das ocorrências ao holerite assinado."
   },
   "products": {
     "personas": {

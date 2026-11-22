@@ -1,8 +1,8 @@
 {
   "meta": {
     "home": {
-      "title": "GestiaHR · Software de planillas y RR. HH. para el Perú",
-      "description": "Personas, Tiempo, Planilla, Talento y Formación en un solo sistema. Elige el producto que necesitas hoy y suma los demás cuando crezcas."
+      "title": "GestiaHR · Planilla y RR. HH. para empresas del Perú",
+      "description": "Calcula la planilla con las tasas vigentes, entrega boletas firmadas en el celular y genera PLAME, AFPnet y T-Registro. Vacaciones, legajo y contratos en el mismo sistema."
     },
     "suite": {
       "title": "Suite GestiaHR · HCM · Todos los productos integrados",
@@ -47,7 +47,9 @@
     "demo": "Agendar demo",
     "contact": "Contacto",
     "login": "Ingresar",
-    "partners": "Partners"
+    "partners": "Partners",
+    "how": "Cómo funciona",
+    "included": "Qué incluye"
   },
   "status": {
     "available": "Disponible",
@@ -68,38 +70,134 @@
     "catalog_unavailable": "Los precios no están disponibles en este momento. Vuelve a intentarlo en unos minutos."
   },
   "home": {
-    "kicker": "Software de planillas y RR. HH. para el Perú",
-    "title": "Toda la gestión de tu equipo, de la contratación a la boleta, en un solo sistema.",
-    "subtitle": "Elige el producto que necesitas hoy y suma los demás cuando crezcas. Todos comparten la misma ficha del colaborador.",
-    "cta_primary": "Ver planes y precios",
-    "cta_secondary": "Conocer la Suite",
-    "fine": "Prueba sin tarjeta · Te acompañamos en la migración · Soporte en español",
-    "needs_title": "¿Qué quieres resolver?",
-    "products_kicker": "Productos",
-    "products_title": "Un producto para cada necesidad",
-    "products_lead": "Contrátalos dentro de un plan o súmalos después. Entra a cada uno para ver sus funciones y qué planes lo incluyen.",
-    "see_product": "Ver funciones y planes",
-    "plans_kicker": "Planes",
-    "plans_title": "Un plan para cada etapa de tu empresa",
-    "plans_lead": "Todos incluyen Gestia Personas. Los montos y límites vienen siempre de nuestro catálogo vigente.",
-    "compare_all": "Comparar todo",
+    "title": "La planilla de tu empresa, calculada, entregada y declarada sin Excel.",
+    "subtitle": "GestiaHR calcula AFP u ONP, EsSalud, quinta categoría, gratificaciones y CTS con las tasas vigentes, entrega la boleta en el celular de cada trabajador y te deja listos los archivos para PLAME y AFPnet.",
+    "cta_demo": "Agendar una demo",
+    "cta_pricing": "Ver precios",
+    "fine": "Te ayudamos a pasar tu planilla actual desde Excel o desde tu sistema anterior.",
+    "slip": {
+      "example": "Boleta de ejemplo",
+      "company": "Distribuidora Ejemplo S.A.C.",
+      "doc": "Boleta de pago",
+      "period": "Octubre 2026",
+      "worker": "María Quispe Huamán",
+      "position": "Asistente de almacén · Régimen general",
+      "currency": "Montos en soles",
+      "income": "Ingresos",
+      "basic": "Remuneración básica",
+      "overtime": "Horas extra al 25 % (6 h)",
+      "total_income": "Total ingresos",
+      "deductions": "Descuentos",
+      "pension": "ONP (13 %)",
+      "net": "Neto a pagar",
+      "employer": "Aporte del empleador",
+      "health": "EsSalud (9 %)",
+      "signed": "Firmada por la trabajadora desde su celular",
+      "amounts": {
+        "basic": "2,400.00",
+        "overtime": "75.00",
+        "total_income": "2,475.00",
+        "pension": "−321.75",
+        "net": "2,153.25",
+        "health": "222.75"
+      }
+    },
+    "month_title": "Así se cierra un mes de planilla",
+    "month_lead": "Los mismos cuatro pasos cada mes, con todo el detalle guardado por si SUNAFIL o un trabajador te lo piden.",
+    "steps": [
+      {
+        "t": "Registras lo que pasó en el mes",
+        "d": "Ingresos, ceses, faltas, horas extra y vacaciones. Lo anotas en el sistema o lo subes desde Excel."
+      },
+      {
+        "t": "GestiaHR calcula la planilla",
+        "d": "Aportes, descuentos, quinta categoría, gratificaciones y CTS con las tasas vigentes. Antes de cerrar te muestra qué cambió frente al mes anterior y por qué."
+      },
+      {
+        "t": "Apruebas y se publican las boletas",
+        "d": "Cada trabajador ve su boleta en el celular y la firma. Queda constancia de la entrega."
+      },
+      {
+        "t": "Declaras y pagas",
+        "d": "Descargas los archivos para PLAME, AFPnet y T-Registro, y el archivo de pagos para tu banco."
+      }
+    ],
+    "modules_title": "Lo que ya puedes usar",
+    "modules_lead": "Empieza por lo que más te urge. Los tres trabajan sobre la misma ficha de cada trabajador, así que nada se carga dos veces.",
+    "modules": [
+      {
+        "slug": "personas",
+        "name": "Personas y legajo",
+        "d": "La ficha de cada trabajador con sus contratos, documentos y cambios de puesto o sueldo.",
+        "points": [
+          "Contratos y adendas con aviso antes de que venzan",
+          "Legajo digital ordenado por trabajador",
+          "Organigrama y directorio de la empresa"
+        ]
+      },
+      {
+        "slug": "tiempo",
+        "name": "Vacaciones y ausencias",
+        "d": "Solicitudes desde el celular, aprobación del jefe y saldos que se calculan solos.",
+        "points": [
+          "Saldo de vacaciones al día por trabajador",
+          "Descansos médicos y licencias con su sustento",
+          "Calendario del equipo para ver quién falta"
+        ]
+      },
+      {
+        "slug": "planilla",
+        "name": "Planilla Perú",
+        "d": "Régimen general y MYPE, desde el cálculo hasta la boleta firmada y la declaración.",
+        "points": [
+          "Gratificaciones, CTS y liquidaciones de cese",
+          "Boletas firmadas desde el celular",
+          "Archivos para PLAME, AFPnet, T-Registro y bancos"
+        ]
+      }
+    ],
+    "see_more": "Ver qué incluye",
+    "portal_title": "Tus trabajadores resuelven sus cosas desde el celular",
+    "portal_text": "Ven y firman su boleta, piden vacaciones, descargan su certificado de trabajo y actualizan sus datos sin escribirle a RR. HH. Entran con su DNI aunque no tengan correo.",
+    "trust_title": "Los datos de tu planilla, bien cuidados",
+    "trust": [
+      {
+        "t": "Cada empresa ve solo lo suyo",
+        "d": "Los datos de tu organización están separados de los de cualquier otra en la base de datos, no solo en la pantalla."
+      },
+      {
+        "t": "Los sueldos, solo para quien debe verlos",
+        "d": "Defines quién ve remuneraciones. Quien no tiene el permiso no las recibe ni en la pantalla ni en las exportaciones."
+      },
+      {
+        "t": "Todo cambio queda registrado",
+        "d": "Quién cambió qué, cuándo y desde dónde, con el valor anterior. Ese registro no se puede borrar."
+      }
+    ],
+    "plans_title": "Precios",
+    "plans_lead": "Pagas según la cantidad de trabajadores y lo que actives. Puedes empezar con una prueba.",
+    "compare_all": "Ver todos los precios",
     "faq_title": "Preguntas frecuentes",
     "faq": [
       {
-        "q": "¿Puedo empezar con un producto y sumar otros después?",
-        "a": "Sí. Todos los productos comparten la misma ficha del colaborador, así que al sumar uno nuevo no vuelves a cargar datos."
+        "q": "¿Tengo que instalar algo?",
+        "a": "No. GestiaHR funciona en el navegador y tus trabajadores entran desde el celular."
       },
       {
-        "q": "¿Qué pasa con lo que está en «Próximamente»?",
-        "a": "Puedes pedir que te avisemos. No se cobra hasta que esté disponible y lo actives."
+        "q": "¿Puedo traer mi planilla actual?",
+        "a": "Sí. Importas trabajadores, sueldos y acumulados del año desde Excel o desde tu sistema anterior, y puedes calcular un mes en paralelo para comparar antes de cambiarte."
       },
       {
-        "q": "¿Mis datos están separados de los de otras empresas?",
-        "a": "Sí. Cada organización tiene sus datos aislados y cada acceso a datos sensibles queda registrado."
+        "q": "¿Qué pasa cuando cambia una tasa, la UIT o la remuneración mínima?",
+        "a": "Las tasas y topes se guardan con su fecha de vigencia y los actualizamos nosotros. Los meses ya cerrados no cambian."
+      },
+      {
+        "q": "¿Sirve para una empresa MYPE?",
+        "a": "Sí. Cada trabajador se calcula según el régimen de su empresa: general, micro o pequeña empresa."
       }
     ],
-    "closing_title": "Empieza a ordenar tu equipo hoy",
-    "closing_text": "Elige un plan, suma lo que necesites y crea tu organización en minutos."
+    "closing_title": "Míralo funcionando con datos como los tuyos",
+    "closing_text": "En una demo de 30 minutos te mostramos un mes de planilla completo, de las incidencias a la boleta firmada."
   },
   "products": {
     "personas": {

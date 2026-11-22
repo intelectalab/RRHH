@@ -15595,7 +15595,7 @@ INSERT INTO modules (code, name, phase, is_core, epic_codes, description) VALUES
   ('whatsapp', 'WhatsApp', 9, false, ARRAY['WHA'], 'Épicas: WHA.'),
   ('white_label', 'Marca blanca', 9, false, ARRAY['WLB'], 'Épicas: WLB.'),
   ('partner', 'Estudio contable', 9, false, ARRAY['EST'], 'Épicas: EST.');
-UPDATE modules SET is_published = true, published_at = now() WHERE code IN ('base', 'core', 'time_off');
+UPDATE modules SET is_published = true, published_at = now() WHERE code IN ('base', 'core', 'time_off', 'payroll');
 INSERT INTO module_dependencies (module_code, depends_on_code, is_required) VALUES
   ('core', 'base', true),
   ('attendance', 'core', true),

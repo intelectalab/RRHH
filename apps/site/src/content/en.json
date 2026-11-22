@@ -1,8 +1,8 @@
 {
   "meta": {
     "home": {
-      "title": "GestiaHR · Payroll and HR software for Peru",
-      "description": "People, Time, Payroll, Talent and Learning in one system. Pick the product you need today and add the rest as you grow."
+      "title": "GestiaHR · Payroll and HR for companies in Peru",
+      "description": "Calculate payroll with current rates, deliver signed payslips to phones and generate PLAME, AFPnet and T-Registro files. Vacations, employee records and contracts in the same system."
     },
     "suite": {
       "title": "GestiaHR Suite · HCM · All products integrated",
@@ -47,7 +47,9 @@
     "demo": "Book a demo",
     "contact": "Contact",
     "login": "Log in",
-    "partners": "Partners"
+    "partners": "Partners",
+    "how": "How it works",
+    "included": "What's included"
   },
   "status": {
     "available": "Available",
@@ -68,38 +70,134 @@
     "catalog_unavailable": "Prices are not available right now. Please try again in a few minutes."
   },
   "home": {
-    "kicker": "Payroll and HR software for Peru",
-    "title": "Manage your whole team, from hiring to payslip, in one system.",
-    "subtitle": "Pick the product you need today and add the rest as you grow. They all share the same employee record.",
-    "cta_primary": "See plans and pricing",
-    "cta_secondary": "Explore the Suite",
-    "fine": "No card needed for the trial · We help you migrate · Support in Spanish",
-    "needs_title": "What do you need to solve?",
-    "products_kicker": "Products",
-    "products_title": "A product for every need",
-    "products_lead": "Get them inside a plan or add them later. Open each one to see its features and which plans include it.",
-    "see_product": "See features and plans",
-    "plans_kicker": "Plans",
-    "plans_title": "A plan for every stage of your company",
-    "plans_lead": "Every plan includes Gestia People. Amounts and limits always come from our current catalog.",
-    "compare_all": "Compare everything",
+    "title": "Your company's payroll, calculated, delivered and filed without spreadsheets.",
+    "subtitle": "GestiaHR calculates AFP or ONP, EsSalud, fifth-category tax, bonuses and CTS with current rates, delivers each payslip to the employee's phone and prepares the files for PLAME and AFPnet.",
+    "cta_demo": "Book a demo",
+    "cta_pricing": "See pricing",
+    "fine": "We help you move your current payroll over from Excel or your previous system.",
+    "slip": {
+      "example": "Sample payslip",
+      "company": "Distribuidora Ejemplo S.A.C.",
+      "doc": "Payslip",
+      "period": "October 2026",
+      "worker": "María Quispe Huamán",
+      "position": "Warehouse assistant · General regime",
+      "currency": "Amounts in soles",
+      "income": "Earnings",
+      "basic": "Base salary",
+      "overtime": "Overtime at 25 % (6 h)",
+      "total_income": "Total earnings",
+      "deductions": "Deductions",
+      "pension": "ONP (13 %)",
+      "net": "Net pay",
+      "employer": "Employer contribution",
+      "health": "EsSalud (9 %)",
+      "signed": "Signed by the employee on her phone",
+      "amounts": {
+        "basic": "2,400.00",
+        "overtime": "75.00",
+        "total_income": "2,475.00",
+        "pension": "−321.75",
+        "net": "2,153.25",
+        "health": "222.75"
+      }
+    },
+    "month_title": "How a payroll month gets closed",
+    "month_lead": "The same four steps every month, with every detail kept in case SUNAFIL or an employee asks.",
+    "steps": [
+      {
+        "t": "You record what happened this month",
+        "d": "Hires, terminations, absences, overtime and vacations. Enter them in the system or upload them from Excel."
+      },
+      {
+        "t": "GestiaHR calculates payroll",
+        "d": "Contributions, deductions, fifth-category tax, bonuses and CTS with current rates. Before closing it shows what changed from last month and why."
+      },
+      {
+        "t": "You approve and payslips are published",
+        "d": "Each employee sees and signs their payslip on their phone. Delivery is recorded."
+      },
+      {
+        "t": "You file and pay",
+        "d": "Download the files for PLAME, AFPnet and T-Registro, and the payment file for your bank."
+      }
+    ],
+    "modules_title": "What you can use today",
+    "modules_lead": "Start with what you need most. All three work on the same employee record, so nothing is entered twice.",
+    "modules": [
+      {
+        "slug": "personas",
+        "name": "People and records",
+        "d": "Each employee's record with contracts, documents and changes in position or salary.",
+        "points": [
+          "Contracts and amendments with alerts before they expire",
+          "Digital employee file",
+          "Org chart and company directory"
+        ]
+      },
+      {
+        "slug": "tiempo",
+        "name": "Vacations and leave",
+        "d": "Requests from the phone, manager approval and balances that update on their own.",
+        "points": [
+          "Up-to-date vacation balance per employee",
+          "Medical leave and permits with their support",
+          "Team calendar to see who is out"
+        ]
+      },
+      {
+        "slug": "planilla",
+        "name": "Peru payroll",
+        "d": "General and MYPE regimes, from calculation to signed payslip and filing.",
+        "points": [
+          "Bonuses, CTS and termination settlements",
+          "Payslips signed from the phone",
+          "Files for PLAME, AFPnet, T-Registro and banks"
+        ]
+      }
+    ],
+    "see_more": "See what's included",
+    "portal_title": "Your employees handle their own requests from their phone",
+    "portal_text": "They see and sign their payslip, request vacations, download their employment certificate and update their details without emailing HR. They sign in with their ID even without an email address.",
+    "trust_title": "Your payroll data, well protected",
+    "trust": [
+      {
+        "t": "Each company sees only its own data",
+        "d": "Your organization's data is separated from any other's in the database, not just on screen."
+      },
+      {
+        "t": "Salaries only for those who should see them",
+        "d": "You decide who sees pay. Without the permission it isn't sent, on screen or in exports."
+      },
+      {
+        "t": "Every change is recorded",
+        "d": "Who changed what, when and from where, with the previous value. That record can't be deleted."
+      }
+    ],
+    "plans_title": "Pricing",
+    "plans_lead": "You pay by number of employees and what you turn on. You can start with a trial.",
+    "compare_all": "See all pricing",
     "faq_title": "Frequently asked questions",
     "faq": [
       {
-        "q": "Can I start with one product and add others later?",
-        "a": "Yes. All products share the same employee record, so adding one does not mean loading data again."
+        "q": "Do I need to install anything?",
+        "a": "No. GestiaHR runs in the browser and your employees use it from their phones."
       },
       {
-        "q": "What about what is coming soon?",
-        "a": "You can ask us to let you know. It is not charged until it is available and you turn it on."
+        "q": "Can I bring my current payroll?",
+        "a": "Yes. Import employees, salaries and year-to-date totals from Excel or your previous system, and run a month in parallel to compare before switching."
       },
       {
-        "q": "Is my data separate from other companies?",
-        "a": "Yes. Each organization's data is isolated and every access to sensitive data is logged."
+        "q": "What happens when a rate, the UIT or the minimum wage changes?",
+        "a": "Rates and caps are stored with their effective date and we keep them updated. Closed months don't change."
+      },
+      {
+        "q": "Does it work for a MYPE company?",
+        "a": "Yes. Each employee is calculated under their company's regime: general, micro or small business."
       }
     ],
-    "closing_title": "Start organizing your team today",
-    "closing_text": "Pick a plan, add what you need and create your organization in minutes."
+    "closing_title": "See it working with data like yours",
+    "closing_text": "In a 30-minute demo we walk you through a full payroll month, from inputs to the signed payslip."
   },
   "products": {
     "personas": {

@@ -1,0 +1,105 @@
+/* Portada del sitio comercial. Una sola pieza protagonista (la boleta de ejemplo); el resto, tipografía y espacio. */
+
+.btn-lg{padding:14px 24px;font-size:16px}
+
+/* Portada: titular a la izquierda, boleta a la derecha que baja sobre la sección siguiente. */
+.hx{background:var(--bg-2);border-bottom:1px solid var(--line);padding:72px 0 0}
+.hx-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:64px;align-items:start}
+.hx-txt{padding-bottom:88px}
+.hx h1{font-size:clamp(34px,4.6vw,54px);font-weight:600;line-height:1.08;letter-spacing:-.025em;color:var(--navy-dd);max-width:15ch}
+.hx-sub{font-size:19px;line-height:1.6;color:var(--ink-2);margin-top:24px;max-width:56ch}
+.hx-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.hx-fine{margin-top:18px;font-size:14.5px;color:var(--mut);max-width:52ch}
+
+/* Boleta de pago de ejemplo */
+.slip{position:relative;background:#fff;border:1px solid #CFD8E3;border-radius:4px;padding:28px 28px 22px;margin-bottom:-56px;
+  box-shadow:0 1px 0 #E4E9F0,0 24px 48px -24px rgba(6,32,63,.28);font-variant-numeric:tabular-nums}
+.slip::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:var(--navy);border-radius:4px 4px 0 0}
+.slip-tag{position:absolute;top:-30px;left:0;font-size:13px;color:var(--mut)}
+.slip-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.slip-head b{display:block;font-size:15px;color:var(--ink)}
+.slip-head span{font-size:13.5px;color:var(--mut)}
+.slip-period{font-size:14px;font-weight:600;color:var(--navy)!important;white-space:nowrap}
+.slip-who{padding:14px 0;border-bottom:1px solid var(--line)}
+.slip-who b{display:block;font-size:16px}
+.slip-who span{font-size:13.5px;color:var(--mut)}
+.slip-t{width:100%;border-collapse:collapse;margin-top:6px;font-size:14.5px}
+.slip-t caption{caption-side:top;text-align:right;font-size:12.5px;color:var(--mut);padding:8px 0 0}
+.slip-t td{padding:5px 0;color:var(--ink-2)}
+.slip-t td:last-child{text-align:right;color:var(--ink)}
+.slip-t .grp th{text-align:left;font-size:13px;font-weight:600;color:var(--navy);padding:14px 0 4px}
+.slip-t .sub td{border-top:1px dashed #CFD8E3;font-weight:600;color:var(--ink)}
+.slip-t .net td{background:var(--green-soft);color:var(--green);font-weight:700;font-size:17px;padding:10px 12px}
+.slip-t .net td:first-child{border-radius:4px 0 0 4px}
+.slip-t .net td:last-child{border-radius:0 4px 4px 0;color:var(--green)}
+.slip-sign{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ok)}
+.slip-sign .tick{width:16px;height:16px;border-radius:50%;background:var(--ok);position:relative;flex:none}
+.slip-sign .tick::after{content:"";position:absolute;left:5px;top:3px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+/* Encabezados de sección */
+.hs-h{font-size:clamp(26px,3vw,36px);font-weight:600;letter-spacing:-.015em;color:var(--navy-dd);max-width:24ch}
+.hs-h-sm{font-size:clamp(22px,2.4vw,28px)}
+.hs-lead{font-size:18px;color:var(--ink-2);margin-top:14px;max-width:60ch}
+
+/* Un mes de planilla: secuencia real de cuatro pasos */
+.hm{padding:136px 0 88px}
+.hsteps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:48px;position:relative}
+.hsteps::before{content:"";position:absolute;left:20px;right:20px;top:20px;height:2px;background:var(--line)}
+.hsteps li{position:relative;padding-right:28px}
+.hsteps .n{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#fff;border:2px solid var(--navy);color:var(--navy);font-weight:700;font-size:17px;position:relative}
+.hsteps h3{font-size:18px;font-weight:600;margin-top:20px;color:var(--ink)}
+.hsteps p{font-size:15.5px;color:var(--ink-2);margin-top:8px}
+
+/* Lo que ya se puede usar: columnas separadas por una línea, sin tarjetas */
+.hmod{padding:88px 0;background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.mods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:44px}
+.mod{padding:4px 32px 4px 0;display:flex;flex-direction:column}
+.mod+.mod{padding-left:32px;border-left:1px solid #D3DBE6}
+.mod h3{font-size:21px;font-weight:600;color:var(--navy-dd)}
+.mod p{font-size:16px;color:var(--ink-2);margin-top:10px}
+.mod ul{list-style:none;margin-top:18px;display:grid;gap:10px;flex:1}
+.mod li{font-size:15px;color:var(--ink);padding-left:22px;position:relative}
+.mod li::before{content:"";position:absolute;left:2px;top:7px;width:9px;height:5px;border:solid var(--green);border-width:0 0 2px 2px;transform:rotate(-45deg)}
+.mod-more{margin-top:24px;font-weight:600;color:var(--navy);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;align-self:flex-start}
+.mod-more:hover{text-decoration-thickness:2px}
+
+/* Portal y confianza */
+.hpor{padding:96px 0}
+.hpor-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px}
+.hguard{margin-top:24px;display:grid;gap:0}
+.hguard div{padding:18px 0;border-top:1px solid var(--line)}
+.hguard dt{font-weight:600;font-size:16.5px;color:var(--ink)}
+.hguard dd{font-size:15.5px;color:var(--ink-2);margin-top:4px}
+
+/* Precios */
+.hplans{padding:88px 0;background:var(--bg-2);border-top:1px solid var(--line)}
+.hplans-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:32px}
+
+/* Cierre */
+.hclose{background:var(--navy-dd);color:#fff;padding:64px 0}
+.hclose-in{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
+.hclose h2{color:#fff;font-size:clamp(24px,2.8vw,32px);font-weight:600;letter-spacing:-.015em}
+.hclose p{color:#C8D5E8;font-size:17px;margin-top:8px;max-width:54ch}
+
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+@media (max-width:960px){
+  .hx{padding-top:48px}
+  .hx-grid{grid-template-columns:1fr;gap:56px}
+  .hx-txt{padding-bottom:0}
+  .slip{margin-bottom:-40px;max-width:520px}
+  .hm{padding-top:104px}
+  .hsteps{grid-template-columns:1fr 1fr;row-gap:40px}
+  .hsteps::before{display:none}
+  .mods{grid-template-columns:1fr}
+  .mod,.mod+.mod{padding:24px 0;border-left:0}
+  .mod+.mod{border-top:1px solid #D3DBE6}
+  .hpor-grid{grid-template-columns:1fr;gap:48px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .hx-sub{font-size:17px}
+  .slip{padding:24px 18px 18px}
+  .hsteps{grid-template-columns:1fr}
+  .hx-ctas .btn{flex:1;justify-content:center}
+}
