@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from 'playwright/test'
-import { call, completeAppMfa, EMAIL, generatedPassword, mailedMatch, mailLogOffset, PASSWORD, signInWithEmail } from './support'
+import { call, completeAppMfa, EMAIL, generatedPassword, mailedMatch, mailLogOffset, PASSWORD, signInWithEmail, skipTour } from './support'
 
 /**
  * QA-2 · Vacaciones de punta a punta y firma electrónica por la bandeja, con tres personas de la demo:
@@ -23,6 +23,8 @@ async function activate(browser: Browser, docNumber: string, code: string): Prom
   await page.locator('form button[type="submit"]').first().click()
   await page.waitForURL((u) => !u.pathname.startsWith('/activar-cuenta'))
   await completeAppMfa(page, `dni-${docNumber}`)
+  // Primer ingreso: el recorrido del rol se abre solo y tapa la pantalla.
+  await skipTour(page, 8_000)
   return page
 }
 
@@ -113,6 +115,7 @@ test('vacaciones de punta a punta y firma electrónica por la bandeja', async ({
   const end = new Date(start)
   end.setUTCDate(end.getUTCDate() + 6)
   await emp.goto('/tiempo/vacaciones')
+  await skipTour(emp)
   await emp.getByRole('button', { name: 'Solicitar vacaciones' }).click()
   // Con una sola relación laboral propia, el formulario la preselecciona al cargar.
   await expect(emp.locator('#vr-employment_id')).toHaveValue(employmentId)
@@ -132,6 +135,7 @@ test('vacaciones de punta a punta y firma electrónica por la bandeja', async ({
   const approveFromInbox = async (approver: Page) => {
     await approver.goto('/aprobaciones')
     await expect(approver.locator('#contenido').getByText(who).first()).toBeVisible({ timeout: 15_000 })
+    await skipTour(approver)
     const approveButton = approver.getByRole('button', { name: 'Aprobar', exact: true })
     // Se toma la fila más interna que tiene al solicitante y el botón Aprobar.
     const card = approver.locator('#contenido *').filter({ hasText: who }).filter({ has: approveButton }).last()

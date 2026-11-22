@@ -20,5 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DemoPeopleSeeder::class);
         // IMP-5 · Historia demo: vacaciones, descanso médico, promoción programada y un cese, con fechas relativas.
         $this->call(DemoStorySeeder::class);
+        // Planilla demo: dos meses cerrados con boletas, el mes en curso abierto y la liquidación del cese.
+        $this->call(DemoPayrollSeeder::class);
     }
 }

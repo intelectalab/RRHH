@@ -194,3 +194,18 @@ export async function mailedLink(to: string, path: string, timeout = 30_000): Pr
   }
   throw new Error(`No llegó a ${to} un correo con ${path} (bitácora ${MAIL_LOG}).`)
 }
+
+/**
+ * El recorrido guiado del rol se abre solo en el primer ingreso y tapa la pantalla: se salta si aparece (espera
+ * unos segundos a que cargue; si no aparece, sigue).
+ */
+export async function skipTour(page: Page, timeout = 5_000): Promise<void> {
+  const skip = page.getByRole('button', { name: 'Saltar', exact: true })
+  try {
+    await skip.waitFor({ state: 'visible', timeout })
+    await skip.click()
+    await skip.waitFor({ state: 'hidden', timeout })
+  } catch {
+    // Sin recorrido pendiente para este usuario.
+  }
+}

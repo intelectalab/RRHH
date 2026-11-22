@@ -63,8 +63,9 @@ class DemoOrganizationSeeder extends Seeder
                 ->first();
             if ($existing !== null) {
                 // Idempotente: un administrador sembrado antes de existir los roles recibe el suyo.
-                if (! $existing->user->roleAssignments()->where('role_id', $adminRole->id)->exists()) {
-                    $existing->user->roleAssignments()->create(['role_id' => $adminRole->id]);
+                $user = $existing->user;
+                if ($user instanceof User && ! $user->roleAssignments()->where('role_id', $adminRole->id)->exists()) {
+                    $user->roleAssignments()->create(['role_id' => $adminRole->id]);
                 }
 
                 return false;
@@ -105,29 +106,33 @@ class DemoOrganizationSeeder extends Seeder
         // IMP-4 · IMP-5 · La organización demo tiene contratado Vacaciones y ausencias (para recorrerlas) y arranca
         // con el paquete del Perú aplicado (idempotente).
         TenancyScope::runAs((string) $tenantId, function (): void {
-            DB::table('tenant_modules')->insertOrIgnore(['tenant_id' => TenancyScope::requireTenant(), 'module_code' => 'time_off',
-                'status' => 'active', 'source' => 'manual', 'activated_at' => now()]);
-            app(ModuleGate::class)->forget();
-            if (! DB::table('tenant_country_packs')->exists()) {
-                app(CountryPackService::class)->apply('pe-base', null);
+            // Y Nómina Perú (régimen general y MYPE) para recorrer la planilla con datos (DemoPayrollSeeder).
+            foreach (['time_off', 'payroll'] as $module) {
+                DB::table('tenant_modules')->insertOrIgnore(['tenant_id' => TenancyScope::requireTenant(), 'module_code' => $module,
+                    'status' => 'active', 'source' => 'manual', 'activated_at' => now()]);
             }
+            app(ModuleGate::class)->forget();
+            // Aplicar el paquete solo crea lo que falta: una demo sembrada antes de activar la planilla recibe sus conceptos.
+            app(CountryPackService::class)->apply('pe-base', null);
         });
 
         // Flujo de vacaciones publicado y tareas de RRHH coherentes con las empresas demo (WFL-1, WFL-8).
         TenancyScope::runAs((string) $tenantId, function () use ($email): void {
             $flows = app(ApprovalFlowService::class);
             $rrhh = Role::query()->where('system_role_code', 'rrhh')->value('id');
+            $companyAdmin = Role::query()->where('system_role_code', 'admin_empresa')->value('id');
             if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'vacation_request')->exists()) {
                 $flow = $flows->create(['name' => 'Vacaciones · aprobación estándar', 'subject_type' => 'vacation_request', 'steps' => ['levels' => [
                     ['name' => 'Jefe directo', 'mode' => 'sequential', 'sla_hours' => 48, 'approvers' => [['kind' => 'manager']]],
-                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                    // El administrador de la empresa también decide: en la demo, sus aprobaciones llegan a su bandeja.
+                    ['name' => 'Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'role', 'role_id' => (string) $rrhh], ['kind' => 'role', 'role_id' => (string) $companyAdmin]]],
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
             // AUS-2: una ausencia solicitada la aprueba el jefe directo o Recursos Humanos (el primero que decida).
             if ($rrhh !== null && ! ApprovalFlow::query()->where('subject_type', 'absence_request')->exists()) {
                 $flow = $flows->create(['name' => 'Ausencias · aprobación estándar', 'subject_type' => 'absence_request', 'steps' => ['levels' => [
-                    ['name' => 'Jefe directo o Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'manager'], ['kind' => 'role', 'role_id' => (string) $rrhh]]],
+                    ['name' => 'Jefe directo o Recursos Humanos', 'mode' => 'parallel_any', 'sla_hours' => 24, 'approvers' => [['kind' => 'manager'], ['kind' => 'role', 'role_id' => (string) $rrhh], ['kind' => 'role', 'role_id' => (string) $companyAdmin]]],
                 ]], 'conditions' => []]);
                 $flows->publish($flow, null);
             }
@@ -139,7 +144,6 @@ class DemoOrganizationSeeder extends Seeder
                 $flows->publish($flow, null);
             }
             // HIS-3: un cambio de sueldo espera la aprobación del administrador de la empresa.
-            $companyAdmin = Role::query()->where('system_role_code', 'admin_empresa')->value('id');
             if ($companyAdmin !== null && ! ApprovalFlow::query()->where('subject_type', 'salary_change')->exists()) {
                 $flow = $flows->create(['name' => 'Cambios de sueldo · aprobación estándar', 'subject_type' => 'salary_change', 'steps' => ['levels' => [
                     ['name' => 'Administración de la empresa', 'mode' => 'parallel_any', 'sla_hours' => 48, 'approvers' => [['kind' => 'role', 'role_id' => (string) $companyAdmin]]],
