@@ -9,7 +9,7 @@ const load = (l: string) => JSON.parse(readFileSync(join(__dirname, `../../messa
 describe('AYU-4 a AYU-7 · ayuda de la organización, consultas y recorridos', () => {
   it('cada párrafo del recorrido es un paso y «Título: texto» separa el título', () => {
     expect(tourSteps('Mi equipo: ve a tus colaboradores.\n\nSin título aquí.')).toEqual([
-      { title: 'Mi equipo', text: 've a tus colaboradores.' },
+      { title: 'Mi equipo', text: 'Ve a tus colaboradores.' },
       { title: null, text: 'Sin título aquí.' },
     ])
   })

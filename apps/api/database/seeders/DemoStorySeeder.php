@@ -7,6 +7,8 @@ use App\Modules\CoreHR\Application\PersonnelActions;
 use App\Modules\CoreHR\Application\TerminationReasonCatalog;
 use App\Modules\CoreHR\Application\TerminationService;
 use App\Modules\CoreHR\Infrastructure\Models\Employment;
+use App\Modules\Identity\Infrastructure\Models\Role;
+use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Vacations\Application\VacationAccrual;
 use App\Modules\Vacations\Application\VacationRequestService;
 use App\Modules\Vacations\Application\VacationScheduling;
@@ -78,6 +80,9 @@ class DemoStorySeeder extends Seeder
             // En aprobación: la bandeja de la jefa de operaciones y de RRHH tiene un pendiente.
             $pendingFor = $by('edwin.huanca');
             if ($pendingFor !== null) {
+                // La pide el propio trabajador desde su cuenta del portal: así la aprobación le llega a RRHH (el administrador
+                // demo) y no queda como «iniciada por mí», que nadie aprueba en su propia bandeja.
+                self::portalUser($pendingFor);
                 $pending = $vacations->create(['employment_id' => $pendingFor->id, 'starts_on' => DemoDates::inDays(35), 'ends_on' => DemoDates::inDays(44),
                     'notes' => 'Viaje familiar a Arequipa.'], $admin);
                 $vacations->submit($pending, 'hr', $admin);
@@ -140,6 +145,7 @@ class DemoStorySeeder extends Seeder
                     continue;
                 }
                 app(VacationAccrual::class)->sync((string) $e->id);
+                self::portalUser($e);
                 try {
                     $vacations->submit($vacations->create(['employment_id' => $e->id, 'starts_on' => DemoDates::inDays($from), 'ends_on' => DemoDates::inDays($to), 'notes' => $note], $admin), 'hr', $admin);
                 } catch (\Throwable) {
@@ -155,5 +161,22 @@ class DemoStorySeeder extends Seeder
                 $scheduling->propose($schedule, (string) $patricia->id, $year.'-02-02', $year.'-02-16', $admin);
             }
         });
+    }
+
+    /**
+     * Cuenta del portal del trabajador, invitada y sin clave (la activa con su código): es quien envía su solicitud.
+     * Idempotente.
+     */
+    public static function portalUser(Employment $e): void
+    {
+        if (DB::table('users')->where('person_id', $e->person_id)->whereNull('deleted_at')->exists()) {
+            return;
+        }
+        $user = User::create(['display_name' => trim((string) DB::table('people')->where('id', $e->person_id)->value(DB::raw("first_names || ' ' || paternal_surname"))),
+            'status' => User::STATUS_INVITED, 'locale' => 'es', 'person_id' => $e->person_id]);
+        $role = Role::query()->where('system_role_code', 'empleado')->value('id');
+        if ($role !== null) {
+            $user->roleAssignments()->create(['role_id' => $role]);
+        }
     }
 }

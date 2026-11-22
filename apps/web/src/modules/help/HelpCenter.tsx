@@ -114,7 +114,7 @@ function TourDialog({ tour, onDone }: { tour: HelpTour; onDone: (status: 'comple
       )}
     >
       <p className="small text-secondary">{t('help.tour_step', { n: i + 1, total: steps.length })}</p>
-      {step.title && <h3 className="panel-sec">{step.title}</h3>}
+      {step.title && <h3 className="tour-step-title">{step.title}</h3>}
       <p>{step.text}</p>
     </Modal>
   )

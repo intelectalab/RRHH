@@ -37,12 +37,19 @@ export type HelpEscalation = {
   created_at: string
 }
 
-/** Cada párrafo del recorrido es un paso: «Título: texto» muestra el título aparte. */
+/**
+ * Cada párrafo del recorrido es un paso: «Título: texto» muestra el título aparte y el texto, que deja de seguir a los
+ * dos puntos, empieza con mayúscula como una oración.
+ */
 export function tourSteps(body: string): Array<{ title: string | null; text: string }> {
   return helpBlocks(body).filter((b) => b.kind === 'p').map((b) => {
     const text = (b as { text: string }).text
     const i = text.indexOf(': ')
-    return i > 0 && i < 60 ? { title: text.slice(0, i), text: text.slice(i + 2) } : { title: null, text }
+    if (i > 0 && i < 60) {
+      const rest = text.slice(i + 2)
+      return { title: text.slice(0, i), text: rest.charAt(0).toLocaleUpperCase() + rest.slice(1) }
+    }
+    return { title: null, text }
   })
 }
 

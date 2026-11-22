@@ -572,6 +572,8 @@
 @media (max-width: 600px) { .form-2col { grid-template-columns: minmax(0, 1fr); } }
 .panel-sec { font-size: var(--fs-s); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--tx2); margin: 20px 0 10px; }
 .panel-sec:first-of-type { margin-top: 4px; }
+/* Título de un paso del recorrido: capitalización normal, como el resto del texto. */
+.tour-step-title { font-size: var(--fs-m); font-weight: 700; color: var(--tx); margin: 8px 0 6px; }
 .consola-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .consola-cifras .card { padding: 14px 16px; }
 .consola-cifras b { display: block; font-size: 24px; line-height: 30px; }
