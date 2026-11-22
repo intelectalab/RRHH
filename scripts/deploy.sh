@@ -8,6 +8,8 @@ cd "$(dirname "$0")/.."
 
 TARGET="${1:-}"
 [ -f .env ] || { echo "Falta .env: copia .env.staging.example a .env y complétalo."; exit 1; }
+envval() { grep -E "^$1=" .env | tail -1 | cut -d= -f2-; }
+DB_USERNAME="$(envval DB_USERNAME)"; DB_DATABASE="$(envval DB_DATABASE)"; BACKUP_DIR="$(envval BACKUP_DIR)"; BACKUP_KEEP_DAYS="$(envval BACKUP_KEEP_DAYS)"
 COMPOSE="docker compose -f docker-compose.prod.yml"
 
 echo "==> 1/7 Código"
@@ -17,7 +19,13 @@ export RELEASE="$(git rev-parse --short HEAD)"
 echo "    versión ${RELEASE}"
 
 echo "==> 2/7 Copia de seguridad previa"
-if $COMPOSE ps --status running postgres 2>/dev/null | grep -q postgres; then scripts/backup.sh pre-deploy; else echo "    (primera instalación, sin base aún)"; fi
+if $COMPOSE ps --status running postgres 2>/dev/null | grep -q postgres \
+  && [ "$($COMPOSE exec -T postgres psql -U "${DB_USERNAME:-gestiahr}" -d "${DB_DATABASE:-gestiahr}" -tAc "select count(*) from tenants" 2>/dev/null | tr -d '[:space:]')" != "0" ] \
+  && $COMPOSE exec -T postgres psql -U "${DB_USERNAME:-gestiahr}" -d "${DB_DATABASE:-gestiahr}" -tAc "select 1 from tenants limit 1" >/dev/null 2>&1; then
+  scripts/backup.sh pre-deploy
+else
+  echo "    (sin datos todavía: no hace falta copia)"
+fi
 
 echo "==> 3/7 Imágenes"
 $COMPOSE build --pull

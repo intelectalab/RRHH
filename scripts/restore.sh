@@ -6,7 +6,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 COMPOSE="docker compose -f docker-compose.prod.yml"
-set -a; . ./.env; set +a
+envval() { grep -E "^$1=" .env | tail -1 | cut -d= -f2-; }
+DB_USERNAME="$(envval DB_USERNAME)"; DB_DATABASE="$(envval DB_DATABASE)"; BACKUP_DIR="$(envval BACKUP_DIR)"; BACKUP_KEEP_DAYS="$(envval BACKUP_KEEP_DAYS)"
 DIR="${BACKUP_DIR:-./backups}"; U="${DB_USERNAME:-gestiahr}"; D="${DB_DATABASE:-gestiahr}"
 CHECK=0; [ "${1:-}" = "--check" ] && { CHECK=1; shift; }
 STAMP="${1:?Indica la copia (STAMP)}"
@@ -34,6 +35,6 @@ $COMPOSE exec -T postgres psql -U "$U" -d postgres -c "select pg_terminate_backe
 $COMPOSE exec -T postgres dropdb -U "$U" "$D"
 $COMPOSE exec -T postgres createdb -U "$U" "$D"
 $COMPOSE exec -T postgres pg_restore -U "$U" -d "$D" --exit-on-error < "$DUMP"
-$COMPOSE run --rm --no-deps -T api sh -c "rm -rf /app/storage/app/* && tar -C /app/storage/app -xzf -" < "$FILES"
+$COMPOSE run --rm --no-deps -T --entrypoint sh api -c "rm -rf /app/storage/app/* && tar -C /app/storage/app -xzf -" < "$FILES"
 $COMPOSE up -d
 echo "Restauración de $STAMP completada."
