@@ -75,10 +75,13 @@ services:
       # Solo en una base nueva: el esquema completo del kit (RLS, roles, catálogos). Después, migraciones.
       - ./kit/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-gestiahr} -d ${DB_DATABASE:-gestiahr}"]
+      # Por TCP: mientras la imagen carga el esquema inicial solo escucha por socket, así que «listo» llega
+      # recién cuando la base acepta conexiones de los demás contenedores.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${DB_USERNAME:-gestiahr} -d ${DB_DATABASE:-gestiahr}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 60
+      start_period: 30s
     networks: [interna]
 
   redis:

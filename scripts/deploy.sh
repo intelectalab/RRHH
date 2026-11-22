@@ -31,7 +31,7 @@ echo "==> 3/7 Imágenes"
 $COMPOSE build --pull
 
 echo "==> 4/7 Base de datos"
-$COMPOSE up -d postgres redis
+$COMPOSE up -d --wait postgres redis
 $COMPOSE run --rm --no-deps api php artisan env:verify
 $COMPOSE run --rm api php artisan migrate --force --no-interaction
 
